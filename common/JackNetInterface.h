@@ -95,7 +95,8 @@ namespace Jack
             virtual int Send(size_t size, int flags) = 0;
             virtual int Recv(size_t size, int flags) = 0;
 
-            virtual void FatalError() = 0;
+            virtual void FatalRecvError() = 0;
+            virtual void FatalSendError() = 0;
 
             int MidiSend(NetMidiBuffer* buffer, int midi_channnels, int audio_channels);
             int AudioSend(NetAudioBuffer* buffer, int audio_channels);
@@ -150,7 +151,8 @@ namespace Jack
 
             bool IsSynched();
 
-            void FatalError();
+            void FatalRecvError();
+            void FatalSendError();
 
         public:
 
@@ -197,7 +199,8 @@ namespace Jack
             int Recv(size_t size, int flags);
             int Send(size_t size, int flags);
 
-            void FatalError();
+            void FatalRecvError();
+            void FatalSendError();
 
             void InitAPI()
             {

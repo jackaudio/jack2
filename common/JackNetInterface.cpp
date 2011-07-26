@@ -23,8 +23,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 using namespace std;
 
-#define PACKET_AVAILABLE_SIZE (fParams.fMtu - sizeof(packet_header_t))
-#define HEADER_SIZE (sizeof(packet_header_t))
 
 /*
  TODO : since midi buffers now uses up to BUFFER_SIZE_MAX frames,
@@ -157,7 +155,7 @@ namespace Jack
             // set global header fields and get the number of midi packets
             fTxHeader.fDataType = 'm';
             uint data_size = buffer->RenderFromJackPorts();
-            fTxHeader.fNumPacket = buffer->GetNumPackets(data_size, PACKET_AVAILABLE_SIZE);
+            fTxHeader.fNumPacket = buffer->GetNumPackets(data_size, PACKET_AVAILABLE_SIZE(&fParams));
 
             for (uint subproc = 0; subproc < fTxHeader.fNumPacket; subproc++) {
                 fTxHeader.fSubCycle = subproc;
@@ -408,10 +406,20 @@ namespace Jack
         mcast_socket.Close();
     }
 
-    void JackNetMasterInterface::FatalError()
+    void JackNetMasterInterface::FatalRecvError()
     {
         // fatal connection issue, exit
-        jack_error("'%s' : %s, exiting", fParams.fName, StrError(NET_ERROR_CODE));
+        jack_error("Recv connection lost error = %s, '%s' exiting", StrError(NET_ERROR_CODE), fParams.fName);
+        // ask to the manager to properly remove the master
+        Exit();
+        // UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
+        ThreadExit();
+    }
+
+     void JackNetMasterInterface::FatalSendError()
+    {
+        // fatal connection issue, exit
+        jack_error("Send connection lost error = %s, '%s' exiting", StrError(NET_ERROR_CODE), fParams.fName);
         // ask to the manager to properly remove the master
         Exit();
         // UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
@@ -430,13 +438,13 @@ namespace Jack
             if (error == NET_NO_DATA) {
                 return 0;
             } else if (error == NET_CONN_ERROR) {
-                FatalError();
+                FatalRecvError();
             } else {
                 jack_error("Error in master receive : %s", StrError(NET_ERROR_CODE));
             }
             */
 
-            FatalError();
+            FatalRecvError();
         }
 
         packet_header_t* header = reinterpret_cast<packet_header_t*>(fRxBuffer);
@@ -454,12 +462,12 @@ namespace Jack
             /*
             net_error_t error = fSocket.GetError();
             if (error == NET_CONN_ERROR) {
-                FatalError();
+                FatalSendError();
             } else {
                 jack_error("Error in master send : %s", StrError(NET_ERROR_CODE));
             }
             */
-            FatalError();
+            FatalSendError();
         }
         return tx_bytes;
     }
@@ -563,7 +571,7 @@ namespace Jack
     {
         // This method contains every step of sync packet informations coding
         // first of all, reset sync packet
-        memset(fTxData, 0, PACKET_AVAILABLE_SIZE);
+        memset(fTxData, 0, PACKET_AVAILABLE_SIZE(&fParams));
 
         // then, first step : transport
         if (fParams.fTransportSync) {
@@ -845,12 +853,12 @@ namespace Jack
                 jack_error("No data, is the master still running ?");
             // if a network error occurs, this exception will restart the driver
             } else if (error == NET_CONN_ERROR) {
-                FatalError();
+                FatalRecvError();
             } else {
                 jack_error("Fatal error in slave receive : %s", StrError(NET_ERROR_CODE));
             }
             */
-            FatalError();
+            FatalRecvError();
         }
 
         packet_header_t* header = reinterpret_cast<packet_header_t*>(fRxBuffer);
@@ -858,9 +866,15 @@ namespace Jack
         return rx_bytes;
     }
 
-    void JackNetSlaveInterface::FatalError()
+    void JackNetSlaveInterface::FatalRecvError()
     {
-        jack_error("Send connection lost");
+        jack_error("Recv connection lost error = %s", StrError(NET_ERROR_CODE));
+        throw JackNetException();
+    }
+
+    void JackNetSlaveInterface::FatalSendError()
+    {
+        jack_error("Send connection lost error = %s", StrError(NET_ERROR_CODE));
         throw JackNetException();
     }
 
@@ -876,12 +890,12 @@ namespace Jack
             net_error_t error = fSocket.GetError();
             // if a network error occurs, this exception will restart the driver
             if (error == NET_CONN_ERROR) {
-                FatalError();
+                FatalSendError();
             } else {
                 jack_error("Fatal error in slave send : %s", StrError(NET_ERROR_CODE));
             }
             */
-            FatalError();
+            FatalSendError();
         }
         return tx_bytes;
     }
@@ -984,7 +998,7 @@ namespace Jack
     {
         // This method contains every step of sync packet informations coding
         // first of all, reset sync packet
-        memset(fTxData, 0, PACKET_AVAILABLE_SIZE);
+        memset(fTxData, 0, PACKET_AVAILABLE_SIZE(&fParams));
         // then first step : transport
         if (fParams.fTransportSync) {
             // desactivated...

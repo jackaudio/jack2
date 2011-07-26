@@ -575,7 +575,7 @@ namespace Jack
         }
 
         //set sync callback
-        jack_set_sync_callback ( fManagerClient, SetSyncCallback, this );
+        jack_set_sync_callback(fManagerClient, SetSyncCallback, this);
 
         //activate the client (for sync callback)
         if (jack_activate(fManagerClient) != 0) {
@@ -583,20 +583,21 @@ namespace Jack
         }
 
         //launch the manager thread
-        if (jack_client_create_thread ( fManagerClient, &fManagerThread, 0, 0, NetManagerThread, this)) {
+        if (jack_client_create_thread(fManagerClient, &fManagerThread, 0, 0, NetManagerThread, this)) {
             jack_error("Can't create the network manager control thread");
         }
     }
 
     JackNetMasterManager::~JackNetMasterManager()
     {
-        jack_log ( "JackNetMasterManager::~JackNetMasterManager" );
-        jack_info ( "Exiting net manager..." );
+        jack_log("JackNetMasterManager::~JackNetMasterManager");
+        jack_info("Exiting net manager...");
         fRunning = false;
-        jack_client_kill_thread ( fManagerClient, fManagerThread );
+        jack_client_kill_thread(fManagerClient, fManagerThread);
         master_list_t::iterator it;
-        for ( it = fMasterList.begin(); it != fMasterList.end(); it++ )
-            delete ( *it );
+        for (it = fMasterList.begin(); it != fMasterList.end(); it++) {
+            delete (*it);
+        }
         fSocket.Close();
         SocketAPIEnd();
     }
@@ -629,10 +630,11 @@ namespace Jack
         //check if each slave is ready to roll
         int ret = 1;
         master_list_it_t it;
-        for (it = fMasterList.begin(); it != fMasterList.end(); it++)
+        for (it = fMasterList.begin(); it != fMasterList.end(); it++) {
             if (!(*it)->IsSlaveReadyToRoll()) {
                 ret = 0;
             }
+        }
         jack_log ( "JackNetMasterManager::SyncCallback returns '%s'", ( ret ) ? "true" : "false" );
         return ret;
     }

@@ -46,6 +46,9 @@ using namespace std;
 
 #define OPTIMIZED_PROTOCOL
 
+#define HEADER_SIZE (sizeof(packet_header_t))
+#define PACKET_AVAILABLE_SIZE(params) ((params)->fMtu - sizeof(packet_header_t))
+
 namespace Jack
 {
     typedef struct _session_params session_params_t;
@@ -562,8 +565,9 @@ namespace Jack
             // Cleanup all JACK ports at the beginning of the cycle
             if (sub_cycle == 0) {
                 for (int port_index = 0; port_index < fNPorts; port_index++) {
-                    if (fPortBuffer[port_index])
+                    if (fPortBuffer[port_index]) {
                         memset(fPortBuffer[port_index], 0, fPeriodSize * sizeof(sample_t));
+                    }
                 }
             }
 
@@ -583,8 +587,9 @@ namespace Jack
                     // Only copy to active ports : read the active port number then audio data
                     int* active_port_address = (int*)(net_buffer + port_index * sub_period_bytes_size);
                     int active_port = (int)(*active_port_address);
-                    if (fPortBuffer[port_index])
+                    if (fPortBuffer[port_index]) {
                         memcpy(fPortBuffer[active_port] + sub_cycle * sub_period_size, (char*)(active_port_address + 1), sub_period_bytes_size - sizeof(int));
+                    }
                 }
 
                 if (sub_cycle != fLastSubCycle + 1) {
@@ -715,6 +720,7 @@ namespace Jack
 
             int fCompressedSizeByte;
             jack_nframes_t fPeriodSize;
+
             int fNumPackets;
             float fCycleDuration;   // in sec
             size_t fCycleSize;      // needed size in bytes for an entire cycle
@@ -734,7 +740,7 @@ namespace Jack
         public:
 
             NetCeltAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer, int kbps);
-            ~NetCeltAudioBuffer();
+            virtual ~NetCeltAudioBuffer();
 
             // needed size in bytes for an entire cycle
             size_t GetCycleSize();
@@ -770,12 +776,12 @@ namespace Jack
 
             size_t fSubPeriodSize;
             size_t fSubPeriodBytesSize;
-            size_t fLastSubPeriodSize;;
+            size_t fLastSubPeriodSize;
             size_t fLastSubPeriodBytesSize;
 
             sample_t** fPortBuffer;
             char* fNetBuffer;
-            short ** fIntBuffer;
+            short** fIntBuffer;
 
             int fNPorts;
             int fLastSubCycle;
@@ -783,7 +789,7 @@ namespace Jack
         public:
 
             NetIntAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer);
-            ~NetIntAudioBuffer();
+            virtual ~NetIntAudioBuffer();
 
             // needed size in bytes for an entire cycle
             size_t GetCycleSize();
