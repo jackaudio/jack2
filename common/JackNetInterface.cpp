@@ -362,10 +362,12 @@ namespace Jack
         }
 
         // set the new timeout for the socket
+        /*
         if (SetRxTimeout() == SOCKET_ERROR) {
             jack_error("Can't set rx timeout : %s", StrError(NET_ERROR_CODE));
             goto error;
         }
+        */
 
         // set the new rx buffer size
         if (SetNetBufferSize() == SOCKET_ERROR) {
@@ -841,6 +843,18 @@ namespace Jack
         return false;
     }
 
+    void JackNetSlaveInterface::FatalRecvError()
+    {
+        jack_error("Recv connection lost error = %s", StrError(NET_ERROR_CODE));
+        throw JackNetException();
+    }
+
+    void JackNetSlaveInterface::FatalSendError()
+    {
+        jack_error("Send connection lost error = %s", StrError(NET_ERROR_CODE));
+        throw JackNetException();
+    }
+
     int JackNetSlaveInterface::Recv(size_t size, int flags)
     {
         int rx_bytes = fSocket.Recv(fRxBuffer, size, flags);
@@ -864,18 +878,6 @@ namespace Jack
         packet_header_t* header = reinterpret_cast<packet_header_t*>(fRxBuffer);
         PacketHeaderNToH(header, header);
         return rx_bytes;
-    }
-
-    void JackNetSlaveInterface::FatalRecvError()
-    {
-        jack_error("Recv connection lost error = %s", StrError(NET_ERROR_CODE));
-        throw JackNetException();
-    }
-
-    void JackNetSlaveInterface::FatalSendError()
-    {
-        jack_error("Send connection lost error = %s", StrError(NET_ERROR_CODE));
-        throw JackNetException();
     }
 
     int JackNetSlaveInterface::Send(size_t size, int flags)

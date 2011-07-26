@@ -61,20 +61,28 @@ bool JackWaitThreadedDriver::Execute()
             fDriver->Process();
         }
         return false;
+
     } catch (JackNetException& e) {
+
         e.PrintMessage();
         jack_info("Driver is restarted");
         fThread.DropSelfRealTime();
+
+        // Thread has been stopped...
+        if (fThread.GetStatus() == JackThread::kIdle) {
+            return false;
+        }
+
         // Thread in kIniting status again...
         fThread.SetStatus(JackThread::kIniting);
         if (Init()) {
             // Thread in kRunning status again...
             fThread.SetStatus(JackThread::kRunning);
             return true;
-        } else {
-            return false;
         }
-	}
+
+        return false;
+    }
 }
 
 } // end of namespace

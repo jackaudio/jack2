@@ -424,13 +424,17 @@ namespace Jack
         for (int audio_port_index = 0; audio_port_index < fParams.fReturnAudioChannels; audio_port_index++) {
 
         #ifdef OPTIMIZED_PROTOCOL
-            fNetAudioPlaybackBuffer->SetBuffer(audio_port_index,
-                                                static_cast<sample_t*>(jack_port_get_buffer_nulled(fAudioPlaybackPorts[audio_port_index],
-                                                fParams.fPeriodSize)));
+            sample_t* out = static_cast<sample_t*>(jack_port_get_buffer_nulled(fAudioPlaybackPorts[audio_port_index], fParams.fPeriodSize));
+            if (out) {
+                memset(out, 0, sizeof(float) * fParams.fPeriodSize);
+            }
+            fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, out);
         #else
-            fNetAudioPlaybackBuffer->SetBuffer(audio_port_index,
-                                                static_cast<sample_t*>(jack_port_get_buffer(fAudioPlaybackPorts[audio_port_index],
-                                                fParams.fPeriodSize)));
+            sample_t* out = static_cast<sample_t*>(jack_port_get_buffer(fAudioPlaybackPorts[audio_port_index], fParams.fPeriodSize));
+            if (out) {
+                memset(out, 0, sizeof(float) * fParams.fPeriodSize);
+            }
+            fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, out)));
         #endif
         }
 

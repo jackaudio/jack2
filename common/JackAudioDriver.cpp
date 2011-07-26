@@ -284,13 +284,13 @@ int JackAudioDriver::ProcessSync()
     // Process graph
     if (fIsMaster) {
         if (ProcessGraphSyncMaster() < 0) {
-            jack_error("JackAudioDriver::ProcessSync: process error, skip cycle...");
-            goto end;
+            //jack_error("JackAudioDriver::ProcessSync: process error, skip cycle...");
+            //goto end;
         }
     } else {
         if (ProcessGraphSyncSlave() < 0) {
-            jack_error("JackAudioDriver::ProcessSync: process error, skip cycle...");
-            goto end;
+            //jack_error("JackAudioDriver::ProcessSync: process error, skip cycle...");
+            //goto end;
         }
     }
 

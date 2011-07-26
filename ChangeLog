@@ -37,6 +37,10 @@ Chris Caudle
 
 2011-07-25 Stephane Letz  <letz@grame.fr>
 
+	* NetJack2: no more timeout, correct JackWaitThreadedDriver::Execute. 
+
+2011-07-25 Stephane Letz  <letz@grame.fr>
+
 	* NetJack2: improve latency management, cleanup. 
 
 2011-07-23 Stephane Letz  <letz@grame.fr>
