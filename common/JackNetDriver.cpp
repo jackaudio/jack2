@@ -640,7 +640,8 @@ namespace Jack
             char net_name[JACK_CLIENT_NAME_SIZE + 1];
             int udp_port;
             int mtu = DEFAULT_MTU;
-            uint transport_sync = 1;
+            // Desactivated for now...
+            uint transport_sync = 0;
             jack_nframes_t period_size = 128;
             jack_nframes_t sample_rate = 48000;
             int audio_capture_ports = -1;

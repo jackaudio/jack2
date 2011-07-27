@@ -26,15 +26,16 @@ namespace Jack
 {
 
 #define DEFAULT_MULTICAST_IP "225.3.19.154"
-#define DEFAULT_PORT 19000
-#define DEFAULT_MTU 1500
+#define DEFAULT_PORT    19000
+#define DEFAULT_MTU     1500
 
-#define SLAVE_SETUP_RETRY 5
+#define SLAVE_SETUP_RETRY   5
 
-#define MASTER_INIT_TIMEOUT 1000000     // in usec
-#define SLAVE_INIT_TIMEOUT 1000000      // in usec
+#define MANAGER_INIT_TIMEOUT    2000000      // in usec
+#define MASTER_INIT_TIMEOUT     1000000     // in usec
+#define SLAVE_INIT_TIMEOUT      1000000      // in usec
 
-#define NETWORK_MAX_LATENCY 20
+#define NETWORK_MAX_LATENCY     20
 
     /**
     \Brief This class describes the basic Net Interface, used by both master and slave

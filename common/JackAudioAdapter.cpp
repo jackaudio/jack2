@@ -42,9 +42,12 @@ namespace Jack
         // Always clear output
         for (int i = 0; i < adapter->fAudioAdapter->GetInputs(); i++) {
         #ifdef OPTIMIZED_PROTOCOL
-            inputBuffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer_nulled(adapter->fCapturePortList[i], frames);
-            if (inputBuffer[i])
+            inputBuffer[i] = (jack_port_connected(adapter->fCapturePortList[i]) > 0)
+                ? (jack_default_audio_sample_t*)(adapter->fCapturePortList[i], frames)
+                : NULL;
+            if (inputBuffer[i]) {
                 memset(inputBuffer[i], 0, frames * sizeof(jack_default_audio_sample_t));
+            }
         #else
             inputBuffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(adapter->fCapturePortList[i], frames);
             memset(inputBuffer[i], 0, frames * sizeof(jack_default_audio_sample_t));
@@ -53,7 +56,9 @@ namespace Jack
 
         for (int i = 0; i < adapter->fAudioAdapter->GetOutputs(); i++) {
         #ifdef OPTIMIZED_PROTOCOL
-            outputBuffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer_nulled(adapter->fPlaybackPortList[i], frames);
+            outputBuffer[i] = (jack_port_connected(fAudioCapturePorts[audio_port_index] > 0)
+                ? (jack_default_audio_sample_t*)jack_port_get_buffer(adapter->fPlaybackPortList[i], frames)
+                : NULL;
         #else
             outputBuffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(adapter->fPlaybackPortList[i], frames);
         #endif

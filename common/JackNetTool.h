@@ -390,8 +390,9 @@ namespace Jack
 
         void Copy(sample_t** buffers)
         {
-            for (int port_index = 0; port_index < fNPorts; port_index++)
+            for (int port_index = 0; port_index < fNPorts; port_index++) {
                 memcpy(buffers[port_index], fPortBuffer[port_index], fPeriodSize * sizeof(float));
+            }
         }
 
         // needed syze in bytes for an entire cycle

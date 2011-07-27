@@ -41,6 +41,7 @@ namespace Jack
         GetHostName(fParams.fName, JACK_CLIENT_NAME_SIZE);
         fSocket.GetName(fParams.fSlaveNetName);
         fParams.fMtu = DEFAULT_MTU;
+        // Desactivated for now...
         fParams.fTransportSync = 0;
         int send_audio = -1;
         int return_audio = -1;
