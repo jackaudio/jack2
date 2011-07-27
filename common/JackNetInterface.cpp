@@ -318,6 +318,7 @@ namespace Jack
 
                     case JackFloatEncoder:
                         fNetAudioCaptureBuffer = new NetFloatAudioBuffer(&fParams, fParams.fSendAudioChannels, fTxData);
+                        //fNetAudioCaptureBuffer = new NetFloatAudioBuffer1(&fParams, fParams.fSendAudioChannels, fTxData);
                         break;
 
                     case JackIntEncoder:
@@ -340,6 +341,7 @@ namespace Jack
 
                     case JackFloatEncoder:
                         fNetAudioPlaybackBuffer = new NetFloatAudioBuffer(&fParams, fParams.fReturnAudioChannels, fRxData);
+                        //fNetAudioPlaybackBuffer = new NetFloatAudioBuffer1(&fParams, fParams.fReturnAudioChannels, fRxData);
                         break;
 
                     case JackIntEncoder:
@@ -476,7 +478,7 @@ namespace Jack
 
     bool JackNetMasterInterface::IsSynched()
     {
-        return (fCycleOffset <= fMaxCycleOffset);
+        return (fCurrentCycleOffset <= fMaxCycleOffset);
     }
 
     int JackNetMasterInterface::SyncSend()
@@ -520,7 +522,7 @@ namespace Jack
             return SOCKET_ERROR;
         }
 
-        fCycleOffset = fTxHeader.fCycle - rx_head->fCycle;
+        fCurrentCycleOffset = fTxHeader.fCycle - rx_head->fCycle;
         */
 
         // receive sync (launch the cycle)
@@ -533,7 +535,7 @@ namespace Jack
         }
         while ((strcmp(rx_head->fPacketType, "header") != 0) && (rx_head->fDataType != 's'));
 
-        fCycleOffset = fTxHeader.fCycle - rx_head->fCycle;
+        fCurrentCycleOffset = fTxHeader.fCycle - rx_head->fCycle;
 
         /*
         // Read active ports list
@@ -542,8 +544,8 @@ namespace Jack
         }
         */
 
-        if (fCycleOffset < fMaxCycleOffset) {
-            jack_info("Synching with latency = %d", fCycleOffset);
+        if (fCurrentCycleOffset < fMaxCycleOffset) {
+            jack_info("Synching with latency = %d", fCurrentCycleOffset);
             return 0;
         } else {
             rx_bytes = Recv(rx_head->fPacketSize, 0);
@@ -592,13 +594,13 @@ namespace Jack
     void JackNetMasterInterface::EncodeSyncPacket()
     {
         // This method contains every step of sync packet informations coding
-        // first of all, reset sync packet
+        // first of all, clear sync packet
         memset(fTxData, 0, PACKET_AVAILABLE_SIZE(&fParams));
 
         // then, first step : transport
         if (fParams.fTransportSync) {
             EncodeTransportData();
-            TransportDataHToN(&fSendTransportData,  &fSendTransportData);
+            TransportDataHToN(&fSendTransportData, &fSendTransportData);
             // copy to TxBuffer
             memcpy(fTxData, &fSendTransportData, sizeof(net_transport_data_t));
         }
@@ -676,10 +678,10 @@ namespace Jack
     }
 
     // Separate the connection protocol into two separated step
-    bool JackNetSlaveInterface::InitConnection(int time_out)
+    bool JackNetSlaveInterface::InitConnection(int time_out_sec)
     {
         jack_log("JackNetSlaveInterface::InitConnection()");
-        uint try_count = (time_out > 0) ? ((1000000 * time_out) / SLAVE_INIT_TIMEOUT) : LONG_MAX;
+        uint try_count = (time_out_sec > 0) ? ((1000000 * time_out_sec) / SLAVE_INIT_TIMEOUT) : LONG_MAX;
 
         // set the parameters to send
         strcpy(fParams.fPacketType, "params");
@@ -800,7 +802,8 @@ namespace Jack
     bool JackNetSlaveInterface::SetParams()
     {
         jack_log("JackNetSlaveInterface::SetParams audio in = %d audio out = %d MIDI in = %d MIDI out = %d",
-            fParams.fSendAudioChannels, fParams.fReturnAudioChannels, fParams.fSendMidiChannels, fParams.fReturnMidiChannels);
+                fParams.fSendAudioChannels, fParams.fReturnAudioChannels,
+                fParams.fSendMidiChannels, fParams.fReturnMidiChannels);
 
         JackNetInterface::SetParams();
 
@@ -823,6 +826,7 @@ namespace Jack
 
                     case JackFloatEncoder:
                         fNetAudioCaptureBuffer = new NetFloatAudioBuffer(&fParams, fParams.fSendAudioChannels, fRxData);
+                        //fNetAudioCaptureBuffer = new NetFloatAudioBuffer1(&fParams, fParams.fSendAudioChannels, fRxData);
                         break;
 
                     case JackIntEncoder:
@@ -845,6 +849,7 @@ namespace Jack
 
                     case JackFloatEncoder:
                         fNetAudioPlaybackBuffer = new NetFloatAudioBuffer(&fParams, fParams.fReturnAudioChannels, fTxData);
+                        //fNetAudioPlaybackBuffer = new NetFloatAudioBuffer1(&fParams, fParams.fReturnAudioChannels, fTxData);
                         break;
 
                     case JackIntEncoder:
@@ -1039,13 +1044,13 @@ namespace Jack
     void JackNetSlaveInterface::EncodeSyncPacket()
     {
         // This method contains every step of sync packet informations coding
-        // first of all, reset sync packet
+        // first of all, clear sync packet
         memset(fTxData, 0, PACKET_AVAILABLE_SIZE(&fParams));
 
         // then first step : transport
         if (fParams.fTransportSync) {
             EncodeTransportData();
-            TransportDataHToN(&fReturnTransportData,  &fReturnTransportData);
+            TransportDataHToN(&fReturnTransportData, &fReturnTransportData);
             // copy to TxBuffer
             memcpy(fTxData, &fReturnTransportData, sizeof(net_transport_data_t));
         }
@@ -1083,7 +1088,6 @@ namespace Jack
         if (fNetAudioPlaybackBuffer) {
             fNetAudioPlaybackBuffer->ActivePortsFromNetwork(fRxData, rx_head->fActivePorts);
         }
-
     }
 
 }

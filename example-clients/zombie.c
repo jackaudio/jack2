@@ -54,7 +54,7 @@ main (int argc, char *argv[])
 	jack_client_t* client = NULL;
     /* try to become a client of the JACK server */
 	if ((client = jack_client_open ("zombie", JackNullOption, NULL)) == 0) {
-		fprintf (stderr, "jack server not running?\n");
+		fprintf (stderr, "JACK server not running?\n");
 		goto error;
 	}
 

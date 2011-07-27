@@ -35,6 +35,7 @@ JackPort::JackPort()
 bool JackPort::Allocate(int refnum, const char* port_name, const char* port_type, JackPortFlags flags)
 {
     jack_port_type_id_t id = GetPortTypeId(port_type);
+    assert(id >= 0 && id <= PORT_TYPES_MAX);
     if (id == PORT_TYPES_MAX)
         return false;
     fTypeId = id;

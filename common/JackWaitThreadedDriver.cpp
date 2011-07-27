@@ -25,6 +25,7 @@
 #include "JackEngineControl.h"
 #include "JackException.h"
 #include "JackError.h"
+#include "JackTools.h"
 
 namespace Jack
 {
@@ -47,7 +48,7 @@ bool JackWaitThreadedDriver::Execute()
             jack_log("JackWaitThreadedDriver::Init IsRealTime");
             // Will do "something" on OSX only...
             GetEngineControl()->fPeriod = GetEngineControl()->fConstraint = GetEngineControl()->fPeriodUsecs * 1000;
-            GetEngineControl()->fComputation = ComputationMicroSec(GetEngineControl()->fBufferSize) * 1000;
+            GetEngineControl()->fComputation = JackTools::ComputationMicroSec(GetEngineControl()->fBufferSize) * 1000;
             fThread.SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
             if (fThread.AcquireSelfRealTime(GetEngineControl()->fServerPriority) < 0) {
                 jack_error("AcquireSelfRealTime error");

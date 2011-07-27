@@ -127,7 +127,8 @@ namespace Jack
         protected:
 
             bool fRunning;
-            int fCycleOffset;
+
+            int fCurrentCycleOffset;
             int fMaxCycleOffset;
             int fLastfCycleOffset;
 
@@ -157,7 +158,7 @@ namespace Jack
 
         public:
 
-            JackNetMasterInterface() : JackNetInterface(), fRunning(false), fCycleOffset(0), fMaxCycleOffset(0), fLastfCycleOffset(0)
+            JackNetMasterInterface() : JackNetInterface(), fRunning(false), fCurrentCycleOffset(0), fMaxCycleOffset(0), fLastfCycleOffset(0)
             {}
             JackNetMasterInterface(session_params_t& params, JackNetSocket& socket, const char* multicast_ip)
                     : JackNetInterface(params, socket, multicast_ip)
@@ -179,7 +180,7 @@ namespace Jack
             static uint fSlaveCounter;
 
             bool Init();
-            bool InitConnection(int time_out);
+            bool InitConnection(int time_out_sec);
             bool InitRendering();
 
             net_status_t SendAvailableToMaster(long count = LONG_MAX);  // long here (and not int...)

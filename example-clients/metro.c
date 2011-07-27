@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2002 Anthony Van Groningen
-    
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -69,18 +69,21 @@ usage ()
 }
 
 static void
-process_silence (jack_nframes_t nframes) 
+process_silence (jack_nframes_t nframes)
 {
 	sample_t *buffer = (sample_t *) jack_port_get_buffer (output_port, nframes);
 	memset (buffer, 0, sizeof (jack_default_audio_sample_t) * nframes);
 }
 
+jack_nframes_t last_time;
+jack_time_t last_micro_time;
+
 static void
-process_audio (jack_nframes_t nframes) 
+process_audio (jack_nframes_t nframes)
 {
 	sample_t *buffer = (sample_t *) jack_port_get_buffer (output_port, nframes);
 	jack_nframes_t frames_left = nframes;
-		
+
 	while (wave_length - offset < frames_left) {
 		memcpy (buffer + (nframes - frames_left), wave + offset, sizeof (sample_t) * (wave_length - offset));
 		frames_left -= wave_length - offset;
@@ -90,6 +93,13 @@ process_audio (jack_nframes_t nframes)
 		memcpy (buffer + (nframes - frames_left), wave + offset, sizeof (sample_t) * frames_left);
 		offset += frames_left;
 	}
+
+    jack_nframes_t cur_time = jack_frame_time(client);
+    jack_time_t cur_micro_time = jack_get_time();
+
+    printf("jack_frame_timed %lld  micro %lld delta %d\n", cur_time, (cur_micro_time - last_micro_time), cur_time - last_time);
+    last_time = cur_time;
+    last_micro_time = cur_micro_time;
 }
 
 static int
@@ -141,7 +151,7 @@ main (int argc, char *argv[])
 		{"verbose", 0, 0, 'v'},
 		{0, 0, 0, 0}
 	};
-	
+
 	while ((opt = getopt_long (argc, argv, options, long_options, &option_index)) != EOF) {
 		switch (opt) {
 		case 'f':
@@ -193,7 +203,7 @@ main (int argc, char *argv[])
 			transport_aware = 1;
 			break;
 		default:
-			fprintf (stderr, "unknown option %c\n", opt); 
+			fprintf (stderr, "unknown option %c\n", opt);
 		case 'h':
 			usage ();
 			return -1;
@@ -211,7 +221,7 @@ main (int argc, char *argv[])
 		strcpy (client_name, "metro");
 	}
 	if ((client = jack_client_open (client_name, JackNoStartServer, &status)) == 0) {
-		fprintf (stderr, "jack server not running?\n");
+		fprintf (stderr, "JACK server not running?\n");
 		return 1;
 	}
 	jack_set_process_callback (client, process, 0);
@@ -259,7 +269,7 @@ main (int argc, char *argv[])
 		fprintf (stderr, "cannot activate client\n");
 		goto error;
 	}
-    
+
     /* install a signal handler to properly quits jack client */
 #ifdef WIN32
 	signal(SIGINT, signal_handler);
@@ -280,9 +290,9 @@ main (int argc, char *argv[])
 		sleep(1);
 	#endif
 	};
-	
+
     jack_client_close(client);
-    
+
 error:
     free(amp);
     free(wave);

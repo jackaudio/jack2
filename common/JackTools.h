@@ -68,8 +68,20 @@ namespace Jack
         static void CleanupFiles ( const char* server_name );
         static int GetTmpdir();
         static void RewriteName ( const char* name, char* new_name );
-        
+
         static void ThrowJackNetException();
+
+        // For OSX only
+        static int ComputationMicroSec(int buffer_size)
+        {
+            if (buffer_size < 128) {
+                return 500;
+            } else if (buffer_size < 256) {
+                return 300;
+            } else {
+                return 100;
+            }
+        }
     };
 
     /*!

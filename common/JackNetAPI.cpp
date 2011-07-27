@@ -194,7 +194,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
         }
 
         // Set a timeout on the multicast receive (the thread can now be cancelled)
-        if (fSocket.SetTimeOut(2000000) == SOCKET_ERROR) {
+        if (fSocket.SetTimeOut(MANAGER_INIT_TIMEOUT) == SOCKET_ERROR) {
             fprintf(stderr, "Can't set timeout : %s\n", StrError(NET_ERROR_CODE));
         }
 
@@ -630,7 +630,11 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
     bool Init()
     {
         // Will do "something" on OSX only...
-        fThread.SetParams(UInt64(float(fParams.fPeriodSize)/float(fParams.fSampleRate)*1000000), 100 * 1000, 500 * 1000);
+        UInt64 period, constraint;
+        period = constraint = float(fParams.fPeriodSize) / float(fParams.fSampleRate) * 1000000;
+        UInt64 computation = JackTools::ComputationMicroSec(fParams.fPeriodSize);
+        fThread.SetParams(period, computation, constraint);
+
         return (fThread.AcquireRealTime(80) == 0);      // TODO: get a value from the server
     }
 
@@ -639,8 +643,9 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
         try  {
             // Keep running even in case of error
             while (fThread.GetStatus() == JackThread::kRunning) {
-                if (Process() == SOCKET_ERROR)
+                if (Process() == SOCKET_ERROR) {
                     return false;
+                }
             }
             return false;
         } catch (JackNetException& e) {
@@ -661,10 +666,9 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
 
     int Read()
     {
-        // Don't return -1 in case of sync recv failure
-        // we need the process to continue for network error detection
+        //receive sync (launch the cycle)
         if (SyncRecv() == SOCKET_ERROR) {
-            return 0;
+            return SOCKET_ERROR;
         }
 
         DecodeSyncPacket();
@@ -684,8 +688,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
 
     int Process()
     {
-        // Read data from the network
-        // in case of fatal network error, stop the process
+        // Read data from the network, throw JackNetException in case of network error...
         if (Read() == SOCKET_ERROR) {
             return SOCKET_ERROR;
         }
@@ -701,8 +704,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
                         (void**)fMidiPlaybackBuffer,
                         fProcessArg);
 
-        // Then write data to network
-        // in case of failure, stop process
+        // Then write data to network, throw JackNetException in case of network error...
         if (Write() == SOCKET_ERROR) {
             return SOCKET_ERROR;
         }
@@ -801,8 +803,9 @@ struct JackNetAdapter : public JackAudioAdapterInterface {
             AdaptRingBufferSize();
             jack_info("Ringbuffer automatic adaptative mode size = %d frames", fRingbufferCurSize);
         } else {
-            if (fRingbufferCurSize > DEFAULT_RB_SIZE)
+            if (fRingbufferCurSize > DEFAULT_RB_SIZE) {
                 fRingbufferCurSize = DEFAULT_RB_SIZE;
+            }
             jack_info("Fixed ringbuffer size = %d frames", fRingbufferCurSize);
         }
 

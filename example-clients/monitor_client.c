@@ -42,7 +42,7 @@ main (int argc, char *argv[])
 	}
 
 	if ((client = jack_client_open ("input monitoring", JackNullOption, NULL)) == 0) {
-		fprintf (stderr, "jack server not running?\n");
+		fprintf (stderr, "JACK server not running?\n");
 		return 1;
 	}
 

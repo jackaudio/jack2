@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
 
     //if ((net = jack_net_slave_open("169.254.112.119", DEFAULT_PORT, "iPhone", &request, &result))  == 0) {
     if ((net = jack_net_slave_open(DEFAULT_MULTICAST_IP, DEFAULT_PORT, "iPod", &request, &result))  == 0) {
-        printf("jack_net_slave_open error..\n");
+        printf("jack_net_slave_open error...\n");
         return -1;
     }
 
@@ -86,6 +86,7 @@ int main(int argc, char *argv[]) {
     jack_set_net_slave_shutdown_callback(net, net_shutdown, NULL);
 
     if (jack_net_slave_activate(net) != 0) {
+        printf("Cannot activate slave client\n");
         return -1;
     }
 

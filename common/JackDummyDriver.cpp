@@ -57,7 +57,7 @@ int JackDummyDriver::Open(jack_nframes_t buffer_size,
         int buffer_size = lroundf((fWaitTime * fEngineControl->fSampleRate) / 1000000.0f);
         if (buffer_size > BUFFER_SIZE_MAX) {
             buffer_size = BUFFER_SIZE_MAX;
-            jack_error("Buffer size set to %d ", BUFFER_SIZE_MAX);
+            jack_error("Buffer size set to %d", BUFFER_SIZE_MAX);
         }
         SetBufferSize(buffer_size);
         return 0;
@@ -156,8 +156,9 @@ extern "C"
             }
         }
 
-        if (wait_time == 0) // Not set
+        if (wait_time == 0) { // Not set
             wait_time = (unsigned long)((((float)period_size) / ((float)sample_rate)) * 1000000.0f);
+        }
 
         Jack::JackDriverClientInterface* driver = new Jack::JackThreadedDriver(new Jack::JackDummyDriver("system", "dummy_pcm", engine, table, wait_time));
         if (driver->Open(period_size, sample_rate, 1, 1, capture_ports, playback_ports, monitor, "dummy", "dummy", 0, 0) == 0) {

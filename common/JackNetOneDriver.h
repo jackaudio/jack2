@@ -58,7 +58,7 @@ class JackNetOneDriver : public JackAudioDriver
                            int sample_rate, int period_size, int resample_factor,
                            const char* net_name, uint transport_sync, int bitdepth, int use_autoconfig,
                            int latency, int redundancy, int dont_htonl_floats, int always_deadline, int jitter_val);
-        ~JackNetOneDriver();
+        virtual ~JackNetOneDriver();
 
         int Open(jack_nframes_t frames_per_cycle, jack_nframes_t rate, bool capturing, bool playing,
                    int inchannels, int outchannels, bool monitor, const char* capture_driver_name,

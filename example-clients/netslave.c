@@ -120,13 +120,13 @@ main (int argc, char *argv[])
 		}
 	}
 
-    jack_slave_t request = { audio_input, audio_output, 0, 0, DEFAULT_MTU, -1, 2 };
+    jack_slave_t request = { audio_input, audio_output, 0, 0, DEFAULT_MTU, -1, JackFloatEncoder, 0, 2 };
     jack_master_t result;
 
     printf("Waiting for a master...\n");
 
     if ((net = jack_net_slave_open(DEFAULT_MULTICAST_IP, DEFAULT_PORT, "net_slave", &request, &result))  == 0) {
-    	fprintf(stderr, "jack server not running?\n");
+    	fprintf(stderr, "JACK server not running?\n");
 		return 1;
 	}
 
@@ -136,7 +136,7 @@ main (int argc, char *argv[])
     jack_set_net_slave_shutdown_callback(net, net_shutdown, NULL);
 
     if (jack_net_slave_activate(net) != 0) {
-    	fprintf(stderr, "Cannot sactivate client\n");
+    	fprintf(stderr, "Cannot activate slave client\n");
 		return 1;
 	}
 
@@ -164,5 +164,5 @@ main (int argc, char *argv[])
     // Wait for application end
     jack_net_slave_deactivate(net);
     jack_net_slave_close(net);
-    exit (0);
+    exit(0);
 }

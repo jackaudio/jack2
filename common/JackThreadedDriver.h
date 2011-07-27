@@ -110,18 +110,6 @@ class SERVER_EXPORT JackThreadedDriver : public JackDriverClientInterface, publi
         virtual bool Execute();
         virtual bool Init();
 
-        // For OSX only
-        int ComputationMicroSec(int buffer_size)
-        {
-            if (buffer_size < 128) {
-                return 500;
-            } else if (buffer_size < 256) {
-                return 300;
-            } else {
-                return 100;
-            }
-        }
-
 };
 
 } // end of namespace

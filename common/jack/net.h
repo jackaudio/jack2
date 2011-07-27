@@ -155,7 +155,7 @@ int jack_net_slave_deactivate(jack_net_slave_t* net);
 typedef int (*JackNetSlaveBufferSizeCallback)(jack_nframes_t nframes, void *arg);
 
 /**
- * Prototype for SampleRate callback
+ * Prototype for SampleRate callback.
  * @param nframes sample rate
  * @param arg pointer to a client supplied structure supplied by jack_set_net_sample_rate_callback().
  *
@@ -184,7 +184,7 @@ int jack_set_net_slave_buffer_size_callback(jack_net_slave_t *net, JackNetSlaveB
 int jack_set_net_slave_sample_rate_callback(jack_net_slave_t *net, JackNetSlaveSampleRateCallback samplerate_callback, void *arg);
 
 /**
- * Prototype for server Shutdown callback (if not set, the client will just restart, waiting for an available master again.)
+ * Prototype for server Shutdown callback (if not set, the client will just restart, waiting for an available master again).
  * @param arg pointer to a client supplied structure supplied by jack_set_net_shutdown_callback().
  */
 typedef void (*JackNetSlaveShutdownCallback)(void* data);
@@ -200,8 +200,8 @@ typedef void (*JackNetSlaveShutdownCallback)(void* data);
 int jack_set_net_slave_shutdown_callback(jack_net_slave_t *net, JackNetSlaveShutdownCallback shutdown_callback, void *arg);
 
 /**
- *  jack_net_master_t is an opaque type. You may only access it using the
- *  API provided.
+ *  jack_net_master_t is an opaque type.
+ *  You may only access it using the API provided.
  */
 typedef struct _jack_net_master jack_net_master_t;
 
@@ -217,7 +217,7 @@ typedef struct _jack_net_master jack_net_master_t;
 jack_net_master_t* jack_net_master_open(const char* ip, int port, const char* name, jack_master_t* request, jack_slave_t* result);
 
 /**
- * Close the network connection with the master machine.
+ * Close the network connection with the slave machine.
  * @param net the network connection to be closed
  *
  * @return 0 on success, otherwise a non-zero error code
@@ -225,7 +225,7 @@ jack_net_master_t* jack_net_master_open(const char* ip, int port, const char* na
 int jack_net_master_close(jack_net_master_t* net);
 
 /**
- * Receive sync and data from the network
+ * Receive sync and data from the network.
  * @param net the network connection
  * @param audio_input number of audio inputs
  * @param audio_input_buffer an array of audio input buffers

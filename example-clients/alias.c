@@ -55,7 +55,7 @@ main (int argc, char *argv[])
 	int option_index;
 	extern int optind;
 	jack_port_t* port;
-	
+
 	struct option long_options[] = {
 		{ "unalias", 0, 0, 'u' },
 		{ "help", 0, 0, 'h' },
@@ -129,5 +129,5 @@ main (int argc, char *argv[])
 	jack_client_close (client);
 
 	return ret;
-	
+
 }
