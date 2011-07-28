@@ -282,10 +282,8 @@ namespace Jack
 
         public:
 
-            NetAudioBuffer()
-            {}
-            virtual ~NetAudioBuffer()
-            {}
+            NetAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer);
+            virtual ~NetAudioBuffer();
 
             // needed syze in bytes ofr an entire cycle
             virtual size_t GetCycleSize() = 0;
@@ -295,23 +293,19 @@ namespace Jack
 
             virtual int GetNumPackets() = 0;
 
+            virtual void SetBuffer(int index, sample_t* buffer);
+            virtual sample_t* GetBuffer(int index);
+
             //jack<->buffer
             virtual void RenderFromJackPorts() = 0;
             virtual void RenderToJackPorts() = 0;
 
             //network<->buffer
             virtual int RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num) = 0;
-            virtual void ActivePortsFromNetwork(char* net_buffer, uint32_t port_num) {}
-
             virtual int RenderToNetwork(int sub_cycle, uint32_t& port_num) = 0;
-            virtual void ActivePortsToNetwork(char* net_buffer, uint32_t& port_num) {}
 
-            virtual void SetBuffer(int index, sample_t* buffer) = 0;
-            virtual sample_t* GetBuffer(int index) = 0;
-
-
-            virtual void ActivePortsToNetwork(uint32_t& port_num);
-            virtual void ActivePortsFromNetwork(uint32_t port_num);
+            virtual void ActivePortsToNetwork(char* net_buffer, uint32_t& port_num);
+            virtual void ActivePortsFromNetwork(char* net_buffer, uint32_t port_num);
 
    };
 
@@ -707,14 +701,16 @@ namespace Jack
             void RenderFromJackPorts();
             void RenderToJackPorts();
 
+
             void SetBuffer(int index, sample_t* buffer);
             sample_t* GetBuffer(int index);
 
+
             //network<->buffer
             int RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num);
-            void ActivePortsFromNetwork(char* net_buffer, uint32_t port_num);
-
             int RenderToNetwork(int sub_cycle, uint32_t&  ort_num);
+
+            void ActivePortsFromNetwork(char* net_buffer, uint32_t port_num);
             void ActivePortsToNetwork(char* net_buffer, uint32_t& port_num);
     };
 
@@ -726,13 +722,9 @@ namespace Jack
             jack_nframes_t fPeriodSize;
             jack_nframes_t fSubPeriodSize;
             size_t fSubPeriodBytesSize;
-            //sample_t** fPortBuffer;
             int fPacketSize;
-            //int fNPorts;
             size_t fCycleSize;      // needed size in bytes for an entire cycle
             float fCycleDuration;   // in sec
-
-            //int fLastSubCycle;
 
         public:
 
@@ -747,9 +739,6 @@ namespace Jack
 
             int GetNumPackets();
 
-            void SetBuffer(int index, sample_t* buffer);
-            sample_t* GetBuffer(int index);
-
             virtual void RenderFromJackPorts()
             {}
 
@@ -762,12 +751,6 @@ namespace Jack
             //jack<->buffer
             int RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num);
             int RenderToNetwork(int sub_cycle, uint32_t& port_num);
-
-            /*
-            void ActivePortsToNetwork(uint32_t& port_num);
-            void ActivePortsFromNetwork(uint32_t port_num);
-            */
-
 
     };
 
@@ -793,7 +776,6 @@ namespace Jack
             size_t fSubPeriodBytesSize;
             size_t fLastSubPeriodBytesSize;
 
-            //sample_t** fPortBuffer;
             unsigned char** fCompressedBuffer;
 
             void FreeCelt();
@@ -809,9 +791,6 @@ namespace Jack
              // cycle duration in sec
             float GetCycleDuration();
             int GetNumPackets();
-
-            void SetBuffer(int index, sample_t* buffer);
-            sample_t* GetBuffer(int index);
 
             //jack<->buffer
             void RenderFromJackPorts();
@@ -842,7 +821,6 @@ namespace Jack
             size_t fLastSubPeriodSize;
             size_t fLastSubPeriodBytesSize;
 
-            //sample_t** fPortBuffer;
             short** fIntBuffer;
 
         public:
@@ -856,9 +834,6 @@ namespace Jack
              // cycle duration in sec
             float GetCycleDuration();
             int GetNumPackets();
-
-            void SetBuffer(int index, sample_t* buffer);
-            sample_t* GetBuffer(int index);
 
             //jack<->buffer
             void RenderFromJackPorts();

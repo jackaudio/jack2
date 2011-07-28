@@ -32,13 +32,15 @@ namespace Jack
 #define SLAVE_SETUP_RETRY   5
 
 #define MANAGER_INIT_TIMEOUT    2000000      // in usec
-#define MASTER_INIT_TIMEOUT     1000000     // in usec
+#define MASTER_INIT_TIMEOUT     1000000      // in usec
 #define SLAVE_INIT_TIMEOUT      1000000      // in usec
 
 #define NETWORK_MAX_LATENCY     20
 
+#define NEW_FLOAT_CONVERTER
+
     /**
-    \Brief This class describes the basic Net Interface, used by both master and slave
+    \Brief This class describes the basic Net Interface, used by both master and slave.
     */
 
     class SERVER_EXPORT JackNetInterface
@@ -66,7 +68,7 @@ namespace Jack
             char* fTxData;
             char* fRxData;
 
-            // jack buffers
+            // JACK buffers
             NetMidiBuffer* fNetMidiCaptureBuffer;
             NetMidiBuffer* fNetMidiPlaybackBuffer;
             NetAudioBuffer* fNetAudioCaptureBuffer;

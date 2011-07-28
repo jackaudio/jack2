@@ -317,8 +317,11 @@ namespace Jack
                 switch (fParams.fSampleEncoder) {
 
                     case JackFloatEncoder:
+                    #ifdef NEW_FLOAT_CONVERTER
+                        fNetAudioCaptureBuffer = new NetFloatAudioBuffer1(&fParams, fParams.fSendAudioChannels, fTxData);
+                    #else
                         fNetAudioCaptureBuffer = new NetFloatAudioBuffer(&fParams, fParams.fSendAudioChannels, fTxData);
-                        //fNetAudioCaptureBuffer = new NetFloatAudioBuffer1(&fParams, fParams.fSendAudioChannels, fTxData);
+                    #endif
                         break;
 
                     case JackIntEncoder:
@@ -340,8 +343,11 @@ namespace Jack
                 switch (fParams.fSampleEncoder) {
 
                     case JackFloatEncoder:
+                    #ifdef NEW_FLOAT_CONVERTER
+                        fNetAudioPlaybackBuffer = new NetFloatAudioBuffer1(&fParams, fParams.fReturnAudioChannels, fRxData);
+                    #else
                         fNetAudioPlaybackBuffer = new NetFloatAudioBuffer(&fParams, fParams.fReturnAudioChannels, fRxData);
-                        //fNetAudioPlaybackBuffer = new NetFloatAudioBuffer1(&fParams, fParams.fReturnAudioChannels, fRxData);
+                    #endif
                         break;
 
                     case JackIntEncoder:
@@ -825,8 +831,11 @@ namespace Jack
                 switch (fParams.fSampleEncoder) {
 
                     case JackFloatEncoder:
+                    #ifdef NEW_FLOAT_CONVERTER
+                        fNetAudioCaptureBuffer = new NetFloatAudioBuffer1(&fParams, fParams.fSendAudioChannels, fRxData);
+                    #else
                         fNetAudioCaptureBuffer = new NetFloatAudioBuffer(&fParams, fParams.fSendAudioChannels, fRxData);
-                        //fNetAudioCaptureBuffer = new NetFloatAudioBuffer1(&fParams, fParams.fSendAudioChannels, fRxData);
+                    #endif
                         break;
 
                     case JackIntEncoder:
@@ -848,8 +857,11 @@ namespace Jack
                 switch (fParams.fSampleEncoder) {
 
                     case JackFloatEncoder:
+                    #ifdef NEW_FLOAT_CONVERTER
+                        fNetAudioPlaybackBuffer = new NetFloatAudioBuffer1(&fParams, fParams.fReturnAudioChannels, fTxData);
+                    #else
                         fNetAudioPlaybackBuffer = new NetFloatAudioBuffer(&fParams, fParams.fReturnAudioChannels, fTxData);
-                        //fNetAudioPlaybackBuffer = new NetFloatAudioBuffer1(&fParams, fParams.fReturnAudioChannels, fTxData);
+                    #endif
                         break;
 
                     case JackIntEncoder:
