@@ -35,6 +35,10 @@ Chris Caudle
   Jackdmp changes log
 ---------------------------
 
+2011-07-29 Stephane Letz  <letz@grame.fr>
+
+	* Enable explicit channel mapping in CoreAudio driver.
+
 2011-07-25 Stephane Letz  <letz@grame.fr>
 
 	* NetJack2: no more timeout, correct JackWaitThreadedDriver::Execute. 

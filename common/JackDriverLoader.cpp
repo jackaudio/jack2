@@ -173,10 +173,10 @@ jack_parse_driver_params(jack_driver_desc_t * desc, int argc, char* argv[], JSLi
         if (optarg) {
             switch (desc->params[param_index].type) {
                 case JackDriverParamInt:
-                    driver_param->value.i = atoi (optarg);
+                    driver_param->value.i = atoi(optarg);
                     break;
                 case JackDriverParamUInt:
-                    driver_param->value.ui = strtoul (optarg, NULL, 10);
+                    driver_param->value.ui = strtoul(optarg, NULL, 10);
                     break;
                 case JackDriverParamChar:
                     driver_param->value.c = optarg[0];
@@ -185,20 +185,11 @@ jack_parse_driver_params(jack_driver_desc_t * desc, int argc, char* argv[], JSLi
                     strncpy (driver_param->value.str, optarg, JACK_DRIVER_PARAM_STRING_MAX);
                     break;
                 case JackDriverParamBool:
-
-                    /*
-                                if (strcasecmp ("false", optarg) == 0 ||
-                                        strcasecmp ("off", optarg) == 0 ||
-                                        strcasecmp ("no", optarg) == 0 ||
-                                        strcasecmp ("0", optarg) == 0 ||
-                                        strcasecmp ("(null)", optarg) == 0 ) {
-                    */
-                    // steph
-                    if (strcmp ("false", optarg) == 0 ||
-                            strcmp ("off", optarg) == 0 ||
-                            strcmp ("no", optarg) == 0 ||
-                            strcmp ("0", optarg) == 0 ||
-                            strcmp ("(null)", optarg) == 0 ) {
+                    if (strcasecmp("false", optarg) == 0 ||
+                        strcasecmp("off", optarg) == 0 ||
+                        strcasecmp("no", optarg) == 0 ||
+                        strcasecmp("0", optarg) == 0 ||
+                        strcasecmp("(null)", optarg) == 0 ) {
                         driver_param->value.i = false;
 
                     } else {
@@ -317,11 +308,11 @@ jackctl_parse_driver_params(jackctl_driver *driver_ptr, int argc, char* argv[])
         if (optarg) {
             switch (jackctl_parameter_get_type(param)) {
                 case JackDriverParamInt:
-                    value.i = atoi (optarg);
+                    value.i = atoi(optarg);
                     jackctl_parameter_set_value(param, &value);
                     break;
                 case JackDriverParamUInt:
-                    value.ui = strtoul (optarg, NULL, 10);
+                    value.ui = strtoul(optarg, NULL, 10);
                     jackctl_parameter_set_value(param, &value);
                     break;
                 case JackDriverParamChar:
@@ -329,23 +320,15 @@ jackctl_parse_driver_params(jackctl_driver *driver_ptr, int argc, char* argv[])
                     jackctl_parameter_set_value(param, &value);
                     break;
                 case JackDriverParamString:
-                    strncpy (value.str, optarg, JACK_DRIVER_PARAM_STRING_MAX);
+                    strncpy(value.str, optarg, JACK_DRIVER_PARAM_STRING_MAX);
                     jackctl_parameter_set_value(param, &value);
                     break;
                 case JackDriverParamBool:
-                    /*
-                     if (strcasecmp ("false", optarg) == 0 ||
-                         strcasecmp ("off", optarg) == 0 ||
-                         strcasecmp ("no", optarg) == 0 ||
-                         strcasecmp ("0", optarg) == 0 ||
-                         strcasecmp ("(null)", optarg) == 0 ) {
-                    */
-                    // steph
-                    if (strcmp ("false", optarg) == 0 ||
-                        strcmp ("off", optarg) == 0 ||
-                        strcmp ("no", optarg) == 0 ||
-                        strcmp ("0", optarg) == 0 ||
-                        strcmp ("(null)", optarg) == 0 ) {
+                    if (strcasecmp("false", optarg) == 0 ||
+                        strcasecmp("off", optarg) == 0 ||
+                        strcasecmp("no", optarg) == 0 ||
+                        strcasecmp("0", optarg) == 0 ||
+                        strcasecmp("(null)", optarg) == 0 ) {
                         value.i = false;
                     } else {
                         value.i = true;

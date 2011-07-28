@@ -28,18 +28,18 @@ extern "C"
 #include <jack/systemdeps.h>
 #include <jack/types.h>
 
-#define DEFAULT_MULTICAST_IP "225.3.19.154"
-#define DEFAULT_PORT 19000
-#define DEFAULT_MTU 1500
-#define MASTER_NAME_SIZE 256
+#define DEFAULT_MULTICAST_IP    "225.3.19.154"
+#define DEFAULT_PORT            19000
+#define DEFAULT_MTU             1500
+#define MASTER_NAME_SIZE        256
 
 #define SOCKET_ERROR -1
 
 enum JackNetEncoder {
 
-    JackFloatEncoder = 0,   // Samples are transmitted as float
-    JackIntEncoder = 1,     // Samples are transmitted as 16 bits integer
-    JackCeltEncoder = 2,    // Samples are transmitted using CELT codec (http://www.celt-codec.org/)
+    JackFloatEncoder = 0,   // samples are transmitted as float
+    JackIntEncoder = 1,     // samples are transmitted as 16 bits integer
+    JackCeltEncoder = 2,    // samples are transmitted using CELT codec (http://www.celt-codec.org/)
 };
 
 typedef struct {
@@ -50,7 +50,7 @@ typedef struct {
     int midi_output;    // to master or from slave (-1 for get master MIDI physical inputs)
     int mtu;            // network Maximum Transmission Unit
     int time_out;       // in second, -1 means in infinite
-    int encoder;        // Encoder type (one of JackNetEncoder)
+    int encoder;        // encoder type (one of JackNetEncoder)
     int kbps;           // KB per second for CELT encoder
     int latency;        // network latency
 
@@ -104,7 +104,7 @@ int jack_net_slave_close(jack_net_slave_t* net);
  * @param audio_output_buffer an array of audio output buffers (to master)
  * @param midi_output number of MIDI outputs
  * @param midi_output_buffer an array of MIDI output buffers (to master)
- * @param arg pointer to a client supplied structure supplied by jack_set_net_process_callback().
+ * @param arg pointer to a client supplied structure supplied by jack_set_net_process_callback()
  *
  * @return zero on success, non-zero on error
  */
@@ -148,7 +148,7 @@ int jack_net_slave_deactivate(jack_net_slave_t* net);
 /**
  * Prototype for BufferSize callback.
  * @param nframes buffer size
- * @param arg pointer to a client supplied structure supplied by jack_set_net_buffer_size_callback().
+ * @param arg pointer to a client supplied structure supplied by jack_set_net_buffer_size_callback()
  *
  * @return zero on success, non-zero on error
  */
@@ -157,7 +157,7 @@ typedef int (*JackNetSlaveBufferSizeCallback)(jack_nframes_t nframes, void *arg)
 /**
  * Prototype for SampleRate callback.
  * @param nframes sample rate
- * @param arg pointer to a client supplied structure supplied by jack_set_net_sample_rate_callback().
+ * @param arg pointer to a client supplied structure supplied by jack_set_net_sample_rate_callback()
  *
  * @return zero on success, non-zero on error
  */
@@ -185,7 +185,7 @@ int jack_set_net_slave_sample_rate_callback(jack_net_slave_t *net, JackNetSlaveS
 
 /**
  * Prototype for server Shutdown callback (if not set, the client will just restart, waiting for an available master again).
- * @param arg pointer to a client supplied structure supplied by jack_set_net_shutdown_callback().
+ * @param arg pointer to a client supplied structure supplied by jack_set_net_shutdown_callback()
  */
 typedef void (*JackNetSlaveShutdownCallback)(void* data);
 
@@ -200,8 +200,7 @@ typedef void (*JackNetSlaveShutdownCallback)(void* data);
 int jack_set_net_slave_shutdown_callback(jack_net_slave_t *net, JackNetSlaveShutdownCallback shutdown_callback, void *arg);
 
 /**
- *  jack_net_master_t is an opaque type.
- *  You may only access it using the API provided.
+ *  jack_net_master_t is an opaque type, you may only access it using the API provided.
  */
 typedef struct _jack_net_master jack_net_master_t;
 
@@ -237,7 +236,7 @@ int jack_net_master_close(jack_net_master_t* net);
 int jack_net_master_recv(jack_net_master_t* net, int audio_input, float** audio_input_buffer, int midi_input, void** midi_input_buffer);
 
 /**
- * Send sync and data to the network
+ * Send sync and data to the network.
  * @param net the network connection
  * @param audio_output number of audio outputs
  * @param audio_output_buffer an array of audio output buffers
@@ -251,8 +250,7 @@ int jack_net_master_send(jack_net_master_t* net, int audio_output, float** audio
 // Experimental Adapter API
 
 /**
- *  jack_adapter_t is an opaque type. You may only access it using the
- *  API provided.
+ *  jack_adapter_t is an opaque type, you may only access it using the API provided.
  */
 typedef struct _jack_adapter jack_adapter_t;
 
@@ -290,7 +288,7 @@ int jack_destroy_adapter(jack_adapter_t* adapter);
 void jack_flush_adapter(jack_adapter_t* adapter);
 
 /**
- * Push input to and pull output from adapter ringbuffer
+ * Push input to and pull output from adapter ringbuffer.
  * @param adapter the adapter
  * @param input an array of audio input buffers
  * @param output an array of audio ouput buffers
@@ -301,7 +299,7 @@ void jack_flush_adapter(jack_adapter_t* adapter);
 int jack_adapter_push_and_pull(jack_adapter_t* adapter, float** input, float** output, unsigned int frames);
 
 /**
- * Pull input to and push output from adapter ringbuffer
+ * Pull input to and push output from adapter ringbuffer.
  * @param adapter the adapter
  * @param input an array of audio input buffers
  * @param output an array of audio ouput buffers
