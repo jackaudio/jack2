@@ -1401,7 +1401,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
 
     // Setup input channel map
     if (capturing && inchannels > 0 && inchannels <= in_nChannels) {
-        UInt32 chanArr[in_nChannels];
+        SInt32 chanArr[in_nChannels];
         for (int i = 0; i < in_nChannels; i++) {
             chanArr[i] = -1;
         }
@@ -1410,7 +1410,8 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
             for (uint i = 0; i < chan_in_list.size(); i++) {
                 int chan = chan_in_list[i];
                 if (chan < out_nChannels) {
-                    chanArr[i] = chan;
+                    // The wanted JACK input index for the 'chan' channel value
+                    chanArr[chan] = i;
                 } else {
                     jack_info("Error input channel number is incorrect : %d", chan);
                     goto error;
@@ -1421,7 +1422,16 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
                 chanArr[i] = i;
             }
         }
-        AudioUnitSetProperty(fAUHAL, kAudioOutputUnitProperty_ChannelMap , kAudioUnitScope_Input, 1, chanArr, sizeof(UInt32) * in_nChannels);
+
+        int jack_input = 0;
+        for (int i = 0; i < in_nChannels; i++) {
+            if (chanArr[i] >= 0) {
+                jack_info("Input channel = %d ==> JACK input port = %d", i, jack_input);
+                jack_input++;
+            }
+        }
+
+        AudioUnitSetProperty(fAUHAL, kAudioOutputUnitProperty_ChannelMap , kAudioUnitScope_Input, 1, chanArr, sizeof(SInt32) * in_nChannels);
         if (err1 != noErr) {
             jack_error("Error calling AudioUnitSetProperty - kAudioOutputUnitProperty_ChannelMap for input");
             printError(err1);
@@ -1431,7 +1441,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
 
     // Setup output channel map
     if (playing && outchannels > 0 && outchannels <= out_nChannels) {
-        UInt32 chanArr[out_nChannels];
+        SInt32 chanArr[out_nChannels];
         for (int i = 0;	i < out_nChannels; i++) {
             chanArr[i] = -1;
         }
@@ -1440,7 +1450,8 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
             for (uint i = 0; i < chan_out_list.size(); i++) {
                 int chan = chan_out_list[i];
                 if (chan < out_nChannels) {
-                    chanArr[i] = chan;
+                    // The wanted JACK output index for the 'chan' channel value
+                    chanArr[chan] = i;
                 } else {
                     jack_info("Error output channel number is incorrect : %d", chan);
                     goto error;
@@ -1451,7 +1462,16 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
                 chanArr[i] = i;
             }
         }
-        err1 = AudioUnitSetProperty(fAUHAL, kAudioOutputUnitProperty_ChannelMap, kAudioUnitScope_Output, 0, chanArr, sizeof(UInt32) * out_nChannels);
+
+        int jack_output = 0;
+        for (int i = 0; i < out_nChannels; i++) {
+           if (chanArr[i] >= 0) {
+                jack_info("JACK output port = %d ==> output channel = %d", jack_output, i);
+                jack_output++;
+            }
+        }
+
+        err1 = AudioUnitSetProperty(fAUHAL, kAudioOutputUnitProperty_ChannelMap, kAudioUnitScope_Output, 0, chanArr, sizeof(SInt32) * out_nChannels);
         if (err1 != noErr) {
             jack_error("Error calling AudioUnitSetProperty - kAudioOutputUnitProperty_ChannelMap for output");
             printError(err1);
