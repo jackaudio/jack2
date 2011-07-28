@@ -37,8 +37,6 @@ namespace Jack
 
 #define NETWORK_MAX_LATENCY     20
 
-#define NEW_FLOAT_CONVERTER
-
     /**
     \Brief This class describes the basic Net Interface, used by both master and slave.
     */

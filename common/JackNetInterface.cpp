@@ -175,8 +175,8 @@ namespace Jack
         // audio
         if (audio_channels > 0) {
             fTxHeader.fDataType = 'a';
-            buffer->RenderFromJackPorts();
-            fTxHeader.fNumPacket = buffer->GetNumPackets();
+            fTxHeader.fActivePorts = buffer->RenderFromJackPorts();
+            fTxHeader.fNumPacket = buffer->GetNumPackets(fTxHeader.fActivePorts);
 
             for (uint subproc = 0; subproc < fTxHeader.fNumPacket; subproc++) {
                 fTxHeader.fSubCycle = subproc;
@@ -212,7 +212,7 @@ namespace Jack
         fRxHeader.fSubCycle = rx_head->fSubCycle;
         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
         fRxHeader.fActivePorts = rx_head->fActivePorts;
-        rx_bytes = buffer->RenderFromNetwork(rx_head->fCycle, rx_head->fSubCycle, rx_bytes - HEADER_SIZE, fRxHeader.fActivePorts);
+        rx_bytes = buffer->RenderFromNetwork(rx_head->fCycle, rx_head->fSubCycle, fRxHeader.fActivePorts);
         // Last audio packet is received, so finish rendering...
         if (fRxHeader.fIsLastPckt) {
             buffer->RenderToJackPorts();
@@ -317,11 +317,7 @@ namespace Jack
                 switch (fParams.fSampleEncoder) {
 
                     case JackFloatEncoder:
-                    #ifdef NEW_FLOAT_CONVERTER
-                        fNetAudioCaptureBuffer = new NetFloatAudioBuffer1(&fParams, fParams.fSendAudioChannels, fTxData);
-                    #else
                         fNetAudioCaptureBuffer = new NetFloatAudioBuffer(&fParams, fParams.fSendAudioChannels, fTxData);
-                    #endif
                         break;
 
                     case JackIntEncoder:
@@ -343,11 +339,7 @@ namespace Jack
                 switch (fParams.fSampleEncoder) {
 
                     case JackFloatEncoder:
-                    #ifdef NEW_FLOAT_CONVERTER
-                        fNetAudioPlaybackBuffer = new NetFloatAudioBuffer1(&fParams, fParams.fReturnAudioChannels, fRxData);
-                    #else
                         fNetAudioPlaybackBuffer = new NetFloatAudioBuffer(&fParams, fParams.fReturnAudioChannels, fRxData);
-                    #endif
                         break;
 
                     case JackIntEncoder:
@@ -495,13 +487,6 @@ namespace Jack
         fTxHeader.fIsLastPckt = (fParams.fSendMidiChannels == 0 && fParams.fSendAudioChannels == 0) ? 1 : 0;
         fTxHeader.fPacketSize = fParams.fMtu;
 
-        /*
-        // Write active ports list
-        if (fNetAudioPlaybackBuffer) {
-            fNetAudioPlaybackBuffer->ActivePortsToNetwork(fTxData, fTxHeader.fActivePorts);
-        }
-        */
-
         memcpy(fTxBuffer, &fTxHeader, HEADER_SIZE);
         // PacketHeaderDisplay(&fTxHeader);
         return Send(fTxHeader.fPacketSize, 0);
@@ -542,13 +527,6 @@ namespace Jack
         while ((strcmp(rx_head->fPacketType, "header") != 0) && (rx_head->fDataType != 's'));
 
         fCurrentCycleOffset = fTxHeader.fCycle - rx_head->fCycle;
-
-        /*
-        // Read active ports list
-        if (fNetAudioCaptureBuffer) {
-            fNetAudioCaptureBuffer->ActivePortsFromNetwork(fRxData, rx_head->fActivePorts);
-        }
-        */
 
         if (fCurrentCycleOffset < fMaxCycleOffset) {
             jack_info("Synching with latency = %d", fCurrentCycleOffset);
@@ -616,11 +594,7 @@ namespace Jack
         // Transport not used for now...
 
         // Write active ports list
-        if (fNetAudioPlaybackBuffer) {
-            fNetAudioPlaybackBuffer->ActivePortsToNetwork(fTxData, fTxHeader.fActivePorts);
-        } else {
-            fTxHeader.fActivePorts = 0;
-        }
+        fTxHeader.fActivePorts = (fNetAudioPlaybackBuffer) ? fNetAudioPlaybackBuffer->ActivePortsToNetwork(fTxData) : 0;
     }
 
     void JackNetMasterInterface::DecodeSyncPacket()
@@ -637,7 +611,6 @@ namespace Jack
         // ...
 
         // Transport not used for now...
-
         packet_header_t* rx_head = reinterpret_cast<packet_header_t*>(fRxBuffer);
 
         // Read active ports list
@@ -831,11 +804,7 @@ namespace Jack
                 switch (fParams.fSampleEncoder) {
 
                     case JackFloatEncoder:
-                    #ifdef NEW_FLOAT_CONVERTER
-                        fNetAudioCaptureBuffer = new NetFloatAudioBuffer1(&fParams, fParams.fSendAudioChannels, fRxData);
-                    #else
                         fNetAudioCaptureBuffer = new NetFloatAudioBuffer(&fParams, fParams.fSendAudioChannels, fRxData);
-                    #endif
                         break;
 
                     case JackIntEncoder:
@@ -857,11 +826,7 @@ namespace Jack
                 switch (fParams.fSampleEncoder) {
 
                     case JackFloatEncoder:
-                    #ifdef NEW_FLOAT_CONVERTER
-                        fNetAudioPlaybackBuffer = new NetFloatAudioBuffer1(&fParams, fParams.fReturnAudioChannels, fTxData);
-                    #else
                         fNetAudioPlaybackBuffer = new NetFloatAudioBuffer(&fParams, fParams.fReturnAudioChannels, fTxData);
-                    #endif
                         break;
 
                     case JackIntEncoder:
@@ -970,13 +935,6 @@ namespace Jack
         }
         while ((strcmp(rx_head->fPacketType, "header") != 0) && (rx_head->fDataType != 's'));
 
-        /*
-        // Read active ports list
-        if (fNetAudioPlaybackBuffer) {
-            fNetAudioPlaybackBuffer->ActivePortsFromNetwork(fRxData, rx_head->fActivePorts);
-        }
-        */
-
         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
         return rx_bytes;
     }
@@ -1032,13 +990,6 @@ namespace Jack
         fTxHeader.fIsLastPckt = (fParams.fReturnMidiChannels == 0 && fParams.fReturnAudioChannels == 0) ? 1 : 0;
         fTxHeader.fPacketSize = fParams.fMtu;
 
-        /*
-        // Write active ports list
-        if (fNetAudioCaptureBuffer) {
-            fNetAudioCaptureBuffer->ActivePortsToNetwork(fTxData, fTxHeader.fActivePorts);
-        }
-        */
-
         memcpy(fTxBuffer, &fTxHeader, HEADER_SIZE);
         // PacketHeaderDisplay(&fTxHeader);
         return Send(fTxHeader.fPacketSize, 0);
@@ -1072,11 +1023,7 @@ namespace Jack
         // Transport is not used for now...
 
         // Write active ports list
-        if (fNetAudioCaptureBuffer) {
-            fNetAudioCaptureBuffer->ActivePortsToNetwork(fTxData, fTxHeader.fActivePorts);
-        } else {
-            fTxHeader.fActivePorts = 0;
-        }
+        fTxHeader.fActivePorts = (fNetAudioCaptureBuffer) ? fNetAudioCaptureBuffer->ActivePortsToNetwork(fTxData) : 0;
     }
 
     void JackNetSlaveInterface::DecodeSyncPacket()
@@ -1093,7 +1040,6 @@ namespace Jack
         // ...
 
         // Transport not used for now...
-
         packet_header_t* rx_head = reinterpret_cast<packet_header_t*>(fRxBuffer);
 
         // Read active ports list
