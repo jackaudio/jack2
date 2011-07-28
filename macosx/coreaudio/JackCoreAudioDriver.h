@@ -155,8 +155,6 @@ class JackCoreAudioDriver : public JackAudioDriver
 
         void UpdateLatencies();
 
-        void ParseChannelList(const string& list, vector<int>& result);
-
     public:
 
         JackCoreAudioDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table);

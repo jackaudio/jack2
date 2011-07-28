@@ -189,7 +189,7 @@ static CFStringRef GetDeviceName(AudioDeviceID id)
     return (err == noErr) ? UIname : NULL;
 }
 
-void JackCoreAudioDriver::ParseChannelList(const string& list, vector<int>& result)
+static void ParseChannelList(const string& list, vector<int>& result)
 {
     stringstream ss(list);
     string token;
@@ -1412,6 +1412,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
                 if (chan < out_nChannels) {
                     // The wanted JACK input index for the 'chan' channel value
                     chanArr[chan] = i;
+                    jack_info("Input channel = %d ==> JACK input port = %d", chan, i);
                 } else {
                     jack_info("Error input channel number is incorrect : %d", chan);
                     goto error;
@@ -1420,14 +1421,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
         } else {
             for (int i = 0; i < inchannels; i++) {
                 chanArr[i] = i;
-            }
-        }
-
-        int jack_input = 0;
-        for (int i = 0; i < in_nChannels; i++) {
-            if (chanArr[i] >= 0) {
-                jack_info("Input channel = %d ==> JACK input port = %d", i, jack_input);
-                jack_input++;
+                jack_info("Input channel = %d ==> JACK input port = %d", chanArr[i], i);
             }
         }
 
@@ -1452,6 +1446,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
                 if (chan < out_nChannels) {
                     // The wanted JACK output index for the 'chan' channel value
                     chanArr[chan] = i;
+                    jack_info("JACK output port = %d ==> output channel = %d", i, chan);
                 } else {
                     jack_info("Error output channel number is incorrect : %d", chan);
                     goto error;
@@ -1460,14 +1455,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
         } else {
             for (int i = 0; i < outchannels; i++) {
                 chanArr[i] = i;
-            }
-        }
-
-        int jack_output = 0;
-        for (int i = 0; i < out_nChannels; i++) {
-           if (chanArr[i] >= 0) {
-                jack_info("JACK output port = %d ==> output channel = %d", jack_output, i);
-                jack_output++;
+                jack_info("JACK output port = %d ==> output channel = %d", i, chanArr[i]);
             }
         }
 
