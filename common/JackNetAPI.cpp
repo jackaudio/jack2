@@ -198,8 +198,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
             fprintf(stderr, "Can't set timeout : %s\n", StrError(NET_ERROR_CODE));
         }
 
-         //main loop, wait for data, deal with it and wait again
-         //utility variables
+         // Main loop, wait for data, deal with it and wait again
         int attempt = 0;
         int rx_bytes = 0;
 

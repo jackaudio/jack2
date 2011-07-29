@@ -39,8 +39,8 @@ using namespace std;
 #endif
 #endif
 
-#define MASTER_PROTOCOL 4
-#define SLAVE_PROTOCOL 4
+#define MASTER_PROTOCOL 5
+#define SLAVE_PROTOCOL 5
 
 #define NET_PACKET_ERROR -2
 
@@ -281,6 +281,7 @@ namespace Jack
 
             char* fNetBuffer;
             sample_t** fPortBuffer;
+            bool* fConnectedPorts;
 
             jack_nframes_t fPeriodSize;
             jack_nframes_t fSubPeriodSize;
@@ -297,6 +298,9 @@ namespace Jack
 
             NetAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer);
             virtual ~NetAudioBuffer();
+
+            bool GetConnected(int port_index) { return fConnectedPorts[port_index]; }
+            void SetConnected(int port_index, bool state) { fConnectedPorts[port_index] = state; }
 
             // needed syze in bytes ofr an entire cycle
             virtual size_t GetCycleSize() = 0;
@@ -350,8 +354,8 @@ namespace Jack
             int RenderFromNetwork(int cycle, int sub_cycle, uint32_t port_num);
             int RenderToNetwork(int sub_cycle, uint32_t port_num);
 
-            void RenderFromNetwork(char* net_buffer, int active_port, int sub_cycle, size_t copy_size);
-            void RenderToNetwork(char* net_buffer, int active_port, int sub_cycle, size_t copy_size);
+            void RenderFromNetwork(char* net_buffer, int active_port, int sub_cycle);
+            void RenderToNetwork(char* net_buffer, int active_port, int sub_cycle);
 
     };
 

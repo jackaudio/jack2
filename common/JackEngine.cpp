@@ -427,7 +427,7 @@ int JackEngine::ClientCheck(const char* name, int uuid, char* name_res, int prot
     *status = 0;
     strcpy(name_res, name);
 
-    jack_log("Check protocol client %ld server = %ld", protocol, JACK_PROTOCOL_VERSION);
+    jack_log("Check protocol client = %ld server = %ld", protocol, JACK_PROTOCOL_VERSION);
 
     if (protocol != JACK_PROTOCOL_VERSION) {
         *status |= (JackFailure | JackVersionError);

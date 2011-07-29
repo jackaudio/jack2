@@ -548,7 +548,7 @@ namespace Jack
         for (int audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++) {
         #ifdef OPTIMIZED_PROTOCOL
             // Port is connected on other side...
-            if ((intptr_t)fNetAudioPlaybackBuffer->GetBuffer(audio_port_index) == -1) {
+            if (fNetAudioPlaybackBuffer->GetConnected(audio_port_index)) {
                 fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, GetOutputBuffer(audio_port_index, true));
             } else {
                 fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, NULL);
@@ -624,10 +624,10 @@ namespace Jack
             strcpy(value.str, "'hostname'");
             jack_driver_descriptor_add_parameter(desc, &filler, "client_name", 'n', JackDriverParamString, &value, NULL, "Name of the jack client", NULL);
 
-            value.ui = 1U;
+            value.ui = 0U;
             jack_driver_descriptor_add_parameter(desc, &filler, "transport_sync", 't', JackDriverParamUInt, &value, NULL, "Sync transport with master's", NULL);
 
-            value.ui = 2U;
+            value.ui = 5U;
             jack_driver_descriptor_add_parameter(desc, &filler, "latency", 'l', JackDriverParamUInt, &value, NULL, "Network latency", NULL);
 
             return desc;
@@ -649,7 +649,7 @@ namespace Jack
             int midi_output_ports = 0;
             int celt_encoding = -1;
             bool monitor = false;
-            int network_latency = 2;
+            int network_latency = 5;
             const JSList* node;
             const jack_driver_param_t* param;
 

@@ -293,7 +293,8 @@ namespace Jack
     bool JackNetMasterInterface::SetParams()
     {
         jack_log("JackNetMasterInterface::SetParams audio in = %d audio out = %d MIDI in = %d MIDI out = %d",
-            fParams.fSendAudioChannels, fParams.fReturnAudioChannels, fParams.fSendMidiChannels, fParams.fReturnMidiChannels);
+            fParams.fSendAudioChannels, fParams.fReturnAudioChannels,
+            fParams.fSendMidiChannels, fParams.fReturnMidiChannels);
 
         JackNetInterface::SetParams();
 
@@ -303,11 +304,13 @@ namespace Jack
         fMaxCycleOffset = fParams.fNetworkLatency;
 
         // midi net buffers
-        if (fParams.fSendMidiChannels > 0)
+        if (fParams.fSendMidiChannels > 0) {
             fNetMidiCaptureBuffer = new NetMidiBuffer(&fParams, fParams.fSendMidiChannels, fTxData);
+        }
 
-        if (fParams.fReturnMidiChannels > 0)
+        if (fParams.fReturnMidiChannels > 0) {
             fNetMidiPlaybackBuffer = new NetMidiBuffer(&fParams, fParams.fReturnMidiChannels, fRxData);
+        }
 
         try {
 
@@ -790,11 +793,13 @@ namespace Jack
         fRxHeader.fDataStream = 's';
 
         // midi net buffers
-        if (fParams.fSendMidiChannels > 0)
+        if (fParams.fSendMidiChannels > 0) {
             fNetMidiCaptureBuffer = new NetMidiBuffer(&fParams, fParams.fSendMidiChannels, fRxData);
+        }
 
-        if (fParams.fReturnMidiChannels > 0)
+        if (fParams.fReturnMidiChannels > 0) {
             fNetMidiPlaybackBuffer = new NetMidiBuffer(&fParams, fParams.fReturnMidiChannels, fTxData);
+        }
 
         try {
 
@@ -1033,7 +1038,7 @@ namespace Jack
         if (fParams.fTransportSync) {
             // copy received transport data to transport data structure
             memcpy(&fSendTransportData, fRxData, sizeof(net_transport_data_t));
-            TransportDataNToH(&fSendTransportData,  &fSendTransportData);
+            TransportDataNToH(&fSendTransportData, &fSendTransportData);
             DecodeTransportData();
         }
         // then others
