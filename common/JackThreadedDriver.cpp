@@ -68,11 +68,6 @@ int JackThreadedDriver::Process()
     return fDriver->Process();
 }
 
-int JackThreadedDriver::ProcessNull()
-{
-    return fDriver->ProcessNull();
-}
-
 int JackThreadedDriver::Attach()
 {
     return fDriver->Attach();

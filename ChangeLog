@@ -37,6 +37,10 @@ Chris Caudle
 
 2011-07-29 Stephane Letz  <letz@grame.fr>
 
+	* New JackTimedDriver class to be used by JackDummyDriver, JackNetDriver and JackNetOneDriver classes.
+
+2011-07-28 Stephane Letz  <letz@grame.fr>
+
 	* Enable explicit channel mapping in CoreAudio driver.
 
 2011-07-25 Stephane Letz  <letz@grame.fr>

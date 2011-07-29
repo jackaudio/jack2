@@ -241,6 +241,7 @@
 		<Unit filename="..\common\JackActivationCount.cpp" />
 		<Unit filename="..\common\JackArgParser.cpp" />
 		<Unit filename="..\common\JackAudioDriver.cpp" />
+		<Unit filename="..\common\JackTimedDriver.cpp" />
 		<Unit filename="..\common\JackAudioPort.cpp" />
 		<Unit filename="..\common\JackClient.cpp" />
 		<Unit filename="..\common\JackConnectionManager.cpp" />

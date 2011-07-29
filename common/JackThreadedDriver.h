@@ -72,8 +72,7 @@ class SERVER_EXPORT JackThreadedDriver : public JackDriverClientInterface, publi
         virtual int Close();
 
         virtual int Process();
-        virtual int ProcessNull();
-
+      
         virtual int Attach();
         virtual int Detach();
 

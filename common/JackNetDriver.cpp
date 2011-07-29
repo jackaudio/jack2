@@ -29,7 +29,7 @@ namespace Jack
     JackNetDriver::JackNetDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
                                 const char* ip, int udp_port, int mtu, int midi_input_ports, int midi_output_ports,
                                 char* net_name, uint transport_sync, int network_latency, int celt_encoding)
-            : JackAudioDriver(name, alias, engine, table), JackNetSlaveInterface(ip, udp_port)
+            : JackTimedDriver(name, alias, engine, table), JackNetSlaveInterface(ip, udp_port)
     {
         jack_log("JackNetDriver::JackNetDriver ip %s, port %d", ip, udp_port);
 
@@ -73,24 +73,7 @@ namespace Jack
     }
 
 //open, close, attach and detach------------------------------------------------------
-    int JackNetDriver::Open(jack_nframes_t buffer_size, jack_nframes_t samplerate, bool capturing, bool playing,
-                            int inchannels, int outchannels, bool monitor,
-                            const char* capture_driver_name, const char* playback_driver_name,
-                            jack_nframes_t capture_latency, jack_nframes_t playback_latency)
-    {
-        return JackAudioDriver::Open(buffer_size,
-                                 samplerate,
-                                 capturing,
-                                 playing,
-                                 inchannels,
-                                 outchannels,
-                                 monitor,
-                                 capture_driver_name,
-                                 playback_driver_name,
-                                 capture_latency,
-                                 playback_latency);
-    }
-
+  
     int JackNetDriver::Close()
     {
 #ifdef JACK_MONITOR
@@ -99,7 +82,7 @@ namespace Jack
         }
 #endif
         FreeAll();
-        return JackDriver::Close();
+        return JackTimedDriver::Close();
     }
 
     // Attach and Detach are defined as empty methods: port allocation is done when driver actually start (that is in Init)
@@ -204,8 +187,8 @@ namespace Jack
         fNetTimeMon->SetPlotFile(net_time_mon_options, 2, net_time_mon_fields, 5);
 #endif
         // Driver parametering
-        JackAudioDriver::SetBufferSize(fParams.fPeriodSize);
-        JackAudioDriver::SetSampleRate(fParams.fSampleRate);
+        JackTimedDriver::SetBufferSize(fParams.fPeriodSize);
+        JackTimedDriver::SetSampleRate(fParams.fSampleRate);
 
         JackDriver::NotifyBufferSize(fParams.fPeriodSize);
         JackDriver::NotifySampleRate(fParams.fSampleRate);
@@ -377,7 +360,7 @@ namespace Jack
         const char** connections;
         fConnections.clear();
 
-        JackAudioDriver::SaveConnections();
+        JackTimedDriver::SaveConnections();
 
         for (int i = 0; i < fParams.fSendMidiChannels; ++i) {
             if (fCapturePortList[i] && (connections = fGraphManager->GetConnections(fMidiCapturePortList[i])) != 0) {
@@ -485,6 +468,12 @@ namespace Jack
     }
 
 //driver processes--------------------------------------------------------------------
+
+    int JackNetDriver::Process()
+    {
+        return (fEngineControl->fSyncMode) ? ProcessSync() : ProcessAsync();
+    }
+            
     int JackNetDriver::Read()
     {
         //buffers

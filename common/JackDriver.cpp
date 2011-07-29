@@ -344,11 +344,6 @@ int JackDriver::Process()
     return 0;
 }
 
-int JackDriver::ProcessNull()
-{
-    return 0;
-}
-
 int JackDriver::Attach()
 {
     return 0;

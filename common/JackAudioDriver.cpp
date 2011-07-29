@@ -215,23 +215,6 @@ int JackAudioDriver::Write()
     return 0;
 }
 
-int JackAudioDriver::ProcessNull()
-{
-    // Keep begin cycle time
-    JackDriver::CycleTakeBeginTime();
-
-    if (fEngineControl->fSyncMode) {
-        ProcessGraphSyncMaster();
-    } else {
-        ProcessGraphAsyncMaster();
-    }
-
-    // Keep end cycle time
-    JackDriver::CycleTakeEndTime();
-    WaitUntilNextCycle();
-    return 0;
-}
-
 int JackAudioDriver::Process()
 {
     return (fEngineControl->fSyncMode) ? ProcessSync() : ProcessAsync();
@@ -388,6 +371,7 @@ int JackAudioDriver::Stop()
     return res;
 }
 
+/*
 void JackAudioDriver::WaitUntilNextCycle()
 {
     int wait_time_usec = (int((float(fEngineControl->fBufferSize) / (float(fEngineControl->fSampleRate))) * 1000000.0f));
@@ -395,6 +379,7 @@ void JackAudioDriver::WaitUntilNextCycle()
 	if (wait_time_usec > 0)
 		JackSleep(wait_time_usec);
 }
+*/
 
 jack_default_audio_sample_t* JackAudioDriver::GetInputBuffer(int port_index, bool nulled)
 {

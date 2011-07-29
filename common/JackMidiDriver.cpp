@@ -143,11 +143,6 @@ int JackMidiDriver::SetBufferSize(jack_nframes_t buffer_size)
     return 0;
 }
 
-int JackMidiDriver::ProcessNull()
-{
-    return 0;
-}
-
 int JackMidiDriver::ProcessRead()
 {
     return (fEngineControl->fSyncMode) ? ProcessReadSync() : ProcessReadAsync();

@@ -20,7 +20,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackNetDriver__
 #define __JackNetDriver__
 
-#include "JackAudioDriver.h"
+#include "JackTimedDriver.h"
 #include "netjack.h"
 #include "netjack_packet.h"
 
@@ -30,7 +30,7 @@ namespace Jack
 \Brief This class describes the Net Backend
 */
 
-class JackNetOneDriver : public JackAudioDriver
+class JackNetOneDriver : public JackTimedDriver
 {
     private:
 
@@ -60,13 +60,11 @@ class JackNetOneDriver : public JackAudioDriver
                            int latency, int redundancy, int dont_htonl_floats, int always_deadline, int jitter_val);
         virtual ~JackNetOneDriver();
 
-        int Open(jack_nframes_t frames_per_cycle, jack_nframes_t rate, bool capturing, bool playing,
-                   int inchannels, int outchannels, bool monitor, const char* capture_driver_name,
-                   const char* playback_driver_name, jack_nframes_t capture_latency, jack_nframes_t playback_latency);
-
         int Close();
         int Attach();
         int Detach();
+    
+        int Process();
 
         int Read();
         int Write();
@@ -76,15 +74,18 @@ class JackNetOneDriver : public JackAudioDriver
         void FreePorts();
 
         // BufferSize can't be changed
-        bool IsFixedBufferSize() {
+        bool IsFixedBufferSize() 
+        {
             return true;
         }
 
-        int SetBufferSize(jack_nframes_t buffer_size) {
+        int SetBufferSize(jack_nframes_t buffer_size) 
+        {
             return -1;
         }
 
-        int SetSampleRate(jack_nframes_t sample_rate) {
+        int SetSampleRate(jack_nframes_t sample_rate) 
+        {
             return -1;
         }
 

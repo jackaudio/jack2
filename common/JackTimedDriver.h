@@ -18,28 +18,46 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifndef __JackDummyDriver__
-#define __JackDummyDriver__
+#ifndef __JackTimedDriver__
+#define __JackTimedDriver__
 
-#include "JackTimedDriver.h"
+#include "JackAudioDriver.h"
 
 namespace Jack
 {
 
 /*!
-\brief The dummy driver.
+\brief The timed driver.
 */
 
-class JackDummyDriver : public JackTimedDriver
+class SERVER_EXPORT JackTimedDriver : public JackAudioDriver
 {
-  
+    private:
+
+        int fCycleCount;
+        jack_time_t fAnchorTime;
+        
+        int FirstCycle(jack_time_t cur_time);
+        int CurrentCycle(jack_time_t cur_time);
+        
+        int ProcessAux();
+
     public:
 
-        JackDummyDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
-                : JackTimedDriver(name, alias, engine, table)
+        JackTimedDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
+                : JackAudioDriver(name, alias, engine, table), fCycleCount(0), fAnchorTime(0)
         {}
-        virtual ~JackDummyDriver()
+        virtual ~JackTimedDriver()
         {}
+
+        virtual int Process();
+        virtual int ProcessNull();
+        
+        // BufferSize can be changed
+        bool IsFixedBufferSize()
+        {
+            return false;
+        }
 
 };
 

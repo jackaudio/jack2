@@ -40,7 +40,9 @@ bool JackWaitThreadedDriver::Execute()
     try {
         // Process a null cycle until NetDriver has started
         while (!fStarter.fRunning && fThread.GetStatus() == JackThread::kRunning) {
-            fDriver->ProcessNull();
+            // Use the base method
+            assert(static_cast<JackTimedDriver*>(fDriver));
+            static_cast<JackTimedDriver*>(fDriver)->ProcessNull();
         }
 
         // Set RT

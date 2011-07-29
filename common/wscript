@@ -114,6 +114,7 @@ def build(bld):
     serverlib.source = [] + common_libsources
     serverlib.source += [
         'JackAudioDriver.cpp',
+	'JackTimedDriver.cpp',
         'JackMidiDriver.cpp',
         'JackDriver.cpp',
         'JackEngine.cpp',

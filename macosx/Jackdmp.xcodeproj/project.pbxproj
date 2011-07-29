@@ -123,6 +123,12 @@
 		4B19B31C0E2362E800DD4A82 /* JackLibSampleRateResampler.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19B30F0E2362E700DD4A82 /* JackLibSampleRateResampler.h */; };
 		4B19B31F0E2362E800DD4A82 /* JackResampler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B19B3120E2362E700DD4A82 /* JackResampler.cpp */; };
 		4B20220A133A9C1C0019E213 /* midi_latency_test.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B202209133A9C1C0019E213 /* midi_latency_test.c */; };
+		4B21794F13E2EEA60095B3E5 /* JackTimedDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B21794D13E2EEA60095B3E5 /* JackTimedDriver.cpp */; };
+		4B21795013E2EEA60095B3E5 /* JackTimedDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B21794E13E2EEA60095B3E5 /* JackTimedDriver.h */; };
+		4B21795113E2EEA60095B3E5 /* JackTimedDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B21794D13E2EEA60095B3E5 /* JackTimedDriver.cpp */; };
+		4B21795213E2EEA60095B3E5 /* JackTimedDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B21794E13E2EEA60095B3E5 /* JackTimedDriver.h */; };
+		4B21795313E2EEA60095B3E5 /* JackTimedDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B21794D13E2EEA60095B3E5 /* JackTimedDriver.cpp */; };
+		4B21795413E2EEA60095B3E5 /* JackTimedDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B21794E13E2EEA60095B3E5 /* JackTimedDriver.h */; };
 		4B2209E112F6BBF300E5DC26 /* JackSocketServerChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BC3B6B30E703B8D0066E42F /* JackSocketServerChannel.cpp */; };
 		4B2209E212F6BBF400E5DC26 /* JackSocketServerChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BC3B6B40E703B8D0066E42F /* JackSocketServerChannel.h */; };
 		4B2209E312F6BBF500E5DC26 /* JackSocketServerNotifyChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BC3B6B50E703B8D0066E42F /* JackSocketServerNotifyChannel.cpp */; };
@@ -1604,6 +1610,8 @@
 		4B19B3120E2362E700DD4A82 /* JackResampler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackResampler.cpp; path = ../common/JackResampler.cpp; sourceTree = SOURCE_ROOT; };
 		4B2021E6133A9BA40019E213 /* jack_midi_latency_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_midi_latency_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B202209133A9C1C0019E213 /* midi_latency_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = midi_latency_test.c; path = "../example-clients/midi_latency_test.c"; sourceTree = SOURCE_ROOT; };
+		4B21794D13E2EEA60095B3E5 /* JackTimedDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackTimedDriver.cpp; path = ../common/JackTimedDriver.cpp; sourceTree = SOURCE_ROOT; };
+		4B21794E13E2EEA60095B3E5 /* JackTimedDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackTimedDriver.h; path = ../common/JackTimedDriver.h; sourceTree = SOURCE_ROOT; };
 		4B2C28F908DAD01E00249230 /* JackGlobals.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackGlobals.cpp; path = ../common/JackGlobals.cpp; sourceTree = SOURCE_ROOT; };
 		4B3224E510A3156800838A8E /* jack_netone.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = jack_netone.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B3224E810A315B100838A8E /* JackNetOneDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackNetOneDriver.cpp; path = ../common/JackNetOneDriver.cpp; sourceTree = SOURCE_ROOT; };
@@ -3074,6 +3082,8 @@
 				4BF8D1B60834EEE400C94B91 /* JackDriver.cpp */,
 				4BC3988A08B3CF6C00B6F371 /* JackDummyDriver.h */,
 				4BC3988908B3CF6C00B6F371 /* JackDummyDriver.cpp */,
+				4B21794E13E2EEA60095B3E5 /* JackTimedDriver.h */,
+				4B21794D13E2EEA60095B3E5 /* JackTimedDriver.cpp */,
 				4BF3390D0F8B86AF0080FB5B /* MIDI */,
 				4B19B3010E23629800DD4A82 /* Adapter */,
 				BA222AEA0DC88379001A17F4 /* Net */,
@@ -3522,6 +3532,7 @@
 				4B97B6781344B50800794F57 /* JackMidiSendQueue.h in Headers */,
 				4B97B67A1344B51600794F57 /* JackMidiUtil.h in Headers */,
 				4B97B67C1344B52800794F57 /* JackMidiWriteQueue.h in Headers */,
+				4B21795213E2EEA60095B3E5 /* JackTimedDriver.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3994,6 +4005,7 @@
 				4B97B65B1344B45600794F57 /* JackMidiSendQueue.h in Headers */,
 				4B97B65D1344B46400794F57 /* JackMidiUtil.h in Headers */,
 				4B97B65F1344B47100794F57 /* JackMidiWriteQueue.h in Headers */,
+				4B21795013E2EEA60095B3E5 /* JackTimedDriver.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4211,6 +4223,7 @@
 				4B6FE16313DDAD7700B4B943 /* JackMidiReadQueue.h in Headers */,
 				4B6FE16513DDAD8800B4B943 /* JackMidiBufferReadQueue.h in Headers */,
 				4B6FE16713DDAD9700B4B943 /* JackMidiAsyncWaitQueue.h in Headers */,
+				4B21795413E2EEA60095B3E5 /* JackTimedDriver.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7011,6 +7024,7 @@
 				4B97B6721344B4F000794F57 /* JackMidiSendQueue.cpp in Sources */,
 				4B97B6791344B50F00794F57 /* JackMidiUtil.cpp in Sources */,
 				4B97B67B1344B51D00794F57 /* JackMidiWriteQueue.cpp in Sources */,
+				4B21795113E2EEA60095B3E5 /* JackTimedDriver.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7472,6 +7486,7 @@
 				4B97B65A1344B44F00794F57 /* JackMidiSendQueue.cpp in Sources */,
 				4B97B65C1344B45D00794F57 /* JackMidiUtil.cpp in Sources */,
 				4B97B65E1344B46B00794F57 /* JackMidiWriteQueue.cpp in Sources */,
+				4B21794F13E2EEA60095B3E5 /* JackTimedDriver.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7694,6 +7709,7 @@
 				4B6FE16413DDAD7F00B4B943 /* JackMidiReadQueue.cpp in Sources */,
 				4B6FE16613DDAD8F00B4B943 /* JackMidiBufferReadQueue.cpp in Sources */,
 				4B6FE16813DDAD9F00B4B943 /* JackMidiAsyncWaitQueue.cpp in Sources */,
+				4B21795313E2EEA60095B3E5 /* JackTimedDriver.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
