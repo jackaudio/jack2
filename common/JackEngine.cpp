@@ -140,7 +140,6 @@ void JackEngine::ProcessNext(jack_time_t cur_cycle_begin)
     fLastSwitchUsecs = cur_cycle_begin;
     if (fGraphManager->RunNextGraph())  { // True if the graph actually switched to a new state
         fChannel.Notify(ALL_CLIENTS, kGraphOrderCallback, 0);
-        //NotifyGraphReorder();
     }
     fSignal.Signal();                   // Signal for threads waiting for next cycle
 }
@@ -198,13 +197,11 @@ void JackEngine::CheckXRun(jack_time_t callback_usecs)  // REVOIR les conditions
             if (status != NotTriggered && status != Finished) {
                 jack_error("JackEngine::XRun: client = %s was not run: state = %ld", client->GetClientControl()->fName, status);
                 fChannel.Notify(ALL_CLIENTS, kXRunCallback, 0);  // Notify all clients
-                //NotifyXRun(ALL_CLIENTS);
             }
 
             if (status == Finished && (long)(finished_date - callback_usecs) > 0) {
                 jack_error("JackEngine::XRun: client %s finished after current callback", client->GetClientControl()->fName);
                 fChannel.Notify(ALL_CLIENTS, kXRunCallback, 0);  // Notify all clients
-                //NotifyXRun(ALL_CLIENTS);
             }
         }
     }
@@ -307,7 +304,6 @@ void JackEngine::NotifyXRun(jack_time_t callback_usecs, float delayed_usecs)
     // Use the audio thread => request thread communication channel
     fEngineControl->NotifyXRun(callback_usecs, delayed_usecs);
     fChannel.Notify(ALL_CLIENTS, kXRunCallback, 0);
-    //NotifyXRun(ALL_CLIENTS);
 }
 
 void JackEngine::NotifyXRun(int refnum)

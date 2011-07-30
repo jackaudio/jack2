@@ -224,22 +224,30 @@ bool JackThreadedDriver::Execute()
 bool JackThreadedDriver::Init()
 {
     if (fDriver->Initialize())  {
-        if (fDriver->IsRealTime()) {
-            jack_log("JackThreadedDriver::Init IsRealTime");
-            // Will do "something" on OSX only...
-            GetEngineControl()->fPeriod = GetEngineControl()->fConstraint = GetEngineControl()->fPeriodUsecs * 1000;
-            GetEngineControl()->fComputation = JackTools::ComputationMicroSec(GetEngineControl()->fBufferSize) * 1000;
-            fThread.SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
-            if (fThread.AcquireSelfRealTime(GetEngineControl()->fServerPriority) < 0) {
-                jack_error("AcquireSelfRealTime error");
-            } else {
-                set_threaded_log_function();
-            }
-        }
+        SetRealTime();
         return true;
     } else {
         return false;
     }
 }
+
+void JackThreadedDriver::SetRealTime()
+{
+    if (fDriver->IsRealTime()) {
+        jack_log("JackThreadedDriver::Init real-time");
+        // Will do "something" on OSX only...
+        GetEngineControl()->fPeriod = GetEngineControl()->fConstraint = GetEngineControl()->fPeriodUsecs * 1000;
+        GetEngineControl()->fComputation = JackTools::ComputationMicroSec(GetEngineControl()->fBufferSize) * 1000;
+        fThread.SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
+        if (fThread.AcquireSelfRealTime(GetEngineControl()->fServerPriority) < 0) {
+            jack_error("AcquireSelfRealTime error");
+        } else {
+            set_threaded_log_function();
+        }
+    } else {
+        jack_log("JackThreadedDriver::Init non non-realtime ");
+    }
+}
+
 
 } // end of namespace

@@ -39,6 +39,8 @@ class SERVER_EXPORT JackThreadedDriver : public JackDriverClientInterface, publi
         JackThread fThread;
         JackDriver* fDriver;
 
+        void SetRealTime();
+
     public:
 
         JackThreadedDriver(JackDriver* driver);
@@ -72,7 +74,7 @@ class SERVER_EXPORT JackThreadedDriver : public JackDriverClientInterface, publi
         virtual int Close();
 
         virtual int Process();
-      
+
         virtual int Attach();
         virtual int Detach();
 

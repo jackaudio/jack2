@@ -41,8 +41,6 @@ class SERVER_EXPORT JackAudioDriver : public JackDriver
         int ProcessGraphSyncMaster();
         int ProcessGraphSyncSlave();
 
-       // void WaitUntilNextCycle();
-
         virtual int ProcessAsync();
         virtual int ProcessSync();
 
@@ -94,7 +92,7 @@ class SERVER_EXPORT JackAudioDriver : public JackDriver
                         jack_nframes_t playback_latency);
 
         virtual int Process();
-      
+
         virtual int Attach();
         virtual int Detach();
 
