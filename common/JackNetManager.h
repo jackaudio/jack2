@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008 Grame
+Copyright (C) 2008-2011 Romain Moret at Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -40,9 +40,9 @@ namespace Jack
 
         private:
 
-            static int SetProcess ( jack_nframes_t nframes, void* arg );
-            static int SetBufferSize (jack_nframes_t nframes, void* arg);
-            static void SetTimebaseCallback ( jack_transport_state_t state, jack_nframes_t nframes, jack_position_t* pos, int new_pos, void* arg );
+            static int SetProcess(jack_nframes_t nframes, void* arg);
+            static int SetBufferSize(jack_nframes_t nframes, void* arg);
+            static void SetTimebaseCallback(jack_transport_state_t state, jack_nframes_t nframes, jack_position_t* pos, int new_pos, void* arg);
 
             //jack client
             jack_client_t* fJackClient;
@@ -72,13 +72,13 @@ namespace Jack
             void DecodeTransportData();
 
             int Process();
-            void TimebaseCallback ( jack_position_t* pos );
+            void TimebaseCallback(jack_position_t* pos);
             void ConnectPorts();
 
         public:
 
-            JackNetMaster ( JackNetSocket& socket, session_params_t& params, const char* multicast_ip);
-            ~JackNetMaster ();
+            JackNetMaster(JackNetSocket& socket, session_params_t& params, const char* multicast_ip);
+            ~JackNetMaster();
 
             bool IsSlaveReadyToRoll();
     };
@@ -96,8 +96,8 @@ namespace Jack
 
         private:
 
-            static int SetSyncCallback ( jack_transport_state_t state, jack_position_t* pos, void* arg );
-            static void* NetManagerThread ( void* arg );
+            static int SetSyncCallback(jack_transport_state_t state, jack_position_t* pos, void* arg);
+            static void* NetManagerThread(void* arg);
 
             jack_client_t* fManagerClient;
             const char* fManagerName;
@@ -110,18 +110,18 @@ namespace Jack
             bool fAutoConnect;
 
             void Run();
-            JackNetMaster* InitMaster ( session_params_t& params );
-            master_list_it_t FindMaster ( uint32_t client_id );
-            int KillMaster ( session_params_t* params );
-            void SetSlaveName ( session_params_t& params );
+            JackNetMaster* InitMaster(session_params_t& params);
+            master_list_it_t FindMaster(uint32_t client_id);
+            int KillMaster(session_params_t* params);
+            void SetSlaveName(session_params_t& params);
 
-            int SyncCallback ( jack_transport_state_t state, jack_position_t* pos );
+            int SyncCallback(jack_transport_state_t state, jack_position_t* pos);
 
             int CountIO(int flags);
 
         public:
 
-            JackNetMasterManager ( jack_client_t* jack_client, const JSList* params);
+            JackNetMasterManager(jack_client_t* jack_client, const JSList* params);
             ~JackNetMasterManager();
     };
 }

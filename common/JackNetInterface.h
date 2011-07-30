@@ -1,5 +1,4 @@
 /*
-Copyright (C) 2001 Paul Davis
 Copyright (C) 2008-2011 Romain Moret at Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -25,8 +24,21 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 namespace Jack
 {
+
+#define DEFAULT_MULTICAST_IP "225.3.19.154"
+#define DEFAULT_PORT    19000
+#define DEFAULT_MTU     1500
+
+#define SLAVE_SETUP_RETRY   5
+
+#define MANAGER_INIT_TIMEOUT    2000000      // in usec
+#define MASTER_INIT_TIMEOUT     1000000      // in usec
+#define SLAVE_INIT_TIMEOUT      1000000      // in usec
+
+#define NETWORK_MAX_LATENCY     20
+
     /**
-    \Brief This class describes the basic Net Interface, used by both master and slave
+    \Brief This class describes the basic Net Interface, used by both master and slave.
     */
 
     class SERVER_EXPORT JackNetInterface
@@ -40,7 +52,7 @@ namespace Jack
             JackNetSocket fSocket;
             char fMulticastIP[32];
 
-            //headers
+            // headers
             packet_header_t fTxHeader;
             packet_header_t fRxHeader;
 
@@ -48,31 +60,31 @@ namespace Jack
             net_transport_data_t fSendTransportData;
             net_transport_data_t fReturnTransportData;
 
-            //network buffers
+            // network buffers
             char* fTxBuffer;
             char* fRxBuffer;
             char* fTxData;
             char* fRxData;
 
-            //jack buffers
+            // JACK buffers
             NetMidiBuffer* fNetMidiCaptureBuffer;
             NetMidiBuffer* fNetMidiPlaybackBuffer;
             NetAudioBuffer* fNetAudioCaptureBuffer;
             NetAudioBuffer* fNetAudioPlaybackBuffer;
 
-            //utility methods
+            // utility methods
             int SetNetBufferSize();
             void FreeNetworkBuffers();
 
-            //virtual methods : depends on the sub class master/slave
+            // virtual methods : depends on the sub class master/slave
             virtual bool SetParams();
             virtual bool Init() = 0;
 
-            //transport
+            // transport
             virtual void EncodeTransportData() = 0;
             virtual void DecodeTransportData() = 0;
 
-            //sync packet
+            // sync packet
             virtual void EncodeSyncPacket() = 0;
             virtual void DecodeSyncPacket() = 0;
 
@@ -84,13 +96,22 @@ namespace Jack
             virtual int Send(size_t size, int flags) = 0;
             virtual int Recv(size_t size, int flags) = 0;
 
-            virtual void FatalError() = 0;
+            virtual void FatalRecvError() = 0;
+            virtual void FatalSendError() = 0;
+
+            int MidiSend(NetMidiBuffer* buffer, int midi_channnels, int audio_channels);
+            int AudioSend(NetAudioBuffer* buffer, int audio_channels);
+
+            int MidiRecv(packet_header_t* rx_head, NetMidiBuffer* buffer, uint& recvd_midi_pckt);
+            int AudioRecv(packet_header_t* rx_head, NetAudioBuffer* buffer);
+
+            int FinishRecv(NetAudioBuffer* buffer);
+
+        public:
 
             JackNetInterface();
             JackNetInterface(const char* multicast_ip, int port);
             JackNetInterface(session_params_t& params, JackNetSocket& socket, const char* multicast_ip);
-
-        public:
 
             virtual ~JackNetInterface();
 
@@ -106,7 +127,9 @@ namespace Jack
         protected:
 
             bool fRunning;
-            int fCycleOffset;
+
+            int fCurrentCycleOffset;
+            int fMaxCycleOffset;
             int fLastfCycleOffset;
 
             bool Init();
@@ -121,24 +144,27 @@ namespace Jack
             int DataRecv();
             int DataSend();
 
-             //sync packet
+            // sync packet
             void EncodeSyncPacket();
             void DecodeSyncPacket();
 
-            int Send ( size_t size, int flags );
-            int Recv ( size_t size, int flags );
+            int Send(size_t size, int flags);
+            int Recv(size_t size, int flags);
 
             bool IsSynched();
 
-            void FatalError();
+            void FatalRecvError();
+            void FatalSendError();
 
         public:
-            JackNetMasterInterface() : JackNetInterface(), fRunning(false), fCycleOffset(0), fLastfCycleOffset(0)
+
+            JackNetMasterInterface() : JackNetInterface(), fRunning(false), fCurrentCycleOffset(0), fMaxCycleOffset(0), fLastfCycleOffset(0)
             {}
-            JackNetMasterInterface ( session_params_t& params, JackNetSocket& socket, const char* multicast_ip )
-                    : JackNetInterface ( params, socket, multicast_ip )
+            JackNetMasterInterface(session_params_t& params, JackNetSocket& socket, const char* multicast_ip)
+                    : JackNetInterface(params, socket, multicast_ip)
             {}
-            ~JackNetMasterInterface()
+
+            virtual~JackNetMasterInterface()
             {}
     };
 
@@ -154,7 +180,7 @@ namespace Jack
             static uint fSlaveCounter;
 
             bool Init();
-            bool InitConnection(int time_out);
+            bool InitConnection(int time_out_sec);
             bool InitRendering();
 
             net_status_t SendAvailableToMaster(long count = LONG_MAX);  // long here (and not int...)
@@ -168,65 +194,47 @@ namespace Jack
             int DataRecv();
             int DataSend();
 
-            //sync packet
+            // sync packet
             void EncodeSyncPacket();
             void DecodeSyncPacket();
 
-            int Recv ( size_t size, int flags );
-            int Send ( size_t size, int flags );
+            int Recv(size_t size, int flags);
+            int Send(size_t size, int flags);
 
-            void FatalError();
+            void FatalRecvError();
+            void FatalSendError();
+
+            void InitAPI()
+            {
+                // open Socket API with the first slave
+                if (fSlaveCounter++ == 0) {
+                    if (SocketAPIInit() < 0) {
+                        jack_error("Can't init Socket API, exiting...");
+                        throw std::bad_alloc();
+                    }
+                }
+            }
 
         public:
 
             JackNetSlaveInterface() : JackNetInterface()
             {
-                //open Socket API with the first slave
-                if ( fSlaveCounter++ == 0 )
-                {
-                    if ( SocketAPIInit() < 0 )
-                    {
-                        jack_error ( "Can't init Socket API, exiting..." );
-                        throw -1;
-                    }
-                }
+                InitAPI();
             }
 
-            JackNetSlaveInterface ( const char* ip, int port ) : JackNetInterface ( ip, port )
+            JackNetSlaveInterface(const char* ip, int port) : JackNetInterface(ip, port)
             {
-                //open Socket API with the first slave
-                if ( fSlaveCounter++ == 0 )
-                {
-                    if ( SocketAPIInit() < 0 )
-                    {
-                        jack_error ( "Can't init Socket API, exiting..." );
-                        throw -1;
-                    }
-                }
+                InitAPI();
             }
 
-            ~JackNetSlaveInterface()
+            virtual ~JackNetSlaveInterface()
             {
-                //close Socket API with the last slave
-                if ( --fSlaveCounter == 0 )
+                // close Socket API with the last slave
+                if (--fSlaveCounter == 0) {
                     SocketAPIEnd();
+                }
             }
     };
 }
-
-#define DEFAULT_MULTICAST_IP "225.3.19.154"
-#define DEFAULT_PORT 19000
-#define DEFAULT_MTU 1500
-
-#define SLAVE_SETUP_RETRY 5
-
-#define MASTER_INIT_TIMEOUT 1000000     // in usec
-#define SLAVE_INIT_TIMEOUT 1000000      // in usec
-
-#define CYCLE_OFFSET_FAST   0
-#define CYCLE_OFFSET_NORMAL 1
-#define CYCLE_OFFSET_SLOW   2
-//#define CYCLE_OFFSET_SLOW   30
-#define MAX_LATENCY CYCLE_OFFSET_SLOW * 4
 
 #endif

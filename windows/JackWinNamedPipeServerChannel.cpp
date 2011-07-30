@@ -117,6 +117,9 @@ bool JackClientPipeThread::HandleRequest()
                 if (req.Read(fPipe) == 0)
                     res.fResult = fServer->GetEngine()->ClientCheck(req.fName, req.fUUID, res.fName, req.fProtocol, req.fOptions, &res.fStatus);
                 res.Write(fPipe);
+                // Atomic ClientCheck followed by ClientOpen on same pipe
+                if (req.fOpen)
+                    HandleRequest();
                 break;
             }
 
@@ -477,11 +480,11 @@ int JackWinNamedPipeServerChannel::Open(const char* server_name, JackServer* ser
 void JackWinNamedPipeServerChannel::Close()
 {
     /* TODO : solve WIN32 thread Kill issue
-        This would hang the server... since we are quitting it, its not really problematic,
-        all ressources will be deallocated at the end.
+    This would hang the server... since we are quitting it, its not really problematic,
+    all ressources will be deallocated at the end.
 
-        fRequestListenPipe.Close();
-        fThread.Stop();
+    fRequestListenPipe.Close();
+    fThread.Stop();
     */
 
     fThread.Kill();

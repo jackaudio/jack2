@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004 Ian Esten
-    
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -93,7 +93,7 @@ int main(int narg, char **args)
 	}
 	if((client = jack_client_open (args[1], JackNullOption, NULL)) == 0)
 	{
-		fprintf (stderr, "jack server not running?\n");
+		fprintf (stderr, "JACK server not running?\n");
 		return 1;
 	}
 	jack_set_process_callback (client, process, 0);
@@ -117,7 +117,7 @@ int main(int narg, char **args)
 		fprintf (stderr, "cannot activate client");
 		return 1;
 	}
-    
+
     /* install a signal handler to properly quits jack client */
     signal(SIGQUIT, signal_handler);
 	signal(SIGTERM, signal_handler);
@@ -128,7 +128,7 @@ int main(int narg, char **args)
 	while (1) {
 		sleep(1);
 	};
-    
+
     jack_client_close(client);
 	exit (0);
 }

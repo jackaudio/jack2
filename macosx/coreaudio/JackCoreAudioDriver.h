@@ -141,6 +141,8 @@ class JackCoreAudioDriver : public JackAudioDriver
                       int outchannels,
                       int in_nChannels,
                       int out_nChannels,
+                      const vector<int>& chan_in_list,
+                      const vector<int>& chan_out_list,
                       jack_nframes_t nframes,
                       jack_nframes_t samplerate);
         void CloseAUHAL();
@@ -162,8 +164,10 @@ class JackCoreAudioDriver : public JackAudioDriver
                  jack_nframes_t samplerate,
                  bool capturing,
                  bool playing,
-                 int chan_in,
-                 int chan_out,
+                 int inchannels,
+                 int outchannels,
+                 const char* chan_in_list,
+                 const char* chan_out_list,
                  bool monitor,
                  const char* capture_driver_name,
                  const char* playback_driver_name,

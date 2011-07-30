@@ -18,42 +18,48 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifndef __JackExternalClient__
-#define __JackExternalClient__
+#ifndef __JackTimedDriver__
+#define __JackTimedDriver__
 
-#include "JackClientInterface.h"
-#include "JackPlatformPlug.h"
+#include "JackAudioDriver.h"
 
 namespace Jack
 {
 
-struct JackClientControl;
-
 /*!
-\brief Server side implementation of library clients.
+\brief The timed driver.
 */
 
-class JackExternalClient : public JackClientInterface
+class SERVER_EXPORT JackTimedDriver : public JackAudioDriver
 {
-
     private:
 
-        JackNotifyChannel fChannel;           /*! Server/client communication channel */
-        JackClientControl* fClientControl;    /*! Client control in shared memory     */
+        int fCycleCount;
+        jack_time_t fAnchorTime;
+        
+        int FirstCycle(jack_time_t cur_time);
+        int CurrentCycle(jack_time_t cur_time);
+        
+        int ProcessAux();
 
     public:
 
-        JackExternalClient();
-        virtual ~JackExternalClient();
+        JackTimedDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
+                : JackAudioDriver(name, alias, engine, table), fCycleCount(0), fAnchorTime(0)
+        {}
+        virtual ~JackTimedDriver()
+        {}
 
-        int Open(const char* name, int pid, int refnum, int uuid, int* shared_client);
-        int Close();
+        virtual int Process();
+        virtual int ProcessNull();
+        
+        // BufferSize can be changed
+        bool IsFixedBufferSize()
+        {
+            return false;
+        }
 
-        int ClientNotify(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2);
-
-        JackClientControl* GetClientControl() const;
 };
-
 
 } // end of namespace
 

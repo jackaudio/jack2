@@ -35,6 +35,26 @@ Chris Caudle
   Jackdmp changes log
 ---------------------------
 
+2011-07-29 Stephane Letz  <letz@grame.fr>
+
+	* New JackTimedDriver class to be used by JackDummyDriver, JackNetDriver and JackNetOneDriver classes.
+
+2011-07-28 Stephane Letz  <letz@grame.fr>
+
+	* Enable explicit channel mapping in CoreAudio driver.
+
+2011-07-25 Stephane Letz  <letz@grame.fr>
+
+	* NetJack2: no more timeout, correct JackWaitThreadedDriver::Execute. 
+
+2011-07-25 Stephane Letz  <letz@grame.fr>
+
+	* NetJack2: improve latency management, cleanup. 
+
+2011-07-23 Stephane Letz  <letz@grame.fr>
+
+	* Possible fix for http://trac.jackaudio.org/ticket/193.
+
 2011-07-22 Stephane Letz  <letz@grame.fr>
 
 	* NetJack2: improve error reporting.

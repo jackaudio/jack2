@@ -108,7 +108,7 @@ main (int argc, char *argv[])
     printf("Waiting for a slave...\n");
 
     if ((net = jack_net_master_open(DEFAULT_MULTICAST_IP, DEFAULT_PORT, "net_master", &request, &result))  == 0) {
-        fprintf(stderr, "jack server not running?\n");
+        fprintf(stderr, "NetJack master can not be opened\n");
 		return 1;
 	}
 

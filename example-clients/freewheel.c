@@ -2,7 +2,7 @@
  *  freewheel - start/stop JACK "freewheeling" mode
  *
  *  Copyright (C) 2003 Paul Davis.
- *  
+ *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2 of the License, or
@@ -58,7 +58,7 @@ static void parse_arguments(int argc, char *argv[])
 	}
 }
 
-int 
+int
 main (int argc, char *argv[])
 {
 	parse_arguments (argc, argv);

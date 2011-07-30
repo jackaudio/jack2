@@ -85,9 +85,9 @@ main (int argc, char *argv[])
 	} else {
 		fprintf (stdout, "%s unloaded.\n", client_name);
 	}
-    
+
     jack_client_close(client);
 	return 0;
 }
-	
-		
+
+

@@ -1,5 +1,4 @@
 /*
-Copyright (C) 2001 Paul Davis
 Copyright (C) 2008-2011 Romain Moret at Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -21,8 +20,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackNetDriver__
 #define __JackNetDriver__
 
-#include "JackAudioDriver.h"
+#include "JackTimedDriver.h"
 #include "JackNetInterface.h"
+
+//#define JACK_MONITOR
 
 #ifdef JACK_MONITOR
 #include "JackFrameTimer.h"
@@ -34,7 +35,7 @@ namespace Jack
     \Brief This class describes the Net Backend
     */
 
-    class JackNetDriver : public JackAudioDriver, public JackNetSlaveInterface
+    class JackNetDriver : public JackTimedDriver, public JackNetSlaveInterface
     {
 
         private:
@@ -72,14 +73,14 @@ namespace Jack
 
             JackNetDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
                         const char* ip, int port, int mtu, int midi_input_ports, int midi_output_ports,
-                        char* net_name, uint transport_sync, char network_master_mode, int celt_encoding);
-            ~JackNetDriver();
+                        char* net_name, uint transport_sync, int network_latency, int celt_encoding);
+            virtual ~JackNetDriver();
 
-            int Open(jack_nframes_t frames_per_cycle, jack_nframes_t rate, bool capturing, bool playing,
-                    int inchannels, int outchannels, bool monitor, const char* capture_driver_name,
-                    const char* playback_driver_name, jack_nframes_t capture_latency, jack_nframes_t playback_latency);
             int Close();
-
+            
+            // The 
+            int Process();
+        
             int Attach();
             int Detach();
 

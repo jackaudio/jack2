@@ -188,6 +188,7 @@ int JackClientSocket::Read(void* data, int len)
             jack_error("Cannot read socket fd = %d err = %s", fSocket, strerror(errno));
             return 0;
         } else {
+            jack_error("Cannot read socket fd = %d err = %s", fSocket, strerror(errno));
             return -1;
         }
     } else {
@@ -232,6 +233,7 @@ int JackClientSocket::Write(void* data, int len)
             jack_error("Cannot write socket fd = %ld err = %s", fSocket, strerror(errno));
             return 0;
         } else {
+            jack_error("Cannot write socket fd = %ld err = %s", fSocket, strerror(errno));
             return -1;
         }
     } else {

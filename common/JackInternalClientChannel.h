@@ -50,7 +50,7 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
             return 0;
         }
 
-        void ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status, int* result)
+        void ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status, int* result, int open)
         {
             *result = fEngine->ClientCheck(name, uuid, name_res, protocol, options, status);
         }

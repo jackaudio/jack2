@@ -19,8 +19,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "JackDummyDriver.h"
-#include "JackEngineControl.h"
-#include "JackGraphManager.h"
 #include "JackDriverLoader.h"
 #include "JackThreadedDriver.h"
 #include "JackCompilerDeps.h"
@@ -28,61 +26,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <unistd.h>
 #include <math.h>
 
-namespace Jack
-{
-
-int JackDummyDriver::Open(jack_nframes_t buffer_size,
-                          jack_nframes_t samplerate,
-                          bool capturing,
-                          bool playing,
-                          int inchannels,
-                          int outchannels,
-                          bool monitor,
-                          const char* capture_driver_name,
-                          const char* playback_driver_name,
-                          jack_nframes_t capture_latency,
-                          jack_nframes_t playback_latency)
-{
-    if (JackAudioDriver::Open(buffer_size,
-                            samplerate,
-                            capturing,
-                            playing,
-                            inchannels,
-                            outchannels,
-                            monitor,
-                            capture_driver_name,
-                            playback_driver_name,
-                            capture_latency,
-                            playback_latency) == 0) {
-        int buffer_size = lroundf((fWaitTime * fEngineControl->fSampleRate) / 1000000.0f);
-        if (buffer_size > BUFFER_SIZE_MAX) {
-            buffer_size = BUFFER_SIZE_MAX;
-            jack_error("Buffer size set to %d ", BUFFER_SIZE_MAX);
-        }
-        SetBufferSize(buffer_size);
-        return 0;
-    } else {
-        return -1;
-    }
-}
-
-int JackDummyDriver::Process()
-{
-    JackDriver::CycleTakeBeginTime();
-    JackAudioDriver::Process();
-    JackSleep(std::max(0L, long(fWaitTime - (GetMicroSeconds() - fBeginDateUst))));
-    return 0;
-}
-
-int JackDummyDriver::SetBufferSize(jack_nframes_t buffer_size)
-{
-    // Generic change, never fails
-    JackAudioDriver::SetBufferSize(buffer_size);
-    fWaitTime = (unsigned long)((((float)buffer_size) / ((float)fEngineControl->fSampleRate)) * 1000000.0f);
-    return 0;
-}
-
-} // end of namespace
 
 #ifdef __cplusplus
 extern "C"
@@ -117,10 +60,10 @@ extern "C"
 
     SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) {
         jack_nframes_t sample_rate = 48000;
-        jack_nframes_t period_size = 1024;
+        jack_nframes_t buffer_size = 1024;
         unsigned int capture_ports = 2;
         unsigned int playback_ports = 2;
-        unsigned long wait_time = 0;
+        int wait_time = 0;
         const JSList * node;
         const jack_driver_param_t * param;
         bool monitor = false;
@@ -143,7 +86,7 @@ extern "C"
                     break;
 
                 case 'p':
-                    period_size = param->value.ui;
+                    buffer_size = param->value.ui;
                     break;
 
                 case 'w':
@@ -156,11 +99,16 @@ extern "C"
             }
         }
 
-        if (wait_time == 0) // Not set
-            wait_time = (unsigned long)((((float)period_size) / ((float)sample_rate)) * 1000000.0f);
-
-        Jack::JackDriverClientInterface* driver = new Jack::JackThreadedDriver(new Jack::JackDummyDriver("system", "dummy_pcm", engine, table, wait_time));
-        if (driver->Open(period_size, sample_rate, 1, 1, capture_ports, playback_ports, monitor, "dummy", "dummy", 0, 0) == 0) {
+        if (wait_time > 0) { 
+            buffer_size = lroundf((wait_time * sample_rate) / 1000000.0f);
+            if (buffer_size > BUFFER_SIZE_MAX) {
+                buffer_size = BUFFER_SIZE_MAX;
+                jack_error("Buffer size set to %d", BUFFER_SIZE_MAX);
+            }
+        }
+      
+        Jack::JackDriverClientInterface* driver = new Jack::JackThreadedDriver(new Jack::JackDummyDriver("system", "dummy_pcm", engine, table));
+        if (driver->Open(buffer_size, sample_rate, 1, 1, capture_ports, playback_ports, monitor, "dummy", "dummy", 0, 0) == 0) {
             return driver;
         } else {
             delete driver;

@@ -36,7 +36,7 @@ unsigned long response_duration;
 unsigned long response_pos;
 int grab_finished = 0;
 jack_client_t *client;
-	
+
 static void signal_handler(int sig)
 {
 	jack_client_close(client);
@@ -60,7 +60,7 @@ process (jack_nframes_t nframes, void *arg)
 		}
 		if (response_pos >=  response_duration) {
 			grab_finished = 1;
-		}	
+		}
 		for (i=0; i<nframes; i++) {
 			out[i] = 0.0f;;
 		}
@@ -72,7 +72,7 @@ process (jack_nframes_t nframes, void *arg)
 		impulse_sent = 1;
 	}
 
-	return 0;      
+	return 0;
 }
 
 static void
@@ -132,7 +132,7 @@ main (int argc, char *argv[])
 	/* try to become a client of the JACK server */
 
 	if ((client = jack_client_open("impulse_grabber", JackNullOption, NULL)) == 0) {
-		fprintf (stderr, "jack server not running?\n");
+		fprintf (stderr, "JACK server not running?\n");
 		return 1;
 	}
 
@@ -149,7 +149,7 @@ main (int argc, char *argv[])
 
 	jack_on_shutdown (client, jack_shutdown, 0);
 
-	/* display the current sample rate. once the client is activated 
+	/* display the current sample rate. once the client is activated
 	   (see below), you should rely on your own sample rate
 	   callback (see above) for this value.
 	*/
@@ -187,7 +187,7 @@ main (int argc, char *argv[])
 	}
 
 	free (ports);
-	
+
 	if ((ports = jack_get_ports (client, NULL, NULL, JackPortIsPhysical|JackPortIsInput)) == NULL) {
 		fprintf(stderr, "Cannot find any physical playback ports");
 		exit(1);
@@ -198,7 +198,7 @@ main (int argc, char *argv[])
 	}
 
 	free (ports);
-    
+
     /* install a signal handler to properly quits jack client */
     signal(SIGQUIT, signal_handler);
 	signal(SIGTERM, signal_handler);

@@ -164,7 +164,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
     JackRequest header;
     if (header.Read(socket) < 0) {
         jack_log("HandleRequest: cannot read header");
-        ClientKill(fd);  // TO CHECK SOLARIS
+        ClientKill(fd);
         return false;
     }
 
@@ -185,6 +185,9 @@ bool JackSocketServerChannel::HandleRequest(int fd)
                 res.fResult = fServer->GetEngine()->ClientCheck(req.fName, req.fUUID, res.fName, req.fProtocol, req.fOptions, &res.fStatus);
             if (res.Write(socket) < 0)
                 jack_error("JackRequest::ClientCheck write error name = %s", req.fName);
+            // Atomic ClientCheck followed by ClientOpen on same socket
+            if (req.fOpen)
+                HandleRequest(fd);
             break;
         }
 

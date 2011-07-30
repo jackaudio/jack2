@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2001 Paul Davis
-Copyright (C) 2008-2011 Romain Moret at Grame
+Copyright (C) 2008-2011 Torben Horn
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -46,21 +45,21 @@ using namespace std;
 
 namespace Jack
 {
-JackNetOneDriver::JackNetOneDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
+JackNetOneDriver::JackNetOneDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
                                      int port, int mtu, int capture_ports, int playback_ports, int midi_input_ports, int midi_output_ports,
                                      int sample_rate, int period_size, int resample_factor,
                                      const char* net_name, uint transport_sync, int bitdepth, int use_autoconfig,
-                                     int latency, int redundancy, int dont_htonl_floats, int always_deadline, int jitter_val )
-    : JackAudioDriver ( name, alias, engine, table )
+                                     int latency, int redundancy, int dont_htonl_floats, int always_deadline, int jitter_val)
+    : JackTimedDriver(name, alias, engine, table)
 {
-    jack_log ( "JackNetOneDriver::JackNetOneDriver port %d", port );
+    jack_log("JackNetOneDriver::JackNetOneDriver port %d", port);
 
 #ifdef WIN32
     WSADATA wsa;
     int rc = WSAStartup(MAKEWORD(2, 0), &wsa);
 #endif
 
-    netjack_init( & (this->netj),
+    netjack_init(& (this->netj),
                   NULL, // client
                   name,
                   capture_ports,
@@ -88,28 +87,11 @@ JackNetOneDriver::~JackNetOneDriver()
 }
 
 //open, close, attach and detach------------------------------------------------------
-int JackNetOneDriver::Open ( jack_nframes_t buffer_size, jack_nframes_t samplerate, bool capturing, bool playing,
-                             int inchannels, int outchannels, bool monitor,
-                             const char* capture_driver_name, const char* playback_driver_name,
-                             jack_nframes_t capture_latency, jack_nframes_t playback_latency )
-{
-    return JackAudioDriver::Open(buffer_size,
-                                 samplerate,
-                                 capturing,
-                                 playing,
-                                 inchannels,
-                                 outchannels,
-                                 monitor,
-                                 capture_driver_name,
-                                 playback_driver_name,
-                                 capture_latency,
-                                 playback_latency);
-}
 
 int JackNetOneDriver::Close()
 {
     // Generic audio driver close
-    int res = JackAudioDriver::Close();
+    int res = JackTimedDriver::Close();
 
     FreePorts();
     netjack_release(&netj);
@@ -254,8 +236,8 @@ bool JackNetOneDriver::Initialize()
 
     //monitor
     //driver parametering
-    JackAudioDriver::SetBufferSize ( netj.period_size );
-    JackAudioDriver::SetSampleRate ( netj.sample_rate );
+    JackTimedDriver::SetBufferSize ( netj.period_size );
+    JackTimedDriver::SetSampleRate ( netj.sample_rate );
 
     JackDriver::NotifyBufferSize ( netj.period_size );
     JackDriver::NotifySampleRate ( netj.sample_rate );
@@ -269,6 +251,12 @@ bool JackNetOneDriver::Initialize()
 //jack ports and buffers--------------------------------------------------------------
 
 //driver processes--------------------------------------------------------------------
+    
+int JackNetOneDriver::Process()
+{
+    return (fEngineControl->fSyncMode) ? ProcessSync() : ProcessAsync();
+}
+    
 int JackNetOneDriver::Read()
 {
     int delay;
@@ -951,8 +939,7 @@ extern "C"
         }
 
         try {
-            Jack::JackDriverClientInterface* driver =
-                new Jack::JackWaitThreadedDriver (
+            Jack::JackDriverClientInterface* driver = new Jack::JackWaitThreadedDriver (
                 new Jack::JackNetOneDriver ( "system", "net_pcm", engine, table, listen_port, mtu,
                                              capture_ports_midi, playback_ports_midi, capture_ports, playback_ports,
                                              sample_rate, period_size, resample_factor,

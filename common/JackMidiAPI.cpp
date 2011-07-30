@@ -57,8 +57,9 @@ LIB_EXPORT
 jack_nframes_t jack_midi_get_event_count(void* port_buffer)
 {
     JackMidiBuffer *buf = (JackMidiBuffer*)port_buffer;
-    if (!buf || !buf->IsValid())
+    if (!buf || !buf->IsValid()) {
         return 0;
+    }
     return buf->event_count;
 }
 
@@ -66,10 +67,12 @@ LIB_EXPORT
 int jack_midi_event_get(jack_midi_event_t *event, void* port_buffer, jack_nframes_t event_index)
 {
     JackMidiBuffer *buf = (JackMidiBuffer*)port_buffer;
-    if (!buf || !buf->IsValid())
+    if (!buf || !buf->IsValid()) {
         return -EINVAL;
-    if (event_index >= buf->event_count)
+    }
+    if (event_index >= buf->event_count) {
         return -ENOBUFS;
+    }
     JackMidiEvent* ev = &buf->events[event_index];
     event->time = ev->time;
     event->size = ev->size;
@@ -81,8 +84,9 @@ LIB_EXPORT
 void jack_midi_clear_buffer(void* port_buffer)
 {
     JackMidiBuffer *buf = (JackMidiBuffer*)port_buffer;
-    if (buf && buf->IsValid())
+    if (buf && buf->IsValid()) {
         buf->Reset(buf->nframes);
+    }
 }
 
 LIB_EXPORT
@@ -124,13 +128,16 @@ int jack_midi_event_write(void* port_buffer,
                           jack_nframes_t time, const jack_midi_data_t* data, size_t data_size)
 {
     JackMidiBuffer *buf = (JackMidiBuffer*)port_buffer;
-    if (!buf && !buf->IsValid())
+    if (!buf && !buf->IsValid()) {
         return -EINVAL;
-    if (time >= buf->nframes || (buf->event_count && buf->events[buf->event_count - 1].time > time))
+    }
+    if (time >= buf->nframes || (buf->event_count && buf->events[buf->event_count - 1].time > time)) {
         return -EINVAL;
+    }
     jack_midi_data_t* dest = buf->ReserveEvent(time, data_size);
-    if (!dest)
+    if (!dest) {
         return -ENOBUFS;
+    }
     memcpy(dest, data, data_size);
     return 0;
 }

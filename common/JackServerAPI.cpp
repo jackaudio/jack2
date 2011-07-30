@@ -33,17 +33,14 @@ extern "C"
 {
 #endif
 
-    jack_client_t * jack_client_new_aux (const char *client_name,
-            jack_options_t options,
-            jack_status_t *status);
-    jack_client_t * jack_client_open_aux (const char *client_name,
-            jack_options_t options,
-            jack_status_t *status, va_list ap);
-    LIB_EXPORT jack_client_t * jack_client_open (const char *client_name,
+    jack_client_t* jack_client_new_aux(const char* client_name, jack_options_t options, jack_status_t* status);
+    jack_client_t* jack_client_open_aux(const char* client_name, jack_options_t options, jack_status_t* status, va_list ap);
+
+    SERVER_EXPORT jack_client_t * jack_client_open (const char *client_name,
             jack_options_t options,
             jack_status_t *status, ...);
-    LIB_EXPORT int jack_client_close (jack_client_t *client);
-    LIB_EXPORT int jack_get_client_pid (const char *name);
+    SERVER_EXPORT int jack_client_close (jack_client_t *client);
+    SERVER_EXPORT int jack_get_client_pid (const char *name);
 
 #ifdef __cplusplus
 }
@@ -153,7 +150,7 @@ jack_client_t* jack_client_open_aux(const char* client_name, jack_options_t opti
     }
 }
 
-LIB_EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options_t options, jack_status_t* status, ...)
+SERVER_EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options_t options, jack_status_t* status, ...)
 {
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_client_open");
@@ -176,7 +173,7 @@ LIB_EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_opt
     }
 }
 
-LIB_EXPORT int jack_client_close(jack_client_t* ext_client)
+SERVER_EXPORT int jack_client_close(jack_client_t* ext_client)
 {
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_client_close");
@@ -198,7 +195,7 @@ LIB_EXPORT int jack_client_close(jack_client_t* ext_client)
     return res;
 }
 
-LIB_EXPORT int jack_get_client_pid(const char *name)
+SERVER_EXPORT int jack_get_client_pid(const char *name)
 {
     return (JackServerGlobals::fInstance != NULL)
         ? JackServerGlobals::fInstance->GetEngine()->GetClientPID(name)

@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
 	jack_on_shutdown(client, jack_shutdown, 0);
 
 	if (just_print_bufsize) {
-		fprintf(stdout, "%d\n", jack_get_buffer_size( client ) );
+		fprintf(stdout, "buffer size = %d  sample rate = %d\n", jack_get_buffer_size(client), jack_get_sample_rate(client));
 		rc=0;
 	}
 	else

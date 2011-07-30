@@ -140,7 +140,6 @@ void JackEngine::ProcessNext(jack_time_t cur_cycle_begin)
     fLastSwitchUsecs = cur_cycle_begin;
     if (fGraphManager->RunNextGraph())  { // True if the graph actually switched to a new state
         fChannel.Notify(ALL_CLIENTS, kGraphOrderCallback, 0);
-        //NotifyGraphReorder();
     }
     fSignal.Signal();                   // Signal for threads waiting for next cycle
 }
@@ -198,13 +197,11 @@ void JackEngine::CheckXRun(jack_time_t callback_usecs)  // REVOIR les conditions
             if (status != NotTriggered && status != Finished) {
                 jack_error("JackEngine::XRun: client = %s was not run: state = %ld", client->GetClientControl()->fName, status);
                 fChannel.Notify(ALL_CLIENTS, kXRunCallback, 0);  // Notify all clients
-                //NotifyXRun(ALL_CLIENTS);
             }
 
             if (status == Finished && (long)(finished_date - callback_usecs) > 0) {
                 jack_error("JackEngine::XRun: client %s finished after current callback", client->GetClientControl()->fName);
                 fChannel.Notify(ALL_CLIENTS, kXRunCallback, 0);  // Notify all clients
-                //NotifyXRun(ALL_CLIENTS);
             }
         }
     }
@@ -275,10 +272,10 @@ int JackEngine::NotifyAddClient(JackClientInterface* new_client, const char* nam
     // Notify existing clients of the new client and new client of existing clients.
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* old_client = fClientTable[i];
-        if (old_client) {
+        if (old_client && old_client != new_client) {
             if (old_client->ClientNotify(refnum, name, kAddClient, true, "", 0, 0) < 0) {
                 jack_error("NotifyAddClient old_client fails name = %s", old_client->GetClientControl()->fName);
-                return -1;
+                // Not considered as a failure...
             }
             if (new_client->ClientNotify(i, old_client->GetClientControl()->fName, kAddClient, true, "", 0, 0) < 0) {
                 jack_error("NotifyAddClient new_client fails name = %s", name);
@@ -296,7 +293,7 @@ void JackEngine::NotifyRemoveClient(const char* name, int refnum)
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
         if (client) {
-            client->ClientNotify(refnum, name, kRemoveClient, true, "",0, 0);
+            client->ClientNotify(refnum, name, kRemoveClient, true, "", 0, 0);
         }
     }
 }
@@ -307,7 +304,6 @@ void JackEngine::NotifyXRun(jack_time_t callback_usecs, float delayed_usecs)
     // Use the audio thread => request thread communication channel
     fEngineControl->NotifyXRun(callback_usecs, delayed_usecs);
     fChannel.Notify(ALL_CLIENTS, kXRunCallback, 0);
-    //NotifyXRun(ALL_CLIENTS);
 }
 
 void JackEngine::NotifyXRun(int refnum)
@@ -427,7 +423,7 @@ int JackEngine::ClientCheck(const char* name, int uuid, char* name_res, int prot
     *status = 0;
     strcpy(name_res, name);
 
-    jack_log("Check protocol client %ld server = %ld", protocol, JACK_PROTOCOL_VERSION);
+    jack_log("Check protocol client = %ld server = %ld", protocol, JACK_PROTOCOL_VERSION);
 
     if (protocol != JACK_PROTOCOL_VERSION) {
         *status |= (JackFailure | JackVersionError);
@@ -563,7 +559,6 @@ int JackEngine::ClientExternalOpen(const char* name, int pid, int uuid, int* ref
         } else {
             strncpy(real_name, name, JACK_CLIENT_NAME_SIZE);
         }
-
         EnsureUUID(uuid);
     }
 
@@ -686,12 +681,12 @@ int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wai
     int i;
 
     fGraphManager->GetInputPorts(refnum, ports);
-    for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY) ; i++) {
+    for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY); i++) {
         PortUnRegister(refnum, ports[i]);
     }
 
     fGraphManager->GetOutputPorts(refnum, ports);
-    for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY) ; i++) {
+    for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY); i++) {
         PortUnRegister(refnum, ports[i]);
     }
 

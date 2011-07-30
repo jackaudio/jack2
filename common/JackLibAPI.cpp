@@ -42,6 +42,7 @@ extern "C"
     jack_client_t * jack_client_open_aux (const char *client_name,
             jack_options_t options,
             jack_status_t *status, va_list ap);
+
     LIB_EXPORT jack_client_t * jack_client_open (const char *client_name,
             jack_options_t options,
             jack_status_t *status, ...);

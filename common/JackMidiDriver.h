@@ -74,8 +74,6 @@ class SERVER_EXPORT JackMidiDriver : public JackDriver
         virtual int ProcessRead();
         virtual int ProcessWrite();
 
-        virtual int ProcessNull();
-
         virtual int Attach();
         virtual int Detach();
 

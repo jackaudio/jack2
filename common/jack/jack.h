@@ -735,7 +735,6 @@ int jack_port_unregister (jack_client_t *, jack_port_t *) JACK_OPTIONAL_WEAK_EXP
  * Port buffers have to be retrieved in each callback for proper functionning.
  */
 void * jack_port_get_buffer (jack_port_t *, jack_nframes_t) JACK_OPTIONAL_WEAK_EXPORT;
-void * jack_port_get_buffer_nulled(jack_port_t* port, jack_nframes_t frames) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return the full name of the jack_port_t (including the @a

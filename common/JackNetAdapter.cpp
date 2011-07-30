@@ -41,6 +41,7 @@ namespace Jack
         GetHostName(fParams.fName, JACK_CLIENT_NAME_SIZE);
         fSocket.GetName(fParams.fSlaveNetName);
         fParams.fMtu = DEFAULT_MTU;
+        // Desactivated for now...
         fParams.fTransportSync = 0;
         int send_audio = -1;
         int return_audio = -1;
@@ -49,7 +50,7 @@ namespace Jack
         fParams.fSampleRate = sample_rate;
         fParams.fPeriodSize = buffer_size;
         fParams.fSlaveSyncMode = 1;
-        fParams.fNetworkMode = 's';
+        fParams.fNetworkLatency = 2;
         fParams.fSampleEncoder = JackFloatEncoder;
         fJackClient = jack_client;
 
@@ -94,15 +95,11 @@ namespace Jack
                     }
                     break;
             #endif
-                case 'm' :
-                    if (strcmp(param->value.str, "normal") == 0) {
-                        fParams.fNetworkMode = 'n';
-                    } else if (strcmp(param->value.str, "slow") == 0) {
-                        fParams.fNetworkMode = 's';
-                    } else if (strcmp(param->value.str, "fast") == 0) {
-                        fParams.fNetworkMode = 'f';
-                    } else {
-                        jack_error("Unknown network mode, using 'normal' mode.");
+                case 'l' :
+                    fParams.fNetworkLatency = param->value.i;
+                    if (fParams.fNetworkLatency > NETWORK_MAX_LATENCY) {
+                        jack_error("Error : network latency is limited to %d\n", NETWORK_MAX_LATENCY);
+                        throw std::bad_alloc();
                     }
                     break;
                 case 'q':
@@ -276,20 +273,20 @@ namespace Jack
             {
                 case JackTransportStopped :
                     jack_transport_stop(fJackClient);
-                    jack_info("NetMaster : transport stops.");
+                    jack_info("NetMaster : transport stops");
                     break;
 
                 case JackTransportStarting :
                     jack_transport_reposition(fJackClient, &fSendTransportData.fPosition);
                     jack_transport_start(fJackClient);
-                    jack_info("NetMaster : transport starts.");
+                    jack_info("NetMaster : transport starts");
                     break;
 
                 case JackTransportRolling :
                     // TODO, we need to :
                     // - find a way to call TransportEngine->SetNetworkSync()
                     // - turn the transport state to JackTransportRolling
-                    jack_info("NetMaster : transport rolls.");
+                    jack_info("NetMaster : transport rolls");
                     break;
             }
         }
@@ -412,8 +409,8 @@ extern "C"
         value.ui = 1U;
         jack_driver_descriptor_add_parameter(desc, &filler, "transport-sync", 't', JackDriverParamUInt, &value, NULL, "Sync transport with master's", NULL);
 
-        strcpy(value.str, "slow");
-        jack_driver_descriptor_add_parameter(desc, &filler, "mode", 'm', JackDriverParamString, &value, NULL, "Slow, Normal or Fast mode.", NULL);
+        value.ui = 2U;
+        jack_driver_descriptor_add_parameter(desc, &filler, "latency", 'l', JackDriverParamUInt, &value, NULL, "Network latency", NULL);
 
         value.i = 0;
         jack_driver_descriptor_add_parameter(desc, &filler, "quality", 'q', JackDriverParamInt, &value, NULL, "Resample algorithm quality (0 - 4)", NULL);
@@ -448,6 +445,7 @@ extern "C"
             }
 
         } catch (...) {
+            jack_info("NetAdapter allocation error");
             return 1;
         }
     }

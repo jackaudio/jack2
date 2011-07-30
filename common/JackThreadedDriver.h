@@ -39,6 +39,8 @@ class SERVER_EXPORT JackThreadedDriver : public JackDriverClientInterface, publi
         JackThread fThread;
         JackDriver* fDriver;
 
+        void SetRealTime();
+
     public:
 
         JackThreadedDriver(JackDriver* driver);
@@ -72,7 +74,6 @@ class SERVER_EXPORT JackThreadedDriver : public JackDriverClientInterface, publi
         virtual int Close();
 
         virtual int Process();
-        virtual int ProcessNull();
 
         virtual int Attach();
         virtual int Detach();
@@ -109,18 +110,6 @@ class SERVER_EXPORT JackThreadedDriver : public JackDriverClientInterface, publi
         // JackRunnableInterface interface
         virtual bool Execute();
         virtual bool Init();
-
-        // For OSX only
-        int ComputationMicroSec(int buffer_size)
-        {
-            if (buffer_size < 128) {
-                return 500;
-            } else if (buffer_size < 256) {
-                return 300;
-            } else {
-                return 100;
-            }
-        }
 
 };
 

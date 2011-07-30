@@ -22,7 +22,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackServerGlobals.h"
 #include "JackTime.h"
 #include "JackFreewheelDriver.h"
-#include "JackDummyDriver.h"
 #include "JackThreadedDriver.h"
 #include "JackGlobals.h"
 #include "JackLockedEngine.h"

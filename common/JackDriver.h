@@ -53,14 +53,14 @@ class SERVER_EXPORT JackDriverInterface
         virtual int Open() = 0;
 
         virtual int Open (bool capturing,
-                     bool playing,
-                     int inchannels,
-                     int outchannels,
-                     bool monitor,
-                     const char* capture_driver_name,
-                     const char* playback_driver_name,
-                     jack_nframes_t capture_latency,
-                     jack_nframes_t playback_latency) = 0;
+                         bool playing,
+                         int inchannels,
+                         int outchannels,
+                         bool monitor,
+                         const char* capture_driver_name,
+                         const char* playback_driver_name,
+                         jack_nframes_t capture_latency,
+                         jack_nframes_t playback_latency) = 0;
 
         virtual int Open(jack_nframes_t buffer_size,
                          jack_nframes_t samplerate,
@@ -88,7 +88,6 @@ class SERVER_EXPORT JackDriverInterface
         virtual int SetSampleRate(jack_nframes_t sample_rate) = 0;
 
         virtual int Process() = 0;
-        virtual int ProcessNull() = 0;
 
         virtual void SetMaster(bool onoff) = 0;
         virtual bool GetMaster() = 0;
@@ -176,14 +175,14 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         virtual int Open();
 
         virtual int Open (bool capturing,
-                     bool playing,
-                     int inchannels,
-                     int outchannels,
-                     bool monitor,
-                     const char* capture_driver_name,
-                     const char* playback_driver_name,
-                     jack_nframes_t capture_latency,
-                     jack_nframes_t playback_latency);
+                         bool playing,
+                         int inchannels,
+                         int outchannels,
+                         bool monitor,
+                         const char* capture_driver_name,
+                         const char* playback_driver_name,
+                         jack_nframes_t capture_latency,
+                         jack_nframes_t playback_latency);
 
         virtual int Open(jack_nframes_t buffer_size,
                          jack_nframes_t samplerate,
@@ -199,8 +198,7 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         virtual int Close();
 
         virtual int Process();
-        virtual int ProcessNull();
-
+    
         virtual int Attach();
         virtual int Detach();
 
