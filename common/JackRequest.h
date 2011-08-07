@@ -26,6 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "types.h"
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <list>
 
 namespace Jack
@@ -1188,6 +1189,26 @@ struct JackSessionNotifyResult : public JackResult
         return 0;
     }
 
+    jack_session_command_t* GetCommands()
+    {
+        jack_session_command_t* session_command = (jack_session_command_t *)malloc(sizeof(jack_session_command_t) * (fCommandList.size() + 1));
+        int i = 0;
+
+        for (std::list<JackSessionCommand>::iterator ci = fCommandList.begin(); ci != fCommandList.end(); ci++) {
+            session_command[i].uuid = strdup(ci->fUUID);
+            session_command[i].client_name = strdup(ci->fClientName);
+            session_command[i].command = strdup(ci->fCommand);
+            session_command[i].flags = ci->fFlags;
+            i += 1;
+        }
+
+        session_command[i].uuid = NULL;
+        session_command[i].client_name = NULL;
+        session_command[i].command = NULL;
+        session_command[i].flags = (jack_session_flags_t)0;
+
+        return session_command;
+    }
 };
 
 /*!
