@@ -932,12 +932,15 @@ int JackEngine::PortRename(int refnum, jack_port_id_t port, const char* name)
 // Session management
 //--------------------
 
-void JackEngine::SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket)
+void JackEngine::SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket, JackSessionNotifyResult** result)
 {
     if (fSessionPendingReplies != 0) {
         JackSessionNotifyResult res(-1);
         res.Write(socket);
         jack_log("JackEngine::SessionNotify ... busy");
+        if (result != NULL) {
+            *result = NULL;
+        }
         return;
     }
 
@@ -982,9 +985,15 @@ void JackEngine::SessionNotify(int refnum, const char *target, jack_session_even
         }
     }
 
+    if (result != NULL) {
+        *result = fSessionResult;
+    }
+
     if (fSessionPendingReplies == 0) {
         fSessionResult->Write(socket);
-        delete fSessionResult;
+        if (result == NULL) {
+            delete fSessionResult;
+        }
         fSessionResult = NULL;
     } else {
         fSessionTransaction = socket;
@@ -1004,7 +1013,10 @@ void JackEngine::SessionReply(int refnum)
 
     if (fSessionPendingReplies == 0) {
         fSessionResult->Write(fSessionTransaction);
-        delete fSessionResult;
+        if (fSessionTransaction != NULL)
+        {
+            delete fSessionResult;
+        }
         fSessionResult = NULL;
     }
 }

@@ -145,7 +145,7 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         void NotifyQuit();
 
         // Session management
-        void SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket);
+        void SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket, JackSessionNotifyResult** result);
         void SessionReply(int refnum);
 
         void GetUUIDForClientName(const char *client_name, char *uuid_res, int *result);

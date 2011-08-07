@@ -343,7 +343,7 @@ bool JackClientPipeThread::HandleRequest()
                 jack_log("JackRequest::SessionNotify");
                 JackSessionNotifyRequest req;
                 if (req.Read(fPipe) == 0) {
-                    fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath, fPipe);
+                    fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath, fPipe, NULL);
                 }
                 res.Write(fPipe);
                 break;

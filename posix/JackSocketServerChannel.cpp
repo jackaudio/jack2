@@ -430,7 +430,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             jack_log("JackRequest::SessionNotify");
             JackSessionNotifyRequest req;
             if (req.Read(socket) == 0) {
-                fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath, socket);
+                fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath, socket, NULL);
             }
             break;
         }

@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "JackConstants.h"
 #include "JackPlatformPlug.h"
+#include "JackTime.h"
 #include "types.h"
 #include <string.h>
 #include <stdio.h>
@@ -1147,15 +1148,21 @@ struct JackSessionNotifyResult : public JackResult
 {
 
     std::list<JackSessionCommand> fCommandList;
+    bool fDone;
 
-    JackSessionNotifyResult(): JackResult()
+    JackSessionNotifyResult(): JackResult(), fDone(false)
     {}
     JackSessionNotifyResult(int32_t result)
-            : JackResult(result)
+            : JackResult(result), fDone(false)
     {}
 
     int Read(JackChannelTransaction* trans)
     {
+        if (trans == NULL)
+        {
+            return 0;
+        }
+
         CheckRes(JackResult::Read(trans));
         while (true) {
             JackSessionCommand buffer;
@@ -1170,11 +1177,20 @@ struct JackSessionNotifyResult : public JackResult
 
             fCommandList.push_back(buffer);
         }
+
+        fDone = true;
+
         return 0;
     }
 
     int Write(JackChannelTransaction* trans)
     {
+        if (trans == NULL)
+        {
+            fDone = true;
+            return 0;
+        }
+
         char terminator[JACK_UUID_SIZE];
         terminator[0] = '\0';
 
@@ -1191,6 +1207,12 @@ struct JackSessionNotifyResult : public JackResult
 
     jack_session_command_t* GetCommands()
     {
+        /* TODO: some kind of signal should be used instead */
+        while (!fDone)
+        {
+            JackSleep(50000);    /* 50 ms */
+        }
+
         jack_session_command_t* session_command = (jack_session_command_t *)malloc(sizeof(jack_session_command_t) * (fCommandList.size() + 1));
         int i = 0;
 

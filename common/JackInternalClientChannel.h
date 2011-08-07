@@ -146,8 +146,16 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
 
         void SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, jack_session_command_t** result)
         {
-            //*result = fEngine->SessionNotify(refnum, target, type, path, result);
-            // TODO
+            JackSessionNotifyResult* res;
+            fEngine->SessionNotify(refnum, target, type, path, NULL, &res);
+            if (res == NULL)
+            {
+                *result = NULL;
+                return;
+            }
+
+            *result = res->GetCommands();
+            delete(res);
         }
 
         void SessionReply(int refnum, int* result)
