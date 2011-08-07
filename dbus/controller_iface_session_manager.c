@@ -60,6 +60,8 @@ jack_controller_dbus_session_notify(
         goto exit;
     }
 
+    jack_info("Session notify initiated. target='%s', type=%"PRIu32", path='%s'", target, u32, path);
+
     if (*target == 0)
     {
         target = NULL;
@@ -81,6 +83,8 @@ jack_controller_dbus_session_notify(
         jack_dbus_error(call, JACK_DBUS_ERROR_GENERIC, "jack_session_notify() failed");
         goto exit;
     }
+
+    jack_info("Session notify complete, commands follow:");
 
     call->reply = dbus_message_new_method_return(call->message);
     if (call->reply == NULL)
@@ -123,11 +127,15 @@ jack_controller_dbus_session_notify(
             goto close_struct;
         }
 
+        jack_info("uuid='%s', client='%s', command='%s', flags=0x%"PRIX32, cmd_ptr->uuid, cmd_ptr->client_name, cmd_ptr->command, u32);
+
         if (!dbus_message_iter_close_container(&array_iter, &struct_iter))
         {
             goto close_array;
         }
     }
+
+    jack_info("End of session commands.");
 
     if (!dbus_message_iter_close_container(&top_iter, &array_iter))
     {
