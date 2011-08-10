@@ -1076,7 +1076,7 @@ void JackEngine::ClientHasSessionCallback(const char *name, int *result)
 {
     JackClientInterface* client = NULL;
     for (int i = 0; i < CLIENT_NUM; i++) {
-        JackClientInterface* client = fClientTable[i];
+        client = fClientTable[i];
         if (client && (strcmp(client->GetClientControl()->fName, name) == 0))
             break;
     }
