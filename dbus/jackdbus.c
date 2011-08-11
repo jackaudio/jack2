@@ -105,6 +105,12 @@ void
 jack_dbus_send_method_return(
     struct jack_dbus_method_call * call)
 {
+    if (call->message == NULL)
+    {
+        /* async call */
+        return;
+    }
+
     if (call->reply)
     {
     retry_send:
