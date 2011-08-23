@@ -81,6 +81,8 @@ JackClient::JackClient(JackSynchro* table):fThread(this)
     fThreadFunArg = NULL;
     fSessionArg = NULL;
     fLatencyArg = NULL;
+
+    fSessionReply = kPendingSessionReply;
 }
 
 JackClient::~JackClient()
@@ -286,17 +288,18 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
             case kSessionCallback:
                 jack_log("JackClient::kSessionCallback");
                 if (fSession) {
-                    jack_session_event_t *event = (jack_session_event_t *) malloc( sizeof(jack_session_event_t) );
+                    jack_session_event_t* event = (jack_session_event_t*)malloc( sizeof(jack_session_event_t));
                     char uuid_buf[JACK_UUID_SIZE];
-                    event->type = (jack_session_event_type_t) value1;
-                    event->session_dir = strdup( message );
+                    event->type = (jack_session_event_type_t)value1;
+                    event->session_dir = strdup(message);
                     event->command_line = NULL;
-                    event->flags = (jack_session_flags_t) 0;
-                    snprintf( uuid_buf, sizeof(uuid_buf), "%d", GetClientControl()->fSessionID );
-                    event->client_uuid = strdup( uuid_buf );
-                    fImmediateSessionReply = false;
+                    event->flags = (jack_session_flags_t)0;
+                    snprintf(uuid_buf, sizeof(uuid_buf), "%d", GetClientControl()->fSessionID);
+                    event->client_uuid = strdup(uuid_buf);
+                    fSessionReply = kPendingSessionReply;
+                    // Session callback may change fSessionReply by directly using jack_session_reply
                     fSession(event, fSessionArg);
-                    res = (fImmediateSessionReply) ? 1 : 2;
+                    res = fSessionReply;
                 }
                 break;
 
@@ -1234,8 +1237,9 @@ int JackClient::SessionReply(jack_session_event_t* ev)
 
     jack_log("JackClient::SessionReply... we are here");
     if (fChannel->IsChannelThread()) {
-        jack_log( "JackClient::SessionReply... in callback reply");
-        fImmediateSessionReply = true;
+        jack_log("JackClient::SessionReply... in callback reply");
+        // OK, immediate reply...
+        fSessionReply = kImmediateSessionReply;
         return 0;
     }
 

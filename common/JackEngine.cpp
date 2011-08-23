@@ -932,12 +932,15 @@ int JackEngine::PortRename(int refnum, jack_port_id_t port, const char* name)
 // Session management
 //--------------------
 
-void JackEngine::SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket)
+void JackEngine::SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket, JackSessionNotifyResult** result)
 {
     if (fSessionPendingReplies != 0) {
         JackSessionNotifyResult res(-1);
         res.Write(socket);
         jack_log("JackEngine::SessionNotify ... busy");
+        if (result != NULL) {
+            *result = NULL;
+        }
         return;
     }
 
@@ -961,30 +964,36 @@ void JackEngine::SessionNotify(int refnum, const char *target, jack_session_even
             }
 
             char path_buf[JACK_PORT_NAME_SIZE];
-            snprintf( path_buf, sizeof(path_buf), "%s%s%c", path, client->GetClientControl()->fName, DIR_SEPARATOR );
+            snprintf(path_buf, sizeof(path_buf), "%s%s%c", path, client->GetClientControl()->fName, DIR_SEPARATOR);
 
             int res = JackTools::MkDir(path_buf);
             if (res)
-                jack_error( "JackEngine::SessionNotify: can not create session directory '%s'", path_buf );
+                jack_error("JackEngine::SessionNotify: can not create session directory '%s'", path_buf);
 
-            int result = client->ClientNotify(i, client->GetClientControl()->fName, kSessionCallback, true, path_buf, (int) type, 0);
+            int result = client->ClientNotify(i, client->GetClientControl()->fName, kSessionCallback, true, path_buf, (int)type, 0);
 
-            if (result == 2) {
+            if (result == kPendingSessionReply) {
                 fSessionPendingReplies += 1;
-            } else if (result == 1) {
+            } else if (result == kImmediateSessionReply) {
                 char uuid_buf[JACK_UUID_SIZE];
-                snprintf( uuid_buf, sizeof(uuid_buf), "%d", client->GetClientControl()->fSessionID );
-                fSessionResult->fCommandList.push_back( JackSessionCommand( uuid_buf,
-                                                                            client->GetClientControl()->fName,
-                                                                            client->GetClientControl()->fSessionCommand,
-                                                                            client->GetClientControl()->fSessionFlags ));
+                snprintf(uuid_buf, sizeof(uuid_buf), "%d", client->GetClientControl()->fSessionID);
+                fSessionResult->fCommandList.push_back(JackSessionCommand(uuid_buf,
+                                                                        client->GetClientControl()->fName,
+                                                                        client->GetClientControl()->fSessionCommand,
+                                                                        client->GetClientControl()->fSessionFlags));
             }
         }
     }
 
+    if (result != NULL) {
+        *result = fSessionResult;
+    }
+
     if (fSessionPendingReplies == 0) {
         fSessionResult->Write(socket);
-        delete fSessionResult;
+        if (result == NULL) {
+            delete fSessionResult;
+        }
         fSessionResult = NULL;
     } else {
         fSessionTransaction = socket;
@@ -995,7 +1004,7 @@ void JackEngine::SessionReply(int refnum)
 {
     JackClientInterface* client = fClientTable[refnum];
     char uuid_buf[JACK_UUID_SIZE];
-    snprintf( uuid_buf, sizeof(uuid_buf), "%d", client->GetClientControl()->fSessionID);
+    snprintf(uuid_buf, sizeof(uuid_buf), "%d", client->GetClientControl()->fSessionID);
     fSessionResult->fCommandList.push_back(JackSessionCommand(uuid_buf,
                                                             client->GetClientControl()->fName,
                                                             client->GetClientControl()->fSessionCommand,
@@ -1004,7 +1013,10 @@ void JackEngine::SessionReply(int refnum)
 
     if (fSessionPendingReplies == 0) {
         fSessionResult->Write(fSessionTransaction);
-        delete fSessionResult;
+        if (fSessionTransaction != NULL)
+        {
+            delete fSessionResult;
+        }
         fSessionResult = NULL;
     }
 }
@@ -1060,11 +1072,11 @@ void JackEngine::ReserveClientName(const char *name, const char *uuid, int *resu
     *result = 0;
 }
 
-void JackEngine::ClientHasSessionCallbackRequest(const char *name, int *result)
+void JackEngine::ClientHasSessionCallback(const char *name, int *result)
 {
     JackClientInterface* client = NULL;
     for (int i = 0; i < CLIENT_NUM; i++) {
-        JackClientInterface* client = fClientTable[i];
+        client = fClientTable[i];
         if (client && (strcmp(client->GetClientControl()->fName, name) == 0))
             break;
     }

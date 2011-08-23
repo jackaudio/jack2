@@ -2,7 +2,7 @@
  *  session_notify.c -- ultra minimal session manager
  *
  *  Copyright (C) 2010 Torben Hohn.
- *  
+ *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2 of the License, or
@@ -141,15 +141,15 @@ int main(int argc, char *argv[])
 
 
 	retval = jack_session_notify( client, NULL, notify_type, save_path );
-	for(i=0; retval[i].uuid; i++ ) {
+	for (i = 0; retval[i].uuid; i++) {
 		printf( "export SESSION_DIR=\"%s%s/\"\n", save_path, retval[i].client_name );
 		printf( "%s &\n", retval[i].command );
-		add_uuid_mapping(retval[i].uuid); 
+		add_uuid_mapping(retval[i].uuid);
 	}
 
 	printf( "sleep 10\n" );
 
-	for(k=0; retval[k].uuid; k++ ) {
+	for (k = 0; retval[k].uuid; k++) {
 
 		char* port_regexp = alloca( jack_client_name_size()+3 );
 		char* client_name = jack_get_client_name_by_uuid( client, retval[k].uuid );
@@ -163,12 +163,12 @@ int main(int argc, char *argv[])
 			const char **connections;
 			if ((connections = jack_port_get_all_connections (client, jack_port_by_name(client, ports[i]))) != 0) {
 				for (j = 0; connections[j]; j++) {
-					char *src = map_port_name_to_uuid_port( ports[i] ); 
-					char *dst = map_port_name_to_uuid_port( connections[j] ); 
+					char *src = map_port_name_to_uuid_port( ports[i] );
+					char *dst = map_port_name_to_uuid_port( connections[j] );
 					printf( "jack_connect -u \"%s\" \"%s\"\n", src, dst );
 				}
 				jack_free (connections);
-			} 
+			}
 		}
 		jack_free(ports);
 

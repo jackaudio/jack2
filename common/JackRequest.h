@@ -23,15 +23,28 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "JackConstants.h"
 #include "JackPlatformPlug.h"
+#include "JackTime.h"
 #include "types.h"
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <list>
 
 namespace Jack
 {
 
-#define CheckRes(exp) { if ((exp) < 0) return -1;}
+#define CheckRes(exp) { if ((exp) < 0) return -1; }
+
+/*!
+\brief Session API constants.
+*/
+
+enum JackSessionReply {
+
+    kImmediateSessionReply = 1,
+    kPendingSessionReply = 2
+
+};
 
 /*!
 \brief Request from client to server.
@@ -1122,11 +1135,11 @@ struct JackSessionCommand
     JackSessionCommand()
     {}
 
-    JackSessionCommand( const char *uuid, const char *clientname, const char *command, jack_session_flags_t flags )
+    JackSessionCommand(const char *uuid, const char *clientname, const char *command, jack_session_flags_t flags)
     {
-        strncpy( fUUID, uuid, sizeof(fUUID));
-        strncpy( fClientName, clientname, sizeof(fClientName));
-        strncpy( fCommand, command, sizeof(fCommand));
+        strncpy(fUUID, uuid, sizeof(fUUID));
+        strncpy(fClientName, clientname, sizeof(fClientName));
+        strncpy(fCommand, command, sizeof(fCommand));
         fFlags = flags;
     }
 };
@@ -1135,17 +1148,23 @@ struct JackSessionNotifyResult : public JackResult
 {
 
     std::list<JackSessionCommand> fCommandList;
+    bool fDone;
 
-    JackSessionNotifyResult(): JackResult()
+    JackSessionNotifyResult(): JackResult(), fDone(false)
     {}
     JackSessionNotifyResult(int32_t result)
-            : JackResult(result)
+            : JackResult(result), fDone(false)
     {}
 
     int Read(JackChannelTransaction* trans)
     {
+        if (trans == NULL)
+        {
+            return 0;
+        }
+
         CheckRes(JackResult::Read(trans));
-        while(1) {
+        while (true) {
             JackSessionCommand buffer;
 
             CheckRes(trans->Read(buffer.fUUID, sizeof(buffer.fUUID)));
@@ -1158,16 +1177,25 @@ struct JackSessionNotifyResult : public JackResult
 
             fCommandList.push_back(buffer);
         }
+
+        fDone = true;
+
         return 0;
     }
 
     int Write(JackChannelTransaction* trans)
     {
+        if (trans == NULL)
+        {
+            fDone = true;
+            return 0;
+        }
+
         char terminator[JACK_UUID_SIZE];
         terminator[0] = '\0';
 
         CheckRes(JackResult::Write(trans));
-        for (std::list<JackSessionCommand>::iterator i=fCommandList.begin(); i!=fCommandList.end(); i++) {
+        for (std::list<JackSessionCommand>::iterator i = fCommandList.begin(); i != fCommandList.end(); i++) {
             CheckRes(trans->Write(i->fUUID, sizeof(i->fUUID)));
             CheckRes(trans->Write(i->fClientName, sizeof(i->fClientName)));
             CheckRes(trans->Write(i->fCommand, sizeof(i->fCommand)));
@@ -1177,6 +1205,32 @@ struct JackSessionNotifyResult : public JackResult
         return 0;
     }
 
+    jack_session_command_t* GetCommands()
+    {
+        /* TODO: some kind of signal should be used instead */
+        while (!fDone)
+        {
+            JackSleep(50000);    /* 50 ms */
+        }
+
+        jack_session_command_t* session_command = (jack_session_command_t *)malloc(sizeof(jack_session_command_t) * (fCommandList.size() + 1));
+        int i = 0;
+
+        for (std::list<JackSessionCommand>::iterator ci = fCommandList.begin(); ci != fCommandList.end(); ci++) {
+            session_command[i].uuid = strdup(ci->fUUID);
+            session_command[i].client_name = strdup(ci->fClientName);
+            session_command[i].command = strdup(ci->fCommand);
+            session_command[i].flags = ci->fFlags;
+            i += 1;
+        }
+
+        session_command[i].uuid = NULL;
+        session_command[i].client_name = NULL;
+        session_command[i].command = NULL;
+        session_command[i].flags = (jack_session_flags_t)0;
+
+        return session_command;
+    }
 };
 
 /*!
@@ -1187,19 +1241,20 @@ struct JackSessionNotifyRequest : public JackRequest
 {
     char fPath[JACK_MESSAGE_SIZE + 1];
     char fDst[JACK_CLIENT_NAME_SIZE + 1];
-    jack_session_event_type_t  fEventType;
-    int  fRefNum;
+    jack_session_event_type_t fEventType;
+    int fRefNum;
 
     JackSessionNotifyRequest()
     {}
-    JackSessionNotifyRequest(int refnum, const char *path, jack_session_event_type_t type, const char *dst)
+    JackSessionNotifyRequest(int refnum, const char* path, jack_session_event_type_t type, const char* dst)
             : JackRequest(JackRequest::kSessionNotify), fEventType(type), fRefNum(refnum)
     {
         snprintf(fPath, sizeof(fPath), "%s", path);
-        if (dst)
+        if (dst) {
             snprintf(fDst, sizeof(fDst), "%s", dst);
-        else
+        } else {
             fDst[0] = '\0';
+        }
     }
 
     int Read(JackChannelTransaction* trans)
@@ -1279,7 +1334,6 @@ struct JackClientNameResult : public JackResult
 
 struct JackUUIDResult : public JackResult
 {
-
     char fUUID[JACK_UUID_SIZE];
 
     JackUUIDResult(): JackResult()

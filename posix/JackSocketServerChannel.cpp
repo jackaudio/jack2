@@ -429,9 +429,8 @@ bool JackSocketServerChannel::HandleRequest(int fd)
         case JackRequest::kSessionNotify: {
             jack_log("JackRequest::SessionNotify");
             JackSessionNotifyRequest req;
-            JackSessionNotifyResult res;
             if (req.Read(socket) == 0) {
-                fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath, socket);
+                fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath, socket, NULL);
             }
             break;
         }
@@ -490,7 +489,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             JackClientHasSessionCallbackRequest req;
             JackResult res;
             if (req.Read(socket) == 0) {
-                fServer->GetEngine()->ClientHasSessionCallbackRequest(req.fName, &res.fResult);
+                fServer->GetEngine()->ClientHasSessionCallback(req.fName, &res.fResult);
             }
             if (res.Write(socket) < 0)
                 jack_error("JackRequest::ClientHasSessionCallback write error");

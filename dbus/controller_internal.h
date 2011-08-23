@@ -25,6 +25,7 @@
 #include "jslist.h"
 #include "jack/control.h"
 #include "jack/jack.h"
+#include "jack/session.h"
 #include "jackdbus.h"
 #include "list.h"
 #include "params.h"
@@ -35,6 +36,16 @@ struct jack_controller_slave_driver
     char * name;
     jackctl_driver_t * handle;
     bool loaded;
+};
+
+struct jack_session_pending_command
+{
+    struct list_head siblings;
+    DBusConnection * connection;
+    DBusMessage * message;
+    jack_session_event_type_t type;
+    const char * target;
+    const char * path;
 };
 
 struct jack_controller
@@ -54,6 +65,9 @@ struct jack_controller
     union jackctl_parameter_value slave_drivers_vparam_value;
 
     struct jack_dbus_object_descriptor dbus_descriptor;
+
+    pthread_mutex_t lock;
+    struct list_head session_pending_commands;
 };
 
 #define DEFAULT_DRIVER "dummy"
@@ -183,6 +197,7 @@ extern struct jack_dbus_interface_descriptor g_jack_controller_iface_introspecta
 extern struct jack_dbus_interface_descriptor g_jack_controller_iface_control;
 extern struct jack_dbus_interface_descriptor g_jack_controller_iface_configure;
 extern struct jack_dbus_interface_descriptor g_jack_controller_iface_patchbay;
+extern struct jack_dbus_interface_descriptor g_jack_controller_iface_session_manager;
 extern struct jack_dbus_interface_descriptor g_jack_controller_iface_transport;
 
 #endif /* #ifndef CONTROLLER_INTERNAL_H__04D54D51_3D79_49A2_A1DA_F8587E9E7F42__INCLUDED */

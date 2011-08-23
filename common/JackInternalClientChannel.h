@@ -146,7 +146,42 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
 
         void SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, jack_session_command_t** result)
         {
-            *result = NULL;
+            JackSessionNotifyResult* res;
+            fEngine->SessionNotify(refnum, target, type, path, NULL, &res);
+            if (res == NULL)
+            {
+                *result = NULL;
+                return;
+            }
+
+            *result = res->GetCommands();
+            delete(res);
+        }
+
+        void SessionReply(int refnum, int* result)
+        {
+            fEngine->SessionReply(refnum);
+            *result = 0;
+        }
+
+        void GetUUIDForClientName(int refnum, const char* client_name, char* uuid_res, int* result)
+        {
+            fEngine->GetUUIDForClientName(client_name, uuid_res, result);
+        }
+
+        void GetClientNameForUUID(int refnum, const char* uuid, char* name_res, int* result)
+        {
+            fEngine->GetClientNameForUUID(uuid, name_res, result);
+        }
+
+        void ReserveClientName(int refnum, const char* client_name, const char *uuid, int* result)
+        {
+            fEngine->ReserveClientName(client_name, uuid, result);
+        }
+
+        void ClientHasSessionCallback(const char* client_name, int* result)
+        {
+            fEngine->ClientHasSessionCallback(client_name, result);
         }
 
 

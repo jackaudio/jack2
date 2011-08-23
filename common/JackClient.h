@@ -93,7 +93,7 @@ class SERVER_EXPORT JackClient : public JackClientInterface, public JackRunnable
         JackSynchro* fSynchroTable;
         std::list<jack_port_id_t> fPortList;
 
-        bool fImmediateSessionReply;
+        JackSessionReply fSessionReply;
 
         int StartThread();
         void SetupDriverSync(bool freewheel);

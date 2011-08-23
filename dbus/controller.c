@@ -26,6 +26,7 @@
 #include <string.h>
 #include <dbus/dbus.h>
 #include <assert.h>
+#include <unistd.h>
 
 #include "controller.h"
 #include "controller_internal.h"
@@ -38,6 +39,7 @@ struct jack_dbus_interface_descriptor * g_jackcontroller_interfaces[] =
     &g_jack_controller_iface_control,
     &g_jack_controller_iface_configure,
     &g_jack_controller_iface_patchbay,
+    &g_jack_controller_iface_session_manager,
     &g_jack_controller_iface_transport,
     NULL
 };
@@ -286,6 +288,15 @@ jack_controller_stop_server(
 {
     int ret;
 
+    pthread_mutex_lock(&controller_ptr->lock);
+    if (!list_empty(&controller_ptr->session_pending_commands))
+    {
+        pthread_mutex_unlock(&controller_ptr->lock);
+        jack_dbus_error(dbus_call_context_ptr, JACK_DBUS_ERROR_GENERIC, "Refusing to stop JACK server because of pending session commands");
+        return false;
+    }
+    pthread_mutex_unlock(&controller_ptr->lock);
+
     jack_info("Stopping jack server...");
 
     assert(controller_ptr->started); /* should be ensured by caller */
@@ -506,6 +517,7 @@ void *
 jack_controller_create(
         DBusConnection *connection)
 {
+    int error;
     struct jack_controller *controller_ptr;
     const char * address[PARAM_ADDRESS_SIZE];
     DBusObjectPathVTable vtable =
@@ -522,11 +534,20 @@ jack_controller_create(
         goto fail;
     }
 
+    error = pthread_mutex_init(&controller_ptr->lock, NULL);
+    if (error != 0)
+    {
+        jack_error("Failed to initialize mutex. error %d", error);
+        goto fail_free;
+    }
+
+    INIT_LIST_HEAD(&controller_ptr->session_pending_commands);
+
     controller_ptr->server = jackctl_server_create(on_device_acquire, on_device_release);
     if (controller_ptr->server == NULL)
     {
         jack_error("Failed to create server object");
-        goto fail_free;
+        goto fail_uninit_mutex;
     }
 
     controller_ptr->params = jack_params_create(controller_ptr->server);
@@ -583,6 +604,9 @@ fail_destroy_params:
 
 fail_destroy_server:
     jackctl_server_destroy(controller_ptr->server);
+
+fail_uninit_mutex:
+    pthread_mutex_destroy(&controller_ptr->lock);
 
 fail_free:
     free(controller_ptr);
@@ -738,13 +762,17 @@ jack_controller_destroy(
 {
     if (controller_ptr->started)
     {
-        jack_controller_stop_server(controller_ptr, NULL);
+        while (!jack_controller_stop_server(controller_ptr, NULL))
+        {
+            jack_info("jack server failed to stop, retrying in 3 seconds...");
+            usleep(3000000);
+        }
     }
 
     jack_controller_remove_slave_drivers(controller_ptr);
     jack_params_destroy(controller_ptr->params);
     jackctl_server_destroy(controller_ptr->server);
-
+    pthread_mutex_destroy(&controller_ptr->lock);
     free(controller_ptr);
 }
 
