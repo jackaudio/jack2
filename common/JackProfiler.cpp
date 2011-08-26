@@ -210,7 +210,7 @@ extern "C"
         jack_driver_desc_filler_t filler;
         jack_driver_param_value_t value;
 
-        desc = jack_driver_descriptor_construct("profiler", "real-time server profiling", &filler);
+        desc = jack_driver_descriptor_construct("profiler", JackDriverNone, "real-time server profiling", &filler);
 
         value.i = FALSE;
         jack_driver_descriptor_add_parameter(desc, &filler, "cpu-load", 'c', JackDriverParamBool, &value, NULL, "Show DSP CPU load", NULL);
