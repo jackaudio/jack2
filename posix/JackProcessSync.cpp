@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -30,6 +30,7 @@ void JackProcessSync::Signal()
         jack_error("JackProcessSync::Signal error err = %s", strerror(res));
 }
 
+// TO DO : check thread consistency?
 void JackProcessSync::LockedSignal()
 {
     int res = pthread_mutex_lock(&fMutex);
@@ -50,6 +51,7 @@ void JackProcessSync::SignalAll()
         jack_error("JackProcessSync::SignalAll error err = %s", strerror(res));
 }
 
+// TO DO : check thread consistency?
 void JackProcessSync::LockedSignalAll()
 {
     int res = pthread_mutex_lock(&fMutex);
@@ -65,11 +67,18 @@ void JackProcessSync::LockedSignalAll()
 
 void JackProcessSync::Wait()
 {
-    int res;
-    if ((res = pthread_cond_wait(&fCond, &fMutex)) != 0)
-        jack_error("JackProcessSync::Wait error err = %s", strerror(res));
- }
+    ThrowIf(!pthread_equal(pthread_self(), fOwner), JackException("JackProcessSync::Wait: a thread has to have locked a mutex before it can wait"));
+    fOwner = 0;
 
+    int res = pthread_cond_wait(&fCond, &fMutex);
+    if (res != 0) {
+        jack_error("JackProcessSync::Wait error err = %s", strerror(res));
+    } else {
+        fOwner = pthread_self();
+    }
+}
+
+// TO DO : check thread consistency?
 void JackProcessSync::LockedWait()
 {
     int res;
@@ -85,6 +94,9 @@ void JackProcessSync::LockedWait()
 
 bool JackProcessSync::TimedWait(long usec)
 {
+    ThrowIf(!pthread_equal(pthread_self(), fOwner), JackException("JackProcessSync::TimedWait: a thread has to have locked a mutex before it can wait"));
+    fOwner = 0;
+
     struct timeval T0, T1;
     timespec time;
     struct timeval now;
@@ -97,17 +109,22 @@ bool JackProcessSync::TimedWait(long usec)
     unsigned int next_date_usec = now.tv_usec + usec;
     time.tv_sec = now.tv_sec + (next_date_usec / 1000000);
     time.tv_nsec = (next_date_usec % 1000000) * 1000;
+
     res = pthread_cond_timedwait(&fCond, &fMutex, &time);
-    if (res != 0)
+    if (res != 0) {
         jack_error("JackProcessSync::TimedWait error usec = %ld err = %s", usec, strerror(res));
+    } else {
+        fOwner = pthread_self();
+    }
 
     gettimeofday(&T1, 0);
     jack_log("JackProcessSync::TimedWait finished delta = %5.1lf",
              (1e6 * T1.tv_sec - 1e6 * T0.tv_sec + T1.tv_usec - T0.tv_usec));
-    
+
     return (res == 0);
 }
 
+// TO DO : check thread consistency?
 bool JackProcessSync::LockedTimedWait(long usec)
 {
     struct timeval T0, T1;
@@ -118,7 +135,7 @@ bool JackProcessSync::LockedTimedWait(long usec)
     res1 = pthread_mutex_lock(&fMutex);
     if (res1 != 0)
         jack_error("JackProcessSync::LockedTimedWait error err = %s", usec, strerror(res1));
-        
+
     jack_log("JackProcessSync::TimedWait time out = %ld", usec);
     gettimeofday(&T0, 0);
 
@@ -134,10 +151,10 @@ bool JackProcessSync::LockedTimedWait(long usec)
     res1 = pthread_mutex_unlock(&fMutex);
     if (res1 != 0)
         jack_error("JackProcessSync::LockedTimedWait error err = %s", usec, strerror(res1));
-        
+
     jack_log("JackProcessSync::TimedWait finished delta = %5.1lf",
              (1e6 * T1.tv_sec - 1e6 * T0.tv_sec + T1.tv_usec - T0.tv_usec));
-    
+
     return (res2 == 0);
 }
 

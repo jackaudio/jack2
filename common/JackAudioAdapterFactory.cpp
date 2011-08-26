@@ -53,7 +53,7 @@ extern "C"
         Jack::JackAudioAdapter* adapter;
         jack_nframes_t buffer_size = jack_get_buffer_size(jack_client);
         jack_nframes_t sample_rate = jack_get_sample_rate(jack_client);
-        
+
         try {
 
     #ifdef __linux__
@@ -71,17 +71,16 @@ extern "C"
     #if defined(__sun__) || defined(sun)
             adapter = new Jack::JackAudioAdapter(jack_client, new Jack::JackOSSAdapter(buffer_size, sample_rate, params));
     #endif
-   
-           assert(adapter);
-           
-            if (adapter->Open() == 0)
+
+            assert(adapter);
+
+            if (adapter->Open() == 0) {
                 return 0;
-            else
-            {
+            } else {
                 delete adapter;
                 return 1;
             }
-         
+
         } catch (...) {
             return 1;
         }
@@ -94,13 +93,14 @@ extern "C"
         int res = 1;
         jack_driver_desc_t* desc = jack_get_descriptor();
 
-        Jack::JackArgParser parser ( load_init );
-        if ( parser.GetArgc() > 0 )
-            parse_params = parser.ParseParams ( desc, &params );
+        Jack::JackArgParser parser(load_init);
+        if (parser.GetArgc() > 0) {
+            parse_params = parser.ParseParams(desc, &params);
+        }
 
         if (parse_params) {
-            res = jack_internal_initialize ( jack_client, params );
-            parser.FreeParams ( params );
+            res = jack_internal_initialize(jack_client, params);
+            parser.FreeParams(params);
         }
         return res;
     }

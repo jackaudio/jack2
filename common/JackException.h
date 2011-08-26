@@ -29,6 +29,13 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
+#define	ThrowIf(inCondition, inException)                                               \
+			if(inCondition)																\
+			{																			\
+				throw(inException);														\
+			}
+
+
 /*!
 \brief Exception base class.
 */
@@ -52,8 +59,9 @@ class SERVER_EXPORT JackException : public std::runtime_error {
         void PrintMessage()
         {
             std::string str = what();
-            if (str != "")
+            if (str != "") {
                 jack_info(str.c_str());
+            }
         }
 };
 
@@ -62,9 +70,9 @@ class SERVER_EXPORT JackException : public std::runtime_error {
  */
 
 class SERVER_EXPORT JackTemporaryException : public JackException {
-    
+
     public:
-        
+
         JackTemporaryException(const std::string& msg) : JackException(msg)
         {}
         JackTemporaryException(char* msg) : JackException(msg)
@@ -74,15 +82,15 @@ class SERVER_EXPORT JackTemporaryException : public JackException {
         JackTemporaryException() : JackException("")
         {}
 };
-    
+
 /*!
- \brief 
+ \brief
  */
 
 class SERVER_EXPORT JackQuitException : public JackException {
-    
+
     public:
-        
+
         JackQuitException(const std::string& msg) : JackException(msg)
         {}
         JackQuitException(char* msg) : JackException(msg)
@@ -92,7 +100,7 @@ class SERVER_EXPORT JackQuitException : public JackException {
         JackQuitException() : JackException("")
         {}
 };
-    
+
 /*!
 \brief Exception possibly thrown by Net slaves.
 */

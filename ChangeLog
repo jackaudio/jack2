@@ -35,6 +35,10 @@ Chris Caudle
   Jackdmp changes log
 ---------------------------
 
+2011-06-26 Stephane Letz  <letz@grame.fr>
+
+	* More robust code in synchronization primitives and in JackMessageBuffer.
+
 2011-07-29 Stephane Letz  <letz@grame.fr>
 
 	* New JackTimedDriver class to be used by JackDummyDriver, JackNetDriver and JackNetOneDriver classes.
