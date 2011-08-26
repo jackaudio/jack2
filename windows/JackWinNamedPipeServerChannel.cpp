@@ -345,7 +345,6 @@ bool JackClientPipeThread::HandleRequest()
                 if (req.Read(fPipe) == 0) {
                     fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath, fPipe, NULL);
                 }
-                res.Write(fPipe);
                 break;
             }
 
@@ -399,7 +398,7 @@ bool JackClientPipeThread::HandleRequest()
                 JackClientHasSessionCallbackRequest req;
                 JackResult res;
                 if (req.Read(fPipe) == 0) {
-                    fServer->GetEngine()->ClientHasSessionCallbackRequest(req.fName, &res.fResult);
+                    fServer->GetEngine()->ClientHasSessionCallback(req.fName, &res.fResult);
                 }
                 res.Write(fPipe);
                 break;

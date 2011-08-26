@@ -21,6 +21,8 @@
 #ifndef __JackWinMutex__
 #define __JackWinMutex__
 
+#include "JackError.h"
+#include "JackException.h"
 #include <windows.h>
 
 namespace Jack
