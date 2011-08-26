@@ -357,6 +357,9 @@ extern "C"
 {
 #endif
 
+     // singleton kind of driver
+    static Jack::JackDriverClientInterface* driver = NULL;
+
     SERVER_EXPORT jack_driver_desc_t * driver_get_descriptor()
     {
         jack_driver_desc_t * desc;
@@ -406,13 +409,20 @@ extern "C"
         }
         */
 
-        Jack::JackDriverClientInterface* driver = new Jack::JackWinMMEDriver("system_midi", "winmme", engine, table);
-        if (driver->Open(1, 1, 0, 0, false, "in", "out", 0, 0) == 0) {
-            return driver;
+        // singleton kind of driver
+        if (!driver) {
+            driver = new Jack::JackWinMMEDriver("system_midi", "winmme", engine, table);
+            if (driver->Open(1, 1, virtual_in, virtual_out, false, "in", "out", 0, 0) == 0) {
+                return driver;
+            } else {
+                delete driver;
+                return NULL;
+            }
         } else {
-            delete driver;
+            jack_info("JackWinMMEDriver already allocated, cannot be loaded twice");
             return NULL;
         }
+
     }
 
 #ifdef __cplusplus

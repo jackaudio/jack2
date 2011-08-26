@@ -41,6 +41,7 @@ Chris Caudle
 	* Non blocking notifications in JackEngine::NotifyAddClient and JackEngine::NotifyRemoveClient.
 	* More robust Control API implementation.
 	* Add jackctl_driver_get_type in Control API.
+	* Singleton behaviour for JackCoreMidiDriver and JackWinMMEDriver.
 
 2011-07-29 Stephane Letz  <letz@grame.fr>
 
