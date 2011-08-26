@@ -39,6 +39,7 @@ Chris Caudle
 
 	* More robust code in synchronization primitives and in JackMessageBuffer.
 	* Non blocking notifications in JackEngine::NotifyAddClient and JackEngine::NotifyRemoveClient.
+	* More robust Control API implementation.
 
 2011-07-29 Stephane Letz  <letz@grame.fr>
 

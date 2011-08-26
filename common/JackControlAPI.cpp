@@ -815,49 +815,59 @@ fail:
 
 SERVER_EXPORT void jackctl_server_destroy(jackctl_server *server_ptr)
 {
-    jackctl_server_free_drivers(server_ptr);
-    jackctl_server_free_internals(server_ptr);
-    jackctl_server_free_parameters(server_ptr);
-    free(server_ptr);
+    if (server_ptr) {
+        jackctl_server_free_drivers(server_ptr);
+        jackctl_server_free_internals(server_ptr);
+        jackctl_server_free_parameters(server_ptr);
+        free(server_ptr);
+    }
 }
 
 SERVER_EXPORT const JSList * jackctl_server_get_drivers_list(jackctl_server *server_ptr)
 {
-    return server_ptr->drivers;
+    return (server_ptr) ? server_ptr->drivers : NULL;
 }
 
 SERVER_EXPORT bool jackctl_server_stop(jackctl_server *server_ptr)
 {
-    server_ptr->engine->Stop();
-    return true;
+    if (server_ptr) {
+        server_ptr->engine->Stop();
+        return true;
+    } else {
+        return false;
+    }
 }
 
 SERVER_EXPORT bool jackctl_server_close(jackctl_server *server_ptr)
 {
-    server_ptr->engine->Close();
-    delete server_ptr->engine;
+    if (server_ptr) {
+        server_ptr->engine->Close();
+        delete server_ptr->engine;
 
-    /* clean up shared memory and files from this server instance */
-    jack_log("cleaning up shared memory");
+        /* clean up shared memory and files from this server instance */
+        jack_log("cleaning up shared memory");
 
-    jack_cleanup_shm();
+        jack_cleanup_shm();
 
-    jack_log("cleaning up files");
+        jack_log("cleaning up files");
 
-    JackTools::CleanupFiles(server_ptr->name.str);
+        JackTools::CleanupFiles(server_ptr->name.str);
 
-    jack_log("unregistering server `%s'", server_ptr->name.str);
+        jack_log("unregistering server `%s'", server_ptr->name.str);
 
-    jack_unregister_server(server_ptr->name.str);
+        jack_unregister_server(server_ptr->name.str);
 
-    server_ptr->engine = NULL;
+        server_ptr->engine = NULL;
 
-    return true;
+        return true;
+    } else {
+        return false;
+    }
 }
 
 SERVER_EXPORT const JSList * jackctl_server_get_parameters(jackctl_server *server_ptr)
 {
-    return server_ptr->parameters;
+    return (server_ptr) ? server_ptr->parameters : NULL;
 }
 
 SERVER_EXPORT bool
@@ -865,9 +875,11 @@ jackctl_server_open(
     jackctl_server *server_ptr,
     jackctl_driver *driver_ptr)
 {
-    int rc;
+    if (!server_ptr || !driver_ptr) {
+        return false;
+    }
 
-    rc = jack_register_server(server_ptr->name.str, server_ptr->replace_registry.b);
+    int rc = jack_register_server(server_ptr->name.str, server_ptr->replace_registry.b);
     switch (rc)
     {
     case EEXIST:
@@ -888,8 +900,9 @@ jackctl_server_open(
     jack_cleanup_shm();
     JackTools::CleanupFiles(server_ptr->name.str);
 
-    if (!server_ptr->realtime.b && server_ptr->client_timeout.i == 0)
+    if (!server_ptr->realtime.b && server_ptr->client_timeout.i == 0) {
         server_ptr->client_timeout.i = 500; /* 0.5 sec; usable when non realtime. */
+    }
 
     /* check port max value before allocating server */
     if (server_ptr->port_max.ui > PORT_NUM_MAX) {
@@ -948,69 +961,82 @@ SERVER_EXPORT bool
 jackctl_server_start(
     jackctl_server *server_ptr)
 {
-    int rc = server_ptr->engine->Start();
-    bool result = rc >= 0;
-    if (! result)
-    {
-        jack_error("JackServer::Start() failed with %d", rc);
+    if (!server_ptr) {
+        return false;
+    } else {
+        int rc = server_ptr->engine->Start();
+        bool result = rc >= 0;
+        if (! result)
+        {
+            jack_error("JackServer::Start() failed with %d", rc);
+        }
+        return result;
     }
-    return result;
 }
 
 SERVER_EXPORT const char * jackctl_driver_get_name(jackctl_driver *driver_ptr)
 {
-    return driver_ptr->desc_ptr->name;
+    return (driver_ptr) ? driver_ptr->desc_ptr->name : NULL;
 }
 
 SERVER_EXPORT const JSList * jackctl_driver_get_parameters(jackctl_driver *driver_ptr)
 {
-    return driver_ptr->parameters;
+    return (driver_ptr) ? driver_ptr->parameters : NULL;
 }
 
 SERVER_EXPORT jack_driver_desc_t * jackctl_driver_get_desc(jackctl_driver *driver_ptr)
 {
-    return driver_ptr->desc_ptr;
+    return (driver_ptr) ? driver_ptr->desc_ptr : NULL;
 }
 
 SERVER_EXPORT const char * jackctl_parameter_get_name(jackctl_parameter *parameter_ptr)
 {
-    return parameter_ptr->name;
+    return (parameter_ptr) ? parameter_ptr->name : NULL;
 }
 
 SERVER_EXPORT const char * jackctl_parameter_get_short_description(jackctl_parameter *parameter_ptr)
 {
-    return parameter_ptr->short_description;
+    return (parameter_ptr) ? parameter_ptr->short_description : NULL;
 }
 
 SERVER_EXPORT const char * jackctl_parameter_get_long_description(jackctl_parameter *parameter_ptr)
 {
-    return parameter_ptr->long_description;
+    return (parameter_ptr) ? parameter_ptr->long_description : NULL;
 }
 
 SERVER_EXPORT bool jackctl_parameter_has_range_constraint(jackctl_parameter *parameter_ptr)
 {
-    return parameter_ptr->constraint_ptr != NULL && (parameter_ptr->constraint_ptr->flags & JACK_CONSTRAINT_FLAG_RANGE) != 0;
+    return (parameter_ptr) ? (parameter_ptr->constraint_ptr != NULL && (parameter_ptr->constraint_ptr->flags & JACK_CONSTRAINT_FLAG_RANGE) != 0) : false;
 }
 
 SERVER_EXPORT bool jackctl_parameter_has_enum_constraint(jackctl_parameter *parameter_ptr)
 {
-    return parameter_ptr->constraint_ptr != NULL && (parameter_ptr->constraint_ptr->flags & JACK_CONSTRAINT_FLAG_RANGE) == 0;
+    return (parameter_ptr) ? (parameter_ptr->constraint_ptr != NULL && (parameter_ptr->constraint_ptr->flags & JACK_CONSTRAINT_FLAG_RANGE) == 0): false;
 }
 
 SERVER_EXPORT uint32_t jackctl_parameter_get_enum_constraints_count(jackctl_parameter *parameter_ptr)
 {
+    if (!parameter_ptr) {
+        return NULL;
+    }
+
     if (!jackctl_parameter_has_enum_constraint(parameter_ptr))
     {
         return 0;
     }
 
     return parameter_ptr->constraint_ptr->constraint.enumeration.count;
-}
+ }
 
 SERVER_EXPORT union jackctl_parameter_value jackctl_parameter_get_enum_constraint_value(jackctl_parameter *parameter_ptr, uint32_t index)
 {
     jack_driver_param_value_t * value_ptr;
     union jackctl_parameter_value jackctl_value;
+
+    if (!parameter_ptr) {
+        memset(&jackctl_value, 0, sizeof(jackctl_value));
+        return jackctl_value;
+    }
 
     value_ptr = &parameter_ptr->constraint_ptr->constraint.enumeration.possible_values_array[index].value;
 
@@ -1038,11 +1064,15 @@ SERVER_EXPORT union jackctl_parameter_value jackctl_parameter_get_enum_constrain
 
 SERVER_EXPORT const char * jackctl_parameter_get_enum_constraint_description(jackctl_parameter *parameter_ptr, uint32_t index)
 {
-    return parameter_ptr->constraint_ptr->constraint.enumeration.possible_values_array[index].short_desc;
+    return (parameter_ptr) ? parameter_ptr->constraint_ptr->constraint.enumeration.possible_values_array[index].short_desc : NULL;
 }
 
 SERVER_EXPORT void jackctl_parameter_get_range_constraint(jackctl_parameter *parameter_ptr, union jackctl_parameter_value * min_ptr, union jackctl_parameter_value * max_ptr)
 {
+    if (!parameter_ptr || !min_ptr || !max_ptr) {
+        return;
+    }
+
     switch (parameter_ptr->type)
     {
     case JackParamInt:
@@ -1061,36 +1091,46 @@ SERVER_EXPORT void jackctl_parameter_get_range_constraint(jackctl_parameter *par
 
 SERVER_EXPORT bool jackctl_parameter_constraint_is_strict(jackctl_parameter_t * parameter_ptr)
 {
-    return parameter_ptr->constraint_ptr != NULL && (parameter_ptr->constraint_ptr->flags & JACK_CONSTRAINT_FLAG_STRICT) != 0;
+    return (parameter_ptr) ? (parameter_ptr->constraint_ptr != NULL && (parameter_ptr->constraint_ptr->flags & JACK_CONSTRAINT_FLAG_STRICT) != 0) : false;
 }
 
 SERVER_EXPORT bool jackctl_parameter_constraint_is_fake_value(jackctl_parameter_t * parameter_ptr)
 {
-    return parameter_ptr->constraint_ptr != NULL && (parameter_ptr->constraint_ptr->flags & JACK_CONSTRAINT_FLAG_FAKE_VALUE) != 0;
+    return (parameter_ptr) ? (parameter_ptr->constraint_ptr != NULL && (parameter_ptr->constraint_ptr->flags & JACK_CONSTRAINT_FLAG_FAKE_VALUE) != 0) : false;
 }
 
 SERVER_EXPORT jackctl_param_type_t jackctl_parameter_get_type(jackctl_parameter *parameter_ptr)
 {
-    return parameter_ptr->type;
+    return (parameter_ptr) ? parameter_ptr->type : (jackctl_param_type_t)0;
 }
 
 SERVER_EXPORT char jackctl_parameter_get_id(jackctl_parameter_t * parameter_ptr)
 {
-    return parameter_ptr->id;
+    return (parameter_ptr) ? parameter_ptr->id : 0;
 }
 
 SERVER_EXPORT bool jackctl_parameter_is_set(jackctl_parameter *parameter_ptr)
 {
-    return parameter_ptr->is_set;
+    return (parameter_ptr) ? parameter_ptr->is_set : false;
 }
 
 SERVER_EXPORT union jackctl_parameter_value jackctl_parameter_get_value(jackctl_parameter *parameter_ptr)
 {
-    return *parameter_ptr->value_ptr;
+    if (parameter_ptr)  {
+        return *parameter_ptr->value_ptr;
+    } else  {
+        union jackctl_parameter_value jackctl_value;
+        memset(&jackctl_value, 0, sizeof(jackctl_value));
+        return jackctl_value;
+    }
 }
 
 SERVER_EXPORT bool jackctl_parameter_reset(jackctl_parameter *parameter_ptr)
 {
+    if (!parameter_ptr) {
+        return NULL;
+    }
+
     if (!parameter_ptr->is_set)
     {
         return true;
@@ -1105,6 +1145,10 @@ SERVER_EXPORT bool jackctl_parameter_reset(jackctl_parameter *parameter_ptr)
 
 SERVER_EXPORT bool jackctl_parameter_set_value(jackctl_parameter *parameter_ptr, const union jackctl_parameter_value * value_ptr)
 {
+    if (!parameter_ptr || !value_ptr) {
+        return NULL;
+    }
+
     bool new_driver_parameter;
 
     /* for driver parameters, set the parameter by adding jack_driver_param_t in the set_parameters list */
@@ -1164,30 +1208,40 @@ SERVER_EXPORT bool jackctl_parameter_set_value(jackctl_parameter *parameter_ptr,
 
 SERVER_EXPORT union jackctl_parameter_value jackctl_parameter_get_default_value(jackctl_parameter *parameter_ptr)
 {
-    return *parameter_ptr->default_value_ptr;
+    if (parameter_ptr)  {
+        return *parameter_ptr->default_value_ptr;
+    } else  {
+        union jackctl_parameter_value jackctl_value;
+        memset(&jackctl_value, 0, sizeof(jackctl_value));
+        return jackctl_value;
+    }
 }
 
 // Internals clients
 
 SERVER_EXPORT const JSList * jackctl_server_get_internals_list(jackctl_server *server_ptr)
 {
-    return server_ptr->internals;
+    return (server_ptr) ? server_ptr->internals : NULL;
 }
 
 SERVER_EXPORT const char * jackctl_internal_get_name(jackctl_internal *internal_ptr)
 {
-    return internal_ptr->desc_ptr->name;
+    return (internal_ptr) ? internal_ptr->desc_ptr->name : NULL;
 }
 
 SERVER_EXPORT const JSList * jackctl_internal_get_parameters(jackctl_internal *internal_ptr)
 {
-    return internal_ptr->parameters;
+    return (internal_ptr) ? internal_ptr->parameters : NULL;
 }
 
 SERVER_EXPORT bool jackctl_server_load_internal(
     jackctl_server * server_ptr,
     jackctl_internal * internal)
 {
+    if (!server_ptr || !internal) {
+        return false;
+    }
+
     int status;
     if (server_ptr->engine != NULL) {
         server_ptr->engine->InternalClientLoad2(internal->desc_ptr->name, internal->desc_ptr->name, internal->set_parameters, JackNullOption, &internal->refnum, -1, &status);
@@ -1201,6 +1255,10 @@ SERVER_EXPORT bool jackctl_server_unload_internal(
     jackctl_server * server_ptr,
     jackctl_internal * internal)
 {
+    if (!server_ptr || !internal) {
+        return false;
+    }
+
     int status;
     if (server_ptr->engine != NULL && internal->refnum > 0) {
         // Client object is internally kept in JackEngine, and will be deallocated in InternalClientUnload
@@ -1212,7 +1270,7 @@ SERVER_EXPORT bool jackctl_server_unload_internal(
 
 SERVER_EXPORT bool jackctl_server_add_slave(jackctl_server * server_ptr, jackctl_driver * driver_ptr)
 {
-    if (server_ptr->engine != NULL) {
+    if (server_ptr && server_ptr->engine) {
         if (server_ptr->engine->IsRunning()) {
             jack_error("cannot add a slave in a running server");
             return false;
@@ -1232,7 +1290,7 @@ SERVER_EXPORT bool jackctl_server_add_slave(jackctl_server * server_ptr, jackctl
 
 SERVER_EXPORT bool jackctl_server_remove_slave(jackctl_server * server_ptr, jackctl_driver * driver_ptr)
 {
-    if (server_ptr->engine != NULL) {
+    if (server_ptr && server_ptr->engine) {
         if (server_ptr->engine->IsRunning()) {
             jack_error("cannot remove a slave from a running server");
             return false;
@@ -1255,7 +1313,7 @@ SERVER_EXPORT bool jackctl_server_remove_slave(jackctl_server * server_ptr, jack
 
 SERVER_EXPORT bool jackctl_server_switch_master(jackctl_server * server_ptr, jackctl_driver * driver_ptr)
 {
-    if (server_ptr->engine != NULL) {
+    if (server_ptr && server_ptr->engine) {
         return (server_ptr->engine->SwitchMaster(driver_ptr->desc_ptr, driver_ptr->set_parameters) == 0);
     } else {
         return false;
