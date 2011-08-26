@@ -37,7 +37,7 @@ extern "C"
         jack_driver_desc_filler_t filler;
         jack_driver_param_value_t value;
 
-        desc = jack_driver_descriptor_construct("dummy", "Timer based backend", &filler);
+        desc = jack_driver_descriptor_construct("dummy", JackDriverMaster, "Timer based backend", &filler);
 
         value.ui = 2U;
         jack_driver_descriptor_add_parameter(desc, &filler, "capture", 'C', JackDriverParamUInt, &value, NULL, "Number of capture ports", NULL);
@@ -99,14 +99,14 @@ extern "C"
             }
         }
 
-        if (wait_time > 0) { 
+        if (wait_time > 0) {
             buffer_size = lroundf((wait_time * sample_rate) / 1000000.0f);
             if (buffer_size > BUFFER_SIZE_MAX) {
                 buffer_size = BUFFER_SIZE_MAX;
                 jack_error("Buffer size set to %d", BUFFER_SIZE_MAX);
             }
         }
-      
+
         Jack::JackDriverClientInterface* driver = new Jack::JackThreadedDriver(new Jack::JackDummyDriver("system", "dummy_pcm", engine, table));
         if (driver->Open(buffer_size, sample_rate, 1, 1, capture_ports, playback_ports, monitor, "dummy", "dummy", 0, 0) == 0) {
             return driver;

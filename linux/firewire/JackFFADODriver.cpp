@@ -527,7 +527,7 @@ int JackFFADODriver::Attach()
             if (fEngine->PortRegister(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_MIDI_TYPE,
                               PlaybackDriverFlags,
-                              fEngineControl->fBufferSize, &port_index) < 0) {                
+                              fEngineControl->fBufferSize, &port_index) < 0) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
             }
@@ -755,7 +755,7 @@ extern "C"
         jack_driver_desc_filler_t filler;
         jack_driver_param_value_t value;
 
-        desc = jack_driver_descriptor_construct("firewire", "Linux FFADO API based audio backend", &filler);
+        desc = jack_driver_descriptor_construct("firewire", JackDriverMaster, "Linux FFADO API based audio backend", &filler);
 
         strcpy(value.str, "hw:0");
         jack_driver_descriptor_add_parameter(

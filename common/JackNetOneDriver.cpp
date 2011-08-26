@@ -251,12 +251,12 @@ bool JackNetOneDriver::Initialize()
 //jack ports and buffers--------------------------------------------------------------
 
 //driver processes--------------------------------------------------------------------
-    
+
 int JackNetOneDriver::Process()
 {
     return (fEngineControl->fSyncMode) ? ProcessSync() : ProcessAsync();
 }
-    
+
 int JackNetOneDriver::Read()
 {
     int delay;
@@ -764,7 +764,7 @@ extern "C"
         jack_driver_desc_filler_t filler;
         jack_driver_param_value_t value;
 
-        desc = jack_driver_descriptor_construct("netone", "netjack one slave backend component", &filler);
+        desc = jack_driver_descriptor_construct("netone", JackDriverMaster, "netjack one slave backend component", &filler);
 
         value.ui = 2U;
         jack_driver_descriptor_add_parameter(desc, &filler, "audio-ins", 'i', JackDriverParamUInt, &value, NULL, "Number of capture channels (defaults to 2)", NULL);

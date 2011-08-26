@@ -1798,6 +1798,8 @@
 		4BAB95B60B9E20B800A0C723 /* JackPortType.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackPortType.cpp; path = ../common/JackPortType.cpp; sourceTree = SOURCE_ROOT; };
 		4BAB95B70B9E20B800A0C723 /* JackPortType.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackPortType.h; path = ../common/JackPortType.h; sourceTree = SOURCE_ROOT; };
 		4BAB95EC0B9E21A500A0C723 /* JackAudioPort.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackAudioPort.cpp; path = ../common/JackAudioPort.cpp; sourceTree = SOURCE_ROOT; };
+		4BB21C6D1407E16400287B3C /* JackWinMMEDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinMMEDriver.cpp; path = ../windows/winmme/JackWinMMEDriver.cpp; sourceTree = SOURCE_ROOT; };
+		4BB21C6E1407E16400287B3C /* JackWinMMEDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackWinMMEDriver.h; path = ../windows/winmme/JackWinMMEDriver.h; sourceTree = SOURCE_ROOT; };
 		4BB371D40C1AD85A0050C1E4 /* JackNotification.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackNotification.h; path = ../common/JackNotification.h; sourceTree = SOURCE_ROOT; };
 		4BBAE40E0F42FA6100B8BD3F /* JackEngineProfiling.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackEngineProfiling.h; path = ../common/JackEngineProfiling.h; sourceTree = SOURCE_ROOT; };
 		4BBAE40F0F42FA6100B8BD3F /* JackEngineProfiling.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackEngineProfiling.cpp; path = ../common/JackEngineProfiling.cpp; sourceTree = SOURCE_ROOT; };
@@ -2850,6 +2852,8 @@
 		4B05A08A0DF72BF600840F4C /* Windows */ = {
 			isa = PBXGroup;
 			children = (
+				4BB21C6D1407E16400287B3C /* JackWinMMEDriver.cpp */,
+				4BB21C6E1407E16400287B3C /* JackWinMMEDriver.h */,
 				4B05A08B0DF72C3200840F4C /* JackWinEvent.cpp */,
 				4B05A08C0DF72C3200840F4C /* JackWinEvent.h */,
 				4B05A08D0DF72C3200840F4C /* JackWinNamedPipe.cpp */,

@@ -822,6 +822,7 @@ SERVER_EXPORT
 jack_driver_desc_t *
 jack_driver_descriptor_construct(
     const char * name,
+    jack_driver_type_t type,
     const char * description,
     jack_driver_desc_filler_t * filler_ptr)
 {

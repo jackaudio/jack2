@@ -101,7 +101,7 @@ extern "C"
         jack_driver_desc_filler_t filler;
         jack_driver_param_value_t value;
 
-        desc = jack_driver_descriptor_construct("loopback", "Loopback backend", &filler);
+        desc = jack_driver_descriptor_construct("loopback", JackDriverSlave, "Loopback backend", &filler);
 
         value.i = 0;
         jack_driver_descriptor_add_parameter(desc, &filler, "channels", 'c', JackDriverParamInt, &value, NULL, "Maximum number of loopback ports", NULL);

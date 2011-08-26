@@ -73,7 +73,7 @@ namespace Jack
     }
 
 //open, close, attach and detach------------------------------------------------------
-  
+
     int JackNetDriver::Close()
     {
 #ifdef JACK_MONITOR
@@ -473,7 +473,7 @@ namespace Jack
     {
         return (fEngineControl->fSyncMode) ? ProcessSync() : ProcessAsync();
     }
-            
+
     int JackNetDriver::Read()
     {
         //buffers
@@ -587,7 +587,7 @@ namespace Jack
             jack_driver_desc_filler_t filler;
             jack_driver_param_value_t value;
 
-            desc = jack_driver_descriptor_construct("net", "netjack slave backend component", &filler);
+            desc = jack_driver_descriptor_construct("net", JackDriverMaster, "netjack slave backend component", &filler);
 
             strcpy(value.str, DEFAULT_MULTICAST_IP);
             jack_driver_descriptor_add_parameter(desc, &filler, "multicast_ip", 'a', JackDriverParamString, &value, NULL, "Multicast Address", NULL);

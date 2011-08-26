@@ -51,6 +51,14 @@ typedef enum
     JackDriverParamBool
 } jack_driver_param_type_t;
 
+/** Driver types */
+typedef enum
+{
+    JackDriverMaster = 1,
+    JackDriverSlave,
+    JackDriverNone,
+} jack_driver_type_t;
+
 /** Driver parameter value */
 typedef union
 {
@@ -103,6 +111,7 @@ jack_driver_param_t;
 /** A struct for describing a jack driver */
 typedef struct {
     char name[JACK_DRIVER_NAME_MAX + 1];      /**< The driver's canonical name */
+    jack_driver_type_t type;               /**< The driver's type */
     char desc[JACK_DRIVER_PARAM_DESC + 1];    /**< The driver's extended description */
     char file[JACK_PATH_MAX + 1];             /**< The filename of the driver's shared object file */
     uint32_t nparams;                         /**< The number of parameters the driver has */
@@ -120,6 +129,7 @@ SERVER_EXPORT int jack_parse_driver_params(jack_driver_desc_t * desc, int argc, 
 SERVER_EXPORT jack_driver_desc_t *            /* newlly allocated driver descriptor, NULL on failure */
 jack_driver_descriptor_construct(
     const char * name,          /* driver name */
+    jack_driver_type_t type,    /* driver type */
     const char * description,   /* driver description */
     jack_driver_desc_filler_t * filler); /* Pointer to stack var to be supplied to jack_driver_descriptor_add_parameter() as well.
                                             Can be NULL for drivers that have no parameters. */

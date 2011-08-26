@@ -979,6 +979,11 @@ SERVER_EXPORT const char * jackctl_driver_get_name(jackctl_driver *driver_ptr)
     return (driver_ptr) ? driver_ptr->desc_ptr->name : NULL;
 }
 
+SERVER_EXPORT jackctl_driver_type_t jackctl_driver_get_type(jackctl_driver *driver_ptr)
+{
+    return (driver_ptr) ? (jackctl_driver_type_t)driver_ptr->desc_ptr->type : (jackctl_driver_type_t)0;
+}
+
 SERVER_EXPORT const JSList * jackctl_driver_get_parameters(jackctl_driver *driver_ptr)
 {
     return (driver_ptr) ? driver_ptr->parameters : NULL;

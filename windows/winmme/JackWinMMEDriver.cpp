@@ -361,7 +361,7 @@ extern "C"
     {
         jack_driver_desc_t * desc;
 
-        return jack_driver_descriptor_construct("winmme", "WinMME API based MIDI backend", NULL);
+        return jack_driver_descriptor_construct("winmme", JackDriverSlave, "WinMME API based MIDI backend", NULL);
     }
 
     SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)
@@ -436,3 +436,4 @@ jack_connect system_midi:capture_2 system:midi_playback_1
 jack_connect system_midi:capture_1  system_midi:playback_1
 
 */
+

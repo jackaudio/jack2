@@ -632,7 +632,7 @@ extern "C" {
         // sizes.  I don't think MIDI drivers can accept parameters right
         // now without being set as the main driver.
 
-        return jack_driver_descriptor_construct("alsarawmidi", "Alternative ALSA raw MIDI backend.", NULL);
+        return jack_driver_descriptor_construct("alsarawmidi", JackDriverSlave, "Alternative ALSA raw MIDI backend.", NULL);
     }
 
     SERVER_EXPORT Jack::JackDriverClientInterface *

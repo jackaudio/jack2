@@ -383,7 +383,7 @@ extern "C"
         jack_driver_desc_filler_t filler;
         jack_driver_param_value_t value;
 
-        desc = jack_driver_descriptor_construct("netadapter", "netjack net <==> audio backend adapter", &filler);
+        desc = jack_driver_descriptor_construct("netadapter", JackDriverNone, "netjack net <==> audio backend adapter", &filler);
 
         strcpy(value.str, DEFAULT_MULTICAST_IP);
         jack_driver_descriptor_add_parameter(desc, &filler, "multicast_ip", 'a', JackDriverParamString, &value, NULL, "Multicast Address", NULL);

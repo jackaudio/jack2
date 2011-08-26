@@ -738,7 +738,7 @@ SERVER_EXPORT jack_driver_desc_t* driver_get_descriptor()
     jack_driver_desc_filler_t filler;
     jack_driver_param_value_t value;
 
-    desc = jack_driver_descriptor_construct("oss", "OSS API based audio backend", &filler);
+    desc = jack_driver_descriptor_construct("oss", JackDriverMaster, "OSS API based audio backend", &filler);
 
     value.ui = OSS_DRIVER_DEF_FS;
     jack_driver_descriptor_add_parameter(desc, &filler, "rate", 'r', JackDriverParamUInt, &value, NULL, "Sample rate", NULL);

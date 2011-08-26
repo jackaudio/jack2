@@ -266,7 +266,7 @@ extern "C"
         jack_driver_desc_filler_t filler;
         jack_driver_param_value_t value;
 
-        desc = jack_driver_descriptor_construct("portaudio", "PortAudio API based audio backend", &filler);
+        desc = jack_driver_descriptor_construct("portaudio", JackDriverMaster, "PortAudio API based audio backend", &filler);
 
         value.ui = 0;
         jack_driver_descriptor_add_parameter(desc, &filler, "channels", 'c', JackDriverParamUInt, &value, NULL, "Maximum number of channels", NULL);

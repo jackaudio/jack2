@@ -218,7 +218,7 @@ extern "C"
         jack_driver_desc_filler_t filler;
         jack_driver_param_value_t value;
 
-        desc = jack_driver_descriptor_construct("audioadapter", "netjack audio <==> net backend adapter", &filler);
+        desc = jack_driver_descriptor_construct("audioadapter", JackDriverNone, "netjack audio <==> net backend adapter", &filler);
 
         value.ui = 0;
         jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamInt, &value, NULL, "Maximum number of input channels", NULL);

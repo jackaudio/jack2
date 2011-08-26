@@ -44,6 +44,13 @@ typedef enum
     JackParamBool,				/**< @brief value type is a boolean */
 } jackctl_param_type_t;
 
+/** Driver types, intentionally similar to jack_driver_type_t */
+typedef enum
+{
+    JackMaster = 1,         /**< @brief master driver */
+    JackSlave,              /**< @brief slave driver */
+} jackctl_driver_type_t;
+
 /** @brief Max value that jackctl_param_type_t type can have */
 #define JACK_PARAM_MAX (JackParamBool + 1)
 
@@ -124,6 +131,10 @@ jackctl_server_get_parameters(
 
 SERVER_EXPORT const char *
 jackctl_driver_get_name(
+	jackctl_driver_t * driver);
+
+SERVER_EXPORT jackctl_driver_type_t
+jackctl_driver_get_type(
 	jackctl_driver_t * driver);
 
 SERVER_EXPORT const JSList *
