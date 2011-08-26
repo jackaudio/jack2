@@ -273,7 +273,7 @@ int JackEngine::NotifyAddClient(JackClientInterface* new_client, const char* nam
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* old_client = fClientTable[i];
         if (old_client && old_client != new_client) {
-            if (old_client->ClientNotify(refnum, name, kAddClient, true, "", 0, 0) < 0) {
+            if (old_client->ClientNotify(refnum, name, kAddClient, false, "", 0, 0) < 0) {
                 jack_error("NotifyAddClient old_client fails name = %s", old_client->GetClientControl()->fName);
                 // Not considered as a failure...
             }
@@ -293,7 +293,7 @@ void JackEngine::NotifyRemoveClient(const char* name, int refnum)
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
         if (client) {
-            client->ClientNotify(refnum, name, kRemoveClient, true, "", 0, 0);
+            client->ClientNotify(refnum, name, kRemoveClient, false, "", 0, 0);
         }
     }
 }

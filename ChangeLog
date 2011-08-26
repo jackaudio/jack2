@@ -38,6 +38,7 @@ Chris Caudle
 2011-06-26 Stephane Letz  <letz@grame.fr>
 
 	* More robust code in synchronization primitives and in JackMessageBuffer.
+	* Non blocking notifications in JackEngine::NotifyAddClient and JackEngine::NotifyRemoveClient.
 
 2011-07-29 Stephane Letz  <letz@grame.fr>
 
