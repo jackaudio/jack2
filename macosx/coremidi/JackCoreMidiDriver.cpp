@@ -275,7 +275,6 @@ JackCoreMidiDriver::Open(bool capturing, bool playing, int in_channels,
         return -1;
     }
     char *client_name = fClientControl.fName;
-    printf("JackCoreMidiDriver::Open client_name %s\n",client_name);
 
     // Allocate and connect physical inputs
     potential_pi_count = MIDIGetNumberOfSources();
@@ -673,7 +672,7 @@ extern "C" {
                 }
         }
 
-         // singleton kind of driver
+        // singleton kind of driver
         if (!driver) {
             driver = new Jack::JackCoreMidiDriver("system_midi", "coremidi", engine, table);
             if (driver->Open(1, 1, virtual_in, virtual_out, false, "in", "out", 0, 0) == 0) {

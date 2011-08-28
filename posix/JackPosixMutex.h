@@ -84,7 +84,6 @@ class JackBasePosixMutex
                     fOwner = current_thread;
                     return true;
                 } else {
-                    jack_error("JackBasePosixMutex::Trylock res = %d", res);
                     return false;
                 }
             } else {

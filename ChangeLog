@@ -35,6 +35,10 @@ Chris Caudle
   Jackdmp changes log
 ---------------------------
 
+2011-06-28 Stephane Letz  <letz@grame.fr>
+
+	* Correct JackBasePosixMutex::Trylock.
+
 2011-06-26 Stephane Letz  <letz@grame.fr>
 
 	* More robust code in synchronization primitives and in JackMessageBuffer.
