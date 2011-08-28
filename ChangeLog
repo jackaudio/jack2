@@ -38,6 +38,7 @@ Chris Caudle
 2011-06-28 Stephane Letz  <letz@grame.fr>
 
 	* Correct JackBasePosixMutex::Trylock.
+	* Correct JackMessageBuffer::Execute.
 
 2011-06-26 Stephane Letz  <letz@grame.fr>
 

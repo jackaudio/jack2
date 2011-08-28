@@ -84,8 +84,8 @@ void JackMessageBuffer::AddMessage(int level, const char *message)
 
 bool JackMessageBuffer::Execute()
 {
-    while (fRunning) {
-        if (fGuard.Lock()) {
+    if (fGuard.Lock()) {
+        while (fRunning) {
             fGuard.Wait();
             /* the client asked for all threads to run a thread
             initialization callback, which includes us.
@@ -96,12 +96,17 @@ bool JackMessageBuffer::Execute()
                 /* and we're done */
                 fGuard.Signal();
             }
-            Flush();
+
+            /* releasing the mutex reduces contention */
             fGuard.Unlock();
-        } else {
-            jack_error("JackMessageBuffer::Execute lock cannot be taken");
+            Flush();
+            fGuard.Lock();
         }
+        fGuard.Unlock();
+    } else {
+        jack_error("JackMessageBuffer::Execute lock cannot be taken");
     }
+
     return false;
 }
 
