@@ -430,6 +430,11 @@ int main(int argc, char* argv[])
         goto destroy_server;
     }
 
+    if (jackctl_driver_get_type(master_driver_ctl) != JackMaster) {
+        fprintf(stderr, "Driver \"%s\" is not a master \n", master_driver_name);
+        goto destroy_server;
+    }
+
     if (optind < argc) {
         master_driver_nargs = 1 + argc - optind;
     } else {
@@ -467,6 +472,10 @@ int main(int argc, char* argv[])
         jackctl_driver_t * slave_driver_ctl = jackctl_server_get_driver(server_ctl, *it);
         if (slave_driver_ctl == NULL) {
             fprintf(stderr, "Unknown driver \"%s\"\n", *it);
+            goto close_server;
+        }
+        if (jackctl_driver_get_type(slave_driver_ctl) != JackSlave) {
+            fprintf(stderr, "Driver \"%s\" is not a slave \n", *it);
             goto close_server;
         }
         if (!jackctl_server_add_slave(server_ctl, slave_driver_ctl)) {

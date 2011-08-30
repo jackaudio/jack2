@@ -849,6 +849,7 @@ jack_driver_descriptor_construct(
     memcpy(desc_ptr->desc, description, description_len + 1);
 
     desc_ptr->nparams = 0;
+    desc_ptr->type = type;
 
     if (filler_ptr != NULL) {
         filler_ptr->size = 0;
