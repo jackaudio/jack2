@@ -35,12 +35,20 @@ Chris Caudle
   Jackdmp changes log
 ---------------------------
 
-2011-06-28 Stephane Letz  <letz@grame.fr>
+2011-08-31 Stephane Letz  <letz@grame.fr>
+
+	* Correct Start/Stop for Control API.
+
+2011-08-30 Stephane Letz  <letz@grame.fr>
+
+	* Check driver type in jackdmp.cpp. 
+
+2011-08-28 Stephane Letz  <letz@grame.fr>
 
 	* Correct JackBasePosixMutex::Trylock.
 	* Correct JackMessageBuffer::Execute.
 
-2011-06-26 Stephane Letz  <letz@grame.fr>
+2011-08-26 Stephane Letz  <letz@grame.fr>
 
 	* More robust code in synchronization primitives and in JackMessageBuffer.
 	* Non blocking notifications in JackEngine::NotifyAddClient and JackEngine::NotifyRemoveClient.

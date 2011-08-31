@@ -486,7 +486,6 @@ void JackWinNamedPipeServerChannel::Close()
     fThread.Stop();
     */
 
-    fThread.Kill();
     fRequestListenPipe.Close();
 }
 
@@ -495,9 +494,14 @@ int JackWinNamedPipeServerChannel::Start()
     if (fThread.Start() != 0) {
         jack_error("Cannot start Jack server listener");
         return -1;
+    } else {
+        return 0;
     }
+}
 
-    return 0;
+void JackWinNamedPipeServerChannel::Stop()
+{
+    fThread.Kill();
 }
 
 bool JackWinNamedPipeServerChannel::Init()

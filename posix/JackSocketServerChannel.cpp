@@ -66,8 +66,7 @@ int JackSocketServerChannel::Open(const char* server_name, JackServer* server)
 
 void JackSocketServerChannel::Close()
 {
-    fThread.Stop();
-    fRequestListenSocket.Close();
+   fRequestListenSocket.Close();
 
     // Close remaining client sockets
     std::map<int, std::pair<int, JackClientSocket*> >::iterator it;
@@ -85,9 +84,14 @@ int JackSocketServerChannel::Start()
     if (fThread.Start() != 0) {
         jack_error("Cannot start Jack server listener");
         return -1;
+    } else {
+        return 0;
     }
+}
 
-    return 0;
+void JackSocketServerChannel::Stop()
+{
+    fThread.Kill();
 }
 
 void JackSocketServerChannel::ClientCreate()

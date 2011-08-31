@@ -532,7 +532,7 @@ int main(int argc, char* argv[])
     jackctl_wait_signals(signals);
 
  stop_server:
-    if (! jackctl_server_stop(server_ctl)) {
+    if (!jackctl_server_stop(server_ctl)) {
         fprintf(stderr, "Cannot stop server...\n");
     }
 

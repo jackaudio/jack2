@@ -409,7 +409,7 @@ extern "C"
         value.ui = 1U;
         jack_driver_descriptor_add_parameter(desc, &filler, "transport-sync", 't', JackDriverParamUInt, &value, NULL, "Sync transport with master's", NULL);
 
-        value.ui = 2U;
+        value.ui = 5U;
         jack_driver_descriptor_add_parameter(desc, &filler, "latency", 'l', JackDriverParamUInt, &value, NULL, "Network latency", NULL);
 
         value.i = 0;

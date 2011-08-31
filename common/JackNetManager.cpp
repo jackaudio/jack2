@@ -846,13 +846,13 @@ extern "C"
         desc = jack_driver_descriptor_construct("netmanager", JackDriverNone, "netjack multi-cast master component", &filler);
 
         strcpy(value.str, DEFAULT_MULTICAST_IP);
-        jack_driver_descriptor_add_parameter(desc, &filler, "multicast_ip", 'a', JackDriverParamString, &value, NULL, "Multicast Address", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "multicast-ip", 'a', JackDriverParamString, &value, NULL, "Multicast Address", NULL);
 
         value.i = DEFAULT_PORT;
-        jack_driver_descriptor_add_parameter(desc, &filler, "udp_net_port", 'p', JackDriverParamInt, &value, NULL, "UDP port", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "udp-net-port", 'p', JackDriverParamInt, &value, NULL, "UDP port", NULL);
 
         value.i = false;
-        jack_driver_descriptor_add_parameter(desc, &filler, "auto_connect", 'c', JackDriverParamBool, &value, NULL, "Auto connect netmaster to system ports", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "auto-connect", 'c', JackDriverParamBool, &value, NULL, "Auto connect netmaster to system ports", NULL);
 
         return desc;
     }
