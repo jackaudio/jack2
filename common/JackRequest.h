@@ -1510,7 +1510,7 @@ struct JackClientNotification
         CheckRes(trans->Read(&fValue1, sizeof(int)));
         CheckRes(trans->Read(&fValue2, sizeof(int)));
         CheckRes(trans->Read(&fSync, sizeof(int)));
-        CheckRes(trans->Read(&fMessage, sizeof(fName)));
+        CheckRes(trans->Read(&fMessage, sizeof(fMessage)));
         return 0;
     }
 
@@ -1522,7 +1522,7 @@ struct JackClientNotification
         CheckRes(trans->Write(&fValue1, sizeof(int)));
         CheckRes(trans->Write(&fValue2, sizeof(int)));
         CheckRes(trans->Write(&fSync, sizeof(int)));
-        CheckRes(trans->Write(&fMessage, sizeof(fName)));
+        CheckRes(trans->Write(&fMessage, sizeof(fMessage)));
         return 0;
     }
 
