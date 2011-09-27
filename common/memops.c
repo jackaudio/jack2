@@ -206,19 +206,42 @@ inline unsigned int fast_rand() {
 /* functions for native float sample data */
 
 void sample_move_floatLE_sSs (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip) {
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+    char *d = (char*)dst;
 	while (nsamples--) {
-		*dst = *((float *) src);
-		dst++;
+        *d++ = src[3];
+        *d++ = src[2];
+        *d++ = src[1];
+        *d++ = src[0];
 		src += src_skip;
 	}
+#else
+    // Matching byte order
+    while (nsamples--) {
+        *dst = *((float *) src);
+        dst++;
+        src += src_skip;
+    }
+#endif
 }
 
 void sample_move_dS_floatLE (char *dst, jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state) {
+#if __BYTE_ORDER == __LITTLE_ENDIAN
 	while (nsamples--) {
 		*((float *) dst) = *src;
 		dst += dst_skip;
 		src++;
 	}
+#else
+    char *d = (char*)dst;
+	while (nsamples--) {
+        *d++ = src[3];
+        *d++ = src[2];
+        *d++ = src[1];
+        *d++ = src[0];
+		src += src_skip;
+	}
+#endif
 }
 
 /* NOTES on function naming:
@@ -249,22 +272,19 @@ void sample_move_dS_floatLE (char *dst, jack_default_audio_sample_t *src, unsign
 void sample_move_d32u24_sSs (char *dst, jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state)
 {
 	int32_t z;
-
-	while (nsamples--) {
-
-		float_24u32 (*src, z);
-
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-		dst[0]=(char)(z>>24);
-		dst[1]=(char)(z>>16);
-		dst[2]=(char)(z>>8);
-		dst[3]=(char)(z);
-#elif __BYTE_ORDER == __BIG_ENDIAN
-		dst[0]=(char)(z);
-		dst[1]=(char)(z>>8);
-		dst[2]=(char)(z>>16);
-		dst[3]=(char)(z>>24);
-#endif
+    
+    union {
+        jack_default_audio_sample_t f;
+        char c[4];
+    } t;
+ 	
+    while (nsamples--) {
+        t.c[0] = *((char*)src + 3);
+        t.c[1] = *((char*)src + 2);
+        t.c[2] = *((char*)src + 1);
+        t.c[3] = *((char*)src + 0);
+		float_24u32 (t.f, z);
+        *((int32_t *) dst) = z;
 		dst += dst_skip;
 		src++;
 	}
@@ -404,17 +424,26 @@ void sample_move_dS_s32u24 (jack_default_audio_sample_t *dst, char *src, unsigne
 void sample_move_d24_sSs (char *dst, jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state)
 {
 	int32_t z;
+    union {
+        jack_default_audio_sample_t f;
+        char c[4];
+    } t;
 
 	while (nsamples--) {
-		float_24 (*src, z);
+        t.c[0] = *((char*)src + 3);
+        t.c[1] = *((char*)src + 2);
+        t.c[2] = *((char*)src + 1);
+        t.c[3] = *((char*)src + 0);
+		float_24 (t.f, z);
+        
 #if __BYTE_ORDER == __LITTLE_ENDIAN
-		dst[0]=(char)(z>>16);
-		dst[1]=(char)(z>>8);
-		dst[2]=(char)(z);
-#elif __BYTE_ORDER == __BIG_ENDIAN
 		dst[0]=(char)(z);
 		dst[1]=(char)(z>>8);
 		dst[2]=(char)(z>>16);
+#elif __BYTE_ORDER == __BIG_ENDIAN
+		dst[0]=(char)(z>>16);
+		dst[1]=(char)(z>>8);
+		dst[2]=(char)(z);
 #endif
 		dst += dst_skip;
 		src++;
@@ -548,25 +577,28 @@ void sample_move_dS_s24 (jack_default_audio_sample_t *dst, char *src, unsigned l
 void sample_move_d16_sSs (char *dst,  jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state)	
 {
 	int16_t tmp;
+    union {
+        jack_default_audio_sample_t f;
+        char c[4];
+    } t;
 
 	while (nsamples--) {
+        t.c[0] = *((char*)src + 3);
+        t.c[1] = *((char*)src + 2);
+        t.c[2] = *((char*)src + 1);
+        t.c[3] = *((char*)src + 0);
+
 		// float_16 (*src, tmp);
 
-		if (*src <= NORMALIZED_FLOAT_MIN) {
+		if (t.f <= NORMALIZED_FLOAT_MIN) {
 			tmp = SAMPLE_16BIT_MIN;
-		} else if (*src >= NORMALIZED_FLOAT_MAX) {
+		} else if (t.f >= NORMALIZED_FLOAT_MAX) {
 			tmp = SAMPLE_16BIT_MAX;
 		} else {
-			tmp = (int16_t) f_round (*src * SAMPLE_16BIT_SCALING);
+			tmp = (int16_t) f_round (t.f * SAMPLE_16BIT_SCALING);
 		}
 
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-		dst[0]=(char)(tmp>>8);
-		dst[1]=(char)(tmp);
-#elif __BYTE_ORDER == __BIG_ENDIAN
-		dst[0]=(char)(tmp);
-		dst[1]=(char)(tmp>>8);
-#endif
+        *((int16_t *) dst) = tmp;
 		dst += dst_skip;
 		src++;
 	}
@@ -585,17 +617,19 @@ void sample_move_dither_rect_d16_sSs (char *dst,  jack_default_audio_sample_t *s
 {
 	jack_default_audio_sample_t val;
 	int16_t      tmp;
+    union {
+        jack_default_audio_sample_t f;
+        char c[4];
+    } t;
 
 	while (nsamples--) {
-		val = (*src * SAMPLE_16BIT_SCALING) + fast_rand() / (float) UINT_MAX - 0.5f;
+        t.c[0] = *((char*)src + 3);
+        t.c[1] = *((char*)src + 2);
+        t.c[2] = *((char*)src + 1);
+        t.c[3] = *((char*)src + 0);
+		val = (t.f * SAMPLE_16BIT_SCALING) + fast_rand() / (float) UINT_MAX - 0.5f;
 		float_16_scaled (val, tmp);
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-		dst[0]=(char)(tmp>>8);
-		dst[1]=(char)(tmp);
-#elif __BYTE_ORDER == __BIG_ENDIAN
-		dst[0]=(char)(tmp);
-		dst[1]=(char)(tmp>>8);
-#endif
+        *((int16_t *) dst) = tmp;
 		dst += dst_skip;
 		src++;
 	}
@@ -617,18 +651,19 @@ void sample_move_dither_tri_d16_sSs (char *dst,  jack_default_audio_sample_t *sr
 {
 	jack_default_audio_sample_t val;
 	int16_t      tmp;
+    union {
+        jack_default_audio_sample_t f;
+        char c[4];
+    } t;
 
 	while (nsamples--) {
-		val = (*src * SAMPLE_16BIT_SCALING) + ((float)fast_rand() + (float)fast_rand()) / (float)UINT_MAX - 1.0f;
+        t.c[0] = *((char*)src + 3);
+        t.c[1] = *((char*)src + 2);
+        t.c[2] = *((char*)src + 1);
+        t.c[3] = *((char*)src + 0);
+        val = (t.f * SAMPLE_16BIT_SCALING) + ((float)fast_rand() + (float)fast_rand()) / (float)UINT_MAX - 1.0f;
 		float_16_scaled (val, tmp);
-
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-		dst[0]=(char)(tmp>>8);
-		dst[1]=(char)(tmp);
-#elif __BYTE_ORDER == __BIG_ENDIAN
-		dst[0]=(char)(tmp);
-		dst[1]=(char)(tmp>>8);
-#endif
+        *((int16_t *) dst) = tmp;
 		dst += dst_skip;
 		src++;
 	}
@@ -655,9 +690,18 @@ void sample_move_dither_shaped_d16_sSs (char *dst,  jack_default_audio_sample_t 
 	float        rm1 = state->rm1;
 	unsigned int idx = state->idx;
 	int16_t      tmp;
+    union {
+        jack_default_audio_sample_t f;
+        char c[4];
+    } t;
 
 	while (nsamples--) {
-		x = *src * SAMPLE_16BIT_SCALING;
+        t.c[0] = *((char*)src + 3);
+        t.c[1] = *((char*)src + 2);
+        t.c[2] = *((char*)src + 1);
+        t.c[3] = *((char*)src + 0);
+
+		x = t.f * SAMPLE_16BIT_SCALING;
 		r = ((float)fast_rand() + (float)fast_rand())  / (float)UINT_MAX - 1.0f;
 		/* Filter the error with Lipshitz's minimally audible FIR:
 		   [2.033 -2.165 1.959 -1.590 0.6149] */
@@ -675,14 +719,7 @@ void sample_move_dither_shaped_d16_sSs (char *dst,  jack_default_audio_sample_t 
 		/* Intrinsic z^-1 delay */
 		idx = (idx + 1) & DITHER_BUF_MASK;
 		state->e[idx] = xp - xe;
-
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-		dst[0]=(char)(tmp>>8);
-		dst[1]=(char)(tmp);
-#elif __BYTE_ORDER == __BIG_ENDIAN
-		dst[0]=(char)(tmp);
-		dst[1]=(char)(tmp>>8);
-#endif
+        *((int16_t *) dst) = tmp;
 		dst += dst_skip;
 		src++;
 	}

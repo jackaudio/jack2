@@ -35,6 +35,10 @@ Chris Caudle
   Jackdmp changes log
 ---------------------------
 
+2011-09-27 Stephane Letz  <letz@grame.fr>
+
+	* Gabriel Beddingfield patch for ALSA driver: error when source is non-native byte-order float.
+
 2011-08-31 Stephane Letz  <letz@grame.fr>
 
 	* Correct Start/Stop for Control API.

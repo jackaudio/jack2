@@ -129,7 +129,7 @@ namespace Jack
         ports = jack_get_ports(fJackClient, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
         if (ports != NULL) {
             for (int i = 0; i < fAudioAdapter->GetInputs() && ports[i]; i++) {
-                jack_connect(fJackClient,jack_port_name(fCapturePortList[i]),  ports[i]);
+                jack_connect(fJackClient, jack_port_name(fCapturePortList[i]), ports[i]);
             }
             free(ports);
         }
