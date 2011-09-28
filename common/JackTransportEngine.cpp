@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -38,7 +38,7 @@ JackTransportEngine::JackTransportEngine(): JackAtomicArrayState<jack_position_t
 {
     fTransportState = JackTransportStopped;
     fTransportCmd = fPreviousCmd = TransportCommandStop;
-    fSyncTimeout = 10000000;	/* 10 seconds default... 
+    fSyncTimeout = 10000000;	/* 10 seconds default...
 				   in case of big netjack1 roundtrip */
     fSyncTimeLeft = 0;
     fTimeBaseMaster = -1;
@@ -112,8 +112,8 @@ void JackTransportEngine::MakeAllStartingLocating(JackClientInterface** table)
             JackClientControl* control = client->GetClientControl();
             // Inactive clients don't have their process function called at all, so they must appear as already "rolling" for the transport....
             control->fTransportState = (control->fActive && control->fCallback[kRealTimeCallback]) ? JackTransportStarting : JackTransportRolling;
-            control->fTransportSync = true; 
-            control->fTransportTimebase = true; 
+            control->fTransportSync = true;
+            control->fTransportTimebase = true;
             jack_log("MakeAllStartingLocating ref = %ld", i);
         }
     }
@@ -127,8 +127,8 @@ void JackTransportEngine::MakeAllStopping(JackClientInterface** table)
         if (client) {
             JackClientControl* control = client->GetClientControl();
             control->fTransportState = JackTransportStopped;
-            control->fTransportSync = false; 
-            control->fTransportTimebase = false; 
+            control->fTransportSync = false;
+            control->fTransportTimebase = false;
             jack_log("MakeAllStopping ref = %ld", i);
         }
     }
@@ -142,8 +142,8 @@ void JackTransportEngine::MakeAllLocating(JackClientInterface** table)
         if (client) {
             JackClientControl* control = client->GetClientControl();
             control->fTransportState = JackTransportStopped;
-            control->fTransportSync = true; 
-            control->fTransportTimebase = true; 
+            control->fTransportSync = true;
+            control->fTransportTimebase = true;
             jack_log("MakeAllLocating ref = %ld", i);
         }
     }

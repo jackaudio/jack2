@@ -1,19 +1,19 @@
 /*
     Copyright (C) 2002 Paul Davis
     Copyright (C) 2003 Jack O'Quin
-    
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation; either version 2.1 of the License, or
     (at your option) any later version.
-    
+
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
-    
+
     You should have received a copy of the GNU Lesser General Public License
-    along with this program; if not, write to the Free Software 
+    along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -135,7 +135,7 @@ int  jack_set_timebase_callback (jack_client_t *client,
  * sync_callbacks until ready.  This function is realtime-safe.
  *
  * @see jack_transport_reposition, jack_set_sync_callback
- * 
+ *
  * @param client the JACK client structure.
  * @param frame frame number of new transport position.
  *
@@ -170,7 +170,7 @@ jack_transport_state_t jack_transport_query (const jack_client_t *client,
  * @param client the JACK client structure
  */
 jack_nframes_t jack_get_current_transport_frame (const jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
-						 
+
 /**
  * Request a new transport position.
  *
@@ -181,14 +181,14 @@ jack_nframes_t jack_get_current_transport_frame (const jack_client_t *client) JA
  * sync_callbacks until ready.  This function is realtime-safe.
  *
  * @see jack_transport_locate, jack_set_sync_callback
- * 
+ *
  * @param client the JACK client structure.
  * @param pos requested new transport position.
  *
  * @return 0 if valid request, EINVAL if position structure rejected.
  */
 int  jack_transport_reposition (jack_client_t *client,
-				jack_position_t *pos) JACK_OPTIONAL_WEAK_EXPORT;
+				const jack_position_t *pos) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Start the JACK transport rolling.
@@ -239,7 +239,7 @@ void jack_set_transport_info (jack_client_t *client,
 			      jack_transport_info_t *tinfo) JACK_OPTIONAL_WEAK_EXPORT;
 
 /*@}*/
-	
+
 #ifdef __cplusplus
 }
 #endif

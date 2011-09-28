@@ -214,7 +214,7 @@ extern "C"
             jack_position_t *pos);
     LIB_EXPORT jack_nframes_t jack_get_current_transport_frame(const jack_client_t *client);
     LIB_EXPORT int jack_transport_reposition(jack_client_t *client,
-                                          jack_position_t *pos);
+                                          const jack_position_t *pos);
     LIB_EXPORT void jack_transport_start(jack_client_t *client);
     LIB_EXPORT void jack_transport_stop(jack_client_t *client);
     LIB_EXPORT void jack_get_transport_info(jack_client_t *client,
@@ -1626,7 +1626,7 @@ LIB_EXPORT jack_nframes_t jack_get_current_transport_frame(const jack_client_t* 
     }
 }
 
-LIB_EXPORT int jack_transport_reposition(jack_client_t* ext_client, jack_position_t* pos)
+LIB_EXPORT int jack_transport_reposition(jack_client_t* ext_client, const jack_position_t* pos)
 {
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_transport_reposition");

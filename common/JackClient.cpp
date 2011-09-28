@@ -848,14 +848,14 @@ void JackClient::TransportLocate(jack_nframes_t frame)
     GetEngineControl()->fTransport.RequestNewPos(&pos);
 }
 
-int JackClient::TransportReposition(jack_position_t* pos)
+int JackClient::TransportReposition(const jack_position_t* pos)
 {
     jack_position_t tmp = *pos;
     jack_log("JackClient::TransportReposition pos = %ld", pos->frame);
     if (tmp.valid & ~JACK_POSITION_MASK) {
         return EINVAL;
     } else {
-        GetEngineControl()->fTransport.RequestNewPos(pos);
+        GetEngineControl()->fTransport.RequestNewPos(&tmp);
         return 0;
     }
 }

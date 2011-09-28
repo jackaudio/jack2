@@ -164,7 +164,7 @@ class SERVER_EXPORT JackClient : public JackClientInterface, public JackRunnable
         virtual void TransportLocate(jack_nframes_t frame);
         virtual jack_transport_state_t TransportQuery(jack_position_t* pos);
         virtual jack_nframes_t GetCurrentTransportFrame();
-        virtual int TransportReposition(jack_position_t* pos);
+        virtual int TransportReposition(const jack_position_t* pos);
         virtual void TransportStart();
         virtual void TransportStop();
 
