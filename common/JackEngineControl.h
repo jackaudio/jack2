@@ -69,12 +69,12 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
     bool fVerbose;
 
     // CPU Load
-    jack_time_t fPrevCycleTime;
-    jack_time_t fCurCycleTime;
-    jack_time_t fSpareUsecs;
-    jack_time_t fMaxUsecs;
-    jack_time_t fRollingClientUsecs[JACK_ENGINE_ROLLING_COUNT];
-    int	fRollingClientUsecsCnt;
+    jack_time_t  fPrevCycleTime;
+    jack_time_t  fCurCycleTime;
+    jack_time_t  fSpareUsecs;
+    jack_time_t  fMaxUsecs;
+    jack_time_t  fRollingClientUsecs[JACK_ENGINE_ROLLING_COUNT];
+    unsigned int fRollingClientUsecsCnt;
     int	fRollingClientUsecsIndex;
     int	fRollingInterval;
     float fCPULoad;

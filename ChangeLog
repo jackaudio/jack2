@@ -30,10 +30,15 @@ Adrian Knoth
 David Garcia Garzon
 Valerio Pilo
 Chris Caudle
+John Emmas
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
+
+2011-10-10 Stephane Letz  <letz@grame.fr>
+
+	* John Emmas patch for DSP CPU computation.
 
 2011-09-27 Stephane Letz  <letz@grame.fr>
 
