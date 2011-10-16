@@ -217,7 +217,6 @@ loop:
     jack_controller_control_send_signal_session_state_changed(pending_cmd_ptr->type, pending_cmd_ptr->target);
 
     commands = jack_session_notify(controller_ptr->client, pending_cmd_ptr->target, pending_cmd_ptr->type, pending_cmd_ptr->path);
-    usleep(5000000);
     send_session_notify_reply(pending_cmd_ptr, commands);
     if (commands != NULL)
     {
