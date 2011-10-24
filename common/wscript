@@ -191,7 +191,7 @@ def build(bld):
         netlib.includes = includes
         netlib.name         = 'netlib'
         netlib.target       = 'jacknet'
-        netlib.uselib = ['SAMPLERATE', 'CELT']
+        netlib.uselib = ['SAMPLERATE', 'CELT', 'PTHREAD' , 'RT']
         netlib.install_path = '${LIBDIR}'
         netlib.source = [
             'JackNetAPI.cpp',
