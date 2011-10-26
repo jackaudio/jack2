@@ -26,6 +26,7 @@
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-DSERVER_SIDE" />
 					<Add option="-D__SMP__" />
+                    <Add option="-DJACK_32_64" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -56,6 +57,7 @@
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-DSERVER_SIDE" />
 					<Add option="-D__SMP__" />
+                    <Add option="-DJACK_32_64" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -86,6 +88,7 @@
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-DSERVER_SIDE" />
 					<Add option="-D__SMP__" />
+                    <Add option="-DJACK_32_64" />
 					<Add option="-DJACK_MONITOR" />
 					<Add directory="." />
 					<Add directory="..\windows" />
@@ -118,6 +121,7 @@
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-DSERVER_SIDE" />
 					<Add option="-D__SMP__" />
+                    <Add option="-DJACK_32_64" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -153,6 +157,7 @@
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-DSERVER_SIDE" />
 					<Add option="-D__SMP__" />
+                    <Add option="-DJACK_32_64" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -188,6 +193,7 @@
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-DSERVER_SIDE" />
 					<Add option="-D__SMP__" />
+                    <Add option="-DJACK_32_64" />
 					<Add option="-DJACK_MONITOR" />
 					<Add directory="." />
 					<Add directory="..\windows" />
