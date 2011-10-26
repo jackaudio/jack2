@@ -15,6 +15,7 @@
 					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-DSERVER_SIDE" />
+                    <Add option="-DJACK_32_64" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
@@ -33,6 +34,7 @@
 					<Add option="-Wall" />
 					<Add option="-g" />
 					<Add option="-DSERVER_SIDE" />
+                    <Add option="-DJACK_32_64" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
@@ -52,6 +54,7 @@
 					<Add option="-Wall" />
 					<Add option="-DJACK_MONITOR" />
 					<Add option="-DSERVER_SIDE" />
+                    <Add option="-DJACK_32_64" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
@@ -71,6 +74,7 @@
 					<Add option="-Wall" />
                     <Add option="-m32" />
 					<Add option="-DSERVER_SIDE" />
+                    <Add option="-DJACK_32_64" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
@@ -94,6 +98,7 @@
 					<Add option="-g" />
                     <Add option="-m32" />
 					<Add option="-DSERVER_SIDE" />
+                    <Add option="-DJACK_32_64" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
@@ -118,6 +123,7 @@
                     <Add option="-m32" />
 					<Add option="-DJACK_MONITOR" />
 					<Add option="-DSERVER_SIDE" />
+                    <Add option="-DJACK_32_64" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
