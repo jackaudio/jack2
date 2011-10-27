@@ -36,6 +36,10 @@ John Emmas
   Jackdmp changes log
 ---------------------------
 
+2011-10-27 Stephane Letz  <letz@grame.fr>
+
+	* Gabriel Beddingfield patch (r4541) reverted.  
+
 2011-10-10 Stephane Letz  <letz@grame.fr>
 
 	* John Emmas patch for DSP CPU computation.
