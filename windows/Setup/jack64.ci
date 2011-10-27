@@ -112,6 +112,7 @@
 <_><src>.\src\64bits\JackRouter.ini</><dest>inst</><custom>64bits</><ifexist>overnewer</><recurs>0</></>
 <_><src>.\src\64bits\msvcr100.dll</><dest>inst</><custom>64bits</><ifexist>overnewer</><recurs>0</></>
 <_><src>.\src\64bits\msvcp100.dll</><dest>inst</><custom>64bits</><ifexist>overnewer</><recurs>0</></>
+<_><src>.\src\64bits\portaudio_x86_64.lib</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\mingwm10.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\qjackctl.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\QtCore4.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
