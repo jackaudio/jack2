@@ -34,6 +34,7 @@ namespace Jack
 \brief Client control possibly in shared memory.
 */
 
+PRE_PACKED_STRUCTURE
 struct JackClientControl : public JackShmMemAble
 {
     char fName[JACK_CLIENT_NAME_SIZE + 1];

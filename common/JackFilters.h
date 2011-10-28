@@ -38,7 +38,8 @@ namespace Jack
 
     #define MAX_SIZE 64
 
-	struct JackFilter
+    PRE_PACKED_STRUCTURE
+    struct JackFilter
     {
 
         jack_time_t fTable[MAX_SIZE];
@@ -65,6 +66,7 @@ namespace Jack
 
     } POST_PACKED_STRUCTURE;
 
+    PRE_PACKED_STRUCTURE
     class JackDelayLockedLoop
     {
 
@@ -147,6 +149,7 @@ namespace Jack
 
     } POST_PACKED_STRUCTURE;
 
+    PRE_PACKED_STRUCTURE
     class JackAtomicDelayLockedLoop : public JackAtomicState<JackDelayLockedLoop>
     {
          public:

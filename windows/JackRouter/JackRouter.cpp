@@ -252,7 +252,7 @@ static bool GetEXEName(DWORD dwProcessID, char* name)
                 HMODULE hMod;
                 DWORD cbNeeded;
 
-                if(EnumProcessModules(hProcess, &hMod,
+                if (EnumProcessModules(hProcess, &hMod,
                                       sizeof(hMod), &cbNeeded)) {
                     //Get the name of the exe file
                     GetModuleBaseName(hProcess, hMod, szEXEName,

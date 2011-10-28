@@ -30,7 +30,7 @@ namespace Jack
 /*!
 \brief Counter for CAS
 */
-
+PRE_PACKED_STRUCTURE
 struct AtomicArrayCounter
 {
     union {
@@ -109,6 +109,7 @@ Requirement:
 
 // CHECK livelock
 
+PRE_PACKED_STRUCTURE
 template <class T>
 class JackAtomicArrayState
 {

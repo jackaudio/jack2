@@ -35,6 +35,7 @@ namespace Jack
 \brief Base class for port.
 */
 
+PRE_PACKED_STRUCTURE
 class SERVER_EXPORT JackPort
 {
 

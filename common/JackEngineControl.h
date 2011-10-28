@@ -45,6 +45,7 @@ class JackGraphManager;
 \brief Engine control in shared memory.
 */
 
+PRE_PACKED_STRUCTURE
 struct SERVER_EXPORT JackEngineControl : public JackShmMem
 {
     // Shared state

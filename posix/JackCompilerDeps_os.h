@@ -23,7 +23,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackConstants.h"
 
 #if __GNUC__
-    #ifndef POST_PACKED_STRUCTURE
+    #define PRE_PACKED_STRUCTURE
+
+	#ifndef POST_PACKED_STRUCTURE
         /* POST_PACKED_STRUCTURE needs to be a macro which
         expands into a compiler directive. The directive must
         tell the compiler to arrange the preceding structure
@@ -54,7 +56,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
     #define MEM_ALIGN(x,y) x
     #define LIB_EXPORT
     #define SERVER_EXPORT
-    /* Add other things here for non-gcc platforms for POST_PACKED_STRUCTURE */
+    /* Add other things here for non-gcc platforms for PRE and POST_PACKED_STRUCTURE */
 #endif
 
 #endif

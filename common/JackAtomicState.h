@@ -31,6 +31,7 @@ namespace Jack
 \brief Counter for CAS
 */
 
+PRE_PACKED_STRUCTURE
 struct AtomicCounter
 {
     union {
@@ -84,6 +85,7 @@ struct AtomicCounter
 
 // CHECK livelock
 
+PRE_PACKED_STRUCTURE
 template <class T>
 class JackAtomicState
 {

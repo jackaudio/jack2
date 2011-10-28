@@ -32,6 +32,7 @@ namespace Jack
 \brief A structure used for time management.
 */
 
+PRE_PACKED_STRUCTURE
 class SERVER_EXPORT JackTimer
 {
 
@@ -73,6 +74,7 @@ class SERVER_EXPORT JackTimer
 \brief A class using the JackAtomicState to manage jack time.
 */
 
+PRE_PACKED_STRUCTURE
 class SERVER_EXPORT JackFrameTimer : public JackAtomicState<JackTimer>
 {
 

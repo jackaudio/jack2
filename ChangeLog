@@ -36,6 +36,10 @@ John Emmas
   Jackdmp changes log
 ---------------------------
 
+2011-10-28 Stephane Letz  <letz@grame.fr>
+
+	* John Emmas POST_PACKED_STRUCTURE patch.
+
 2011-10-27 Stephane Letz  <letz@grame.fr>
 
 	* Gabriel Beddingfield patch (r4541) reverted.  
