@@ -143,6 +143,28 @@ static int semid = -1;
 
 #ifdef WIN32
 
+static bool check_process_running(DWORD process_id)
+{
+    DWORD aProcesses [2048], cbNeeded, cProcesses;
+    unsigned int i;
+
+    // Enumerate all processes
+    if (!EnumProcesses(aProcesses, sizeof(aProcesses), &cbNeeded)) {
+        return false;
+    }
+
+    // Calculate how many process identifiers were returned.
+    cProcesses = cbNeeded / sizeof(DWORD);
+
+    for (i = 0; i < cProcesses; i++) {
+        if (aProcesses [i] == dwProcessID) {
+            // Process process_id is running...
+            return true;
+        }
+    }
+    return false;
+}
+
 static int
 semaphore_init () {return 0;}
 
@@ -481,7 +503,12 @@ jack_register_server (const char *server_name, int new_registry)
 		}
 
 		/* see if server still exists */
-	#ifndef WIN32 // steph TO CHECK
+    #ifdef WIN32
+        if (check_process_running(jack_shm_header->server[i].pid)) {
+            res = EEXIST;	/* other server running */
+			goto unlock;
+        }
+	#else
 		if (kill (jack_shm_header->server[i].pid, 0) == 0)  {
 			res = EEXIST;	/* other server running */
 			goto unlock;
