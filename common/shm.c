@@ -143,26 +143,29 @@ static int semid = -1;
 
 #ifdef WIN32
 
-static bool check_process_running(DWORD process_id)
+#include <psapi.h>
+#include <lmcons.h>
+
+static BOOL check_process_running(DWORD process_id)
 {
-    DWORD aProcesses [2048], cbNeeded, cProcesses;
+    DWORD aProcesses[2048], cbNeeded, cProcesses;
     unsigned int i;
 
     // Enumerate all processes
     if (!EnumProcesses(aProcesses, sizeof(aProcesses), &cbNeeded)) {
-        return false;
+        return FALSE;
     }
 
     // Calculate how many process identifiers were returned.
     cProcesses = cbNeeded / sizeof(DWORD);
 
     for (i = 0; i < cProcesses; i++) {
-        if (aProcesses [i] == dwProcessID) {
+         if (aProcesses[i] == process_id) {
             // Process process_id is running...
-            return true;
+            return TRUE;
         }
     }
-    return false;
+    return FALSE;
 }
 
 static int
@@ -311,8 +314,17 @@ jack_shm_validate_registry ()
 static void
 jack_set_server_prefix (const char *server_name)
 {
-	snprintf (jack_shm_server_prefix, sizeof (jack_shm_server_prefix),
+    #ifdef WIN32
+    char buffer[UNLEN+1]={0};
+    DWORD len = UNLEN+1;
+    GetUserName(buffer, &len);
+    snprintf (jack_shm_server_prefix, sizeof (jack_shm_server_prefix),
+		  "jack-%s:%s:", buffer, server_name);
+    #else
+    snprintf (jack_shm_server_prefix, sizeof (jack_shm_server_prefix),
 		  "jack-%d:%s:", GetUID(), server_name);
+    #endif
+
 }
 
 /* gain server addressability to shared memory registration segment
@@ -599,7 +611,7 @@ jack_cleanup_shm ()
 
 			/* see if allocator still exists */
 		#ifdef WIN32 // steph
-			jack_info("TODO: kill API not available !!");
+			//jack_info("TODO: kill API not available !!");
 		#else
 			if (kill (r->allocator, 0)) {
 				if (errno == ESRCH) {

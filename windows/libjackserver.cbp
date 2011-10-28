@@ -26,8 +26,8 @@
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-DSERVER_SIDE" />
 					<Add option="-D__SMP__" />
-                    <Add option="-DJACK_32_64" />
-                    <Add option="-DHAVE_CONFIG_H" />
+					<Add option="-DJACK_32_64" />
+					<Add option="-DHAVE_CONFIG_H" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -36,6 +36,7 @@
 					<Add directory="tre-0.8.0\lib" />
 				</Compiler>
 				<Linker>
+					<Add library="psapi" />
 					<Add directory="Release\bin64" />
 				</Linker>
 			</Target>
@@ -59,7 +60,7 @@
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-DSERVER_SIDE" />
 					<Add option="-D__SMP__" />
-                    <Add option="-DJACK_32_64" />
+					<Add option="-DJACK_32_64" />
 					<Add option="-DHAVE_CONFIG_H" />
 					<Add directory="." />
 					<Add directory="..\windows" />
@@ -69,6 +70,7 @@
 					<Add directory="tre-0.8.0\lib" />
 				</Compiler>
 				<Linker>
+					<Add library="psapi" />
 					<Add directory="Debug\bin64" />
 				</Linker>
 			</Target>
@@ -92,7 +94,7 @@
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-DSERVER_SIDE" />
 					<Add option="-D__SMP__" />
-                    <Add option="-DJACK_32_64" />
+					<Add option="-DJACK_32_64" />
 					<Add option="-DJACK_MONITOR" />
 					<Add option="-DHAVE_CONFIG_H" />
 					<Add directory="." />
@@ -103,6 +105,7 @@
 					<Add directory="tre-0.8.0\lib" />
 				</Compiler>
 				<Linker>
+					<Add library="psapi" />
 					<Add directory="Release\bin64" />
 				</Linker>
 			</Target>
@@ -127,7 +130,7 @@
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-DSERVER_SIDE" />
 					<Add option="-D__SMP__" />
-                    <Add option="-DJACK_32_64" />
+					<Add option="-DJACK_32_64" />
 					<Add option="-DHAVE_CONFIG_H" />
 					<Add directory="." />
 					<Add directory="..\windows" />
@@ -138,6 +141,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-m32" />
+					<Add library="psapi" />
 					<Add directory="Release\bin" />
 				</Linker>
 				<ExtraCommands>
@@ -165,7 +169,7 @@
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-DSERVER_SIDE" />
 					<Add option="-D__SMP__" />
-                    <Add option="-DJACK_32_64" />
+					<Add option="-DJACK_32_64" />
 					<Add option="-DHAVE_CONFIG_H" />
 					<Add directory="." />
 					<Add directory="..\windows" />
@@ -176,6 +180,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-m32" />
+					<Add library="psapi" />
 					<Add directory="Debug\bin" />
 				</Linker>
 				<ExtraCommands>
@@ -203,7 +208,7 @@
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-DSERVER_SIDE" />
 					<Add option="-D__SMP__" />
-                    <Add option="-DJACK_32_64" />
+					<Add option="-DJACK_32_64" />
 					<Add option="-DJACK_MONITOR" />
 					<Add option="-DHAVE_CONFIG_H" />
 					<Add directory="." />
@@ -215,6 +220,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-m32" />
+					<Add library="psapi" />
 					<Add directory="Release\bin" />
 				</Linker>
 				<ExtraCommands>
@@ -247,7 +253,6 @@
 		<Unit filename="..\common\JackActivationCount.cpp" />
 		<Unit filename="..\common\JackArgParser.cpp" />
 		<Unit filename="..\common\JackAudioDriver.cpp" />
-		<Unit filename="..\common\JackTimedDriver.cpp" />
 		<Unit filename="..\common\JackAudioPort.cpp" />
 		<Unit filename="..\common\JackClient.cpp" />
 		<Unit filename="..\common\JackConnectionManager.cpp" />
@@ -287,6 +292,7 @@
 		<Unit filename="..\common\JackServerGlobals.cpp" />
 		<Unit filename="..\common\JackShmMem.cpp" />
 		<Unit filename="..\common\JackThreadedDriver.cpp" />
+		<Unit filename="..\common\JackTimedDriver.cpp" />
 		<Unit filename="..\common\JackTools.cpp" />
 		<Unit filename="..\common\JackTransportEngine.cpp" />
 		<Unit filename="..\common\JackWaitThreadedDriver.cpp" />
