@@ -39,6 +39,7 @@ John Emmas
 2011-11-03 Stephane Letz  <letz@grame.fr>
 
 	* Add missing jack_client_get_uuid API.
+	* John Emmas Windows server launching patch (1).
 
 2011-10-28 Stephane Letz  <letz@grame.fr>
 

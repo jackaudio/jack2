@@ -503,8 +503,6 @@ jack_register_server (const char *server_name, int new_registry)
 	 */
 	for (i = 0; i < MAX_SERVERS; i++) {
 
-        printf("server name %s %s\n", jack_shm_header->server[i].name, jack_shm_server_prefix);
-
 		if (strncmp (jack_shm_header->server[i].name,
 			     jack_shm_server_prefix,
 			     JACK_SERVER_NAME_SIZE) != 0)
@@ -549,8 +547,6 @@ jack_register_server (const char *server_name, int new_registry)
 	strncpy (jack_shm_header->server[i].name,
 		 jack_shm_server_prefix,
 		 JACK_SERVER_NAME_SIZE);
-
-    printf("new server name %s \n", jack_shm_header->server[i].name);
 
  unlock:
 	jack_shm_unlock_registry ();

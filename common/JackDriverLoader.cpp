@@ -25,6 +25,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <getopt.h>
 #include <stdio.h>
 #include <errno.h>
+#include <string.h>
 
 #ifndef WIN32
 #include <dirent.h>
@@ -393,7 +394,15 @@ jack_get_descriptor (JSList * drivers, const char * sofile, const char * symbol)
 #ifdef WIN32
         char temp_driver_dir1[512];
         char temp_driver_dir2[512];
-        GetCurrentDirectory(512, temp_driver_dir1);
+        if (3 < GetModuleFileName(NULL, temp_driver_dir1, 512)) {
+            char *p = strrchr(temp_driver_dir1, '\\');
+            if (p && (p != temp_driver_dir1))
+                *p = 0;
+            else
+                GetCurrentDirectory(512, temp_driver_dir1);
+        } else {
+            GetCurrentDirectory(512, temp_driver_dir1);
+        }
         sprintf(temp_driver_dir2, "%s/%s", temp_driver_dir1, ADDON_DIR);
         driver_dir = temp_driver_dir2;
 #else
@@ -477,7 +486,15 @@ static bool check_symbol(const char* sofile, const char* symbol)
 #ifdef WIN32
         char temp_driver_dir1[512];
         char temp_driver_dir2[512];
-        GetCurrentDirectory(512, temp_driver_dir1);
+        if (3 < GetModuleFileName(NULL, temp_driver_dir1, 512)) {
+            char *p = strrchr(temp_driver_dir1, '\\');
+            if (p && (p != temp_driver_dir1))
+                *p = 0;
+            else
+                GetCurrentDirectory(512, temp_driver_dir1);
+        } else {
+            GetCurrentDirectory(512, temp_driver_dir1);
+        }
         sprintf(temp_driver_dir2, "%s/%s", temp_driver_dir1, ADDON_DIR);
         driver_dir = temp_driver_dir2;
 #else
@@ -518,7 +535,15 @@ jack_drivers_load (JSList * drivers) {
 
     if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) {
         // for WIN32 ADDON_DIR is defined in JackConstants.h as relative path
-        GetCurrentDirectory(512, driver_dir_storage);
+        if (3 < GetModuleFileName(NULL, driver_dir_storage, 512)) {
+            char *p = strrchr(driver_dir_storage, '\\');
+            if (p && (p != driver_dir_storage))
+                *p = 0;
+            else
+                GetCurrentDirectory(512, driver_dir_storage);
+        } else {
+            GetCurrentDirectory(512, driver_dir_storage);
+        }
         strcat(driver_dir_storage, "/");
         strcat(driver_dir_storage, ADDON_DIR);
         driver_dir = driver_dir_storage;
@@ -655,7 +680,15 @@ jack_internals_load (JSList * internals) {
 
     if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) {
         // for WIN32 ADDON_DIR is defined in JackConstants.h as relative path
-        GetCurrentDirectory(512, driver_dir_storage);
+        if (3 < GetModuleFileName(NULL, driver_dir_storage, 512)) {
+            char *p = strrchr(driver_dir_storage, '\\');
+            if (p && (p != driver_dir_storage))
+                *p = 0;
+            else
+                GetCurrentDirectory(512, driver_dir_storage);
+        } else {
+            GetCurrentDirectory(512, driver_dir_storage);
+        }
         strcat(driver_dir_storage, "/");
         strcat(driver_dir_storage, ADDON_DIR);
         driver_dir = driver_dir_storage;
