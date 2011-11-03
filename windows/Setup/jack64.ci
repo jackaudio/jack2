@@ -79,7 +79,7 @@
 <_><src>..\Release64\bin\jack_midi_latency_test.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\jackd.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\libsamplerate_x86_64.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release64\bin\portaudio_x86_64.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release64\bin\portaudio_x86_64.dll</><dest>win</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\jack\jack_net.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\jack\jack_netone.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\jack_netsource.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
