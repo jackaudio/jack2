@@ -260,6 +260,7 @@ extern "C"
     LIB_EXPORT jack_session_command_t *jack_session_notify(jack_client_t* ext_client, const char* target, jack_session_event_type_t ev_type, const char* path);
     LIB_EXPORT int jack_session_reply(jack_client_t* ext_client, jack_session_event_t *event);
     LIB_EXPORT void jack_session_event_free(jack_session_event_t* ev);
+    LIB_EXPORT char* jack_client_get_uuid (jack_client_t *client);
     LIB_EXPORT char* jack_get_uuid_for_client_name(jack_client_t* ext_client, const char* client_name);
     LIB_EXPORT char* jack_get_client_name_by_uuid(jack_client_t* ext_client, const char* client_uuid);
     LIB_EXPORT int jack_reserve_client_name(jack_client_t* ext_client, const char* name, const char* uuid);
@@ -2019,6 +2020,22 @@ LIB_EXPORT void jack_session_event_free(jack_session_event_t* ev)
         if (ev->command_line)
             free(ev->command_line);
         free(ev);
+    }
+}
+
+LIB_EXPORT char *jack_client_get_uuid(jack_client_t* ext_client)
+{
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_client_get_uuid");
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    if (client == NULL) {
+        jack_error("jack_client_get_uuid called with a NULL client");
+        return NULL;
+    } else {
+        char retval[16];
+        snprintf(retval, sizeof(retval), "%d", client->GetClientControl()->fSessionID);
+        return strdup(retval);
     }
 }
 

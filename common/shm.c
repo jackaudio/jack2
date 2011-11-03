@@ -314,17 +314,16 @@ jack_shm_validate_registry ()
 static void
 jack_set_server_prefix (const char *server_name)
 {
-    #ifdef WIN32
+#ifdef WIN32
     char buffer[UNLEN+1]={0};
     DWORD len = UNLEN+1;
     GetUserName(buffer, &len);
     snprintf (jack_shm_server_prefix, sizeof (jack_shm_server_prefix),
 		  "jack-%s:%s:", buffer, server_name);
-    #else
+#else
     snprintf (jack_shm_server_prefix, sizeof (jack_shm_server_prefix),
 		  "jack-%d:%s:", GetUID(), server_name);
-    #endif
-
+#endif
 }
 
 /* gain server addressability to shared memory registration segment
@@ -504,6 +503,8 @@ jack_register_server (const char *server_name, int new_registry)
 	 */
 	for (i = 0; i < MAX_SERVERS; i++) {
 
+        printf("server name %s %s\n", jack_shm_header->server[i].name, jack_shm_server_prefix);
+
 		if (strncmp (jack_shm_header->server[i].name,
 			     jack_shm_server_prefix,
 			     JACK_SERVER_NAME_SIZE) != 0)
@@ -548,6 +549,8 @@ jack_register_server (const char *server_name, int new_registry)
 	strncpy (jack_shm_header->server[i].name,
 		 jack_shm_server_prefix,
 		 JACK_SERVER_NAME_SIZE);
+
+    printf("new server name %s \n", jack_shm_header->server[i].name);
 
  unlock:
 	jack_shm_unlock_registry ();
@@ -1288,3 +1291,4 @@ jack_attach_shm (jack_shm_info_t* si)
 }
 
 #endif /* !USE_POSIX_SHM */
+

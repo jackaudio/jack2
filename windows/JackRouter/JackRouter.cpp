@@ -34,7 +34,7 @@
 #include "profport.h"
 
 /*
-	08/07/2007 SL : USe jack_client_open instead of jack_client_new (automatic client renaming).
+	08/07/2007 SL : Use jack_client_open instead of jack_client_new (automatic client renaming).
 	09/08/2007 SL : Add JackRouter.ini parameter file.
 	09/20/2007 SL : Better error report in DllRegisterServer (for Vista).
 	09/27/2007 SL : Add AUDO_CONNECT property in JackRouter.ini file.
