@@ -278,8 +278,8 @@ bool PortAudioDevices::IsDuplex (PaDeviceIndex id)
     //else is another complementary device ? (search in devices with the same name)
     for (PaDeviceIndex i = 0; i < fNumDevice; i++) {
         if ((i != id) && (GetDeviceName (i) == GetDeviceName (id))) {
-            if ((fDeviceInfo[i]->maxInputChannels && fDeviceInfo[id]->maxOutputChannels) {
-                    || (fDeviceInfo[i]->maxOutputChannels && fDeviceInfo[id]->maxInputChannels))
+            if ((fDeviceInfo[i]->maxInputChannels && fDeviceInfo[id]->maxOutputChannels)
+                    || (fDeviceInfo[i]->maxOutputChannels && fDeviceInfo[id]->maxInputChannels)) {
                 return true;
             }
         }

@@ -21,6 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "driver_interface.h"
 #include "JackPortAudioDriver.h"
 #include "JackEngineControl.h"
+#include "JackGraphManager.h"
 #include "JackError.h"
 #include "JackTime.h"
 #include "JackCompilerDeps.h"
@@ -133,7 +134,7 @@ void JackPortAudioDriver::UpdateLatencies()
     for (int i = 0; i < fPlaybackChannels; i++) {
         output_range.max = output_range.min = (info->outputLatency * fEngineControl->fSampleRate) + fPlaybackLatency;
         if (fEngineControl->fSyncMode) {
-            output_range.max = output_range.min += fEngineControl->fBufferSizey;
+            output_range.max = output_range.min += fEngineControl->fBufferSize;
         } else {
             output_range.max = output_range.min += fEngineControl->fBufferSize * 2;
         }
