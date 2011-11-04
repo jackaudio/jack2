@@ -637,15 +637,14 @@ LIB_EXPORT int jack_port_set_name(jack_port_t* port, const char* name)
         jack_error("jack_port_set_name called with a NULL port name");
         return -1;
     } else {
-        JackGraphManager* manager = GetGraphManager();
-        int refnum;
-        if (manager && ((refnum = manager->GetPort(myport)->GetRefNum()) > 0)) {
-            JackClient* client = JackGlobals::fClientTable[refnum];
-            assert(client);
-            return client->PortRename(myport, name);
-        } else {
-            return -1;
+        JackClient* client = NULL;
+        for (int i = 0; i < CLIENT_NUM; i++) {
+            // Find a valid client
+            if ((client = JackGlobals::fClientTable[i])) {
+                break;
+            }
         }
+        return (client) ? client->PortRename(myport, name) : -1;
     }
 }
 
