@@ -55,53 +55,55 @@ namespace Jack
         public:
 
             JackNetUnixSocket();
-            JackNetUnixSocket ( const char* ip, int port );
-            JackNetUnixSocket ( const JackNetUnixSocket& );
+            JackNetUnixSocket(const char* ip, int port);
+            JackNetUnixSocket(const JackNetUnixSocket&);
             ~JackNetUnixSocket();
 
-            JackNetUnixSocket& operator= ( const JackNetUnixSocket& socket );
+            JackNetUnixSocket& operator=(const JackNetUnixSocket& socket);
 
             //socket management
             int NewSocket();
             int Bind();
-            int BindWith ( const char* ip );
-            int BindWith ( int port );
+            int BindWith(const char* ip);
+            int BindWith(int port);
             int Connect();
-            int ConnectTo ( const char* ip );
+            int ConnectTo(const char* ip);
             void Close();
             void Reset();
             bool IsSocket();
 
             //IP/PORT management
-            void SetPort ( int port );
+            void SetPort(int port);
             int GetPort();
 
             //address management
-            int SetAddress ( const char* ip, int port );
+            int SetAddress(const char* ip, int port);
             char* GetSendIP();
             char* GetRecvIP();
 
             //utility
-            int GetName ( char* name );
-            int JoinMCastGroup ( const char* mcast_ip );
+            int GetName(char* name);
+            int JoinMCastGroup(const char* mcast_ip);
 
             //options management
-            int SetOption ( int level, int optname, const void* optval, socklen_t optlen );
-            int GetOption ( int level, int optname, void* optval, socklen_t* optlen );
+            int SetOption(int level, int optname, const void* optval, socklen_t optlen);
+            int GetOption(int level, int optname, void* optval, socklen_t* optlen);
 
             //timeout
-            int SetTimeOut ( int us );
+            int SetTimeOut(int us);
 
             //disable local loop
             int SetLocalLoop();
 
+            bool IsLocal(char* ip);
+
             //network operations
-            int SendTo ( const void* buffer, size_t nbytes, int flags );
-            int SendTo ( const void* buffer, size_t nbytes, int flags, const char* ip );
-            int Send ( const void* buffer, size_t nbytes, int flags );
-            int RecvFrom ( void* buffer, size_t nbytes, int flags );
-            int Recv ( void* buffer, size_t nbytes, int flags );
-            int CatchHost ( void* buffer, size_t nbytes, int flags );
+            int SendTo(const void* buffer, size_t nbytes, int flags);
+            int SendTo(const void* buffer, size_t nbytes, int flags, const char* ip);
+            int Send(const void* buffer, size_t nbytes, int flags);
+            int RecvFrom(void* buffer, size_t nbytes, int flags);
+            int Recv(void* buffer, size_t nbytes, int flags);
+            int CatchHost(void* buffer, size_t nbytes, int flags);
 
             //error management
             net_error_t GetError();

@@ -221,8 +221,8 @@ extern "C"
         desc = jack_driver_descriptor_construct("audioadapter", JackDriverNone, "netjack audio <==> net backend adapter", &filler);
 
         value.ui = 0;
-        jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamInt, &value, NULL, "Maximum number of input channels", NULL);
-        jack_driver_descriptor_add_parameter(desc, &filler, "outchannels", 'o', JackDriverParamInt, &value, NULL, "Maximum number of output channels", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "in-channels", 'i', JackDriverParamInt, &value, NULL, "Maximum number of input channels", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "out-channels", 'o', JackDriverParamInt, &value, NULL, "Maximum number of output channels", NULL);
 
         strcpy(value.str, "default input device");
         jack_driver_descriptor_add_parameter(desc, &filler, "capture", 'C', JackDriverParamString, &value, NULL, "Provide capture ports. Optionally set PortAudio device name", NULL);

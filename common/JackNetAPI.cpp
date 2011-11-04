@@ -166,36 +166,36 @@ struct JackNetExtMaster : public JackNetMasterInterface {
     {
         // Init socket API (win32)
         if (SocketAPIInit() < 0) {
-            fprintf(stderr, "Can't init Socket API, exiting...\n");
+            jack_error("Can't init Socket API, exiting...");
             return -1;
         }
 
         // Request socket
         if (fSocket.NewSocket() == SOCKET_ERROR) {
-            fprintf(stderr, "Can't create the network management input socket : %s\n", StrError(NET_ERROR_CODE));
+            jack_error("Can't create the network management input socket : %s", StrError(NET_ERROR_CODE));
             return -1;
         }
 
         // Bind the socket to the local port
         if (fSocket.Bind() == SOCKET_ERROR) {
-            fprintf(stderr, "Can't bind the network manager socket : %s\n", StrError(NET_ERROR_CODE));
+            jack_error("Can't bind the network manager socket : %s", StrError(NET_ERROR_CODE));
             fSocket.Close();
             return -1;
         }
 
         // Join multicast group
         if (fSocket.JoinMCastGroup(fMulticastIP) == SOCKET_ERROR) {
-            fprintf(stderr, "Can't join multicast group : %s\n", StrError(NET_ERROR_CODE));
+            jack_error("Can't join multicast group : %s", StrError(NET_ERROR_CODE));
         }
 
         // Local loop
         if (fSocket.SetLocalLoop() == SOCKET_ERROR) {
-            fprintf(stderr, "Can't set local loop : %s\n", StrError(NET_ERROR_CODE));
+            jack_error("Can't set local loop : %s", StrError(NET_ERROR_CODE));
         }
 
         // Set a timeout on the multicast receive (the thread can now be cancelled)
         if (fSocket.SetTimeOut(MANAGER_INIT_TIMEOUT) == SOCKET_ERROR) {
-            fprintf(stderr, "Can't set timeout : %s\n", StrError(NET_ERROR_CODE));
+            jack_error("Can't set timeout : %s", StrError(NET_ERROR_CODE));
         }
 
          // Main loop, wait for data, deal with it and wait again
@@ -209,9 +209,9 @@ struct JackNetExtMaster : public JackNetMasterInterface {
             SessionParamsNToH(&net_params, &fParams);
 
             if ((rx_bytes == SOCKET_ERROR) && (fSocket.GetError() != NET_NO_DATA)) {
-                fprintf(stderr, "Error in receive : %s\n", StrError(NET_ERROR_CODE));
+                jack_error("Error in receive : %s", StrError(NET_ERROR_CODE));
                 if (++attempt == 10) {
-                    fprintf(stderr, "Can't receive on the socket, exiting net manager.\n" );
+                    jack_error("Can't receive on the socket, exiting net manager" );
                     goto error;
                 }
             }
@@ -225,10 +225,10 @@ struct JackNetExtMaster : public JackNetMasterInterface {
                             SessionParamsDisplay(&fParams);
                             fRunning = false;
                         } else {
-                            fprintf(stderr, "Can't init new net master...\n");
+                            jack_error("Can't init new net master...");
                             goto error;
                         }
-                        jack_info ( "Waiting for a slave..." );
+                        jack_info("Waiting for a slave...");
                         break;
 
                     case KILL_MASTER:
@@ -259,7 +259,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
     {
         // Check MASTER <==> SLAVE network protocol coherency
         if (fParams.fProtocolVersion != MASTER_PROTOCOL) {
-            fprintf(stderr, "Error : slave is running with a different protocol %s\n", fParams.fName);
+            jack_error("Error : slave is running with a different protocol %s", fParams.fName);
             return -1;
         }
 
@@ -465,7 +465,6 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
         // Request parameters
         assert(strlen(ip) < 32);
         strcpy(fMulticastIP, ip);
-
         fParams.fMtu = request->mtu;
         fParams.fTransportSync = 0;
         fParams.fSendAudioChannels = request->audio_input;
@@ -494,17 +493,25 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
     int Open(jack_master_t* result)
     {
         if (fParams.fNetworkLatency > NETWORK_MAX_LATENCY) {
-            printf("Error : network latency is limited to %d\n", NETWORK_MAX_LATENCY);
+            jack_error("Error : network latency is limited to %d", NETWORK_MAX_LATENCY);
             return -1;
         }
 
         // Init network connection
         if (!JackNetSlaveInterface::InitConnection(fConnectTimeOut)) {
+            jack_error("Initing network fails...");
+            return -1;
+        }
+
+        // Finish connection...
+        if (!JackNetSlaveInterface::InitRendering()) {
+            jack_error("Starting network fails...");
             return -1;
         }
 
         // Then set global parameters
         if (!SetParams()) {
+            jack_error("SetParams error...");
             return -1;
         }
 
@@ -532,11 +539,19 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
 
         // Init network connection
         if (!JackNetSlaveInterface::InitConnection(fConnectTimeOut)) {
+            jack_error("Initing network fails...");
+            return -1;
+        }
+
+         // Finish connection...
+        if (!JackNetSlaveInterface::InitRendering()) {
+            jack_error("Starting network fails...");
             return -1;
         }
 
         // Then set global parameters
         if (!SetParams()) {
+            jack_error("SetParams error...");
             return -1;
         }
 
@@ -630,8 +645,8 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
     {
         // Will do "something" on OSX only...
         UInt64 period, constraint;
-        period = constraint = float(fParams.fPeriodSize) / float(fParams.fSampleRate) * 1000000;
-        UInt64 computation = JackTools::ComputationMicroSec(fParams.fPeriodSize);
+        period = constraint = UInt64(1000000000.f * (float(fParams.fPeriodSize) / float(fParams.fSampleRate)));
+        UInt64 computation = JackTools::ComputationMicroSec(fParams.fPeriodSize) * 1000;
         fThread.SetParams(period, computation, constraint);
 
         return (fThread.AcquireRealTime(80) == 0);      // TODO: get a value from the server
@@ -713,11 +728,6 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
 
     int Start()
     {
-        // Finish connection...
-        if (!JackNetSlaveInterface::InitRendering()) {
-            return -1;
-        }
-
         return (fProcessCallback == 0) ? -1 : fThread.StartSync();
     }
 
@@ -974,7 +984,8 @@ SERVER_EXPORT int jack_adapter_pull_and_push(jack_adapter_t* adapter, float** in
 }
 
 
-#ifdef MY_TARGET_OS_IPHONE
+//#ifdef MY_TARGET_OS_IPHONE
+#if 1
 
 static void jack_format_and_log(int level, const char *prefix, const char *fmt, va_list ap)
 {
@@ -1031,3 +1042,4 @@ SERVER_EXPORT void jack_log(const char *fmt, ...)
 {}
 
 #endif
+

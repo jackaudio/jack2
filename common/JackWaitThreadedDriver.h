@@ -39,7 +39,7 @@ class SERVER_EXPORT JackWaitThreadedDriver : public JackThreadedDriver
 {
     private:
 
-        struct SERVER_EXPORT JackDriverStarter : public JackRunnableInterface
+        struct JackDriverStarter : public JackRunnableInterface
         {
 
                 JackDriver* fDriver;
@@ -47,7 +47,7 @@ class SERVER_EXPORT JackWaitThreadedDriver : public JackThreadedDriver
                 volatile bool fRunning;
 
                 JackDriverStarter(JackDriver* driver)
-                    :fDriver(driver),fThread(this),fRunning(false)
+                    :fDriver(driver), fThread(this), fRunning(false)
                 {}
 
                 ~JackDriverStarter()

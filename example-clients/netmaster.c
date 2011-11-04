@@ -57,9 +57,9 @@ main (int argc, char *argv[])
 {
     int buffer_size = BUFFER_SIZE;
     int sample_rate = SAMPLE_RATE;
-    int port = DEFAULT_PORT;
+    int udp_port = DEFAULT_PORT;
     char* multicast_ip = DEFAULT_MULTICAST_IP;
- 	const char *options = "b:r:a:p:";
+ 	const char *options = "b:r:a:p:h";
     int option_index;
 	int opt;
 
@@ -89,7 +89,7 @@ main (int argc, char *argv[])
             break;
 
 		case 'p':
-			port = atoi(optarg);
+			udp_port = atoi(optarg);
 			break;
 
 		case 'h':
@@ -107,7 +107,7 @@ main (int argc, char *argv[])
 
     printf("Waiting for a slave...\n");
 
-    if ((net = jack_net_master_open(DEFAULT_MULTICAST_IP, DEFAULT_PORT, "net_master", &request, &result))  == 0) {
+    if ((net = jack_net_master_open(multicast_ip, udp_port, "net_master", &request, &result))  == 0) {
         fprintf(stderr, "NetJack master can not be opened\n");
 		return 1;
 	}

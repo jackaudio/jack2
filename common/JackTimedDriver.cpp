@@ -29,58 +29,61 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-int JackTimedDriver::FirstCycle(jack_time_t cur_time)
+int JackTimedDriver::FirstCycle(jack_time_t cur_time_usec)
 {
-    fAnchorTime = cur_time;
+    fAnchorTimeUsec = cur_time_usec;
     return int((double(fEngineControl->fBufferSize) * 1000000) / double(fEngineControl->fSampleRate));
 }
- 
-int JackTimedDriver::CurrentCycle(jack_time_t cur_time)
+
+int JackTimedDriver::CurrentCycle(jack_time_t cur_time_usec)
 {
-    return int((double(fCycleCount) * double(fEngineControl->fBufferSize) * 1000000.) / double(fEngineControl->fSampleRate)) - (cur_time - fAnchorTime);
+    return int(((double(fCycleCount) * double(fEngineControl->fBufferSize) * 1000000.) / double(fEngineControl->fSampleRate)) - (cur_time_usec - fAnchorTimeUsec));
 }
 
-int JackTimedDriver::ProcessAux()
+int JackTimedDriver::Start()
 {
-    jack_time_t cur_time = GetMicroSeconds();
-    int wait_time;
-    
+    fCycleCount = 0;
+    return JackAudioDriver::Start();
+}
+
+void JackTimedDriver::ProcessWait()
+{
+    jack_time_t cur_time_usec = GetMicroSeconds();
+    int wait_time_usec;
+
     if (fCycleCount++ == 0) {
-        wait_time = FirstCycle(cur_time);
+        wait_time_usec = FirstCycle(cur_time_usec);
     } else {
-        wait_time = CurrentCycle(cur_time);
+        wait_time_usec = CurrentCycle(cur_time_usec);
     }
-    
-    if (wait_time < 0) {
-        NotifyXRun(cur_time, float(cur_time -fBeginDateUst));
+
+    if (wait_time_usec < 0) {
+        NotifyXRun(cur_time_usec, float(cur_time_usec - fBeginDateUst));
         fCycleCount = 0;
-        wait_time = 0;
+        wait_time_usec = 0;
+        jack_error("JackTimedDriver::Process XRun = %ld usec", (cur_time_usec - fBeginDateUst));
     }
-    
-    //jack_log("JackTimedDriver::Process wait_time = %d", wait_time);
-    JackSleep(wait_time);
-    return 0;
+
+    //jack_log("JackTimedDriver::Process wait_time = %d", wait_time_usec);
+    JackSleep(wait_time_usec);
 }
 
-int JackTimedDriver::Process()
+int JackWaiterDriver::ProcessNull()
 {
     JackDriver::CycleTakeBeginTime();
-    JackAudioDriver::Process();
-     
-    return ProcessAux();
-}
 
-int JackTimedDriver::ProcessNull()
-{
-    JackDriver::CycleTakeBeginTime();
-    
+    // Graph processing without Read/Write
     if (fEngineControl->fSyncMode) {
-        ProcessGraphSyncMaster();
+        ProcessGraphSync();
     } else {
-        ProcessGraphAsyncMaster();
+        ProcessGraphAsync();
     }
-     
-    return ProcessAux();
+
+    // Keep end cycle time
+    JackDriver::CycleTakeEndTime();
+
+    ProcessWait();
+    return 0;
 }
 
 } // end of namespace

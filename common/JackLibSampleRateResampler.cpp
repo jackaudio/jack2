@@ -58,8 +58,9 @@ JackLibSampleRateResampler::JackLibSampleRateResampler(unsigned int quality)
 
     int error;
     fResampler = src_new(quality, 1, &error);
-    if (error != 0)
+    if (error != 0) {
         jack_error("JackLibSampleRateResampler::JackLibSampleRateResampler err = %s", src_strerror(error));
+    }
 }
 
 JackLibSampleRateResampler::~JackLibSampleRateResampler()

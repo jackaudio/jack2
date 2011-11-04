@@ -25,17 +25,13 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 //#define JACK_MONITOR
 
-#ifdef JACK_MONITOR
-#include "JackFrameTimer.h"
-#endif
-
 namespace Jack
 {
     /**
     \Brief This class describes the Net Backend
     */
 
-    class JackNetDriver : public JackTimedDriver, public JackNetSlaveInterface
+    class JackNetDriver : public JackWaiterDriver, public JackNetSlaveInterface
     {
 
         private:
@@ -77,10 +73,7 @@ namespace Jack
             virtual ~JackNetDriver();
 
             int Close();
-            
-            // The 
-            int Process();
-        
+
             int Attach();
             int Detach();
 

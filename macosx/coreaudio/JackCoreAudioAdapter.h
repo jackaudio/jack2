@@ -41,7 +41,7 @@ typedef	UInt8	CAAudioHardwareDeviceSectionID;
 #define	kAudioDeviceSectionWildcard	((CAAudioHardwareDeviceSectionID)0xFF)
 
 #define WAIT_COUNTER 60
-    
+
 /*!
 \brief Audio adapter using CoreAudio API.
 */
@@ -53,15 +53,18 @@ class JackCoreAudioAdapter : public JackAudioAdapterInterface
 
         AudioUnit fAUHAL;
         AudioBufferList* fInputData;
-        
+
         char fCaptureUID[256];
         char fPlaybackUID[256];
-         
+
         bool fCapturing;
         bool fPlaying;
 
         AudioDeviceID fDeviceID;    // Used "duplex" device
         AudioObjectID fPluginID;    // Used for aggregate device
+
+        vector<int> fInputLatencies;
+        vector<int> fOutputLatencies;
 
         bool fState;
 
@@ -93,13 +96,14 @@ class JackCoreAudioAdapter : public JackAudioAdapterInterface
         OSStatus GetDefaultInputDevice(AudioDeviceID* id);
         OSStatus GetDefaultOutputDevice(AudioDeviceID* id);
         OSStatus GetDeviceNameFromID(AudioDeviceID id, char* name);
+        AudioDeviceID GetDeviceIDFromName(const char* name);
 
         // Setup
         OSStatus CreateAggregateDevice(AudioDeviceID captureDeviceID, AudioDeviceID playbackDeviceID, jack_nframes_t samplerate, AudioDeviceID* outAggregateDevice);
         OSStatus CreateAggregateDeviceAux(vector<AudioDeviceID> captureDeviceID, vector<AudioDeviceID> playbackDeviceID, jack_nframes_t samplerate, AudioDeviceID* outAggregateDevice);
         OSStatus DestroyAggregateDevice();
         bool IsAggregateDevice(AudioDeviceID device);
-        
+
         int SetupDevices(const char* capture_driver_uid,
                          const char* playback_driver_uid,
                          char* capture_driver_name,
@@ -126,13 +130,16 @@ class JackCoreAudioAdapter : public JackAudioAdapterInterface
         int SetupBufferSize(jack_nframes_t buffer_size);
         int SetupSampleRate(jack_nframes_t samplerate);
         int SetupSampleRateAux(AudioDeviceID inDevice, jack_nframes_t samplerate);
-    
+
         int SetupBuffers(int inchannels);
         void DisposeBuffers();
         void CloseAUHAL();
-        
+
         int AddListeners();
         void RemoveListeners();
+
+        int GetLatency(int port_index, bool input);
+        OSStatus GetStreamLatencies(AudioDeviceID device, bool isInput, vector<int>& latencies);
 
     public:
 
@@ -146,8 +153,12 @@ class JackCoreAudioAdapter : public JackAudioAdapterInterface
         virtual int SetSampleRate(jack_nframes_t sample_rate);
         virtual int SetBufferSize(jack_nframes_t buffer_size);
 
+        virtual int GetInputLatency(int port_index);
+        virtual int GetOutputLatency(int port_index);
 };
-}
+
+
+} // end of namepace
 
 #ifdef __cplusplus
 extern "C"

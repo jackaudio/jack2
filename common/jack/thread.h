@@ -114,7 +114,7 @@ int jack_drop_real_time_scheduling (jack_native_thread_t thread) JACK_OPTIONAL_W
 int jack_client_stop_thread(jack_client_t* client, jack_native_thread_t thread) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
- * Cancel the thread then waits for the thread handler to terminate.
+ * Kill the thread.
  *
  * @param thread POSIX thread ID.
  *

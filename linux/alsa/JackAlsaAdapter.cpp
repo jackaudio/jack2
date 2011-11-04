@@ -213,8 +213,8 @@ extern "C"
         jack_driver_descriptor_add_parameter(desc, &filler, "duplex", 'D', JackDriverParamBool, &value, NULL, "Provide both capture and playback ports", NULL);
 
         value.i  = 0;
-        jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamInt, &value, NULL, "Number of capture channels (defaults to hardware max)", NULL);
-        jack_driver_descriptor_add_parameter(desc, &filler, "outchannels", 'o', JackDriverParamInt, &value, NULL, "Number of playback channels (defaults to hardware max)", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "in-channels", 'i', JackDriverParamInt, &value, NULL, "Number of capture channels (defaults to hardware max)", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "out-channels", 'o', JackDriverParamInt, &value, NULL, "Number of playback channels (defaults to hardware max)", NULL);
 
         value.ui  = 0;
         jack_driver_descriptor_add_parameter(desc, &filler, "quality", 'q', JackDriverParamUInt, &value, NULL, "Resample algorithm quality (0 - 4)", NULL);

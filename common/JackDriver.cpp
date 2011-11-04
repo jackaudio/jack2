@@ -124,8 +124,9 @@ int JackDriver::Open(bool capturing,
     strcpy(fPlaybackDriverName, playback_driver_name);
 
     fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize); // in microsec
-    if (!fEngineControl->fTimeOut)
+    if (!fEngineControl->fTimeOut) {
         fEngineControl->fTimeOutUsecs = jack_time_t(2.f * fEngineControl->fPeriodUsecs);
+    }
 
     fGraphManager->DirectConnect(fClientControl.fRefNum, fClientControl.fRefNum); // Connect driver to itself for "sync" mode
     SetupDriverSync(fClientControl.fRefNum, false);
@@ -177,8 +178,9 @@ int JackDriver::Open(jack_nframes_t buffer_size,
     strcpy(fPlaybackDriverName, playback_driver_name);
 
     fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize); // in microsec
-    if (!fEngineControl->fTimeOut)
+    if (!fEngineControl->fTimeOut) {
         fEngineControl->fTimeOutUsecs = jack_time_t(2.f * fEngineControl->fPeriodUsecs);
+    }
 
     fGraphManager->SetBufferSize(buffer_size);
     fGraphManager->DirectConnect(fClientControl.fRefNum, fClientControl.fRefNum); // Connect driver to itself for "sync" mode
@@ -309,9 +311,9 @@ int JackDriver::ProcessReadSlaves()
     list<JackDriverInterface*>::const_iterator it;
     for (it = fSlaveList.begin(); it != fSlaveList.end(); it++) {
         JackDriverInterface* slave = *it;
-        if (slave->ProcessRead() < 0)
+        if (slave->ProcessRead() < 0) {
             res = -1;
-
+        }
     }
     return res;
 }
@@ -322,9 +324,9 @@ int JackDriver::ProcessWriteSlaves()
     list<JackDriverInterface*>::const_iterator it;
     for (it = fSlaveList.begin(); it != fSlaveList.end(); it++) {
         JackDriverInterface* slave = *it;
-        if (slave->ProcessWrite() < 0)
+        if (slave->ProcessWrite() < 0) {
             res = -1;
-
+        }
     }
     return res;
 }
@@ -387,10 +389,8 @@ int JackDriver::StartSlaves()
         JackDriverInterface* slave = *it;
         if (slave->Start() < 0) {
             res = -1;
-
             // XXX: We should attempt to stop all of the slaves that we've
             // started here.
-
             break;
         }
     }
@@ -403,8 +403,9 @@ int JackDriver::StopSlaves()
     list<JackDriverInterface*>::const_iterator it;
     for (it = fSlaveList.begin(); it != fSlaveList.end(); it++) {
         JackDriverInterface* slave = *it;
-        if (slave->Stop() < 0)
+        if (slave->Stop() < 0) {
             res = -1;
+        }
     }
     return res;
 }
@@ -417,14 +418,13 @@ bool JackDriver::IsFixedBufferSize()
 int JackDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
     int res = 0;
-
     list<JackDriverInterface*>::const_iterator it;
     for (it = fSlaveList.begin(); it != fSlaveList.end(); it++) {
         JackDriverInterface* slave = *it;
-        if (slave->SetBufferSize(buffer_size) < 0)
+        if (slave->SetBufferSize(buffer_size) < 0) {
             res = -1;
+        }
     }
-
     return res;
 }
 
@@ -434,8 +434,9 @@ int JackDriver::SetSampleRate(jack_nframes_t sample_rate)
     list<JackDriverInterface*>::const_iterator it;
     for (it = fSlaveList.begin(); it != fSlaveList.end(); it++) {
         JackDriverInterface* slave = *it;
-        if (slave->SetSampleRate(sample_rate) < 0)
+        if (slave->SetSampleRate(sample_rate) < 0) {
             res = -1;
+        }
     }
     return res;
 }
@@ -444,6 +445,5 @@ bool JackDriver::Initialize()
 {
     return true;
 }
-
 
 } // end of namespace

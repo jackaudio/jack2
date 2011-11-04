@@ -24,7 +24,7 @@ namespace Jack
 {
 
 JackResampler::JackResampler()
-    :fRatio(1),fRingBufferSize(DEFAULT_RB_SIZE)
+    :fRatio(1), fRingBufferSize(DEFAULT_RB_SIZE)
 {
     fRingBuffer = jack_ringbuffer_create(sizeof(jack_default_audio_sample_t) * fRingBufferSize);
     jack_ringbuffer_read_advance(fRingBuffer, (sizeof(jack_default_audio_sample_t) * fRingBufferSize) / 2);
@@ -32,8 +32,9 @@ JackResampler::JackResampler()
 
 JackResampler::~JackResampler()
 {
-    if (fRingBuffer)
+    if (fRingBuffer) {
         jack_ringbuffer_free(fRingBuffer);
+    }
 }
 
 void JackResampler::Reset(unsigned int new_size)

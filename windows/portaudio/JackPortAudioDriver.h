@@ -49,8 +49,8 @@ class JackPortAudioDriver : public JackMMCSS, public JackAudioDriver
                           PaStreamCallbackFlags statusFlags,
                           void* userData);
 
-        void UpdateLatencies();
         PaError OpenStream(jack_nframes_t buffer_size);
+        void UpdateLatencies();
 
     public:
 

@@ -77,9 +77,6 @@ class SERVER_EXPORT JackMidiDriver : public JackDriver
         virtual int Attach();
         virtual int Detach();
 
-        virtual int Read();
-        virtual int Write();
-
 };
 
 } // end of namespace

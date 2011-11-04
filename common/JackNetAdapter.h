@@ -38,7 +38,7 @@ namespace Jack
         private:
 
             //jack data
-            jack_client_t* fJackClient;
+            jack_client_t* fClient;
 
             //transport data
             int fLastTransportState;

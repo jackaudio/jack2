@@ -110,16 +110,6 @@ int JackMidiDriver::Detach()
     return 0;
 }
 
-int JackMidiDriver::Read()
-{
-    return 0;
-}
-
-int JackMidiDriver::Write()
-{
-    return 0;
-}
-
 void JackMidiDriver::UpdateLatencies()
 {
     jack_latency_range_t range;

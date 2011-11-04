@@ -203,16 +203,16 @@ static void ParseChannelList(const string& list, vector<int>& result)
     }
 }
 
-OSStatus JackCoreAudioDriver::Render(void *inRefCon,
-                                     AudioUnitRenderActionFlags *ioActionFlags,
-                                     const AudioTimeStamp *inTimeStamp,
+OSStatus JackCoreAudioDriver::Render(void* inRefCon,
+                                     AudioUnitRenderActionFlags* ioActionFlags,
+                                     const AudioTimeStamp* inTimeStamp,
                                      UInt32 inBusNumber,
                                      UInt32 inNumberFrames,
-                                     AudioBufferList *ioData)
+                                     AudioBufferList* ioData)
 {
     JackCoreAudioDriver* driver = (JackCoreAudioDriver*)inRefCon;
     driver->fActionFags = ioActionFlags;
-    driver->fCurrentTime = (AudioTimeStamp *)inTimeStamp;
+    driver->fCurrentTime = inTimeStamp;
     driver->fDriverOutputData = ioData;
 
     // Setup threaded based log function et get RT thread parameters once...
@@ -475,7 +475,7 @@ OSStatus JackCoreAudioDriver::GetDefaultInputDevice(AudioDeviceID* id)
     }
 
     if (inDefault == 0) {
-        jack_error("Error : input device is 0, please select a correct one !!");
+        jack_error("Error: default input device is 0, please select a correct one !!");
         return -1;
     }
     jack_log("GetDefaultInputDevice: input = %ld ", inDefault);
@@ -494,7 +494,7 @@ OSStatus JackCoreAudioDriver::GetDefaultOutputDevice(AudioDeviceID* id)
     }
 
     if (outDefault == 0) {
-        jack_error("Error : output device is 0, please select a correct one !!");
+        jack_error("Error: default output device is 0, please select a correct one !!");
         return -1;
     }
     jack_log("GetDefaultOutputDevice: output = %ld", outDefault);
@@ -511,17 +511,65 @@ OSStatus JackCoreAudioDriver::GetDeviceNameFromID(AudioDeviceID id, char* name)
 OSStatus JackCoreAudioDriver::GetTotalChannels(AudioDeviceID device, int& channelCount, bool isInput)
 {
     OSStatus err = noErr;
-    UInt32	outSize;
+    UInt32 outSize;
     Boolean	outWritable;
 
     channelCount = 0;
     err = AudioDeviceGetPropertyInfo(device, 0, isInput, kAudioDevicePropertyStreamConfiguration, &outSize, &outWritable);
     if (err == noErr) {
-        AudioBufferList bufferList[outSize];
+        int stream_count = outSize / sizeof(AudioBufferList);
+        AudioBufferList bufferList[stream_count];
         err = AudioDeviceGetProperty(device, 0, isInput, kAudioDevicePropertyStreamConfiguration, &outSize, bufferList);
         if (err == noErr) {
-            for (unsigned int i = 0; i < bufferList->mNumberBuffers; i++) {
+            for (uint i = 0; i < bufferList->mNumberBuffers; i++) {
                 channelCount += bufferList->mBuffers[i].mNumberChannels;
+                //jack_info("GetTotalChannels stream = %d channels = %d", i, bufferList->mBuffers[i].mNumberChannels);
+            }
+        }
+    }
+    return err;
+}
+
+OSStatus JackCoreAudioDriver::GetStreamLatencies(AudioDeviceID device, bool isInput, vector<int>& latencies)
+{
+    OSStatus err = noErr;
+    UInt32 outSize1, outSize2, outSize3;
+    Boolean	outWritable;
+
+    err = AudioDeviceGetPropertyInfo(device, 0, isInput, kAudioDevicePropertyStreams, &outSize1, &outWritable);
+    if (err == noErr) {
+        int stream_count = outSize1 / sizeof(UInt32);
+        AudioStreamID streamIDs[stream_count];
+        AudioBufferList bufferList[stream_count];
+        UInt32 streamLatency;
+        outSize2 = sizeof(UInt32);
+
+        err = AudioDeviceGetProperty(device, 0, isInput, kAudioDevicePropertyStreams, &outSize1, streamIDs);
+        if (err != noErr) {
+            jack_error("GetStreamLatencies kAudioDevicePropertyStreams err = %d", err);
+            return err;
+        }
+
+        err = AudioDeviceGetPropertyInfo(device, 0, isInput, kAudioDevicePropertyStreamConfiguration, &outSize3, &outWritable);
+        if (err != noErr) {
+            jack_error("GetStreamLatencies kAudioDevicePropertyStreamConfiguration err = %d", err);
+            return err;
+        }
+
+        for (int i = 0; i < stream_count; i++) {
+            err = AudioStreamGetProperty(streamIDs[i], 0, kAudioStreamPropertyLatency, &outSize2, &streamLatency);
+            if (err != noErr) {
+                jack_error("GetStreamLatencies kAudioStreamPropertyLatency err = %d", err);
+                return err;
+            }
+            err = AudioDeviceGetProperty(device, 0, isInput, kAudioDevicePropertyStreamConfiguration, &outSize3, bufferList);
+            if (err != noErr) {
+                jack_error("GetStreamLatencies kAudioDevicePropertyStreamConfiguration err = %d", err);
+                return err;
+            }
+            // Push 'channel' time the stream latency
+            for (uint k = 0; k < bufferList->mBuffers[i].mNumberChannels; k++) {
+                latencies.push_back(streamLatency);
             }
         }
     }
@@ -1787,49 +1835,69 @@ void JackCoreAudioDriver::UpdateLatencies()
 {
     UInt32 size;
     OSStatus err;
-    jack_latency_range_t range;
-    range.max = fEngineControl->fBufferSize;
-    range.min = fEngineControl->fBufferSize;
+    jack_latency_range_t input_range;
+    jack_latency_range_t output_range;
+    jack_latency_range_t monitor_range;
 
-    for (int i = 0; i < fCaptureChannels; i++) {
-        size = sizeof(UInt32);
-        UInt32 value1 = 0;
-        UInt32 value2 = 0;
-        err = AudioDeviceGetProperty(fDeviceID, 0, true, kAudioDevicePropertyLatency, &size, &value1);
-        if (err != noErr) {
-            jack_log("AudioDeviceGetProperty kAudioDevicePropertyLatency error");
-        }
-        err = AudioDeviceGetProperty(fDeviceID, 0, true, kAudioDevicePropertySafetyOffset, &size, &value2);
-        if (err != noErr) {
-            jack_log("AudioDeviceGetProperty kAudioDevicePropertySafetyOffset error");
-        }
-
-        range.min = range.max = fEngineControl->fBufferSize + value1 + value2 + fCaptureLatency;
-        fGraphManager->GetPort(fCapturePortList[i])->SetLatencyRange(JackCaptureLatency, &range);
+    // Get Input latency
+    size = sizeof(UInt32);
+    UInt32 value1 = 0;
+    UInt32 value2 = 0;
+    err = AudioDeviceGetProperty(fDeviceID, 0, true, kAudioDevicePropertyLatency, &size, &value1);
+    if (err != noErr) {
+        jack_error("AudioDeviceGetProperty kAudioDevicePropertyLatency error");
+    }
+    err = AudioDeviceGetProperty(fDeviceID, 0, true, kAudioDevicePropertySafetyOffset, &size, &value2);
+    if (err != noErr) {
+        jack_error("AudioDeviceGetProperty kAudioDevicePropertySafetyOffset error");
     }
 
-    for (int i = 0; i < fPlaybackChannels; i++) {
-        size = sizeof(UInt32);
-        UInt32 value1 = 0;
-        UInt32 value2 = 0;
-        err = AudioDeviceGetProperty(fDeviceID, 0, false, kAudioDevicePropertyLatency, &size, &value1);
-        if (err != noErr) {
-            jack_log("AudioDeviceGetProperty kAudioDevicePropertyLatency error");
-        }
-        err = AudioDeviceGetProperty(fDeviceID, 0, false, kAudioDevicePropertySafetyOffset, &size, &value2);
-        if (err != noErr) {
-            jack_log("AudioDeviceGetProperty kAudioDevicePropertySafetyOffset error");
-        }
+    input_range.min = input_range.max = fEngineControl->fBufferSize + value1 + value2 + fCaptureLatency;
 
-        // Add more latency if "async" mode is used...
-        range.min = range.max
-            = fEngineControl->fBufferSize + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize * fIOUsage) + value1 + value2 + fPlaybackLatency;
-        fGraphManager->GetPort(fPlaybackPortList[i])->SetLatencyRange(JackPlaybackLatency, &range);
+    // Get input stream latencies
+    vector<int> input_latencies;
+    err = GetStreamLatencies(fDeviceID, true, input_latencies);
+
+    for (int i = 0; i < fCaptureChannels; i++) {
+        if (err != noErr) {
+            input_range.min += input_latencies[i];
+            input_range.max += input_latencies[i];
+        }
+        fGraphManager->GetPort(fCapturePortList[i])->SetLatencyRange(JackCaptureLatency, &input_range);
+    }
+
+    // Get Output latency
+    size = sizeof(UInt32);
+    value1 = 0;
+    value2 = 0;
+    err = AudioDeviceGetProperty(fDeviceID, 0, false, kAudioDevicePropertyLatency, &size, &value1);
+    if (err != noErr) {
+        jack_error("AudioDeviceGetProperty kAudioDevicePropertyLatency error");
+    }
+    err = AudioDeviceGetProperty(fDeviceID, 0, false, kAudioDevicePropertySafetyOffset, &size, &value2);
+    if (err != noErr) {
+        jack_error("AudioDeviceGetProperty kAudioDevicePropertySafetyOffset error");
+    }
+
+    // Get output stream latencies
+    vector<int> output_latencies;
+    err = GetStreamLatencies(fDeviceID, false, output_latencies);
+
+    // Add more latency if "async" mode is used...
+    output_range.min = output_range.max = fEngineControl->fBufferSize + ((fEngineControl->fSyncMode)
+        ? 0 : fEngineControl->fBufferSize * fIOUsage) + value1 + value2 + fPlaybackLatency;
+
+    for (int i = 0; i < fPlaybackChannels; i++) {
+        if (err != noErr) {
+            output_range.min += output_latencies[i];
+            output_range.max += output_latencies[i];
+        }
+        fGraphManager->GetPort(fPlaybackPortList[i])->SetLatencyRange(JackPlaybackLatency, &output_range);
 
         // Monitor port
         if (fWithMonitorPorts) {
-            range.min = range.max = fEngineControl->fBufferSize;
-            fGraphManager->GetPort(fMonitorPortList[i])->SetLatencyRange(JackCaptureLatency, &range);
+            monitor_range.min = monitor_range.max = fEngineControl->fBufferSize;
+            fGraphManager->GetPort(fMonitorPortList[i])->SetLatencyRange(JackCaptureLatency, &monitor_range);
         }
     }
 }

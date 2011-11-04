@@ -652,10 +652,10 @@ extern "C"
         jack_driver_descriptor_add_parameter(desc, &filler, "wordlength", 'w', JackDriverParamInt, &value, NULL, "Word length", NULL);
 
         value.ui = OSS_DRIVER_DEF_INS;
-        jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamUInt, &value, NULL, "Capture channels", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "in-channels", 'i', JackDriverParamUInt, &value, NULL, "Capture channels", NULL);
 
         value.ui = OSS_DRIVER_DEF_OUTS;
-        jack_driver_descriptor_add_parameter(desc, &filler, "outchannels", 'o', JackDriverParamUInt, &value, NULL, "Playback channels", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "out-channels", 'o', JackDriverParamUInt, &value, NULL, "Playback channels", NULL);
 
         value.i  = false;
         jack_driver_descriptor_add_parameter(desc, &filler, "excl", 'e', JackDriverParamBool, &value, NULL, "Exclusif (O_EXCL) access mode", NULL);

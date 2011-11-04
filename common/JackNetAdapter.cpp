@@ -35,9 +35,8 @@ namespace Jack
         because we don't have full parametering right now, parameters will be parsed from the param list,
         and then JackNetSlaveInterface will be filled with proper values.
         */
-
-        strcpy(fMulticastIP, DEFAULT_MULTICAST_IP);
-        uint port = DEFAULT_PORT;
+        char multicast_ip[32];
+        uint udp_port;
         GetHostName(fParams.fName, JACK_CLIENT_NAME_SIZE);
         fSocket.GetName(fParams.fSlaveNetName);
         fParams.fMtu = DEFAULT_MTU;
@@ -52,7 +51,18 @@ namespace Jack
         fParams.fSlaveSyncMode = 1;
         fParams.fNetworkLatency = 2;
         fParams.fSampleEncoder = JackFloatEncoder;
-        fJackClient = jack_client;
+        fClient = jack_client;
+
+        // Possibly use env variable
+        const char* default_udp_port = getenv("JACK_NETJACK_PORT");
+        udp_port = (default_udp_port) ? atoi(default_udp_port) : DEFAULT_PORT;
+
+        const char* default_multicast_ip = getenv("JACK_NETJACK_MULTICAST");
+        if (default_multicast_ip) {
+            strcpy(multicast_ip, default_multicast_ip);
+        } else {
+            strcpy(multicast_ip, DEFAULT_MULTICAST_IP);
+        }
 
         //options parsing
         const JSList* node;
@@ -63,14 +73,11 @@ namespace Jack
 
             switch (param->character) {
                 case 'a' :
-                    if (strlen(param->value.str) < 32) {
-                        strcpy(fMulticastIP, param->value.str);
-                    } else {
-                        jack_error("Can't use multicast address %s, using default %s", param->value.ui, DEFAULT_MULTICAST_IP);
-                    }
+                    assert(strlen(param->value.str) < 32);
+                    strcpy(multicast_ip, param->value.str);
                     break;
                 case 'p' :
-                    fSocket.SetPort(param->value.ui);
+                    udp_port = param->value.ui;
                     break;
                 case 'M' :
                     fParams.fMtu = param->value.i;
@@ -85,7 +92,7 @@ namespace Jack
                     strncpy(fParams.fName, param->value.str, JACK_CLIENT_NAME_SIZE);
                     break;
                 case 't' :
-                    //fParams.fTransportSync = param->value.ui;
+                    fParams.fTransportSync = param->value.ui;
                     break;
             #if HAVE_CELT
                 case 'c':
@@ -112,9 +119,11 @@ namespace Jack
              }
         }
 
+        strcpy(fMulticastIP, multicast_ip);
+
         // Set the socket parameters
-        fSocket.SetPort(port);
-        fSocket.SetAddress(fMulticastIP, port);
+        fSocket.SetPort(udp_port);
+        fSocket.SetAddress(fMulticastIP, udp_port);
 
         // If not set, takes default
         fParams.fSendAudioChannels = (send_audio == -1) ? 2 : send_audio;
@@ -136,13 +145,15 @@ namespace Jack
         jack_log("JackNetAdapter::~JackNetAdapter");
 
         if (fSoftCaptureBuffer) {
-            for (int port_index = 0; port_index < fCaptureChannels; port_index++)
+            for (int port_index = 0; port_index < fCaptureChannels; port_index++) {
                 delete[] fSoftCaptureBuffer[port_index];
+            }
             delete[] fSoftCaptureBuffer;
         }
         if (fSoftPlaybackBuffer) {
-            for (int port_index = 0; port_index < fPlaybackChannels; port_index++)
+            for (int port_index = 0; port_index < fPlaybackChannels; port_index++) {
                 delete[] fSoftPlaybackBuffer[port_index];
+            }
             delete[] fSoftPlaybackBuffer;
         }
     }
@@ -244,8 +255,9 @@ namespace Jack
         try {
             // Keep running even in case of error
             while (fThread.GetStatus() == JackThread::kRunning)
-                if (Process() == SOCKET_ERROR)
+                if (Process() == SOCKET_ERROR) {
                     return false;
+                }
             return false;
         } catch (JackNetException& e) {
             e.PrintMessage();
@@ -268,17 +280,17 @@ namespace Jack
         //TODO : we need here to get the actual timebase master to eventually release it from its duty (see JackNetDriver)
 
         //is there a new transport state ?
-        if (fSendTransportData.fNewState &&(fSendTransportData.fState != jack_transport_query(fJackClient, NULL))) {
+        if (fSendTransportData.fNewState &&(fSendTransportData.fState != jack_transport_query(fClient, NULL))) {
             switch (fSendTransportData.fState)
             {
                 case JackTransportStopped :
-                    jack_transport_stop(fJackClient);
+                    jack_transport_stop(fClient);
                     jack_info("NetMaster : transport stops");
                     break;
 
                 case JackTransportStarting :
-                    jack_transport_reposition(fJackClient, &fSendTransportData.fPosition);
-                    jack_transport_start(fJackClient);
+                    jack_transport_reposition(fClient, &fSendTransportData.fPosition);
+                    jack_transport_start(fClient);
                     jack_info("NetMaster : transport starts");
                     break;
 
@@ -314,13 +326,14 @@ namespace Jack
         }
 
         //update transport state and position
-        fReturnTransportData.fState = jack_transport_query(fJackClient, &fReturnTransportData.fPosition);
+        fReturnTransportData.fState = jack_transport_query(fClient, &fReturnTransportData.fPosition);
 
         //is it a new state (that the master need to know...) ?
         fReturnTransportData.fNewState = ((fReturnTransportData.fState != fLastTransportState) &&
                                            (fReturnTransportData.fState != fSendTransportData.fState));
-        if (fReturnTransportData.fNewState)
+        if (fReturnTransportData.fNewState) {
             jack_info("Sending transport state '%s'.", GetTransportState(fReturnTransportData.fState));
+        }
         fLastTransportState = fReturnTransportData.fState;
     }
 
@@ -329,8 +342,9 @@ namespace Jack
     {
         //don't return -1 in case of sync recv failure
         //we need the process to continue for network error detection
-        if (SyncRecv() == SOCKET_ERROR)
+        if (SyncRecv() == SOCKET_ERROR) {
             return 0;
+        }
 
         DecodeSyncPacket();
         return DataRecv();
@@ -340,8 +354,9 @@ namespace Jack
     {
         EncodeSyncPacket();
 
-        if (SyncSend() == SOCKET_ERROR)
+        if (SyncSend() == SOCKET_ERROR) {
             return SOCKET_ERROR;
+        }
 
         return DataSend();
     }
@@ -351,15 +366,17 @@ namespace Jack
     {
         //read data from the network
         //in case of fatal network error, stop the process
-        if (Read() == SOCKET_ERROR)
+        if (Read() == SOCKET_ERROR) {
             return SOCKET_ERROR;
+        }
 
         PushAndPull(fSoftCaptureBuffer, fSoftPlaybackBuffer, fAdaptedBufferSize);
 
         //then write data to network
         //in case of failure, stop process
-        if (Write() == SOCKET_ERROR)
+        if (Write() == SOCKET_ERROR) {
             return SOCKET_ERROR;
+        }
 
         return 0;
     }
@@ -386,10 +403,10 @@ extern "C"
         desc = jack_driver_descriptor_construct("netadapter", JackDriverNone, "netjack net <==> audio backend adapter", &filler);
 
         strcpy(value.str, DEFAULT_MULTICAST_IP);
-        jack_driver_descriptor_add_parameter(desc, &filler, "multicast_ip", 'a', JackDriverParamString, &value, NULL, "Multicast Address", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "multicast-ip", 'a', JackDriverParamString, &value, NULL, "Multicast Address", NULL);
 
         value.i = DEFAULT_PORT;
-        jack_driver_descriptor_add_parameter(desc, &filler, "udp_net_port", 'p', JackDriverParamInt, &value, NULL, "UDP port", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "udp-net-port", 'p', JackDriverParamInt, &value, NULL, "UDP port", NULL);
 
         value.i = DEFAULT_MTU;
         jack_driver_descriptor_add_parameter(desc, &filler, "mtu", 'M', JackDriverParamInt, &value, NULL, "MTU to the master", NULL);
@@ -406,7 +423,7 @@ extern "C"
         strcpy(value.str, "'hostname'");
         jack_driver_descriptor_add_parameter(desc, &filler, "client-name", 'n', JackDriverParamString, &value, NULL, "Name of the jack client", NULL);
 
-        value.ui = 1U;
+        value.ui = 0U;
         jack_driver_descriptor_add_parameter(desc, &filler, "transport-sync", 't', JackDriverParamUInt, &value, NULL, "Sync transport with master's", NULL);
 
         value.ui = 5U;
@@ -424,17 +441,17 @@ extern "C"
         return desc;
     }
 
-    SERVER_EXPORT int jack_internal_initialize(jack_client_t* jack_client, const JSList* params)
+    SERVER_EXPORT int jack_internal_initialize(jack_client_t* client, const JSList* params)
     {
         jack_log("Loading netadapter");
 
         Jack::JackAudioAdapter* adapter;
-        jack_nframes_t buffer_size = jack_get_buffer_size(jack_client);
-        jack_nframes_t sample_rate = jack_get_sample_rate(jack_client);
+        jack_nframes_t buffer_size = jack_get_buffer_size(client);
+        jack_nframes_t sample_rate = jack_get_sample_rate(client);
 
         try {
 
-            adapter = new Jack::JackAudioAdapter(jack_client, new Jack::JackNetAdapter(jack_client, buffer_size, sample_rate, params), params, false);
+            adapter = new Jack::JackAudioAdapter(client, new Jack::JackNetAdapter(client, buffer_size, sample_rate, params), params);
             assert(adapter);
 
             if (adapter->Open() == 0) {
@@ -458,8 +475,9 @@ extern "C"
         jack_driver_desc_t* desc = jack_get_descriptor();
 
         Jack::JackArgParser parser(load_init);
-        if (parser.GetArgc() > 0)
+        if (parser.GetArgc() > 0) {
             parse_params = parser.ParseParams(desc, &params);
+        }
 
         if (parse_params) {
             res = jack_internal_initialize(jack_client, params);
