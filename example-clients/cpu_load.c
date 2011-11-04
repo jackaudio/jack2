@@ -18,7 +18,7 @@ jack_client_t *client;
 
 static void signal_handler(int sig)
 {
-    jack_client_close(client ;
+    jack_client_close(client);
     fprintf(stderr, "signal received, exiting ...\n");
     exit(0);
 }
