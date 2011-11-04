@@ -32,32 +32,46 @@ namespace Jack
 
 class SERVER_EXPORT JackTimedDriver : public JackAudioDriver
 {
-    private:
+    protected:
 
         int fCycleCount;
-        jack_time_t fAnchorTime;
-        
+        jack_time_t fAnchorTimeUsec;
+
         int FirstCycle(jack_time_t cur_time);
         int CurrentCycle(jack_time_t cur_time);
-        
-        int ProcessAux();
+
+        void ProcessWait();
 
     public:
 
         JackTimedDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
-                : JackAudioDriver(name, alias, engine, table), fCycleCount(0), fAnchorTime(0)
+                : JackAudioDriver(name, alias, engine, table), fCycleCount(0), fAnchorTimeUsec(0)
         {}
         virtual ~JackTimedDriver()
         {}
 
-        virtual int Process();
-        virtual int ProcessNull();
-        
         // BufferSize can be changed
         bool IsFixedBufferSize()
         {
             return false;
         }
+
+        int Start();
+
+};
+
+class SERVER_EXPORT JackWaiterDriver : public JackTimedDriver
+{
+
+    public:
+
+        JackWaiterDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
+            : JackTimedDriver(name, alias, engine, table)
+        {}
+        virtual ~JackWaiterDriver()
+        {}
+
+        virtual int ProcessNull();
 
 };
 

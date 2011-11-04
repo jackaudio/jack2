@@ -33,11 +33,14 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 class PortAudioDevices
 {
     private:
+
         PaHostApiIndex fNumHostApi;     //number of hosts
         PaDeviceIndex fNumDevice;       //number of devices
         PaDeviceInfo** fDeviceInfo;     //array of device info
         std::string* fHostName;         //array of host names (matched with host id's)
+
     public:
+
         PortAudioDevices();
         ~PortAudioDevices();
 
@@ -48,12 +51,13 @@ class PortAudioDevices
         std::string GetHostFromDevice(PaDeviceIndex id);
         std::string GetFullName(PaDeviceIndex id);
         std::string GetFullName(std::string hostname, std::string devicename);
-        PaDeviceInfo* GetDeviceFromFullName(std::string fullname, PaDeviceIndex& id, bool isInput );
+        PaDeviceInfo* GetDeviceFromFullName(std::string fullname, PaDeviceIndex& id, bool isInput);
         void PrintSupportedStandardSampleRates(const PaStreamParameters* inputParameters, const PaStreamParameters* outputParameters);
         int GetInputDeviceFromName(const char* name, PaDeviceIndex& device, int& in_max);
         int GetOutputDeviceFromName(const char* name, PaDeviceIndex& device, int& out_max);
         void DisplayDevicesNames();
-        bool IsDuplex ( PaDeviceIndex id );
+        bool IsDuplex(PaDeviceIndex id);
+
 };
 
 #endif

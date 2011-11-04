@@ -166,7 +166,7 @@ bool JackGraphManager::IsDirectConnection(int ref1, int ref2)
 }
 
 // RT
-void* JackGraphManager::GetBuffer(jack_port_id_t port_index, jack_nframes_t buffer_size, bool nulled)
+void* JackGraphManager::GetBuffer(jack_port_id_t port_index, jack_nframes_t buffer_size)
 {
     AssertPort(port_index);
     AssertBufferSize(buffer_size);
@@ -184,17 +184,13 @@ void* JackGraphManager::GetBuffer(jack_port_id_t port_index, jack_nframes_t buff
 
     // Output port
     if (port->fFlags & JackPortIsOutput) {
-        if (port->fTied != NO_PORT) {
-            return GetBuffer(port->fTied, buffer_size);
-        } else {
-            return (len == 0 && nulled) ? NULL : GetBuffer(port_index);
-        }
-     }
+        return (port->fTied != NO_PORT) ? GetBuffer(port->fTied, buffer_size) : GetBuffer(port_index);
+    }
 
     // No connections : return a zero-filled buffer
     if (len == 0) {
         port->ClearBuffer(buffer_size);
-        return  (nulled) ? NULL : port->GetBuffer();
+        return port->GetBuffer();
 
     // One connection
     } else if (len == 1) {

@@ -64,7 +64,7 @@ class JackCoreAudioDriver : public JackAudioDriver
         AudioObjectID fPluginID;    // Used for aggregate device
 
         AudioUnitRenderActionFlags* fActionFags;
-        AudioTimeStamp* fCurrentTime;
+        const AudioTimeStamp* fCurrentTime;
 
         bool fState;
         bool fHogged;
@@ -107,6 +107,7 @@ class JackCoreAudioDriver : public JackAudioDriver
         OSStatus GetDefaultOutputDevice(AudioDeviceID* id);
         OSStatus GetDeviceNameFromID(AudioDeviceID id, char* name);
         OSStatus GetTotalChannels(AudioDeviceID device, int& channelCount, bool isInput);
+        OSStatus GetStreamLatencies(AudioDeviceID device, bool isInput, vector<int>& latencies);
 
         // Setup
         OSStatus CreateAggregateDevice(AudioDeviceID captureDeviceID, AudioDeviceID playbackDeviceID, jack_nframes_t samplerate, AudioDeviceID* outAggregateDevice);

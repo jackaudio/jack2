@@ -49,15 +49,17 @@ static OSStatus DisplayDeviceNames()
     CFStringRef UIname;
 
     err = AudioHardwareGetPropertyInfo(kAudioHardwarePropertyDevices, &size, &isWritable);
-    if (err != noErr)
+    if (err != noErr) {
         return err;
+    }
 
     deviceNum = size / sizeof(AudioDeviceID);
     AudioDeviceID devices[deviceNum];
 
     err = AudioHardwareGetProperty(kAudioHardwarePropertyDevices, &size, devices);
-    if (err != noErr)
+    if (err != noErr) {
         return err;
+    }
 
     for (i = 0; i < deviceNum; i++) {
         char device_name[256];
@@ -74,8 +76,9 @@ static OSStatus DisplayDeviceNames()
 
         size = 256;
         err = AudioDeviceGetProperty(devices[i], 0, false, kAudioDevicePropertyDeviceName, &size, device_name);
-        if (err != noErr)
+        if (err != noErr) {
             return err;
+        }
 
         jack_info("Device name = \'%s\', internal_name = \'%s\' (to be used as -C, -P, or -d parameter)", device_name, internal_name);
     }
@@ -83,8 +86,9 @@ static OSStatus DisplayDeviceNames()
     return noErr;
 
 error:
-    if (UIname != NULL)
+    if (UIname != NULL) {
         CFRelease(UIname);
+    }
     return err;
 }
 
@@ -267,27 +271,31 @@ void JackCoreAudioAdapter::RemoveListeners()
 }
 
 OSStatus JackCoreAudioAdapter::Render(void *inRefCon,
-                                        AudioUnitRenderActionFlags *ioActionFlags,
-                                        const AudioTimeStamp *inTimeStamp,
-                                        UInt32 inBusNumber,
-                                        UInt32 inNumberFrames,
-                                        AudioBufferList *ioData)
+                                    AudioUnitRenderActionFlags *ioActionFlags,
+                                    const AudioTimeStamp *inTimeStamp,
+                                    UInt32 inBusNumber,
+                                    UInt32 inNumberFrames,
+                                    AudioBufferList *ioData)
 {
     JackCoreAudioAdapter* adapter = static_cast<JackCoreAudioAdapter*>(inRefCon);
-    AudioUnitRender(adapter->fAUHAL, ioActionFlags, inTimeStamp, 1, inNumberFrames, adapter->fInputData);
+    OSStatus err = AudioUnitRender(adapter->fAUHAL, ioActionFlags, inTimeStamp, 1, inNumberFrames, adapter->fInputData);
 
-    jack_default_audio_sample_t* inputBuffer[adapter->fCaptureChannels];
-    jack_default_audio_sample_t* outputBuffer[adapter->fPlaybackChannels];
+    if (err == noErr) {
+        jack_default_audio_sample_t* inputBuffer[adapter->fCaptureChannels];
+        jack_default_audio_sample_t* outputBuffer[adapter->fPlaybackChannels];
 
-    for (int i = 0; i < adapter->fCaptureChannels; i++) {
-        inputBuffer[i] = (jack_default_audio_sample_t*)adapter->fInputData->mBuffers[i].mData;
+        for (int i = 0; i < adapter->fCaptureChannels; i++) {
+            inputBuffer[i] = (jack_default_audio_sample_t*)adapter->fInputData->mBuffers[i].mData;
+        }
+        for (int i = 0; i < adapter->fPlaybackChannels; i++) {
+            outputBuffer[i] = (jack_default_audio_sample_t*)ioData->mBuffers[i].mData;
+        }
+
+        adapter->PushAndPull((jack_default_audio_sample_t**)inputBuffer, (jack_default_audio_sample_t**)outputBuffer, inNumberFrames);
+        return noErr;
+    } else {
+        return err;
     }
-    for (int i = 0; i < adapter->fPlaybackChannels; i++) {
-        outputBuffer[i] = (jack_default_audio_sample_t*)ioData->mBuffers[i].mData;
-    }
-
-    adapter->PushAndPull((jack_default_audio_sample_t**)inputBuffer, (jack_default_audio_sample_t**)outputBuffer, inNumberFrames);
-    return noErr;
 }
 
 JackCoreAudioAdapter::JackCoreAudioAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params)
@@ -420,6 +428,9 @@ JackCoreAudioAdapter::JackCoreAudioAdapter(jack_nframes_t buffer_size, jack_nfra
     if (AddListeners() < 0) {
         throw std::bad_alloc();
     }
+
+    GetStreamLatencies(fDeviceID, true, fInputLatencies);
+    GetStreamLatencies(fDeviceID, false, fOutputLatencies);
 }
 
 OSStatus JackCoreAudioAdapter::GetDefaultDevice(AudioDeviceID* id)
@@ -429,11 +440,13 @@ OSStatus JackCoreAudioAdapter::GetDefaultDevice(AudioDeviceID* id)
     AudioDeviceID inDefault;
     AudioDeviceID outDefault;
 
-    if ((res = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultInputDevice, &theSize, &inDefault)) != noErr)
+    if ((res = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultInputDevice, &theSize, &inDefault)) != noErr) {
         return res;
+    }
 
-    if ((res = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultOutputDevice, &theSize, &outDefault)) != noErr)
+    if ((res = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultOutputDevice, &theSize, &outDefault)) != noErr) {
         return res;
+    }
 
     jack_log("GetDefaultDevice: input = %ld output = %ld", inDefault, outDefault);
 
@@ -462,8 +475,9 @@ OSStatus JackCoreAudioAdapter::GetTotalChannels(AudioDeviceID device, int& chann
         AudioBufferList bufferList[outSize];
         err = AudioDeviceGetProperty(device, 0, isInput, kAudioDevicePropertyStreamConfiguration, &outSize, bufferList);
         if (err == noErr) {
-            for (unsigned int i = 0; i < bufferList->mNumberBuffers; i++)
+            for (unsigned int i = 0; i < bufferList->mNumberBuffers; i++) {
                 channelCount += bufferList->mBuffers[i].mNumberChannels;
+            }
         }
     }
 
@@ -492,11 +506,12 @@ OSStatus JackCoreAudioAdapter::GetDefaultInputDevice(AudioDeviceID* id)
     UInt32 theSize = sizeof(UInt32);
     AudioDeviceID inDefault;
 
-    if ((res = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultInputDevice, &theSize, &inDefault)) != noErr)
+    if ((res = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultInputDevice, &theSize, &inDefault)) != noErr) {
         return res;
+    }
 
     if (inDefault == 0) {
-        jack_error("Error : input device is 0, please select a correct one !!");
+        jack_error("Error: default input device is 0, please select a correct one !!");
         return -1;
     }
     jack_log("GetDefaultInputDevice: input = %ld ", inDefault);
@@ -510,11 +525,12 @@ OSStatus JackCoreAudioAdapter::GetDefaultOutputDevice(AudioDeviceID* id)
     UInt32 theSize = sizeof(UInt32);
     AudioDeviceID outDefault;
 
-    if ((res = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultOutputDevice, &theSize, &outDefault)) != noErr)
+    if ((res = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultOutputDevice, &theSize, &outDefault)) != noErr) {
         return res;
+    }
 
     if (outDefault == 0) {
-        jack_error("Error : output device is 0, please select a correct one !!");
+        jack_error("Error: default output device is 0, please select a correct one !!");
         return -1;
     }
     jack_log("GetDefaultOutputDevice: output = %ld", outDefault);
@@ -526,6 +542,39 @@ OSStatus JackCoreAudioAdapter::GetDeviceNameFromID(AudioDeviceID id, char* name)
 {
     UInt32 size = 256;
     return AudioDeviceGetProperty(id, 0, false, kAudioDevicePropertyDeviceName, &size, name);
+}
+
+AudioDeviceID JackCoreAudioAdapter::GetDeviceIDFromName(const char* name)
+{
+    UInt32 size;
+    Boolean isWritable;
+    int i, deviceNum;
+
+    OSStatus err = AudioHardwareGetPropertyInfo(kAudioHardwarePropertyDevices, &size, &isWritable);
+    if (err != noErr) {
+        return -1;
+    }
+
+    deviceNum = size / sizeof(AudioDeviceID);
+    AudioDeviceID devices[deviceNum];
+
+    err = AudioHardwareGetProperty(kAudioHardwarePropertyDevices, &size, devices);
+    if (err != noErr) {
+        return err;
+    }
+
+    for (i = 0; i < deviceNum; i++) {
+        char device_name[256];
+        size = 256;
+        err = AudioDeviceGetProperty(devices[i], 0, false, kAudioDevicePropertyDeviceName, &size, device_name);
+        if (err != noErr) {
+            return -1;
+        } else if (strcmp(device_name, name) == 0) {
+            return devices[i];
+        }
+    }
+
+    return -1;
 }
 
 // Setup
@@ -540,6 +589,7 @@ int JackCoreAudioAdapter::SetupDevices(const char* capture_driver_uid,
 
     // Duplex
     if (strcmp(capture_driver_uid, "") != 0 && strcmp(playback_driver_uid, "") != 0) {
+        jack_log("JackCoreAudioDriver::Open duplex");
 
         // Same device for capture and playback...
         if (strcmp(capture_driver_uid, playback_driver_uid) == 0)  {
@@ -577,8 +627,9 @@ int JackCoreAudioAdapter::SetupDevices(const char* capture_driver_uid,
                 }
             }
 
-            if (CreateAggregateDevice(captureID, playbackID, samplerate, &fDeviceID) != noErr)
+            if (CreateAggregateDevice(captureID, playbackID, samplerate, &fDeviceID) != noErr) {
                 return -1;
+            }
         }
 
     // Capture only
@@ -616,13 +667,13 @@ int JackCoreAudioAdapter::SetupDevices(const char* capture_driver_uid,
             jack_error("Cannot open default device in duplex mode, so aggregate default input and default output");
 
             // Creates aggregate device
-            AudioDeviceID captureID, playbackID;
+            AudioDeviceID captureID = -1, playbackID = -1;
 
             if (GetDeviceIDFromUID(capture_driver_uid, &captureID) != noErr) {
                 jack_log("Will take default input");
                 if (GetDefaultInputDevice(&captureID) != noErr) {
                     jack_error("Cannot open default input device");
-                    return -1;
+                    goto built_in;
                 }
             }
 
@@ -630,13 +681,36 @@ int JackCoreAudioAdapter::SetupDevices(const char* capture_driver_uid,
                 jack_log("Will take default output");
                 if (GetDefaultOutputDevice(&playbackID) != noErr) {
                     jack_error("Cannot open default output device");
-                    return -1;
+                    goto built_in;
                 }
             }
 
-            if (CreateAggregateDevice(captureID, playbackID, samplerate, &fDeviceID) != noErr)
-                return -1;
+            if (captureID > 0 && playbackID > 0) {
+                if (CreateAggregateDevice(captureID, playbackID, samplerate, &fDeviceID) != noErr) {
+                    goto built_in;
+                }
+            } else {
+                jack_error("Cannot use default input/output");
+                goto built_in;
+            }
         }
+    }
+
+    return 0;
+
+built_in:
+
+    // Aggregate built-in input and output
+    AudioDeviceID captureID = GetDeviceIDFromName("Built-in Input");
+    AudioDeviceID playbackID = GetDeviceIDFromName("Built-in Output");
+
+    if (captureID > 0 && playbackID > 0) {
+        if (CreateAggregateDevice(captureID, playbackID, samplerate, &fDeviceID) != noErr) {
+            return -1;
+        }
+    } else {
+        jack_error("Cannot aggregate built-in input and output");
+        return -1;
     }
 
     return 0;
@@ -676,14 +750,16 @@ int JackCoreAudioAdapter::SetupChannels(bool capturing,
 
     if (inchannels > in_nChannels) {
         jack_error("This device hasn't required input channels inchannels = %ld in_nChannels = %ld", inchannels, in_nChannels);
-        if (strict)
+        if (strict) {
             return -1;
+        }
     }
 
     if (outchannels > out_nChannels) {
         jack_error("This device hasn't required output channels outchannels = %ld out_nChannels = %ld", outchannels, out_nChannels);
-        if (strict)
+        if (strict) {
             return -1;
+        }
     }
 
     if (inchannels == -1) {
@@ -785,8 +861,9 @@ int JackCoreAudioAdapter::SetupBuffers(int inchannels)
 void JackCoreAudioAdapter::DisposeBuffers()
 {
     if (fInputData) {
-        for (int i = 0; i < fCaptureChannels; i++)
+        for (int i = 0; i < fCaptureChannels; i++) {
             free(fInputData->mBuffers[i].mData);
+        }
         free(fInputData);
         fInputData = 0;
     }
@@ -901,7 +978,7 @@ int JackCoreAudioAdapter::OpenAUHAL(bool capturing,
     }
 
     // Setup channel map
-    if (capturing && inchannels > 0 && inchannels < in_nChannels) {
+    if (capturing && inchannels > 0 && inchannels <= in_nChannels) {
         SInt32 chanArr[in_nChannels];
         for (int i = 0; i < in_nChannels; i++) {
             chanArr[i] = -1;
@@ -917,7 +994,7 @@ int JackCoreAudioAdapter::OpenAUHAL(bool capturing,
         }
     }
 
-    if (playing && outchannels > 0 && outchannels < out_nChannels) {
+    if (playing && outchannels > 0 && outchannels <= out_nChannels) {
         SInt32 chanArr[out_nChannels];
         for (int i = 0;	i < out_nChannels; i++) {
             chanArr[i] = -1;
@@ -1284,8 +1361,9 @@ OSStatus JackCoreAudioAdapter::CreateAggregateDeviceAux(vector<AudioDeviceID> ca
     vector<CFStringRef> captureDeviceUID;
     for (UInt32 i = 0; i < captureDeviceID.size(); i++) {
         CFStringRef ref = GetDeviceName(captureDeviceID[i]);
-        if (ref == NULL)
+        if (ref == NULL) {
             return -1;
+        }
         captureDeviceUID.push_back(ref);
         // input sub-devices in this example, so append the sub-device's UID to the CFArray
         CFArrayAppendValue(subDevicesArray, ref);
@@ -1294,8 +1372,9 @@ OSStatus JackCoreAudioAdapter::CreateAggregateDeviceAux(vector<AudioDeviceID> ca
     vector<CFStringRef> playbackDeviceUID;
     for (UInt32 i = 0; i < playbackDeviceID.size(); i++) {
         CFStringRef ref = GetDeviceName(playbackDeviceID[i]);
-        if (ref == NULL)
+        if (ref == NULL) {
             return -1;
+        }
         playbackDeviceUID.push_back(ref);
         // output sub-devices in this example, so append the sub-device's UID to the CFArray
         CFArrayAppendValue(subDevicesArray, ref);
@@ -1421,8 +1500,9 @@ OSStatus JackCoreAudioAdapter::CreateAggregateDeviceAux(vector<AudioDeviceID> ca
     CFRelease(aggDeviceDict);
     CFRelease(subDevicesArray);
 
-    if (subDevicesArrayClock)
+    if (subDevicesArrayClock) {
         CFRelease(subDevicesArrayClock);
+    }
 
     // release the device UID
     for (UInt32 i = 0; i < captureDeviceUID.size(); i++) {
@@ -1479,21 +1559,110 @@ int JackCoreAudioAdapter::Close()
     DisposeBuffers();
     CloseAUHAL();
     RemoveListeners();
-    if (fPluginID > 0)
+    if (fPluginID > 0) {
         DestroyAggregateDevice();
+    }
     return 0;
 }
 
-int JackCoreAudioAdapter::SetSampleRate ( jack_nframes_t sample_rate ) {
-    JackAudioAdapterInterface::SetHostSampleRate ( sample_rate );
+int JackCoreAudioAdapter::SetSampleRate(jack_nframes_t sample_rate)
+{
+    JackAudioAdapterInterface::SetHostSampleRate(sample_rate);
     Close();
     return Open();
 }
 
-int JackCoreAudioAdapter::SetBufferSize ( jack_nframes_t buffer_size ) {
-    JackAudioAdapterInterface::SetHostBufferSize ( buffer_size );
+int JackCoreAudioAdapter::SetBufferSize(jack_nframes_t buffer_size)
+{
+    JackAudioAdapterInterface::SetHostBufferSize(buffer_size);
     Close();
     return Open();
+}
+
+OSStatus JackCoreAudioAdapter::GetStreamLatencies(AudioDeviceID device, bool isInput, vector<int>& latencies)
+{
+    OSStatus err = noErr;
+    UInt32 outSize1, outSize2, outSize3;
+    Boolean	outWritable;
+
+    err = AudioDeviceGetPropertyInfo(device, 0, isInput, kAudioDevicePropertyStreams, &outSize1, &outWritable);
+    if (err == noErr) {
+        int stream_count = outSize1 / sizeof(UInt32);
+        AudioStreamID streamIDs[stream_count];
+        AudioBufferList bufferList[stream_count];
+        UInt32 streamLatency;
+        outSize2 = sizeof(UInt32);
+
+        err = AudioDeviceGetProperty(device, 0, isInput, kAudioDevicePropertyStreams, &outSize1, streamIDs);
+        if (err != noErr) {
+            jack_error("GetStreamLatencies kAudioDevicePropertyStreams err = %d", err);
+            return err;
+        }
+
+        err = AudioDeviceGetPropertyInfo(device, 0, isInput, kAudioDevicePropertyStreamConfiguration, &outSize3, &outWritable);
+        if (err != noErr) {
+            jack_error("GetStreamLatencies kAudioDevicePropertyStreamConfiguration err = %d", err);
+            return err;
+        }
+
+        for (int i = 0; i < stream_count; i++) {
+            err = AudioStreamGetProperty(streamIDs[i], 0, kAudioStreamPropertyLatency, &outSize2, &streamLatency);
+            if (err != noErr) {
+                jack_error("GetStreamLatencies kAudioStreamPropertyLatency err = %d", err);
+                return err;
+            }
+            err = AudioDeviceGetProperty(device, 0, isInput, kAudioDevicePropertyStreamConfiguration, &outSize3, bufferList);
+            if (err != noErr) {
+                jack_error("GetStreamLatencies kAudioDevicePropertyStreamConfiguration err = %d", err);
+                return err;
+            }
+            // Push 'channel' time the stream latency
+            for (uint k = 0; k < bufferList->mBuffers[i].mNumberChannels; k++) {
+                latencies.push_back(streamLatency);
+            }
+        }
+    }
+    return err;
+}
+
+int JackCoreAudioAdapter::GetLatency(int port_index, bool input)
+{
+    UInt32 size = sizeof(UInt32);
+    UInt32 value1 = 0;
+    UInt32 value2 = 0;
+
+    OSStatus err = AudioDeviceGetProperty(fDeviceID, 0, input, kAudioDevicePropertyLatency, &size, &value1);
+    if (err != noErr) {
+        jack_log("AudioDeviceGetProperty kAudioDevicePropertyLatency error");
+    }
+    err = AudioDeviceGetProperty(fDeviceID, 0, input, kAudioDevicePropertySafetyOffset, &size, &value2);
+    if (err != noErr) {
+        jack_log("AudioDeviceGetProperty kAudioDevicePropertySafetyOffset error");
+    }
+
+    // TODO : add stream latency
+
+    return value1 + value2 + fAdaptedBufferSize;
+}
+
+int JackCoreAudioAdapter::GetInputLatency(int port_index)
+{
+    if (port_index < int(fInputLatencies.size())) {
+        return GetLatency(port_index, true) + fInputLatencies[port_index];
+    } else {
+        // No stream latency
+        return GetLatency(port_index, true);
+    }
+}
+
+int JackCoreAudioAdapter::GetOutputLatency(int port_index)
+{
+    if (port_index < int(fOutputLatencies.size())) {
+        return GetLatency(port_index, false) + fOutputLatencies[port_index];
+    } else {
+        // No stream latency
+        return GetLatency(port_index, false);
+    }
 }
 
 } // namespace
@@ -1513,8 +1682,8 @@ extern "C"
 
         value.i = -1;
         jack_driver_descriptor_add_parameter(desc, &filler, "channels", 'c', JackDriverParamInt, &value, NULL, "Maximum number of channels", "Maximum number of channels. If -1, max possible number of channels will be used");
-        jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamInt, &value, NULL, "Maximum number of input channels", "Maximum number of input channels. If -1, max possible number of input channels will be used");
-        jack_driver_descriptor_add_parameter(desc, &filler, "outchannels", 'o', JackDriverParamInt, &value, NULL, "Maximum number of output channels", "Maximum number of output channels. If -1, max possible number of output channels will be used");
+        jack_driver_descriptor_add_parameter(desc, &filler, "in-channels", 'i', JackDriverParamInt, &value, NULL, "Maximum number of input channels", "Maximum number of input channels. If -1, max possible number of input channels will be used");
+        jack_driver_descriptor_add_parameter(desc, &filler, "out-channels", 'o', JackDriverParamInt, &value, NULL, "Maximum number of output channels", "Maximum number of output channels. If -1, max possible number of output channels will be used");
 
         value.str[0] = 0;
         jack_driver_descriptor_add_parameter(desc, &filler, "capture", 'C', JackDriverParamString, &value, NULL, "Input CoreAudio device name", NULL);

@@ -31,7 +31,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <dirent.h>
 #endif
 
-jack_driver_desc_t * jackctl_driver_get_desc(jackctl_driver_t * driver);
+jack_driver_desc_t* jackctl_driver_get_desc(jackctl_driver_t * driver);
 
 SERVER_EXPORT void jack_print_driver_options(jack_driver_desc_t* desc, FILE* file)
 {
@@ -50,17 +50,18 @@ SERVER_EXPORT void jack_print_driver_options(jack_driver_desc_t* desc, FILE* fil
                 sprintf (arg_default, "%c", desc->params[i].value.c);
                 break;
             case JackDriverParamString:
-                if (desc->params[i].value.str && strcmp (desc->params[i].value.str, "") != 0)
+                if (desc->params[i].value.str && strcmp (desc->params[i].value.str, "") != 0) {
                     sprintf (arg_default, "%s", desc->params[i].value.str);
-                else
+                } else {
                     sprintf (arg_default, "none");
+                }
                 break;
             case JackDriverParamBool:
                 sprintf (arg_default, "%s", desc->params[i].value.i ? "true" : "false");
                 break;
         }
 
-        fprintf (file, "\t-%c, --%s \t%s (default: %s)\n",
+        fprintf(file, "\t-%c, --%s \t%s (default: %s)\n",
                  desc->params[i].character,
                  desc->params[i].name,
                  desc->params[i].long_desc,
@@ -69,7 +70,7 @@ SERVER_EXPORT void jack_print_driver_options(jack_driver_desc_t* desc, FILE* fil
 }
 
 static void
-jack_print_driver_param_usage (jack_driver_desc_t * desc, unsigned long param, FILE *file)
+jack_print_driver_param_usage (jack_driver_desc_t* desc, unsigned long param, FILE *file)
 {
     fprintf (file, "Usage information for the '%s' parameter for driver '%s':\n",
              desc->params[param].name, desc->name);
@@ -78,8 +79,8 @@ jack_print_driver_param_usage (jack_driver_desc_t * desc, unsigned long param, F
 
 SERVER_EXPORT void jack_free_driver_params(JSList * driver_params)
 {
-    JSList *node_ptr = driver_params;
-    JSList *next_node_ptr;
+    JSList*node_ptr = driver_params;
+    JSList*next_node_ptr;
 
     while (node_ptr) {
         next_node_ptr = node_ptr->next;
@@ -90,14 +91,14 @@ SERVER_EXPORT void jack_free_driver_params(JSList * driver_params)
 }
 
 SERVER_EXPORT int
-jack_parse_driver_params(jack_driver_desc_t * desc, int argc, char* argv[], JSList ** param_ptr)
+jack_parse_driver_params(jack_driver_desc_t* desc, int argc, char* argv[], JSList** param_ptr)
 {
     struct option * long_options;
-    char * options, * options_ptr;
+    char* options, * options_ptr;
     unsigned long i;
     int opt;
     unsigned int param_index;
-    JSList * params = NULL;
+    JSList* params = NULL;
     jack_driver_param_t * driver_param;
 
     if (argc <= 1) {
@@ -192,11 +193,8 @@ jack_parse_driver_params(jack_driver_desc_t * desc, int argc, char* argv[], JSLi
                         strcasecmp("0", optarg) == 0 ||
                         strcasecmp("(null)", optarg) == 0 ) {
                         driver_param->value.i = false;
-
                     } else {
-
                         driver_param->value.i = true;
-
                     }
                     break;
             }
@@ -214,31 +212,33 @@ jack_parse_driver_params(jack_driver_desc_t * desc, int argc, char* argv[], JSLi
     free (options);
     free (long_options);
 
-    if (param_ptr)
+    if (param_ptr) {
         *param_ptr = params;
-
+    }
     return 0;
 }
 
 SERVER_EXPORT int
 jackctl_parse_driver_params(jackctl_driver *driver_ptr, int argc, char* argv[])
 {
-    struct option * long_options;
-    char * options, * options_ptr;
+    struct option* long_options;
+    char* options, * options_ptr;
     unsigned long i;
     int opt;
-    JSList * node_ptr;
+    JSList* node_ptr;
     jackctl_parameter_t * param = NULL;
     union jackctl_parameter_value value;
 
-    if (argc <= 1)
+    if (argc <= 1) {
         return 0;
+    }
 
-    const JSList * driver_params = jackctl_driver_get_parameters(driver_ptr);
-    if (driver_params == NULL)
+    const JSList* driver_params = jackctl_driver_get_parameters(driver_ptr);
+    if (driver_params == NULL) {
         return 1;
+    }
 
-    jack_driver_desc_t * desc = jackctl_driver_get_desc(driver_ptr);
+    jack_driver_desc_t* desc = jackctl_driver_get_desc(driver_ptr);
 
     /* check for help */
     if (strcmp (argv[1], "-h") == 0 || strcmp (argv[1], "--help") == 0) {
@@ -352,14 +352,14 @@ jackctl_parse_driver_params(jackctl_driver *driver_ptr, int argc, char* argv[])
     return 0;
 }
 
-jack_driver_desc_t *
-jack_find_driver_descriptor (JSList * drivers, const char * name)
+jack_driver_desc_t*
+jack_find_driver_descriptor (JSList * drivers, const char* name)
 {
-    jack_driver_desc_t * desc = 0;
-    JSList * node;
+    jack_driver_desc_t* desc = 0;
+    JSList* node;
 
     for (node = drivers; node; node = jack_slist_next (node)) {
-        desc = (jack_driver_desc_t *) node->data;
+        desc = (jack_driver_desc_t*) node->data;
 
         if (strcmp (desc->name, name) != 0) {
             desc = NULL;
@@ -371,18 +371,18 @@ jack_find_driver_descriptor (JSList * drivers, const char * name)
     return desc;
 }
 
-static jack_driver_desc_t *
-jack_get_descriptor (JSList * drivers, const char * sofile, const char * symbol)
+static jack_driver_desc_t*
+jack_get_descriptor (JSList * drivers, const char* sofile, const char* symbol)
 {
-    jack_driver_desc_t * descriptor, * other_descriptor;
+    jack_driver_desc_t* descriptor, * other_descriptor;
     JackDriverDescFunction so_get_descriptor = NULL;
-    JSList * node;
+    JSList* node;
     void * dlhandle;
-    char * filename;
+    char* filename;
 #ifdef WIN32
     int dlerr;
 #else
-    const char * dlerr;
+    const char* dlerr;
 #endif
 
     int err;
@@ -410,7 +410,7 @@ jack_get_descriptor (JSList * drivers, const char * sofile, const char * symbol)
 #endif
     }
 
-    filename = (char *)malloc(strlen (driver_dir) + 1 + strlen(sofile) + 1);
+    filename = (char*)malloc(strlen (driver_dir) + 1 + strlen(sofile) + 1);
     sprintf (filename, "%s/%s", driver_dir, sofile);
 
     if ((dlhandle = LoadDriverModule(filename)) == NULL) {
@@ -458,7 +458,7 @@ jack_get_descriptor (JSList * drivers, const char * sofile, const char * symbol)
 
     /* check it doesn't exist already */
     for (node = drivers; node; node = jack_slist_next (node)) {
-        other_descriptor = (jack_driver_desc_t *) node->data;
+        other_descriptor = (jack_driver_desc_t*) node->data;
 
         if (strcmp(descriptor->name, other_descriptor->name) == 0) {
             jack_error("the drivers in '%s' and '%s' both have the name '%s'; using the first",
@@ -502,7 +502,7 @@ static bool check_symbol(const char* sofile, const char* symbol)
 #endif
     }
 
-    char* filename = (char *)malloc(strlen (driver_dir) + 1 + strlen(sofile) + 1);
+    char* filename = (char*)malloc(strlen (driver_dir) + 1 + strlen(sofile) + 1);
     sprintf (filename, "%s/%s", driver_dir, sofile);
 
     if ((dlhandle = LoadDriverModule(filename)) == NULL) {
@@ -524,14 +524,14 @@ static bool check_symbol(const char* sofile, const char* symbol)
 
 JSList *
 jack_drivers_load (JSList * drivers) {
-    char * driver_dir;
+    char* driver_dir;
     char driver_dir_storage[512];
     char dll_filename[512];
     WIN32_FIND_DATA filedata;
     HANDLE file;
-    const char * ptr = NULL;
-    JSList * driver_list = NULL;
-    jack_driver_desc_t * desc = NULL;
+    const char* ptr = NULL;
+    JSList* driver_list = NULL;
+    jack_driver_desc_t* desc = NULL;
 
     if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) {
         // for WIN32 ADDON_DIR is defined in JackConstants.h as relative path
@@ -601,10 +601,10 @@ JSList *
 jack_drivers_load (JSList * drivers) {
     struct dirent * dir_entry;
     DIR * dir_stream;
-    const char * ptr;
+    const char* ptr;
     int err;
-    JSList * driver_list = NULL;
-    jack_driver_desc_t * desc = NULL;
+    JSList* driver_list = NULL;
+    jack_driver_desc_t* desc = NULL;
 
     const char* driver_dir;
     if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) {
@@ -669,14 +669,14 @@ jack_drivers_load (JSList * drivers) {
 
 JSList *
 jack_internals_load (JSList * internals) {
-    char * driver_dir;
+    char* driver_dir;
     char driver_dir_storage[512];
     char dll_filename[512];
     WIN32_FIND_DATA filedata;
     HANDLE file;
-    const char * ptr = NULL;
-    JSList * driver_list = NULL;
-    jack_driver_desc_t * desc;
+    const char* ptr = NULL;
+    JSList* driver_list = NULL;
+    jack_driver_desc_t* desc;
 
     if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) {
         // for WIN32 ADDON_DIR is defined in JackConstants.h as relative path
@@ -742,10 +742,10 @@ JSList *
 jack_internals_load (JSList * internals) {
     struct dirent * dir_entry;
     DIR * dir_stream;
-    const char * ptr;
+    const char* ptr;
     int err;
-    JSList * driver_list = NULL;
-    jack_driver_desc_t * desc;
+    JSList* driver_list = NULL;
+    jack_driver_desc_t* desc;
 
     const char* driver_dir;
     if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) {
@@ -809,7 +809,7 @@ Jack::JackDriverClientInterface* JackDriverInfo::Open(jack_driver_desc_t* driver
 #ifdef WIN32
     int errstr;
 #else
-    const char * errstr;
+    const char* errstr;
 #endif
 
     fHandle = LoadDriverModule (driver_desc->file);
@@ -852,7 +852,7 @@ JackDriverInfo::~JackDriverInfo()
 }
 
 SERVER_EXPORT
-jack_driver_desc_t *
+jack_driver_desc_t*
 jack_driver_descriptor_construct(
     const char * name,
     jack_driver_type_t type,
@@ -861,7 +861,7 @@ jack_driver_descriptor_construct(
 {
     size_t name_len;
     size_t description_len;
-    jack_driver_desc_t * desc_ptr;
+    jack_driver_desc_t* desc_ptr;
 
     name_len = strlen(name);
     description_len = strlen(description);
@@ -894,15 +894,15 @@ jack_driver_descriptor_construct(
 SERVER_EXPORT
 int
 jack_driver_descriptor_add_parameter(
-    jack_driver_desc_t * desc_ptr,
+    jack_driver_desc_t* desc_ptr,
     jack_driver_desc_filler_t * filler_ptr,
-    const char * name,
+    const char* name,
     char character,
     jack_driver_param_type_t type,
     const jack_driver_param_value_t * value_ptr,
     jack_driver_param_constraint_desc_t * constraint,
-    const char * short_desc,
-    const char * long_desc)
+    const char* short_desc,
+    const char* long_desc)
 {
     size_t name_len;
     size_t short_desc_len;

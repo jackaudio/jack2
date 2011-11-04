@@ -30,7 +30,7 @@ namespace Jack
 \Brief This class describes the Net Backend
 */
 
-class JackNetOneDriver : public JackTimedDriver
+class JackNetOneDriver : public JackWaiterDriver
 {
     private:
 
@@ -63,8 +63,6 @@ class JackNetOneDriver : public JackTimedDriver
         int Close();
         int Attach();
         int Detach();
-    
-        int Process();
 
         int Read();
         int Write();
@@ -74,17 +72,17 @@ class JackNetOneDriver : public JackTimedDriver
         void FreePorts();
 
         // BufferSize can't be changed
-        bool IsFixedBufferSize() 
+        bool IsFixedBufferSize()
         {
             return true;
         }
 
-        int SetBufferSize(jack_nframes_t buffer_size) 
+        int SetBufferSize(jack_nframes_t buffer_size)
         {
             return -1;
         }
 
-        int SetSampleRate(jack_nframes_t sample_rate) 
+        int SetSampleRate(jack_nframes_t sample_rate)
         {
             return -1;
         }

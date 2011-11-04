@@ -37,7 +37,7 @@ extern "C" {
 /**
  * Session event type.
  *
- * if a client cant save templates, i might just do a normal save.
+ * If a client cant save templates, i might just do a normal save.
  *
  * There is no "quit without saving" event because a client might refuse to
  * quit when it has unsaved data, but other clients may have already quit.
@@ -192,15 +192,13 @@ int jack_session_reply (jack_client_t        *client,
 /**
  * Free memory used by a jack_session_event_t.
  *
- * This also frees the memory used by the command_line pointer.
- * if its non NULL.
+ * This also frees the memory used by the command_line pointer, if its non NULL.
  */
 void jack_session_event_free (jack_session_event_t *event) JACK_WEAK_EXPORT;
 
 
 /**
  * Get the assigned uuid for client.
- *
  * Safe to call from callback and all other threads.
  *
  * The caller is responsible for calling jack_free(3) on any non-NULL

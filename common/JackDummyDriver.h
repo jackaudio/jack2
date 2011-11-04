@@ -32,7 +32,7 @@ namespace Jack
 
 class JackDummyDriver : public JackTimedDriver
 {
-  
+
     public:
 
         JackDummyDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
@@ -40,6 +40,18 @@ class JackDummyDriver : public JackTimedDriver
         {}
         virtual ~JackDummyDriver()
         {}
+
+        virtual int Process()
+        {
+            JackDriver::CycleTakeBeginTime();
+
+            if (JackAudioDriver::Process() < 0) {
+                return -1;
+            } else {
+                ProcessWait();
+                return 0;
+            }
+        }
 
 };
 

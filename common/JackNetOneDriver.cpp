@@ -50,7 +50,7 @@ JackNetOneDriver::JackNetOneDriver(const char* name, const char* alias, JackLock
                                      int sample_rate, int period_size, int resample_factor,
                                      const char* net_name, uint transport_sync, int bitdepth, int use_autoconfig,
                                      int latency, int redundancy, int dont_htonl_floats, int always_deadline, int jitter_val)
-    : JackTimedDriver(name, alias, engine, table)
+    : JackWaiterDriver(name, alias, engine, table)
 {
     jack_log("JackNetOneDriver::JackNetOneDriver port %d", port);
 
@@ -91,7 +91,7 @@ JackNetOneDriver::~JackNetOneDriver()
 int JackNetOneDriver::Close()
 {
     // Generic audio driver close
-    int res = JackTimedDriver::Close();
+    int res = JackWaiterDriver::Close();
 
     FreePorts();
     netjack_release(&netj);
@@ -122,10 +122,10 @@ int JackNetOneDriver::AllocPorts()
 
         if (fEngine->PortRegister(fClientControl.fRefNum, buf, JACK_DEFAULT_AUDIO_TYPE,
             CaptureDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
-            jack_error ( "driver: cannot register port for %s", buf );
+            jack_error("driver: cannot register port for %s", buf);
             return -1;
         }
-        //port = fGraphManager->GetPort ( port_index );
+        //port = fGraphManager->GetPort(port_index);
 
         netj.capture_ports = jack_slist_append (netj.capture_ports, (void *)(intptr_t)port_index);
 
@@ -133,18 +133,18 @@ int JackNetOneDriver::AllocPorts()
 #if HAVE_CELT
 #if HAVE_CELT_API_0_11
             celt_int32 lookahead;
-            CELTMode *celt_mode = celt_mode_create( netj.sample_rate, netj.period_size, NULL );
-            netj.capture_srcs = jack_slist_append(netj.capture_srcs, celt_decoder_create_custom( celt_mode, 1, NULL ) );
+            CELTMode *celt_mode = celt_mode_create(netj.sample_rate, netj.period_size, NULL);
+            netj.capture_srcs = jack_slist_append(netj.capture_srcs, celt_decoder_create_custom(celt_mode, 1, NULL));
 #elif HAVE_CELT_API_0_7 || HAVE_CELT_API_0_8
             celt_int32 lookahead;
-            CELTMode *celt_mode = celt_mode_create( netj.sample_rate, netj.period_size, NULL );
-            netj.capture_srcs = jack_slist_append(netj.capture_srcs, celt_decoder_create( celt_mode, 1, NULL ) );
+            CELTMode *celt_mode = celt_mode_create(netj.sample_rate, netj.period_size, NULL);
+            netj.capture_srcs = jack_slist_append(netj.capture_srcs, celt_decoder_create(celt_mode, 1, NULL));
 #else
             celt_int32_t lookahead;
-            CELTMode *celt_mode = celt_mode_create( netj.sample_rate, 1, netj.period_size, NULL );
-            netj.capture_srcs = jack_slist_append(netj.capture_srcs, celt_decoder_create( celt_mode ) );
+            CELTMode *celt_mode = celt_mode_create(netj.sample_rate, 1, netj.period_size, NULL);
+            netj.capture_srcs = jack_slist_append(netj.capture_srcs, celt_decoder_create(celt_mode));
 #endif
-            celt_mode_info( celt_mode, CELT_GET_LOOKAHEAD, &lookahead );
+            celt_mode_info(celt_mode, CELT_GET_LOOKAHEAD, &lookahead);
             netj.codec_latency = 2 * lookahead;
 #endif
         } else {
@@ -159,10 +159,10 @@ int JackNetOneDriver::AllocPorts()
 
         if (fEngine->PortRegister(fClientControl.fRefNum, buf, JACK_DEFAULT_MIDI_TYPE,
             CaptureDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
-            jack_error ( "driver: cannot register port for %s", buf );
+            jack_error("driver: cannot register port for %s", buf);
             return -1;
         }
-        //port = fGraphManager->GetPort ( port_index );
+        //port = fGraphManager->GetPort(port_index);
 
         netj.capture_ports =
             jack_slist_append (netj.capture_ports, (void *)(intptr_t)port_index);
@@ -173,23 +173,23 @@ int JackNetOneDriver::AllocPorts()
 
         if (fEngine->PortRegister(fClientControl.fRefNum, buf, JACK_DEFAULT_AUDIO_TYPE,
             PlaybackDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
-            jack_error ( "driver: cannot register port for %s", buf );
+            jack_error("driver: cannot register port for %s", buf);
             return -1;
         }
-        //port = fGraphManager->GetPort ( port_index );
+        //port = fGraphManager->GetPort(port_index);
 
         netj.playback_ports = jack_slist_append (netj.playback_ports, (void *)(intptr_t)port_index);
-        if( netj.bitdepth == CELT_MODE ) {
+        if (netj.bitdepth == CELT_MODE) {
 #if HAVE_CELT
 #if HAVE_CELT_API_0_11
-            CELTMode *celt_mode = celt_mode_create( netj.sample_rate, netj.period_size, NULL );
-            netj.playback_srcs = jack_slist_append(netj.playback_srcs, celt_encoder_create_custom( celt_mode, 1, NULL ) );
+            CELTMode *celt_mode = celt_mode_create(netj.sample_rate, netj.period_size, NULL);
+            netj.playback_srcs = jack_slist_append(netj.playback_srcs, celt_encoder_create_custom(celt_mode, 1, NULL));
 #elif HAVE_CELT_API_0_7 || HAVE_CELT_API_0_8
-            CELTMode *celt_mode = celt_mode_create( netj.sample_rate, netj.period_size, NULL );
-            netj.playback_srcs = jack_slist_append(netj.playback_srcs, celt_encoder_create( celt_mode, 1, NULL ) );
+            CELTMode *celt_mode = celt_mode_create(netj.sample_rate, netj.period_size, NULL);
+            netj.playback_srcs = jack_slist_append(netj.playback_srcs, celt_encoder_create(celt_mode, 1, NULL));
 #else
-            CELTMode *celt_mode = celt_mode_create( netj.sample_rate, 1, netj.period_size, NULL );
-            netj.playback_srcs = jack_slist_append(netj.playback_srcs, celt_encoder_create( celt_mode ) );
+            CELTMode *celt_mode = celt_mode_create(netj.sample_rate, 1, netj.period_size, NULL);
+            netj.playback_srcs = jack_slist_append(netj.playback_srcs, celt_encoder_create(celt_mode));
 #endif
 #endif
         } else {
@@ -203,10 +203,10 @@ int JackNetOneDriver::AllocPorts()
 
         if (fEngine->PortRegister(fClientControl.fRefNum, buf, JACK_DEFAULT_MIDI_TYPE,
             PlaybackDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
-            jack_error ( "driver: cannot register port for %s", buf );
+            jack_error("driver: cannot register port for %s", buf);
             return -1;
         }
-        //port = fGraphManager->GetPort ( port_index );
+        //port = fGraphManager->GetPort(port_index);
 
         netj.playback_ports =
             jack_slist_append (netj.playback_ports, (void *)(intptr_t)port_index);
@@ -217,33 +217,33 @@ int JackNetOneDriver::AllocPorts()
 //init and restart--------------------------------------------------------------------
 bool JackNetOneDriver::Initialize()
 {
-    jack_log ( "JackNetOneDriver::Init()" );
+    jack_log("JackNetOneDriver::Init");
 
     FreePorts();
-    netjack_release( &netj );
+    netjack_release(&netj);
 
     //display some additional infos
-    jack_info ( "NetOne driver started" );
-    if( netjack_startup( &netj ) ) {
+    jack_info("NetOne driver started");
+    if (netjack_startup(&netj)) {
         return false;
     }
 
     //register jack ports
-    if ( AllocPorts() != 0 ) {
-        jack_error ( "Can't allocate ports." );
+    if (AllocPorts() != 0) {
+        jack_error("Can't allocate ports.");
         return false;
     }
 
     //monitor
     //driver parametering
-    JackTimedDriver::SetBufferSize ( netj.period_size );
-    JackTimedDriver::SetSampleRate ( netj.sample_rate );
+    JackTimedDriver::SetBufferSize(netj.period_size);
+    JackTimedDriver::SetSampleRate(netj.sample_rate);
 
-    JackDriver::NotifyBufferSize ( netj.period_size );
-    JackDriver::NotifySampleRate ( netj.sample_rate );
+    JackDriver::NotifyBufferSize(netj.period_size);
+    JackDriver::NotifySampleRate(netj.sample_rate);
 
     //transport engine parametering
-    fEngineControl->fTransport.SetNetworkSync ( true );
+    fEngineControl->fTransport.SetNetworkSync(true);
     return true;
 }
 
@@ -252,24 +252,19 @@ bool JackNetOneDriver::Initialize()
 
 //driver processes--------------------------------------------------------------------
 
-int JackNetOneDriver::Process()
-{
-    return (fEngineControl->fSyncMode) ? ProcessSync() : ProcessAsync();
-}
-
 int JackNetOneDriver::Read()
 {
     int delay;
-    delay = netjack_wait( &netj );
-    if( delay ) {
+    delay = netjack_wait(&netj);
+    if (delay) {
         NotifyXRun(fBeginDateUst, (float) delay);
-        jack_error( "netxruns... duration: %dms", delay / 1000 );
+        jack_error("netxruns... duration: %dms", delay / 1000);
     }
 
-    if( (netj.num_lost_packets * netj.period_size / netj.sample_rate) > 2 )
+    if ((netj.num_lost_packets * netj.period_size / netj.sample_rate) > 2)
         JackTools::ThrowJackNetException();
 
-    //netjack_read( &netj, netj.period_size );
+    //netjack_read(&netj, netj.period_size);
     JackDriver::CycleTakeBeginTime();
 
     jack_position_t local_trans_pos;
@@ -277,9 +272,9 @@ int JackNetOneDriver::Read()
 
     unsigned int *packet_buf, *packet_bufX;
 
-    if( ! netj.packet_data_valid ) {
-        jack_log( "data not valid" );
-        render_payload_to_jack_ports (netj.bitdepth, NULL, netj.net_period_down, netj.capture_ports, netj.capture_srcs, netj.period_size, netj.dont_htonl_floats );
+    if (! netj.packet_data_valid) {
+        jack_log("data not valid");
+        render_payload_to_jack_ports (netj.bitdepth, NULL, netj.net_period_down, netj.capture_ports, netj.capture_srcs, netj.period_size, netj.dont_htonl_floats);
         return 0;
     }
     packet_buf = netj.rx_buf;
@@ -292,10 +287,10 @@ int JackNetOneDriver::Read()
     netj.latency = pkthdr->latency;
 
     // Special handling for latency=0
-    if( netj.latency == 0 )
+    if (netj.latency == 0)
         netj.resync_threshold = 0;
     else
-        netj.resync_threshold = MIN( 15, pkthdr->latency - 1 );
+        netj.resync_threshold = MIN(15, pkthdr->latency - 1);
 
     // check whether, we should handle the transport sync stuff, or leave trnasports untouched.
     if (netj.handle_transport_sync) {
@@ -305,7 +300,7 @@ int JackNetOneDriver::Read()
         // read local transport info....
         //local_trans_state = jack_transport_query(netj.client, &local_trans_pos);
 
-        local_trans_state = fEngineControl->fTransport.Query ( &local_trans_pos );
+        local_trans_state = fEngineControl->fTransport.Query(&local_trans_pos);
 
         // Now check if we have to start or stop local transport to sync to remote...
         switch (pkthdr->transport_state) {
@@ -313,7 +308,7 @@ int JackNetOneDriver::Read()
             case JackTransportStarting:
                 // the master transport is starting... so we set our reply to the sync_callback;
                 if (local_trans_state == JackTransportStopped) {
-                    fEngineControl->fTransport.SetCommand ( TransportCommandStart );
+                    fEngineControl->fTransport.SetCommand(TransportCommandStart);
                     //jack_transport_start(netj.client);
                     //last_transport_state = JackTransportStopped;
                     netj.sync_state = 0;
@@ -326,11 +321,11 @@ int JackNetOneDriver::Read()
                     new_pos.valid = (jack_position_bits_t) 0;
 
 
-                    fEngineControl->fTransport.RequestNewPos ( &new_pos );
+                    fEngineControl->fTransport.RequestNewPos(&new_pos);
                     //jack_transport_locate(netj.client, compensated_tranport_pos);
                     //last_transport_state = JackTransportRolling;
                     netj.sync_state = 0;
-                    jack_info("starting locate to %d", compensated_tranport_pos );
+                    jack_info("starting locate to %d", compensated_tranport_pos);
                 }
                 break;
 
@@ -340,13 +335,13 @@ int JackNetOneDriver::Read()
                     jack_position_t new_pos = local_trans_pos;
                     new_pos.frame = pkthdr->transport_frame;
                     new_pos.valid = (jack_position_bits_t)0;
-                    fEngineControl->fTransport.RequestNewPos ( &new_pos );
+                    fEngineControl->fTransport.RequestNewPos(&new_pos);
                     //jack_transport_locate(netj.client, (pkthdr->transport_frame));
                     jack_info("transport is stopped locate to %d", pkthdr->transport_frame);
                 }
                 if (local_trans_state != JackTransportStopped)
                     //jack_transport_stop(netj.client);
-                    fEngineControl->fTransport.SetCommand ( TransportCommandStop );
+                    fEngineControl->fTransport.SetCommand(TransportCommandStop);
                 break;
 
             case JackTransportRolling:
@@ -356,7 +351,7 @@ int JackNetOneDriver::Read()
                 //			jack_info("running locate to %d", pkthdr->transport_frame + (pkthdr->latency)*netj.period_size);
                 //		    		}
                 if (local_trans_state != JackTransportRolling)
-                    fEngineControl->fTransport.SetState ( JackTransportRolling );
+                    fEngineControl->fTransport.SetState(JackTransportRolling);
                 break;
 
             case JackTransportLooping:
@@ -365,14 +360,14 @@ int JackNetOneDriver::Read()
 #endif
     }
 
-    render_payload_to_jack_ports (netj.bitdepth, packet_bufX, netj.net_period_down, netj.capture_ports, netj.capture_srcs, netj.period_size, netj.dont_htonl_floats );
-    packet_cache_release_packet(netj.packcache, netj.expected_framecnt );
+    render_payload_to_jack_ports (netj.bitdepth, packet_bufX, netj.net_period_down, netj.capture_ports, netj.capture_srcs, netj.period_size, netj.dont_htonl_floats);
+    packet_cache_release_packet(netj.packcache, netj.expected_framecnt);
     return 0;
 }
 
 int JackNetOneDriver::Write()
 {
-    int syncstate = netj.sync_state | ((fEngineControl->fTransport.GetState() == JackTransportNetStarting) ? 1 : 0 );
+    int syncstate = netj.sync_state | ((fEngineControl->fTransport.GetState() == JackTransportNetStarting) ? 1 : 0);
     uint32_t *packet_buf, *packet_bufX;
 
     int packet_size = get_sample_size(netj.bitdepth) * netj.playback_channels * netj.net_period_up + sizeof(jacknet_packet_header);
@@ -381,7 +376,7 @@ int JackNetOneDriver::Write()
     packet_buf = (uint32_t *) alloca(packet_size);
     pkthdr = (jacknet_packet_header *)packet_buf;
 
-    if( netj.running_free ) {
+    if (netj.running_free) {
         return 0;
     }
 
@@ -390,10 +385,10 @@ int JackNetOneDriver::Write()
 
     pkthdr->sync_state = syncstate;;
     pkthdr->latency = netj.time_to_deadline;
-    //printf( "time to deadline = %d  goodness=%d\n", (int)netj.time_to_deadline, netj.deadline_goodness );
+    //printf("time to deadline = %d  goodness=%d\n", (int)netj.time_to_deadline, netj.deadline_goodness);
     pkthdr->framecnt = netj.expected_framecnt;
 
-    render_jack_ports_to_payload(netj.bitdepth, netj.playback_ports, netj.playback_srcs, netj.period_size, packet_bufX, netj.net_period_up, netj.dont_htonl_floats );
+    render_jack_ports_to_payload(netj.bitdepth, netj.playback_ports, netj.playback_srcs, netj.period_size, packet_bufX, netj.net_period_up, netj.dont_htonl_floats);
 
     packet_header_hton(pkthdr);
     if (netj.srcaddress_valid) {
@@ -403,7 +398,7 @@ int JackNetOneDriver::Write()
         if (netj.reply_port)
             netj.syncsource_address.sin_port = htons(netj.reply_port);
 
-        for( r = 0; r < netj.redundancy; r++ )
+        for (r = 0; r < netj.redundancy; r++)
             netjack_sendto(netj.sockfd, (char *)packet_buf, packet_size,
                            flag, (struct sockaddr*) & (netj.syncsource_address), sizeof(struct sockaddr_in), netj.mtu);
     }
@@ -415,66 +410,66 @@ JackNetOneDriver::FreePorts ()
 {
     JSList *node = netj.capture_ports;
 
-    while( node != NULL ) {
+    while (node != NULL) {
         JSList *this_node = node;
         jack_port_id_t port_index = (jack_port_id_t)(intptr_t) node->data;
-        node = jack_slist_remove_link( node, this_node );
-        jack_slist_free_1( this_node );
+        node = jack_slist_remove_link(node, this_node);
+        jack_slist_free_1(this_node);
         fEngine->PortUnRegister(fClientControl.fRefNum, port_index);
     }
     netj.capture_ports = NULL;
 
     node = netj.playback_ports;
-    while( node != NULL ) {
+    while (node != NULL) {
         JSList *this_node = node;
         jack_port_id_t port_index = (jack_port_id_t)(intptr_t) node->data;
-        node = jack_slist_remove_link( node, this_node );
-        jack_slist_free_1( this_node );
+        node = jack_slist_remove_link(node, this_node);
+        jack_slist_free_1(this_node);
         fEngine->PortUnRegister(fClientControl.fRefNum, port_index);
     }
     netj.playback_ports = NULL;
 
-    if( netj.bitdepth == CELT_MODE ) {
+    if (netj.bitdepth == CELT_MODE) {
 #if HAVE_CELT
         node = netj.playback_srcs;
-        while( node != NULL ) {
+        while (node != NULL) {
             JSList *this_node = node;
             CELTEncoder *enc = (CELTEncoder *) node->data;
-            node = jack_slist_remove_link( node, this_node );
-            jack_slist_free_1( this_node );
-            celt_encoder_destroy( enc );
+            node = jack_slist_remove_link(node, this_node);
+            jack_slist_free_1(this_node);
+            celt_encoder_destroy(enc);
         }
         netj.playback_srcs = NULL;
 
         node = netj.capture_srcs;
-        while( node != NULL ) {
+        while (node != NULL) {
             JSList *this_node = node;
             CELTDecoder *dec = (CELTDecoder *) node->data;
-            node = jack_slist_remove_link( node, this_node );
-            jack_slist_free_1( this_node );
-            celt_decoder_destroy( dec );
+            node = jack_slist_remove_link(node, this_node);
+            jack_slist_free_1(this_node);
+            celt_decoder_destroy(dec);
         }
         netj.capture_srcs = NULL;
 #endif
     } else {
 #if HAVE_SAMPLERATE
         node = netj.playback_srcs;
-        while( node != NULL ) {
+        while (node != NULL) {
             JSList *this_node = node;
             SRC_STATE *state = (SRC_STATE *) node->data;
-            node = jack_slist_remove_link( node, this_node );
-            jack_slist_free_1( this_node );
-            src_delete( state );
+            node = jack_slist_remove_link(node, this_node);
+            jack_slist_free_1(this_node);
+            src_delete(state);
         }
         netj.playback_srcs = NULL;
 
         node = netj.capture_srcs;
-        while( node != NULL ) {
+        while (node != NULL) {
             JSList *this_node = node;
             SRC_STATE *state = (SRC_STATE *) node->data;
-            node = jack_slist_remove_link( node, this_node );
-            jack_slist_free_1( this_node );
-            src_delete( state );
+            node = jack_slist_remove_link(node, this_node);
+            jack_slist_free_1(this_node);
+            src_delete(state);
         }
         netj.capture_srcs = NULL;
 #endif
@@ -485,7 +480,7 @@ JackNetOneDriver::FreePorts ()
 
 // render functions for float
 void
-JackNetOneDriver::render_payload_to_jack_ports_float ( void *packet_payload, jack_nframes_t net_period_down, JSList *capture_ports, JSList *capture_srcs, jack_nframes_t nframes, int dont_htonl_floats)
+JackNetOneDriver::render_payload_to_jack_ports_float(void *packet_payload, jack_nframes_t net_period_down, JSList *capture_ports, JSList *capture_srcs, jack_nframes_t nframes, int dont_htonl_floats)
 {
     uint32_t chn = 0;
     JSList *node = capture_ports;
@@ -495,7 +490,7 @@ JackNetOneDriver::render_payload_to_jack_ports_float ( void *packet_payload, jac
 
     uint32_t *packet_bufX = (uint32_t *)packet_payload;
 
-    if( !packet_payload )
+    if (!packet_payload)
         return;
 
     while (node != NULL) {
@@ -505,7 +500,7 @@ JackNetOneDriver::render_payload_to_jack_ports_float ( void *packet_payload, jac
         SRC_DATA src;
 #endif
         jack_port_id_t port_index = (jack_port_id_t)(intptr_t) node->data;
-        JackPort *port = fGraphManager->GetPort( port_index );
+        JackPort *port = fGraphManager->GetPort(port_index);
 
         jack_default_audio_sample_t* buf =
             (jack_default_audio_sample_t*)fGraphManager->GetBuffer(port_index, fEngineControl->fBufferSize);
@@ -536,8 +531,8 @@ JackNetOneDriver::render_payload_to_jack_ports_float ( void *packet_payload, jac
             } else
 #endif
             {
-                if( dont_htonl_floats ) {
-                    memcpy( buf, packet_bufX, net_period_down * sizeof(jack_default_audio_sample_t));
+                if (dont_htonl_floats) {
+                    memcpy(buf, packet_bufX, net_period_down * sizeof(jack_default_audio_sample_t));
                 } else {
                     for (i = 0; i < net_period_down; i++) {
                         val.i = packet_bufX[i];
@@ -560,7 +555,7 @@ JackNetOneDriver::render_payload_to_jack_ports_float ( void *packet_payload, jac
 }
 
 void
-JackNetOneDriver::render_jack_ports_to_payload_float (JSList *playback_ports, JSList *playback_srcs, jack_nframes_t nframes, void *packet_payload, jack_nframes_t net_period_up, int dont_htonl_floats )
+JackNetOneDriver::render_jack_ports_to_payload_float (JSList *playback_ports, JSList *playback_srcs, jack_nframes_t nframes, void *packet_payload, jack_nframes_t net_period_up, int dont_htonl_floats)
 {
     uint32_t chn = 0;
     JSList *node = playback_ports;
@@ -577,7 +572,7 @@ JackNetOneDriver::render_jack_ports_to_payload_float (JSList *playback_ports, JS
         unsigned int i;
         int_float_t val;
         jack_port_id_t port_index = (jack_port_id_t)(intptr_t) node->data;
-        JackPort *port = fGraphManager->GetPort( port_index );
+        JackPort *port = fGraphManager->GetPort(port_index);
 
         jack_default_audio_sample_t* buf =
             (jack_default_audio_sample_t*)fGraphManager->GetBuffer(port_index, fEngineControl->fBufferSize);
@@ -609,8 +604,8 @@ JackNetOneDriver::render_jack_ports_to_payload_float (JSList *playback_ports, JS
             } else
 #endif
             {
-                if( dont_htonl_floats ) {
-                    memcpy( packet_bufX, buf, net_period_up * sizeof(jack_default_audio_sample_t) );
+                if (dont_htonl_floats) {
+                    memcpy(packet_bufX, buf, net_period_up * sizeof(jack_default_audio_sample_t));
                 } else {
                     for (i = 0; i < net_period_up; i++) {
                         val.f = buf[i];
@@ -644,7 +639,7 @@ JackNetOneDriver::render_payload_to_jack_ports_celt (void *packet_payload, jack_
 
     while (node != NULL) {
         jack_port_id_t port_index = (jack_port_id_t) (intptr_t)node->data;
-        JackPort *port = fGraphManager->GetPort( port_index );
+        JackPort *port = fGraphManager->GetPort(port_index);
 
         jack_default_audio_sample_t* buf =
             (jack_default_audio_sample_t*)fGraphManager->GetBuffer(port_index, fEngineControl->fBufferSize);
@@ -656,15 +651,15 @@ JackNetOneDriver::render_payload_to_jack_ports_celt (void *packet_payload, jack_
             CELTDecoder *decoder = (CELTDecoder *)src_node->data;
 
 #if HAVE_CELT_API_0_8 || HAVE_CELT_API_0_11
-            if( !packet_payload )
-                celt_decode_float( decoder, NULL, net_period_down, buf, nframes );
+            if (!packet_payload)
+                celt_decode_float(decoder, NULL, net_period_down, buf, nframes);
             else
-                celt_decode_float( decoder, packet_bufX, net_period_down, buf, nframes );
+                celt_decode_float(decoder, packet_bufX, net_period_down, buf, nframes);
 #else
-            if( !packet_payload )
-                celt_decode_float( decoder, NULL, net_period_down, buf );
+            if (!packet_payload)
+                celt_decode_float(decoder, NULL, net_period_down, buf);
             else
-                celt_decode_float( decoder, packet_bufX, net_period_down, buf );
+                celt_decode_float(decoder, packet_bufX, net_period_down, buf);
 #endif
 
             src_node = jack_slist_next (src_node);
@@ -673,7 +668,7 @@ JackNetOneDriver::render_payload_to_jack_ports_celt (void *packet_payload, jack_
             // convert the data buffer to a standard format (uint32_t based)
             unsigned int buffer_size_uint32 = net_period_down / 2;
             uint32_t * buffer_uint32 = (uint32_t*) packet_bufX;
-            if( packet_payload )
+            if (packet_payload)
                 decode_midi_buffer (buffer_uint32, buffer_size_uint32, buf);
         }
         packet_bufX = (packet_bufX + net_period_down);
@@ -693,7 +688,7 @@ JackNetOneDriver::render_jack_ports_to_payload_celt (JSList *playback_ports, JSL
 
     while (node != NULL) {
         jack_port_id_t port_index = (jack_port_id_t) (intptr_t) node->data;
-        JackPort *port = fGraphManager->GetPort( port_index );
+        JackPort *port = fGraphManager->GetPort(port_index);
 
         jack_default_audio_sample_t* buf =
             (jack_default_audio_sample_t*)fGraphManager->GetBuffer(port_index, fEngineControl->fBufferSize);
@@ -704,17 +699,17 @@ JackNetOneDriver::render_jack_ports_to_payload_celt (JSList *playback_ports, JSL
             // audio port, encode celt data.
 
             int encoded_bytes;
-            jack_default_audio_sample_t *floatbuf = (jack_default_audio_sample_t *)alloca (sizeof(jack_default_audio_sample_t) * nframes );
-            memcpy( floatbuf, buf, nframes * sizeof(jack_default_audio_sample_t) );
+            jack_default_audio_sample_t *floatbuf = (jack_default_audio_sample_t *)alloca (sizeof(jack_default_audio_sample_t) * nframes);
+            memcpy(floatbuf, buf, nframes * sizeof(jack_default_audio_sample_t));
             CELTEncoder *encoder = (CELTEncoder *)src_node->data;
 #if HAVE_CELT_API_0_8 || HAVE_CELT_API_0_11
-            encoded_bytes = celt_encode_float( encoder, floatbuf, nframes, packet_bufX, net_period_up );
+            encoded_bytes = celt_encode_float(encoder, floatbuf, nframes, packet_bufX, net_period_up);
 #else
-            encoded_bytes = celt_encode_float( encoder, floatbuf, NULL, packet_bufX, net_period_up );
+            encoded_bytes = celt_encode_float(encoder, floatbuf, NULL, packet_bufX, net_period_up);
 #endif
-            if( encoded_bytes != (int)net_period_up )
-                jack_error( "something in celt changed. netjack needs to be changed to handle this." );
-            src_node = jack_slist_next( src_node );
+            if (encoded_bytes != (int)net_period_up)
+                jack_error("something in celt changed. netjack needs to be changed to handle this.");
+            src_node = jack_slist_next(src_node);
         } else if (strncmp(portname, JACK_DEFAULT_MIDI_TYPE, jack_port_type_size()) == 0) {
             // encode midi events from port to packet
             // convert the data buffer to a standard format (uint32_t based)
@@ -820,7 +815,7 @@ extern "C"
         return desc;
     }
 
-    SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize ( Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params )
+    SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)
     {
         jack_nframes_t sample_rate = 48000;
         jack_nframes_t resample_factor = 1;
@@ -845,9 +840,9 @@ extern "C"
         const JSList * node;
         const jack_driver_param_t * param;
 
-        for ( node = params; node; node = jack_slist_next ( node ) ) {
-            param = ( const jack_driver_param_t* ) node->data;
-            switch ( param->character ) {
+        for (node = params; node; node = jack_slist_next(node)) {
+            param = (const jack_driver_param_t*) node->data;
+            switch (param->character) {
                 case 'i':
                     capture_ports = param->value.ui;
                     break;
@@ -880,7 +875,7 @@ extern "C"
 #if HAVE_SAMPLERATE
                     resample_factor = param->value.ui;
 #else
-                    jack_error( "not built with libsamplerate support" );
+                    jack_error("not built with libsamplerate support");
                     return NULL;
 #endif
                     break;
@@ -889,7 +884,7 @@ extern "C"
 #if HAVE_SAMPLERATE
                     resample_factor_up = param->value.ui;
 #else
-                    jack_error( "not built with libsamplerate support" );
+                    jack_error("not built with libsamplerate support");
                     return NULL;
 #endif
                     break;
@@ -903,7 +898,7 @@ extern "C"
                     bitdepth = CELT_MODE;
                     resample_factor = param->value.ui;
 #else
-                    jack_error( "not built with celt support" );
+                    jack_error("not built with celt support");
                     return NULL;
 #endif
                     break;
@@ -940,21 +935,21 @@ extern "C"
 
         try {
             Jack::JackDriverClientInterface* driver = new Jack::JackWaitThreadedDriver (
-                new Jack::JackNetOneDriver ( "system", "net_pcm", engine, table, listen_port, mtu,
+                new Jack::JackNetOneDriver("system", "net_pcm", engine, table, listen_port, mtu,
                                              capture_ports_midi, playback_ports_midi, capture_ports, playback_ports,
                                              sample_rate, period_size, resample_factor,
                                              "net_pcm", handle_transport_sync, bitdepth, use_autoconfig, latency, redundancy,
-                                             dont_htonl_floats, always_deadline, jitter_val ) );
+                                             dont_htonl_floats, always_deadline, jitter_val));
 
-            if ( driver->Open ( period_size, sample_rate, 1, 1, capture_ports, playback_ports,
-                                0, "from_master_", "to_master_", 0, 0 ) == 0 ) {
+            if (driver->Open(period_size, sample_rate, 1, 1, capture_ports, playback_ports,
+                                0, "from_master_", "to_master_", 0, 0) == 0) {
                 return driver;
             } else {
                 delete driver;
                 return NULL;
             }
 
-        } catch ( ... ) {
+        } catch (...) {
             return NULL;
         }
     }

@@ -79,9 +79,9 @@ main (int argc, char *argv[])
 {
     int audio_input = 2;
     int audio_output = 2;
-    int port = DEFAULT_PORT;
+    int udp_port = DEFAULT_PORT;
     char* multicast_ip = DEFAULT_MULTICAST_IP;
- 	const char *options = "C:P:a:p:";
+ 	const char *options = "C:P:a:p:h";
     int option_index;
 	int opt;
 
@@ -111,7 +111,7 @@ main (int argc, char *argv[])
             break;
 
 		case 'p':
-			port = atoi(optarg);
+			udp_port = atoi(optarg);
 			break;
 
 		case 'h':
@@ -125,7 +125,7 @@ main (int argc, char *argv[])
 
     printf("Waiting for a master...\n");
 
-    if ((net = jack_net_slave_open(DEFAULT_MULTICAST_IP, DEFAULT_PORT, "net_slave", &request, &result))  == 0) {
+    if ((net = jack_net_slave_open(multicast_ip, udp_port, "net_slave", &request, &result)) == 0) {
     	fprintf(stderr, "JACK server not running?\n");
 		return 1;
 	}

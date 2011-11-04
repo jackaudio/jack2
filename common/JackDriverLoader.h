@@ -27,7 +27,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackDriver.h"
 #include "JackSystemDeps.h"
 
-typedef jack_driver_desc_t * (*JackDriverDescFunction) ();
+typedef jack_driver_desc_t* (*JackDriverDescFunction) ();
 typedef Jack::JackDriverClientInterface* (*driverInitialize) (Jack::JackLockedEngine*, Jack::JackSynchro*, const JSList*);
 
 class SERVER_EXPORT JackDriverInfo
@@ -54,10 +54,10 @@ class SERVER_EXPORT JackDriverInfo
 
 };
 
-jack_driver_desc_t * jack_find_driver_descriptor(JSList * drivers, const char * name);
+jack_driver_desc_t* jack_find_driver_descriptor(JSList* drivers, const char* name);
 
-JSList * jack_drivers_load(JSList * drivers);
-JSList * jack_internals_load(JSList * internals);
+JSList* jack_drivers_load(JSList* drivers);
+JSList* jack_internals_load(JSList* internals);
 
 #ifdef __cplusplus
 extern "C"

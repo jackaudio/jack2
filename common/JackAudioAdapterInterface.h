@@ -49,7 +49,7 @@ namespace Jack
         Measure fTable[TABLE_MAX];
         int fCount;
 
-        MeasureTable() :fCount ( 0 )
+        MeasureTable() :fCount(0)
         {}
 
         void Write(int time1, int time2, float r1, float r2, int pos1, int pos2);
@@ -102,13 +102,13 @@ namespace Jack
 
     public:
 
-         JackAudioAdapterInterface ( jack_nframes_t buffer_size, jack_nframes_t sample_rate, jack_nframes_t ring_buffer_size = DEFAULT_ADAPTATIVE_SIZE):
-            fCaptureChannels ( 0 ),
-            fPlaybackChannels ( 0 ),
-            fHostBufferSize ( buffer_size ),
-            fHostSampleRate ( sample_rate ),
-            fAdaptedBufferSize ( buffer_size),
-            fAdaptedSampleRate ( sample_rate ),
+        JackAudioAdapterInterface(jack_nframes_t buffer_size, jack_nframes_t sample_rate, jack_nframes_t ring_buffer_size = DEFAULT_ADAPTATIVE_SIZE):
+            fCaptureChannels(0),
+            fPlaybackChannels(0),
+            fHostBufferSize(buffer_size),
+            fHostSampleRate(sample_rate),
+            fAdaptedBufferSize(buffer_size),
+            fAdaptedSampleRate(sample_rate),
             fPIControler(sample_rate / sample_rate, 256),
             fCaptureRingBuffer(NULL), fPlaybackRingBuffer(NULL),
             fQuality(0),
@@ -117,23 +117,23 @@ namespace Jack
             fRunning(false),
             fAdaptative(true)
         {}
-        JackAudioAdapterInterface ( jack_nframes_t host_buffer_size,
+        JackAudioAdapterInterface(jack_nframes_t host_buffer_size,
                                     jack_nframes_t host_sample_rate,
                                     jack_nframes_t adapted_buffer_size,
                                     jack_nframes_t adapted_sample_rate,
-                                    jack_nframes_t ring_buffer_size = DEFAULT_ADAPTATIVE_SIZE ) :
-                fCaptureChannels ( 0 ),
-                fPlaybackChannels ( 0 ),
-                fHostBufferSize ( host_buffer_size ),
-                fHostSampleRate ( host_sample_rate ),
-                fAdaptedBufferSize ( adapted_buffer_size),
-                fAdaptedSampleRate ( adapted_sample_rate ),
-                fPIControler(host_sample_rate / host_sample_rate, 256),
-                fQuality(0),
-                fRingbufferCurSize(ring_buffer_size),
-                fPullAndPushTime(0),
-                fRunning(false),
-                fAdaptative(true)
+                                    jack_nframes_t ring_buffer_size = DEFAULT_ADAPTATIVE_SIZE) :
+            fCaptureChannels(0),
+            fPlaybackChannels(0),
+            fHostBufferSize(host_buffer_size),
+            fHostSampleRate(host_sample_rate),
+            fAdaptedBufferSize(adapted_buffer_size),
+            fAdaptedSampleRate(adapted_sample_rate),
+            fPIControler(host_sample_rate / host_sample_rate, 256),
+            fQuality(0),
+            fRingbufferCurSize(ring_buffer_size),
+            fPullAndPushTime(0),
+            fRunning(false),
+            fAdaptative(true)
         {}
 
         virtual ~JackAudioAdapterInterface()
@@ -154,59 +154,61 @@ namespace Jack
             return 0;
         }
 
-        virtual int SetHostBufferSize ( jack_nframes_t buffer_size )
+        virtual int SetHostBufferSize(jack_nframes_t buffer_size)
         {
             fHostBufferSize = buffer_size;
-            if (fAdaptative)
+            if (fAdaptative) {
                 AdaptRingBufferSize();
+            }
             return 0;
         }
 
-        virtual int SetAdaptedBufferSize ( jack_nframes_t buffer_size )
+        virtual int SetAdaptedBufferSize(jack_nframes_t buffer_size)
         {
             fAdaptedBufferSize = buffer_size;
-            if (fAdaptative)
+            if (fAdaptative) {
                 AdaptRingBufferSize();
+            }
             return 0;
         }
 
-        virtual int SetBufferSize ( jack_nframes_t buffer_size )
+        virtual int SetBufferSize(jack_nframes_t buffer_size)
         {
-            SetHostBufferSize ( buffer_size );
-            SetAdaptedBufferSize ( buffer_size );
+            SetHostBufferSize(buffer_size);
+            SetAdaptedBufferSize(buffer_size);
             return 0;
         }
 
-        virtual int SetHostSampleRate ( jack_nframes_t sample_rate )
+        virtual int SetHostSampleRate(jack_nframes_t sample_rate)
         {
             fHostSampleRate = sample_rate;
             fPIControler.Init(double(fHostSampleRate) / double(fAdaptedSampleRate));
             return 0;
         }
 
-        virtual int SetAdaptedSampleRate ( jack_nframes_t sample_rate )
+        virtual int SetAdaptedSampleRate(jack_nframes_t sample_rate)
         {
             fAdaptedSampleRate = sample_rate;
             fPIControler.Init(double(fHostSampleRate) / double(fAdaptedSampleRate));
             return 0;
         }
 
-        virtual int SetSampleRate ( jack_nframes_t sample_rate )
+        virtual int SetSampleRate(jack_nframes_t sample_rate)
         {
-            SetHostSampleRate ( sample_rate );
-            SetAdaptedSampleRate ( sample_rate );
+            SetHostSampleRate(sample_rate);
+            SetAdaptedSampleRate(sample_rate);
             return 0;
         }
 
-        void SetInputs ( int inputs )
+        void SetInputs(int inputs)
         {
-            jack_log ( "JackAudioAdapterInterface::SetInputs %d", inputs );
+            jack_log("JackAudioAdapterInterface::SetInputs %d", inputs);
             fCaptureChannels = inputs;
         }
 
-        void SetOutputs ( int outputs )
+        void SetOutputs(int outputs)
         {
-            jack_log ( "JackAudioAdapterInterface::SetOutputs %d", outputs );
+            jack_log("JackAudioAdapterInterface::SetOutputs %d", outputs);
             fPlaybackChannels = outputs;
         }
 
@@ -221,6 +223,9 @@ namespace Jack
             //jack_log ("JackAudioAdapterInterface::GetOutputs %d", fPlaybackChannels);
             return fPlaybackChannels;
         }
+
+        virtual int GetInputLatency(int port_index) { return 0; }
+        virtual int GetOutputLatency(int port_index) { return 0; }
 
         int PushAndPull(jack_default_audio_sample_t** inputBuffer, jack_default_audio_sample_t** outputBuffer, unsigned int frames);
         int PullAndPush(jack_default_audio_sample_t** inputBuffer, jack_default_audio_sample_t** outputBuffer, unsigned int frames);
