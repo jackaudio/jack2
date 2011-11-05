@@ -290,6 +290,7 @@ DECL_FUNCTION(int, jack_set_session_callback, (jack_client_t* ext_client, JackSe
 DECL_FUNCTION(jack_session_command_t*, jack_session_notify, (jack_client_t* ext_client, const char* target, jack_session_event_type_t ev_type, const char* path), (ext_client, target, ev_type, path));
 DECL_FUNCTION(int, jack_session_reply, (jack_client_t* ext_client, jack_session_event_t *event), (ext_client, event));
 DECL_VOID_FUNCTION(jack_session_event_free, (jack_session_event_t* ev), (ev));
+DECL_FUNCTION(char*, jack_client_get_uuid, (jack_client_t* ext_client),(ext_client));
 DECL_FUNCTION(char*, jack_get_uuid_for_client_name, (jack_client_t* ext_client, const char* client_name),(ext_client, client_name));
 DECL_FUNCTION(char*, jack_get_client_name_by_uuid, (jack_client_t* ext_client, const char* client_uuid),(ext_client, client_uuid));
 DECL_FUNCTION(int, jack_reserve_client_name, (jack_client_t* ext_client, const char* name, const char* uuid),(ext_client, name, uuid));
