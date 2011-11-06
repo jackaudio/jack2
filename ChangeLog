@@ -36,6 +36,10 @@ John Emmas
   Jackdmp changes log
 ---------------------------
 
+2011-11-06 Stephane Letz  <letz@grame.fr>
+
+	* Enable local access in NetJack2 code.
+
 2011-11-04 Stephane Letz  <letz@grame.fr>
 
 	* Fix jack_set_port_name API.

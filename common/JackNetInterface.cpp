@@ -713,10 +713,14 @@ namespace Jack
             return NET_SOCKET_ERROR;
         }
 
-        // bind the socket
-        if (fSocket.Bind() == SOCKET_ERROR) {
-            jack_error("Can't bind the socket : %s", StrError(NET_ERROR_CODE));
-            return NET_SOCKET_ERROR;
+        if (fSocket.IsLocal(fMulticastIP)) {
+            jack_info("Local IP is used...");
+        } else {
+            // bind the socket
+            if (fSocket.Bind() == SOCKET_ERROR) {
+                jack_error("Can't bind the socket : %s", StrError(NET_ERROR_CODE));
+                return NET_SOCKET_ERROR;
+            }
         }
 
         // timeout on receive
