@@ -17,33 +17,37 @@
 
  */
 
-
 #ifndef __JackShmMem_WIN32__
 #define __JackShmMem_WIN32__
 
 #include <windows.h>
 
-// See GetProcessWorkingSetSize and SetProcessWorkingSetSize
-
-bool CHECK_MLOCK(ptr, size)
+inline bool CHECK_MLOCK(void* ptr, size_t size)
 {
     if (!VirtualLock((ptr), (size))) {
         SIZE_T minWSS, maxWSS;
         HANDLE hProc = GetCurrentProcess();
         if (GetProcessWorkingSetSize(hProc, &minWSS, &maxWSS)) {
             const size_t increase = size + (10 * 4096);
-            maxWSS += increase; minWSS += increase;
+            maxWSS += increase;
+            minWSS += increase;
             if (!SetProcessWorkingSetSize(hProc, minWSS, maxWSS)) {
-                jack_error("SetProcessWorkingSetSize error %d", GetLastError());
+                jack_error("SetProcessWorkingSetSize error = %d", GetLastError());
+                return false;
             } else if (!VirtualLock((ptr), (size))) {
-                jack_error("VirtualLock error %d", GetLastError());
+                jack_error("VirtualLock error = %d", GetLastError());
+                return false;
             } else {
                 return true;
             }
+        } else {
+            return false;
         }
+    } else {
+        return true;
     }
-    return false;
 }
+
 #define CHECK_MUNLOCK(ptr, size) (VirtualUnlock((ptr), (size)) != 0)
 #define CHECK_MLOCKALL()(false)
 #define CHECK_MUNLOCKALL()(false)

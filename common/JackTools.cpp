@@ -237,21 +237,6 @@ namespace Jack {
         new_name[i] = '\0';
     }
 
-    void JackTools::InitOS()
-    {
-     #ifdef WIN32
-        SIZE_T dwMin, dwMax;
-        HANDLE hProcess = GetCurrentProcess();
-        if (!GetProcessWorkingSetSize(hProcess, &dwMin, &dwMax)) {
-            jack_error("GetProcessWorkingSetSize failed (%d)", GetLastError());
-        } else if (!SetProcessWorkingSetSize(hProcess, dwMin, dwMax * 5)) {
-            jack_error("SetProcessWorkingSetSize failed (%d)", GetLastError());
-        } else {
-            jack_info("SetProcessWorkingSetSize min = %d max = %d", dwMin, dwMax * 5);
-        }
-    #endif
-    }
-
 #ifdef WIN32
 
 void BuildClientPath(char* path_to_so, int path_len, const char* so_name)
