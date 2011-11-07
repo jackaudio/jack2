@@ -13,10 +13,12 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
+
+#if !defined(WIN32) || defined(__CYGWIN__)
 
 #include "JackConstants.h"
 #include "JackChannel.h"
@@ -116,8 +118,13 @@ static void start_server_classic_aux(const char* server_name)
     }
 
     if (!good) {
-        command = (char*)(JACK_LOCATION "/jackd");
-        strncpy(arguments, JACK_LOCATION "/jackd -T -d "JACK_DEFAULT_DRIVER, 255);
+#if defined(__CYGWIN__)
+        command = (char*)("/usr/bin/jackd.exe");
+        strncpy(arguments, "jackd.exe -S -R -d JACK_DEFAULT_DRIVER", 255);
+#else
+        command = (char*)("/usr/bin/jackd");
+        strncpy(arguments, "/jackd -R -d "JACK_DEFAULT_DRIVER, 255);
+#endif
     } else {
         result = strcspn(arguments, " ");
         command = (char*)malloc(result + 1);
@@ -209,6 +216,8 @@ static int server_connect(char* server_name)
     JackClientChannel channel;
     int res = channel.ServerCheck(server_name);
     channel.Close();
+    JackSleep(2000); // Added by JE - 02-01-2009 (gives
+                     // the channel some time to close)
     return res;
 }
 
@@ -236,3 +245,5 @@ int try_start_server(jack_varargs_t* va, jack_options_t options, jack_status_t* 
 
     return 0;
 }
+
+#endif // !WIN32 || __CYGWIN__
