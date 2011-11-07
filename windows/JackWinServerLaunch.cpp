@@ -55,7 +55,7 @@ find_path_to_jackdrc(char *path_to_jackdrc)
 
 		// The above call should have given us the path to the user's home folder
 		char* pos;
-		char  ch = user_jackdrc[strlen(user_jackdrc)-1];
+		char ch = user_jackdrc[strlen(user_jackdrc)-1];
 
 		if (('/' != ch) && ('\\' != ch))
 			strcat(user_jackdrc, "\\");
@@ -94,24 +94,25 @@ find_path_to_jackdrc(char *path_to_jackdrc)
  */
 
 #include <direct.h>
+
 static int start_server_aux(const char* server_name)
 {
-FILE*  fp      = 0;
-size_t pos     = 0;
-size_t result  = 0;
-int    i       = 0;
-int    good    = 0;
-int    ret     = 0;
-char*  command = 0;
-char** argv    = 0;
-char*  p;
-char*  back_slash;
-char*  forward_slash;
-char   arguments [256];
-char   buffer    [MAX_PATH];
-char   filename  [MAX_PATH];
-char   curr_wd   [MAX_PATH];
-char   temp_wd   [MAX_PATH];
+    FILE*  fp      = 0;
+    size_t pos     = 0;
+    size_t result  = 0;
+    int    i       = 0;
+    int    good    = 0;
+    int    ret     = 0;
+    char*  command = 0;
+    char** argv    = 0;
+    char*  p;
+    char*  back_slash;
+    char*  forward_slash;
+    char   arguments [256];
+    char   buffer    [MAX_PATH];
+    char   filename  [MAX_PATH];
+    char   curr_wd   [MAX_PATH];
+    char   temp_wd   [MAX_PATH];
 
 	curr_wd[0] = '\0';
 	if (find_path_to_jackdrc(filename))
@@ -309,7 +310,7 @@ int try_start_server(jack_varargs_t* va, jack_options_t options, jack_status_t* 
 	}
 
 	return 0;
- }
+}
 
 #endif  // WIN32 && !__CYGWIN__
 
