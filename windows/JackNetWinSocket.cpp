@@ -159,6 +159,30 @@ namespace Jack
         return fSockfd;
     }
 
+    bool JackNetWinSocket::IsLocal(char* ip)
+    {
+        if (strcmp(ip, "127.0.0.1") == 0) {
+            return true;
+        }
+
+        char host_name[32];
+        gethostname(host_name, sizeof(host_name));
+
+        struct hostent* host = gethostbyname(host_name);
+        if (host) {
+            for (int i = 0; host->h_addr_list[i] != 0; ++i) {
+                struct in_addr addr;
+                memcpy(&addr, host->h_addr_list[i], sizeof(struct in_addr));
+                if (strcmp(inet_ntoa(addr), ip) == 0) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            return false;
+        }
+    }
+
     int JackNetWinSocket::Bind()
     {
         return bind(fSockfd, reinterpret_cast<SOCKADDR*>(&fRecvAddr), sizeof(SOCKADDR));

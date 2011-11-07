@@ -95,8 +95,8 @@ namespace Jack
 
             //disable local loop
             int SetLocalLoop();
-            
-            bool IsLocal(char* ip) { return false; }
+
+            bool IsLocal(char* ip);
 
             //network operations
             int SendTo(const void* buffer, size_t nbytes, int flags);
