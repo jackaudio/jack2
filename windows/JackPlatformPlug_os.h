@@ -25,7 +25,7 @@
 #define jack_client_dir "client"
 #define ADDON_DIR "jack"
 #define JACK_DEFAULT_DRIVER "portaudio"
-#define JACK_LOCATION "C:\Program Files\Jack v1.9.8"
+#define JACK_LOCATION "C:\Program Files\Jack"
 
 namespace Jack
 {
