@@ -43,11 +43,11 @@ namespace Jack {
 #endif
     }
 
-    void JackTools::ThrowJackNetException() 
+    void JackTools::ThrowJackNetException()
     {
         throw JackNetException();
     }
-    
+
      int JackTools::MkDir(const char* path)
      {
 #ifdef WIN32
@@ -235,6 +235,21 @@ namespace Jack {
                 new_name[i] = name[i];
         }
         new_name[i] = '\0';
+    }
+
+    void JackTools::InitOS()
+    {
+     #ifdef WIN32
+        SIZE_T dwMin, dwMax;
+        HANDLE hProcess = GetCurrentProcess();
+        if (!GetProcessWorkingSetSize(hProcess, &dwMin, &dwMax)) {
+            jack_error("GetProcessWorkingSetSize failed (%d)", GetLastError());
+        } else if (!SetProcessWorkingSetSize(hProcess, dwMin, dwMax * 5)) {
+            jack_error("SetProcessWorkingSetSize failed (%d)", GetLastError());
+        } else {
+            jack_info("SetProcessWorkingSetSize min = %d max = %d", dwMin, dwMax * 5);
+        }
+    #endif
     }
 
 #ifdef WIN32

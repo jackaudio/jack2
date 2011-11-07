@@ -900,6 +900,9 @@ jackctl_server_open(
     jack_cleanup_shm();
     JackTools::CleanupFiles(server_ptr->name.str);
 
+    // OS specific initialisations
+    JackTools::InitOS();
+
     if (!server_ptr->realtime.b && server_ptr->client_timeout.i == 0) {
         server_ptr->client_timeout.i = 500; /* 0.5 sec; usable when non realtime. */
     }
