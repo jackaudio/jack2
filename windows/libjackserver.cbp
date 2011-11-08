@@ -16,6 +16,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
+					<Add option="-Wl,-subsystem,windows" />
 					<Add option="-DWIN32" />
 					<Add option="-DNDEBUG" />
 					<Add option="-D_WINDOWS" />
@@ -84,6 +85,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
+					<Add option="-Wl,-subsystem,windows" />
 					<Add option="-DWIN32" />
 					<Add option="-DNDEBUG" />
 					<Add option="-D_WINDOWS" />
@@ -120,6 +122,7 @@
 					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-m32" />
+					<Add option="-Wl,-subsystem,windows" />
 					<Add option="-DWIN32" />
 					<Add option="-DNDEBUG" />
 					<Add option="-D_WINDOWS" />
@@ -198,6 +201,7 @@
 					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-m32" />
+					<Add option="-Wl,-subsystem,windows" />
 					<Add option="-DWIN32" />
 					<Add option="-DNDEBUG" />
 					<Add option="-D_WINDOWS" />
