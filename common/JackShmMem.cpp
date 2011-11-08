@@ -111,11 +111,7 @@ void LockMemoryImp(void* ptr, size_t size)
     if (CHECK_MLOCK((char*)ptr, size)) {
         jack_log("Succeeded in locking %u byte memory area", size);
     } else {
-        #ifdef WIN32
-        jack_error("Cannot lock down memory area size = %d (%d)", size, GetLastError());
-        #else
         jack_error("Cannot lock down memory area (%s)", strerror(errno));
-        #endif
     }
 }
 
@@ -125,11 +121,7 @@ void InitLockMemoryImp(void* ptr, size_t size)
         memset(ptr, 0, size);
         jack_log("Succeeded in locking %u byte memory area", size);
     } else {
-        #ifdef WIN32
-        jack_error("Cannot lock down memory area (%d)", GetLastError());
-        #else
         jack_error("Cannot lock down memory area (%s)", strerror(errno));
-        #endif
     }
 }
 
