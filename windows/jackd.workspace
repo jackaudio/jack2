@@ -8,7 +8,7 @@
 		<Project filename="jack_dummy.cbp" />
 		<Project filename="jack_netmanager.cbp" />
 		<Project filename="jack_audioadapter.cbp" />
-		<Project filename="libjack.cbp" active="1" />
+		<Project filename="libjack.cbp" />
 		<Project filename="jack_load.cbp" />
 		<Project filename="jack_unload.cbp" />
 		<Project filename="jack_lsp.cbp" />
@@ -20,7 +20,7 @@
 		<Project filename="multiple_metro.cbp" />
 		<Project filename="jack_winmme.cbp" />
 		<Project filename="jack_loopback.cbp" />
-		<Project filename="jackd.cbp" />
+		<Project filename="jackd.cbp" active="1" />
 		<Project filename="jack_midi_latency_test.cbp" />
 		<Project filename="jack_netadapter.cbp" />
 		<Project filename="jack_netsource.cbp" />
