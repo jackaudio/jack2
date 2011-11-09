@@ -21,59 +21,32 @@
 #ifndef __JackSystemDeps_WIN32__
 #define __JackSystemDeps_WIN32__
 
+#include <windows.h>
+
 #ifndef PATH_MAX
 #define PATH_MAX   512
 #endif
 
-#if defined(__CYGWIN__)
+#define UINT32_MAX 4294967295U
 
-    #include <inttypes.h>
-    #include <sys/types.h>
-    #include <signal.h>
-    #include <dlfcn.h>
+#define DRIVER_HANDLE HINSTANCE
+#define LoadDriverModule(name) LoadLibrary((name))
+#define UnloadDriverModule(handle) (FreeLibrary(((HMODULE)handle)))
+#define GetDriverProc(handle, name) GetProcAddress(((HMODULE)handle), (name))
 
-    #ifndef UINT32_MAX
-    #define UINT32_MAX 4294967295U
-    #endif
+#define JACK_HANDLE HINSTANCE
+#define LoadJackModule(name) LoadLibrary((name));
+#define UnloadJackModule(handle) FreeLibrary((handle));
+#define GetJackProc(handle, name) GetProcAddress((handle), (name));
 
-    #define DRIVER_HANDLE void*
-    #define LoadDriverModule(name) dlopen((name), RTLD_NOW | RTLD_GLOBAL)
-    #define UnloadDriverModule(handle) dlclose((handle))
-    #define GetDriverProc(handle, name) dlsym((handle), (name))
+#ifndef ENOBUFS
+#define ENOBUFS 55
+#endif
 
-    #define JACK_HANDLE void*
-    #define LoadJackModule(name) dlopen((name), RTLD_NOW | RTLD_LOCAL);
-    #define UnloadJackModule(handle) dlclose((handle));
-    #define GetJackProc(handle, name) dlsym((handle), (name));
-
-    #define JACK_DEBUG (getenv("JACK_CLIENT_DEBUG") && strcmp(getenv("JACK_CLIENT_DEBUG"), "on") == 0)
-
+#ifdef _DEBUG
+#define JACK_DEBUG true
 #else
-
-    #include <windows.h>
-
-    #define UINT32_MAX 4294967295U
-
-    #define DRIVER_HANDLE HINSTANCE
-    #define LoadDriverModule(name) LoadLibrary((name))
-    #define UnloadDriverModule(handle) (FreeLibrary(((HMODULE)handle)))
-    #define GetDriverProc(handle, name) GetProcAddress(((HMODULE)handle), (name))
-
-    #define JACK_HANDLE HINSTANCE
-    #define LoadJackModule(name) LoadLibrary((name));
-    #define UnloadJackModule(handle) FreeLibrary((handle));
-    #define GetJackProc(handle, name) GetProcAddress((handle), (name));
-
-    #ifndef ENOBUFS
-    #define ENOBUFS 55
-    #endif
-
-    #ifdef _DEBUG
-    #define JACK_DEBUG true
-    #else
-    #define JACK_DEBUG false
-    #endif
-
+#define JACK_DEBUG false
 #endif
 
 #endif

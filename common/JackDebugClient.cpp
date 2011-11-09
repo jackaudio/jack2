@@ -17,10 +17,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#if defined(__CYGWIN__) && !defined(CYGWIN_USE_PIPES)
-#undef WIN32 // Avoids "unqualified id" problem with std::max() etc
-#endif
-
 #include "JackDebugClient.h"
 #include "JackEngineControl.h"
 #include "JackException.h"
