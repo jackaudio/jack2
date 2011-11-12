@@ -27,6 +27,8 @@
 #include <dbus/dbus.h>
 #include <assert.h>
 #include <unistd.h>
+#include <sys/sysinfo.h>
+#include <errno.h>
 
 #include "controller.h"
 #include "controller_internal.h"
@@ -560,6 +562,8 @@ jack_controller_create(
     controller_ptr->client = NULL;
     controller_ptr->started = false;
 
+    controller_ptr->pending_save = 0;
+
     INIT_LIST_HEAD(&controller_ptr->slave_drivers);
     controller_ptr->slave_drivers_set = false;
     controller_ptr->slave_drivers_vparam_value.str[0] = 0;
@@ -776,3 +780,45 @@ jack_controller_destroy(
     free(controller_ptr);
 }
 
+void
+jack_controller_run(
+    void * context)
+{
+    struct sysinfo si;
+
+    if (controller_ptr->pending_save == 0)
+    {
+        return;
+    }
+
+    if (sysinfo(&si) != 0)
+    {
+        jack_error("sysinfo() failed with %d", errno);
+    }
+    else if (si.uptime < controller_ptr->pending_save + 2) /* delay save by two seconds */
+    {
+        return;
+    }
+
+    controller_ptr->pending_save = 0;
+    jack_controller_settings_save_auto(controller_ptr);
+}
+
+#undef controller_ptr
+
+void
+jack_controller_pending_save(
+    struct jack_controller * controller_ptr)
+{
+    struct sysinfo si;
+
+    if (sysinfo(&si) != 0)
+    {
+        jack_error("sysinfo() failed with %d.", errno);
+        controller_ptr->pending_save = 0;
+        jack_controller_settings_save_auto(controller_ptr);
+        return;
+    }
+
+    controller_ptr->pending_save = si.uptime;
+}

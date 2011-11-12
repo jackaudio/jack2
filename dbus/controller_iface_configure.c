@@ -903,7 +903,7 @@ jack_controller_dbus_set_parameter_value(
 
     param_ptr->vtable.set_value(param_ptr->obj, &value);
 
-    jack_controller_settings_save_auto(controller_ptr);
+    jack_controller_pending_save(controller_ptr);
 
     jack_dbus_construct_method_return_empty(call);
 
@@ -945,7 +945,7 @@ jack_controller_dbus_reset_parameter_value(
 
     param_ptr->vtable.reset(param_ptr->obj);
 
-    jack_controller_settings_save_auto(controller_ptr);
+    jack_controller_pending_save(controller_ptr);
 
     jack_dbus_construct_method_return_empty(call);
 }

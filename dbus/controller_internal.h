@@ -68,6 +68,8 @@ struct jack_controller
 
     pthread_mutex_t lock;
     struct list_head session_pending_commands;
+
+    long pending_save;          /* uptime seconds */
 };
 
 #define DEFAULT_DRIVER "dummy"
@@ -76,6 +78,10 @@ struct jack_controller
     "JACK settings, as persisted by D-Bus object.\n"        \
     "You probably don't want to edit this because\n"        \
     "it will be overwritten next time jackdbus saves.\n"
+
+void
+jack_controller_pending_save(
+    struct jack_controller *controller_ptr);
 
 bool
 jack_controller_start_server(

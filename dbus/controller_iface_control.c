@@ -261,7 +261,7 @@ jack_control_run_method(
         }
         else
         {
-            jack_controller_settings_save_auto(controller_ptr);
+            jack_controller_pending_save(controller_ptr);
         }
     }
     else if (strcmp (call->method_name, "RemoveSlaveDriver") == 0)
@@ -290,7 +290,7 @@ jack_control_run_method(
         }
         else
         {
-            jack_controller_settings_save_auto(controller_ptr);
+            jack_controller_pending_save(controller_ptr);
         }
     }
     else if (strcmp (call->method_name, "UnloadInternal") == 0)

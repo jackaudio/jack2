@@ -948,7 +948,10 @@ main (int argc, char **argv)
     jack_info("Listening for D-Bus messages");
 
     g_exit_command = FALSE;
-    while (!g_exit_command && dbus_connection_read_write_dispatch (g_connection, 200));
+    while (!g_exit_command && dbus_connection_read_write_dispatch (g_connection, 200))
+    {
+        jack_controller_run(controller_ptr);
+    }
 
     jack_controller_destroy(controller_ptr);
 

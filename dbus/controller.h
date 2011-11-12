@@ -25,6 +25,10 @@ jack_controller_create(
     DBusConnection *connection);
 
 void
+jack_controller_run(
+    void *controller_ptr);
+
+void
 jack_controller_destroy(
     void *controller_ptr);
 
