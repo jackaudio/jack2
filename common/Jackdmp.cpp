@@ -185,8 +185,22 @@ jackctl_get_parameter(
     return NULL;
 }
 
-int main(int argc, char* argv[])
+#if defined(WIN32) && !defined(_DEBUG)
+# define USEWINMAIN
+#endif
+
+#ifdef USEWINMAIN
+#include <windows.h>
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdParam, int iCmdShow)
+#else
+int main(int argc, char** argv)
+#endif
 {
+#ifdef USEWINMAIN
+	int argc = __argc;
+	char **argv = __argv;
+#endif
+
     jackctl_server_t * server_ctl;
     const JSList * server_parameters;
     const char* server_name = "default";
