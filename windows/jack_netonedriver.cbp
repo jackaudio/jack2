@@ -17,14 +17,14 @@
 					<Add option="-Wl,-subsystem,windows" />
 					<Add option="-DBUILD_DLL" />
 					<Add option="-DSERVER_SIDE" />
-                    			<Add option="-DJACK_32_64" />
+                    <Add option="-DJACK_32_64" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
 					<Add directory="Release64\bin" />
-                   			<Add library="libjackserver64" />
+                    <Add library="libjackserver64" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Debug 64bits">
@@ -37,14 +37,14 @@
 					<Add option="-g" />
 					<Add option="-DBUILD_DLL" />
 					<Add option="-DSERVER_SIDE" />
-                    			<Add option="-DJACK_32_64" />
+                    <Add option="-DJACK_32_64" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
 					<Add directory="Debug64\bin" />
-                   			<Add library="libjackserver64" />
+                    <Add library="libjackserver64" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Profiling 64bits">
@@ -59,14 +59,14 @@
 					<Add option="-DBUILD_DLL" />
 					<Add option="-DJACK_MONITOR" />
 					<Add option="-DSERVER_SIDE" />
-                    			<Add option="-DJACK_32_64" />
+                    <Add option="-DJACK_32_64" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
 					<Add directory="Release64\bin" />
-                    			<Add library="libjackserver64" />
+                    <Add library="libjackserver64" />
 				</Linker>
 			</Target>
             		<Target title="Win32 Release 32bits">
@@ -77,21 +77,21 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
-                    			<Add option="-m32" />
+                    <Add option="-m32" />
 					<Add option="-Wl,-subsystem,windows" />
 					<Add option="-DBUILD_DLL" />
 					<Add option="-DSERVER_SIDE" />
-                    			<Add option="-DJACK_32_64" />
+                    <Add option="-DJACK_32_64" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
 					<Add directory="Release\bin" />
-                    			<Add option="-m32" />
-                    			<Add library="libjackserver" />
+                    <Add option="-m32" />
+                    <Add library="libjackserver" />
 				</Linker>
-                		<ExtraCommands>
+                <ExtraCommands>
 					<Add before="windres -F pe-i386 -O coff -o Release/jacknetonedriver.res jacknetonedriver.rc" />
 				</ExtraCommands>
 			</Target>
@@ -103,20 +103,20 @@
 				<Compiler>
 					<Add option="-Wall" />
 					<Add option="-g" />
-                    			<Add option="-m32" />
+                    <Add option="-m32" />
 					<Add option="-DBUILD_DLL" />
 					<Add option="-DSERVER_SIDE" />
-                    			<Add option="-DJACK_32_64" />
+                    <Add option="-DJACK_32_64" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
 					<Add directory="Debug\bin" />
-                    			<Add option="-m32" />
-                   			<Add library="libjackserver" />
+                    <Add option="-m32" />
+                    <Add library="libjackserver" />
 				</Linker>
-                		<ExtraCommands>
+                <ExtraCommands>
 					<Add before="windres -F pe-i386 -O coff -o Debug/jacknetonedriver.res jacknetonedriver.rc" />
 				</ExtraCommands>
 			</Target>
@@ -128,22 +128,22 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
-                    			<Add option="-m32" />
+                    <Add option="-m32" />
 					<Add option="-Wl,-subsystem,windows" />
 					<Add option="-DBUILD_DLL" />
 					<Add option="-DJACK_MONITOR" />
 					<Add option="-DSERVER_SIDE" />
-                    			<Add option="-DJACK_32_64" />
+                    <Add option="-DJACK_32_64" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
 					<Add directory="Release\bin" />
-                    			<Add option="-m32" />
-                    			<Add library="libjackserver" />
+                    <Add option="-m32" />
+                    <Add library="libjackserver" />
 				</Linker>
-                		<ExtraCommands>
+                <ExtraCommands>
 					<Add before="windres -F pe-i386 -O coff -o Debug/jacknetonedriver.res jacknetonedriver.rc" />
 				</ExtraCommands>
 			</Target>

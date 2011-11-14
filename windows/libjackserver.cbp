@@ -53,7 +53,7 @@
 					<Add option="-g" />
 					<Add option="-DWIN32" />
 					<Add option="-D_DEBUG" />
-					<Add option="-D_WINDOWS" />
+					<Add option="-D_CONSOLE" />
 					<Add option="-D_MBCS" />
 					<Add option="-D_USRDLL" />
 					<Add option="-DLIBJACKDMP_EXPORTS" />
@@ -164,7 +164,7 @@
 					<Add option="-m32" />
 					<Add option="-DWIN32" />
 					<Add option="-D_DEBUG" />
-					<Add option="-D_WINDOWS" />
+					<Add option="-D_CONSOLE" />
 					<Add option="-D_MBCS" />
 					<Add option="-D_USRDLL" />
 					<Add option="-DLIBJACKDMP_EXPORTS" />
