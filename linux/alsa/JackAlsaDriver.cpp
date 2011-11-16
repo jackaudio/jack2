@@ -114,8 +114,8 @@ int JackAlsaDriver::Attach()
     jack_log("JackAlsaDriver::Attach fBufferSize %ld fSampleRate %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
 
     for (int i = 0; i < fCaptureChannels; i++) {
-        snprintf(alias, sizeof(alias) - 1, "%s:%s:out%d", fAliasName, fCaptureDriverName, i + 1);
-        snprintf(name, sizeof(name) - 1, "%s:capture_%d", fClientControl.fName, i + 1);
+        snprintf(alias, sizeof(alias), "%s:%s:out%d", fAliasName, fCaptureDriverName, i + 1);
+        snprintf(name, sizeof(name), "%s:capture_%d", fClientControl.fName, i + 1);
         if (fEngine->PortRegister(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize, &port_index) < 0) {
             jack_error("driver: cannot register port for %s", name);
             return -1;
@@ -129,8 +129,8 @@ int JackAlsaDriver::Attach()
     port_flags = (unsigned long)PlaybackDriverFlags;
 
     for (int i = 0; i < fPlaybackChannels; i++) {
-        snprintf(alias, sizeof(alias) - 1, "%s:%s:in%d", fAliasName, fPlaybackDriverName, i + 1);
-        snprintf(name, sizeof(name) - 1, "%s:playback_%d", fClientControl.fName, i + 1);
+        snprintf(alias, sizeof(alias), "%s:%s:in%d", fAliasName, fPlaybackDriverName, i + 1);
+        snprintf(name, sizeof(name), "%s:playback_%d", fClientControl.fName, i + 1);
         if (fEngine->PortRegister(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize, &port_index) < 0) {
             jack_error("driver: cannot register port for %s", name);
             return -1;
@@ -143,7 +143,7 @@ int JackAlsaDriver::Attach()
         // Monitor ports
         if (fWithMonitorPorts) {
             jack_log("Create monitor port");
-            snprintf(name, sizeof(name) - 1, "%s:monitor_%d", fClientControl.fName, i + 1);
+            snprintf(name, sizeof(name), "%s:monitor_%d", fClientControl.fName, i + 1);
             if (fEngine->PortRegister(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, MonitorDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
                 jack_error("ALSA: cannot register monitor port for %s", name);
             } else {
@@ -278,14 +278,14 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
         int playback_card = card_to_num(playback_driver_name);
         char audio_name[32];
 
-        snprintf(audio_name, sizeof(audio_name) - 1, "Audio%d", capture_card);
+        snprintf(audio_name, sizeof(audio_name), "Audio%d", capture_card);
         if (!JackServerGlobals::on_device_acquire(audio_name)) {
             jack_error("Audio device %s cannot be acquired...", capture_driver_name);
             return -1;
         }
 
         if (playback_card != capture_card) {
-            snprintf(audio_name, sizeof(audio_name) - 1, "Audio%d", playback_card);
+            snprintf(audio_name, sizeof(audio_name), "Audio%d", playback_card);
             if (!JackServerGlobals::on_device_acquire(audio_name)) {
                 jack_error("Audio device %s cannot be acquired...", playback_driver_name);
                 return -1;
@@ -334,13 +334,13 @@ int JackAlsaDriver::Close()
         char audio_name[32];
         int capture_card = card_to_num(fCaptureDriverName);
         if (capture_card >= 0) {
-            snprintf(audio_name, sizeof(audio_name) - 1, "Audio%d", capture_card);
+            snprintf(audio_name, sizeof(audio_name), "Audio%d", capture_card);
             JackServerGlobals::on_device_release(audio_name);
         }
 
         int playback_card = card_to_num(fPlaybackDriverName);
         if (playback_card >= 0 && playback_card != capture_card) {
-            snprintf(audio_name, sizeof(audio_name) - 1, "Audio%d", playback_card);
+            (audio_name, sizeof(audio_name), "Audio%d", playback_card);
             JackServerGlobals::on_device_release(audio_name);
         }
     }

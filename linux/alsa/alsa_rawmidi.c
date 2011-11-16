@@ -427,9 +427,9 @@ inline int midi_port_open_jack(alsa_rawmidi_t *midi, midi_port_t *port, int type
 	char name[128];
 
 	if (type & JackPortIsOutput)
-		snprintf(name, sizeof(name) - 1, "system:midi_capture_%d", ++midi->midi_in_cnt);
+		snprintf(name, sizeof(name), "system:midi_capture_%d", ++midi->midi_in_cnt);
 	else
-		snprintf(name, sizeof(name) - 1, "system:midi_playback_%d", ++midi->midi_out_cnt);
+		snprintf(name, sizeof(name), "system:midi_playback_%d", ++midi->midi_out_cnt);
 
 	port->jack = jack_port_register(midi->client, name, JACK_DEFAULT_MIDI_TYPE,
 		type | JackPortIsPhysical | JackPortIsTerminal, 0);

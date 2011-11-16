@@ -253,8 +253,8 @@ namespace Jack
 
         //audio
         for (audio_port_index = 0; audio_port_index < fCaptureChannels; audio_port_index++) {
-            snprintf(alias, sizeof(alias) - 1, "%s:%s:out%d", fAliasName, fCaptureDriverName, audio_port_index + 1);
-            snprintf(name, sizeof(name) - 1, "%s:capture_%d", fClientControl.fName, audio_port_index + 1);
+            snprintf(alias, sizeof(alias), "%s:%s:out%d", fAliasName, fCaptureDriverName, audio_port_index + 1);
+            snprintf(name, sizeof(name), "%s:capture_%d", fClientControl.fName, audio_port_index + 1);
             if (fEngine->PortRegister(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE,
                              CaptureDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
                 jack_error("driver: cannot register port for %s", name);
@@ -271,8 +271,8 @@ namespace Jack
         }
 
         for (audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++) {
-            snprintf(alias, sizeof(alias) - 1, "%s:%s:in%d", fAliasName, fPlaybackDriverName, audio_port_index + 1);
-            snprintf(name, sizeof(name) - 1, "%s:playback_%d",fClientControl.fName, audio_port_index + 1);
+            snprintf(alias, sizeof(alias), "%s:%s:in%d", fAliasName, fPlaybackDriverName, audio_port_index + 1);
+            snprintf(name, sizeof(name), "%s:playback_%d",fClientControl.fName, audio_port_index + 1);
             if (fEngine->PortRegister(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE,
                              PlaybackDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
                 jack_error("driver: cannot register port for %s", name);
@@ -290,8 +290,8 @@ namespace Jack
 
         //midi
         for (midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++) {
-            snprintf(alias, sizeof(alias) - 1, "%s:%s:out%d", fAliasName, fCaptureDriverName, midi_port_index + 1);
-            snprintf(name, sizeof (name) - 1, "%s:midi_capture_%d", fClientControl.fName, midi_port_index + 1);
+            snprintf(alias, sizeof(alias), "%s:%s:out%d", fAliasName, fCaptureDriverName, midi_port_index + 1);
+            snprintf(name, sizeof (name), "%s:midi_capture_%d", fClientControl.fName, midi_port_index + 1);
             if (fEngine->PortRegister(fClientControl.fRefNum, name, JACK_DEFAULT_MIDI_TYPE,
                              CaptureDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
                 jack_error("driver: cannot register port for %s", name);
@@ -307,8 +307,8 @@ namespace Jack
         }
 
         for (midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++) {
-            snprintf(alias, sizeof(alias) - 1, "%s:%s:in%d", fAliasName, fPlaybackDriverName, midi_port_index + 1);
-            snprintf(name, sizeof(name) - 1, "%s:midi_playback_%d", fClientControl.fName, midi_port_index + 1);
+            snprintf(alias, sizeof(alias), "%s:%s:in%d", fAliasName, fPlaybackDriverName, midi_port_index + 1);
+            snprintf(name, sizeof(name), "%s:midi_playback_%d", fClientControl.fName, midi_port_index + 1);
             if (fEngine->PortRegister(fClientControl.fRefNum, name, JACK_DEFAULT_MIDI_TYPE,
                              PlaybackDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
                 jack_error("driver: cannot register port for %s", name);

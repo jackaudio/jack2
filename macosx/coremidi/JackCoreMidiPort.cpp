@@ -80,13 +80,13 @@ JackCoreMidiPort::Initialize(const char *alias_name, const char *client_name,
         jack_error("JackCoreMidiPort::Initialize - failed to allocate memory "
                    "for endpoint name.");
     get_basic_alias:
-        snprintf(alias, sizeof(alias) - 1, "%s:%s:%s%d", alias_name,
+        snprintf(alias, sizeof(alias), "%s:%s:%s%d", alias_name,
                  driver_name, is_output ? "in" : "out", num);
     } else {
-        snprintf(alias, sizeof(alias) - 1, "%s:%s:%s%d", alias_name,
+        snprintf(alias, sizeof(alias), "%s:%s:%s%d", alias_name,
                  endpoint_name, is_output ? "in" : "out", num);
     }
-    snprintf(name, sizeof(name) - 1, "%s:%s_%d", client_name,
+    snprintf(name, sizeof(name), "%s:%s_%d", client_name,
              is_output ? "playback" : "capture", num);
     this->endpoint = endpoint;
     initialized = true;

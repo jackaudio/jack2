@@ -23,7 +23,7 @@ namespace Jack
 {
 
 bool JackGlobals::fVerbose = 0;
-    
+
 jack_tls_key JackGlobals::fRealTime;
 static bool gKeyRealtimeInitialized = jack_tls_allocate_key(&JackGlobals::fRealTime);
 
@@ -37,7 +37,7 @@ JackClient* JackGlobals::fClientTable[CLIENT_NUM] = {};
 #ifndef WIN32
 jack_thread_creator_t JackGlobals::fJackThreadCreator = pthread_create;
 #endif
-    
+
 #ifdef __CLIENTDEBUG__
 std::ofstream* JackGlobals::fStream = NULL;
 
@@ -59,6 +59,6 @@ void JackGlobals::CheckContext(const char* name)
     }
     (*fStream) << "JACK API call : " << name << ", calling thread : " << pthread_self() << std::endl;
 }
-#endif    
+#endif
 
 } // end of namespace

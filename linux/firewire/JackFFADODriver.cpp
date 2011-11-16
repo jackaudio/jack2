@@ -414,11 +414,11 @@ int JackFFADODriver::Attach()
 
     fCaptureChannels = 0;
     for (channel_t chn = 0; chn < driver->capture_nchannels; chn++) {
-        ffado_streaming_get_capture_stream_name(driver->dev, chn, portname, sizeof(portname) - 1);
+        ffado_streaming_get_capture_stream_name(driver->dev, chn, portname, sizeof(portname));
 
         driver->capture_channels[chn].stream_type = ffado_streaming_get_capture_stream_type(driver->dev, chn);
         if (driver->capture_channels[chn].stream_type == ffado_stream_type_audio) {
-            snprintf(buf, sizeof(buf) - 1, "firewire_pcm:%s_in", portname);
+            snprintf(buf, sizeof(buf), "firewire_pcm:%s_in", portname);
             printMessage ("Registering audio capture port %s", buf);
             if (fEngine->PortRegister(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_AUDIO_TYPE,
@@ -438,13 +438,13 @@ int JackFFADODriver::Attach()
             range.min = range.max = driver->period_size + driver->capture_frame_latency;
             port->SetLatencyRange(JackCaptureLatency, &range);
             // capture port aliases (jackd1 style port names)
-            snprintf(buf, sizeof(buf) - 1, "%s:capture_%i", fClientControl.fName, (int) chn + 1);
+            snprintf(buf, sizeof(buf), "%s:capture_%i", fClientControl.fName, (int) chn + 1);
             port->SetAlias(buf);
             fCapturePortList[chn] = port_index;
             jack_log("JackFFADODriver::Attach fCapturePortList[i] %ld ", port_index);
             fCaptureChannels++;
         } else if (driver->capture_channels[chn].stream_type == ffado_stream_type_midi) {
-            snprintf(buf, sizeof(buf) - 1, "firewire_pcm:%s_in", portname);
+            snprintf(buf, sizeof(buf), "firewire_pcm:%s_in", portname);
             printMessage ("Registering midi capture port %s", buf);
             if (fEngine->PortRegister(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_MIDI_TYPE,
@@ -487,12 +487,12 @@ int JackFFADODriver::Attach()
 
     fPlaybackChannels = 0;
     for (channel_t chn = 0; chn < driver->playback_nchannels; chn++) {
-        ffado_streaming_get_playback_stream_name(driver->dev, chn, portname, sizeof(portname) - 1);
+        ffado_streaming_get_playback_stream_name(driver->dev, chn, portname, sizeof(portname));
 
         driver->playback_channels[chn].stream_type = ffado_streaming_get_playback_stream_type(driver->dev, chn);
 
         if (driver->playback_channels[chn].stream_type == ffado_stream_type_audio) {
-            snprintf(buf, sizeof(buf) - 1, "firewire_pcm:%s_out", portname);
+            snprintf(buf, sizeof(buf), "firewire_pcm:%s_out", portname);
             printMessage ("Registering audio playback port %s", buf);
             if (fEngine->PortRegister(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_AUDIO_TYPE,
@@ -515,13 +515,13 @@ int JackFFADODriver::Attach()
             range.min = range.max = (driver->period_size * (driver->device_options.nb_buffers - 1)) + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + driver->playback_frame_latency;
             port->SetLatencyRange(JackPlaybackLatency, &range);
             // playback port aliases (jackd1 style port names)
-            snprintf(buf, sizeof(buf) - 1, "%s:playback_%i", fClientControl.fName, (int) chn + 1);
+            snprintf(buf, sizeof(buf), "%s:playback_%i", fClientControl.fName, (int) chn + 1);
             port->SetAlias(buf);
             fPlaybackPortList[chn] = port_index;
             jack_log("JackFFADODriver::Attach fPlaybackPortList[i] %ld ", port_index);
             fPlaybackChannels++;
         } else if (driver->playback_channels[chn].stream_type == ffado_stream_type_midi) {
-            snprintf(buf, sizeof(buf) - 1, "firewire_pcm:%s_out", portname);
+            snprintf(buf, sizeof(buf), "firewire_pcm:%s_out", portname);
             printMessage ("Registering midi playback port %s", buf);
 
             if (fEngine->PortRegister(fClientControl.fRefNum, buf,
