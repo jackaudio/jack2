@@ -176,7 +176,7 @@ namespace Jack
 
         //audio
         for (i = 0; i < fParams.fSendAudioChannels; i++) {
-            sprintf(name, "to_slave_%d", i+1);
+            snprintf(name, sizeof(name), "to_slave_%d", i+1);
             if ((fAudioCapturePorts[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput | JackPortIsTerminal, 0)) == NULL)
                 return -1;
             //port latency
@@ -185,7 +185,7 @@ namespace Jack
         }
 
         for (i = 0; i < fParams.fReturnAudioChannels; i++) {
-            sprintf(name, "from_slave_%d", i+1);
+            snprintf(name, sizeof(name), "from_slave_%d", i+1);
             if ((fAudioPlaybackPorts[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput | JackPortIsTerminal, 0)) == NULL)
                 return -1;
             //port latency
@@ -195,7 +195,7 @@ namespace Jack
 
         //midi
         for (i = 0; i < fParams.fSendMidiChannels; i++) {
-            sprintf(name, "midi_to_slave_%d", i+1);
+            snprintf(name, sizeof(name), "midi_to_slave_%d", i+1);
             if ((fMidiCapturePorts[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_MIDI_TYPE, JackPortIsInput | JackPortIsTerminal, 0)) == NULL)
                 return -1;
             //port latency
@@ -204,7 +204,7 @@ namespace Jack
         }
 
         for (i = 0; i < fParams.fReturnMidiChannels; i++) {
-            sprintf(name, "midi_from_slave_%d", i+1);
+            snprintf(name, sizeof(name), "midi_from_slave_%d", i+1);
             if ((fMidiPlaybackPorts[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_MIDI_TYPE,  JackPortIsOutput | JackPortIsTerminal, 0)) == NULL)
                 return -1;
             //port latency
@@ -779,7 +779,8 @@ namespace Jack
             jack_info("Takes physical %d outputs for client", params.fReturnAudioChannels);
         }
 
-        SetSlaveName(params);
+        // Rename done in jack_client_open if needed ?
+        //SetSlaveName(params);
 
         //create a new master and add it to the list
         JackNetMaster* master = new JackNetMaster(fSocket, params, fMulticastIP);
@@ -798,7 +799,7 @@ namespace Jack
         master_list_it_t it;
         for (it = fMasterList.begin(); it != fMasterList.end(); it++) {
             if (strcmp((*it)->fParams.fName, params.fName) == 0) {
-                sprintf(params.fName, "%s-%u", params.fName, params.fID);
+                snprintf(params.fName, sizeof(params.fName), "%s-%u", params.fName, params.fID);
             }
         }
     }

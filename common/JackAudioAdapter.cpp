@@ -165,14 +165,14 @@ int JackAudioAdapter::Open()
     fPlaybackPortList = new jack_port_t*[fAudioAdapter->GetOutputs()];
 
     for (int i = 0; i < fAudioAdapter->GetInputs(); i++) {
-        sprintf(name, "capture_%d", i + 1);
+        snprintf(name, sizeof(name), "capture_%d", i + 1);
         if ((fCapturePortList[i] = jack_port_register(fClient, name, JACK_DEFAULT_AUDIO_TYPE, CaptureDriverFlags, 0)) == NULL) {
             goto fail;
         }
     }
 
     for (int i = 0; i < fAudioAdapter->GetOutputs(); i++) {
-        sprintf(name, "playback_%d", i + 1);
+        snprintf(name, sizeof(name), "playback_%d", i + 1);
         if ((fPlaybackPortList[i] = jack_port_register(fClient, name, JACK_DEFAULT_AUDIO_TYPE, PlaybackDriverFlags, 0)) == NULL) {
             goto fail;
         }

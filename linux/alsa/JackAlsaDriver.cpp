@@ -574,7 +574,7 @@ enum_alsa_devices()
 
     while(snd_card_next(&card_no) >= 0 && card_no >= 0)
     {
-        sprintf(card_id, "hw:%d", card_no);
+        snprintf(card_id, sizeof(card_id), "hw:%d", card_no);
 
         if (snd_ctl_open(&handle, card_id, 0) >= 0 &&
             snd_ctl_card_info(handle, info) >= 0)
@@ -585,7 +585,7 @@ enum_alsa_devices()
 
             while (snd_ctl_pcm_next_device(handle, &device_no) >= 0 && device_no != -1)
             {
-                sprintf(device_id, "%s,%d", card_id, device_no);
+                snprintf(device_id, sizeof(device_id), "%s,%d", card_id, device_no);
 
                 snd_pcm_info_set_device(pcminfo_capture, device_no);
                 snd_pcm_info_set_subdevice(pcminfo_capture, 0);

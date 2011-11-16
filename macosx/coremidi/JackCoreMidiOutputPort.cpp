@@ -40,7 +40,7 @@ JackCoreMidiOutputPort::JackCoreMidiOutputPort(double time_ratio,
     std::auto_ptr<JackMidiAsyncQueue> thread_queue_ptr(thread_queue);
     thread = new JackThread(this);
     std::auto_ptr<JackThread> thread_ptr(thread);
-    sprintf(semaphore_name, "coremidi_%p", this);
+    snprintf(semaphore_name, sizeof(semaphore_name), "coremidi_%p", this);
     thread_queue_semaphore = sem_open(semaphore_name, O_CREAT, 0777, 0);
     if (thread_queue_semaphore == (sem_t *) SEM_FAILED) {
         throw std::runtime_error(strerror(errno));

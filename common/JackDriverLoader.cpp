@@ -266,7 +266,7 @@ jackctl_parse_driver_params(jackctl_driver *driver_ptr, int argc, char* argv[])
 
     options_ptr = options;
     for (i = 0; i < desc->nparams; i++) {
-        sprintf (options_ptr, "%c::", desc->params[i].character);
+        sprintf(options_ptr, "%c::", desc->params[i].character);
         options_ptr += 3;
         long_options[i].name = desc->params[i].name;
         long_options[i].flag = NULL;
@@ -410,8 +410,9 @@ jack_get_descriptor (JSList * drivers, const char* sofile, const char* symbol)
 #endif
     }
 
-    filename = (char*)malloc(strlen (driver_dir) + 1 + strlen(sofile) + 1);
-    sprintf (filename, "%s/%s", driver_dir, sofile);
+    int len = strlen(driver_dir) + 1 + strlen(sofile) + 1;
+    filename = (char*)malloc(len);
+    snprintf(filename, len, "%s/%s", driver_dir, sofile);
 
     if ((dlhandle = LoadDriverModule(filename)) == NULL) {
 #ifdef WIN32
@@ -495,15 +496,16 @@ static bool check_symbol(const char* sofile, const char* symbol)
         } else {
             GetCurrentDirectory(512, temp_driver_dir1);
         }
-        sprintf(temp_driver_dir2, "%s/%s", temp_driver_dir1, ADDON_DIR);
+        snprintf(temp_driver_dir2, sizeof(temp_driver_dir2), "%s/%s", temp_driver_dir1, ADDON_DIR);
         driver_dir = temp_driver_dir2;
 #else
         driver_dir = ADDON_DIR;
 #endif
     }
 
-    char* filename = (char*)malloc(strlen (driver_dir) + 1 + strlen(sofile) + 1);
-    sprintf (filename, "%s/%s", driver_dir, sofile);
+    int len = strlen(driver_dir) + 1 + strlen(sofile) + 1;
+    char* filename = (char*)malloc(len);
+    snprintf(filename, len, "%s/%s", driver_dir, sofile);
 
     if ((dlhandle = LoadDriverModule(filename)) == NULL) {
 #ifdef WIN32
@@ -549,7 +551,7 @@ jack_drivers_load (JSList * drivers) {
         driver_dir = driver_dir_storage;
     }
 
-    sprintf(dll_filename, "%s/*.dll", driver_dir);
+    snprintf(dll_filename, sizeof(dll_filename), "%s/*.dll", driver_dir);
 
     file = (HANDLE )FindFirstFile(dll_filename, &filedata);
 
@@ -694,7 +696,7 @@ jack_internals_load (JSList * internals) {
         driver_dir = driver_dir_storage;
     }
 
-    sprintf(dll_filename, "%s/*.dll", driver_dir);
+    snprintf(dll_filename, sizeof(dll_filename), "%s/*.dll", driver_dir);
 
     file = (HANDLE )FindFirstFile(dll_filename, &filedata);
 
