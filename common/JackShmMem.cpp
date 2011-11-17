@@ -121,7 +121,7 @@ void InitLockMemoryImp(void* ptr, size_t size)
         memset(ptr, 0, size);
         jack_log("Succeeded in locking %u byte memory area", size);
     } else {
-        jack_error("Cannot lock down memory area (%s)", strerror(errno));
+        jack_error("Cannot lock down %u byte memory area (%s)", size, strerror(errno));
     }
 }
 
@@ -130,7 +130,7 @@ void UnlockMemoryImp(void* ptr, size_t size)
     if (CHECK_MUNLOCK((char*)ptr, size)) {
         jack_log("Succeeded in unlocking %u byte memory area", size);
     } else {
-        jack_error("Cannot unlock down memory area (%s)", strerror(errno));
+        jack_error("Cannot unlock down %u byte memory area (%s)", size, strerror(errno));
     }
 }
 
