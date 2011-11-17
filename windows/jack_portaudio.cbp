@@ -14,7 +14,6 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
-					<Add option="-Wl,-subsystem,windows" />
 					<Add option="-DWIN32" />
 					<Add option="-DNDEBUG" />
 					<Add option="-D_WINDOWS" />
@@ -22,7 +21,7 @@
 					<Add option="-D_USRDLL" />
 					<Add option="-DJACK_PORTAUDIO_EXPORTS" />
 					<Add option="-DSERVER_SIDE" />
-                    <Add option="-DJACK_32_64" />
+					<Add option="-DJACK_32_64" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -30,10 +29,10 @@
 					<Add directory="portaudio" />
 				</Compiler>
 				<Linker>
+					<Add library="libjackserver64" />
+					<Add library="portaudio_x86_64" />
 					<Add directory="..\windows" />
 					<Add directory="Release64\bin" />
-                    <Add library="libjackserver64" />
-                    <Add library="portaudio_x86_64" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Debug 64bits">
@@ -51,7 +50,7 @@
 					<Add option="-D_USRDLL" />
 					<Add option="-DJACK_PORTAUDIO_EXPORTS" />
 					<Add option="-DSERVER_SIDE" />
-                    <Add option="-DJACK_32_64" />
+					<Add option="-DJACK_32_64" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -59,10 +58,10 @@
 					<Add directory="portaudio" />
 				</Compiler>
 				<Linker>
+					<Add library="libjackserver64" />
+					<Add library="portaudio_x86_64" />
 					<Add directory="Debug64\bin" />
 					<Add directory="..\windows" />
-                    <Add library="libjackserver64" />
-                    <Add library="portaudio_x86_64" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Profiling 64bits">
@@ -73,7 +72,6 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
-					<Add option="-Wl,-subsystem,windows" />
 					<Add option="-DWIN32" />
 					<Add option="-DNDEBUG" />
 					<Add option="-D_WINDOWS" />
@@ -82,7 +80,7 @@
 					<Add option="-DJACK_PORTAUDIO_EXPORTS" />
 					<Add option="-DJACK_MONITOR" />
 					<Add option="-DSERVER_SIDE" />
-                    <Add option="-DJACK_32_64" />
+					<Add option="-DJACK_32_64" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -90,13 +88,13 @@
 					<Add directory="portaudio" />
 				</Compiler>
 				<Linker>
+					<Add library="libjackserver64" />
+					<Add library="portaudio_x86_64" />
 					<Add directory="Release64\bin" />
 					<Add directory="..\windows" />
-                    <Add library="libjackserver64" />
-                    <Add library="portaudio_x86_64" />
 				</Linker>
 			</Target>
-           		<Target title="Win32 Release 32bits">
+			<Target title="Win32 Release 32bits">
 				<Option output="Release\bin\jack\jack_portaudio" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release" />
 				<Option type="3" />
@@ -104,8 +102,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
-                    <Add option="-m32" />
-					<Add option="-Wl,-subsystem,windows" />
+					<Add option="-m32" />
 					<Add option="-DWIN32" />
 					<Add option="-DNDEBUG" />
 					<Add option="-D_WINDOWS" />
@@ -113,7 +110,7 @@
 					<Add option="-D_USRDLL" />
 					<Add option="-DJACK_PORTAUDIO_EXPORTS" />
 					<Add option="-DSERVER_SIDE" />
-                    <Add option="-DJACK_32_64" />
+					<Add option="-DJACK_32_64" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -121,13 +118,13 @@
 					<Add directory="portaudio" />
 				</Compiler>
 				<Linker>
+					<Add option="-m32" />
+					<Add library="libjackserver" />
+					<Add library="portaudio_x86" />
 					<Add directory="..\windows" />
 					<Add directory="Release\bin" />
-                    <Add option="-m32" />
-                    <Add library="libjackserver" />
-                    <Add library="portaudio_x86" />
 				</Linker>
-                <ExtraCommands>
+				<ExtraCommands>
 					<Add before="windres -F pe-i386 -O coff -o Release/jackportaudio.res jackportaudio.rc" />
 				</ExtraCommands>
 			</Target>
@@ -139,7 +136,7 @@
 				<Compiler>
 					<Add option="-W" />
 					<Add option="-g" />
-                    <Add option="-m32" />
+					<Add option="-m32" />
 					<Add option="-DWIN32" />
 					<Add option="-D_DEBUG" />
 					<Add option="-D_CONSOLE" />
@@ -147,7 +144,7 @@
 					<Add option="-D_USRDLL" />
 					<Add option="-DJACK_PORTAUDIO_EXPORTS" />
 					<Add option="-DSERVER_SIDE" />
-                    <Add option="-DJACK_32_64" />
+					<Add option="-DJACK_32_64" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -155,13 +152,13 @@
 					<Add directory="portaudio" />
 				</Compiler>
 				<Linker>
+					<Add option="-m32" />
+					<Add library="libjackserver" />
+					<Add library="portaudio_x86" />
 					<Add directory="Debug\bin" />
 					<Add directory="..\windows" />
-                    <Add option="-m32" />
-                    <Add library="libjackserver" />
-                    <Add library="portaudio_x86" />
 				</Linker>
-                <ExtraCommands>
+				<ExtraCommands>
 					<Add before="windres -F pe-i386 -O coff -o Debug/jackportaudio.res jackportaudio.rc" />
 				</ExtraCommands>
 			</Target>
@@ -173,8 +170,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
-                    <Add option="-m32" />
-					<Add option="-Wl,-subsystem,windows" />
+					<Add option="-m32" />
 					<Add option="-DWIN32" />
 					<Add option="-DNDEBUG" />
 					<Add option="-D_WINDOWS" />
@@ -183,7 +179,7 @@
 					<Add option="-DJACK_PORTAUDIO_EXPORTS" />
 					<Add option="-DJACK_MONITOR" />
 					<Add option="-DSERVER_SIDE" />
-                    <Add option="-DJACK_32_64" />
+					<Add option="-DJACK_32_64" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -191,17 +187,17 @@
 					<Add directory="portaudio" />
 				</Compiler>
 				<Linker>
+					<Add option="-m32" />
+					<Add library="libjackserver" />
+					<Add library="portaudio_x86" />
 					<Add directory="Release\bin" />
 					<Add directory="..\windows" />
-                    <Add option="-m32" />
-                    <Add library="libjackserver" />
-                    <Add library="portaudio_x86" />
 				</Linker>
-                <ExtraCommands>
+				<ExtraCommands>
 					<Add before="windres -F pe-i386 -O coff -o Release/jackportaudio.res jackportaudio.rc" />
 				</ExtraCommands>
 			</Target>
-        	</Build>
+		</Build>
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>

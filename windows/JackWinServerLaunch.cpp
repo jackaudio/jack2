@@ -238,7 +238,7 @@ static int start_server_aux(const char* server_name)
 	}
 #endif
 
-	ret = _spawnv(_P_NOWAIT, command, argv);
+	ret = _spawnv(_P_DETACH, command, argv);
 	Sleep(2500); // Give the server time to launch
 
 	if ((-1) == ret)
