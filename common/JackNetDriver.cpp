@@ -640,7 +640,7 @@ namespace Jack
             int mtu = DEFAULT_MTU;
             // Desactivated for now...
             uint transport_sync = 0;
-            jack_nframes_t period_size = 256;
+            jack_nframes_t period_size = 1024;
             jack_nframes_t sample_rate = 48000;
             int audio_capture_ports = -1;
             int audio_playback_ports = -1;
