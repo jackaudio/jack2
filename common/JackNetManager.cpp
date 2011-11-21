@@ -779,9 +779,6 @@ namespace Jack
             jack_info("Takes physical %d outputs for client", params.fReturnAudioChannels);
         }
 
-        // Rename done in jack_client_open if needed ?
-        //SetSlaveName(params);
-
         //create a new master and add it to the list
         JackNetMaster* master = new JackNetMaster(fSocket, params, fMulticastIP);
         if (master->Init(fAutoConnect)) {
@@ -790,18 +787,6 @@ namespace Jack
         }
         delete master;
         return NULL;
-    }
-
-    void JackNetMasterManager::SetSlaveName(session_params_t& params)
-    {
-        jack_log("JackNetMasterManager::SetSlaveName");
-
-        master_list_it_t it;
-        for (it = fMasterList.begin(); it != fMasterList.end(); it++) {
-            if (strcmp((*it)->fParams.fName, params.fName) == 0) {
-                snprintf(params.fName, sizeof(params.fName), "%s-%u", params.fName, params.fID);
-            }
-        }
     }
 
     master_list_it_t JackNetMasterManager::FindMaster(uint32_t id)
