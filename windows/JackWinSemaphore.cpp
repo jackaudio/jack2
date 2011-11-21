@@ -30,7 +30,7 @@ void JackWinSemaphore::BuildName(const char* client_name, const char* server_nam
 {
     char ext_client_name[JACK_CLIENT_NAME_SIZE + 1];
     JackTools::RewriteName(client_name, ext_client_name);
-    snprintf(res, size, "jack_pipe.%s_%s", server_name, ext_client_name);
+    _snprintf(res, size, "jack_pipe.%s_%s", server_name, ext_client_name);
 }
 
 bool JackWinSemaphore::Signal()
@@ -158,4 +158,3 @@ void JackWinSemaphore::Destroy()
 
 
 } // end of namespace
-

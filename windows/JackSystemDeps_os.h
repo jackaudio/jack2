@@ -49,5 +49,9 @@
 #define JACK_DEBUG false
 #endif
 
+#if defined(_MSC_VER)
+#define snprintf _snprintf
+#endif
+
 #endif
 

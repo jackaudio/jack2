@@ -36,6 +36,10 @@ John Emmas
   Jackdmp changes log
 ---------------------------
 
+2011-11-21 Stephane Letz  <letz@grame.fr>
+
+	* John Emmas third auto-launch server on Windows patch.
+
 2011-11-07 Stephane Letz  <letz@grame.fr>
 
 	* John Emmas first auto-launch server on Windows patch.

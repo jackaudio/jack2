@@ -45,10 +45,7 @@ find_path_to_jackdrc(char *path_to_jackdrc)
 
 	if (S_OK == SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, SHGFP_TYPE_CURRENT, user_jackdrc))
 	{
-		int fh;
-
 		// The above call should have given us the path to the user's home folder
-		char* pos;
 		char ch = user_jackdrc[strlen(user_jackdrc)-1];
 
 		if (('/' != ch) && ('\\' != ch))
@@ -165,9 +162,10 @@ static int start_server_aux(const char* server_name)
         strncpy(arguments, "jackd.exe -S -d " JACK_DEFAULT_DRIVER, 255);
     }
 
-	int buffer_termination;
+    int  buffer_termination;
+    bool verbose_mode = false;
     argv = (char**)malloc(255);
-	pos  = 0;
+    pos  = 0;
 
     while (1) {
         /* insert -T and -n server_name in front of arguments */
@@ -215,6 +213,9 @@ static int start_server_aux(const char* server_name)
 			strcpy(argv[i], buffer);
 			pos += (result + 1);
 			++i;
+
+			if ((0 == strcmp(buffer, "-v")) || (0 == strcmp(buffer, "--verbose")))
+				verbose_mode = true;
 		}
     }
 
@@ -238,8 +239,17 @@ static int start_server_aux(const char* server_name)
 	}
 #endif
 
-	ret = _spawnv(_P_DETACH, command, argv);
-	Sleep(2500); // Give the server time to launch
+	if (verbose_mode) {
+		// Launch the server with a console... (note that
+		// if the client is a console app, the server might
+		// also use the client's console)
+		ret = _spawnv(_P_NOWAIT, command, argv);
+	} else {
+		// Launch the server silently... (without a console)
+		ret = _spawnv(_P_DETACH, command, argv);
+	}
+
+    Sleep(2500); // Give it some time to launch
 
 	if ((-1) == ret)
 		fprintf(stderr, "Execution of JACK server (command = \"%s\") failed: %s\n", command, strerror(errno));
@@ -305,4 +315,3 @@ int try_start_server(jack_varargs_t* va, jack_options_t options, jack_status_t* 
 
 	return 0;
 }
-

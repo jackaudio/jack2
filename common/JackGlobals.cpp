@@ -53,7 +53,7 @@ void JackGlobals::CheckContext(const char* name)
         /* Convert it to local time representation. */
         loctime = localtime (&curtime);
         strftime(buffer, 256, "%I-%M", loctime);
-        sprintnf(provstr, sizeof(provstr), "JackAPICall-%s.log", buffer);
+        snprintf(provstr, sizeof(provstr), "JackAPICall-%s.log", buffer);
         JackGlobals::fStream = new std::ofstream(provstr, std::ios_base::ate);
         JackGlobals::fStream->is_open();
     }
