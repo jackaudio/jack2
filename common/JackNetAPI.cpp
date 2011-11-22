@@ -1001,7 +1001,7 @@ static void jack_format_and_log(int level, const char *prefix, const char *fmt, 
     }
 
     vsnprintf(buffer + len, sizeof(buffer) - len, fmt, ap);
-    printf(buffer);
+    printf("%s", buffer);
     printf("\n");
 }
 

@@ -340,7 +340,7 @@ int JackAlsaDriver::Close()
 
         int playback_card = card_to_num(fPlaybackDriverName);
         if (playback_card >= 0 && playback_card != capture_card) {
-            (audio_name, sizeof(audio_name), "Audio%d", playback_card);
+            snprintf(audio_name, sizeof(audio_name), "Audio%d", playback_card);
             JackServerGlobals::on_device_release(audio_name);
         }
     }
