@@ -245,13 +245,13 @@ class JackShmReadWritePtr1
                 if (jack_attach_lib_shm(&fInfo)) {
                     throw std::bad_alloc();
                 }
+                GetShmAddress()->LockMemory();
                 /*
                 nobody else needs to access this shared memory any more, so
                 destroy it. because we have our own attachment to it, it won't
                 vanish till we exit (and release it).
                 */
                 jack_destroy_shm(&fInfo);
-                GetShmAddress()->LockMemory();
             }
         }
 
