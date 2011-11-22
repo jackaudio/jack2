@@ -650,7 +650,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
         UInt64 computation = JackTools::ComputationMicroSec(fParams.fPeriodSize) * 1000;
         fThread.SetParams(period, computation, constraint);
 
-        return (fThread.AcquireRealTime(80) == 0);      // TODO: get a value from the server
+        return (fThread.AcquireSelfRealTime(80) == 0);      // TODO: get a value from the server
     }
 
     bool Execute()
