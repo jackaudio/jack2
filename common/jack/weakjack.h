@@ -21,7 +21,7 @@
 #define __weakjack_h__
 
 /**
- * @defgroup WeakLinkage managing support for newer/older versions of JACK
+ * @defgroup WeakLinkage Managing support for newer/older versions of JACK
  * @{ One challenge faced by developers is that of taking
  *    advantage of new features introduced in new versions
  *    of [ JACK ] while still supporting older versions of
