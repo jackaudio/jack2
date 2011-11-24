@@ -35,19 +35,6 @@ class SERVER_EXPORT JackAudioDriver : public JackDriver
 
     protected:
 
-        int fCaptureChannels;
-        int fPlaybackChannels;
-
-        // Static tables since the actual number of ports may be changed by the real driver
-        // thus dynamic allocation is more difficult to handle
-        jack_port_id_t fCapturePortList[DRIVER_PORT_NUM];
-        jack_port_id_t fPlaybackPortList[DRIVER_PORT_NUM];
-        jack_port_id_t fMonitorPortList[DRIVER_PORT_NUM];
-
-        bool fWithMonitorPorts;
-
-        std::list<std::pair<std::string, std::string> > fConnections;		// Connections list
-
         jack_default_audio_sample_t* GetInputBuffer(int port_index);
         jack_default_audio_sample_t* GetOutputBuffer(int port_index);
         jack_default_audio_sample_t* GetMonitorBuffer(int port_index);
@@ -104,9 +91,6 @@ class SERVER_EXPORT JackAudioDriver : public JackDriver
 
         virtual int SetBufferSize(jack_nframes_t buffer_size);
         virtual int SetSampleRate(jack_nframes_t sample_rate);
-
-        virtual void SaveConnections();
-        virtual void RestoreConnections();
 
         virtual int ClientNotify(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2);
 

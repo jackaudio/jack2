@@ -37,14 +37,6 @@ class SERVER_EXPORT JackMidiDriver : public JackDriver
 
      protected:
 
-        int fCaptureChannels;
-        int fPlaybackChannels;
-
-        std::list<std::pair<std::string, std::string> > fConnections;		// Connections list
-
-        jack_port_id_t fCapturePortList[DRIVER_PORT_NUM];
-        jack_port_id_t fPlaybackPortList[DRIVER_PORT_NUM];
-
         JackMidiBuffer* GetInputBuffer(int port_index);
         JackMidiBuffer* GetOutputBuffer(int port_index);
 
@@ -55,9 +47,6 @@ class SERVER_EXPORT JackMidiDriver : public JackDriver
         virtual int ProcessWriteAsync();
 
         virtual void UpdateLatencies();
-
-        void SaveConnections();
-        void RestoreConnections();
 
     public:
 

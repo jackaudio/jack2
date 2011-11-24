@@ -129,12 +129,16 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
 
         char fCaptureDriverName[JACK_CLIENT_NAME_SIZE + 1];
         char fPlaybackDriverName[JACK_CLIENT_NAME_SIZE + 1];
+
         char fAliasName[JACK_CLIENT_NAME_SIZE + 1];
+
         jack_nframes_t fCaptureLatency;
         jack_nframes_t fPlaybackLatency;
+
         jack_time_t fBeginDateUst;
         jack_time_t fEndDateUst;
         float fDelayedUsecs;
+
         JackLockedEngine* fEngine;
         JackGraphManager* fGraphManager;
         JackSynchro* fSynchroTable;
@@ -143,6 +147,19 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         std::list<JackDriverInterface*> fSlaveList;
         bool fIsMaster;
         bool fIsRunning;
+
+        int fCaptureChannels;
+        int fPlaybackChannels;
+
+        // Static tables since the actual number of ports may be changed by the real driver
+        // thus dynamic allocation is more difficult to handle
+        jack_port_id_t fCapturePortList[DRIVER_PORT_NUM];
+        jack_port_id_t fPlaybackPortList[DRIVER_PORT_NUM];
+        jack_port_id_t fMonitorPortList[DRIVER_PORT_NUM];
+
+        bool fWithMonitorPorts;
+
+        std::list<std::pair<std::string, std::string> > fConnections;		// Connections list
 
         void CycleIncTime();
         void CycleTakeBeginTime();
@@ -198,7 +215,7 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         virtual int Close();
 
         virtual int Process();
-    
+
         virtual int Attach();
         virtual int Detach();
 
@@ -216,6 +233,9 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
 
         int ProcessRead();
         int ProcessWrite();
+
+        virtual void SaveConnections();
+        virtual void RestoreConnections();
 
         virtual bool IsFixedBufferSize();
         virtual int SetBufferSize(jack_nframes_t buffer_size);

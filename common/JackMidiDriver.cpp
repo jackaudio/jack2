@@ -33,9 +33,7 @@ namespace Jack
 {
 
 JackMidiDriver::JackMidiDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
-        : JackDriver(name, alias, engine, table),
-        fCaptureChannels(0),
-        fPlaybackChannels(0)
+        : JackDriver(name, alias, engine, table)
 {}
 
 JackMidiDriver::~JackMidiDriver()
@@ -223,43 +221,5 @@ JackMidiBuffer* JackMidiDriver::GetOutputBuffer(int port_index)
     assert(fPlaybackPortList[port_index]);
     return (JackMidiBuffer*)fGraphManager->GetBuffer(fPlaybackPortList[port_index], fEngineControl->fBufferSize);
 }
-
-void JackMidiDriver::SaveConnections()
-{
-    const char** connections;
-    fConnections.clear();
-
-    for (int i = 0; i < fCaptureChannels; ++i) {
-        if (fCapturePortList[i] && (connections = fGraphManager->GetConnections(fCapturePortList[i])) != 0) {
-            for (int j = 0; connections[j]; j++) {
-                fConnections.push_back(make_pair(fGraphManager->GetPort(fCapturePortList[i])->GetName(), connections[j]));
-                jack_info("Save connection: %s %s", fGraphManager->GetPort(fCapturePortList[i])->GetName(), connections[j]);
-            }
-            free(connections);
-        }
-    }
-
-    for (int i = 0; i < fPlaybackChannels; ++i) {
-        if (fPlaybackPortList[i] && (connections = fGraphManager->GetConnections(fPlaybackPortList[i])) != 0) {
-            for (int j = 0; connections[j]; j++) {
-                fConnections.push_back(make_pair(connections[j], fGraphManager->GetPort(fPlaybackPortList[i])->GetName()));
-                jack_info("Save connection: %s %s", connections[j], fGraphManager->GetPort(fPlaybackPortList[i])->GetName());
-            }
-            free(connections);
-        }
-    }
-}
-
-void JackMidiDriver::RestoreConnections()
-{
-    list<pair<string, string> >::const_iterator it;
-
-    for (it = fConnections.begin(); it != fConnections.end(); it++) {
-        pair<string, string> connection = *it;
-        jack_info("Restore connection: %s %s", connection.first.c_str(), connection.second.c_str());
-        fEngine->PortConnect(fClientControl.fRefNum, connection.first.c_str(), connection.second.c_str());
-    }
-}
-
 
 } // end of namespace
