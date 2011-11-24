@@ -107,10 +107,12 @@ bool JackCoreMidiDriver::OpenAux()
         return false;
     }
 
+    jack_log("MIDIClientCreate...");
     OSStatus status = MIDIClientCreate(name, HandleNotificationEvent, this,
                                        &client);
 
     CFRelease(name);
+    jack_log("MIDIClientCreate...OK");
     if (status != noErr) {
         WriteMacOSError("JackCoreMidiDriver::Open", "MIDIClientCreate",
                         status);
@@ -504,6 +506,8 @@ JackCoreMidiDriver::HandleNotification(const MIDINotification *message)
     }
 }
 
+#define WAIT_COUNTER 100
+
 int
 JackCoreMidiDriver::Open(bool capturing_aux, bool playing_aux, int in_channels_aux,
                          int out_channels_aux, bool monitor_aux,
@@ -527,15 +531,18 @@ JackCoreMidiDriver::Open(bool capturing_aux, bool playing_aux, int in_channels_a
     fThread.StartSync();
 
     int count = 0;
-    while (fThread.GetStatus() != JackThread::kRunning && ++count < 10) {
-        jack_info("CoreMIDI driver...");
-        JackSleep(10000);
+    while (fThread.GetStatus() != JackThread::kRunning && ++count < WAIT_COUNTER) {
+        JackSleep(100000);
+        jack_log("JackCoreMidiDriver::Open wait count = %d", count);
+
     }
-    if (count == 100) {
+    if (count == WAIT_COUNTER) {
         jack_info("Cannot open CoreMIDI driver");
+        fThread.Kill();
         return -1;
     } else {
         JackSleep(10000);
+        jack_info("CoreMIDI driver is running...");
     }
 
     return 0;
