@@ -116,7 +116,7 @@
    </registry>
    <shcut listview >
       <_><shpath>prog</><shname>Jack NetDriver</><tarpath>inst</><tarname>jackd.exe</><cmdline>-R -S -d net</><workpath>inst</><workcust></><icon></></>
-<_><shpath>prog</><shname>Jack Portaudio</><tarpath>inst</><tarname>jackd.exe</><cmdline>-R -S -d portaudio</><workpath>inst</><workcust></><icon></></>
+<_><shpath>prog</><shname>Jack PortAudio</><tarpath>inst</><tarname>jackd.exe</><cmdline>-R -S -d portaudio</><workpath>inst</><workcust></><icon></></>
 <_><shpath>prog</><shname>Jack Control</><tarpath>inst</><tarname>qjackctl.exe</><cmdline></><workpath>inst</><workcust></><icon>jackdmp.exe</></>
 <_><shpath>prog</><shname>Jack Command</><tarpath>sys</><tarname>cmd.exe</><cmdline></><workpath>inst</><workcust></><icon></></>
 

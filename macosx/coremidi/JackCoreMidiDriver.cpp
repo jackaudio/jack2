@@ -28,6 +28,14 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 using Jack::JackCoreMidiDriver;
 
+static char capture_driver_name[256];
+static char playback_driver_name[256];
+
+static int in_channels, out_channels;
+static bool capturing, playing, monitor;
+
+static jack_nframes_t capture_latency, playback_latency;
+
 ///////////////////////////////////////////////////////////////////////////////
 // Static callbacks
 ///////////////////////////////////////////////////////////////////////////////
@@ -53,7 +61,7 @@ JackCoreMidiDriver::HandleNotificationEvent(const MIDINotification *message,
 JackCoreMidiDriver::JackCoreMidiDriver(const char *name, const char *alias,
                                        JackLockedEngine *engine,
                                        JackSynchro *table):
-    JackMidiDriver(name, alias, engine, table)
+    JackMidiDriver(name, alias, engine, table),fThread(this)
 {
     mach_timebase_info_data_t info;
     kern_return_t result = mach_timebase_info(&info);
@@ -77,178 +85,12 @@ JackCoreMidiDriver::JackCoreMidiDriver(const char *name, const char *alias,
 JackCoreMidiDriver::~JackCoreMidiDriver()
 {}
 
-int
-JackCoreMidiDriver::Attach()
+bool JackCoreMidiDriver::Init()
 {
-    jack_nframes_t buffer_size = fEngineControl->fBufferSize;
-    jack_port_id_t index;
-    jack_nframes_t latency = buffer_size;
-    jack_latency_range_t latency_range;
-    const char *name;
-    JackPort *port;
-    JackCoreMidiPort *port_obj;
-    latency_range.max = latency;
-    latency_range.min = latency;
-
-    // Physical inputs
-    for (int i = 0; i < num_physical_inputs; i++) {
-        port_obj = physical_input_ports[i];
-        name = port_obj->GetName();
-        if (fEngine->PortRegister(fClientControl.fRefNum, name,
-                                JACK_DEFAULT_MIDI_TYPE,
-                                CaptureDriverFlags, buffer_size, &index) < 0) {
-            jack_error("JackCoreMidiDriver::Attach - cannot register physical "
-                       "input port with name '%s'.", name);
-            // X: Do we need to deallocate ports?
-            return -1;
-        }
-        port = fGraphManager->GetPort(index);
-        port->SetAlias(port_obj->GetAlias());
-        port->SetLatencyRange(JackCaptureLatency, &latency_range);
-        fCapturePortList[i] = index;
-    }
-
-    // Virtual inputs
-    for (int i = 0; i < num_virtual_inputs; i++) {
-        port_obj = virtual_input_ports[i];
-        name = port_obj->GetName();
-        if (fEngine->PortRegister(fClientControl.fRefNum, name,
-                                JACK_DEFAULT_MIDI_TYPE,
-                                CaptureDriverFlags, buffer_size, &index) < 0) {
-            jack_error("JackCoreMidiDriver::Attach - cannot register virtual "
-                       "input port with name '%s'.", name);
-            // X: Do we need to deallocate ports?
-            return -1;
-        }
-        port = fGraphManager->GetPort(index);
-        port->SetAlias(port_obj->GetAlias());
-        port->SetLatencyRange(JackCaptureLatency, &latency_range);
-        fCapturePortList[num_physical_inputs + i] = index;
-    }
-
-    if (! fEngineControl->fSyncMode) {
-        latency += buffer_size;
-        latency_range.max = latency;
-        latency_range.min = latency;
-    }
-
-    // Physical outputs
-    for (int i = 0; i < num_physical_outputs; i++) {
-        port_obj = physical_output_ports[i];
-        name = port_obj->GetName();
-        fEngine->PortRegister(fClientControl.fRefNum, name,
-                            JACK_DEFAULT_MIDI_TYPE,
-                            PlaybackDriverFlags, buffer_size, &index);
-        if (index == NO_PORT) {
-            jack_error("JackCoreMidiDriver::Attach - cannot register physical "
-                       "output port with name '%s'.", name);
-            // X: Do we need to deallocate ports?
-            return -1;
-        }
-        port = fGraphManager->GetPort(index);
-        port->SetAlias(port_obj->GetAlias());
-        port->SetLatencyRange(JackPlaybackLatency, &latency_range);
-        fPlaybackPortList[i] = index;
-    }
-
-    // Virtual outputs
-    for (int i = 0; i < num_virtual_outputs; i++) {
-        port_obj = virtual_output_ports[i];
-        name = port_obj->GetName();
-        fEngine->PortRegister(fClientControl.fRefNum, name,
-                            JACK_DEFAULT_MIDI_TYPE,
-                            PlaybackDriverFlags, buffer_size, &index);
-        if (index == NO_PORT) {
-            jack_error("JackCoreMidiDriver::Attach - cannot register virtual "
-                       "output port with name '%s'.", name);
-            // X: Do we need to deallocate ports?
-            return -1;
-        }
-        port = fGraphManager->GetPort(index);
-        port->SetAlias(port_obj->GetAlias());
-        port->SetLatencyRange(JackPlaybackLatency, &latency_range);
-        fPlaybackPortList[num_physical_outputs + i] = index;
-    }
-
-    return 0;
+    return OpenAux();
 }
 
-int
-JackCoreMidiDriver::Close()
-{
-    // Generic MIDI driver close
-    int result = JackMidiDriver::Close();
-
-    OSStatus status;
-    if (physical_input_ports) {
-        for (int i = 0; i < num_physical_inputs; i++) {
-            delete physical_input_ports[i];
-        }
-        delete[] physical_input_ports;
-        num_physical_inputs = 0;
-        physical_input_ports = 0;
-        status = MIDIPortDispose(internal_input);
-        if (status != noErr) {
-            WriteMacOSError("JackCoreMidiDriver::Close", "MIDIPortDispose",
-                            status);
-            result = -1;
-        }
-    }
-    if (physical_output_ports) {
-        for (int i = 0; i < num_physical_outputs; i++) {
-            delete physical_output_ports[i];
-        }
-        delete[] physical_output_ports;
-        num_physical_outputs = 0;
-        physical_output_ports = 0;
-        status = MIDIPortDispose(internal_output);
-        if (status != noErr) {
-            WriteMacOSError("JackCoreMidiDriver::Close", "MIDIPortDispose",
-                            status);
-            result = -1;
-        }
-    }
-    if (virtual_input_ports) {
-        for (int i = 0; i < num_virtual_inputs; i++) {
-            delete virtual_input_ports[i];
-        }
-        delete[] virtual_input_ports;
-        num_virtual_inputs = 0;
-        virtual_input_ports = 0;
-    }
-    if (virtual_output_ports) {
-        for (int i = 0; i < num_virtual_outputs; i++) {
-            delete virtual_output_ports[i];
-        }
-        delete[] virtual_output_ports;
-        num_virtual_outputs = 0;
-        virtual_output_ports = 0;
-    }
-    if (client) {
-        status = MIDIClientDispose(client);
-        if (status != noErr) {
-            WriteMacOSError("JackCoreMidiDriver::Close", "MIDIClientDispose",
-                            status);
-            result = -1;
-        }
-        client = 0;
-    }
-    return result;
-}
-
-void
-JackCoreMidiDriver::HandleNotification(const MIDINotification *message)
-{
-    // Empty
-}
-
-int
-JackCoreMidiDriver::Open(bool capturing, bool playing, int in_channels,
-                         int out_channels, bool monitor,
-                         const char* capture_driver_name,
-                         const char* playback_driver_name,
-                         jack_nframes_t capture_latency,
-                         jack_nframes_t playback_latency)
+bool JackCoreMidiDriver::OpenAux()
 {
     int pi_count = 0;
     int po_count = 0;
@@ -262,7 +104,7 @@ JackCoreMidiDriver::Open(bool capturing, bool playing, int in_channels,
     if (! name) {
         jack_error("JackCoreMidiDriver::Open - failed to allocate memory for "
                    "client name string");
-        return -1;
+        return false;
     }
 
     OSStatus status = MIDIClientCreate(name, HandleNotificationEvent, this,
@@ -270,9 +112,9 @@ JackCoreMidiDriver::Open(bool capturing, bool playing, int in_channels,
 
     CFRelease(name);
     if (status != noErr) {
-        WriteMacOSError("JackCoreMidiDriver::Close", "MIDIClientCreate",
+        WriteMacOSError("JackCoreMidiDriver::Open", "MIDIClientCreate",
                         status);
-        return -1;
+        return false;
     }
     char *client_name = fClientControl.fName;
 
@@ -398,7 +240,9 @@ JackCoreMidiDriver::Open(bool capturing, bool playing, int in_channels,
     if (! (pi_count || po_count || in_channels || out_channels)) {
         jack_error("JackCoreMidiDriver::Open - no CoreMIDI inputs or outputs "
                    "found, and no virtual ports allocated.");
-    } else if (! JackMidiDriver::Open(capturing, playing,
+    }
+
+    if (! JackMidiDriver::Open(capturing, playing,
                                       in_channels + pi_count,
                                       out_channels + po_count, monitor,
                                       capture_driver_name,
@@ -408,7 +252,7 @@ JackCoreMidiDriver::Open(bool capturing, bool playing, int in_channels,
         num_physical_outputs = po_count;
         num_virtual_inputs = in_channels;
         num_virtual_outputs = out_channels;
-        return 0;
+        return true;
     }
 
     // Cleanup
@@ -460,7 +304,241 @@ JackCoreMidiDriver::Open(bool capturing, bool playing, int in_channels,
                         status);
     }
     client = 0;
-    return -1;
+    return false;
+}
+
+bool JackCoreMidiDriver::Execute()
+{
+    CFRunLoopRun();
+    return false;
+}
+
+int
+JackCoreMidiDriver::Attach()
+{
+    jack_nframes_t buffer_size = fEngineControl->fBufferSize;
+    jack_port_id_t index;
+    jack_nframes_t latency = buffer_size;
+    jack_latency_range_t latency_range;
+    const char *name;
+    JackPort *port;
+    JackCoreMidiPort *port_obj;
+    latency_range.max = latency;
+    latency_range.min = latency;
+
+    // Physical inputs
+    for (int i = 0; i < num_physical_inputs; i++) {
+        port_obj = physical_input_ports[i];
+        name = port_obj->GetName();
+        if (fEngine->PortRegister(fClientControl.fRefNum, name,
+                                JACK_DEFAULT_MIDI_TYPE,
+                                CaptureDriverFlags, buffer_size, &index) < 0) {
+            jack_error("JackCoreMidiDriver::Attach - cannot register physical "
+                       "input port with name '%s'.", name);
+            // X: Do we need to deallocate ports?
+            return -1;
+        }
+        port = fGraphManager->GetPort(index);
+        port->SetAlias(port_obj->GetAlias());
+        port->SetLatencyRange(JackCaptureLatency, &latency_range);
+        fCapturePortList[i] = index;
+    }
+
+    // Virtual inputs
+    for (int i = 0; i < num_virtual_inputs; i++) {
+        port_obj = virtual_input_ports[i];
+        name = port_obj->GetName();
+        if (fEngine->PortRegister(fClientControl.fRefNum, name,
+                                JACK_DEFAULT_MIDI_TYPE,
+                                CaptureDriverFlags, buffer_size, &index) < 0) {
+            jack_error("JackCoreMidiDriver::Attach - cannot register virtual "
+                       "input port with name '%s'.", name);
+            // X: Do we need to deallocate ports?
+            return -1;
+        }
+        port = fGraphManager->GetPort(index);
+        port->SetAlias(port_obj->GetAlias());
+        port->SetLatencyRange(JackCaptureLatency, &latency_range);
+        fCapturePortList[num_physical_inputs + i] = index;
+    }
+
+    if (! fEngineControl->fSyncMode) {
+        latency += buffer_size;
+        latency_range.max = latency;
+        latency_range.min = latency;
+    }
+
+    // Physical outputs
+    for (int i = 0; i < num_physical_outputs; i++) {
+        port_obj = physical_output_ports[i];
+        name = port_obj->GetName();
+        fEngine->PortRegister(fClientControl.fRefNum, name,
+                            JACK_DEFAULT_MIDI_TYPE,
+                            PlaybackDriverFlags, buffer_size, &index);
+        if (index == NO_PORT) {
+            jack_error("JackCoreMidiDriver::Attach - cannot register physical "
+                       "output port with name '%s'.", name);
+            // X: Do we need to deallocate ports?
+            return -1;
+        }
+        port = fGraphManager->GetPort(index);
+        port->SetAlias(port_obj->GetAlias());
+        port->SetLatencyRange(JackPlaybackLatency, &latency_range);
+        fPlaybackPortList[i] = index;
+    }
+
+    // Virtual outputs
+    for (int i = 0; i < num_virtual_outputs; i++) {
+        port_obj = virtual_output_ports[i];
+        name = port_obj->GetName();
+        fEngine->PortRegister(fClientControl.fRefNum, name,
+                            JACK_DEFAULT_MIDI_TYPE,
+                            PlaybackDriverFlags, buffer_size, &index);
+        if (index == NO_PORT) {
+            jack_error("JackCoreMidiDriver::Attach - cannot register virtual "
+                       "output port with name '%s'.", name);
+            // X: Do we need to deallocate ports?
+            return -1;
+        }
+        port = fGraphManager->GetPort(index);
+        port->SetAlias(port_obj->GetAlias());
+        port->SetLatencyRange(JackPlaybackLatency, &latency_range);
+        fPlaybackPortList[num_physical_outputs + i] = index;
+    }
+
+    return 0;
+}
+
+int
+JackCoreMidiDriver::Close()
+{
+    fThread.Kill();
+    return CloseAux();
+}
+
+int
+JackCoreMidiDriver::CloseAux()
+{
+    // Generic MIDI driver close
+    int result = JackMidiDriver::Close();
+
+    OSStatus status;
+    if (physical_input_ports) {
+        for (int i = 0; i < num_physical_inputs; i++) {
+            delete physical_input_ports[i];
+        }
+        delete[] physical_input_ports;
+        num_physical_inputs = 0;
+        physical_input_ports = 0;
+        status = MIDIPortDispose(internal_input);
+        if (status != noErr) {
+            WriteMacOSError("JackCoreMidiDriver::Close", "MIDIPortDispose",
+                            status);
+            result = -1;
+        }
+    }
+    if (physical_output_ports) {
+        for (int i = 0; i < num_physical_outputs; i++) {
+            delete physical_output_ports[i];
+        }
+        delete[] physical_output_ports;
+        num_physical_outputs = 0;
+        physical_output_ports = 0;
+        status = MIDIPortDispose(internal_output);
+        if (status != noErr) {
+            WriteMacOSError("JackCoreMidiDriver::Close", "MIDIPortDispose",
+                            status);
+            result = -1;
+        }
+    }
+    if (virtual_input_ports) {
+        for (int i = 0; i < num_virtual_inputs; i++) {
+            delete virtual_input_ports[i];
+        }
+        delete[] virtual_input_ports;
+        num_virtual_inputs = 0;
+        virtual_input_ports = 0;
+    }
+    if (virtual_output_ports) {
+        for (int i = 0; i < num_virtual_outputs; i++) {
+            delete virtual_output_ports[i];
+        }
+        delete[] virtual_output_ports;
+        num_virtual_outputs = 0;
+        virtual_output_ports = 0;
+    }
+    if (client) {
+        status = MIDIClientDispose(client);
+        if (status != noErr) {
+            WriteMacOSError("JackCoreMidiDriver::Close", "MIDIClientDispose",
+                            status);
+            result = -1;
+        }
+        client = 0;
+    }
+    return result;
+}
+
+void
+JackCoreMidiDriver::HandleNotification(const MIDINotification *message)
+{
+    switch (message->messageID) {
+
+        case kMIDIMsgSetupChanged:
+            SaveConnections();
+            Stop();
+            Detach();
+            CloseAux();
+            OpenAux();
+            Attach();
+            Start();
+            RestoreConnections();
+            break;
+
+        case kMIDIMsgObjectAdded:
+            break;
+
+        case kMIDIMsgObjectRemoved:
+            break;
+
+    }
+}
+
+int
+JackCoreMidiDriver::Open(bool capturing_aux, bool playing_aux, int in_channels_aux,
+                         int out_channels_aux, bool monitor_aux,
+                         const char* capture_driver_name_aux,
+                         const char* playback_driver_name_aux,
+                         jack_nframes_t capture_latency_aux,
+                         jack_nframes_t playback_latency_aux)
+{
+
+    strcpy(capture_driver_name, capture_driver_name_aux);
+    strcpy(playback_driver_name, playback_driver_name_aux);
+
+    capturing = capturing_aux;
+    playing = playing_aux;
+    in_channels = in_channels_aux;
+    out_channels = out_channels_aux;
+    monitor = monitor_aux;
+    capture_latency = capture_latency_aux;
+    playback_latency = playback_latency_aux;
+
+    fThread.StartSync();
+
+    int count = 0;
+    while (fThread.GetStatus() != JackThread::kRunning && ++count < 10) {
+        jack_info("CoreMIDI driver...");
+        JackSleep(10000);
+    }
+    if (count == 100) {
+        jack_info("Cannot open CoreMIDI driver");
+        return -1;
+    } else {
+        JackSleep(10000);
+    }
+
+    return 0;
 }
 
 int
