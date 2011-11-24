@@ -30,8 +30,6 @@ JackWinMMEDriver::JackWinMMEDriver(const char *name, const char *alias,
                                    JackSynchro *table):
     JackMidiDriver(name, alias, engine, table)
 {
-    fCaptureChannels = 0;
-    fPlaybackChannels = 0;
     input_ports = 0;
     output_ports = 0;
     period = 0;
