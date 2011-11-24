@@ -39,6 +39,7 @@ John Emmas
 2011-11-24 Stephane Letz  <letz@grame.fr>
 
 	* Dynamic port management in JACK/CoreMidi bridge.
+	* Correct jack_client_create_thread (when realtime in on).
 
 2011-11-21 Stephane Letz  <letz@grame.fr>
 

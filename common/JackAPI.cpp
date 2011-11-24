@@ -1776,7 +1776,14 @@ LIB_EXPORT int jack_client_create_thread(jack_client_t* client,
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_client_create_thread");
 #endif
-    return JackThread::StartImp(thread, priority, realtime, routine, arg);
+    JackEngineControl* control = GetEngineControl();
+    int res = JackThread::StartImp(thread, priority, realtime, routine, arg);
+    return (res == 0)
+        ? ((realtime ? JackThread::AcquireRealTimeImp(*thread, priority,
+            GetEngineControl()->fPeriod,
+            GetEngineControl()->fComputation,
+            GetEngineControl()->fConstraint) : res))
+        : res;
 }
 
 LIB_EXPORT int jack_drop_real_time_scheduling(jack_native_thread_t thread)
