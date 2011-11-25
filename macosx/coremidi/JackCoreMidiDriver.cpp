@@ -482,23 +482,27 @@ JackCoreMidiDriver::CloseAux()
 }
 
 void
+JackCoreMidiDriver::Restart()
+{
+    JackLock lock(this);
+
+    SaveConnections();
+    Stop();
+    Detach();
+    CloseAux();
+    OpenAux();
+    Attach();
+    Start();
+    RestoreConnections();
+}
+
+void
 JackCoreMidiDriver::HandleNotification(const MIDINotification *message)
 {
     switch (message->messageID) {
 
         case kMIDIMsgSetupChanged:
-            Lock();
-            {
-                SaveConnections();
-                Stop();
-                Detach();
-                CloseAux();
-                OpenAux();
-                Attach();
-                Start();
-                RestoreConnections();
-            }
-            Unlock();
+            Restart();
             break;
 
         case kMIDIMsgObjectAdded:
