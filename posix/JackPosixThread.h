@@ -72,7 +72,9 @@ class SERVER_EXPORT JackPosixThread : public detail::JackThreadInterface
 
         static int AcquireRealTimeImp(jack_native_thread_t thread, int priority);
         static int AcquireRealTimeImp(jack_native_thread_t thread, int priority, UInt64 period, UInt64 computation, UInt64 constraint)
-                { return JackPosixThread::AcquireRealTimeImp(thread, priority); }
+        {
+            return JackPosixThread::AcquireRealTimeImp(thread, priority);
+        }
         static int DropRealTimeImp(jack_native_thread_t thread);
         static int StartImp(jack_native_thread_t* thread, int priority, int realtime, void*(*start_routine)(void*), void* arg);
         static int StopImp(jack_native_thread_t thread);

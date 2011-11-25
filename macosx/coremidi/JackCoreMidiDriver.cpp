@@ -489,6 +489,8 @@ JackCoreMidiDriver::HandleNotification(const MIDINotification *message)
         case kMIDIMsgSetupChanged:
             SaveConnections();
             Stop();
+            // Wait at least one cycle...
+            JackSleep(int(fEngineControl->fPeriodUsecs * 2.f));
             Detach();
             CloseAux();
             OpenAux();
@@ -654,6 +656,8 @@ int
 JackCoreMidiDriver::Stop()
 {
     int result = 0;
+
+    JackMidiDriver::Stop();
 
     jack_info("JackCoreMidiDriver::Stop - disabling physical input ports.");
 

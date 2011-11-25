@@ -317,8 +317,10 @@ int JackDriver::ProcessReadSlaves()
     list<JackDriverInterface*>::const_iterator it;
     for (it = fSlaveList.begin(); it != fSlaveList.end(); it++) {
         JackDriverInterface* slave = *it;
-        if (slave->ProcessRead() < 0) {
-            res = -1;
+        if (slave->IsRunning()) {
+            if (slave->ProcessRead() < 0) {
+                res = -1;
+            }
         }
     }
     return res;
@@ -330,8 +332,10 @@ int JackDriver::ProcessWriteSlaves()
     list<JackDriverInterface*>::const_iterator it;
     for (it = fSlaveList.begin(); it != fSlaveList.end(); it++) {
         JackDriverInterface* slave = *it;
-        if (slave->ProcessWrite() < 0) {
-            res = -1;
+        if (slave->IsRunning()) {
+            if (slave->ProcessWrite() < 0) {
+                res = -1;
+            }
         }
     }
     return res;

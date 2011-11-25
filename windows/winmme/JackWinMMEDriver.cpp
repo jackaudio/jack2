@@ -327,6 +327,8 @@ JackWinMMEDriver::Stop()
 {
     int result = 0;
 
+    JackMidiDriver::Stop();
+
     jack_info("JackWinMMEDriver::Stop - disabling input ports.");
 
     for (int i = 0; i < fCaptureChannels; i++) {

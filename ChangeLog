@@ -36,6 +36,10 @@ John Emmas
   Jackdmp changes log
 ---------------------------
 
+2011-11-25 Stephane Letz  <letz@grame.fr>
+
+	* More robust dynamic port management in JACK/CoreMidi bridge.
+
 2011-11-24 Stephane Letz  <letz@grame.fr>
 
 	* Dynamic port management in JACK/CoreMidi bridge.

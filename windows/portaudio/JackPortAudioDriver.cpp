@@ -24,6 +24,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackGraphManager.h"
 #include "JackError.h"
 #include "JackTime.h"
+#include "JackTools.h"
 #include "JackCompilerDeps.h"
 #include <iostream>
 #include <assert.h>
@@ -220,7 +221,7 @@ int JackPortAudioDriver::Open(jack_nframes_t buffer_size,
 
 #ifdef __APPLE__
     fEngineControl->fPeriod = fEngineControl->fPeriodUsecs * 1000;
-    fEngineControl->fComputation = 500 * 1000;
+    fEngineControl->fComputation = JackTools::ComputationMicroSec(fEngineControl->fBufferSize) * 1000;
     fEngineControl->fConstraint = fEngineControl->fPeriodUsecs * 1000;
 #endif
 

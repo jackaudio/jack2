@@ -567,6 +567,7 @@ int
 JackALSARawMidiDriver::Stop()
 {
     jack_info("JackALSARawMidiDriver::Stop - stopping 'alsarawmidi' driver.");
+    JackMidiDriver::Stop();
 
     if (fds[1] != -1) {
         close(fds[1]);
