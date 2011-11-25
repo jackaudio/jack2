@@ -30,7 +30,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 namespace Jack {
 
-    class JackCoreMidiDriver: public JackMidiDriver, public JackRunnableInterface {
+    class JackCoreMidiDriver: public JackMidiDriver, public JackRunnableInterface, public JackLockAble {
 
     private:
 
@@ -100,5 +100,7 @@ namespace Jack {
     };
 
 }
+
+#define WAIT_COUNTER 100
 
 #endif

@@ -487,16 +487,18 @@ JackCoreMidiDriver::HandleNotification(const MIDINotification *message)
     switch (message->messageID) {
 
         case kMIDIMsgSetupChanged:
-            SaveConnections();
-            Stop();
-            // Wait at least one cycle...
-            JackSleep(int(fEngineControl->fPeriodUsecs * 2.f));
-            Detach();
-            CloseAux();
-            OpenAux();
-            Attach();
-            Start();
-            RestoreConnections();
+            Lock();
+            {
+                SaveConnections();
+                Stop();
+                Detach();
+                CloseAux();
+                OpenAux();
+                Attach();
+                Start();
+                RestoreConnections();
+            }
+            Unlock();
             break;
 
         case kMIDIMsgObjectAdded:
@@ -507,8 +509,6 @@ JackCoreMidiDriver::HandleNotification(const MIDINotification *message)
 
     }
 }
-
-#define WAIT_COUNTER 100
 
 int
 JackCoreMidiDriver::Open(bool capturing_aux, bool playing_aux, int in_channels_aux,
@@ -547,20 +547,6 @@ JackCoreMidiDriver::Open(bool capturing_aux, bool playing_aux, int in_channels_a
         jack_info("CoreMIDI driver is running...");
     }
 
-    return 0;
-}
-
-int
-JackCoreMidiDriver::Read()
-{
-    jack_nframes_t buffer_size = fEngineControl->fBufferSize;
-    for (int i = 0; i < num_physical_inputs; i++) {
-        physical_input_ports[i]->ProcessJack(GetInputBuffer(i), buffer_size);
-    }
-    for (int i = 0; i < num_virtual_inputs; i++) {
-        virtual_input_ports[i]->
-            ProcessJack(GetInputBuffer(num_physical_inputs + i), buffer_size);
-    }
     return 0;
 }
 
@@ -703,16 +689,36 @@ JackCoreMidiDriver::Stop()
 }
 
 int
+JackCoreMidiDriver::Read()
+{
+    if (Trylock()) {
+        jack_nframes_t buffer_size = fEngineControl->fBufferSize;
+        for (int i = 0; i < num_physical_inputs; i++) {
+            physical_input_ports[i]->ProcessJack(GetInputBuffer(i), buffer_size);
+        }
+        for (int i = 0; i < num_virtual_inputs; i++) {
+            virtual_input_ports[i]->
+                ProcessJack(GetInputBuffer(num_physical_inputs + i), buffer_size);
+        }
+        Unlock();
+    }
+    return 0;
+}
+
+int
 JackCoreMidiDriver::Write()
 {
-    jack_nframes_t buffer_size = fEngineControl->fBufferSize;
-    for (int i = 0; i < num_physical_outputs; i++) {
-        physical_output_ports[i]->ProcessJack(GetOutputBuffer(i), buffer_size);
-    }
-    for (int i = 0; i < num_virtual_outputs; i++) {
-        virtual_output_ports[i]->
-            ProcessJack(GetOutputBuffer(num_physical_outputs + i),
-                        buffer_size);
+    if (Trylock()) {
+        jack_nframes_t buffer_size = fEngineControl->fBufferSize;
+        for (int i = 0; i < num_physical_outputs; i++) {
+            physical_output_ports[i]->ProcessJack(GetOutputBuffer(i), buffer_size);
+        }
+        for (int i = 0; i < num_virtual_outputs; i++) {
+            virtual_output_ports[i]->
+                ProcessJack(GetOutputBuffer(num_physical_outputs + i),
+                            buffer_size);
+        }
+        Unlock();
     }
     return 0;
 }

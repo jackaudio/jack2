@@ -247,11 +247,11 @@ void JackEngine::NotifyClient(int refnum, int event, int sync, const char* messa
             /*
                 Important for internal clients : unlock before calling the notification callbacks.
             */
-            bool res = fMutex.Unlock();
+            bool res = Unlock();
             if (client->ClientNotify(refnum, client->GetClientControl()->fName, event, sync, message, value1, value2) < 0)
                 jack_error("NotifyClient fails name = %s event = %ld val1 = %ld val2 = %ld", client->GetClientControl()->fName, event, value1, value2);
             if (res)
-                fMutex.Lock();
+                Lock();
 
         } else {
             jack_log("JackEngine::NotifyClient: no callback for event = %ld", event);

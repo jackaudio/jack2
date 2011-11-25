@@ -37,7 +37,7 @@ class JackLockAble
 {
 
     protected:
-    
+
         JackMutex fMutex;
 
         JackLockAble()
@@ -46,10 +46,10 @@ class JackLockAble
         {}
 
     public:
-     
-        void Lock()
+
+        bool Lock()
         {
-            fMutex.Lock();
+            return fMutex.Lock();
         }
 
         bool Trylock()
@@ -57,9 +57,9 @@ class JackLockAble
             return fMutex.Trylock();
         }
 
-        void Unlock()
+        bool Unlock()
         {
-            fMutex.Unlock();
+            return fMutex.Unlock();
         }
 
 };
