@@ -39,6 +39,7 @@ John Emmas
 2011-11-25 Stephane Letz  <letz@grame.fr>
 
 	* More robust dynamic port management in JACK/CoreMidi bridge.
+	* Correct jack_port_name_size API.
 
 2011-11-24 Stephane Letz  <letz@grame.fr>
 

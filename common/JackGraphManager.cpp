@@ -741,8 +741,9 @@ jack_port_id_t JackGraphManager::GetPort(const char* name)
 {
     for (unsigned int i = 0; i < fPortMax; i++) {
         JackPort* port = GetPort(i);
-        if (port->IsUsed() && port->NameEquals(name))
+        if (port->IsUsed() && port->NameEquals(name)) {
             return i;
+        }
     }
     return NO_PORT;
 }

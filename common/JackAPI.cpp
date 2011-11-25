@@ -1494,7 +1494,7 @@ LIB_EXPORT int jack_client_name_size(void)
 
 LIB_EXPORT int jack_port_name_size(void)
 {
-    return JACK_PORT_NAME_SIZE;
+    return JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE;
 }
 
 LIB_EXPORT int jack_port_type_size(void)

@@ -461,10 +461,21 @@ void JackDriver::SaveConnections()
 {
     const char** connections;
     fConnections.clear();
+    char alias1[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
+    char alias2[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
+    char* aliases[2];
+
+    aliases[0] = alias1;
+    aliases[1] = alias2;
 
     for (int i = 0; i < fCaptureChannels; ++i) {
         if (fCapturePortList[i] && (connections = fGraphManager->GetConnections(fCapturePortList[i])) != 0) {
             for (int j = 0; connections[j]; j++) {
+                /*
+                fGraphManager->GetPort(fCapturePortList[i])->GetAliases(aliases);
+                fConnections.push_back(make_pair(aliases[0], connections[j]));
+                jack_info("Save connection: %s %s", aliases[0], connections[j]);
+                */
                 fConnections.push_back(make_pair(fGraphManager->GetPort(fCapturePortList[i])->GetName(), connections[j]));
                 jack_info("Save connection: %s %s", fGraphManager->GetPort(fCapturePortList[i])->GetName(), connections[j]);
             }
@@ -475,6 +486,11 @@ void JackDriver::SaveConnections()
     for (int i = 0; i < fPlaybackChannels; ++i) {
         if (fPlaybackPortList[i] && (connections = fGraphManager->GetConnections(fPlaybackPortList[i])) != 0) {
             for (int j = 0; connections[j]; j++) {
+                /*
+                fGraphManager->GetPort(fPlaybackPortList[i])->GetAliases(aliases);
+                fConnections.push_back(make_pair(connections[j], aliases[0]));
+                jack_info("Save connection: %s %s", connections[j], aliases[0]);
+                */
                 fConnections.push_back(make_pair(connections[j], fGraphManager->GetPort(fPlaybackPortList[i])->GetName()));
                 jack_info("Save connection: %s %s", connections[j], fGraphManager->GetPort(fPlaybackPortList[i])->GetName());
             }
