@@ -227,6 +227,24 @@ namespace Jack
         return NET_PACKET_ERROR;
     }
 
+    NetAudioBuffer* JackNetInterface::AudioBufferFactory(int nports, char* buffer)
+    {
+         switch (fParams.fSampleEncoder) {
+
+            case JackFloatEncoder:
+                return new NetFloatAudioBuffer(&fParams, nports, buffer);
+
+            case JackIntEncoder:
+                return new NetIntAudioBuffer(&fParams, nports, buffer);
+
+            case JackCeltEncoder:
+            #if HAVE_CELT
+                return new NetCeltAudioBuffer(&fParams, nports, buffer, fParams.fKBps);
+            #endif
+        }
+        return NULL;
+    }
+
     // JackNetMasterInterface ************************************************************************************
 
     bool JackNetMasterInterface::Init()
@@ -316,46 +334,12 @@ namespace Jack
 
             // audio net buffers
             if (fParams.fSendAudioChannels > 0) {
-
-                switch (fParams.fSampleEncoder) {
-
-                    case JackFloatEncoder:
-                        fNetAudioCaptureBuffer = new NetFloatAudioBuffer(&fParams, fParams.fSendAudioChannels, fTxData);
-                        break;
-
-                    case JackIntEncoder:
-                        fNetAudioCaptureBuffer = new NetIntAudioBuffer(&fParams, fParams.fSendAudioChannels, fTxData);
-                        break;
-
-                    case JackCeltEncoder:
-                    #if HAVE_CELT
-                        fNetAudioCaptureBuffer = new NetCeltAudioBuffer(&fParams, fParams.fSendAudioChannels, fTxData, fParams.fKBps);
-                    #endif
-                        break;
-                }
-
+                fNetAudioCaptureBuffer = AudioBufferFactory(fParams.fSendAudioChannels, fTxData);
                 assert(fNetAudioCaptureBuffer);
             }
 
             if (fParams.fReturnAudioChannels > 0) {
-
-                switch (fParams.fSampleEncoder) {
-
-                    case JackFloatEncoder:
-                        fNetAudioPlaybackBuffer = new NetFloatAudioBuffer(&fParams, fParams.fReturnAudioChannels, fRxData);
-                        break;
-
-                    case JackIntEncoder:
-                        fNetAudioPlaybackBuffer = new NetIntAudioBuffer(&fParams, fParams.fReturnAudioChannels, fRxData);
-                        break;
-
-                    case JackCeltEncoder:
-                    #if HAVE_CELT
-                        fNetAudioPlaybackBuffer = new NetCeltAudioBuffer(&fParams, fParams.fReturnAudioChannels, fRxData, fParams.fKBps);
-                    #endif
-                        break;
-                }
-
+                fNetAudioPlaybackBuffer = AudioBufferFactory(fParams.fReturnAudioChannels, fRxData);
                 assert(fNetAudioPlaybackBuffer);
             }
 
@@ -809,46 +793,12 @@ namespace Jack
 
             // audio net buffers
             if (fParams.fSendAudioChannels > 0) {
-
-                switch (fParams.fSampleEncoder) {
-
-                    case JackFloatEncoder:
-                        fNetAudioCaptureBuffer = new NetFloatAudioBuffer(&fParams, fParams.fSendAudioChannels, fRxData);
-                        break;
-
-                    case JackIntEncoder:
-                        fNetAudioCaptureBuffer = new NetIntAudioBuffer(&fParams, fParams.fSendAudioChannels, fRxData);
-                        break;
-
-                    case JackCeltEncoder:
-                    #if HAVE_CELT
-                        fNetAudioCaptureBuffer = new NetCeltAudioBuffer(&fParams, fParams.fSendAudioChannels, fRxData, fParams.fKBps);
-                    #endif
-                        break;
-                }
-
+                fNetAudioCaptureBuffer = AudioBufferFactory(fParams.fSendAudioChannels, fRxData);
                 assert(fNetAudioCaptureBuffer);
             }
 
             if (fParams.fReturnAudioChannels > 0) {
-
-                switch (fParams.fSampleEncoder) {
-
-                    case JackFloatEncoder:
-                        fNetAudioPlaybackBuffer = new NetFloatAudioBuffer(&fParams, fParams.fReturnAudioChannels, fTxData);
-                        break;
-
-                    case JackIntEncoder:
-                        fNetAudioPlaybackBuffer = new NetIntAudioBuffer(&fParams, fParams.fReturnAudioChannels, fTxData);
-                        break;
-
-                    case JackCeltEncoder:
-                    #if HAVE_CELT
-                        fNetAudioPlaybackBuffer = new NetCeltAudioBuffer(&fParams, fParams.fReturnAudioChannels, fTxData, fParams.fKBps);
-                    #endif
-                        break;
-                }
-
+                fNetAudioPlaybackBuffer = AudioBufferFactory(fParams.fReturnAudioChannels, fTxData);
                 assert(fNetAudioPlaybackBuffer);
             }
 

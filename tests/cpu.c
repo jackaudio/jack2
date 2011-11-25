@@ -96,7 +96,7 @@ int process(jack_nframes_t nframes, void *arg)
 
 void jack_shutdown(void *arg)
 {
-	printf("Jack_cpu has been kicked out by jackd !\n");
+	fprintf(stderr, "JACK shut down, exiting ...\n");
 	exit (1);
 }
 

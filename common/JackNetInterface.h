@@ -107,6 +107,8 @@ namespace Jack
 
             int FinishRecv(NetAudioBuffer* buffer);
 
+            NetAudioBuffer* AudioBufferFactory(int nports, char* buffer);
+
         public:
 
             JackNetInterface();

@@ -111,6 +111,7 @@ static int srate(jack_nframes_t nframes, void *arg)
 
 static void jack_shutdown(void *arg)
 {
+    fprintf(stderr, "JACK shut down, exiting ...\n");
 	exit(1);
 }
 

@@ -167,7 +167,7 @@ JackCoreMidiOutputPort::Init()
 {
     set_threaded_log_function();
 
-    // OSX only, values read in RT CoreMidi thread
+    // OSX only, values read in RT CoreMIDI thread
     UInt64 period = 0;
     UInt64 computation = 250 * 1000;
     UInt64 constraint = 500 * 1000;

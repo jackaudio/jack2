@@ -31,7 +31,7 @@ jack_tls_key JackGlobals::fKeyLogFunction;
 static bool fKeyLogFunctionInitialized = jack_tls_allocate_key(&JackGlobals::fKeyLogFunction);
 
 JackMutex* JackGlobals::fOpenMutex = new JackMutex();
-bool JackGlobals::fServerRunning = false;
+volatile bool JackGlobals::fServerRunning = false;
 JackClient* JackGlobals::fClientTable[CLIENT_NUM] = {};
 
 #ifndef WIN32

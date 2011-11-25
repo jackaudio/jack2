@@ -124,6 +124,7 @@ static void* jack_thread(void *arg)
 static void
 jack_shutdown (void *arg)
 {
+    fprintf(stderr, "JACK shut down, exiting ...\n");
 	exit (1);
 }
 

@@ -717,8 +717,7 @@ JackCoreMidiDriver::Write()
         }
         for (int i = 0; i < num_virtual_outputs; i++) {
             virtual_output_ports[i]->
-                ProcessJack(GetOutputBuffer(num_physical_outputs + i),
-                            buffer_size);
+                ProcessJack(GetOutputBuffer(num_physical_outputs + i), buffer_size);
         }
         Unlock();
         return 0;

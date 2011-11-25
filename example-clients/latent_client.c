@@ -77,6 +77,7 @@ latency_cb (jack_latency_callback_mode_t mode, void *arg)
 void
 jack_shutdown (void *arg)
 {
+    fprintf(stderr, "JACK shut down, exiting ...\n");
 	exit (1);
 }
 

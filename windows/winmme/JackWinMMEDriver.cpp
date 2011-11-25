@@ -357,7 +357,7 @@ extern "C"
 {
 #endif
 
-     // singleton kind of driver
+    // singleton kind of driver
     static Jack::JackDriverClientInterface* driver = NULL;
 
     SERVER_EXPORT jack_driver_desc_t * driver_get_descriptor()

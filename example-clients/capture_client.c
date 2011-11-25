@@ -158,9 +158,8 @@ process (jack_nframes_t nframes, void *arg)
 static void
 jack_shutdown (void *arg)
 {
-	fprintf (stderr, "JACK shutdown\n");
-	// exit (0);
-	abort();
+	fprintf(stderr, "JACK shut down, exiting ...\n");
+	exit(1);
 }
 
 static void

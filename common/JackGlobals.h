@@ -40,7 +40,7 @@ struct JackGlobals {
     static jack_tls_key fRealTime;
     static jack_tls_key fKeyLogFunction;
     static JackMutex* fOpenMutex;
-    static bool fServerRunning;
+    static volatile bool fServerRunning;
     static JackClient* fClientTable[];
     static bool fVerbose;
 #ifndef WIN32
