@@ -640,7 +640,7 @@ int JackClient::PortRegister(const char* port_name, const char* port_type, unsig
 {
     // Check if port name is empty
     string port_name_str = string(port_name);
-    if (port_name_str.size() == 0)
+    if (port_name_str.size() == 0) {
         jack_error("port_name is empty");
         return 0; // Means failure here...
     }
