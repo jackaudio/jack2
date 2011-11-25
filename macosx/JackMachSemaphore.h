@@ -39,7 +39,7 @@ class SERVER_EXPORT JackMachSemaphore : public detail::JackSynchro
     private:
 
         semaphore_t fSemaphore;
-        static mach_port_t fBootPort;
+        mach_port_t fBootPort;
 
     protected:
 
@@ -47,7 +47,7 @@ class SERVER_EXPORT JackMachSemaphore : public detail::JackSynchro
 
     public:
 
-        JackMachSemaphore():JackSynchro(), fSemaphore(0)
+        JackMachSemaphore():JackSynchro(), fSemaphore(0), fBootPort(0)
         {}
 
         bool Signal();
