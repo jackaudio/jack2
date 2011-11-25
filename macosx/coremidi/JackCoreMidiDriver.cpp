@@ -701,8 +701,10 @@ JackCoreMidiDriver::Read()
                 ProcessJack(GetInputBuffer(num_physical_inputs + i), buffer_size);
         }
         Unlock();
+        return 0;
+    } else {
+        return -1;
     }
-    return 0;
 }
 
 int
@@ -719,8 +721,10 @@ JackCoreMidiDriver::Write()
                             buffer_size);
         }
         Unlock();
+        return 0;
+    } else {
+        return -1;
     }
-    return 0;
 }
 
 #ifdef __cplusplus
