@@ -200,7 +200,7 @@ void JackMachSemaphore::Destroy()
     kern_return_t res;
 
     if (fSemaphore > 0) {
-        jack_log("JackMachSemaphore::Destroy");
+        jack_log("JackMachSemaphore::Destroy name = %s", fName);
         if ((res = semaphore_destroy(mach_task_self(), fSemaphore)) != KERN_SUCCESS) {
             jack_error("JackMachSemaphore::Destroy can't destroy semaphore err = %s", mach_error_string(res));
         }

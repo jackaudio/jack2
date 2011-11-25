@@ -80,6 +80,8 @@ JackCoreMidiDriver::JackCoreMidiDriver(const char *name, const char *alias,
     time_ratio = (((double) info.numer) / info.denom) / 1000.0;
     virtual_input_ports = 0;
     virtual_output_ports = 0;
+    internal_input = 0;
+    internal_output = 0;
 }
 
 JackCoreMidiDriver::~JackCoreMidiDriver()
@@ -107,17 +109,17 @@ bool JackCoreMidiDriver::OpenAux()
         return false;
     }
 
-    jack_log("MIDIClientCreate...");
     OSStatus status = MIDIClientCreate(name, HandleNotificationEvent, this,
                                        &client);
 
     CFRelease(name);
-    jack_log("MIDIClientCreate...OK");
+
     if (status != noErr) {
         WriteMacOSError("JackCoreMidiDriver::Open", "MIDIClientCreate",
                         status);
         return false;
     }
+
     char *client_name = fClientControl.fName;
 
     // Allocate and connect physical inputs
@@ -128,16 +130,18 @@ bool JackCoreMidiDriver::OpenAux()
         if (status != noErr) {
             WriteMacOSError("JackCoreMidiDriver::Open", "MIDIInputPortCreate",
                             status);
-            goto destroy_virtual_output_ports;
+            goto destroy;
         }
+
         try {
             physical_input_ports =
                 new JackCoreMidiPhysicalInputPort*[potential_pi_count];
         } catch (std::exception e) {
             jack_error("JackCoreMidiDriver::Open - while creating physical "
                        "input port array: %s", e.what());
-            goto destroy_internal_input_port;
+            goto destroy;
         }
+
         for (ItemCount i = 0; i < potential_pi_count; i++) {
             try {
                 physical_input_ports[pi_count] =
@@ -148,7 +152,7 @@ bool JackCoreMidiDriver::OpenAux()
             } catch (std::exception e) {
                 jack_error("JackCoreMidiDriver::Open - while creating "
                            "physical input port: %s", e.what());
-                goto destroy_internal_input_port;
+                goto destroy;
             }
             pi_count++;
         }
@@ -162,16 +166,18 @@ bool JackCoreMidiDriver::OpenAux()
         if (status != noErr) {
             WriteMacOSError("JackCoreMidiDriver::Open", "MIDIOutputPortCreate",
                             status);
-            goto destroy_physical_input_ports;
+            goto destroy;
         }
+
         try {
             physical_output_ports =
                 new JackCoreMidiPhysicalOutputPort*[potential_po_count];
         } catch (std::exception e) {
             jack_error("JackCoreMidiDriver::Open - while creating physical "
                        "output port array: %s", e.what());
-            goto destroy_internal_output_port;
+            goto destroy;
         }
+
         for (ItemCount i = 0; i < potential_po_count; i++) {
             try {
                 physical_output_ports[po_count] =
@@ -182,7 +188,7 @@ bool JackCoreMidiDriver::OpenAux()
             } catch (std::exception e) {
                 jack_error("JackCoreMidiDriver::Open - while creating "
                            "physical output port: %s", e.what());
-                goto destroy_internal_output_port;
+                goto destroy;
             }
             po_count++;
         }
@@ -196,7 +202,8 @@ bool JackCoreMidiDriver::OpenAux()
         } catch (std::exception e) {
             jack_error("JackCoreMidiDriver::Open - while creating virtual "
                        "input port array: %s", e.what());
-            goto destroy_client;
+            goto destroy;
+
         }
         for (vi_count = 0; vi_count < in_channels; vi_count++) {
             try {
@@ -208,7 +215,7 @@ bool JackCoreMidiDriver::OpenAux()
             } catch (std::exception e) {
                 jack_error("JackCoreMidiDriver::Open - while creating virtual "
                            "input port: %s", e.what());
-                goto destroy_virtual_input_ports;
+                goto destroy;
             }
         }
     }
@@ -221,7 +228,7 @@ bool JackCoreMidiDriver::OpenAux()
         } catch (std::exception e) {
             jack_error("JackCoreMidiDriver::Open - while creating virtual "
                        "output port array: %s", e.what());
-            goto destroy_virtual_input_ports;
+            goto destroy;
         }
         for (vo_count = 0; vo_count < out_channels; vo_count++) {
             try {
@@ -233,7 +240,7 @@ bool JackCoreMidiDriver::OpenAux()
             } catch (std::exception e) {
                 jack_error("JackCoreMidiDriver::Open - while creating virtual "
                            "output port: %s", e.what());
-                goto destroy_virtual_output_ports;
+                goto destroy;
             }
         }
     }
@@ -245,11 +252,11 @@ bool JackCoreMidiDriver::OpenAux()
     }
 
     if (! JackMidiDriver::Open(capturing, playing,
-                                      in_channels + pi_count,
-                                      out_channels + po_count, monitor,
-                                      capture_driver_name,
-                                      playback_driver_name, capture_latency,
-                                      playback_latency)) {
+                              in_channels + pi_count,
+                              out_channels + po_count, monitor,
+                              capture_driver_name,
+                              playback_driver_name, capture_latency,
+                              playback_latency)) {
         num_physical_inputs = pi_count;
         num_physical_outputs = po_count;
         num_virtual_inputs = in_channels;
@@ -257,20 +264,8 @@ bool JackCoreMidiDriver::OpenAux()
         return true;
     }
 
-    // Cleanup
-    if (physical_output_ports) {
-        for (int i = 0; i < po_count; i++) {
-            delete physical_output_ports[i];
-        }
-        delete[] physical_output_ports;
-        physical_output_ports = 0;
-    }
- destroy_internal_output_port:
-    status = MIDIPortDispose(internal_output);
-    if (status != noErr) {
-        WriteMacOSError("JackCoreMidiDriver::Open", "MIDIPortDispose", status);
-    }
- destroy_physical_input_ports:
+ destroy:
+
     if (physical_input_ports) {
         for (int i = 0; i < pi_count; i++) {
             delete physical_input_ports[i];
@@ -278,20 +273,15 @@ bool JackCoreMidiDriver::OpenAux()
         delete[] physical_input_ports;
         physical_input_ports = 0;
     }
- destroy_internal_input_port:
-    status = MIDIPortDispose(internal_input);
-    if (status != noErr) {
-        WriteMacOSError("JackCoreMidiDriver::Open", "MIDIPortDispose", status);
-    }
- destroy_virtual_output_ports:
-    if (virtual_output_ports) {
-        for (int i = 0; i < vo_count; i++) {
-            delete virtual_output_ports[i];
+
+    if (physical_output_ports) {
+        for (int i = 0; i < po_count; i++) {
+            delete physical_output_ports[i];
         }
-        delete[] virtual_output_ports;
-        virtual_output_ports = 0;
+        delete[] physical_output_ports;
+        physical_output_ports = 0;
     }
- destroy_virtual_input_ports:
+
     if (virtual_input_ports) {
         for (int i = 0; i < vi_count; i++) {
             delete virtual_input_ports[i];
@@ -299,14 +289,53 @@ bool JackCoreMidiDriver::OpenAux()
         delete[] virtual_input_ports;
         virtual_input_ports = 0;
     }
- destroy_client:
-    status = MIDIClientDispose(client);
-    if (status != noErr) {
-        WriteMacOSError("JackCoreMidiDriver::Open", "MIDIClientDispose",
-                        status);
+
+    if (virtual_output_ports) {
+        for (int i = 0; i < vo_count; i++) {
+            delete virtual_output_ports[i];
+        }
+        delete[] virtual_output_ports;
+        virtual_output_ports = 0;
     }
-    client = 0;
-    return false;
+
+    if (internal_output) {
+        status = MIDIPortDispose(internal_output);
+        if (status != noErr) {
+            WriteMacOSError("JackCoreMidiDriver::Open", "MIDIPortDispose", status);
+        }
+    }
+
+    if (internal_input) {
+        status = MIDIPortDispose(internal_input);
+        if (status != noErr) {
+            WriteMacOSError("JackCoreMidiDriver::Open", "MIDIPortDispose", status);
+        }
+    }
+
+    if (client) {
+        status = MIDIClientDispose(client);
+        if (status != noErr) {
+            WriteMacOSError("JackCoreMidiDriver::Open", "MIDIClientDispose",
+                            status);
+        }
+    }
+
+    // Default open
+    if (! JackMidiDriver::Open(capturing, playing,
+                              in_channels + pi_count,
+                              out_channels + po_count, monitor,
+                              capture_driver_name,
+                              playback_driver_name, capture_latency,
+                              playback_latency)) {
+        client = 0;
+        num_physical_inputs = 0;
+        num_physical_outputs = 0;
+        num_virtual_inputs = 0;
+        num_virtual_outputs = 0;
+       return true;
+    } else {
+        return false;
+    }
 }
 
 bool JackCoreMidiDriver::Execute()
@@ -432,11 +461,14 @@ JackCoreMidiDriver::CloseAux()
         delete[] physical_input_ports;
         num_physical_inputs = 0;
         physical_input_ports = 0;
-        status = MIDIPortDispose(internal_input);
-        if (status != noErr) {
-            WriteMacOSError("JackCoreMidiDriver::Close", "MIDIPortDispose",
-                            status);
-            result = -1;
+        if (internal_input) {
+            status = MIDIPortDispose(internal_input);
+            if (status != noErr) {
+                WriteMacOSError("JackCoreMidiDriver::Close", "MIDIPortDispose",
+                                status);
+                result = -1;
+            }
+            internal_input = 0;
         }
     }
     if (physical_output_ports) {
@@ -446,11 +478,14 @@ JackCoreMidiDriver::CloseAux()
         delete[] physical_output_ports;
         num_physical_outputs = 0;
         physical_output_ports = 0;
-        status = MIDIPortDispose(internal_output);
-        if (status != noErr) {
-            WriteMacOSError("JackCoreMidiDriver::Close", "MIDIPortDispose",
-                            status);
-            result = -1;
+        if (internal_output) {
+            status = MIDIPortDispose(internal_output);
+            if (status != noErr) {
+                WriteMacOSError("JackCoreMidiDriver::Close", "MIDIPortDispose",
+                                status);
+                result = -1;
+            }
+            internal_output = 0;
         }
     }
     if (virtual_input_ports) {
@@ -469,6 +504,7 @@ JackCoreMidiDriver::CloseAux()
         num_virtual_outputs = 0;
         virtual_output_ports = 0;
     }
+
     if (client) {
         status = MIDIClientDispose(client);
         if (status != noErr) {
@@ -693,41 +729,57 @@ JackCoreMidiDriver::Stop()
 }
 
 int
+JackCoreMidiDriver::ProcessRead()
+{
+    int res;
+    if (Trylock()) {
+        res = (fEngineControl->fSyncMode) ? ProcessReadSync() : ProcessReadAsync();
+        Unlock();
+    } else {
+        res = -1;
+    }
+    return res;
+}
+
+int
+JackCoreMidiDriver::ProcessWrite()
+{
+    int res;
+    if (Trylock()) {
+        res = (fEngineControl->fSyncMode) ? ProcessWriteSync() : ProcessWriteAsync();
+        Unlock();
+    } else {
+        res = -1;
+    }
+    return res;
+}
+
+int
 JackCoreMidiDriver::Read()
 {
-    if (Trylock()) {
-        jack_nframes_t buffer_size = fEngineControl->fBufferSize;
-        for (int i = 0; i < num_physical_inputs; i++) {
-            physical_input_ports[i]->ProcessJack(GetInputBuffer(i), buffer_size);
-        }
-        for (int i = 0; i < num_virtual_inputs; i++) {
-            virtual_input_ports[i]->
-                ProcessJack(GetInputBuffer(num_physical_inputs + i), buffer_size);
-        }
-        Unlock();
-        return 0;
-    } else {
-        return -1;
+    jack_nframes_t buffer_size = fEngineControl->fBufferSize;
+    for (int i = 0; i < num_physical_inputs; i++) {
+        physical_input_ports[i]->ProcessJack(GetInputBuffer(i), buffer_size);
     }
+    for (int i = 0; i < num_virtual_inputs; i++) {
+        virtual_input_ports[i]->
+            ProcessJack(GetInputBuffer(num_physical_inputs + i), buffer_size);
+    }
+    return 0;
 }
 
 int
 JackCoreMidiDriver::Write()
 {
-    if (Trylock()) {
-        jack_nframes_t buffer_size = fEngineControl->fBufferSize;
-        for (int i = 0; i < num_physical_outputs; i++) {
-            physical_output_ports[i]->ProcessJack(GetOutputBuffer(i), buffer_size);
-        }
-        for (int i = 0; i < num_virtual_outputs; i++) {
-            virtual_output_ports[i]->
-                ProcessJack(GetOutputBuffer(num_physical_outputs + i), buffer_size);
-        }
-        Unlock();
-        return 0;
-    } else {
-        return -1;
+    jack_nframes_t buffer_size = fEngineControl->fBufferSize;
+    for (int i = 0; i < num_physical_outputs; i++) {
+        physical_output_ports[i]->ProcessJack(GetOutputBuffer(i), buffer_size);
     }
+    for (int i = 0; i < num_virtual_outputs; i++) {
+        virtual_output_ports[i]->
+            ProcessJack(GetOutputBuffer(num_physical_outputs + i), buffer_size);
+    }
+    return 0;
 }
 
 #ifdef __cplusplus

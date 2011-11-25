@@ -95,6 +95,9 @@ namespace Jack {
         int
         Write();
 
+        int ProcessRead();
+        int ProcessWrite();
+
         // JackRunnableInterface interface
         bool Init();
         bool Execute();
