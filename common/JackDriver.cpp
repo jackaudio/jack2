@@ -461,8 +461,8 @@ void JackDriver::SaveConnections()
 {
     const char** connections;
     fConnections.clear();
-    char alias1[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-    char alias2[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
+    char alias1[REAL_JACK_PORT_NAME_SIZE];
+    char alias2[REAL_JACK_PORT_NAME_SIZE];
     char* aliases[2];
 
     aliases[0] = alias1;

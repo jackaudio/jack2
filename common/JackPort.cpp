@@ -225,7 +225,7 @@ void JackPort::SetName(const char* new_name)
 
 bool JackPort::NameEquals(const char* target)
 {
-    char buf[JACK_PORT_NAME_SIZE + 1];
+    char buf[REAL_JACK_PORT_NAME_SIZE];
 
     /* this nasty, nasty kludge is here because between 0.109.0 and 0.109.1,
        the ALSA audio backend had the name "ALSA", whereas as before and
@@ -249,12 +249,12 @@ int JackPort::GetAliases(char* const aliases[2])
     int cnt = 0;
 
     if (fAlias1[0] != '\0') {
-        snprintf(aliases[0], JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE, "%s", fAlias1);
+        snprintf(aliases[0], REAL_JACK_PORT_NAME_SIZE, "%s", fAlias1);
         cnt++;
     }
 
     if (fAlias2[0] != '\0') {
-        snprintf(aliases[1], JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE, "%s", fAlias2);
+        snprintf(aliases[1], REAL_JACK_PORT_NAME_SIZE, "%s", fAlias2);
         cnt++;
     }
 

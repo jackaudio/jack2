@@ -640,14 +640,14 @@ int JackClient::PortRegister(const char* port_name, const char* port_type, unsig
 {
     // Check if port name is empty
     string port_name_str = string(port_name);
-    if (port_name_str.size() == 0) {
+    if (port_name_str.size() == 0)
         jack_error("port_name is empty");
         return 0; // Means failure here...
     }
 
     // Check port name length
     string name = string(GetClientControl()->fName) + string(":") + port_name_str;
-    if (name.size() >= JACK_PORT_NAME_SIZE) {
+    if (name.size() >= REAL_JACK_PORT_NAME_SIZE) {
         jack_error("\"%s:%s\" is too long to be used as a JACK port name.\n"
                    "Please use %lu characters or less",
                    GetClientControl()->fName,

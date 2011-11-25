@@ -62,7 +62,7 @@ JackCoreMidiPort::Initialize(const char *alias_name, const char *client_name,
                              const char *driver_name, int index,
                              MIDIEndpointRef endpoint, bool is_output)
 {
-    char endpoint_name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
+    char endpoint_name[REAL_JACK_PORT_NAME_SIZE];
     CFStringRef endpoint_name_ref;
     int num = index + 1;
     Boolean res;

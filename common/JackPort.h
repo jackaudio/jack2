@@ -45,9 +45,9 @@ class SERVER_EXPORT JackPort
 
         int fTypeId;
         enum JackPortFlags fFlags;
-        char fName[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-        char fAlias1[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-        char fAlias2[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
+        char fName[REAL_JACK_PORT_NAME_SIZE];
+        char fAlias1[REAL_JACK_PORT_NAME_SIZE];
+        char fAlias2[REAL_JACK_PORT_NAME_SIZE];
         int fRefNum;
 
         jack_nframes_t fLatency;

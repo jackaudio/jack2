@@ -245,8 +245,8 @@ namespace Jack
 
         JackPort* port;
         jack_port_id_t port_index;
-        char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-        char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
+        char name[REAL_JACK_PORT_NAME_SIZE];
+        char alias[REAL_JACK_PORT_NAME_SIZE];
         int audio_port_index;
         int midi_port_index;
         jack_latency_range_t range;

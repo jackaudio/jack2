@@ -669,8 +669,8 @@ int JackFreebobDriver::Attach()
     JackPort* port;
     jack_port_id_t port_index;
 
-    char buf[JACK_PORT_NAME_SIZE];
-    char portname[JACK_PORT_NAME_SIZE];
+    char buf[REAL_JACK_PORT_NAME_SIZE];
+    char portname[REAL_JACK_PORT_NAME_SIZE];
     jack_latency_range_t range;
 
     freebob_driver_t* driver = (freebob_driver_t*)fDriver;

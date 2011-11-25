@@ -921,7 +921,7 @@ int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t ds
 
 int JackEngine::PortRename(int refnum, jack_port_id_t port, const char* name)
 {
-    char old_name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
+    char old_name[REAL_JACK_PORT_NAME_SIZE];
     strcpy(old_name, fGraphManager->GetPort(port)->GetName());
     fGraphManager->GetPort(port)->SetName(name);
     NotifyPortRename(port, old_name);
