@@ -237,8 +237,8 @@ namespace Jack
             case JackIntEncoder:
                 return new NetIntAudioBuffer(&fParams, nports, buffer);
 
-            case JackCeltEncoder:
             #if HAVE_CELT
+            case JackCeltEncoder:
                 return new NetCeltAudioBuffer(&fParams, nports, buffer, fParams.fKBps);
             #endif
         }
