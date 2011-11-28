@@ -187,6 +187,7 @@ destroy_semaphore(semaphore_t semaphore, int id)
     {
         char name[128];
         sprintf(name, "midi_sem_%d", id);
+        sem_close(semaphore);
         sem_unlink(name);
     }
 #else
