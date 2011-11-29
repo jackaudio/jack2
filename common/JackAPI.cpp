@@ -1756,14 +1756,16 @@ LIB_EXPORT int jack_client_max_real_time_priority(jack_client_t* ext_client)
         return -1;
     } else {
         JackEngineControl* control = GetEngineControl();
-       return (control->fRealTime) ? control->fMaxClientPriority : -1;
+        return (control->fRealTime) ? control->fMaxClientPriority : -1;
     }
 }
 
 LIB_EXPORT int jack_acquire_real_time_scheduling(jack_native_thread_t thread, int priority)
 {
     JackEngineControl* control = GetEngineControl();
-    return (control ? JackThread::AcquireRealTimeImp(thread, priority, GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint) : -1);
+    return (control
+        ? JackThread::AcquireRealTimeImp(thread, priority, control->fPeriod, control->fComputation, control->fConstraint)
+        : -1);
 }
 
 LIB_EXPORT int jack_client_create_thread(jack_client_t* client,
@@ -1779,10 +1781,7 @@ LIB_EXPORT int jack_client_create_thread(jack_client_t* client,
     JackEngineControl* control = GetEngineControl();
     int res = JackThread::StartImp(thread, priority, realtime, routine, arg);
     return (res == 0)
-        ? ((realtime ? JackThread::AcquireRealTimeImp(*thread, priority,
-            GetEngineControl()->fPeriod,
-            GetEngineControl()->fComputation,
-            GetEngineControl()->fConstraint) : res))
+        ? ((realtime ? JackThread::AcquireRealTimeImp(*thread, priority, control->fPeriod, control->fComputation, control->fConstraint) : res))
         : res;
 }
 

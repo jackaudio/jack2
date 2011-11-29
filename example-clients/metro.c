@@ -190,12 +190,12 @@ main (int argc, char *argv[])
 				fprintf (stderr, "invalid bpm\n");
 				return -1;
 			}
-			bpm_string = (char *) malloc ((strlen (optarg) + 4) * sizeof (char));
+			bpm_string = (char *) malloc ((strlen (optarg) + 5) * sizeof (char));
 			strcpy (bpm_string, optarg);
 			strcat (bpm_string, "_bpm");
 			break;
 		case 'n':
-			client_name = (char *) malloc (strlen (optarg) * sizeof (char));
+			client_name = (char *) malloc ((strlen (optarg) + 1) * sizeof (char));
 			strcpy (client_name, optarg);
 			break;
 		case 'v':

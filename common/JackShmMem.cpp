@@ -61,12 +61,12 @@ void* JackShmMem::operator new(size_t size)
     snprintf(name, sizeof(name), "/jack_shared%d", fSegmentNum++);
 
     if (jack_shmalloc(name, size, &info)) {
-        jack_error("cannot create shared memory segment of size = %d", size, strerror(errno));
+        jack_error("Cannot create shared memory segment of size = %d", size, strerror(errno));
         goto error;
     }
 
     if (jack_attach_shm(&info)) {
-        jack_error("cannot attach shared memory segment name = %s err = %s", name, strerror(errno));
+        jack_error("Cannot attach shared memory segment name = %s err = %s", name, strerror(errno));
         jack_destroy_shm(&info);
         goto error;
     }

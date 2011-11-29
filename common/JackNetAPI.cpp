@@ -26,7 +26,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackException.h"
 #include "JackAudioAdapterInterface.h"
 
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -297,7 +296,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
 
     void AllocPorts()
     {
-         // Set buffers
+        // Set buffers
         if (fParams.fSendAudioChannels > 0) {
             fAudioCaptureBuffer = new float*[fParams.fSendAudioChannels];
             for (int audio_port_index = 0; audio_port_index < fParams.fSendAudioChannels; audio_port_index++) {
@@ -363,7 +362,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
     }
 
     int Read(int audio_input, float** audio_input_buffer, int midi_input, void** midi_input_buffer)
-     {
+    {
         try {
             assert(audio_input == fParams.fReturnAudioChannels);
 

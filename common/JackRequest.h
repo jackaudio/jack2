@@ -91,7 +91,7 @@ struct JackRequest
 
     RequestType fType;
 
-    JackRequest()
+    JackRequest(): fType((RequestType)0)
     {}
 
     JackRequest(RequestType type): fType(type)
