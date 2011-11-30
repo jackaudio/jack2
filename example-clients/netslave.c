@@ -80,10 +80,10 @@ main (int argc, char *argv[])
     int audio_input = 2;
     int audio_output = 2;
     int udp_port = DEFAULT_PORT;
-    char* multicast_ip = DEFAULT_MULTICAST_IP;
- 	const char *options = "C:P:a:p:h";
+    const char* multicast_ip = DEFAULT_MULTICAST_IP;
+    const char *options = "C:P:a:p:h";
     int option_index;
-	int opt;
+    int opt;
 
 	struct option long_options[] =
 	{

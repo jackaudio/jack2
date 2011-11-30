@@ -58,7 +58,7 @@ main (int argc, char *argv[])
     int buffer_size = BUFFER_SIZE;
     int sample_rate = SAMPLE_RATE;
     int udp_port = DEFAULT_PORT;
-    char* multicast_ip = DEFAULT_MULTICAST_IP;
+    const char* multicast_ip = DEFAULT_MULTICAST_IP;
  	const char *options = "b:r:a:p:h";
     int option_index;
 	int opt;
@@ -127,14 +127,14 @@ main (int argc, char *argv[])
 #endif
 
     // Allocate buffers
-    audio_input_buffer = calloc(result.audio_input, sizeof(float*));
+    audio_input_buffer = (float**)calloc(result.audio_input, sizeof(float*));
     for (i = 0; i < result.audio_input; i++) {
-        audio_input_buffer[i] = calloc(buffer_size, sizeof(float));
+        audio_input_buffer[i] = (float*)calloc(buffer_size, sizeof(float));
     }
 
-    audio_output_buffer = calloc(result.audio_output, sizeof(float*));
+    audio_output_buffer = (float**)calloc(result.audio_output, sizeof(float*));
     for (i = 0; i < result.audio_output; i++) {
-        audio_output_buffer[i] = calloc(buffer_size, sizeof(float));
+        audio_output_buffer[i] = (float*)calloc(buffer_size, sizeof(float));
     }
 
     /*
