@@ -441,7 +441,7 @@ namespace Jack
     {
         if (fPortBuffer[active_port]) {
             jack_default_audio_sample_t* src = (jack_default_audio_sample_t*)(net_buffer);
-            jack_default_audio_sample_t* dst = (jack_default_audio_sample_t*)(fPortBuffer[active_port] + sub_cycle * fSubPeriodSize;
+            jack_default_audio_sample_t* dst = (jack_default_audio_sample_t*)(fPortBuffer[active_port] + sub_cycle * fSubPeriodSize);
             for (unsigned int sample = 0; sample < (fSubPeriodBytesSize -  sizeof(int)) / sizeof(jack_default_audio_sample_t); sample++) {
                 dst[sample] = SwapFloat(src[sample]);
             }
