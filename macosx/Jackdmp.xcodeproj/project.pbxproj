@@ -1559,24 +1559,6 @@
 		4B05A0830DF72BC000840F4C /* freebob_driver.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = freebob_driver.h; path = ../linux/freebob/freebob_driver.h; sourceTree = SOURCE_ROOT; };
 		4B05A0840DF72BC000840F4C /* JackFreebobDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackFreebobDriver.cpp; path = ../linux/freebob/JackFreebobDriver.cpp; sourceTree = SOURCE_ROOT; };
 		4B05A0850DF72BC000840F4C /* JackFreebobDriver.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackFreebobDriver.h; path = ../linux/freebob/JackFreebobDriver.h; sourceTree = SOURCE_ROOT; };
-		4B05A08B0DF72C3200840F4C /* JackWinEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinEvent.cpp; path = ../windows/JackWinEvent.cpp; sourceTree = SOURCE_ROOT; };
-		4B05A08C0DF72C3200840F4C /* JackWinEvent.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackWinEvent.h; path = ../windows/JackWinEvent.h; sourceTree = SOURCE_ROOT; };
-		4B05A08D0DF72C3200840F4C /* JackWinNamedPipe.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinNamedPipe.cpp; path = ../windows/JackWinNamedPipe.cpp; sourceTree = SOURCE_ROOT; };
-		4B05A08E0DF72C3200840F4C /* JackWinNamedPipe.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackWinNamedPipe.h; path = ../windows/JackWinNamedPipe.h; sourceTree = SOURCE_ROOT; };
-		4B05A08F0DF72C3200840F4C /* JackWinNamedPipeClientChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinNamedPipeClientChannel.cpp; path = ../windows/JackWinNamedPipeClientChannel.cpp; sourceTree = SOURCE_ROOT; };
-		4B05A0900DF72C3200840F4C /* JackWinNamedPipeClientChannel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackWinNamedPipeClientChannel.h; path = ../windows/JackWinNamedPipeClientChannel.h; sourceTree = SOURCE_ROOT; };
-		4B05A0910DF72C3200840F4C /* JackWinNamedPipeNotifyChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinNamedPipeNotifyChannel.cpp; path = ../windows/JackWinNamedPipeNotifyChannel.cpp; sourceTree = SOURCE_ROOT; };
-		4B05A0920DF72C3200840F4C /* JackWinNamedPipeNotifyChannel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackWinNamedPipeNotifyChannel.h; path = ../windows/JackWinNamedPipeNotifyChannel.h; sourceTree = SOURCE_ROOT; };
-		4B05A0930DF72C3200840F4C /* JackWinNamedPipeServerChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinNamedPipeServerChannel.cpp; path = ../windows/JackWinNamedPipeServerChannel.cpp; sourceTree = SOURCE_ROOT; };
-		4B05A0940DF72C3200840F4C /* JackWinNamedPipeServerChannel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackWinNamedPipeServerChannel.h; path = ../windows/JackWinNamedPipeServerChannel.h; sourceTree = SOURCE_ROOT; };
-		4B05A0950DF72C3200840F4C /* JackWinNamedPipeServerNotifyChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinNamedPipeServerNotifyChannel.cpp; path = ../windows/JackWinNamedPipeServerNotifyChannel.cpp; sourceTree = SOURCE_ROOT; };
-		4B05A0960DF72C3200840F4C /* JackWinNamedPipeServerNotifyChannel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackWinNamedPipeServerNotifyChannel.h; path = ../windows/JackWinNamedPipeServerNotifyChannel.h; sourceTree = SOURCE_ROOT; };
-		4B05A0970DF72C3200840F4C /* JackWinProcessSync.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinProcessSync.cpp; path = ../windows/JackWinProcessSync.cpp; sourceTree = SOURCE_ROOT; };
-		4B05A0980DF72C3200840F4C /* JackWinProcessSync.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackWinProcessSync.h; path = ../windows/JackWinProcessSync.h; sourceTree = SOURCE_ROOT; };
-		4B05A0990DF72C3200840F4C /* JackWinSemaphore.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinSemaphore.cpp; path = ../windows/JackWinSemaphore.cpp; sourceTree = SOURCE_ROOT; };
-		4B05A09A0DF72C3200840F4C /* JackWinSemaphore.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackWinSemaphore.h; path = ../windows/JackWinSemaphore.h; sourceTree = SOURCE_ROOT; };
-		4B05A09B0DF72C3200840F4C /* JackWinThread.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinThread.cpp; path = ../windows/JackWinThread.cpp; sourceTree = SOURCE_ROOT; };
-		4B05A09C0DF72C3200840F4C /* JackWinThread.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackWinThread.h; path = ../windows/JackWinThread.h; sourceTree = SOURCE_ROOT; };
 		4B0A28E60D52073D002EFF74 /* jack_thread_wait */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_thread_wait; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B0A28EC0D520852002EFF74 /* tw.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tw.c; path = "../example-clients/tw.c"; sourceTree = SOURCE_ROOT; };
 		4B0A292D0D52108E002EFF74 /* jack_thread_wait */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_thread_wait; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1717,6 +1699,57 @@
 		4B43A8E71014615800E52943 /* jack_loopback.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = jack_loopback.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B464301076CAC7700E5077C /* Jack-Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = "Jack-Info.plist"; sourceTree = SOURCE_ROOT; };
 		4B47ACD710B5890100469C67 /* Jackmp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Jackmp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B49D3B314864D41003390F8 /* JackWinMMEDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinMMEDriver.cpp; path = ../windows/winmme/JackWinMMEDriver.cpp; sourceTree = SOURCE_ROOT; };
+		4B49D3B414864D41003390F8 /* JackWinMMEDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackWinMMEDriver.h; path = ../windows/winmme/JackWinMMEDriver.h; sourceTree = SOURCE_ROOT; };
+		4B49D3B514864D41003390F8 /* JackWinMMEInputPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinMMEInputPort.cpp; path = ../windows/winmme/JackWinMMEInputPort.cpp; sourceTree = SOURCE_ROOT; };
+		4B49D3B614864D41003390F8 /* JackWinMMEInputPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackWinMMEInputPort.h; path = ../windows/winmme/JackWinMMEInputPort.h; sourceTree = SOURCE_ROOT; };
+		4B49D3B714864D41003390F8 /* JackWinMMEOutputPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinMMEOutputPort.cpp; path = ../windows/winmme/JackWinMMEOutputPort.cpp; sourceTree = SOURCE_ROOT; };
+		4B49D3B814864D41003390F8 /* JackWinMMEOutputPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackWinMMEOutputPort.h; path = ../windows/winmme/JackWinMMEOutputPort.h; sourceTree = SOURCE_ROOT; };
+		4B49D3B914864D41003390F8 /* JackWinMMEPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinMMEPort.cpp; path = ../windows/winmme/JackWinMMEPort.cpp; sourceTree = SOURCE_ROOT; };
+		4B49D3BA14864D41003390F8 /* JackWinMMEPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackWinMMEPort.h; path = ../windows/winmme/JackWinMMEPort.h; sourceTree = SOURCE_ROOT; };
+		4B49D3BC14864D49003390F8 /* JackPortAudioAdapter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackPortAudioAdapter.cpp; path = ../windows/portaudio/JackPortAudioAdapter.cpp; sourceTree = SOURCE_ROOT; };
+		4B49D3BD14864D49003390F8 /* JackPortAudioAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackPortAudioAdapter.h; path = ../windows/portaudio/JackPortAudioAdapter.h; sourceTree = SOURCE_ROOT; };
+		4B49D3BE14864D49003390F8 /* JackPortAudioDevices.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackPortAudioDevices.cpp; path = ../windows/portaudio/JackPortAudioDevices.cpp; sourceTree = SOURCE_ROOT; };
+		4B49D3BF14864D49003390F8 /* JackPortAudioDevices.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackPortAudioDevices.h; path = ../windows/portaudio/JackPortAudioDevices.h; sourceTree = SOURCE_ROOT; };
+		4B49D3C014864D49003390F8 /* JackPortAudioDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackPortAudioDriver.cpp; path = ../windows/portaudio/JackPortAudioDriver.cpp; sourceTree = SOURCE_ROOT; };
+		4B49D3C114864D49003390F8 /* JackPortAudioDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackPortAudioDriver.h; path = ../windows/portaudio/JackPortAudioDriver.h; sourceTree = SOURCE_ROOT; };
+		4B49D3C214864D49003390F8 /* pa_asio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pa_asio.h; path = ../windows/portaudio/pa_asio.h; sourceTree = SOURCE_ROOT; };
+		4B49D3C314864D49003390F8 /* portaudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = portaudio.h; path = ../windows/portaudio/portaudio.h; sourceTree = SOURCE_ROOT; };
+		4B49D3C914864DA7003390F8 /* JackLinuxTime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = JackLinuxTime.c; path = ../linux/JackLinuxTime.c; sourceTree = SOURCE_ROOT; };
+		4B49D3CA14864DB2003390F8 /* JackAtomic_os.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackAtomic_os.h; path = ../linux/JackAtomic_os.h; sourceTree = SOURCE_ROOT; };
+		4B49D3CB14864DB2003390F8 /* cycles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cycles.h; path = ../linux/cycles.h; sourceTree = SOURCE_ROOT; };
+		4B49D3CC14864DB2003390F8 /* JackPlatformPlug_os.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackPlatformPlug_os.h; path = ../linux/JackPlatformPlug_os.h; sourceTree = SOURCE_ROOT; };
+		4B49D3D814864DEC003390F8 /* JackWinThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinThread.cpp; path = ../windows/JackWinThread.cpp; sourceTree = SOURCE_ROOT; };
+		4B49D3D914864DEC003390F8 /* JackWinServerLaunch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinServerLaunch.cpp; path = ../windows/JackWinServerLaunch.cpp; sourceTree = SOURCE_ROOT; };
+		4B49D3DA14864DEC003390F8 /* JackWinSemaphore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinSemaphore.cpp; path = ../windows/JackWinSemaphore.cpp; sourceTree = SOURCE_ROOT; };
+		4B49D3DB14864DEC003390F8 /* JackWinProcessSync.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinProcessSync.cpp; path = ../windows/JackWinProcessSync.cpp; sourceTree = SOURCE_ROOT; };
+		4B49D3DC14864DEC003390F8 /* JackWinNamedPipeServerNotifyChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinNamedPipeServerNotifyChannel.cpp; path = ../windows/JackWinNamedPipeServerNotifyChannel.cpp; sourceTree = SOURCE_ROOT; };
+		4B49D3DD14864DEC003390F8 /* JackWinNamedPipeServerChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinNamedPipeServerChannel.cpp; path = ../windows/JackWinNamedPipeServerChannel.cpp; sourceTree = SOURCE_ROOT; };
+		4B49D3DE14864DEC003390F8 /* JackWinNamedPipeNotifyChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinNamedPipeNotifyChannel.cpp; path = ../windows/JackWinNamedPipeNotifyChannel.cpp; sourceTree = SOURCE_ROOT; };
+		4B49D3DF14864DEC003390F8 /* JackWinNamedPipeClientChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinNamedPipeClientChannel.cpp; path = ../windows/JackWinNamedPipeClientChannel.cpp; sourceTree = SOURCE_ROOT; };
+		4B49D3E014864DED003390F8 /* JackWinNamedPipe.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinNamedPipe.cpp; path = ../windows/JackWinNamedPipe.cpp; sourceTree = SOURCE_ROOT; };
+		4B49D3E114864DED003390F8 /* JackWinEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinEvent.cpp; path = ../windows/JackWinEvent.cpp; sourceTree = SOURCE_ROOT; };
+		4B49D3E214864DED003390F8 /* JackNetWinSocket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackNetWinSocket.cpp; path = ../windows/JackNetWinSocket.cpp; sourceTree = SOURCE_ROOT; };
+		4B49D3E314864DED003390F8 /* JackMMCSS.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackMMCSS.cpp; path = ../windows/JackMMCSS.cpp; sourceTree = SOURCE_ROOT; };
+		4B49D3E414864DED003390F8 /* JackWinTime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = JackWinTime.c; path = ../windows/JackWinTime.c; sourceTree = SOURCE_ROOT; };
+		4B49D3EA14864DED003390F8 /* JackWinThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackWinThread.h; path = ../windows/JackWinThread.h; sourceTree = SOURCE_ROOT; };
+		4B49D3EB14864DED003390F8 /* JackWinSemaphore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackWinSemaphore.h; path = ../windows/JackWinSemaphore.h; sourceTree = SOURCE_ROOT; };
+		4B49D3EC14864DED003390F8 /* JackWinProcessSync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackWinProcessSync.h; path = ../windows/JackWinProcessSync.h; sourceTree = SOURCE_ROOT; };
+		4B49D3ED14864DED003390F8 /* JackWinNamedPipeServerNotifyChannel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackWinNamedPipeServerNotifyChannel.h; path = ../windows/JackWinNamedPipeServerNotifyChannel.h; sourceTree = SOURCE_ROOT; };
+		4B49D3EE14864DED003390F8 /* JackWinNamedPipeServerChannel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackWinNamedPipeServerChannel.h; path = ../windows/JackWinNamedPipeServerChannel.h; sourceTree = SOURCE_ROOT; };
+		4B49D3EF14864DED003390F8 /* JackWinNamedPipeNotifyChannel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackWinNamedPipeNotifyChannel.h; path = ../windows/JackWinNamedPipeNotifyChannel.h; sourceTree = SOURCE_ROOT; };
+		4B49D3F014864DED003390F8 /* JackWinNamedPipeClientChannel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackWinNamedPipeClientChannel.h; path = ../windows/JackWinNamedPipeClientChannel.h; sourceTree = SOURCE_ROOT; };
+		4B49D3F114864DED003390F8 /* JackWinNamedPipe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackWinNamedPipe.h; path = ../windows/JackWinNamedPipe.h; sourceTree = SOURCE_ROOT; };
+		4B49D3F214864DED003390F8 /* JackWinMutex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackWinMutex.h; path = ../windows/JackWinMutex.h; sourceTree = SOURCE_ROOT; };
+		4B49D3F314864DED003390F8 /* JackWinEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackWinEvent.h; path = ../windows/JackWinEvent.h; sourceTree = SOURCE_ROOT; };
+		4B49D3F414864DED003390F8 /* JackTypes_os.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackTypes_os.h; path = ../windows/JackTypes_os.h; sourceTree = SOURCE_ROOT; };
+		4B49D3F514864DED003390F8 /* JackSystemDeps_os.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackSystemDeps_os.h; path = ../windows/JackSystemDeps_os.h; sourceTree = SOURCE_ROOT; };
+		4B49D3F614864DED003390F8 /* JackShmMem_os.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackShmMem_os.h; path = ../windows/JackShmMem_os.h; sourceTree = SOURCE_ROOT; };
+		4B49D3F714864DED003390F8 /* JackPlatformPlug_os.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackPlatformPlug_os.h; path = ../windows/JackPlatformPlug_os.h; sourceTree = SOURCE_ROOT; };
+		4B49D3F814864DED003390F8 /* JackNetWinSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackNetWinSocket.h; path = ../windows/JackNetWinSocket.h; sourceTree = SOURCE_ROOT; };
+		4B49D3F914864DED003390F8 /* JackMMCSS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackMMCSS.h; path = ../windows/JackMMCSS.h; sourceTree = SOURCE_ROOT; };
+		4B49D3FA14864DED003390F8 /* JackCompilerDeps_os.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackCompilerDeps_os.h; path = ../windows/JackCompilerDeps_os.h; sourceTree = SOURCE_ROOT; };
+		4B49D3FB14864DED003390F8 /* JackAtomic_os.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackAtomic_os.h; path = ../windows/JackAtomic_os.h; sourceTree = SOURCE_ROOT; };
 		4B4CA9730E02CF9600F4BFDA /* JackRestartThreadedDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackRestartThreadedDriver.h; path = ../common/JackRestartThreadedDriver.h; sourceTree = SOURCE_ROOT; };
 		4B4CA9740E02CF9600F4BFDA /* JackRestartThreadedDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackRestartThreadedDriver.cpp; path = ../common/JackRestartThreadedDriver.cpp; sourceTree = SOURCE_ROOT; };
 		4B4E9AF80E5F1090000A3278 /* JackControlAPI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackControlAPI.cpp; path = ../common/JackControlAPI.cpp; sourceTree = SOURCE_ROOT; };
@@ -1785,7 +1818,7 @@
 		4B98AE010931D30C0091932A /* JackDebugClient.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackDebugClient.h; path = ../common/JackDebugClient.h; sourceTree = SOURCE_ROOT; };
 		4B9A25B30DBF8330006E9FBC /* JackError.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackError.cpp; path = ../common/JackError.cpp; sourceTree = SOURCE_ROOT; };
 		4B9A26000DBF8584006E9FBC /* jslist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = jslist.h; path = ../common/jack/jslist.h; sourceTree = SOURCE_ROOT; };
-		4BA2574C132FB49B009F2D3F /* alsa_driver.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = alsa_driver.c; path = ../linux/alsa/alsa_driver.c; sourceTree = SOURCE_ROOT; };
+		4BA2574C132FB49B009F2D3F /* alsa_driver.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = alsa_driver.c; sourceTree = "<group>"; };
 		4BA339AC10B2E36800190E3B /* Jackservermp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Jackservermp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BA577BC08BF8BE200F82DE1 /* testSynchroClient.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testSynchroClient.cpp; path = ../tests/testSynchroClient.cpp; sourceTree = SOURCE_ROOT; };
 		4BA577FB08BF8E4600F82DE1 /* testSynchroServer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testSynchroServer.cpp; path = ../tests/testSynchroServer.cpp; sourceTree = SOURCE_ROOT; };
@@ -1798,8 +1831,6 @@
 		4BAB95B60B9E20B800A0C723 /* JackPortType.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackPortType.cpp; path = ../common/JackPortType.cpp; sourceTree = SOURCE_ROOT; };
 		4BAB95B70B9E20B800A0C723 /* JackPortType.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackPortType.h; path = ../common/JackPortType.h; sourceTree = SOURCE_ROOT; };
 		4BAB95EC0B9E21A500A0C723 /* JackAudioPort.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackAudioPort.cpp; path = ../common/JackAudioPort.cpp; sourceTree = SOURCE_ROOT; };
-		4BB21C6D1407E16400287B3C /* JackWinMMEDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinMMEDriver.cpp; path = ../windows/winmme/JackWinMMEDriver.cpp; sourceTree = SOURCE_ROOT; };
-		4BB21C6E1407E16400287B3C /* JackWinMMEDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackWinMMEDriver.h; path = ../windows/winmme/JackWinMMEDriver.h; sourceTree = SOURCE_ROOT; };
 		4BB371D40C1AD85A0050C1E4 /* JackNotification.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackNotification.h; path = ../common/JackNotification.h; sourceTree = SOURCE_ROOT; };
 		4BBAE40E0F42FA6100B8BD3F /* JackEngineProfiling.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackEngineProfiling.h; path = ../common/JackEngineProfiling.h; sourceTree = SOURCE_ROOT; };
 		4BBAE40F0F42FA6100B8BD3F /* JackEngineProfiling.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackEngineProfiling.cpp; path = ../common/JackEngineProfiling.cpp; sourceTree = SOURCE_ROOT; };
@@ -2797,10 +2828,14 @@
 		4B05A0420DF72B8500840F4C /* Linux */ = {
 			isa = PBXGroup;
 			children = (
+				4B05A07D0DF72BC000840F4C /* driver.h */,
+				4B49D3CA14864DB2003390F8 /* JackAtomic_os.h */,
+				4B49D3CB14864DB2003390F8 /* cycles.h */,
+				4B49D3CC14864DB2003390F8 /* JackPlatformPlug_os.h */,
+				4B49D3C914864DA7003390F8 /* JackLinuxTime.c */,
 				4B349837133A6B6F00D130AB /* firewire */,
 				4B349825133A6AF500D130AB /* alsarawmidi */,
 				4B05A04C0DF72BC000840F4C /* alsa */,
-				4B05A07D0DF72BC000840F4C /* driver.h */,
 				4B05A0820DF72BC000840F4C /* freebob */,
 			);
 			name = Linux;
@@ -2809,6 +2844,7 @@
 		4B05A04C0DF72BC000840F4C /* alsa */ = {
 			isa = PBXGroup;
 			children = (
+				4BA2574C132FB49B009F2D3F /* alsa_driver.c */,
 				4B05A04D0DF72BC000840F4C /* alsa_driver.h */,
 				4B05A04E0DF72BC000840F4C /* alsa_midi.h */,
 				4B05A04F0DF72BC000840F4C /* alsa_midi_impl.h */,
@@ -2851,26 +2887,39 @@
 		4B05A08A0DF72BF600840F4C /* Windows */ = {
 			isa = PBXGroup;
 			children = (
-				4BB21C6D1407E16400287B3C /* JackWinMMEDriver.cpp */,
-				4BB21C6E1407E16400287B3C /* JackWinMMEDriver.h */,
-				4B05A08B0DF72C3200840F4C /* JackWinEvent.cpp */,
-				4B05A08C0DF72C3200840F4C /* JackWinEvent.h */,
-				4B05A08D0DF72C3200840F4C /* JackWinNamedPipe.cpp */,
-				4B05A08E0DF72C3200840F4C /* JackWinNamedPipe.h */,
-				4B05A08F0DF72C3200840F4C /* JackWinNamedPipeClientChannel.cpp */,
-				4B05A0900DF72C3200840F4C /* JackWinNamedPipeClientChannel.h */,
-				4B05A0910DF72C3200840F4C /* JackWinNamedPipeNotifyChannel.cpp */,
-				4B05A0920DF72C3200840F4C /* JackWinNamedPipeNotifyChannel.h */,
-				4B05A0930DF72C3200840F4C /* JackWinNamedPipeServerChannel.cpp */,
-				4B05A0940DF72C3200840F4C /* JackWinNamedPipeServerChannel.h */,
-				4B05A0950DF72C3200840F4C /* JackWinNamedPipeServerNotifyChannel.cpp */,
-				4B05A0960DF72C3200840F4C /* JackWinNamedPipeServerNotifyChannel.h */,
-				4B05A0970DF72C3200840F4C /* JackWinProcessSync.cpp */,
-				4B05A0980DF72C3200840F4C /* JackWinProcessSync.h */,
-				4B05A0990DF72C3200840F4C /* JackWinSemaphore.cpp */,
-				4B05A09A0DF72C3200840F4C /* JackWinSemaphore.h */,
-				4B05A09B0DF72C3200840F4C /* JackWinThread.cpp */,
-				4B05A09C0DF72C3200840F4C /* JackWinThread.h */,
+				4B49D3D814864DEC003390F8 /* JackWinThread.cpp */,
+				4B49D3D914864DEC003390F8 /* JackWinServerLaunch.cpp */,
+				4B49D3DA14864DEC003390F8 /* JackWinSemaphore.cpp */,
+				4B49D3DB14864DEC003390F8 /* JackWinProcessSync.cpp */,
+				4B49D3DC14864DEC003390F8 /* JackWinNamedPipeServerNotifyChannel.cpp */,
+				4B49D3DD14864DEC003390F8 /* JackWinNamedPipeServerChannel.cpp */,
+				4B49D3DE14864DEC003390F8 /* JackWinNamedPipeNotifyChannel.cpp */,
+				4B49D3DF14864DEC003390F8 /* JackWinNamedPipeClientChannel.cpp */,
+				4B49D3E014864DED003390F8 /* JackWinNamedPipe.cpp */,
+				4B49D3E114864DED003390F8 /* JackWinEvent.cpp */,
+				4B49D3E214864DED003390F8 /* JackNetWinSocket.cpp */,
+				4B49D3E314864DED003390F8 /* JackMMCSS.cpp */,
+				4B49D3E414864DED003390F8 /* JackWinTime.c */,
+				4B49D3EA14864DED003390F8 /* JackWinThread.h */,
+				4B49D3EB14864DED003390F8 /* JackWinSemaphore.h */,
+				4B49D3EC14864DED003390F8 /* JackWinProcessSync.h */,
+				4B49D3ED14864DED003390F8 /* JackWinNamedPipeServerNotifyChannel.h */,
+				4B49D3EE14864DED003390F8 /* JackWinNamedPipeServerChannel.h */,
+				4B49D3EF14864DED003390F8 /* JackWinNamedPipeNotifyChannel.h */,
+				4B49D3F014864DED003390F8 /* JackWinNamedPipeClientChannel.h */,
+				4B49D3F114864DED003390F8 /* JackWinNamedPipe.h */,
+				4B49D3F214864DED003390F8 /* JackWinMutex.h */,
+				4B49D3F314864DED003390F8 /* JackWinEvent.h */,
+				4B49D3F414864DED003390F8 /* JackTypes_os.h */,
+				4B49D3F514864DED003390F8 /* JackSystemDeps_os.h */,
+				4B49D3F614864DED003390F8 /* JackShmMem_os.h */,
+				4B49D3F714864DED003390F8 /* JackPlatformPlug_os.h */,
+				4B49D3F814864DED003390F8 /* JackNetWinSocket.h */,
+				4B49D3F914864DED003390F8 /* JackMMCSS.h */,
+				4B49D3FA14864DED003390F8 /* JackCompilerDeps_os.h */,
+				4B49D3FB14864DED003390F8 /* JackAtomic_os.h */,
+				4B49D3BB14864D49003390F8 /* portaudio */,
+				4B49D3B214864D41003390F8 /* winmme */,
 			);
 			name = Windows;
 			sourceTree = "<group>";
@@ -2878,7 +2927,6 @@
 		4B05A09D0DF72C6000840F4C /* Additional */ = {
 			isa = PBXGroup;
 			children = (
-				4BA2574C132FB49B009F2D3F /* alsa_driver.c */,
 				4B05A08A0DF72BF600840F4C /* Windows */,
 				4B05A0420DF72B8500840F4C /* Linux */,
 			);
@@ -2951,6 +2999,38 @@
 			);
 			name = Latency;
 			sourceTree = "<group>";
+		};
+		4B49D3B214864D41003390F8 /* winmme */ = {
+			isa = PBXGroup;
+			children = (
+				4B49D3B314864D41003390F8 /* JackWinMMEDriver.cpp */,
+				4B49D3B414864D41003390F8 /* JackWinMMEDriver.h */,
+				4B49D3B514864D41003390F8 /* JackWinMMEInputPort.cpp */,
+				4B49D3B614864D41003390F8 /* JackWinMMEInputPort.h */,
+				4B49D3B714864D41003390F8 /* JackWinMMEOutputPort.cpp */,
+				4B49D3B814864D41003390F8 /* JackWinMMEOutputPort.h */,
+				4B49D3B914864D41003390F8 /* JackWinMMEPort.cpp */,
+				4B49D3BA14864D41003390F8 /* JackWinMMEPort.h */,
+			);
+			name = winmme;
+			path = ../windows/winmme;
+			sourceTree = SOURCE_ROOT;
+		};
+		4B49D3BB14864D49003390F8 /* portaudio */ = {
+			isa = PBXGroup;
+			children = (
+				4B49D3BC14864D49003390F8 /* JackPortAudioAdapter.cpp */,
+				4B49D3BD14864D49003390F8 /* JackPortAudioAdapter.h */,
+				4B49D3BE14864D49003390F8 /* JackPortAudioDevices.cpp */,
+				4B49D3BF14864D49003390F8 /* JackPortAudioDevices.h */,
+				4B49D3C014864D49003390F8 /* JackPortAudioDriver.cpp */,
+				4B49D3C114864D49003390F8 /* JackPortAudioDriver.h */,
+				4B49D3C214864D49003390F8 /* pa_asio.h */,
+				4B49D3C314864D49003390F8 /* portaudio.h */,
+			);
+			name = portaudio;
+			path = ../windows/portaudio;
+			sourceTree = SOURCE_ROOT;
 		};
 		4B6BEB4A07A6CCDC00A5DBDA /* Tests */ = {
 			isa = PBXGroup;

@@ -2091,19 +2091,23 @@ LIB_EXPORT void jack_session_commands_free(jack_session_command_t *cmds)
     JackGlobals::CheckContext("jack_session_commands_free");
 #endif
 
-    if (!cmds)
+    if (!cmds) {
         return;
+    }
 
     int i = 0;
     while (1) {
-        if (cmds[i].client_name)
+        if (cmds[i].client_name) {
             free ((char *)cmds[i].client_name);
-        if (cmds[i].command)
+        }
+        if (cmds[i].command) {
             free ((char *)cmds[i].command);
-        if (cmds[i].uuid)
+        }
+        if (cmds[i].uuid) {
             free ((char *)cmds[i].uuid);
-        else
+        } else {
             break;
+        }
 
         i += 1;
     }
