@@ -271,7 +271,7 @@ namespace Jack
         for (int port_index = 0; port_index < fNPorts; port_index++) {
             // Write the active port number
             if (fPortBuffer[port_index]) {
-                *active_port_address = port_index;
+                *active_port_address = htonl(port_index);
                 active_port_address++;
                 active_ports++;
                 assert(active_ports < 256);
@@ -291,7 +291,7 @@ namespace Jack
 
         for (uint port_index = 0; port_index < port_num; port_index++) {
             // Use -1 when port is actually connected on other side
-            int active_port = *active_port_address;
+            int active_port = ntohl(*active_port_address);
             if (active_port >= 0 && active_port < fNPorts) {
                 fConnectedPorts[active_port] = true;
             } else {
