@@ -16309,8 +16309,10 @@
 		4B8692D91371DB4700D2D11B /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = (
+					x86_64,
+					i386,
+				);
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -17811,8 +17813,10 @@
 		4BDCDBFC1001FD7300B15929 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = (
+					i386,
+					x86_64,
+				);
 				COPY_PHASE_STRIP = NO;
 				DEBUGGING_SYMBOLS = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -17864,8 +17868,10 @@
 		4BDCDBFD1001FD7300B15929 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = (
+					i386,
+					x86_64,
+				);
 				COPY_PHASE_STRIP = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -17918,8 +17924,10 @@
 		4BDCDBFE1001FD7300B15929 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = (
+					i386,
+					x86_64,
+				);
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_EXTENSION = so;
@@ -17960,8 +17968,10 @@
 		4BDCDC221001FDE300B15929 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = (
+					i386,
+					x86_64,
+				);
 				COPY_PHASE_STRIP = NO;
 				DEBUGGING_SYMBOLS = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -18018,8 +18028,10 @@
 		4BDCDC231001FDE300B15929 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = (
+					i386,
+					x86_64,
+				);
 				COPY_PHASE_STRIP = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -18074,8 +18086,10 @@
 		4BDCDC241001FDE300B15929 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = (
+					i386,
+					x86_64,
+				);
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_EXTENSION = so;
