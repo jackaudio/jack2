@@ -827,6 +827,7 @@ namespace Jack
         dst_params->fSampleRate = htonl(src_params->fSampleRate);
         dst_params->fPeriodSize = htonl(src_params->fPeriodSize);
         dst_params->fSampleEncoder = htonl(src_params->fSampleEncoder);
+        dst_params->fKBps = htonl(src_params->fKBps);
         dst_params->fSlaveSyncMode = htonl(src_params->fSlaveSyncMode);
         dst_params->fNetworkLatency = htonl(src_params->fNetworkLatency);
     }
@@ -845,6 +846,7 @@ namespace Jack
         dst_params->fSampleRate = ntohl(src_params->fSampleRate);
         dst_params->fPeriodSize = ntohl(src_params->fPeriodSize);
         dst_params->fSampleEncoder = ntohl(src_params->fSampleEncoder);
+        dst_params->fKBps = ntohl(src_params->fKBps);
         dst_params->fSlaveSyncMode = ntohl(src_params->fSlaveSyncMode);
         dst_params->fNetworkLatency = ntohl(src_params->fNetworkLatency);
     }
