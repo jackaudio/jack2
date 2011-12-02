@@ -393,7 +393,7 @@ namespace Jack
             for (uint32_t port_index = 0; port_index < port_num; port_index++) {
                 // Only copy to active ports : read the active port number then audio data
                 int* active_port_address = (int*)(fNetBuffer + port_index * fSubPeriodBytesSize);
-                int active_port = *active_port_address;
+                int active_port = ntohl(*active_port_address);
                 RenderFromNetwork((char*)(active_port_address + 1), active_port, sub_cycle);
             }
         }
@@ -410,7 +410,7 @@ namespace Jack
             // Only copy from active ports : write the active port number then audio data
             if (fPortBuffer[port_index]) {
                 int* active_port_address = (int*)(fNetBuffer + active_ports * fSubPeriodBytesSize);
-                *active_port_address = port_index;
+                *active_port_address = htonl(port_index);
                 RenderToNetwork((char*)(active_port_address + 1), port_index, sub_cycle);
                 active_ports++;
             }
