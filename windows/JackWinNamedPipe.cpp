@@ -52,6 +52,59 @@ int JackWinNamedPipe::Write(void* data, int len)
     }
 }
 
+/*
+See :
+    http://answers.google.com/answers/threadview?id=430173
+    http://msdn.microsoft.com/en-us/library/windows/desktop/aa365800(v=vs.85).aspx
+*/
+
+int JackWinNamedPipeClient::ConnectAux(int retry_count)
+{
+    jack_log("Connect: fName %s", fName);
+
+    while (true) {
+
+        fNamedPipe = CreateFile(fName, 			 // pipe name
+                                GENERIC_READ |   // read and write access
+                                GENERIC_WRITE,
+                                0,               // no sharing
+                                NULL,            // default security attributes
+                                OPEN_EXISTING,   // opens existing pipe
+                                0,               // default attributes
+                                NULL);           // no template file
+
+        // Break if the pipe handle is valid.
+        if (fNamedPipe != INVALID_HANDLE_VALUE) {
+            return 0;
+        }
+
+        // Exit if an error other than ERROR_PIPE_BUSY occurs.
+        if (GetLastError() != ERROR_PIPE_BUSY) {
+            jack_error("Cannot connect to named pipe = %s err = %ld", fName, GetLastError());
+            return -1;
+        }
+
+        // All pipe instances are busy, so wait for 2 seconds.
+        if (!WaitNamedPipe(lpszPipename, 2000)) {
+            jack_error("Cannot connect to named pipe = %s err = %ld", fName, GetLastError());
+            return -1;
+        }
+    }
+}
+
+int JackWinNamedPipeClient::Connect(const char* dir, int which)
+{
+    snprintf(fName, sizeof(fName), "\\\\.\\pipe\\%s_jack_%d", dir, which);
+    return ConnectAux();
+}
+
+int JackWinNamedPipeClient::Connect(const char* dir, const char* name, int which)
+{
+    snprintf(fName, sizeof(fName), "\\\\.\\pipe\\%s_jack_%s_%d", dir, name, which);
+    return ConnectAux();
+}
+
+/*
 int JackWinNamedPipeClient::Connect(const char* dir, int which)
 {
     snprintf(fName, sizeof(fName), "\\\\.\\pipe\\%s_jack_%d", dir, which);
@@ -95,6 +148,7 @@ int JackWinNamedPipeClient::Connect(const char* dir, const char* name, int which
         return 0;
     }
 }
+*/
 
 int JackWinNamedPipeClient::Close()
 {
@@ -131,8 +185,9 @@ JackWinAsyncNamedPipeClient::JackWinAsyncNamedPipeClient(HANDLE pipe, bool pendi
                                   TRUE,     // initial state = signaled
                                   NULL);	// unnamed event object
 
-    if (!fPendingIO)
+    if (!fPendingIO) {
         SetEvent(fOverlap.hEvent);
+    }
 
     fIOState = (fPendingIO) ? kConnecting : kReading;
 }
@@ -188,7 +243,6 @@ int JackWinAsyncNamedPipeClient::Read(void* data, int len)
     DWORD read;
     jack_log("JackWinNamedPipeClient::Read len = %ld", len);
     BOOL res = ReadFile(fNamedPipe, data, len, &read, &fOverlap);
-    jack_log("JackWinNamedPipeClient::Read res = %ld read %ld", res, read);
 
     if (res && read != 0) {
         fPendingIO = false;
@@ -224,6 +278,40 @@ int JackWinAsyncNamedPipeClient::Write(void* data, int len)
 
 // Server side
 
+int JackWinNamedPipeServer::BindAux()
+{
+    jack_log("Bind: fName %s", fName);
+
+    if ((fNamedPipe = CreateNamedPipe(fName,
+                                      PIPE_ACCESS_DUPLEX,       // read/write access
+                                      PIPE_TYPE_MESSAGE |       // message type pipe
+                                      PIPE_READMODE_MESSAGE |   // message-read mode
+                                      PIPE_WAIT,                // blocking mode
+                                      PIPE_UNLIMITED_INSTANCES, // max. instances
+                                      BUFSIZE,  // output buffer size
+                                      BUFSIZE,  // input buffer size
+                                      INFINITE, // client time-out
+                                      NULL)) == INVALID_HANDLE_VALUE) { // no security
+        jack_error("Cannot bind server to pipe err = %ld", GetLastError());
+        return -1;
+    } else {
+        return 0;
+    }
+}
+
+int JackWinNamedPipeServer::Bind(const char* dir, int which)
+{
+     snprintf(fName, sizeof(fName), "\\\\.\\pipe\\%s_jack_%d", dir, which);
+     return BindAux();
+}
+
+int JackWinNamedPipeServer::Bind(const char* dir, const char* name, int which)
+{
+    snprintf(fName, sizeof(fName), "\\\\.\\pipe\\%s_jack_%s_%d", dir, name, which);
+    return BindAux();
+}
+
+/*
 int JackWinNamedPipeServer::Bind(const char* dir, int which)
 {
     snprintf(fName, sizeof(fName), "\\\\.\\pipe\\%s_jack_%d", dir, which);
@@ -267,6 +355,7 @@ int JackWinNamedPipeServer::Bind(const char* dir, const char* name, int which)
         return 0;
     }
 }
+*/
 
 bool JackWinNamedPipeServer::Accept()
 {
@@ -320,6 +409,40 @@ int JackWinNamedPipeServer::Close()
 
 // Server side
 
+int JackWinAsyncNamedPipeServer::BindAux()
+{
+    jack_log("Bind: fName %s", fName);
+
+    if ((fNamedPipe = CreateNamedPipe(fName,
+                                      PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,  // read/write access
+                                      PIPE_TYPE_MESSAGE |  // message type pipe
+                                      PIPE_READMODE_MESSAGE |  // message-read mode
+                                      PIPE_WAIT,  // blocking mode
+                                      PIPE_UNLIMITED_INSTANCES,  // max. instances
+                                      BUFSIZE,  // output buffer size
+                                      BUFSIZE,  // input buffer size
+                                      INFINITE,  // client time-out
+                                      NULL)) == INVALID_HANDLE_VALUE) { // no security a
+        jack_error("Cannot bind server to pipe err = %ld", GetLastError());
+        return -1;
+    } else {
+        return 0;
+    }
+}
+
+int JackWinAsyncNamedPipeServer::Bind(const char* dir, int which)
+{
+    snprintf(fName, sizeof(fName), "\\\\.\\pipe\\%s_jack_%d", dir, which);
+    return BindAux();
+}
+
+int JackWinAsyncNamedPipeServer::Bind(const char* dir, const char* name, int which)
+{
+    snprintf(fName, sizeof(fName), "\\\\.\\pipe\\%s_jack_%s_%d", dir, name, which);
+    return BindAux();
+}
+
+/*
 int JackWinAsyncNamedPipeServer::Bind(const char* dir, int which)
 {
     snprintf(fName, sizeof(fName), "\\\\.\\pipe\\%s_jack_%d", dir, which);
@@ -363,6 +486,7 @@ int JackWinAsyncNamedPipeServer::Bind(const char* dir, const char* name, int whi
         return 0;
     }
 }
+*/
 
 bool JackWinAsyncNamedPipeServer::Accept()
 {
@@ -383,7 +507,7 @@ JackWinNamedPipeClient* JackWinAsyncNamedPipeServer::AcceptClient()
                 return new JackWinAsyncNamedPipeClient(fNamedPipe, false);
 
             default:
-                jack_error("Cannot connect server pipe name = %s  err = %ld", fName, GetLastError());
+                jack_error("Cannot connect server pipe name = %s err = %ld", fName, GetLastError());
                 return NULL;
                 break;
         }
