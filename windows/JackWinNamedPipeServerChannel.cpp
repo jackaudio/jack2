@@ -98,8 +98,9 @@ bool JackClientPipeThread::HandleRequest()
     bool ret = true;
 
     // Lock the global mutex
-    if (WaitForSingleObject(fMutex, INFINITE) == WAIT_FAILED)
+    if (WaitForSingleObject(fMutex, INFINITE) == WAIT_FAILED) {
         jack_error("JackClientPipeThread::HandleRequest: mutex wait error");
+    }
 
     if (res < 0) {
         jack_error("HandleRequest: cannot read header");
@@ -436,7 +437,7 @@ void JackClientPipeThread::ClientKill()
 {
     jack_log("JackClientPipeThread::ClientKill ref = %d", fRefNum);
 
-    if (fRefNum == -1) {                // Correspond to an already removed client.
+    if (fRefNum == -1) {        // Correspond to an already removed client.
         jack_log("Kill a closed client");
     } else if (fRefNum == 0) {  // Correspond to a still not opened client.
         jack_log("Kill a not opened client");
