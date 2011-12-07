@@ -632,14 +632,16 @@ namespace Jack
         for (int port_index = 0; port_index < fNPorts; port_index++) {
             if (fPortBuffer[port_index]) {
                 memcpy(buffer, fPortBuffer[port_index], fPeriodSize * sizeof(sample_t));
-            #if HAVE_CELT_API_0_8 || HAVE_CELT_API_0_11
-                int res = celt_encode_float(fCeltEncoder[port_index], buffer, fPeriodSize, fCompressedBuffer[port_index], fCompressedSizeByte);
-            #else
-                int res = celt_encode_float(fCeltEncoder[port_index], buffer, NULL, fCompressedBuffer[port_index], fCompressedSizeByte);
-            #endif
-                if (res != fCompressedSizeByte) {
-                    jack_error("celt_encode_float error fCompressedSizeByte = %d res = %d", fCompressedSizeByte, res);
-                }
+            } else {
+                memset(buffer, 0, fPeriodSize * sizeof(sample_t));
+            }
+        #if HAVE_CELT_API_0_8 || HAVE_CELT_API_0_11
+            int res = celt_encode_float(fCeltEncoder[port_index], buffer, fPeriodSize, fCompressedBuffer[port_index], fCompressedSizeByte);
+        #else
+            int res = celt_encode_float(fCeltEncoder[port_index], buffer, NULL, fCompressedBuffer[port_index], fCompressedSizeByte);
+        #endif
+            if (res != fCompressedSizeByte) {
+                jack_error("celt_encode_float error fCompressedSizeByte = %d res = %d", fCompressedSizeByte, res);
             }
         }
 
