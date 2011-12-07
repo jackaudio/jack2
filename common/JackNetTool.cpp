@@ -552,6 +552,7 @@ namespace Jack
             fCompressedBuffer = new unsigned char* [fNPorts];
             for (int port_index = 0; port_index < fNPorts; port_index++) {
                 fCompressedBuffer[port_index] = new unsigned char[fCompressedSizeByte];
+                memset(fCompressedBuffer[port_index], 0, fCompressedSizeByte * sizeof(char));
             }
 
             int res1 = (fNPorts * fCompressedSizeByte) % PACKET_AVAILABLE_SIZE(params);
@@ -717,6 +718,7 @@ namespace Jack
         fIntBuffer = new short* [fNPorts];
         for (int port_index = 0; port_index < fNPorts; port_index++) {
             fIntBuffer[port_index] = new short[fPeriodSize];
+            memset(fIntBuffer[port_index], 0, fPeriodSize * sizeof(short));
         }
 
         int res1 = (fNPorts * fCompressedSizeByte) % PACKET_AVAILABLE_SIZE(params);
