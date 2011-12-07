@@ -58,6 +58,27 @@ See :
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa365800(v=vs.85).aspx
 */
 
+/*
+int JackWinNamedPipeClient::ConnectAux()
+{
+    fNamedPipe = CreateFile(fName, 			 // pipe name
+                            GENERIC_READ |   // read and write access
+                            GENERIC_WRITE,
+                            0,               // no sharing
+                            NULL,            // default security attributes
+                            OPEN_EXISTING,   // opens existing pipe
+                            0,               // default attributes
+                            NULL);          // no template file
+
+    if (fNamedPipe == INVALID_HANDLE_VALUE) {
+        jack_error("Cannot connect to named pipe = %s err = %ld", fName, GetLastError());
+        return -1;
+    } else {
+        return 0;
+    }
+}
+*/
+
 int JackWinNamedPipeClient::ConnectAux()
 {
     jack_log("Connect: fName %s", fName);
@@ -104,52 +125,6 @@ int JackWinNamedPipeClient::Connect(const char* dir, const char* name, int which
     return ConnectAux();
 }
 
-/*
-int JackWinNamedPipeClient::Connect(const char* dir, int which)
-{
-    snprintf(fName, sizeof(fName), "\\\\.\\pipe\\%s_jack_%d", dir, which);
-    jack_log("Connect: fName %s", fName);
-
-    fNamedPipe = CreateFile(fName, 			 // pipe name
-                            GENERIC_READ |   // read and write access
-                            GENERIC_WRITE,
-                            0,               // no sharing
-                            NULL,            // default security attributes
-                            OPEN_EXISTING,   // opens existing pipe
-                            0,               // default attributes
-                            NULL);          // no template file
-
-    if (fNamedPipe == INVALID_HANDLE_VALUE) {
-        jack_error("Cannot connect to named pipe = %s err = %ld", fName, GetLastError());
-        return -1;
-    } else {
-        return 0;
-    }
-}
-
-int JackWinNamedPipeClient::Connect(const char* dir, const char* name, int which)
-{
-    snprintf(fName, sizeof(fName), "\\\\.\\pipe\\%s_jack_%s_%d", dir, name, which);
-    jack_log("Connect: fName %s", fName);
-
-    fNamedPipe = CreateFile(fName, 			 // pipe name
-                            GENERIC_READ |   // read and write access
-                            GENERIC_WRITE,
-                            0,               // no sharing
-                            NULL,            // default security attributes
-                            OPEN_EXISTING,   // opens existing pipe
-                            0,               // default attributes
-                            NULL);          // no template file
-
-    if (fNamedPipe == INVALID_HANDLE_VALUE) {
-        jack_error("Cannot connect to named pipe = %s err = %ld", fName, GetLastError());
-        return -1;
-    } else {
-        return 0;
-    }
-}
-*/
-
 int JackWinNamedPipeClient::Close()
 {
     if (fNamedPipe != INVALID_HANDLE_VALUE) {
@@ -177,8 +152,8 @@ JackWinAsyncNamedPipeClient::JackWinAsyncNamedPipeClient()
                                   NULL);    // unnamed event object
 }
 
-JackWinAsyncNamedPipeClient::JackWinAsyncNamedPipeClient(HANDLE pipe, bool pending)
-        : JackWinNamedPipeClient(pipe), fPendingIO(pending), fIOState(kIdle)
+JackWinAsyncNamedPipeClient::JackWinAsyncNamedPipeClient(HANDLE pipe, const char* name, bool pending)
+        : JackWinNamedPipeClient(pipe, name), fPendingIO(pending), fIOState(kIdle)
 {
     fOverlap.hEvent = CreateEvent(NULL,     // default security attribute
                                   TRUE,     // manual-reset event
@@ -277,7 +252,6 @@ int JackWinAsyncNamedPipeClient::Write(void* data, int len)
 }
 
 // Server side
-
 int JackWinNamedPipeServer::BindAux()
 {
     jack_log("Bind: fName %s", fName);
@@ -311,52 +285,6 @@ int JackWinNamedPipeServer::Bind(const char* dir, const char* name, int which)
     return BindAux();
 }
 
-/*
-int JackWinNamedPipeServer::Bind(const char* dir, int which)
-{
-    snprintf(fName, sizeof(fName), "\\\\.\\pipe\\%s_jack_%d", dir, which);
-    jack_log("Bind: fName %s", fName);
-
-    if ((fNamedPipe = CreateNamedPipe(fName,
-                                      PIPE_ACCESS_DUPLEX,  // read/write access
-                                      PIPE_TYPE_MESSAGE |  // message type pipe
-                                      PIPE_READMODE_MESSAGE |  // message-read mode
-                                      PIPE_WAIT,  // blocking mode
-                                      PIPE_UNLIMITED_INSTANCES,  // max. instances
-                                      BUFSIZE,  // output buffer size
-                                      BUFSIZE,  // input buffer size
-                                      INFINITE,  // client time-out
-                                      NULL)) == INVALID_HANDLE_VALUE) { // no security a
-        jack_error("Cannot bind server to pipe err = %ld", GetLastError());
-        return -1;
-    } else {
-        return 0;
-    }
-}
-
-int JackWinNamedPipeServer::Bind(const char* dir, const char* name, int which)
-{
-    snprintf(fName, sizeof(fName), "\\\\.\\pipe\\%s_jack_%s_%d", dir, name, which);
-    jack_log("Bind: fName %s", fName);
-
-    if ((fNamedPipe = CreateNamedPipe(fName,
-                                      PIPE_ACCESS_DUPLEX,  // read/write access
-                                      PIPE_TYPE_MESSAGE |  // message type pipe
-                                      PIPE_READMODE_MESSAGE |  // message-read mode
-                                      PIPE_WAIT,  // blocking mode
-                                      PIPE_UNLIMITED_INSTANCES,  // max. instances
-                                      BUFSIZE,  // output buffer size
-                                      BUFSIZE,  // input buffer size
-                                      INFINITE,  // client time-out
-                                      NULL)) == INVALID_HANDLE_VALUE) { // no security a
-        jack_error("Cannot bind server to pipe err = %ld", GetLastError());
-        return -1;
-    } else {
-        return 0;
-    }
-}
-*/
-
 bool JackWinNamedPipeServer::Accept()
 {
     if (ConnectNamedPipe(fNamedPipe, NULL)) {
@@ -375,7 +303,7 @@ bool JackWinNamedPipeServer::Accept()
 JackWinNamedPipeClient* JackWinNamedPipeServer::AcceptClient()
 {
     if (ConnectNamedPipe(fNamedPipe, NULL)) {
-        JackWinNamedPipeClient* client = new JackWinNamedPipeClient(fNamedPipe);
+        JackWinNamedPipeClient* client = new JackWinNamedPipeClient(fNamedPipe, fName);
         // Init the pipe to the default value
         fNamedPipe = INVALID_HANDLE_VALUE;
         return client;
@@ -383,7 +311,7 @@ JackWinNamedPipeClient* JackWinNamedPipeServer::AcceptClient()
         switch (GetLastError()) {
 
             case ERROR_PIPE_CONNECTED:
-                return new JackWinNamedPipeClient(fNamedPipe);
+                return new JackWinNamedPipeClient(fNamedPipe, fName);
 
             default:
                 jack_error("Cannot connect server pipe name = %s  err = %ld", fName, GetLastError());
@@ -496,15 +424,15 @@ bool JackWinAsyncNamedPipeServer::Accept()
 JackWinNamedPipeClient* JackWinAsyncNamedPipeServer::AcceptClient()
 {
     if (ConnectNamedPipe(fNamedPipe, NULL)) {
-        return new JackWinAsyncNamedPipeClient(fNamedPipe, false);
+        return new JackWinAsyncNamedPipeClient(fNamedPipe, fName, false);
     } else {
         switch (GetLastError()) {
 
             case ERROR_IO_PENDING:
-                return new JackWinAsyncNamedPipeClient(fNamedPipe, true);
+                return new JackWinAsyncNamedPipeClient(fNamedPipe, fName, true);
 
             case ERROR_PIPE_CONNECTED:
-                return new JackWinAsyncNamedPipeClient(fNamedPipe, false);
+                return new JackWinAsyncNamedPipeClient(fNamedPipe, fName, false);
 
             default:
                 jack_error("Cannot connect server pipe name = %s err = %ld", fName, GetLastError());

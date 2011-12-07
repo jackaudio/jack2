@@ -62,8 +62,10 @@ class JackWinNamedPipeClient : public JackWinNamedPipe
 
         JackWinNamedPipeClient(): JackWinNamedPipe()
         {}
-        JackWinNamedPipeClient(HANDLE pipe): JackWinNamedPipe(pipe)
-        {}
+        JackWinNamedPipeClient(HANDLE pipe, const char* name): JackWinNamedPipe(pipe)
+        {
+            strcpy(fName, name);
+        }
 
         virtual ~JackWinNamedPipeClient()
         {}
@@ -88,7 +90,7 @@ class JackWinAsyncNamedPipeClient : public JackWinNamedPipeClient
     public:
 
         JackWinAsyncNamedPipeClient();
-        JackWinAsyncNamedPipeClient(HANDLE pipe, bool pending);
+        JackWinAsyncNamedPipeClient(HANDLE pipe, const char* name, bool pending);
         virtual ~JackWinAsyncNamedPipeClient();
 
         virtual int Read(void* data, int len);
