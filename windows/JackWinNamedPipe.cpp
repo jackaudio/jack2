@@ -58,7 +58,7 @@ See :
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa365800(v=vs.85).aspx
 */
 
-int JackWinNamedPipeClient::ConnectAux(int retry_count)
+int JackWinNamedPipeClient::ConnectAux()
 {
     jack_log("Connect: fName %s", fName);
 
@@ -85,7 +85,7 @@ int JackWinNamedPipeClient::ConnectAux(int retry_count)
         }
 
         // All pipe instances are busy, so wait for 2 seconds.
-        if (!WaitNamedPipe(lpszPipename, 2000)) {
+        if (!WaitNamedPipe(fName, 2000)) {
             jack_error("Cannot connect to named pipe = %s err = %ld", fName, GetLastError());
             return -1;
         }
