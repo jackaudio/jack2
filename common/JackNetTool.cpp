@@ -387,9 +387,7 @@ namespace Jack
         }
 
         if (port_num > 0)  {
-
             UpdateParams(port_num);
-
             for (uint32_t port_index = 0; port_index < port_num; port_index++) {
                 // Only copy to active ports : read the active port number then audio data
                 int* active_port_address = (int*)(fNetBuffer + port_index * fSubPeriodBytesSize);
@@ -669,14 +667,21 @@ namespace Jack
     //network<->buffer
     int NetCeltAudioBuffer::RenderFromNetwork(int cycle, int sub_cycle, uint32_t port_num)
     {
-        // Last packet of the cycle
-        if (sub_cycle == fNumPackets - 1) {
-            for (int port_index = 0; port_index < fNPorts; port_index++) {
-                memcpy(fCompressedBuffer[port_index] + sub_cycle * fSubPeriodBytesSize, fNetBuffer + port_index * fLastSubPeriodBytesSize, fLastSubPeriodBytesSize);
-            }
-        } else {
-            for (int port_index = 0; port_index < fNPorts; port_index++) {
-                memcpy(fCompressedBuffer[port_index] + sub_cycle * fSubPeriodBytesSize, fNetBuffer + port_index * fSubPeriodBytesSize, fSubPeriodBytesSize);
+        // Cleanup all JACK ports at the beginning of the cycle
+        if (sub_cycle == 0) {
+            Cleanup();
+        }
+
+        if (port_num > 0)  {
+            // Last packet of the cycle
+            if (sub_cycle == fNumPackets - 1) {
+                for (int port_index = 0; port_index < fNPorts; port_index++) {
+                    memcpy(fCompressedBuffer[port_index] + sub_cycle * fSubPeriodBytesSize, fNetBuffer + port_index * fLastSubPeriodBytesSize, fLastSubPeriodBytesSize);
+                }
+            } else {
+                for (int port_index = 0; port_index < fNPorts; port_index++) {
+                    memcpy(fCompressedBuffer[port_index] + sub_cycle * fSubPeriodBytesSize, fNetBuffer + port_index * fSubPeriodBytesSize, fSubPeriodBytesSize);
+                }
             }
         }
 
@@ -790,13 +795,20 @@ namespace Jack
     //network<->buffer
     int NetIntAudioBuffer::RenderFromNetwork(int cycle, int sub_cycle, uint32_t port_num)
     {
-        if (sub_cycle == fNumPackets - 1) {
-            for (int port_index = 0; port_index < fNPorts; port_index++) {
-                memcpy(fIntBuffer[port_index] + sub_cycle * fSubPeriodSize, fNetBuffer + port_index * fLastSubPeriodBytesSize, fLastSubPeriodBytesSize);
-            }
-        } else {
-            for (int port_index = 0; port_index < fNPorts; port_index++) {
-                memcpy(fIntBuffer[port_index] + sub_cycle * fSubPeriodSize, fNetBuffer + port_index * fSubPeriodBytesSize, fSubPeriodBytesSize);
+        // Cleanup all JACK ports at the beginning of the cycle
+        if (sub_cycle == 0) {
+            Cleanup();
+        }
+
+        if (port_num > 0)  {
+            if (sub_cycle == fNumPackets - 1) {
+                for (int port_index = 0; port_index < fNPorts; port_index++) {
+                    memcpy(fIntBuffer[port_index] + sub_cycle * fSubPeriodSize, fNetBuffer + port_index * fLastSubPeriodBytesSize, fLastSubPeriodBytesSize);
+                }
+            } else {
+                for (int port_index = 0; port_index < fNPorts; port_index++) {
+                    memcpy(fIntBuffer[port_index] + sub_cycle * fSubPeriodSize, fNetBuffer + port_index * fSubPeriodBytesSize, fSubPeriodBytesSize);
+                }
             }
         }
 
