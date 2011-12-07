@@ -450,7 +450,7 @@ namespace Jack
 
     void NetFloatAudioBuffer::RenderToNetwork(char* net_buffer, int active_port, int sub_cycle)
     {
-        for ( int port_index = 0; port_index < fNPorts; port_index++ ) {
+        for (int port_index = 0; port_index < fNPorts; port_index++ ) {
             jack_default_audio_sample_t* src = (jack_default_audio_sample_t*)(fPortBuffer[active_port] + sub_cycle * fSubPeriodSize);
             jack_default_audio_sample_t* dst = (jack_default_audio_sample_t*)(net_buffer);
             for (unsigned int sample = 0; sample < (fSubPeriodBytesSize - sizeof(int)) / sizeof(jack_default_audio_sample_t); sample++) {
@@ -631,14 +631,16 @@ namespace Jack
         float buffer[fPeriodSize];
 
         for (int port_index = 0; port_index < fNPorts; port_index++) {
-            memcpy(buffer, fPortBuffer[port_index], fPeriodSize * sizeof(sample_t));
-#if HAVE_CELT_API_0_8 || HAVE_CELT_API_0_11
-            int res = celt_encode_float(fCeltEncoder[port_index], buffer, fPeriodSize, fCompressedBuffer[port_index], fCompressedSizeByte);
-#else
-            int res = celt_encode_float(fCeltEncoder[port_index], buffer, NULL, fCompressedBuffer[port_index], fCompressedSizeByte);
-#endif
-            if (res != fCompressedSizeByte) {
-                jack_error("celt_encode_float error fCompressedSizeByte = %d res = %d", fCompressedSizeByte, res);
+            if (fPortBuffer[port_index]) {
+                memcpy(buffer, fPortBuffer[port_index], fPeriodSize * sizeof(sample_t));
+            #if HAVE_CELT_API_0_8 || HAVE_CELT_API_0_11
+                int res = celt_encode_float(fCeltEncoder[port_index], buffer, fPeriodSize, fCompressedBuffer[port_index], fCompressedSizeByte);
+            #else
+                int res = celt_encode_float(fCeltEncoder[port_index], buffer, NULL, fCompressedBuffer[port_index], fCompressedSizeByte);
+            #endif
+                if (res != fCompressedSizeByte) {
+                    jack_error("celt_encode_float error fCompressedSizeByte = %d res = %d", fCompressedSizeByte, res);
+                }
             }
         }
 
@@ -649,13 +651,15 @@ namespace Jack
     void NetCeltAudioBuffer::RenderToJackPorts()
     {
         for (int port_index = 0; port_index < fNPorts; port_index++) {
-#if HAVE_CELT_API_0_8 || HAVE_CELT_API_0_11
-            int res = celt_decode_float(fCeltDecoder[port_index], fCompressedBuffer[port_index], fCompressedSizeByte, fPortBuffer[port_index], fPeriodSize);
-#else
-            int res = celt_decode_float(fCeltDecoder[port_index], fCompressedBuffer[port_index], fCompressedSizeByte, fPortBuffer[port_index]);
-#endif
-            if (res != CELT_OK) {
-                jack_error("celt_decode_float error fCompressedSizeByte = %d res = %d", fCompressedSizeByte, res);
+            if (fPortBuffer[port_index]) {
+            #if HAVE_CELT_API_0_8 || HAVE_CELT_API_0_11
+                int res = celt_decode_float(fCeltDecoder[port_index], fCompressedBuffer[port_index], fCompressedSizeByte, fPortBuffer[port_index], fPeriodSize);
+            #else
+                int res = celt_decode_float(fCeltDecoder[port_index], fCompressedBuffer[port_index], fCompressedSizeByte, fPortBuffer[port_index]);
+            #endif
+                if (res != CELT_OK) {
+                    jack_error("celt_decode_float error fCompressedSizeByte = %d res = %d", fCompressedSizeByte, res);
+                }
             }
         }
 
@@ -758,8 +762,10 @@ namespace Jack
     int NetIntAudioBuffer::RenderFromJackPorts()
     {
         for (int port_index = 0; port_index < fNPorts; port_index++) {
-            for (uint frame = 0; frame < fPeriodSize; frame++) {
-                fIntBuffer[port_index][frame] = short(fPortBuffer[port_index][frame] * 32768.f);
+            if (fPortBuffer[port_index]) {
+                for (uint frame = 0; frame < fPeriodSize; frame++) {
+                    fIntBuffer[port_index][frame] = short(fPortBuffer[port_index][frame] * 32768.f);
+                }
             }
         }
 
@@ -771,8 +777,10 @@ namespace Jack
     {
         float coef = 1.f / 32768.f;
         for (int port_index = 0; port_index < fNPorts; port_index++) {
-            for (uint frame = 0; frame < fPeriodSize; frame++) {
-                fPortBuffer[port_index][frame] = float(fIntBuffer[port_index][frame] * coef);
+            if (fPortBuffer[port_index]) {
+                for (uint frame = 0; frame < fPeriodSize; frame++) {
+                    fPortBuffer[port_index][frame] = float(fIntBuffer[port_index][frame] * coef);
+                }
             }
         }
 
