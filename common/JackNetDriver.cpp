@@ -19,7 +19,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackNetDriver.h"
 #include "JackEngineControl.h"
 #include "JackLockedEngine.h"
-#include "JackGraphManager.h"
 #include "JackWaitThreadedDriver.h"
 
 using namespace std;

@@ -20,7 +20,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackNetSocket__
 #define __JackNetSocket__
 
-//#include "JackCompilerDeps.h"
 #include "JackError.h"
 #include <cstdlib>
 #include <cstdio>

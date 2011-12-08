@@ -18,11 +18,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackNetInterface.h"
 #include "JackException.h"
-//#include "JackPlatformPlug.h"
 #include <assert.h>
 
 using namespace std;
-
 
 /*
  TODO : since midi buffers now uses up to BUFFER_SIZE_MAX frames,

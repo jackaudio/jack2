@@ -19,7 +19,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackMidiPort.h"
 #include "JackTools.h"
-#include "JackPlatformPlug.h"
 #include "types.h"
 #include "transport.h"
 #ifndef WIN32
