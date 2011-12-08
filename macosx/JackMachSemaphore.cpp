@@ -40,8 +40,9 @@ bool JackMachSemaphore::Signal()
         return false;
     }
 
-    if (fFlush)
+    if (fFlush) {
         return true;
+    }
 
     kern_return_t res;
     if ((res = semaphore_signal(fSemaphore)) != KERN_SUCCESS) {
@@ -57,8 +58,9 @@ bool JackMachSemaphore::SignalAll()
         return false;
     }
 
-    if (fFlush)
+    if (fFlush) {
         return true;
+    }
 
     kern_return_t res;
     // When signaled several times, do not accumulate signals...
@@ -149,14 +151,6 @@ bool JackMachSemaphore::ConnectInput(const char* name, const char* server_name)
 {
     BuildName(name, server_name, fName, sizeof(fName));
     kern_return_t res;
-
-    // Temporary...  A REVOIR
-    /*
-    if (fSemaphore > 0) {
-    	jack_log("Already connected name = %s", name);
-    	return true;
-    }
-    */
 
     if (fBootPort == 0) {
         if ((res = task_get_bootstrap_port(mach_task_self(), &fBootPort)) != KERN_SUCCESS) {

@@ -53,3 +53,4 @@ inline bool CHECK_MLOCK(void* ptr, size_t size)
 #define CHECK_MUNLOCKALL()(false)
 
 #endif
+

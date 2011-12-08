@@ -27,9 +27,9 @@
 #include <stdint.h>
 #endif
 
-
 namespace Jack
 {
+
 #define E(code, s) { code, s }
 #define NET_ERROR_CODE WSAGetLastError()
 #define StrError PrintError

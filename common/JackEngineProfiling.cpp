@@ -81,7 +81,7 @@ JackEngineProfiling::~JackEngineProfiling()
                      fStream << ((d7 > 0 && d6 > 0) ? (d7 - d6) : 0) << "\t" ;
                      fStream << fProfileTable[i].fClientTable[ref].fStatus << "\t" ;;
 
-                 } else { // Print tabs
+                } else { // Print tabs
                      fStream <<  "\t  \t  \t  \t  \t  \t \t";
                 }
             }
@@ -136,7 +136,7 @@ JackEngineProfiling::~JackEngineProfiling()
         fStream2 <<  "set xlabel \"audio cycles\"\n";
         fStream2 <<  "set ylabel \"usec\"\n";
         fStream2 <<  "plot  \"JackEngineProfiling.log\" using 2 title \"Driver end date\" with lines \n";
-	fStream2 <<  "unset output\n";
+        fStream2 <<  "unset output\n";
     }
 
     // Clients end date
@@ -198,8 +198,8 @@ JackEngineProfiling::~JackEngineProfiling()
                     fStream3 << "\"JackEngineProfiling.log\" using " << ((i + 1) * 7) - 1  << " title \"" << fIntervalTable[i].fName << "\" with lines,";
                 }
             }
-	    fStream3 << "\nunset multiplot\n";
-	    fStream3 << "unset output\n";
+            fStream3 << "\nunset multiplot\n";
+            fStream3 << "unset output\n";
         }
     }
 
@@ -242,8 +242,8 @@ JackEngineProfiling::~JackEngineProfiling()
                      fStream4 << "\"JackEngineProfiling.log\" using " << ((i + 1) * 7)  << " title \"" << fIntervalTable[i].fName << "\" with lines,";
                 }
             }
-	    fStream4 << "\nunset multiplot\n";
-	    fStream4 << "unset output\n";
+            fStream4 << "\nunset multiplot\n";
+            fStream4 << "unset output\n";
         }
     }
 
@@ -286,8 +286,8 @@ JackEngineProfiling::~JackEngineProfiling()
                     fStream5 << "\"JackEngineProfiling.log\" using " << ((i + 1) * 7) + 1  << " title \"" << fIntervalTable[i].fName << "\" with lines,";
                 }
             }
-	    fStream5 << "\nunset multiplot\n";
-	    fStream5 << "unset output\n";
+            fStream5 << "\nunset multiplot\n";
+            fStream5 << "unset output\n";
         }
     }
 

@@ -370,52 +370,6 @@ int JackWinAsyncNamedPipeServer::Bind(const char* dir, const char* name, int whi
     return BindAux();
 }
 
-/*
-int JackWinAsyncNamedPipeServer::Bind(const char* dir, int which)
-{
-    snprintf(fName, sizeof(fName), "\\\\.\\pipe\\%s_jack_%d", dir, which);
-    jack_log("Bind: fName %s", fName);
-
-    if ((fNamedPipe = CreateNamedPipe(fName,
-                                      PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,  // read/write access
-                                      PIPE_TYPE_MESSAGE |  // message type pipe
-                                      PIPE_READMODE_MESSAGE |  // message-read mode
-                                      PIPE_WAIT,  // blocking mode
-                                      PIPE_UNLIMITED_INSTANCES,  // max. instances
-                                      BUFSIZE,  // output buffer size
-                                      BUFSIZE,  // input buffer size
-                                      INFINITE,  // client time-out
-                                      NULL)) == INVALID_HANDLE_VALUE) { // no security a
-        jack_error("Cannot bind server to pipe err = %ld", GetLastError());
-        return -1;
-    } else {
-        return 0;
-    }
-}
-
-int JackWinAsyncNamedPipeServer::Bind(const char* dir, const char* name, int which)
-{
-    snprintf(fName, sizeof(fName), "\\\\.\\pipe\\%s_jack_%s_%d", dir, name, which);
-    jack_log("Bind: fName %s", fName);
-
-    if ((fNamedPipe = CreateNamedPipe(fName,
-                                      PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,  // read/write access
-                                      PIPE_TYPE_MESSAGE |  // message type pipe
-                                      PIPE_READMODE_MESSAGE |  // message-read mode
-                                      PIPE_WAIT,  // blocking mode
-                                      PIPE_UNLIMITED_INSTANCES,  // max. instances
-                                      BUFSIZE,  // output buffer size
-                                      BUFSIZE,  // input buffer size
-                                      INFINITE,  // client time-out
-                                      NULL)) == INVALID_HANDLE_VALUE) { // no security a
-        jack_error("Cannot bind server to pipe err = %ld", GetLastError());
-        return -1;
-    } else {
-        return 0;
-    }
-}
-*/
-
 bool JackWinAsyncNamedPipeServer::Accept()
 {
     return false;

@@ -38,8 +38,9 @@ bool JackWinSemaphore::Signal()
     BOOL res;
     assert(fSemaphore);
 
-    if (fFlush)
+    if (fFlush) {
         return true;
+    }
 
     if (!(res = ReleaseSemaphore(fSemaphore, 1, NULL))) {
         jack_error("JackWinSemaphore::Signal name = %s err = %ld", fName, GetLastError());
@@ -53,8 +54,9 @@ bool JackWinSemaphore::SignalAll()
     BOOL res;
     assert(fSemaphore);
 
-    if (fFlush)
+    if (fFlush) {
         return true;
+    }
 
     if (!(res = ReleaseSemaphore(fSemaphore, 1, NULL))) {
         jack_error("JackWinSemaphore::SignalAll name = %s err = %ld", fName, GetLastError());
