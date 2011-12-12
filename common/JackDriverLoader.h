@@ -64,7 +64,7 @@ extern "C"
 {
 #endif
 
-SERVER_EXPORT int jackctl_parse_driver_params (jackctl_driver * driver_ptr, int argc, char* argv[]);
+SERVER_EXPORT int jackctl_parse_driver_params(jackctl_driver * driver_ptr, int argc, char* argv[]);
 SERVER_EXPORT void jack_free_driver_params(JSList * param_ptr);
 SERVER_EXPORT void jack_print_driver_options(jack_driver_desc_t* desc, FILE* file);
 

@@ -34,7 +34,6 @@ extern "C"
 #endif
 
     jack_client_t* jack_client_new_aux(const char* client_name, jack_options_t options, jack_status_t* status);
-    jack_client_t* jack_client_open_aux(const char* client_name, jack_options_t options, jack_status_t* status, va_list ap);
 
     SERVER_EXPORT jack_client_t * jack_client_open (const char *client_name,
             jack_options_t options,
@@ -47,6 +46,10 @@ extern "C"
 #endif
 
 using namespace Jack;
+
+static jack_client_t * jack_client_open_aux (const char *client_name,
+            jack_options_t options,
+            jack_status_t *status, va_list ap);
 
 jack_client_t* jack_client_new_aux(const char* client_name, jack_options_t options, jack_status_t* status)
 {

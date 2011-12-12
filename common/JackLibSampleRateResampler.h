@@ -21,8 +21,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackLibSampleRateResampler__
 
 #include "JackResampler.h"
-#include "types.h"
-
 #include <samplerate.h>
 
 namespace Jack

@@ -25,9 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackClientControl.h"
 #include "JackGlobals.h"
 #include "JackTime.h"
-#include "JackCompilerDeps.h"
 #include "JackPortType.h"
-#include "JackPlatformPlug.h"
 #include <math.h>
 
 #ifdef __CLIENTDEBUG__
@@ -59,6 +57,7 @@ extern "C"
     jack_client_t * jack_client_new_aux(const char* client_name,
             jack_options_t options,
             jack_status_t *status);
+
     LIB_EXPORT jack_client_t * jack_client_open(const char* client_name,
             jack_options_t options,
             jack_status_t *status, ...);
