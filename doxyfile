@@ -578,10 +578,17 @@ INPUT                  = common \
                          posix \
                          macosx \
                          macosx/coreaudio/ \
+			 macosx/coremidi/ \
                          linux \
                          linux/alsa \
+			 linux/alsarawmidi \
+			 linux/firewire \
+			 linux/freebob \
                          windows \
                          windows/portaudio \
+                         windows/winmme \
+                         solaris \
+			 solaris/oss \
                          common/jack/
 
 # This tag can be used to specify the character encoding of the source files
