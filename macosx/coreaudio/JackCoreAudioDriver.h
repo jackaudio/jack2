@@ -62,7 +62,7 @@ class JackCoreAudioDriver : public JackAudioDriver
 
         AudioDeviceID fDeviceID;    // Used "duplex" device
         AudioObjectID fPluginID;    // Used for aggregate device
-
+    
         AudioUnitRenderActionFlags* fActionFags;
         const AudioTimeStamp* fCurrentTime;
 
@@ -75,14 +75,17 @@ class JackCoreAudioDriver : public JackAudioDriver
         float fIOUsage;
         float fComputationGrain;
         bool fClockDriftCompensate;
-
+   
+    
         static OSStatus Render(void *inRefCon,
                                AudioUnitRenderActionFlags *ioActionFlags,
                                const AudioTimeStamp *inTimeStamp,
                                UInt32 inBusNumber,
                                UInt32 inNumberFrames,
                                AudioBufferList *ioData);
-
+    
+        static OSStatus AudioHardwareNotificationCallback(AudioHardwarePropertyID inPropertyID,void* inClientData);
+   
         static OSStatus DeviceNotificationCallback(AudioDeviceID inDevice,
                                                     UInt32 inChannel,
                                                     Boolean	isInput,

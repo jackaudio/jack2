@@ -79,6 +79,8 @@ class JackCoreAudioAdapter : public JackAudioAdapterInterface
                                 UInt32 inNumberFrames,
                                 AudioBufferList *ioData);
 
+        static OSStatus AudioHardwareNotificationCallback(AudioHardwarePropertyID inPropertyID,void* inClientData);
+
         static OSStatus SRNotificationCallback(AudioDeviceID inDevice,
                                                 UInt32 inChannel,
                                                 Boolean	isInput,

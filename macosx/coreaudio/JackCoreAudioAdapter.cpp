@@ -161,6 +161,22 @@ static void printError(OSStatus err)
     }
 }
 
+OSStatus JackCoreAudioAdapter::AudioHardwareNotificationCallback(AudioHardwarePropertyID inPropertyID, void* inClientData)
+{
+    JackCoreAudioAdapter* driver = (JackCoreAudioAdapter*)inClientData;
+
+    switch (inPropertyID) {
+
+            case kAudioHardwarePropertyDevices: {
+                jack_log("JackCoreAudioAdapter::AudioHardwareNotificationCallback kAudioHardwarePropertyDevices");
+                DisplayDeviceNames();
+                break;
+            }
+    }
+
+    return noErr;
+}
+
 OSStatus JackCoreAudioAdapter::SRNotificationCallback(AudioDeviceID inDevice,
                                                         UInt32 inChannel,
                                                         Boolean	isInput,
@@ -222,9 +238,9 @@ int JackCoreAudioAdapter::AddListeners()
         return -1;
     }
 
-    err = AudioDeviceAddPropertyListener(fDeviceID, 0, true, kAudioHardwarePropertyDevices, DeviceNotificationCallback, this);
+    err = AudioHardwareAddPropertyListener(kAudioHardwarePropertyDevices, AudioHardwareNotificationCallback, this);
     if (err != noErr) {
-        jack_error("Error calling AudioDeviceAddPropertyListener with kAudioHardwarePropertyDevices");
+        jack_error("Error calling AudioHardwareAddPropertyListener with kAudioHardwarePropertyDevices");
         printError(err);
         return -1;
     }
@@ -263,7 +279,7 @@ int JackCoreAudioAdapter::AddListeners()
 void JackCoreAudioAdapter::RemoveListeners()
 {
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDeviceProcessorOverload, DeviceNotificationCallback);
-    AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioHardwarePropertyDevices, DeviceNotificationCallback);
+    AudioHardwareRemovePropertyListener(kAudioHardwarePropertyDevices, AudioHardwareNotificationCallback);
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDevicePropertyNominalSampleRate, DeviceNotificationCallback);
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDevicePropertyDeviceIsRunning, DeviceNotificationCallback);
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDevicePropertyStreamConfiguration, DeviceNotificationCallback);
