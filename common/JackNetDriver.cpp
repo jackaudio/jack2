@@ -361,10 +361,8 @@ namespace Jack
 
     void JackNetDriver::SaveConnections()
     {
+        JackDriver::SaveConnections();
         const char** connections;
-        fConnections.clear();
-
-        JackTimedDriver::SaveConnections();
 
         for (int i = 0; i < fParams.fSendMidiChannels; ++i) {
             if (fCapturePortList[i] && (connections = fGraphManager->GetConnections(fMidiCapturePortList[i])) != 0) {

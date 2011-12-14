@@ -400,73 +400,30 @@ OSStatus JackCoreAudioDriver::BSNotificationCallback(AudioDeviceID inDevice,
     return noErr;
 }
 
+// A better implementation would possibly try to recover in case of hardware device change (see HALLAB HLFilePlayerWindowControllerAudioDevicePropertyListenerProc code)
 OSStatus JackCoreAudioDriver::AudioHardwareNotificationCallback(AudioHardwarePropertyID inPropertyID, void* inClientData)
 {
     JackCoreAudioDriver* driver = (JackCoreAudioDriver*)inClientData;
 
     switch (inPropertyID) {
 
-             case kAudioHardwarePropertyDevices: {
-                 jack_log("JackCoreAudioDriver::AudioHardwareNotificationCallback kAudioHardwarePropertyDevices");
-                 DisplayDeviceNames();
+            case kAudioHardwarePropertyDevices: {
+                jack_log("JackCoreAudioDriver::AudioHardwareNotificationCallback kAudioHardwarePropertyDevices");
+                DisplayDeviceNames();
+                AudioDeviceID captureID, playbackID;
+                if (CheckAvailableDevice(driver->fDeviceID) ||
+                    (CheckAvailableDeviceName(driver->fCaptureUID, &captureID)
+                    && CheckAvailableDeviceName(driver->fPlaybackUID, &playbackID))) {
 
-                 AudioDeviceID captureID, playbackID;
-
-                 jack_log("JackCoreAudioDriver::AudioHardwareNotificationCallback  %s %d %s %d",
-                          driver->fCaptureUID, CheckAvailableDeviceName(driver->fCaptureUID, &captureID),
-                          driver->fPlaybackUID, CheckAvailableDeviceName(driver->fPlaybackUID, &playbackID));
-                 jack_log("JackCoreAudioDriver::AudioHardwareNotificationCallback  %d %d", driver->fDeviceID, CheckAvailableDevice(driver->fDeviceID));
-                 driver->CloseAUHAL();
-
-                 if (CheckAvailableDevice(driver->fDeviceID) ||
-                    (CheckAvailableDeviceName(driver->fCaptureUID, &captureID) && CheckAvailableDeviceName(driver->fPlaybackUID, &playbackID))) {
-
-                    vector<int> parsed_chan_in_list;
-                    vector<int> parsed_chan_out_list;
-
-                    if (driver->OpenAUHAL(true, true, 2, 2, 2, 2,
-                                           parsed_chan_in_list,
-                                           parsed_chan_out_list,
-                                           driver->fEngineControl->fBufferSize,
-                                           driver->fEngineControl->fSampleRate) < 0) {
-                        jack_log("JackCoreAudioDriver::OpenAUHAL fails");
-                        return -1;
-                    }
-
-                     // Waiting for Render callback to be called (= driver has started)
-                     driver->fState = false;
-                     int count = 0;
-
-                     OSStatus err = AudioOutputUnitStart(driver->fAUHAL);
-                     if (err == noErr) {
-
-                         while (!driver->fState && count++ < WAIT_COUNTER) {
-                             usleep(100000);
-                             jack_log("JackCoreAudioDriver::Start wait count = %d", count);
-                         }
-
-                         if (count < WAIT_COUNTER) {
-                             jack_info("CoreAudio driver is running...");
-                             return 0;
-                         }
-
-                         jack_error("CoreAudio driver cannot start...");
-                         return -1;
-                     }
-
-                 } else {
-                     driver->CloseAUHAL();
-                 }
-
-                 break;
-             }
+                }
+                break;
+            }
 
     }
 
     return noErr;
 }
 
-// A better implementation would possibly try to recover in case of hardware device change (see HALLAB HLFilePlayerWindowControllerAudioDevicePropertyListenerProc code)
 OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
                                                         UInt32 inChannel,
                                                         Boolean	isInput,
