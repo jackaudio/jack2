@@ -102,37 +102,38 @@ namespace Jack
     public:
 
         JackAudioAdapterInterface(jack_nframes_t buffer_size, jack_nframes_t sample_rate, jack_nframes_t ring_buffer_size = DEFAULT_ADAPTATIVE_SIZE):
-            fCaptureChannels(0),
-            fPlaybackChannels(0),
-            fHostBufferSize(buffer_size),
-            fHostSampleRate(sample_rate),
-            fAdaptedBufferSize(buffer_size),
-            fAdaptedSampleRate(sample_rate),
-            fPIControler(sample_rate / sample_rate, 256),
-            fCaptureRingBuffer(NULL), fPlaybackRingBuffer(NULL),
-            fQuality(0),
-            fRingbufferCurSize(ring_buffer_size),
-            fPullAndPushTime(0),
-            fRunning(false),
-            fAdaptative(true)
+                                fCaptureChannels(0),
+                                fPlaybackChannels(0),
+                                fHostBufferSize(buffer_size),
+                                fHostSampleRate(sample_rate),
+                                fAdaptedBufferSize(buffer_size),
+                                fAdaptedSampleRate(sample_rate),
+                                fPIControler(sample_rate / sample_rate, 256),
+                                fCaptureRingBuffer(NULL), fPlaybackRingBuffer(NULL),
+                                fQuality(0),
+                                fRingbufferCurSize(ring_buffer_size),
+                                fPullAndPushTime(0),
+                                fRunning(false),
+                                fAdaptative(true)
         {}
+
         JackAudioAdapterInterface(jack_nframes_t host_buffer_size,
-                                    jack_nframes_t host_sample_rate,
-                                    jack_nframes_t adapted_buffer_size,
-                                    jack_nframes_t adapted_sample_rate,
-                                    jack_nframes_t ring_buffer_size = DEFAULT_ADAPTATIVE_SIZE) :
-            fCaptureChannels(0),
-            fPlaybackChannels(0),
-            fHostBufferSize(host_buffer_size),
-            fHostSampleRate(host_sample_rate),
-            fAdaptedBufferSize(adapted_buffer_size),
-            fAdaptedSampleRate(adapted_sample_rate),
-            fPIControler(host_sample_rate / host_sample_rate, 256),
-            fQuality(0),
-            fRingbufferCurSize(ring_buffer_size),
-            fPullAndPushTime(0),
-            fRunning(false),
-            fAdaptative(true)
+                                jack_nframes_t host_sample_rate,
+                                jack_nframes_t adapted_buffer_size,
+                                jack_nframes_t adapted_sample_rate,
+                                jack_nframes_t ring_buffer_size = DEFAULT_ADAPTATIVE_SIZE) :
+                                fCaptureChannels(0),
+                                fPlaybackChannels(0),
+                                fHostBufferSize(host_buffer_size),
+                                fHostSampleRate(host_sample_rate),
+                                fAdaptedBufferSize(adapted_buffer_size),
+                                fAdaptedSampleRate(adapted_sample_rate),
+                                fPIControler(host_sample_rate / host_sample_rate, 256),
+                                fQuality(0),
+                                fRingbufferCurSize(ring_buffer_size),
+                                fPullAndPushTime(0),
+                                fRunning(false),
+                                fAdaptative(true)
         {}
 
         virtual ~JackAudioAdapterInterface()
