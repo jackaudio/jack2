@@ -32,6 +32,9 @@ namespace Jack
 
 class JackFreewheelDriver : public JackDriver
 {
+    protected:
+
+        int SuspendRefNum();
 
     public:
 

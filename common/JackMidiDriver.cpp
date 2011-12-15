@@ -143,7 +143,7 @@ int JackMidiDriver::ProcessReadSync()
         res = -1;
     }
 
-    if (fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable) < 0) {
+    if (ResumeRefNum() < 0) {
         jack_error("JackMidiDriver::ProcessReadSync: ResumeRefNum error");
         res = -1;
     }
@@ -155,9 +155,7 @@ int JackMidiDriver::ProcessWriteSync()
 {
     int res = 0;
 
-    if (fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable,
-                                     DRIVER_TIMEOUT_FACTOR *
-                                     fEngineControl->fTimeOutUsecs) < 0) {
+    if (SuspendRefNum() < 0) {
         jack_error("JackMidiDriver::ProcessWriteSync: SuspendRefNum error");
         res = -1;
     }
@@ -187,7 +185,7 @@ int JackMidiDriver::ProcessReadAsync()
         res = -1;
     }
 
-    if (fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable) < 0) {
+    if (ResumeRefNum() < 0) {
         jack_error("JackMidiDriver::ProcessReadAsync: ResumeRefNum error");
         res = -1;
     }

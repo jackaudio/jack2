@@ -186,6 +186,9 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         virtual int StartSlaves();
         virtual int StopSlaves();
 
+        virtual int ResumeRefNum();
+        virtual int SuspendRefNum();
+
     public:
 
         JackDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table);

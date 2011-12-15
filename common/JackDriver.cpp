@@ -530,4 +530,15 @@ void JackDriver::RestoreConnections()
     }
 }
 
+int JackDriver::ResumeRefNum()
+{
+    return fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable);
+}
+
+int JackDriver::SuspendRefNum()
+{
+    return fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable, DRIVER_TIMEOUT_FACTOR * fEngineControl->fTimeOutUsecs);
+}
+
+
 } // end of namespace

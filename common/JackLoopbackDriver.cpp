@@ -41,7 +41,7 @@ int JackLoopbackDriver::ProcessReadSync()
         memcpy(GetInputBuffer(i), GetOutputBuffer(i), sizeof(jack_default_audio_sample_t) * fEngineControl->fBufferSize);
     }
 
-    if (fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable) < 0) {
+    if (ResumeRefNum() < 0) {
         jack_error("JackLoopbackDriver::ProcessReadSync - ResumeRefNum error");
         res = -1;
     }
@@ -51,7 +51,7 @@ int JackLoopbackDriver::ProcessReadSync()
 
 int JackLoopbackDriver::ProcessWriteSync()
 {
-    if (fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable, DRIVER_TIMEOUT_FACTOR * fEngineControl->fTimeOutUsecs) < 0) {
+    if (SuspendRefNum() < 0) {
         jack_error("JackLoopbackDriver::ProcessWriteSync SuspendRefNum error");
         return -1;
     }
@@ -67,7 +67,7 @@ int JackLoopbackDriver::ProcessReadAsync()
         memcpy(GetInputBuffer(i), GetOutputBuffer(i), sizeof(jack_default_audio_sample_t) * fEngineControl->fBufferSize);
     }
 
-    if (fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable) < 0) {
+    if (ResumeRefNum() < 0) {
         jack_error("JackLoopbackDriver::ProcessReadAsync - ResumeRefNum error");
         res = -1;
     }
