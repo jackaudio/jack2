@@ -143,29 +143,31 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         jack_nframes_t fCaptureLatency;
         jack_nframes_t fPlaybackLatency;
 
+        int fCaptureChannels;
+        int fPlaybackChannels;
+
         jack_time_t fBeginDateUst;
         jack_time_t fEndDateUst;
         float fDelayedUsecs;
 
+        // Pointers to engine state
         JackLockedEngine* fEngine;
         JackGraphManager* fGraphManager;
         JackSynchro* fSynchroTable;
         JackEngineControl* fEngineControl;
         JackClientControl fClientControl;
+
         std::list<JackDriverInterface*> fSlaveList;
+
         bool fIsMaster;
         bool fIsRunning;
-
-        int fCaptureChannels;
-        int fPlaybackChannels;
+        bool fWithMonitorPorts;
 
         // Static tables since the actual number of ports may be changed by the real driver
         // thus dynamic allocation is more difficult to handle
         jack_port_id_t fCapturePortList[DRIVER_PORT_NUM];
         jack_port_id_t fPlaybackPortList[DRIVER_PORT_NUM];
         jack_port_id_t fMonitorPortList[DRIVER_PORT_NUM];
-
-        bool fWithMonitorPorts;
 
         std::list<std::pair<std::string, std::string> > fConnections;		// Connections list
 

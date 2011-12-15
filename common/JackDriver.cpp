@@ -37,9 +37,9 @@ namespace Jack
 {
 
 JackDriver::JackDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
-    :fClientControl(name),
-    fCaptureChannels(0),
+    :fCaptureChannels(0),
     fPlaybackChannels(0),
+    fClientControl(name),
     fWithMonitorPorts(false)
 {
     assert(strlen(name) < JACK_CLIENT_NAME_SIZE);
@@ -475,7 +475,6 @@ bool JackDriver::Initialize()
 {
     return true;
 }
-
 
 void JackDriver::SaveConnections()
 {
