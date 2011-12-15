@@ -713,7 +713,7 @@ int JackOSSDriver::ProcessSync()
     if (fIsMaster) {
         ProcessGraphSync();
     } else {
-        fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable);
+        ResumeRefNum();
     }
 
     // Write output buffers for the current cycle
