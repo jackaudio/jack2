@@ -12,21 +12,21 @@
 
 /*
  Copyright (C) 2001-2003 Paul Davis
- 
+
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as published by
  the Free Software Foundation; either version 2.1 of the License, or
  (at your option) any later version.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU Lesser General Public License for more details.
- 
+
  You should have received a copy of the GNU Lesser General Public License
- along with this program; if not, write to the Free Software 
+ along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- 
+
  */
 
 #include "JackConstants.h"
@@ -142,6 +142,31 @@ static char jack_shm_server_prefix[JACK_SERVER_NAME_SIZE] = "";
 static int semid = -1;
 
 #ifdef WIN32
+
+#include <psapi.h>
+#include <lmcons.h>
+
+static BOOL check_process_running(DWORD process_id)
+{
+    DWORD aProcesses[2048], cbNeeded, cProcesses;
+    unsigned int i;
+
+    // Enumerate all processes
+    if (!EnumProcesses(aProcesses, sizeof(aProcesses), &cbNeeded)) {
+        return FALSE;
+    }
+
+    // Calculate how many process identifiers were returned.
+    cProcesses = cbNeeded / sizeof(DWORD);
+
+    for (i = 0; i < cProcesses; i++) {
+         if (aProcesses[i] == process_id) {
+            // Process process_id is running...
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
 
 static int
 semaphore_init () {return 0;}
@@ -289,8 +314,16 @@ jack_shm_validate_registry ()
 static void
 jack_set_server_prefix (const char *server_name)
 {
-	snprintf (jack_shm_server_prefix, sizeof (jack_shm_server_prefix),
+#ifdef WIN32
+    char buffer[UNLEN+1]={0};
+    DWORD len = UNLEN+1;
+    GetUserName(buffer, &len);
+    snprintf (jack_shm_server_prefix, sizeof (jack_shm_server_prefix),
+		  "jack-%s:%s:", buffer, server_name);
+#else
+    snprintf (jack_shm_server_prefix, sizeof (jack_shm_server_prefix),
 		  "jack-%d:%s:", GetUID(), server_name);
+#endif
 }
 
 /* gain server addressability to shared memory registration segment
@@ -481,7 +514,12 @@ jack_register_server (const char *server_name, int new_registry)
 		}
 
 		/* see if server still exists */
-	#ifndef WIN32 // steph TO CHECK
+    #ifdef WIN32
+        if (check_process_running(jack_shm_header->server[i].pid)) {
+            res = EEXIST;	/* other server running */
+			goto unlock;
+        }
+	#else
 		if (kill (jack_shm_header->server[i].pid, 0) == 0)  {
 			res = EEXIST;	/* other server running */
 			goto unlock;
@@ -572,7 +610,7 @@ jack_cleanup_shm ()
 
 			/* see if allocator still exists */
 		#ifdef WIN32 // steph
-			jack_info("TODO: kill API not available !!");
+			//jack_info("TODO: kill API not available !!");
 		#else
 			if (kill (r->allocator, 0)) {
 				if (errno == ESRCH) {
@@ -634,6 +672,24 @@ jack_resize_shm (jack_shm_info_t* si, jack_shmsize_t size)
 	}
 
 	return jack_attach_shm (si);
+}
+
+int
+jack_attach_lib_shm (jack_shm_info_t* si)
+{
+    int res = jack_attach_shm(si);
+    if (res == 0)
+        si->size = jack_shm_registry[si->index].size; // Keep size in si struct
+    return res;
+}
+
+int
+jack_attach_lib_shm_read (jack_shm_info_t* si)
+{
+    int res = jack_attach_shm_read(si);
+    if (res == 0)
+        si->size = jack_shm_registry[si->index].size; // Keep size in si struct
+    return res;
 }
 
 #ifdef USE_POSIX_SHM
@@ -759,6 +815,15 @@ jack_release_shm (jack_shm_info_t* si)
 	/* registry may or may not be locked */
 	if (si->ptr.attached_at != MAP_FAILED) {
 		munmap (si->ptr.attached_at, jack_shm_registry[si->index].size);
+  	}
+}
+
+void
+jack_release_lib_shm (jack_shm_info_t* si)
+{
+	/* registry may or may not be locked */
+	if (si->ptr.attached_at != MAP_FAILED) {
+       munmap (si->ptr.attached_at, si->size);
 	}
 }
 
@@ -961,6 +1026,12 @@ jack_release_shm (jack_shm_info_t* si)
 	}
 }
 
+void
+jack_release_lib_shm (jack_shm_info_t* si)
+{
+	jack_release_shm(si);
+}
+
 int
 jack_shmalloc (const char *shm_name, jack_shmsize_t size, jack_shm_info_t* si)
 {
@@ -1160,6 +1231,12 @@ jack_release_shm (jack_shm_info_t* si)
 	}
 }
 
+void
+jack_release_lib_shm (jack_shm_info_t* si)
+{
+	jack_release_shm(si);
+}
+
 int
 jack_shmalloc (const char* name_not_used, jack_shmsize_t size,
 	       jack_shm_info_t* si)
@@ -1210,3 +1287,4 @@ jack_attach_shm (jack_shm_info_t* si)
 }
 
 #endif /* !USE_POSIX_SHM */
+

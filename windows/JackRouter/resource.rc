@@ -1,4 +1,4 @@
-//Microsoft Developer Studio generated resource script.
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -13,15 +13,12 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// French (France) resources
+// Français (France) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_FRA)
-#ifdef _WIN32
 LANGUAGE LANG_FRENCH, SUBLANG_FRENCH
 #pragma code_page(1252)
-#endif //_WIN32
 
-#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -44,18 +41,14 @@ BEGIN
     BEGIN
         BLOCK "040c04b0"
         BEGIN
-            VALUE "Comments", "\0"
-            VALUE "CompanyName", "Grame\0"
-            VALUE "FileDescription", "JackRouter ASIO driver\0"
-            VALUE "FileVersion", "0, 2, 1, 0\0"
-            VALUE "InternalName", "JackRouter\0"
-            VALUE "LegalCopyright", "Copyright Grame © 2006-2010\0"
-            VALUE "LegalTrademarks", "\0"
-            VALUE "OriginalFilename", "JackRouter.dll\0"
-            VALUE "PrivateBuild", "\0"
-            VALUE "ProductName", "JackRouter\0"
-            VALUE "ProductVersion", "0, 2, 1, 0\0"
-            VALUE "SpecialBuild", "\0"
+            VALUE "CompanyName", "Grame"
+            VALUE "FileDescription", "JackRouter ASIO driver"
+            VALUE "FileVersion", "0, 2, 1, 0"
+            VALUE "InternalName", "JackRouter"
+            VALUE "LegalCopyright", "Copyright Grame © 2006-2011"
+            VALUE "OriginalFilename", "JackRouter.dll"
+            VALUE "ProductName", "JackRouter"
+            VALUE "ProductVersion", "0, 2, 1, 0"
         END
     END
     BLOCK "VarFileInfo"
@@ -64,8 +57,6 @@ BEGIN
     END
 END
 
-#endif    // !_MAC
-
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -73,18 +64,18 @@ END
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE DISCARDABLE 
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE DISCARDABLE 
+2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE DISCARDABLE 
+3 TEXTINCLUDE 
 BEGIN
     "\r\n"
     "\0"
@@ -92,7 +83,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // French (France) resources
+#endif    // Français (France) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

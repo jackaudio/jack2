@@ -36,6 +36,7 @@ struct JackClientControl;
 \brief Utility class.
 */
 
+PRE_PACKED_STRUCTURE
 template <int SIZE>
 class JackFixedArray
 {
@@ -122,6 +123,7 @@ class JackFixedArray
 \brief Utility class.
 */
 
+PRE_PACKED_STRUCTURE
 template <int SIZE>
 class JackFixedArray1 : public JackFixedArray<SIZE>
 {
@@ -158,6 +160,7 @@ class JackFixedArray1 : public JackFixedArray<SIZE>
 \brief Utility class.
 */
 
+PRE_PACKED_STRUCTURE
 template <int SIZE>
 class JackFixedMatrix
 {
@@ -253,6 +256,7 @@ class JackFixedMatrix
 \brief Utility class.
 */
 
+PRE_PACKED_STRUCTURE
 template <int SIZE>
 class JackLoopFeedback
 {
@@ -366,6 +370,7 @@ class JackLoopFeedback
 \brief For client timing measurements.
 */
 
+PRE_PACKED_STRUCTURE
 struct JackClientTiming
 {
     jack_time_t fSignaledAt;
@@ -402,6 +407,7 @@ struct JackClientTiming
 </UL>
 */
 
+PRE_PACKED_STRUCTURE
 class SERVER_EXPORT JackConnectionManager
 {
 

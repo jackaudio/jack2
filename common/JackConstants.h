@@ -24,7 +24,7 @@
 #include "config.h"
 #endif
 
-#define VERSION "1.9.7"
+#define VERSION "1.9.8"
 
 #define BUFFER_SIZE_MAX 8192
 
@@ -35,6 +35,8 @@
 #define JACK_MESSAGE_SIZE 256
 #define JACK_UUID_SIZE 32
 #define JACK_SESSION_COMMAND_SIZE 256
+
+#define REAL_JACK_PORT_NAME_SIZE JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE
 
 #ifndef PORT_NUM
 #define PORT_NUM 2048
@@ -71,7 +73,7 @@
 #define SOCKET_TIME_OUT 5               // in sec
 #define DRIVER_OPEN_TIMEOUT 5           // in sec
 #define FREEWHEEL_DRIVER_TIMEOUT 10     // in sec
-#define DRIVER_TIMEOUT_FACTOR    10     
+#define DRIVER_TIMEOUT_FACTOR    10
 
 
 #define NO_PORT   0xFFFE

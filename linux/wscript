@@ -13,12 +13,14 @@ def configure(conf):
 
     conf.define('HAVE_PPOLL', 1 )
 
-
 def create_jack_driver_obj(bld, target, sources, uselib = None):
     driver = bld.new_task_gen('cxx', 'shlib')
     driver.features.append('cc')
     driver.env['shlib_PATTERN'] = 'jack_%s.so'
-    driver.defines = ['HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL']
+
+    #driver.defines = ['HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL']
+    driver.defines = ['HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL', 'HAVE_TIMERFD']
+
     driver.includes = ['.', '../linux', '../posix', '../common', '../common/jack', '../dbus']
     driver.target = target
     driver.source = sources
@@ -32,7 +34,7 @@ def build(bld):
     if bld.env['BUILD_JACKD'] == True:
         jackd = bld.new_task_gen('cxx', 'program')
         jackd.includes = ['../linux', '../posix', '../common/jack', '../common', '../dbus']
-        jackd.defines = 'HAVE_CONFIG_H'
+        jackd.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
         jackd.source = ['../common/Jackdmp.cpp']
 	if bld.env['IS_LINUX'] and bld.env['BUILD_JACKDBUS']: 
             jackd.source += ['../dbus/reserve.c', '../dbus/audio_reserve.c'] 
@@ -57,15 +59,26 @@ def build(bld):
                        'alsa/ice1712.c'
                        ]
 
+    alsarawmidi_driver_src = ['alsarawmidi/JackALSARawMidiDriver.cpp',
+                              'alsarawmidi/JackALSARawMidiInputPort.cpp',
+                              'alsarawmidi/JackALSARawMidiOutputPort.cpp',
+                              'alsarawmidi/JackALSARawMidiPort.cpp',
+                              'alsarawmidi/JackALSARawMidiReceiveQueue.cpp',
+                              'alsarawmidi/JackALSARawMidiSendQueue.cpp',
+                              'alsarawmidi/JackALSARawMidiUtil.cpp'
+                              ]
+
     ffado_driver_src = ['firewire/JackFFADODriver.cpp',
-                        'firewire/JackFFADOMidiInput.cpp',
-                        'firewire/JackFFADOMidiOutput.cpp',
-                        '../common/JackPhysicalMidiInput.cpp',
-                        '../common/JackPhysicalMidiOutput.cpp'
+                        'firewire/JackFFADOMidiInputPort.cpp',
+                        'firewire/JackFFADOMidiOutputPort.cpp',
+                        'firewire/JackFFADOMidiReceiveQueue.cpp',
+                        'firewire/JackFFADOMidiSendQueue.cpp'
                        ]
 
     if bld.env['BUILD_DRIVER_ALSA'] == True:
         create_jack_driver_obj(bld, 'alsa', alsa_driver_src, "ALSA")
+        create_jack_driver_obj(bld, 'alsarawmidi', alsarawmidi_driver_src,
+                               "ALSA")
 
     if bld.env['BUILD_DRIVER_FREEBOB'] == True:
         create_jack_driver_obj(bld, 'freebob', 'freebob/JackFreebobDriver.cpp', "LIBFREEBOB")

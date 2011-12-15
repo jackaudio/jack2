@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008 Romain Moret at Grame
+Copyright (C) 2008-2011 Romain Moret at Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackPortAudioDevices.h"
 #include "JackError.h"
+#include <stdlib.h>
 
 using namespace std;
 
@@ -27,19 +28,20 @@ PortAudioDevices::PortAudioDevices()
     PaError err;
 	PaDeviceIndex id;
 	jack_log("Initializing PortAudio...");
-    if ( ( err = Pa_Initialize() ) == paNoError )
-    {
+    if ((err = Pa_Initialize()) == paNoError) {
         fNumHostApi = Pa_GetHostApiCount();
         fNumDevice = Pa_GetDeviceCount();
         fDeviceInfo = new PaDeviceInfo*[fNumDevice];
-        for ( id = 0; id < fNumDevice; id++ )
+        for (id = 0; id < fNumDevice; id++) {
             fDeviceInfo[id] = const_cast<PaDeviceInfo*>(Pa_GetDeviceInfo(id));
+        }
         fHostName = new string[fNumHostApi];
-        for ( id = 0; id < fNumHostApi; id++ )
-            fHostName[id] = string ( Pa_GetHostApiInfo(id)->name );
-    }
-    else
+        for (id = 0; id < fNumHostApi; id++) {
+            fHostName[id] = string (Pa_GetHostApiInfo(id)->name);
+        }
+    } else {
 		jack_error("JackPortAudioDriver::Pa_Initialize error = %s", Pa_GetErrorText(err));
+    }
 }
 
 PortAudioDevices::~PortAudioDevices()
@@ -56,70 +58,73 @@ PaDeviceIndex PortAudioDevices::GetNumDevice()
     return fNumDevice;
 }
 
-PaDeviceInfo* PortAudioDevices::GetDeviceInfo ( PaDeviceIndex id )
+PaDeviceInfo* PortAudioDevices::GetDeviceInfo(PaDeviceIndex id)
 {
     return fDeviceInfo[id];
 }
 
-string PortAudioDevices::GetDeviceName ( PaDeviceIndex id )
+string PortAudioDevices::GetDeviceName(PaDeviceIndex id)
 {
-    return string ( fDeviceInfo[id]->name );
+    return string(fDeviceInfo[id]->name);
 }
 
-string PortAudioDevices::GetHostFromDevice ( PaDeviceInfo* device )
+string PortAudioDevices::GetHostFromDevice(PaDeviceInfo* device)
 {
     return fHostName[device->hostApi];
 }
 
-string PortAudioDevices::GetHostFromDevice ( PaDeviceIndex id )
+string PortAudioDevices::GetHostFromDevice(PaDeviceIndex id)
 {
     return fHostName[fDeviceInfo[id]->hostApi];
 }
 
-string PortAudioDevices::GetFullName ( PaDeviceIndex id )
+string PortAudioDevices::GetFullName(PaDeviceIndex id)
 {
-    string hostname = GetHostFromDevice ( id );
-    string devicename = GetDeviceName ( id );
+    string hostname = GetHostFromDevice(id);
+    string devicename = GetDeviceName(id);
     //some hostname are quite long...use shortcuts
-    if ( hostname.compare ( "Windows DirectSound" ) == 0 )
-        hostname = string ( "DirectSound" );
-    return ( hostname + "::" + devicename );
+    if (hostname.compare("Windows DirectSound") == 0) {
+        hostname = string("DirectSound");
+    }
+    return (hostname + "::" + devicename);
 }
 
-string PortAudioDevices::GetFullName ( std::string hostname, std::string devicename )
+string PortAudioDevices::GetFullName(std::string hostname, std::string devicename)
 {
     //some hostname are quite long...use shortcuts
-    if ( hostname.compare ( "Windows DirectSound" ) == 0 )
-        hostname = string ( "DirectSound" );
-    return ( hostname + "::" + devicename );
+    if (hostname.compare("Windows DirectSound") == 0) {
+        hostname = string("DirectSound");
+    }
+    return (hostname + "::" + devicename);
 }
 
-PaDeviceInfo* PortAudioDevices::GetDeviceFromFullName ( string fullname, PaDeviceIndex& id, bool isInput )
+PaDeviceInfo* PortAudioDevices::GetDeviceFromFullName (string fullname, PaDeviceIndex& id, bool isInput)
 {
     PaDeviceInfo* ret = NULL;
     //no driver to find
-    if ( fullname.size() == 0 )
+    if (fullname.size() == 0) {
         return NULL;
+    }
     //first get host and device names from fullname
-    string::size_type separator = fullname.find ( "::", 0 );
-    if ( separator == 0 )
+    string::size_type separator = fullname.find ("::", 0);
+    if (separator == 0) {
         return NULL;
+    }
     char* hostname = (char*)malloc(separator + 9);
-    fill_n ( hostname, separator + 9, 0 );
-    fullname.copy ( hostname, separator );
+    fill_n (hostname, separator + 9, 0);
+    fullname.copy (hostname, separator);
 
     //we need the entire hostname, replace shortcuts
-    if ( strcmp ( hostname, "DirectSound" ) == 0 )
-        strcpy ( hostname, "Windows DirectSound" );
-    string devicename = fullname.substr ( separator + 2 );
+    if (strcmp (hostname, "DirectSound") == 0) {
+        strcpy (hostname, "Windows DirectSound");
+    }
+    string devicename = fullname.substr (separator + 2);
     //then find the corresponding device
-    for ( PaDeviceIndex dev_id = 0; dev_id < fNumDevice; dev_id++ )
-    {
+    for (PaDeviceIndex dev_id = 0; dev_id < fNumDevice; dev_id++) {
         bool flag = (isInput) ? (fDeviceInfo[dev_id]->maxInputChannels > 0) : (fDeviceInfo[dev_id]->maxOutputChannels > 0);
-        if ( ( GetHostFromDevice(dev_id).compare(hostname) == 0 )
-            && ( GetDeviceName(dev_id).compare(devicename) == 0 )
-            && flag )
-        {
+        if ((GetHostFromDevice(dev_id).compare(hostname) == 0)
+            && (GetDeviceName(dev_id).compare(devicename) == 0)
+            && flag) {
             id = dev_id;
             ret = fDeviceInfo[dev_id];
         }
@@ -139,23 +144,16 @@ void PortAudioDevices::PrintSupportedStandardSampleRates(const PaStreamParameter
     PaError err;
 
     printCount = 0;
-    for (i = 0; standardSampleRates[i] > 0; i++)
-    {
+    for (i = 0; standardSampleRates[i] > 0; i++) {
         err = Pa_IsFormatSupported(inputParameters, outputParameters, standardSampleRates[i]);
-        if (err == paFormatIsSupported)
-        {
-            if (printCount == 0)
-            {
+        if (err == paFormatIsSupported) {
+            if (printCount == 0) {
                 jack_info("\t%8.2f", standardSampleRates[i]);
                 printCount = 1;
-            }
-            else if (printCount == 4)
-            {
+            } else if (printCount == 4) {
                 jack_info(",\n\t%8.2f", standardSampleRates[i]);
                 printCount = 1;
-            }
-            else
-            {
+            } else {
                 jack_info(", %8.2f", standardSampleRates[i]);
                 ++printCount;
             }
@@ -170,17 +168,18 @@ void PortAudioDevices::PrintSupportedStandardSampleRates(const PaStreamParameter
 
 int PortAudioDevices::GetInputDeviceFromName(const char* devicename, PaDeviceIndex& id, int& max_input)
 {
-    string fullname = string ( devicename );
-    PaDeviceInfo* device = GetDeviceFromFullName ( fullname, id, true );
-    if ( device )
+    string fullname = string (devicename);
+    PaDeviceInfo* device = GetDeviceFromFullName (fullname, id, true);
+    if (device) {
         max_input = device->maxInputChannels;
-    else
-    {
+    } else {
         id = Pa_GetDefaultInputDevice();
-        if ( fullname.size() )
+        if (fullname.size()) {
             jack_error("Can't open %s, PortAudio will use default input device.", devicename);
-        if ( id == paNoDevice )
+        }
+        if (id == paNoDevice) {
             return -1;
+        }
         max_input = GetDeviceInfo(id)->maxInputChannels;
     }
     return id;
@@ -188,17 +187,18 @@ int PortAudioDevices::GetInputDeviceFromName(const char* devicename, PaDeviceInd
 
 int PortAudioDevices::GetOutputDeviceFromName(const char* devicename, PaDeviceIndex& id, int& max_output)
 {
-    string fullname = string ( devicename );
-    PaDeviceInfo* device = GetDeviceFromFullName ( fullname, id, false );
-    if ( device )
+    string fullname = string (devicename);
+    PaDeviceInfo* device = GetDeviceFromFullName (fullname, id, false);
+    if (device) {
         max_output = device->maxOutputChannels;
-    else
-    {
+    } else {
         id = Pa_GetDefaultOutputDevice();
-        if ( fullname.size() )
+        if (fullname.size()) {
             jack_error("Can't open %s, PortAudio will use default output device.", devicename);
-        if ( id == paNoDevice )
+        }
+        if (id == paNoDevice) {
             return -1;
+        }
         max_output = GetDeviceInfo(id)->maxOutputChannels;
     }
     return id;
@@ -208,57 +208,50 @@ void PortAudioDevices::DisplayDevicesNames()
 {
     PaDeviceIndex id;
     PaStreamParameters inputParameters, outputParameters;
-    jack_info ( "********************** Devices list, %d detected **********************", fNumDevice );
+    jack_info ("********************** Devices list, %d detected **********************", fNumDevice);
 
-    for ( id = 0; id < fNumDevice; id++ )
-    {
-        jack_info ( "-------- device #%d ------------------------------------------------", id );
+    for (id = 0; id < fNumDevice; id++) {
+        jack_info ("-------- device #%d ------------------------------------------------", id);
 
-        if ( id == Pa_GetDefaultInputDevice() )
-        {
+        if (id == Pa_GetDefaultInputDevice()) {
             jack_info("[ Default Input ]");
-        }
-        else if ( id == Pa_GetHostApiInfo ( fDeviceInfo[id]->hostApi)->defaultInputDevice )
-        {
-            const PaHostApiInfo *host_info = Pa_GetHostApiInfo ( fDeviceInfo[id]->hostApi );
-            jack_info ( "[ Default %s Input ]", host_info->name );
+        } else if (id == Pa_GetHostApiInfo (fDeviceInfo[id]->hostApi)->defaultInputDevice) {
+            const PaHostApiInfo *host_info = Pa_GetHostApiInfo (fDeviceInfo[id]->hostApi);
+            jack_info("[ Default %s Input ]", host_info->name);
         }
 
-        if ( id == Pa_GetDefaultOutputDevice() )
-        {
-            jack_info ( "[ Default Output ]" );
-        }
-        else if ( id == Pa_GetHostApiInfo ( fDeviceInfo[id]->hostApi )->defaultOutputDevice )
-        {
-            const PaHostApiInfo *host_info = Pa_GetHostApiInfo ( fDeviceInfo[id]->hostApi );
-            jack_info ( "[ Default %s Output ]", host_info->name );
+        if (id == Pa_GetDefaultOutputDevice()) {
+            jack_info ("[ Default Output ]");
+        } else if (id == Pa_GetHostApiInfo (fDeviceInfo[id]->hostApi)->defaultOutputDevice) {
+            const PaHostApiInfo *host_info = Pa_GetHostApiInfo (fDeviceInfo[id]->hostApi);
+            jack_info("[ Default %s Output ]", host_info->name);
         }
 
         /* print device info fields */
-        jack_info ( "Name                        = %s", GetFullName ( id ).c_str() );
-        jack_info ( "Max inputs                  = %d", fDeviceInfo[id]->maxInputChannels );
-        jack_info ( "Max outputs                 = %d", fDeviceInfo[id]->maxOutputChannels );
+        jack_info ("Name                        = %s", GetFullName (id).c_str());
+        jack_info ("Max inputs                  = %d", fDeviceInfo[id]->maxInputChannels);
+        jack_info ("Max outputs                 = %d", fDeviceInfo[id]->maxOutputChannels);
 
 #ifdef WIN32
         /* ASIO specific latency information */
-        if ( Pa_GetHostApiInfo(fDeviceInfo[id]->hostApi)->type == paASIO )
-        {
+        if (Pa_GetHostApiInfo(fDeviceInfo[id]->hostApi)->type == paASIO) {
             long minLatency, maxLatency, preferredLatency, granularity;
 
-            PaAsio_GetAvailableLatencyValues ( id, &minLatency, &maxLatency, &preferredLatency, &granularity );
+            PaAsio_GetAvailableLatencyValues (id, &minLatency, &maxLatency, &preferredLatency, &granularity);
 
-            jack_info ( "ASIO minimum buffer size    = %ld", minLatency );
-            jack_info ( "ASIO maximum buffer size    = %ld", maxLatency );
-            jack_info ( "ASIO preferred buffer size  = %ld", preferredLatency );
+            jack_info ("ASIO minimum buffer size    = %ld", minLatency);
+            jack_info ("ASIO maximum buffer size    = %ld", maxLatency);
+            jack_info ("ASIO preferred buffer size  = %ld", preferredLatency);
 
-            if ( granularity == -1 )
-                jack_info ( "ASIO buffer granularity     = power of 2" );
-            else
-                jack_info ( "ASIO buffer granularity     = %ld", granularity );
+            if (granularity == -1) {
+                jack_info ("ASIO buffer granularity     = power of 2");
+            } else {
+                jack_info ("ASIO buffer granularity     = %ld", granularity);
+            }
         }
 #endif
 
-        jack_info ( "Default sample rate         = %8.2f", fDeviceInfo[id]->defaultSampleRate );
+        jack_info ("Default sample rate         = %8.2f", fDeviceInfo[id]->defaultSampleRate);
 
         /* poll for standard sample rates */
         inputParameters.device = id;
@@ -273,20 +266,25 @@ void PortAudioDevices::DisplayDevicesNames()
         outputParameters.suggestedLatency = 0; /* ignored by Pa_IsFormatSupported() */
         outputParameters.hostApiSpecificStreamInfo = NULL;
     }
-    jack_info ( "**************************** End of list ****************************" );
+    jack_info("**************************** End of list ****************************");
 }
 
-bool PortAudioDevices::IsDuplex ( PaDeviceIndex id )
+bool PortAudioDevices::IsDuplex (PaDeviceIndex id)
 {
     //does the device has in and out facilities
-    if ( fDeviceInfo[id]->maxInputChannels && fDeviceInfo[id]->maxOutputChannels )
+    if (fDeviceInfo[id]->maxInputChannels && fDeviceInfo[id]->maxOutputChannels) {
         return true;
+    }
     //else is another complementary device ? (search in devices with the same name)
-    for ( PaDeviceIndex i = 0; i < fNumDevice; i++ )
-        if ( ( i != id ) && ( GetDeviceName ( i ) == GetDeviceName ( id ) ) )
-            if ( ( fDeviceInfo[i]->maxInputChannels && fDeviceInfo[id]->maxOutputChannels )
-                    || ( fDeviceInfo[i]->maxOutputChannels && fDeviceInfo[id]->maxInputChannels ) )
+    for (PaDeviceIndex i = 0; i < fNumDevice; i++) {
+        if ((i != id) && (GetDeviceName (i) == GetDeviceName (id))) {
+            if ((fDeviceInfo[i]->maxInputChannels && fDeviceInfo[id]->maxOutputChannels)
+                    || (fDeviceInfo[i]->maxOutputChannels && fDeviceInfo[id]->maxInputChannels)) {
                 return true;
+            }
+        }
+    }
     //then the device isn't full duplex
     return false;
 }
+

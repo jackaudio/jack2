@@ -1,19 +1,24 @@
 /*
-Copyright (C) 2006 Grame
+ Copyright (C) 2006-2011 Grame
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
+ Permission is hereby granted, free of charge, to any person obtaining
+ a copy of this software and associated documentation files
+ (the "Software"), to deal in the Software without restriction,
+ including without limitation the rights to use, copy, modify, merge,
+ publish, distribute, sublicense, and/or sell copies of the Software,
+ and to permit persons to whom the Software is furnished to do so,
+ subject to the following conditions:
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+ The above copyright notice and this permission notice shall be
+ included in all copies or substantial portions of the Software.
 
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
+ ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
@@ -29,13 +34,12 @@ Copyright (C) 2006 Grame
 #include "profport.h"
 
 /*
-
-	08/07/2007 SL : USe jack_client_open instead of jack_client_new (automatic client renaming).
+	08/07/2007 SL : Use jack_client_open instead of jack_client_new (automatic client renaming).
 	09/08/2007 SL : Add JackRouter.ini parameter file.
 	09/20/2007 SL : Better error report in DllRegisterServer (for Vista).
 	09/27/2007 SL : Add AUDO_CONNECT property in JackRouter.ini file.
 	10/10/2007 SL : Use ASIOSTInt32LSB instead of ASIOSTInt16LSB.
-
+	12/04/2011 SL : Compilation on Windows 64.
  */
 
 //------------------------------------------------------------------------------------------
@@ -54,7 +58,13 @@ static const double twoRaisedTo32Reciprocal = 1. / twoRaisedTo32;
 #if WINDOWS
 #include "windows.h"
 #include "mmsystem.h"
-#include "psapi.h"
+#ifdef _WIN64
+#define JACK_ROUTER "JackRouter.dll"
+#include <psapi.h>
+#else
+#define JACK_ROUTER "JackRouter.dll"
+#include "./psapi.h"
+#endif
 
 using namespace std;
 
@@ -95,11 +105,11 @@ HRESULT _stdcall DllRegisterServer()
 	LONG	rc;
 	char	errstr[128];
 
-	rc = RegisterAsioDriver (IID_ASIO_DRIVER,"JackRouter.dll","JackRouter","JackRouter","Apartment");
+	rc = RegisterAsioDriver (IID_ASIO_DRIVER, JACK_ROUTER,"JackRouter","JackRouter","Apartment");
 
 	if (rc) {
 		memset(errstr,0,128);
-		sprintf(errstr,"Register Server failed ! (%d)",rc);
+		sprintf(errstr,"Register Server failed ! (%d)", rc);
 		MessageBox(0,(LPCTSTR)errstr,(LPCTSTR)"JackRouter",MB_OK);
 		return -1;
 	}
@@ -115,7 +125,7 @@ HRESULT _stdcall DllUnregisterServer()
 	LONG	rc;
 	char	errstr[128];
 
-	rc = UnregisterAsioDriver (IID_ASIO_DRIVER,"JackRouter.dll","JackRouter");
+	rc = UnregisterAsioDriver (IID_ASIO_DRIVER,JACK_ROUTER,"JackRouter");
 
 	if (rc) {
 		memset(errstr,0,128);
@@ -175,7 +185,7 @@ JackRouter::JackRouter() : AsioDriver()
 	printf("Constructor\n");
 
 	// Use "jackrouter.ini" parameters if available
-	HMODULE handle = LoadLibrary("JackRouter.dll");
+	HMODULE handle = LoadLibrary(JACK_ROUTER);
 
 	if (handle) {
 
@@ -209,15 +219,11 @@ JackRouter::~JackRouter()
 {
 	stop ();
 	disposeBuffers ();
-	printf("Destructor\n");
 	jack_client_close(fClient);
+	printf("Destructor\n");
 }
 
 //------------------------------------------------------------------------------------------
-#include <windows.h>
-#include <stdio.h>
-#include <tchar.h>
-#include "psapi.h"
 
 static bool GetEXEName(DWORD dwProcessID, char* name)
 {
@@ -246,7 +252,7 @@ static bool GetEXEName(DWORD dwProcessID, char* name)
                 HMODULE hMod;
                 DWORD cbNeeded;
 
-                if(EnumProcessModules(hProcess, &hMod,
+                if (EnumProcessModules(hProcess, &hMod,
                                       sizeof(hMod), &cbNeeded)) {
                     //Get the name of the exe file
                     GetModuleBaseName(hProcess, hMod, szEXEName,

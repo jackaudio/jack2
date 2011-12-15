@@ -1,7 +1,7 @@
 /*
     Copyright (C) 2001 Paul Davis
     Copyright (C) 2003 Jack O'Quin
-    
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -100,7 +100,7 @@ disk_thread (void *arg)
 				info->status = EIO; /* write failed */
 				goto done;
 			}
-				
+
 			if (++total_captured >= info->duration) {
 				printf ("disk thread finished\n");
 				goto done;
@@ -116,7 +116,7 @@ disk_thread (void *arg)
 	free (framebuf);
 	return 0;
 }
-	
+
 static int
 process (jack_nframes_t nframes, void *arg)
 {
@@ -158,9 +158,8 @@ process (jack_nframes_t nframes, void *arg)
 static void
 jack_shutdown (void *arg)
 {
-	fprintf (stderr, "JACK shutdown\n");
-	// exit (0);
-	abort();
+	fprintf(stderr, "JACK shut down, exiting ...\n");
+	exit(1);
 }
 
 static void
@@ -168,10 +167,10 @@ setup_disk_thread (jack_thread_info_t *info)
 {
 	SF_INFO sf_info;
 	int short_mask;
-	
+
 	sf_info.samplerate = jack_get_sample_rate (info->client);
 	sf_info.channels = info->channels;
-	
+
 	switch (info->bitdepth) {
 		case 8: short_mask = SF_FORMAT_PCM_U8;
 		  	break;
@@ -183,7 +182,7 @@ setup_disk_thread (jack_thread_info_t *info)
 			 break;
 		default: short_mask = SF_FORMAT_PCM_16;
 			 break;
-	}		 
+	}
 	sf_info.format = SF_FORMAT_WAV|short_mask;
 
 	if ((info->sf = sf_open (info->path, SFM_WRITE, &sf_info)) == NULL) {
@@ -253,7 +252,7 @@ setup_ports (int sources, char *source_names[], jack_thread_info_t *info)
 			fprintf (stderr, "cannot connect input port %s to %s\n", jack_port_name (ports[i]), source_names[i]);
 			jack_client_close (info->client);
 			exit (1);
-		} 
+		}
 	}
 
 	info->can_process = 1;		/* process() can start, now */
@@ -315,7 +314,7 @@ main (int argc, char *argv[])
 	}
 
 	if ((client = jack_client_open ("jackrec", JackNullOption, NULL)) == 0) {
-		fprintf (stderr, "jack server not running?\n");
+		fprintf (stderr, "JACK server not running?\n");
 		exit (1);
 	}
 
@@ -333,7 +332,7 @@ main (int argc, char *argv[])
 	}
 
 	setup_ports (argc - optind, &argv[optind], &thread_info);
-    
+
      /* install a signal handler to properly quits jack client */
     signal(SIGQUIT, signal_handler);
 	signal(SIGTERM, signal_handler);

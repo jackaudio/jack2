@@ -19,71 +19,13 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "JackDummyDriver.h"
-#include "JackEngineControl.h"
-#include "JackGraphManager.h"
 #include "JackDriverLoader.h"
 #include "JackThreadedDriver.h"
 #include "JackCompilerDeps.h"
 #include <iostream>
 #include <unistd.h>
+#include <math.h>
 
-namespace Jack
-{
-
-int JackDummyDriver::Open(jack_nframes_t buffer_size,
-                          jack_nframes_t samplerate,
-                          bool capturing,
-                          bool playing,
-                          int inchannels,
-                          int outchannels,
-                          bool monitor,
-                          const char* capture_driver_name,
-                          const char* playback_driver_name,
-                          jack_nframes_t capture_latency,
-                          jack_nframes_t playback_latency)
-{
-    if (JackAudioDriver::Open(buffer_size,
-                            samplerate,
-                            capturing,
-                            playing,
-                            inchannels,
-                            outchannels,
-                            monitor,
-                            capture_driver_name,
-                            playback_driver_name,
-                            capture_latency,
-                            playback_latency) == 0) {
-        fEngineControl->fPeriod = 0;
-        fEngineControl->fComputation = 500 * 1000;
-        fEngineControl->fConstraint = 500 * 1000;
-        int buffer_size = int((fWaitTime * fEngineControl->fSampleRate) / 1000000.0f);
-        if (buffer_size > BUFFER_SIZE_MAX) {
-            buffer_size = BUFFER_SIZE_MAX;
-            jack_error("Buffer size set to %d ", BUFFER_SIZE_MAX);
-        }
-        SetBufferSize(buffer_size);
-        return 0;
-    } else {
-        return -1;
-    }
-}
-
-int JackDummyDriver::Process()
-{
-    JackDriver::CycleTakeBeginTime();
-    JackAudioDriver::Process();
-    JackSleep(std::max(0L, long(fWaitTime - (GetMicroSeconds() - fBeginDateUst))));
-    return 0;
-}
-
-int JackDummyDriver::SetBufferSize(jack_nframes_t buffer_size)
-{
-    JackAudioDriver::SetBufferSize(buffer_size);
-    fWaitTime = (unsigned long)((((float)buffer_size) / ((float)fEngineControl->fSampleRate)) * 1000000.0f);
-    return 0;
-}
-
-} // end of namespace
 
 #ifdef __cplusplus
 extern "C"
@@ -92,73 +34,36 @@ extern "C"
 
     SERVER_EXPORT jack_driver_desc_t * driver_get_descriptor () {
         jack_driver_desc_t * desc;
-        unsigned int i;
+        jack_driver_desc_filler_t filler;
+        jack_driver_param_value_t value;
 
-        desc = (jack_driver_desc_t*)calloc (1, sizeof (jack_driver_desc_t));
-        strcpy(desc->name, "dummy");                  // size MUST be less then JACK_DRIVER_NAME_MAX + 1
-        strcpy(desc->desc, "Timer based backend");    // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
+        desc = jack_driver_descriptor_construct("dummy", JackDriverMaster, "Timer based backend", &filler);
 
-        desc->nparams = 6;
-        desc->params = (jack_driver_param_desc_t*)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));
+        value.ui = 2U;
+        jack_driver_descriptor_add_parameter(desc, &filler, "capture", 'C', JackDriverParamUInt, &value, NULL, "Number of capture ports", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "playback", 'P', JackDriverParamUInt, &value, NULL, "Number of playback ports", NULL);
 
-        i = 0;
-        strcpy(desc->params[i].name, "capture");
-        desc->params[i].character = 'C';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 2U;
-        strcpy(desc->params[i].short_desc, "Number of capture ports");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.ui = 48000U;
+        jack_driver_descriptor_add_parameter(desc, &filler, "rate", 'r', JackDriverParamUInt, &value, NULL, "Sample rate", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "playback");
-        desc->params[i].character = 'P';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[1].value.ui = 2U;
-        strcpy(desc->params[i].short_desc, "Number of playback ports");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.i = 0;
+        jack_driver_descriptor_add_parameter(desc, &filler, "monitor", 'm', JackDriverParamBool, &value, NULL, "Provide monitor ports for the output", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "rate");
-        desc->params[i].character = 'r';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 48000U;
-        strcpy(desc->params[i].short_desc, "Sample rate");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.ui = 1024U;
+        jack_driver_descriptor_add_parameter(desc, &filler, "period", 'p', JackDriverParamUInt, &value, NULL, "Frames per period", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "monitor");
-        desc->params[i].character = 'm';
-        desc->params[i].type = JackDriverParamBool;
-        desc->params[i].value.i = 0;
-        strcpy(desc->params[i].short_desc, "Provide monitor ports for the output");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-
-        i++;
-        strcpy(desc->params[i].name, "period");
-        desc->params[i].character = 'p';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 1024U;
-        strcpy(desc->params[i].short_desc, "Frames per period");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-
-        i++;
-        strcpy(desc->params[i].name, "wait");
-        desc->params[i].character = 'w';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 21333U;
-        strcpy(desc->params[i].short_desc,
-               "Number of usecs to wait between engine processes");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.ui = 21333U;
+        jack_driver_descriptor_add_parameter(desc, &filler, "wait", 'w', JackDriverParamUInt, &value, NULL, "Number of usecs to wait between engine processes", NULL);
 
         return desc;
     }
 
     SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) {
         jack_nframes_t sample_rate = 48000;
-        jack_nframes_t period_size = 1024;
+        jack_nframes_t buffer_size = 1024;
         unsigned int capture_ports = 2;
         unsigned int playback_ports = 2;
-        unsigned long wait_time = 0;
+        int wait_time = 0;
         const JSList * node;
         const jack_driver_param_t * param;
         bool monitor = false;
@@ -181,7 +86,7 @@ extern "C"
                     break;
 
                 case 'p':
-                    period_size = param->value.ui;
+                    buffer_size = param->value.ui;
                     break;
 
                 case 'w':
@@ -194,11 +99,16 @@ extern "C"
             }
         }
 
-        if (wait_time == 0) // Not set
-            wait_time = (unsigned long)((((float)period_size) / ((float)sample_rate)) * 1000000.0f);
+        if (wait_time > 0) {
+            buffer_size = lroundf((wait_time * sample_rate) / 1000000.0f);
+            if (buffer_size > BUFFER_SIZE_MAX) {
+                buffer_size = BUFFER_SIZE_MAX;
+                jack_error("Buffer size set to %d", BUFFER_SIZE_MAX);
+            }
+        }
 
-        Jack::JackDriverClientInterface* driver = new Jack::JackThreadedDriver(new Jack::JackDummyDriver("system", "dummy_pcm", engine, table, wait_time));
-        if (driver->Open(period_size, sample_rate, 1, 1, capture_ports, playback_ports, monitor, "dummy", "dummy", 0, 0) == 0) {
+        Jack::JackDriverClientInterface* driver = new Jack::JackThreadedDriver(new Jack::JackDummyDriver("system", "dummy_pcm", engine, table));
+        if (driver->Open(buffer_size, sample_rate, 1, 1, capture_ports, playback_ports, monitor, "dummy", "dummy", 0, 0) == 0) {
             return driver;
         } else {
             delete driver;

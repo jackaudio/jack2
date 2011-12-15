@@ -44,14 +44,23 @@ catch (...) {
     } catch(std::bad_alloc& e) {                    \
         jack_error("Memory allocation error...");   \
         return -1;                                  \
-    } catch(JackTemporaryException& e) {                       \
-        jack_error("JackTemporaryException : now quits...");   \
-        JackTools::KillServer();                     \
-        return -1;                                  \
     } catch (...) {                                 \
         jack_error("Unknown error...");             \
         throw;                                      \
     }                                               \
+
+#define CATCH_CLOSE_EXCEPTION_RETURN                      \
+    } catch(std::bad_alloc& e) {                    \
+        jack_error("Memory allocation error...");   \
+        return -1;                                  \
+    } catch(JackTemporaryException& e) {                       \
+        jack_error("JackTemporaryException : now quits...");   \
+        JackTools::KillServer();                     \
+        return 0;                                   \
+    } catch (...) {                                 \
+        jack_error("Unknown error...");             \
+        throw;                                      \
+    }
 
 #define CATCH_EXCEPTION                      \
     } catch(std::bad_alloc& e) {                    \
@@ -122,15 +131,15 @@ class SERVER_EXPORT JackLockedEngine
         {
             TRY_CALL
             JackLock lock(&fEngine);
-            return (fEngine.CheckClient(refnum)) ? fEngine.ClientExternalClose(refnum) : - 1;
-            CATCH_EXCEPTION_RETURN
+            return (fEngine.CheckClient(refnum)) ? fEngine.ClientExternalClose(refnum) : -1;
+            CATCH_CLOSE_EXCEPTION_RETURN
         }
         int ClientInternalClose(int refnum, bool wait)
         {
             TRY_CALL
             JackLock lock(&fEngine);
             return (fEngine.CheckClient(refnum)) ? fEngine.ClientInternalClose(refnum, wait) : -1;
-            CATCH_EXCEPTION_RETURN
+            CATCH_CLOSE_EXCEPTION_RETURN
         }
 
         int ClientActivate(int refnum, bool is_real_time)
@@ -261,6 +270,7 @@ class SERVER_EXPORT JackLockedEngine
             fEngine.NotifyGraphReorder();
             CATCH_EXCEPTION
         }
+
         void NotifyBufferSize(jack_nframes_t buffer_size)
         {
             TRY_CALL
@@ -315,11 +325,11 @@ class SERVER_EXPORT JackLockedEngine
             CATCH_EXCEPTION
         }
 
-        void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket)
+        void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket, JackSessionNotifyResult** result)
         {
             TRY_CALL
             JackLock lock(&fEngine);
-            fEngine.SessionNotify(refnum, target, type, path, socket);
+            fEngine.SessionNotify(refnum, target, type, path, socket, result);
             CATCH_EXCEPTION
         }
 
@@ -353,11 +363,11 @@ class SERVER_EXPORT JackLockedEngine
             CATCH_EXCEPTION
         }
 
-        void ClientHasSessionCallbackRequest(const char *name, int *result)
+        void ClientHasSessionCallback(const char *name, int *result)
         {
             TRY_CALL
             JackLock lock(&fEngine);
-            fEngine.ClientHasSessionCallbackRequest(name, result);
+            fEngine.ClientHasSessionCallback(name, result);
             CATCH_EXCEPTION
         }
 };

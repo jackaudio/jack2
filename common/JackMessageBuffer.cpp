@@ -48,11 +48,16 @@ void JackMessageBuffer::Stop()
     } else {
         jack_log("no message buffer overruns");
     }
-    fGuard.Lock();
-    fRunning = false;
-    fGuard.Signal();
-    fGuard.Unlock();
-    fThread.Stop();
+
+    if (fGuard.Lock()) {
+        fRunning = false;
+        fGuard.Signal();
+        fGuard.Unlock();
+        fThread.Stop();
+    } else {
+        fThread.Kill();
+    }
+
     Flush();
 }
 
@@ -79,21 +84,29 @@ void JackMessageBuffer::AddMessage(int level, const char *message)
 
 bool JackMessageBuffer::Execute()
 {
-    while (fRunning) {
-        fGuard.Lock();
-        fGuard.Wait();
-        /* the client asked for all threads to run a thread
-        initialization callback, which includes us.
-        */
-        if (fInit) {
-            fInit(fInitArg);
-            fInit = NULL;
-            /* and we're done */
-            fGuard.Signal();
+    if (fGuard.Lock()) {
+        while (fRunning) {
+            fGuard.Wait();
+            /* the client asked for all threads to run a thread
+            initialization callback, which includes us.
+            */
+            if (fInit) {
+                fInit(fInitArg);
+                fInit = NULL;
+                /* and we're done */
+                fGuard.Signal();
+            }
+
+            /* releasing the mutex reduces contention */
+            fGuard.Unlock();
+            Flush();
+            fGuard.Lock();
         }
-        Flush();
         fGuard.Unlock();
+    } else {
+        jack_error("JackMessageBuffer::Execute lock cannot be taken");
     }
+
     return false;
 }
 
@@ -126,16 +139,19 @@ void JackMessageBufferAdd(int level, const char *message)
 
 void JackMessageBuffer::SetInitCallback(JackThreadInitCallback callback, void *arg)
 {
-    fGuard.Lock();
-    /* set up the callback */
-    fInitArg = arg;
-    fInit = callback;
-    /* wake msg buffer thread */
-    fGuard.Signal();
-    /* wait for it to be done */
-    fGuard.Wait();
-    /* and we're done */
-    fGuard.Unlock();
+    if (fGuard.Lock()) {
+        /* set up the callback */
+        fInitArg = arg;
+        fInit = callback;
+        /* wake msg buffer thread */
+        fGuard.Signal();
+        /* wait for it to be done */
+        fGuard.Wait();
+        /* and we're done */
+        fGuard.Unlock();
+    } else {
+        jack_error("JackMessageBuffer::SetInitCallback lock cannot be taken");
+    }
 }
 
 };

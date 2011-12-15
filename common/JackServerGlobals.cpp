@@ -85,7 +85,7 @@ void JackServerGlobals::Delete()
         int status;
         int refnum = (*it2).second;
         if (refnum > 0) {
-            // Client object is internally kept in JackEngine, and will be desallocated in InternalClientUnload
+            // Client object is internally kept in JackEngine, and will be deallocated in InternalClientUnload
             fInstance->GetEngine()->InternalClientUnload(refnum, &status);
         }
     }

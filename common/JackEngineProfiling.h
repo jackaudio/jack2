@@ -37,6 +37,7 @@ namespace Jack
 \brief Timing stucture for a client.
 */
 
+PRE_PACKED_STRUCTURE
 struct JackTimingMeasureClient
 {
     int fRefNum;
@@ -59,6 +60,7 @@ struct JackTimingMeasureClient
 \brief Timing interval in the global table for a given client
 */
 
+PRE_PACKED_STRUCTURE
 struct JackTimingClientInterval
 {
     int fRefNum;
@@ -78,6 +80,7 @@ struct JackTimingClientInterval
 \brief Timing stucture for a table of clients.
 */
 
+PRE_PACKED_STRUCTURE
 struct JackTimingMeasure
 {
     unsigned int fAudioCycle;
@@ -102,6 +105,7 @@ struct JackTimingMeasure
 class JackClientInterface;
 class JackGraphManager;
 
+PRE_PACKED_STRUCTURE
 class SERVER_EXPORT JackEngineProfiling
 {
 

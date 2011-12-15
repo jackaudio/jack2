@@ -11,7 +11,7 @@ import Task
 import re
 import Logs
 
-VERSION='1.9.7'
+VERSION='1.9.8'
 APPNAME='jack'
 JACK_API_VERSION = '0.1.0'
 
@@ -127,6 +127,12 @@ def configure(conf):
         conf.sub_config('dbus')
         if conf.env['BUILD_JACKDBUS'] != True:
             conf.fatal('jackdbus was explicitly requested but cannot be built')
+
+    conf.check_cc(header_name='samplerate.h', define_name="HAVE_SAMPLERATE")
+
+    if conf.is_defined('HAVE_SAMPLERATE'):
+        conf.env['LIB_SAMPLERATE'] = ['samplerate']
+
     conf.sub_config('example-clients')
 
     if conf.check_cfg(package='celt', atleast_version='0.11.0', args='--cflags --libs'):

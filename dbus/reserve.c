@@ -369,8 +369,7 @@ int rd_acquire(
 	DBusError _error;
 	DBusMessage *m = NULL, *reply = NULL;
 	dbus_bool_t good;
-
-        vtable.message_function = object_handler;
+    vtable.message_function = object_handler;
 
 	if (!error)
 		error = &_error;
@@ -430,7 +429,7 @@ int rd_acquire(
 		goto fail;
 	}
 
-	if (k == DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER)
+	if (k == DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER || k == DBUS_REQUEST_NAME_REPLY_ALREADY_OWNER)
 		goto success;
 
 	if (k != DBUS_REQUEST_NAME_REPLY_EXISTS) {

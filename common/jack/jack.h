@@ -233,7 +233,7 @@ jack_nframes_t jack_thread_wait (jack_client_t*, int status) JACK_OPTIONAL_WEAK_
  *
  * @return the number of frames of data to process
  */
-    jack_nframes_t jack_cycle_wait (jack_client_t* client) JACK_OPTIONAL_WEAK_EXPORT;
+jack_nframes_t jack_cycle_wait (jack_client_t* client) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Signal next clients in the graph.
@@ -310,7 +310,7 @@ int jack_set_thread_init_callback (jack_client_t *client,
  * jack_on_info_shutdown() will.
  */
 void jack_on_shutdown (jack_client_t *client,
-                       JackShutdownCallback shutdown_callback, void *arg) JACK_WEAK_EXPORT;
+                       JackShutdownCallback shutdown_callback, void *arg) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @param client pointer to JACK client structure.
@@ -336,7 +336,7 @@ void jack_on_shutdown (jack_client_t *client,
  * jack_on_info_shutdown() will.
  */
 void jack_on_info_shutdown (jack_client_t *client,
-                            JackInfoShutdownCallback shutdown_callback, void *arg) JACK_OPTIONAL_WEAK_EXPORT;
+                            JackInfoShutdownCallback shutdown_callback, void *arg) JACK_WEAK_EXPORT;
 
 /**
  * Tell the Jack server to call @a process_callback whenever there is

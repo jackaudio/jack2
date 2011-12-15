@@ -71,7 +71,7 @@ void JackClientPipeThread::Close()                                      // Close
     /*
         TODO : solve WIN32 thread Kill issue
         This would hang.. since Close will be followed by a delete,
-        all ressources will be desallocated at the end.
+        all ressources will be deallocated at the end.
     */
 
     fThread.Kill();
@@ -85,7 +85,7 @@ bool JackClientPipeThread::Execute()
         jack_log("JackClientPipeThread::Execute");
         return (HandleRequest());
     } catch (JackQuitException& e) {
-        jack_log("JackMachServerChannel::Execute JackQuitException");
+        jack_log("JackClientPipeThread::Execute JackQuitException");
         return false;
     }
 }
@@ -98,8 +98,9 @@ bool JackClientPipeThread::HandleRequest()
     bool ret = true;
 
     // Lock the global mutex
-    if (WaitForSingleObject(fMutex, INFINITE) == WAIT_FAILED)
+    if (WaitForSingleObject(fMutex, INFINITE) == WAIT_FAILED) {
         jack_error("JackClientPipeThread::HandleRequest: mutex wait error");
+    }
 
     if (res < 0) {
         jack_error("HandleRequest: cannot read header");
@@ -117,6 +118,9 @@ bool JackClientPipeThread::HandleRequest()
                 if (req.Read(fPipe) == 0)
                     res.fResult = fServer->GetEngine()->ClientCheck(req.fName, req.fUUID, res.fName, req.fProtocol, req.fOptions, &res.fStatus);
                 res.Write(fPipe);
+                // Atomic ClientCheck followed by ClientOpen on same pipe
+                if (req.fOpen)
+                    HandleRequest();
                 break;
             }
 
@@ -339,11 +343,9 @@ bool JackClientPipeThread::HandleRequest()
             case JackRequest::kSessionNotify: {
                 jack_log("JackRequest::SessionNotify");
                 JackSessionNotifyRequest req;
-                JackSessionNotifyResult res;
                 if (req.Read(fPipe) == 0) {
-                    fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath, fPipe);
+                    fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath, fPipe, NULL);
                 }
-                res.Write(fPipe);
                 break;
             }
 
@@ -397,7 +399,7 @@ bool JackClientPipeThread::HandleRequest()
                 JackClientHasSessionCallbackRequest req;
                 JackResult res;
                 if (req.Read(fPipe) == 0) {
-                    fServer->GetEngine()->ClientHasSessionCallbackRequest(req.fName, &res.fResult);
+                    fServer->GetEngine()->ClientHasSessionCallback(req.fName, &res.fResult);
                 }
                 res.Write(fPipe);
                 break;
@@ -435,7 +437,7 @@ void JackClientPipeThread::ClientKill()
 {
     jack_log("JackClientPipeThread::ClientKill ref = %d", fRefNum);
 
-    if (fRefNum == -1) {                // Correspond to an already removed client.
+    if (fRefNum == -1) {        // Correspond to an already removed client.
         jack_log("Kill a closed client");
     } else if (fRefNum == 0) {  // Correspond to a still not opened client.
         jack_log("Kill a not opened client");
@@ -478,14 +480,13 @@ int JackWinNamedPipeServerChannel::Open(const char* server_name, JackServer* ser
 void JackWinNamedPipeServerChannel::Close()
 {
     /* TODO : solve WIN32 thread Kill issue
-        This would hang the server... since we are quitting it, its not really problematic,
-        all ressources will be desallocated at the end.
+    This would hang the server... since we are quitting it, its not really problematic,
+    all ressources will be deallocated at the end.
 
-        fRequestListenPipe.Close();
-        fThread.Stop();
+    fRequestListenPipe.Close();
+    fThread.Stop();
     */
 
-    fThread.Kill();
     fRequestListenPipe.Close();
 }
 
@@ -494,9 +495,14 @@ int JackWinNamedPipeServerChannel::Start()
     if (fThread.Start() != 0) {
         jack_error("Cannot start Jack server listener");
         return -1;
+    } else {
+        return 0;
     }
+}
 
-    return 0;
+void JackWinNamedPipeServerChannel::Stop()
+{
+    fThread.Kill();
 }
 
 bool JackWinNamedPipeServerChannel::Init()

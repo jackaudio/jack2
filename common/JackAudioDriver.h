@@ -35,29 +35,22 @@ class SERVER_EXPORT JackAudioDriver : public JackDriver
 
     protected:
 
-        void ProcessGraphAsync();
-        int ProcessGraphSync();
-        void WaitUntilNextCycle();
-
-        virtual int ProcessAsync();
-        virtual int ProcessSync();
-
-        int fCaptureChannels;
-        int fPlaybackChannels;
-
-        // Static tables since the actual number of ports may be changed by the real driver
-        // thus dynamic allocation is more difficult to handle
-        jack_port_id_t fCapturePortList[DRIVER_PORT_NUM];
-        jack_port_id_t fPlaybackPortList[DRIVER_PORT_NUM];
-        jack_port_id_t fMonitorPortList[DRIVER_PORT_NUM];
-
-        bool fWithMonitorPorts;
-
         jack_default_audio_sample_t* GetInputBuffer(int port_index);
         jack_default_audio_sample_t* GetOutputBuffer(int port_index);
         jack_default_audio_sample_t* GetMonitorBuffer(int port_index);
 
         void HandleLatencyCallback(int status);
+        virtual void UpdateLatencies();
+
+        int ProcessAsync();
+        void ProcessGraphAsync();
+        void ProcessGraphAsyncMaster();
+        void ProcessGraphAsyncSlave();
+
+        int ProcessSync();
+        void ProcessGraphSync();
+        int ProcessGraphSyncMaster();
+        int ProcessGraphSyncSlave();
 
     public:
 
@@ -87,7 +80,6 @@ class SERVER_EXPORT JackAudioDriver : public JackDriver
                         jack_nframes_t playback_latency);
 
         virtual int Process();
-        virtual int ProcessNull();
 
         virtual int Attach();
         virtual int Detach();

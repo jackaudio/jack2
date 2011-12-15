@@ -37,7 +37,7 @@ extern "C" {
 /**
  * Session event type.
  *
- * if a client cant save templates, i might just do a normal save.
+ * If a client cant save templates, i might just do a normal save.
  *
  * There is no "quit without saving" event because a client might refuse to
  * quit when it has unsaved data, but other clients may have already quit.
@@ -190,19 +190,20 @@ int jack_session_reply (jack_client_t        *client,
 
 
 /**
- * free memory used by a jack_session_event_t
- * this also frees the memory used by the command_line pointer.
- * if its non NULL.
+ * Free memory used by a jack_session_event_t.
+ *
+ * This also frees the memory used by the command_line pointer, if its non NULL.
  */
 void jack_session_event_free (jack_session_event_t *event) JACK_WEAK_EXPORT;
 
 
 /**
- * get the assigned uuid for client.
- * safe to call from callback and all other threads.
- * memory needs to be freed.
+ * Get the assigned uuid for client.
+ * Safe to call from callback and all other threads.
+ *
+ * The caller is responsible for calling jack_free(3) on any non-NULL
+ * returned value.
  */
-
 char *jack_client_get_uuid (jack_client_t *client) JACK_WEAK_EXPORT;
 
 /**
@@ -242,7 +243,11 @@ void jack_session_commands_free (jack_session_command_t *cmds) JACK_WEAK_EXPORT;
 
 /**
  * Get the session ID for a client name.
+ *
  * The session manager needs this to reassociate a client name to the session_id.
+ *
+ * The caller is responsible for calling jack_free(3) on any non-NULL
+ * returned value.
  */
 char *jack_get_uuid_for_client_name (jack_client_t *client,
                                      const char    *client_name) JACK_WEAK_EXPORT;
@@ -252,6 +257,9 @@ char *jack_get_uuid_for_client_name (jack_client_t *client,
  *
  * In order to snapshot the graph connections, the session manager needs to map
  * session_ids to client names.
+ *
+ * The caller is responsible for calling jack_free(3) on any non-NULL
+ * returned value.
  */
 char *jack_get_client_name_by_uuid (jack_client_t *client,
                                     const char    *client_uuid ) JACK_WEAK_EXPORT;

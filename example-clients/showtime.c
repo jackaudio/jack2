@@ -34,7 +34,7 @@ showtime ()
 
 	transport_state = jack_transport_query (client, &current);
 	frame_time = jack_frame_time (client);
-	
+
 	printf ("frame = %u  frame_time = %u usecs = %lld \t",  current.frame, frame_time, current.usecs);
 
 	switch (transport_state) {
@@ -64,6 +64,7 @@ showtime ()
 static void
 jack_shutdown (void *arg)
 {
+    fprintf(stderr, "JACK shut down, exiting ...\n");
 	exit (1);
 }
 
@@ -81,7 +82,7 @@ main (int argc, char *argv[])
 	/* try to become a client of the JACK server */
 
 	if ((client = jack_client_open ("showtime", JackNullOption, NULL)) == 0) {
-		fprintf (stderr, "jack server not running?\n");
+		fprintf (stderr, "JACK server not running?\n");
 		return 1;
 	}
 
@@ -103,7 +104,7 @@ main (int argc, char *argv[])
 		fprintf (stderr, "cannot activate client");
 		return 1;
 	}
-	
+
 	while (1) {
 		usleep (20);
 		showtime ();

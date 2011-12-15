@@ -1,5 +1,6 @@
 /*
 Copyright (C) 2009 Grame
+Copyright (C) 2011 Devin Anderson
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,67 +22,52 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackWinMMEDriver__
 
 #include "JackMidiDriver.h"
-#include "JackTime.h"
+#include "JackWinMMEInputPort.h"
+#include "JackWinMMEOutputPort.h"
 
-namespace Jack
-{
+namespace Jack {
 
-/*!
-\brief The WinMME driver.
-*/
-
-#define kBuffSize	512
-
-struct MidiSlot {
-
-	LPVOID	    fHandle;    // MMSystem handler
-	short		fIndex;     // MMSystem dev index
-	LPMIDIHDR	fHeader;    // for long msg output
-
-	MidiSlot():fHandle(0),fIndex(0)
-	{}
-
-};
-
-class JackWinMMEDriver : public JackMidiDriver
-{
+    class JackWinMMEDriver : public JackMidiDriver {
 
     private:
 
-        int fRealCaptureChannels;
-        int fRealPlaybackChannels;
-
-        MidiSlot* fMidiSource;
-        MidiSlot* fMidiDestination;
-
-        void CloseInput(MidiSlot* slot);
-        void CloseOutput(MidiSlot* slot);
-
-        static void CALLBACK MidiInProc(HMIDIIN hMidiIn, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2);
+        JackWinMMEInputPort **input_ports;
+        JackWinMMEOutputPort **output_ports;
+        UINT period;
 
     public:
 
-        JackWinMMEDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table);
-        virtual ~JackWinMMEDriver();
+        JackWinMMEDriver(const char* name, const char* alias,
+                         JackLockedEngine* engine, JackSynchro* table);
 
-        int Open(bool capturing,
-                 bool playing,
-                 int chan_in,
-                 int chan_out,
-                 bool monitor,
-                 const char* capture_driver_name,
-                 const char* playback_driver_name,
-                 jack_nframes_t capture_latency,
-                 jack_nframes_t playback_latency);
-        int Close();
+        ~JackWinMMEDriver();
 
-        int Attach();
+        int
+        Attach();
 
-        int Read();
-        int Write();
+        int
+        Close();
 
-};
+        int
+        Open(bool capturing, bool playing, int num_inputs, int num_outputs,
+             bool monitor, const char* capture_driver_name,
+             const char* playback_driver_name, jack_nframes_t capture_latency,
+             jack_nframes_t playback_latency);
 
-} // end of namespace
+        int
+        Read();
+
+        int
+        Start();
+
+        int
+        Stop();
+
+        int
+        Write();
+
+    };
+
+}
 
 #endif

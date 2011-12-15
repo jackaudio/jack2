@@ -35,7 +35,7 @@ bool JackRestartThreadedDriver::Execute()
         return false;
     } catch (JackNetException& e) {
         e.PrintMessage();
-        jack_log("Driver is restarted");
+        jack_info("Driver is restarted");
         fThread.DropSelfRealTime();
         // Thread in kIniting status again...
         fThread.SetStatus(JackThread::kIniting);

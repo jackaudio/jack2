@@ -180,13 +180,12 @@ void* JackGraphManager::GetBuffer(jack_port_id_t port_index, jack_nframes_t buff
         return GetBuffer(0); // port_index 0 is not used
     }
 
+    jack_int_t len = manager->Connections(port_index);
+
     // Output port
     if (port->fFlags & JackPortIsOutput) {
         return (port->fTied != NO_PORT) ? GetBuffer(port->fTied, buffer_size) : GetBuffer(port_index);
     }
-
-    // Input port
-    jack_int_t len = manager->Connections(port_index);
 
     // No connections : return a zero-filled buffer
     if (len == 0) {
@@ -742,8 +741,9 @@ jack_port_id_t JackGraphManager::GetPort(const char* name)
 {
     for (unsigned int i = 0; i < fPortMax; i++) {
         JackPort* port = GetPort(i);
-        if (port->IsUsed() && port->NameEquals(name))
+        if (port->IsUsed() && port->NameEquals(name)) {
             return i;
+        }
     }
     return NO_PORT;
 }
@@ -791,9 +791,9 @@ const char** JackGraphManager::GetConnections(jack_port_id_t port_index)
         next_index = GetCurrentIndex();
     } while (cur_index != next_index); // Until a coherent state has been read
 
-    if (res[0]) {	// at least one connection
+    if (res[0]) {	// At least one connection
         return res;
-    } else {		// empty array, should return NULL
+    } else {		// Empty array, should return NULL
         free(res);
         return NULL;
     }
@@ -874,10 +874,10 @@ const char** JackGraphManager::GetPorts(const char* port_name_pattern, const cha
         next_index = GetCurrentIndex();
     } while (cur_index != next_index);  // Until a coherent state has been read
 
-    if (res[0]) {    // at least one port
+    if (res[0]) {    // At least one port
         return res;
     } else {
-        free(res);   // empty array, should return NULL
+        free(res);   // Empty array, should return NULL
         return NULL;
     }
 }

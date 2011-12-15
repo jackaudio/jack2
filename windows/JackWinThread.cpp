@@ -17,11 +17,11 @@
 
  */
 
-
 #include "JackWinThread.h"
 #include "JackError.h"
 #include "JackTime.h"
 #include <assert.h>
+#include <stdio.h>
 
 namespace Jack
 {
@@ -55,7 +55,7 @@ DWORD WINAPI JackWinThread::ThreadHandler(void* arg)
 }
 
 JackWinThread::JackWinThread(JackRunnableInterface* runnable)
-        : JackThreadInterface(runnable, 0, false, 0)
+        : JackMMCSS(), JackThreadInterface(runnable, 0, false, 0)
 {
     fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
     fThread = (HANDLE)NULL;
@@ -200,13 +200,19 @@ int JackWinThread::AcquireSelfRealTime(int priority)
 
 int JackWinThread::AcquireRealTimeImp(jack_native_thread_t thread, int priority)
 {
-    jack_log("JackWinThread::AcquireRealTime");
+    jack_log("JackWinThread::AcquireRealTimeImp priority = %d", priority);
 
-    if (SetThreadPriority(thread, THREAD_PRIORITY_TIME_CRITICAL)) {
+    if (priority >= 90 && MMCSSAcquireRealTime(thread) == 0) {
+        jack_info("MMCSS API used to acquire RT for thread");
         return 0;
     } else {
-        jack_error("Cannot set thread priority = %d", GetLastError());
-        return -1;
+        jack_info("MMCSS API not used...");
+        if (SetThreadPriority(thread, THREAD_PRIORITY_TIME_CRITICAL)) {
+            return 0;
+        } else {
+            jack_error("Cannot set thread priority = %d", GetLastError());
+            return -1;
+        }
     }
 }
 
@@ -222,7 +228,10 @@ int JackWinThread::DropSelfRealTime()
 
 int JackWinThread::DropRealTimeImp(jack_native_thread_t thread)
 {
-    if (SetThreadPriority(thread, THREAD_PRIORITY_NORMAL)) {
+    if (MMCSSDropRealTime(thread) == 0 ) {
+        jack_info("MMCSS API used to drop RT for thread");
+        return 0;
+    } else if (SetThreadPriority(thread, THREAD_PRIORITY_NORMAL)) {
         return 0;
     } else {
         jack_error("Cannot set thread priority = %d", GetLastError());

@@ -43,11 +43,11 @@ namespace Jack {
 #endif
     }
 
-    void JackTools::ThrowJackNetException() 
+    void JackTools::ThrowJackNetException()
     {
         throw JackNetException();
     }
-    
+
      int JackTools::MkDir(const char* path)
      {
 #ifdef WIN32

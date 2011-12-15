@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2004 Ian Esten
-    
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -76,7 +76,7 @@ static int process(jack_nframes_t nframes, void *arg)
 		if ((in_event.time == i) && (event_index < event_count))
 		{
 			if (((*(in_event.buffer) & 0xf0)) == 0x90)
-			{   
+			{
                 /* note on */
                 note = *(in_event.buffer + 1);
                 if (*(in_event.buffer + 2) == 0) {
@@ -99,7 +99,7 @@ static int process(jack_nframes_t nframes, void *arg)
 		ramp = (ramp > 1.0) ? ramp - 2.0 : ramp;
 		out[i] = note_on*sin(2*M_PI*ramp);
 	}
-	return 0;      
+	return 0;
 }
 
 static int srate(jack_nframes_t nframes, void *arg)
@@ -111,6 +111,7 @@ static int srate(jack_nframes_t nframes, void *arg)
 
 static void jack_shutdown(void *arg)
 {
+    fprintf(stderr, "JACK shut down, exiting ...\n");
 	exit(1);
 }
 
@@ -118,10 +119,10 @@ int main(int narg, char **args)
 {
 	if ((client = jack_client_open("midisine", JackNullOption, NULL)) == 0)
 	{
-		fprintf(stderr, "jack server not running?\n");
+		fprintf(stderr, "JACK server not running?\n");
 		return 1;
 	}
-	
+
 	calc_note_frqs(jack_get_sample_rate (client));
 
 	jack_set_process_callback (client, process, 0);
@@ -138,7 +139,7 @@ int main(int narg, char **args)
 		fprintf(stderr, "cannot activate client");
 		return 1;
 	}
-    
+
     /* install a signal handler to properly quits jack client */
     signal(SIGQUIT, signal_handler);
 	signal(SIGTERM, signal_handler);

@@ -32,7 +32,7 @@ namespace Jack
 \brief Client on the library side.
 */
 
-class SERVER_EXPORT JackLibClient : public JackClient
+class LIB_EXPORT JackLibClient : public JackClient
 {
 
     private:

@@ -62,13 +62,14 @@ int JackSocketClientChannel::Open(const char* server_name, const char* name, int
     }
 
     // Check name in server
-    ClientCheck(name, uuid, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result);
+    ClientCheck(name, uuid, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result, true);
     if (result < 0) {
         int status1 = *status;
-        if (status1 & JackVersionError)
+        if (status1 & JackVersionError) {
             jack_error("JACK protocol mismatch %d", JACK_PROTOCOL_VERSION);
-        else
+        } else {
             jack_error("Client name = %s conflits with another running client", name);
+        }
         goto error;
     }
 
@@ -141,9 +142,9 @@ void JackSocketClientChannel::ServerAsyncCall(JackRequest* req, JackResult* res,
     }
 }
 
-void JackSocketClientChannel::ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status, int* result)
+void JackSocketClientChannel::ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status, int* result, int open)
 {
-    JackClientCheckRequest req(name, protocol, options, uuid);
+    JackClientCheckRequest req(name, protocol, options, uuid, open);
     JackClientCheckResult res;
     ServerSyncCall(&req, &res, result);
     *status = res.fStatus;
@@ -258,24 +259,7 @@ void JackSocketClientChannel::SessionNotify(int refnum, const char* target, jack
     JackSessionNotifyResult res;
     int intresult;
     ServerSyncCall(&req, &res, &intresult);
-
-    jack_session_command_t* session_command = (jack_session_command_t *)malloc(sizeof(jack_session_command_t) * (res.fCommandList.size() + 1));
-    int i = 0;
-
-    for (std::list<JackSessionCommand>::iterator ci=res.fCommandList.begin(); ci!=res.fCommandList.end(); ci++) {
-        session_command[i].uuid = strdup( ci->fUUID );
-        session_command[i].client_name = strdup( ci->fClientName );
-        session_command[i].command = strdup( ci->fCommand );
-        session_command[i].flags = ci->fFlags;
-        i += 1;
-    }
-
-    session_command[i].uuid = NULL;
-    session_command[i].client_name = NULL;
-    session_command[i].command = NULL;
-    session_command[i].flags = (jack_session_flags_t)0;
-
-    *result = session_command;
+    *result = res.GetCommands();
 }
 
 void JackSocketClientChannel::SessionReply(int refnum, int* result)

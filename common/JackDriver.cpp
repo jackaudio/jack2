@@ -37,7 +37,10 @@ namespace Jack
 {
 
 JackDriver::JackDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
-    :fClientControl(name)
+    :fClientControl(name),
+    fCaptureChannels(0),
+    fPlaybackChannels(0),
+    fWithMonitorPorts(false)
 {
     assert(strlen(name) < JACK_CLIENT_NAME_SIZE);
     fSynchroTable = table;
@@ -56,8 +59,12 @@ JackDriver::JackDriver()
     fEngine = NULL;
     fGraphManager = NULL;
     fBeginDateUst = 0;
+    fDelayedUsecs = 0.f;
     fIsMaster = true;
     fIsRunning = false;
+    fCaptureChannels = 0;
+    fPlaybackChannels = 0;
+    fWithMonitorPorts = false;
 }
 
 JackDriver::~JackDriver()
@@ -123,8 +130,9 @@ int JackDriver::Open(bool capturing,
     strcpy(fPlaybackDriverName, playback_driver_name);
 
     fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize); // in microsec
-    if (!fEngineControl->fTimeOut)
+    if (!fEngineControl->fTimeOut) {
         fEngineControl->fTimeOutUsecs = jack_time_t(2.f * fEngineControl->fPeriodUsecs);
+    }
 
     fGraphManager->DirectConnect(fClientControl.fRefNum, fClientControl.fRefNum); // Connect driver to itself for "sync" mode
     SetupDriverSync(fClientControl.fRefNum, false);
@@ -176,8 +184,9 @@ int JackDriver::Open(jack_nframes_t buffer_size,
     strcpy(fPlaybackDriverName, playback_driver_name);
 
     fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize); // in microsec
-    if (!fEngineControl->fTimeOut)
+    if (!fEngineControl->fTimeOut) {
         fEngineControl->fTimeOutUsecs = jack_time_t(2.f * fEngineControl->fPeriodUsecs);
+    }
 
     fGraphManager->SetBufferSize(buffer_size);
     fGraphManager->DirectConnect(fClientControl.fRefNum, fClientControl.fRefNum); // Connect driver to itself for "sync" mode
@@ -216,6 +225,8 @@ void JackDriver::SetupDriverSync(int ref, bool freewheel)
 
 int JackDriver::ClientNotify(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2)
 {
+    jack_log("JackDriver::ClientNotify ref = %ld driver = %s name = %s notify = %ld", refnum, fClientControl.fName, name, notify);
+
     switch (notify) {
 
         case kStartFreewheelCallback:
@@ -227,7 +238,7 @@ int JackDriver::ClientNotify(int refnum, const char* name, int notify, int sync,
             jack_log("JackDriver::kStopFreewheel");
             SetupDriverSync(fClientControl.fRefNum, false);
             break;
-   }
+    }
 
     return 0;
 }
@@ -300,25 +311,47 @@ void JackDriver::RemoveSlave(JackDriverInterface* slave)
     fSlaveList.remove(slave);
 }
 
-int JackDriver::ProcessSlaves()
+int JackDriver::ProcessReadSlaves()
 {
     int res = 0;
     list<JackDriverInterface*>::const_iterator it;
     for (it = fSlaveList.begin(); it != fSlaveList.end(); it++) {
         JackDriverInterface* slave = *it;
-        if (slave->Process() < 0)
-            res = -1;
-
+        if (slave->IsRunning()) {
+            if (slave->ProcessRead() < 0) {
+                res = -1;
+            }
+        }
     }
     return res;
 }
 
-int JackDriver::Process()
+int JackDriver::ProcessWriteSlaves()
+{
+    int res = 0;
+    list<JackDriverInterface*>::const_iterator it;
+    for (it = fSlaveList.begin(); it != fSlaveList.end(); it++) {
+        JackDriverInterface* slave = *it;
+        if (slave->IsRunning()) {
+            if (slave->ProcessWrite() < 0) {
+                res = -1;
+            }
+        }
+    }
+    return res;
+}
+
+int JackDriver::ProcessRead()
 {
     return 0;
 }
 
-int JackDriver::ProcessNull()
+int JackDriver::ProcessWrite()
+{
+    return 0;
+}
+
+int JackDriver::Process()
 {
     return 0;
 }
@@ -352,6 +385,12 @@ int JackDriver::Start()
     return 0;
 }
 
+int JackDriver::Stop()
+{
+    fIsRunning = false;
+    return 0;
+}
+
 int JackDriver::StartSlaves()
 {
     int res = 0;
@@ -360,20 +399,12 @@ int JackDriver::StartSlaves()
         JackDriverInterface* slave = *it;
         if (slave->Start() < 0) {
             res = -1;
-
             // XXX: We should attempt to stop all of the slaves that we've
             // started here.
-
             break;
         }
     }
     return res;
-}
-
-int JackDriver::Stop()
-{
-    fIsRunning = false;
-    return 0;
 }
 
 int JackDriver::StopSlaves()
@@ -382,8 +413,9 @@ int JackDriver::StopSlaves()
     list<JackDriverInterface*>::const_iterator it;
     for (it = fSlaveList.begin(); it != fSlaveList.end(); it++) {
         JackDriverInterface* slave = *it;
-        if (slave->Stop() < 0)
+        if (slave->Stop() < 0) {
             res = -1;
+        }
     }
     return res;
 }
@@ -395,12 +427,28 @@ bool JackDriver::IsFixedBufferSize()
 
 int JackDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
-    return 0;
+    int res = 0;
+    list<JackDriverInterface*>::const_iterator it;
+    for (it = fSlaveList.begin(); it != fSlaveList.end(); it++) {
+        JackDriverInterface* slave = *it;
+        if (slave->SetBufferSize(buffer_size) < 0) {
+            res = -1;
+        }
+    }
+    return res;
 }
 
 int JackDriver::SetSampleRate(jack_nframes_t sample_rate)
 {
-    return 0;
+    int res = 0;
+    list<JackDriverInterface*>::const_iterator it;
+    for (it = fSlaveList.begin(); it != fSlaveList.end(); it++) {
+        JackDriverInterface* slave = *it;
+        if (slave->SetSampleRate(sample_rate) < 0) {
+            res = -1;
+        }
+    }
+    return res;
 }
 
 bool JackDriver::Initialize()
@@ -408,5 +456,58 @@ bool JackDriver::Initialize()
     return true;
 }
 
+
+void JackDriver::SaveConnections()
+{
+    const char** connections;
+    fConnections.clear();
+    char alias1[REAL_JACK_PORT_NAME_SIZE];
+    char alias2[REAL_JACK_PORT_NAME_SIZE];
+    char* aliases[2];
+
+    aliases[0] = alias1;
+    aliases[1] = alias2;
+
+    for (int i = 0; i < fCaptureChannels; ++i) {
+        if (fCapturePortList[i] && (connections = fGraphManager->GetConnections(fCapturePortList[i])) != 0) {
+            for (int j = 0; connections[j]; j++) {
+                /*
+                fGraphManager->GetPort(fCapturePortList[i])->GetAliases(aliases);
+                fConnections.push_back(make_pair(aliases[0], connections[j]));
+                jack_info("Save connection: %s %s", aliases[0], connections[j]);
+                */
+                fConnections.push_back(make_pair(fGraphManager->GetPort(fCapturePortList[i])->GetName(), connections[j]));
+                jack_info("Save connection: %s %s", fGraphManager->GetPort(fCapturePortList[i])->GetName(), connections[j]);
+            }
+            free(connections);
+        }
+    }
+
+    for (int i = 0; i < fPlaybackChannels; ++i) {
+        if (fPlaybackPortList[i] && (connections = fGraphManager->GetConnections(fPlaybackPortList[i])) != 0) {
+            for (int j = 0; connections[j]; j++) {
+                /*
+                fGraphManager->GetPort(fPlaybackPortList[i])->GetAliases(aliases);
+                fConnections.push_back(make_pair(connections[j], aliases[0]));
+                jack_info("Save connection: %s %s", connections[j], aliases[0]);
+                */
+                fConnections.push_back(make_pair(connections[j], fGraphManager->GetPort(fPlaybackPortList[i])->GetName()));
+                jack_info("Save connection: %s %s", connections[j], fGraphManager->GetPort(fPlaybackPortList[i])->GetName());
+            }
+            free(connections);
+        }
+    }
+}
+
+void JackDriver::RestoreConnections()
+{
+    list<pair<string, string> >::const_iterator it;
+
+    for (it = fConnections.begin(); it != fConnections.end(); it++) {
+        pair<string, string> connection = *it;
+        jack_info("Restore connection: %s %s", connection.first.c_str(), connection.second.c_str());
+        fEngine->PortConnect(fClientControl.fRefNum, connection.first.c_str(), connection.second.c_str());
+    }
+}
 
 } // end of namespace

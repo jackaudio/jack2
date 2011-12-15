@@ -21,7 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackDummyDriver__
 #define __JackDummyDriver__
 
-#include "JackAudioDriver.h"
+#include "JackTimedDriver.h"
 
 namespace Jack
 {
@@ -30,41 +30,28 @@ namespace Jack
 \brief The dummy driver.
 */
 
-class JackDummyDriver : public JackAudioDriver
+class JackDummyDriver : public JackTimedDriver
 {
-    private:
-
-        long fWaitTime;
 
     public:
 
-        JackDummyDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table, unsigned long wait_time)
-                : JackAudioDriver(name, alias, engine, table), fWaitTime(wait_time)
+        JackDummyDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
+                : JackTimedDriver(name, alias, engine, table)
         {}
         virtual ~JackDummyDriver()
         {}
 
-        int Open(jack_nframes_t buffersize,
-                 jack_nframes_t samplerate,
-                 bool capturing,
-                 bool playing,
-                 int chan_in,
-                 int chan_out,
-                 bool monitor,
-                 const char* capture_driver_name,
-                 const char* playback_driver_name,
-                 jack_nframes_t capture_latency,
-                 jack_nframes_t playback_latency);
-
-        int Process();
-        
-        // BufferSize can be changed
-        bool IsFixedBufferSize()
+        virtual int Process()
         {
-            return false;
-        }
+            JackDriver::CycleTakeBeginTime();
 
-        int SetBufferSize(jack_nframes_t buffer_size);
+            if (JackAudioDriver::Process() < 0) {
+                return -1;
+            } else {
+                ProcessWait();
+                return 0;
+            }
+        }
 
 };
 

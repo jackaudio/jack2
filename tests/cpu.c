@@ -1,7 +1,7 @@
 /*
     Copyright (C) 2005 Samuel TRACOL
-	Copyright (C) 2008 Grame
-    
+    Copyright (C) 2008 Grame
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -21,7 +21,7 @@
 /** @file jack_cpu.c
  *
  * @brief This client test the capacity for jackd to kick out a to heavy cpu client.
- * 
+ *
  */
 
 #include <stdio.h>
@@ -80,23 +80,23 @@ int process(jack_nframes_t nframes, void *arg)
 {
 	jack_default_audio_sample_t *in, *out;
 	jack_nframes_t start_frame = jack_frame_time(client);
-	
+
 	in = (jack_default_audio_sample_t *) jack_port_get_buffer (input_port, nframes);
 	out = (jack_default_audio_sample_t *) jack_port_get_buffer (output_port, nframes);
-	memset(out, 0, sizeof (jack_default_audio_sample_t) * nframes); 
-    
+	memset(out, 0, sizeof (jack_default_audio_sample_t) * nframes);
+
 	while ((client_state == Run) && (jack_frame_time(client) < (start_frame + idle_time))) {}
- 	return 0;      
+ 	return 0;
 }
 
 /**
  * JACK calls this shutdown_callback if the server ever shuts down or
  * decides to disconnect the client.
  */
- 
+
 void jack_shutdown(void *arg)
 {
-	printf("Jack_cpu has been kicked out by jackd !\n");
+	fprintf(stderr, "JACK shut down, exiting ...\n");
 	exit (1);
 }
 
@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
 		{"cpu", 1, 0, 'c'},
 		{0, 0, 0, 0}
 	};
-	
+
 	client_name = "jack-cpu";
 	while ((opt = getopt_long (argc, argv, options, long_options, &option_index)) != EOF) {
 		switch (opt) {
@@ -136,35 +136,35 @@ int main(int argc, char *argv[])
 				got_time = 1;
 				break;
 			default:
-				fprintf(stderr, "unknown option %c\n", opt); 
+				fprintf(stderr, "unknown option %c\n", opt);
 				usage();
 		}
 	}
-	
+
 	if (!got_time) {
 		fprintf(stderr, "CPU load not specified ! See usage as following :\n");
 		usage();
 		return -1;
 	}
-	
+
 	if (time_to_run != 0)
 		printf("Running jack-cpu for %d seconds...\n", time_to_run);
-	
+
 	/* open a client connection to the JACK server */
 
 	client = jack_client_open (client_name, JackNoStartServer, &status);
- 	
+
 	if (client == NULL) {
 		fprintf(stderr, "jack_client_open() failed : is jack server running ?\n");
 		exit(1);
 	}
-    
+
     cur_buffer_size = jack_get_buffer_size(client);
 	printf("engine buffer size = %d \n", cur_buffer_size);
     printf("engine sample rate: %d Hz\n", jack_get_sample_rate(client));
 	idle_time = (jack_nframes_t) (cur_buffer_size * percent_cpu / 100);
 	printf("CPU load applies as %d sample delay.\n", idle_time);
-	
+
 	/* tell the JACK server to call `process()' whenever
 	   there is work to be done.
 	*/
@@ -188,15 +188,15 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "no more JACK ports available\n");
 		exit(1);
 	}
-	
+
 	if (jack_set_buffer_size_callback(client, update_buffer_size, 0) != 0) {
 		printf("Error when calling buffer_size_callback !");
 		return -1;
 	}
-	
+
 	/* Tell the JACK server that we are ready to roll.  Our
 	 * process() callback will start running now. */
-	
+
 	printf("Activating as jackd client...\n");
 	if (jack_activate(client)) {
 		fprintf(stderr, "cannot activate client");
@@ -220,8 +220,8 @@ int main(int argc, char *argv[])
 	if (jack_connect(client, ports[0], jack_port_name(input_port))) {
 		fprintf (stderr, "cannot connect input ports\n");
 	}
-	free(ports);
-	
+	jack_free(ports);
+
 	ports = jack_get_ports (client, NULL, NULL, JackPortIsPhysical|JackPortIsInput);
 	if (ports == NULL) {
 		fprintf(stderr, "no physical playback ports\n");
@@ -231,16 +231,16 @@ int main(int argc, char *argv[])
 	if (jack_connect(client, jack_port_name (output_port), ports[0])) {
 		fprintf(stderr, "cannot connect output ports\n");
 	}
-	free(ports);
-	
+	jack_free(ports);
+
 	if (time_before_run == 0) {
 		client_state = Run;
 		printf("Activating cpu load...\n");
 	}
-		
-	if (time_to_run !=0) 
+
+	if (time_to_run !=0)
 		time_before_exit = time_to_run + time_before_run;
-	
+
 	while (client_state != Exit) {
 		if ((time_before_run > 0) && (client_state == Init))
 			time_before_run--;
@@ -252,7 +252,7 @@ int main(int argc, char *argv[])
 		if (time_to_run != 0)
 			time_before_exit--;
 		if (time_before_exit < 1)
-			client_state = Exit; 
+			client_state = Exit;
 	}
 	jack_client_close(client);
 	printf("Exiting after a %d seconds run.\n", time_to_run);

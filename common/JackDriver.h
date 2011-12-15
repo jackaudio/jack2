@@ -34,6 +34,7 @@ namespace Jack
 class JackLockedEngine;
 class JackGraphManager;
 struct JackEngineControl;
+class JackSlaveDriverInterface;
 
 /*!
 \brief The base interface for drivers.
@@ -52,14 +53,14 @@ class SERVER_EXPORT JackDriverInterface
         virtual int Open() = 0;
 
         virtual int Open (bool capturing,
-                     bool playing,
-                     int inchannels,
-                     int outchannels,
-                     bool monitor,
-                     const char* capture_driver_name,
-                     const char* playback_driver_name,
-                     jack_nframes_t capture_latency,
-                     jack_nframes_t playback_latency) = 0;
+                         bool playing,
+                         int inchannels,
+                         int outchannels,
+                         bool monitor,
+                         const char* capture_driver_name,
+                         const char* playback_driver_name,
+                         jack_nframes_t capture_latency,
+                         jack_nframes_t playback_latency) = 0;
 
         virtual int Open(jack_nframes_t buffer_size,
                          jack_nframes_t samplerate,
@@ -87,14 +88,20 @@ class SERVER_EXPORT JackDriverInterface
         virtual int SetSampleRate(jack_nframes_t sample_rate) = 0;
 
         virtual int Process() = 0;
-        virtual int ProcessNull() = 0;
 
         virtual void SetMaster(bool onoff) = 0;
         virtual bool GetMaster() = 0;
+
         virtual void AddSlave(JackDriverInterface* slave) = 0;
         virtual void RemoveSlave(JackDriverInterface* slave) = 0;
+
         virtual std::list<JackDriverInterface*> GetSlaves() = 0;
-        virtual int ProcessSlaves() = 0;
+
+        virtual int ProcessReadSlaves() = 0;
+        virtual int ProcessWriteSlaves() = 0;
+
+        virtual int ProcessRead() = 0;
+        virtual int ProcessWrite() = 0;
 
         virtual bool IsRealTime() const = 0;
         virtual bool IsRunning() const = 0;
@@ -122,12 +129,16 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
 
         char fCaptureDriverName[JACK_CLIENT_NAME_SIZE + 1];
         char fPlaybackDriverName[JACK_CLIENT_NAME_SIZE + 1];
+
         char fAliasName[JACK_CLIENT_NAME_SIZE + 1];
+
         jack_nframes_t fCaptureLatency;
         jack_nframes_t fPlaybackLatency;
+
         jack_time_t fBeginDateUst;
         jack_time_t fEndDateUst;
         float fDelayedUsecs;
+
         JackLockedEngine* fEngine;
         JackGraphManager* fGraphManager;
         JackSynchro* fSynchroTable;
@@ -136,6 +147,19 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         std::list<JackDriverInterface*> fSlaveList;
         bool fIsMaster;
         bool fIsRunning;
+
+        int fCaptureChannels;
+        int fPlaybackChannels;
+
+        // Static tables since the actual number of ports may be changed by the real driver
+        // thus dynamic allocation is more difficult to handle
+        jack_port_id_t fCapturePortList[DRIVER_PORT_NUM];
+        jack_port_id_t fPlaybackPortList[DRIVER_PORT_NUM];
+        jack_port_id_t fMonitorPortList[DRIVER_PORT_NUM];
+
+        bool fWithMonitorPorts;
+
+        std::list<std::pair<std::string, std::string> > fConnections;		// Connections list
 
         void CycleIncTime();
         void CycleTakeBeginTime();
@@ -159,23 +183,23 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
 
         void AddSlave(JackDriverInterface* slave);
         void RemoveSlave(JackDriverInterface* slave);
+
         std::list<JackDriverInterface*> GetSlaves()
         {
             return fSlaveList;
         }
-        int ProcessSlaves();
 
         virtual int Open();
 
         virtual int Open (bool capturing,
-                     bool playing,
-                     int inchannels,
-                     int outchannels,
-                     bool monitor,
-                     const char* capture_driver_name,
-                     const char* playback_driver_name,
-                     jack_nframes_t capture_latency,
-                     jack_nframes_t playback_latency);
+                         bool playing,
+                         int inchannels,
+                         int outchannels,
+                         bool monitor,
+                         const char* capture_driver_name,
+                         const char* playback_driver_name,
+                         jack_nframes_t capture_latency,
+                         jack_nframes_t playback_latency);
 
         virtual int Open(jack_nframes_t buffer_size,
                          jack_nframes_t samplerate,
@@ -191,7 +215,6 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         virtual int Close();
 
         virtual int Process();
-        virtual int ProcessNull();
 
         virtual int Attach();
         virtual int Detach();
@@ -200,9 +223,19 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         virtual int Write();
 
         virtual int Start();
-        virtual int StartSlaves();
         virtual int Stop();
+
+        virtual int StartSlaves();
         virtual int StopSlaves();
+
+        int ProcessReadSlaves();
+        int ProcessWriteSlaves();
+
+        int ProcessRead();
+        int ProcessWrite();
+
+        virtual void SaveConnections();
+        virtual void RestoreConnections();
 
         virtual bool IsFixedBufferSize();
         virtual int SetBufferSize(jack_nframes_t buffer_size);

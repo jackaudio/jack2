@@ -1,20 +1,20 @@
 /*
  Copyright (C) 2004-2008 Grame
- 
+
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as published by
  the Free Software Foundation; either version 2.1 of the License, or
  (at your option) any later version.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU Lesser General Public License for more details.
- 
+
  You should have received a copy of the GNU Lesser General Public License
- along with this program; if not, write to the Free Software 
+ along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- 
+
  */
 
 #include "JackError.h"
@@ -33,7 +33,7 @@ JackShmMem::JackShmMem()
     JackShmMemAble::Init();
     LockMemory();
 }
-    
+
 JackShmMem::~JackShmMem()
 {
     UnlockMemory();
@@ -45,7 +45,7 @@ void JackShmMemAble::Init()
     fInfo.ptr.attached_at = gInfo.ptr.attached_at;
     fInfo.size = gInfo.size;
 }
-    
+
 void* JackShmMem::operator new(size_t size, void* memory)
 {
     jack_log("JackShmMem::new placement size = %ld", size);
@@ -61,12 +61,12 @@ void* JackShmMem::operator new(size_t size)
     snprintf(name, sizeof(name), "/jack_shared%d", fSegmentNum++);
 
     if (jack_shmalloc(name, size, &info)) {
-        jack_error("cannot create shared memory segment of size = %d", size, strerror(errno));
+        jack_error("Cannot create shared memory segment of size = %d", size, strerror(errno));
         goto error;
     }
 
     if (jack_attach_shm(&info)) {
-        jack_error("cannot attach shared memory segment name = %s err = %s", name, strerror(errno));
+        jack_error("Cannot attach shared memory segment name = %s err = %s", name, strerror(errno));
         jack_destroy_shm(&info);
         goto error;
     }
@@ -100,7 +100,7 @@ void JackShmMem::operator delete(void* p, size_t size)
 }
 
 void JackShmMem::operator delete(void* obj)
-{	
+{
     if (obj) {
         JackShmMem::operator delete(obj, 0);
     }
@@ -111,7 +111,7 @@ void LockMemoryImp(void* ptr, size_t size)
     if (CHECK_MLOCK((char*)ptr, size)) {
         jack_log("Succeeded in locking %u byte memory area", size);
     } else {
-        jack_error("Cannot lock down memory area (%s)", strerror(errno));
+        jack_error("Cannot lock down %u byte memory area (%s)", size, strerror(errno));
     }
 }
 
@@ -121,7 +121,7 @@ void InitLockMemoryImp(void* ptr, size_t size)
         memset(ptr, 0, size);
         jack_log("Succeeded in locking %u byte memory area", size);
     } else {
-        jack_error("Cannot lock down memory area (%s)", strerror(errno));
+        jack_error("Cannot lock down %u byte memory area (%s)", size, strerror(errno));
     }
 }
 
@@ -130,7 +130,7 @@ void UnlockMemoryImp(void* ptr, size_t size)
     if (CHECK_MUNLOCK((char*)ptr, size)) {
         jack_log("Succeeded in unlocking %u byte memory area", size);
     } else {
-        jack_error("Cannot unlock down memory area (%s)", strerror(errno));
+        jack_error("Cannot unlock down %u byte memory area (%s)", size, strerror(errno));
     }
 }
 

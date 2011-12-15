@@ -105,6 +105,12 @@ void
 jack_dbus_send_method_return(
     struct jack_dbus_method_call * call)
 {
+    if (call->message == NULL)
+    {
+        /* async call */
+        return;
+    }
+
     if (call->reply)
     {
     retry_send:
@@ -942,7 +948,10 @@ main (int argc, char **argv)
     jack_info("Listening for D-Bus messages");
 
     g_exit_command = FALSE;
-    while (!g_exit_command && dbus_connection_read_write_dispatch (g_connection, 200));
+    while (!g_exit_command && dbus_connection_read_write_dispatch (g_connection, 200))
+    {
+        jack_controller_run(controller_ptr);
+    }
 
     jack_controller_destroy(controller_ptr);
 

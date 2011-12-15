@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -20,25 +20,34 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef __JackPlatformPlug_APPLE__
 #define __JackPlatformPlug_APPLE__
 
+#include <TargetConditionals.h>
+
 #define jack_server_dir "/tmp"
 #define jack_client_dir "/tmp"
 #define JACK_DEFAULT_DRIVER "coreaudio"
 
 namespace Jack
-{       
+{
     struct JackRequest;
     struct JackResult;
-    
+
 	class JackPosixMutex;
 	class JackMachThread;
 	class JackMachSemaphore;
-    
+
     class JackSocketServerChannel;
     class JackSocketClientChannel;
     class JackSocketServerNotifyChannel;
     class JackSocketNotifyChannel;
-    
+
 	class JackNetUnixSocket;
+
+#ifdef MY_TARGET_OS_IPHONE
+    class JackClient;
+    class JackGraphManager;
+    class JackEngineControl;
+    class JackSynchro;
+#endif
 }
 
 /* __JackPlatformMutex__ */
@@ -50,8 +59,13 @@ namespace Jack { typedef JackPosixMutex JackMutex; }
 namespace Jack { typedef JackMachThread JackThread; }
 
 /* __JackPlatformSynchro__  client activation */
+#ifndef MY_TARGET_OS_IPHONE
 #include "JackMachSemaphore.h"
 namespace Jack { typedef JackMachSemaphore JackSynchro; }
+#endif
+
+#include "JackSocket.h"
+namespace Jack { typedef JackClientSocket JackChannelTransaction; }
 
 #include "JackSocket.h"
 namespace Jack { typedef JackClientSocket JackChannelTransaction; }
@@ -60,7 +74,8 @@ namespace Jack { typedef JackClientSocket JackChannelTransaction; }
 #include "JackProcessSync.h"
 /* Only on windows a special JackProcessSync is used. It is directly defined by including JackProcessSync.h here */
 
-/* __JackPlatformServerChannel__ */ 
+#ifndef MY_TARGET_OS_IPHONE
+/* __JackPlatformServerChannel__ */
 #include "JackSocketServerChannel.h"
 namespace Jack { typedef JackSocketServerChannel JackServerChannel; }
 
@@ -75,6 +90,7 @@ namespace Jack { typedef JackSocketServerNotifyChannel JackServerNotifyChannel; 
 /* __JackPlatformNotifyChannel__ */
 #include "JackSocketNotifyChannel.h"
 namespace Jack { typedef JackSocketNotifyChannel JackNotifyChannel; }
+#endif
 
 /* __JackPlatformNetSocket__ */
 #include "JackNetUnixSocket.h"

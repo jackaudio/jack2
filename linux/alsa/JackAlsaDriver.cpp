@@ -55,8 +55,11 @@ int JackAlsaDriver::SetBufferSize(jack_nframes_t buffer_size)
                                            ((alsa_driver_t *)fDriver)->frame_rate);
 
     if (res == 0) { // update fEngineControl and fGraphManager
-        JackAudioDriver::SetBufferSize(buffer_size); // never fails
+        JackAudioDriver::SetBufferSize(buffer_size);  // Generic change, never fails
+        // ALSA specific
+        UpdateLatencies();
     } else {
+        // Restore old values
         alsa_driver_reset_parameters((alsa_driver_t *)fDriver, fEngineControl->fBufferSize,
                                      ((alsa_driver_t *)fDriver)->user_nperiods,
                                      ((alsa_driver_t *)fDriver)->frame_rate);
@@ -65,14 +68,36 @@ int JackAlsaDriver::SetBufferSize(jack_nframes_t buffer_size)
     return res;
 }
 
+void JackAlsaDriver::UpdateLatencies()
+{
+    jack_latency_range_t range;
+    alsa_driver_t* alsa_driver = (alsa_driver_t*)fDriver;
+
+    for (int i = 0; i < fCaptureChannels; i++) {
+        range.min = range.max = alsa_driver->frames_per_cycle + alsa_driver->capture_frame_latency;
+        fGraphManager->GetPort(fCapturePortList[i])->SetLatencyRange(JackCaptureLatency, &range);
+    }
+
+    for (int i = 0; i < fPlaybackChannels; i++) {
+        // Add one buffer more latency if "async" mode is used...
+        range.min = range.max = (alsa_driver->frames_per_cycle * (alsa_driver->user_nperiods - 1)) +
+                         ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + alsa_driver->playback_frame_latency;
+        fGraphManager->GetPort(fPlaybackPortList[i])->SetLatencyRange(JackPlaybackLatency, &range);
+        // Monitor port
+        if (fWithMonitorPorts) {
+            range.min = range.max = alsa_driver->frames_per_cycle;
+            fGraphManager->GetPort(fMonitorPortList[i])->SetLatencyRange(JackCaptureLatency, &range);
+        }
+    }
+}
+
 int JackAlsaDriver::Attach()
 {
     JackPort* port;
-    int port_index;
+    jack_port_id_t port_index;
     unsigned long port_flags = (unsigned long)CaptureDriverFlags;
-    char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-    char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-    jack_latency_range_t range;
+    char name[REAL_JACK_PORT_NAME_SIZE];
+    char alias[REAL_JACK_PORT_NAME_SIZE];
 
     assert(fCaptureChannels < DRIVER_PORT_NUM);
     assert(fPlaybackChannels < DRIVER_PORT_NUM);
@@ -89,16 +114,14 @@ int JackAlsaDriver::Attach()
     jack_log("JackAlsaDriver::Attach fBufferSize %ld fSampleRate %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
 
     for (int i = 0; i < fCaptureChannels; i++) {
-        snprintf(alias, sizeof(alias) - 1, "%s:%s:out%d", fAliasName, fCaptureDriverName, i + 1);
-        snprintf(name, sizeof(name) - 1, "%s:capture_%d", fClientControl.fName, i + 1);
-        if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
+        snprintf(alias, sizeof(alias), "%s:%s:out%d", fAliasName, fCaptureDriverName, i + 1);
+        snprintf(name, sizeof(name), "%s:capture_%d", fClientControl.fName, i + 1);
+        if (fEngine->PortRegister(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize, &port_index) < 0) {
             jack_error("driver: cannot register port for %s", name);
             return -1;
         }
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
-        range.min = range.max = alsa_driver->frames_per_cycle + alsa_driver->capture_frame_latency;
-        port->SetLatencyRange(JackCaptureLatency, &range);
         fCapturePortList[i] = port_index;
         jack_log("JackAlsaDriver::Attach fCapturePortList[i] %ld ", port_index);
     }
@@ -106,36 +129,30 @@ int JackAlsaDriver::Attach()
     port_flags = (unsigned long)PlaybackDriverFlags;
 
     for (int i = 0; i < fPlaybackChannels; i++) {
-        snprintf(alias, sizeof(alias) - 1, "%s:%s:in%d", fAliasName, fPlaybackDriverName, i + 1);
-        snprintf(name, sizeof(name) - 1, "%s:playback_%d", fClientControl.fName, i + 1);
-        if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
+        snprintf(alias, sizeof(alias), "%s:%s:in%d", fAliasName, fPlaybackDriverName, i + 1);
+        snprintf(name, sizeof(name), "%s:playback_%d", fClientControl.fName, i + 1);
+        if (fEngine->PortRegister(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize, &port_index) < 0) {
             jack_error("driver: cannot register port for %s", name);
             return -1;
         }
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
-        // Add one buffer more latency if "async" mode is used...
-        range.min = range.max = (alsa_driver->frames_per_cycle * (alsa_driver->user_nperiods - 1)) +
-                         ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + alsa_driver->playback_frame_latency;
-
-        port->SetLatencyRange(JackPlaybackLatency, &range);
         fPlaybackPortList[i] = port_index;
         jack_log("JackAlsaDriver::Attach fPlaybackPortList[i] %ld ", port_index);
 
         // Monitor ports
         if (fWithMonitorPorts) {
             jack_log("Create monitor port");
-            snprintf(name, sizeof(name) - 1, "%s:monitor_%d", fClientControl.fName, i + 1);
-            if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, MonitorDriverFlags, fEngineControl->fBufferSize)) == NO_PORT) {
-                jack_error ("ALSA: cannot register monitor port for %s", name);
+            snprintf(name, sizeof(name), "%s:monitor_%d", fClientControl.fName, i + 1);
+            if (fEngine->PortRegister(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, MonitorDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
+                jack_error("ALSA: cannot register monitor port for %s", name);
             } else {
-                port = fGraphManager->GetPort(port_index);
-                range.min = range.max = alsa_driver->frames_per_cycle;
-                port->SetLatencyRange(JackCaptureLatency, &range);
                 fMonitorPortList[i] = port_index;
             }
         }
     }
+
+    UpdateLatencies();
 
     if (alsa_driver->midi) {
         int err = (alsa_driver->midi->attach)(alsa_driver->midi);
@@ -256,26 +273,27 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
     else if (strcmp(midi_driver_name, "raw") == 0)
         midi = alsa_rawmidi_new((jack_client_t*)this);
 
-    if (JackServerGlobals::on_device_acquire != NULL)
-    {
+    if (JackServerGlobals::on_device_acquire != NULL) {
         int capture_card = card_to_num(capture_driver_name);
         int playback_card = card_to_num(playback_driver_name);
         char audio_name[32];
 
-        snprintf(audio_name, sizeof(audio_name) - 1, "Audio%d", capture_card);
+        snprintf(audio_name, sizeof(audio_name), "Audio%d", capture_card);
         if (!JackServerGlobals::on_device_acquire(audio_name)) {
-            jack_error("Audio device %s cannot be acquired, trying to open it anyway...", capture_driver_name);
+            jack_error("Audio device %s cannot be acquired...", capture_driver_name);
+            return -1;
         }
 
         if (playback_card != capture_card) {
-            snprintf(audio_name, sizeof(audio_name) - 1, "Audio%d", playback_card);
+            snprintf(audio_name, sizeof(audio_name), "Audio%d", playback_card);
             if (!JackServerGlobals::on_device_acquire(audio_name)) {
-                jack_error("Audio device %s cannot be acquired, trying to open it anyway...", playback_driver_name);
+                jack_error("Audio device %s cannot be acquired...", playback_driver_name);
+                return -1;
             }
         }
     }
 
-    fDriver = alsa_driver_new ("alsa_pcm", (char*)playback_driver_name, (char*)capture_driver_name,
+    fDriver = alsa_driver_new ((char*)"alsa_pcm", (char*)playback_driver_name, (char*)capture_driver_name,
                                NULL,
                                nframes,
                                user_nperiods,
@@ -316,13 +334,13 @@ int JackAlsaDriver::Close()
         char audio_name[32];
         int capture_card = card_to_num(fCaptureDriverName);
         if (capture_card >= 0) {
-            snprintf(audio_name, sizeof(audio_name) - 1, "Audio%d", capture_card);
+            snprintf(audio_name, sizeof(audio_name), "Audio%d", capture_card);
             JackServerGlobals::on_device_release(audio_name);
         }
 
         int playback_card = card_to_num(fPlaybackDriverName);
         if (playback_card >= 0 && playback_card != capture_card) {
-            snprintf(audio_name, sizeof(audio_name) - 1, "Audio%d", playback_card);
+            snprintf(audio_name, sizeof(audio_name), "Audio%d", playback_card);
             JackServerGlobals::on_device_release(audio_name);
         }
     }
@@ -556,7 +574,7 @@ enum_alsa_devices()
 
     while(snd_card_next(&card_no) >= 0 && card_no >= 0)
     {
-        sprintf(card_id, "hw:%d", card_no);
+        snprintf(card_id, sizeof(card_id), "hw:%d", card_no);
 
         if (snd_ctl_open(&handle, card_id, 0) >= 0 &&
             snd_ctl_card_info(handle, info) >= 0)
@@ -567,7 +585,7 @@ enum_alsa_devices()
 
             while (snd_ctl_pcm_next_device(handle, &device_no) >= 0 && device_no != -1)
             {
-                sprintf(device_id, "%s,%d", card_id, device_no);
+                snprintf(device_id, sizeof(device_id), "%s,%d", card_id, device_no);
 
                 snd_pcm_info_set_device(pcminfo_capture, device_no);
                 snd_pcm_info_set_subdevice(pcminfo_capture, 0);
@@ -708,179 +726,84 @@ dither_opt (char c, DitherAlgorithm* dither)
 SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
 {
     jack_driver_desc_t * desc;
-    jack_driver_param_desc_t * params;
-    unsigned int i;
+    jack_driver_desc_filler_t filler;
+    jack_driver_param_value_t value;
 
-    desc = (jack_driver_desc_t*)calloc (1, sizeof (jack_driver_desc_t));
+    desc = jack_driver_descriptor_construct("alsa", JackDriverMaster, "Linux ALSA API based audio backend", &filler);
 
-    strcpy(desc->name, "alsa");                                    // size MUST be less then JACK_DRIVER_NAME_MAX + 1
-    strcpy(desc->desc, "Linux ALSA API based audio backend");      // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
+    strcpy(value.str, "none");
+    jack_driver_descriptor_add_parameter(desc, &filler, "capture", 'C', JackDriverParamString, &value, NULL, "Provide capture ports.  Optionally set device", NULL);
+    jack_driver_descriptor_add_parameter(desc, &filler, "playback", 'P', JackDriverParamString, &value, NULL, "Provide playback ports.  Optionally set device", NULL);
 
-    desc->nparams = 18;
-    params = (jack_driver_param_desc_t*)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));
+    strcpy(value.str, "hw:0");
+    jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, enum_alsa_devices(), "ALSA device name", NULL);
 
-    i = 0;
-    strcpy (params[i].name, "capture");
-    params[i].character = 'C';
-    params[i].type = JackDriverParamString;
-    strcpy (params[i].value.str, "none");
-    strcpy (params[i].short_desc,
-            "Provide capture ports.  Optionally set device");
-    strcpy (params[i].long_desc, params[i].short_desc);
+    value.ui = 48000U;
+    jack_driver_descriptor_add_parameter(desc, &filler, "rate", 'r', JackDriverParamUInt, &value, NULL, "Sample rate", NULL);
 
-    i++;
-    strcpy (params[i].name, "playback");
-    params[i].character = 'P';
-    params[i].type = JackDriverParamString;
-    strcpy (params[i].value.str, "none");
-    strcpy (params[i].short_desc,
-            "Provide playback ports.  Optionally set device");
-    strcpy (params[i].long_desc, params[i].short_desc);
+    value.ui = 1024U;
+    jack_driver_descriptor_add_parameter(desc, &filler, "period", 'p', JackDriverParamUInt, &value, NULL, "Frames per period", NULL);
 
-    i++;
-    strcpy (params[i].name, "device");
-    params[i].character = 'd';
-    params[i].type = JackDriverParamString;
-    strcpy (params[i].value.str, "hw:0");
-    strcpy (params[i].short_desc, "ALSA device name");
-    strcpy (params[i].long_desc, params[i].short_desc);
-    params[i].constraint = enum_alsa_devices();
+    value.ui = 2U;
+    jack_driver_descriptor_add_parameter(desc, &filler, "nperiods", 'n', JackDriverParamUInt, &value, NULL, "Number of periods of playback latency", NULL);
 
-    i++;
-    strcpy (params[i].name, "rate");
-    params[i].character = 'r';
-    params[i].type = JackDriverParamUInt;
-    params[i].value.ui = 48000U;
-    strcpy (params[i].short_desc, "Sample rate");
-    strcpy (params[i].long_desc, params[i].short_desc);
+    value.i = 0;
+    jack_driver_descriptor_add_parameter(desc, &filler, "hwmon", 'H', JackDriverParamBool, &value, NULL, "Hardware monitoring, if available", NULL);
 
-    i++;
-    strcpy (params[i].name, "period");
-    params[i].character = 'p';
-    params[i].type = JackDriverParamUInt;
-    params[i].value.ui = 1024U;
-    strcpy (params[i].short_desc, "Frames per period");
-    strcpy (params[i].long_desc, params[i].short_desc);
+    value.i = 0;
+    jack_driver_descriptor_add_parameter(desc, &filler, "hwmeter", 'M', JackDriverParamBool, &value, NULL, "Hardware metering, if available", NULL);
 
-    i++;
-    strcpy (params[i].name, "nperiods");
-    params[i].character = 'n';
-    params[i].type = JackDriverParamUInt;
-    params[i].value.ui = 2U;
-    strcpy (params[i].short_desc, "Number of periods of playback latency");
-    strcpy (params[i].long_desc, params[i].short_desc);
+    value.i = 1;
+    jack_driver_descriptor_add_parameter(desc, &filler, "duplex", 'D', JackDriverParamBool, &value, NULL, "Provide both capture and playback ports", NULL);
 
-    i++;
-    strcpy (params[i].name, "hwmon");
-    params[i].character = 'H';
-    params[i].type = JackDriverParamBool;
-    params[i].value.i = 0;
-    strcpy (params[i].short_desc, "Hardware monitoring, if available");
-    strcpy (params[i].long_desc, params[i].short_desc);
+    value.i = 0;
+    jack_driver_descriptor_add_parameter(desc, &filler, "softmode", 's', JackDriverParamBool, &value, NULL, "Soft-mode, no xrun handling", NULL);
 
-    i++;
-    strcpy (params[i].name, "hwmeter");
-    params[i].character = 'M';
-    params[i].type = JackDriverParamBool;
-    params[i].value.i = 0;
-    strcpy (params[i].short_desc, "Hardware metering, if available");
-    strcpy (params[i].long_desc, params[i].short_desc);
+    value.i = 0;
+    jack_driver_descriptor_add_parameter(desc, &filler, "monitor", 'm', JackDriverParamBool, &value, NULL, "Provide monitor ports for the output", NULL);
 
-    i++;
-    strcpy (params[i].name, "duplex");
-    params[i].character = 'D';
-    params[i].type = JackDriverParamBool;
-    params[i].value.i = 1;
-    strcpy (params[i].short_desc,
-            "Provide both capture and playback ports");
-    strcpy (params[i].long_desc, params[i].short_desc);
+    value.c = 'n';
+    jack_driver_descriptor_add_parameter(
+        desc,
+        &filler,
+        "dither",
+        'z',
+        JackDriverParamChar,
+        &value,
+        get_dither_constraint(),
+        "Dithering mode",
+        "Dithering mode:\n"
+        "  n - none\n"
+        "  r - rectangular\n"
+        "  s - shaped\n"
+        "  t - triangular");
 
-    i++;
-    strcpy (params[i].name, "softmode");
-    params[i].character = 's';
-    params[i].type = JackDriverParamBool;
-    params[i].value.i = 0;
-    strcpy (params[i].short_desc, "Soft-mode, no xrun handling");
-    strcpy (params[i].long_desc, params[i].short_desc);
+    value.i = 0;
+    jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamInt, &value, NULL, "Number of capture channels (defaults to hardware max)", NULL);
+    jack_driver_descriptor_add_parameter(desc, &filler, "outchannels", 'o', JackDriverParamInt, &value, NULL, "Number of playback channels (defaults to hardware max)", NULL);
 
-    i++;
-    strcpy (params[i].name, "monitor");
-    params[i].character = 'm';
-    params[i].type = JackDriverParamBool;
-    params[i].value.i = 0;
-    strcpy (params[i].short_desc, "Provide monitor ports for the output");
-    strcpy (params[i].long_desc, params[i].short_desc);
+    value.i = FALSE;
+    jack_driver_descriptor_add_parameter(desc, &filler, "shorts", 'S', JackDriverParamBool, &value, NULL, "Try 16-bit samples before 32-bit", NULL);
 
-    i++;
-    strcpy (params[i].name, "dither");
-    params[i].character = 'z';
-    params[i].type = JackDriverParamChar;
-    params[i].value.c = 'n';
-    strcpy (params[i].short_desc, "Dithering mode");
-    strcpy (params[i].long_desc,
-            "Dithering mode:\n"
-            "  n - none\n"
-            "  r - rectangular\n"
-            "  s - shaped\n"
-            "  t - triangular");
-    params[i].constraint = get_dither_constraint();
+    value.ui = 0;
+    jack_driver_descriptor_add_parameter(desc, &filler, "input-latency", 'I', JackDriverParamUInt, &value, NULL, "Extra input latency (frames)", NULL);
+    jack_driver_descriptor_add_parameter(desc, &filler, "output-latency", 'O', JackDriverParamUInt, &value, NULL, "Extra output latency (frames)", NULL);
 
-    i++;
-    strcpy (params[i].name, "inchannels");
-    params[i].character = 'i';
-    params[i].type = JackDriverParamUInt;
-    params[i].value.i = 0;
-    strcpy (params[i].short_desc,
-            "Number of capture channels (defaults to hardware max)");
-    strcpy (params[i].long_desc, params[i].short_desc);
+    strcpy(value.str, "none");
+    jack_driver_descriptor_add_parameter(
+        desc,
+        &filler,
+        "midi-driver",
+        'X',
+        JackDriverParamString,
+        &value,
+        get_midi_driver_constraint(),
+        "ALSA device name",
+        "ALSA MIDI driver:\n"
+        " none - no MIDI driver\n"
+        " seq - ALSA Sequencer driver\n"
+        " raw - ALSA RawMIDI driver\n");
 
-    i++;
-    strcpy (params[i].name, "outchannels");
-    params[i].character = 'o';
-    params[i].type = JackDriverParamUInt;
-    params[i].value.i = 0;
-    strcpy (params[i].short_desc,
-            "Number of playback channels (defaults to hardware max)");
-    strcpy (params[i].long_desc, params[i].short_desc);
-
-    i++;
-    strcpy (params[i].name, "shorts");
-    params[i].character = 'S';
-    params[i].type = JackDriverParamBool;
-    params[i].value.i = FALSE;
-    strcpy (params[i].short_desc, "Try 16-bit samples before 32-bit");
-    strcpy (params[i].long_desc, params[i].short_desc);
-
-    i++;
-    strcpy (params[i].name, "input-latency");
-    params[i].character = 'I';
-    params[i].type = JackDriverParamUInt;
-    params[i].value.i = 0;
-    strcpy (params[i].short_desc, "Extra input latency (frames)");
-    strcpy (params[i].long_desc, params[i].short_desc);
-
-    i++;
-    strcpy (params[i].name, "output-latency");
-    params[i].character = 'O';
-    params[i].type = JackDriverParamUInt;
-    params[i].value.i = 0;
-    strcpy (params[i].short_desc, "Extra output latency (frames)");
-    strcpy (params[i].long_desc, params[i].short_desc);
-
-    i++;
-    strcpy (params[i].name, "midi-driver");
-    params[i].character = 'X';
-    params[i].type = JackDriverParamString;
-    strcpy (params[i].value.str, "none");
-    strcpy (params[i].short_desc, "ALSA MIDI driver name (seq|raw)");
-    strcpy (params[i].long_desc,
-            "ALSA MIDI driver:\n"
-            " none - no MIDI driver\n"
-            " seq - ALSA Sequencer driver\n"
-            " raw - ALSA RawMIDI driver\n");
-    params[i].constraint = get_midi_driver_constraint();
-
-    desc->params = params;
     return desc;
 }
 

@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -39,15 +39,15 @@ class SERVER_EXPORT JackMachSemaphore : public detail::JackSynchro
     private:
 
         semaphore_t fSemaphore;
-        static mach_port_t fBootPort;
+        mach_port_t fBootPort;
 
     protected:
 
-        void BuildName(const char* name, const char* server_name, char* res);
+        void BuildName(const char* name, const char* server_name, char* res, int size);
 
     public:
 
-        JackMachSemaphore():JackSynchro(), fSemaphore(0)
+        JackMachSemaphore():JackSynchro(), fSemaphore(0), fBootPort(0)
         {}
 
         bool Signal();

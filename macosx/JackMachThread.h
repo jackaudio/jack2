@@ -61,12 +61,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef __JackMachThread__
 #define __JackMachThread__
 
+#include <TargetConditionals.h>
+
+#ifdef MY_TARGET_OS_IPHONE
+typedef unsigned char Boolean;
+#endif
+
+
 #include "JackPosixThread.h"
-#import <CoreServices/../Frameworks/CarbonCore.framework/Headers/MacTypes.h>
+#ifndef MY_TARGET_OS_IPHONE
+#include <CoreServices/../Frameworks/CarbonCore.framework/Headers/MacTypes.h>
+#endif
 
 #include <mach/thread_policy.h>
 #include <mach/thread_act.h>
+#ifndef MY_TARGET_OS_IPHONE
 #include <CoreAudio/HostTime.h>
+#endif
 
 #define THREAD_SET_PRIORITY         0
 #define THREAD_SCHEDULED_PRIORITY   1
@@ -122,6 +133,7 @@ class SERVER_EXPORT JackMachThread : public JackPosixThread
             return JackMachThread::AcquireRealTimeImp(thread, period, computation, constraint);
         }
         static int DropRealTimeImp(jack_native_thread_t thread);
+
 };
 
 } // end of namespace

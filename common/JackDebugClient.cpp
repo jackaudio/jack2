@@ -90,7 +90,7 @@ int JackDebugClient::Open(const char* server_name, const char* name, int uuid, j
     /* Convert it to local time representation. */
     loctime = localtime (&curtime);
     strftime (buffer, 256, "%I-%M", loctime);
-    sprintf(provstr, "JackClientDebug-%s-%s.log", name, buffer);
+    snprintf(provstr, sizeof(provstr), "JackClientDebug-%s-%s.log", name, buffer);
     fStream = new ofstream(provstr, ios_base::ate);
     if (fStream->is_open()) {
         if (res == -1) {
@@ -333,7 +333,7 @@ int JackDebugClient::SetFreeWheel(int onoff)
          *fStream << "!!! ERROR !!! : Freewheel setup seems incorrect : set = ON while FW is already ON " << endl;
     if (!onoff && !fFreewheel)
          *fStream << "!!! ERROR !!! : Freewheel setup seems incorrect : set = OFF while FW is already OFF " << endl;
-    fFreewheel = onoff;
+    fFreewheel = onoff ? true : false;
     return fClient->SetFreeWheel(onoff);
 }
 

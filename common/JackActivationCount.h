@@ -33,6 +33,7 @@ struct JackClientControl;
 \brief Client activation counter.
 */
 
+PRE_PACKED_STRUCTURE
 class JackActivationCount
 {
 

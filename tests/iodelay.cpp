@@ -49,7 +49,6 @@ public:
     double del (void) { return _del; }
     double err (void) { return _err; }
 
-private:
 
     double  _del;
     double  _err;
@@ -77,9 +76,9 @@ MTDM::MTDM (void) : _cnt (0), _inv (0)
 
     for (i = 0, F = _freq; i < 5; i++, F++)
     {
-	F->p = 128;
-	F->xa = F->ya = 0.0f;
-	F->xf = F->yf = 0.0f;
+        F->p = 128;
+        F->xa = F->ya = 0.0f;
+        F->xf = F->yf = 0.0f;
     }
 }
 
@@ -92,28 +91,28 @@ int MTDM::process (size_t len, float *ip, float *op)
     while (len--)
     {
         vop = 0.0f;
-	vip = *ip++;
-	for (i = 0, F = _freq; i < 5; i++, F++)
-	{
-	    a = 2 * (float) M_PI * (F->p & 65535) / 65536.0;
-	    F->p += F->f;
-	    c =  cosf (a);
-	    s = -sinf (a);
-	    vop += F->a * s;
-	    F->xa += s * vip;
-	    F->ya += c * vip;
-	}
-	*op++ = vop;
-	if (++_cnt == 16)
-	{
-	    for (i = 0, F = _freq; i < 5; i++, F++)
-	    {
-		F->xf += 1e-3f * (F->xa - F->xf + 1e-20);
-		F->yf += 1e-3f * (F->ya - F->yf + 1e-20);
-		F->xa = F->ya = 0.0f;
-	    }
+        vip = *ip++;
+        for (i = 0, F = _freq; i < 5; i++, F++)
+        {
+            a = 2 * (float) M_PI * (F->p & 65535) / 65536.0;
+            F->p += F->f;
+            c =  cosf (a);
+            s = -sinf (a);
+            vop += F->a * s;
+            F->xa += s * vip;
+            F->ya += c * vip;
+        }
+        *op++ = vop;
+        if (++_cnt == 16)
+        {
+            for (i = 0, F = _freq; i < 5; i++, F++)
+            {
+                F->xf += 1e-3f * (F->xa - F->xf + 1e-20);
+                F->yf += 1e-3f * (F->ya - F->yf + 1e-20);
+                F->xa = F->ya = 0.0f;
+            }
             _cnt = 0;
-	}
+        }
     }
 
     return 0;
@@ -134,17 +133,17 @@ int MTDM::resolve (void)
     _err = 0.0;
     for (i = 0; i < 4; i++)
     {
-	F++;
-	p = atan2 (F->yf, F->xf) / (2 * M_PI) - d * F->f / f0;
+        F++;
+        p = atan2 (F->yf, F->xf) / (2 * M_PI) - d * F->f / f0;
         if (_inv) p += 0.5f;
-	p -= floor (p);
-	p *= 8;
-	k = (int)(floor (p + 0.5));
-	e = fabs (p - k);
+        p -= floor (p);
+        p *= 8;
+        k = (int)(floor (p + 0.5));
+        e = fabs (p - k);
         if (e > _err) _err = e;
         if (e > 0.4) return 1;
-	d += m * (k & 7);
-	m *= 8;
+        d += m * (k & 7);
+        m *= 8;
     }
     _del = 16 * d;
 
@@ -232,17 +231,22 @@ int main (int ac, char *av [])
     #else
         usleep (250000);
  	#endif
-        if (mtdm.resolve () < 0) printf ("Signal below threshold...\n");
+        if (mtdm.resolve() < 0) printf ("Signal below threshold...\n");
         else
         {
+            jack_nframes_t systemic_latency;
             if (mtdm.err () > 0.3)
             {
                 mtdm.invert ();
                 mtdm.resolve ();
             }
-            printf ("%10.3lf frames %10.3lf ms", mtdm.del (), mtdm.del () * t);
-            if (mtdm.err () > 0.2) printf (" ??");
-                if (mtdm.inv ()) printf (" Inv");
+            systemic_latency = (jack_nframes_t) floor (mtdm._del - (capture_latency.max + playback_latency.max));
+
+            printf("%10.3lf frames %10.3lf ms total roundtrip latency\n\textra loopback latency: %u frames\n\tuse %u for the backend arguments -I and -O"
+                    , mtdm._del, mtdm._del * t,
+                    systemic_latency, systemic_latency/2);
+            if (mtdm._err > 0.2) printf (" ??");
+            if (mtdm._inv) printf (" Inv");
             printf ("\n");
         }
     }

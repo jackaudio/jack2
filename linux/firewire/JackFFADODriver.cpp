@@ -36,13 +36,14 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <string.h>
 
 #include "JackFFADODriver.h"
-#include "JackFFADOMidiInput.h"
-#include "JackFFADOMidiOutput.h"
+#include "JackFFADOMidiInputPort.h"
+#include "JackFFADOMidiOutputPort.h"
 #include "JackEngineControl.h"
 #include "JackClientControl.h"
 #include "JackPort.h"
 #include "JackGraphManager.h"
 #include "JackCompilerDeps.h"
+#include "JackLockedEngine.h"
 
 namespace Jack
 {
@@ -94,14 +95,9 @@ JackFFADODriver::ffado_driver_read (ffado_driver_t * driver, jack_nframes_t nfra
     /* process the midi data */
     for (chn = 0; chn < driver->capture_nchannels; chn++) {
         if (driver->capture_channels[chn].stream_type == ffado_stream_type_midi) {
-            JackFFADOMidiInput *midi_input = (JackFFADOMidiInput *) driver->capture_channels[chn].midi_input;
+            JackFFADOMidiInputPort *midi_input = (JackFFADOMidiInputPort *) driver->capture_channels[chn].midi_input;
             JackMidiBuffer *buffer = (JackMidiBuffer *) fGraphManager->GetBuffer(fCapturePortList[chn], nframes);
-            if (! buffer) {
-                continue;
-            }
-            midi_input->SetInputBuffer(driver->capture_channels[chn].midi_buffer);
-            midi_input->SetPortBuffer(buffer);
-            midi_input->Process(nframes);
+            midi_input->Process(buffer, driver->capture_channels[chn].midi_buffer, nframes);
         }
     }
 
@@ -138,16 +134,9 @@ JackFFADODriver::ffado_driver_write (ffado_driver_t * driver, jack_nframes_t nfr
                 memset(midi_buffer, 0, nframes * sizeof(uint32_t));
                 buf = (jack_default_audio_sample_t *) fGraphManager->GetBuffer(fPlaybackPortList[chn], nframes);
                 ffado_streaming_set_playback_stream_buffer(driver->dev, chn, (char *)(midi_buffer));
-                /* if the returned buffer is invalid, continue */
-                if (!buf) {
-                    ffado_streaming_playback_stream_onoff(driver->dev, chn, 0);
-                    continue;
-                }
-                ffado_streaming_playback_stream_onoff(driver->dev, chn, 1);
-                JackFFADOMidiOutput *midi_output = (JackFFADOMidiOutput *) driver->playback_channels[chn].midi_output;
-                midi_output->SetPortBuffer((JackMidiBuffer *) buf);
-                midi_output->SetOutputBuffer(midi_buffer);
-                midi_output->Process(nframes);
+                ffado_streaming_playback_stream_onoff(driver->dev, chn, buf ? 1 : 0);
+                JackFFADOMidiOutputPort *midi_output = (JackFFADOMidiOutputPort *) driver->playback_channels[chn].midi_output;
+                midi_output->Process((JackMidiBuffer *) buf, midi_buffer, nframes);
 
             } else { // always have a valid buffer
                 ffado_streaming_set_playback_stream_buffer(driver->dev, chn, (char *)(driver->nullbuffer));
@@ -155,9 +144,7 @@ JackFFADODriver::ffado_driver_write (ffado_driver_t * driver, jack_nframes_t nfr
             }
         }
     }
-
     ffado_streaming_transfer_playback_buffers(driver->dev);
-
     printExit();
     return 0;
 }
@@ -359,9 +346,9 @@ JackFFADODriver::ffado_driver_delete (ffado_driver_t *driver)
 int JackFFADODriver::Attach()
 {
     JackPort* port;
-    int port_index;
-    char buf[JACK_PORT_NAME_SIZE];
-    char portname[JACK_PORT_NAME_SIZE];
+    jack_port_id_t port_index;
+    char buf[REAL_JACK_PORT_NAME_SIZE];
+    char portname[REAL_JACK_PORT_NAME_SIZE];
     jack_latency_range_t range;
 
     ffado_driver_t* driver = (ffado_driver_t*)fDriver;
@@ -427,16 +414,16 @@ int JackFFADODriver::Attach()
 
     fCaptureChannels = 0;
     for (channel_t chn = 0; chn < driver->capture_nchannels; chn++) {
-        ffado_streaming_get_capture_stream_name(driver->dev, chn, portname, sizeof(portname) - 1);
+        ffado_streaming_get_capture_stream_name(driver->dev, chn, portname, sizeof(portname));
 
         driver->capture_channels[chn].stream_type = ffado_streaming_get_capture_stream_type(driver->dev, chn);
         if (driver->capture_channels[chn].stream_type == ffado_stream_type_audio) {
-            snprintf(buf, sizeof(buf) - 1, "firewire_pcm:%s_in", portname);
+            snprintf(buf, sizeof(buf), "firewire_pcm:%s_in", portname);
             printMessage ("Registering audio capture port %s", buf);
-            if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
+            if (fEngine->PortRegister(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_AUDIO_TYPE,
                               CaptureDriverFlags,
-                              fEngineControl->fBufferSize)) == NO_PORT) {
+                              fEngineControl->fBufferSize, &port_index) < 0) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
             }
@@ -451,19 +438,18 @@ int JackFFADODriver::Attach()
             range.min = range.max = driver->period_size + driver->capture_frame_latency;
             port->SetLatencyRange(JackCaptureLatency, &range);
             // capture port aliases (jackd1 style port names)
-            snprintf(buf, sizeof(buf) - 1, "%s:capture_%i", fClientControl.fName, (int) chn + 1);
+            snprintf(buf, sizeof(buf), "%s:capture_%i", fClientControl.fName, (int) chn + 1);
             port->SetAlias(buf);
             fCapturePortList[chn] = port_index;
             jack_log("JackFFADODriver::Attach fCapturePortList[i] %ld ", port_index);
             fCaptureChannels++;
-
         } else if (driver->capture_channels[chn].stream_type == ffado_stream_type_midi) {
-            snprintf(buf, sizeof(buf) - 1, "firewire_pcm:%s_in", portname);
+            snprintf(buf, sizeof(buf), "firewire_pcm:%s_in", portname);
             printMessage ("Registering midi capture port %s", buf);
-            if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
+            if (fEngine->PortRegister(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_MIDI_TYPE,
                               CaptureDriverFlags,
-                              fEngineControl->fBufferSize)) == NO_PORT) {
+                              fEngineControl->fBufferSize, &port_index) < 0) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
             }
@@ -476,7 +462,7 @@ int JackFFADODriver::Attach()
                 printError(" cannot enable port %s", buf);
             }
 
-            driver->capture_channels[chn].midi_input = new JackFFADOMidiInput();
+            driver->capture_channels[chn].midi_input = new JackFFADOMidiInputPort();
             // setup the midi buffer
             driver->capture_channels[chn].midi_buffer = (uint32_t *)calloc(driver->period_size, sizeof(uint32_t));
 
@@ -501,17 +487,17 @@ int JackFFADODriver::Attach()
 
     fPlaybackChannels = 0;
     for (channel_t chn = 0; chn < driver->playback_nchannels; chn++) {
-        ffado_streaming_get_playback_stream_name(driver->dev, chn, portname, sizeof(portname) - 1);
+        ffado_streaming_get_playback_stream_name(driver->dev, chn, portname, sizeof(portname));
 
         driver->playback_channels[chn].stream_type = ffado_streaming_get_playback_stream_type(driver->dev, chn);
 
         if (driver->playback_channels[chn].stream_type == ffado_stream_type_audio) {
-            snprintf(buf, sizeof(buf) - 1, "firewire_pcm:%s_out", portname);
+            snprintf(buf, sizeof(buf), "firewire_pcm:%s_out", portname);
             printMessage ("Registering audio playback port %s", buf);
-            if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
+            if (fEngine->PortRegister(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_AUDIO_TYPE,
                               PlaybackDriverFlags,
-                              fEngineControl->fBufferSize)) == NO_PORT) {
+                              fEngineControl->fBufferSize, &port_index) < 0) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
             }
@@ -529,18 +515,19 @@ int JackFFADODriver::Attach()
             range.min = range.max = (driver->period_size * (driver->device_options.nb_buffers - 1)) + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + driver->playback_frame_latency;
             port->SetLatencyRange(JackPlaybackLatency, &range);
             // playback port aliases (jackd1 style port names)
-            snprintf(buf, sizeof(buf) - 1, "%s:playback_%i", fClientControl.fName, (int) chn + 1);
+            snprintf(buf, sizeof(buf), "%s:playback_%i", fClientControl.fName, (int) chn + 1);
             port->SetAlias(buf);
             fPlaybackPortList[chn] = port_index;
             jack_log("JackFFADODriver::Attach fPlaybackPortList[i] %ld ", port_index);
             fPlaybackChannels++;
         } else if (driver->playback_channels[chn].stream_type == ffado_stream_type_midi) {
-            snprintf(buf, sizeof(buf) - 1, "firewire_pcm:%s_out", portname);
+            snprintf(buf, sizeof(buf), "firewire_pcm:%s_out", portname);
             printMessage ("Registering midi playback port %s", buf);
-            if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
+
+            if (fEngine->PortRegister(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_MIDI_TYPE,
                               PlaybackDriverFlags,
-                              fEngineControl->fBufferSize)) == NO_PORT) {
+                              fEngineControl->fBufferSize, &port_index) < 0) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
             }
@@ -557,12 +544,12 @@ int JackFFADODriver::Attach()
             // This constructor optionally accepts arguments for the
             // non-realtime buffer size and the realtime buffer size.  Ideally,
             // these would become command-line options for the FFADO driver.
-            driver->playback_channels[chn].midi_output = new JackFFADOMidiOutput();
+            driver->playback_channels[chn].midi_output = new JackFFADOMidiOutputPort();
 
             driver->playback_channels[chn].midi_buffer = (uint32_t *)calloc(driver->period_size, sizeof(uint32_t));
 
             port = fGraphManager->GetPort(port_index);
-            range.min = range.max = (driver->period_size * (driver->device_options.nb_buffers - 1)) + driver->playback_frame_latency;
+            range.min = range.max = (driver->period_size * (driver->device_options.nb_buffers - 1)) + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + driver->playback_frame_latency;
             port->SetLatencyRange(JackPlaybackLatency, &range);
             fPlaybackPortList[chn] = port_index;
             jack_log("JackFFADODriver::Attach fPlaybackPortList[i] %ld ", port_index);
@@ -600,7 +587,7 @@ int JackFFADODriver::Detach()
         if (driver->capture_channels[chn].midi_buffer)
             free(driver->capture_channels[chn].midi_buffer);
         if (driver->capture_channels[chn].midi_input)
-            delete ((JackFFADOMidiInput *) (driver->capture_channels[chn].midi_input));
+            delete ((JackFFADOMidiInputPort *) (driver->capture_channels[chn].midi_input));
     }
     free(driver->capture_channels);
 
@@ -608,7 +595,7 @@ int JackFFADODriver::Detach()
         if (driver->playback_channels[chn].midi_buffer)
             free(driver->playback_channels[chn].midi_buffer);
         if (driver->playback_channels[chn].midi_output)
-            delete ((JackFFADOMidiOutput *) (driver->playback_channels[chn].midi_output));
+            delete ((JackFFADOMidiOutputPort *) (driver->playback_channels[chn].midi_output));
     }
     free(driver->playback_channels);
 
@@ -765,122 +752,52 @@ extern "C"
     SERVER_EXPORT const jack_driver_desc_t *
     driver_get_descriptor () {
         jack_driver_desc_t * desc;
-        jack_driver_param_desc_t * params;
-        unsigned int i;
+        jack_driver_desc_filler_t filler;
+        jack_driver_param_value_t value;
 
-        desc = (jack_driver_desc_t *)calloc (1, sizeof (jack_driver_desc_t));
+        desc = jack_driver_descriptor_construct("firewire", JackDriverMaster, "Linux FFADO API based audio backend", &filler);
 
-        strcpy (desc->name, "firewire");                               // size MUST be less then JACK_DRIVER_NAME_MAX + 1
-        strcpy(desc->desc, "Linux FFADO API based audio backend");     // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
+        strcpy(value.str, "hw:0");
+        jack_driver_descriptor_add_parameter(
+            desc,
+            &filler,
+            "device",
+            'd',
+            JackDriverParamString,
+            &value,
+            NULL,
+            "The FireWire device to use.",
+            "The FireWire device to use. Please consult the FFADO documentation for more info.");
 
-        desc->nparams = 13;
+        value.ui = 1024;
+        jack_driver_descriptor_add_parameter(desc, &filler, "period", 'p', JackDriverParamUInt, &value, NULL, "Frames per period", NULL);
 
-        params = (jack_driver_param_desc_t *)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));
-        desc->params = params;
+        value.ui = 3;
+        jack_driver_descriptor_add_parameter(desc, &filler, "nperiods", 'n', JackDriverParamUInt, &value, NULL, "Number of periods of playback latency", NULL);
 
-        i = 0;
-        strcpy (params[i].name, "device");
-        params[i].character  = 'd';
-        params[i].type       = JackDriverParamString;
-        strcpy (params[i].value.str,  "hw:0");
-        strcpy (params[i].short_desc, "The FireWire device to use.");
-        strcpy (params[i].long_desc,  "The FireWire device to use. Please consult the FFADO documentation for more info.");
+        value.ui = 48000U;
+        jack_driver_descriptor_add_parameter(desc, &filler, "rate", 'r', JackDriverParamUInt, &value, NULL, "Sample rate", NULL);
 
-        i++;
-        strcpy (params[i].name, "period");
-        params[i].character  = 'p';
-        params[i].type       = JackDriverParamUInt;
-        params[i].value.ui   = 1024;
-        strcpy (params[i].short_desc, "Frames per period");
-        strcpy (params[i].long_desc, params[i].short_desc);
+        value.i = 0;
+        jack_driver_descriptor_add_parameter(desc, &filler, "capture", 'C', JackDriverParamBool, &value, NULL, "Provide capture ports.", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "playback", 'P', JackDriverParamBool, &value, NULL, "Provide playback ports.", NULL);
 
-        i++;
-        strcpy (params[i].name, "nperiods");
-        params[i].character  = 'n';
-        params[i].type       = JackDriverParamUInt;
-        params[i].value.ui   = 3;
-        strcpy (params[i].short_desc, "Number of periods of playback latency");
-        strcpy (params[i].long_desc, params[i].short_desc);
+        value.i = 1;
+        jack_driver_descriptor_add_parameter(desc, &filler, "duplex", 'D', JackDriverParamBool, &value, NULL, "Provide both capture and playback ports.", NULL);
 
-        i++;
-        strcpy (params[i].name, "rate");
-        params[i].character  = 'r';
-        params[i].type       = JackDriverParamUInt;
-        params[i].value.ui   = 48000U;
-        strcpy (params[i].short_desc, "Sample rate");
-        strcpy (params[i].long_desc, params[i].short_desc);
+        value.ui = 0;
+        jack_driver_descriptor_add_parameter(desc, &filler, "input-latency", 'I', JackDriverParamUInt, &value, NULL, "Extra input latency (frames)", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "output-latency", 'O', JackDriverParamUInt, &value, NULL, "Extra output latency (frames)", NULL);
 
-        i++;
-        strcpy (params[i].name, "capture");
-        params[i].character  = 'C';
-        params[i].type       = JackDriverParamBool;
-        params[i].value.i    = 0;
-        strcpy (params[i].short_desc, "Provide capture ports.");
-        strcpy (params[i].long_desc, params[i].short_desc);
+        value.ui = 0;
+        jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamUInt, &value, NULL, "Number of input channels to provide (note: currently ignored)", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "outchannels", 'o', JackDriverParamUInt, &value, NULL, "Number of output channels to provide (note: currently ignored)", NULL);
 
-        i++;
-        strcpy (params[i].name, "playback");
-        params[i].character  = 'P';
-        params[i].type       = JackDriverParamBool;
-        params[i].value.i    = 0;
-        strcpy (params[i].short_desc, "Provide playback ports.");
-        strcpy (params[i].long_desc, params[i].short_desc);
+        value.ui = 3;
+        jack_driver_descriptor_add_parameter(desc, &filler, "verbose", 'v', JackDriverParamUInt, &value, NULL, "libffado verbose level", NULL);
 
-        i++;
-        strcpy (params[i].name, "duplex");
-        params[i].character  = 'D';
-        params[i].type       = JackDriverParamBool;
-        params[i].value.i    = 1;
-        strcpy (params[i].short_desc, "Provide both capture and playback ports.");
-        strcpy (params[i].long_desc, params[i].short_desc);
-
-        i++;
-        strcpy (params[i].name, "input-latency");
-        params[i].character  = 'I';
-        params[i].type       = JackDriverParamUInt;
-        params[i].value.ui    = 0;
-        strcpy (params[i].short_desc, "Extra input latency (frames)");
-        strcpy (params[i].long_desc, params[i].short_desc);
-
-        i++;
-        strcpy (params[i].name, "output-latency");
-        params[i].character  = 'O';
-        params[i].type       = JackDriverParamUInt;
-        params[i].value.ui    = 0;
-        strcpy (params[i].short_desc, "Extra output latency (frames)");
-        strcpy (params[i].long_desc, params[i].short_desc);
-
-        i++;
-        strcpy (params[i].name, "inchannels");
-        params[i].character  = 'i';
-        params[i].type       = JackDriverParamUInt;
-        params[i].value.ui    = 0;
-        strcpy (params[i].short_desc, "Number of input channels to provide (note: currently ignored)");
-        strcpy (params[i].long_desc, params[i].short_desc);
-
-        i++;
-        strcpy (params[i].name, "outchannels");
-        params[i].character  = 'o';
-        params[i].type       = JackDriverParamUInt;
-        params[i].value.ui    = 0;
-        strcpy (params[i].short_desc, "Number of output channels to provide (note: currently ignored)");
-        strcpy (params[i].long_desc, params[i].short_desc);
-
-        i++;
-        strcpy (params[i].name, "verbose");
-        params[i].character  = 'v';
-        params[i].type       = JackDriverParamUInt;
-        params[i].value.ui    = 3;
-        strcpy (params[i].short_desc, "libffado verbose level");
-        strcpy (params[i].long_desc, params[i].short_desc);
-
-        i++;
-        strcpy (params[i].name, "snoop");
-        params[i].character  = 'X';
-        params[i].type       = JackDriverParamBool;
-        params[i].value.i    = 0;
-        strcpy (params[i].short_desc, "Snoop firewire traffic");
-        strcpy (params[i].long_desc, params[i].short_desc);
+        value.i = 0;
+        jack_driver_descriptor_add_parameter(desc, &filler, "snoop", 'X', JackDriverParamBool, &value, NULL, "Snoop firewire traffic", NULL);
 
         return desc;
     }

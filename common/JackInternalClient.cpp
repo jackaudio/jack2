@@ -38,17 +38,17 @@ JackGraphManager* JackInternalClient::fGraphManager = NULL;
 JackEngineControl* JackInternalClient::fEngineControl = NULL;
 
 // Used for external C API (JackAPI.cpp)
-EXPORT JackGraphManager* GetGraphManager()
+SERVER_EXPORT JackGraphManager* GetGraphManager()
 {
     return JackServerGlobals::fInstance->GetGraphManager();
 }
 
-EXPORT JackEngineControl* GetEngineControl()
+SERVER_EXPORT JackEngineControl* GetEngineControl()
 {
     return JackServerGlobals::fInstance->GetEngineControl();
 }
 
-EXPORT JackSynchro* GetSynchroTable()
+SERVER_EXPORT JackSynchro* GetSynchroTable()
 {
     return JackServerGlobals::fInstance->GetSynchroTable();
 }
@@ -71,13 +71,14 @@ int JackInternalClient::Open(const char* server_name, const char* name, int uuid
 
     strncpy(fServerName, server_name, sizeof(fServerName));
 
-    fChannel->ClientCheck(name, uuid, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result);
+    fChannel->ClientCheck(name, uuid, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result, false);
     if (result < 0) {
         int status1 = *status;
-        if (status1 & JackVersionError)
+        if (status1 & JackVersionError) {
             jack_error("JACK protocol mismatch %d", JACK_PROTOCOL_VERSION);
-        else
+        } else {
             jack_error("Client name = %s conflits with another running client", name);
+        }
         goto error;
     }
 

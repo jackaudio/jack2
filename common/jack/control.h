@@ -45,6 +45,13 @@ typedef enum
     JackParamBool,				/**< @brief value type is a boolean */
 } jackctl_param_type_t;
 
+/** Driver types */
+typedef enum
+{
+    JackMaster = 1,         /**< @brief master driver */
+    JackSlave               /**< @brief slave driver */
+} jackctl_driver_type_t;
+
 /** @brief Max value that jackctl_param_type_t type can have */
 #define JACK_PARAM_MAX (JackParamBool + 1)
 
@@ -82,7 +89,7 @@ extern "C" {
 #endif
 
 /**
- * @defgroup ServerControl Controling the server
+ * @defgroup ControlAPI The API for starting and controlling a JACK server
  * @{
  */
 
@@ -296,6 +303,18 @@ jackctl_server_switch_master(jackctl_server_t * server,
  */
 const char *
 jackctl_driver_get_name(
+	jackctl_driver_t * driver);
+
+/**
+ * Call this function to get type of driver.
+ *
+ * @param driver driver object handle to get name of
+ *
+ * @return driver type. Must not be modified. Always same for same
+ * driver object.
+ */
+jackctl_driver_type_t
+jackctl_driver_get_type(
 	jackctl_driver_t * driver);
 
 /**

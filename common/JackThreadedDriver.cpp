@@ -21,6 +21,7 @@
 #include "JackSystemDeps.h"
 #include "JackThreadedDriver.h"
 #include "JackError.h"
+#include "JackTools.h"
 #include "JackGlobals.h"
 #include "JackEngineControl.h"
 
@@ -43,16 +44,16 @@ int JackThreadedDriver::Open()
 }
 
 int JackThreadedDriver::Open(jack_nframes_t buffer_size,
-                 jack_nframes_t samplerate,
-                 bool capturing,
-                 bool playing,
-                 int inchannels,
-                 int outchannels,
-                 bool monitor,
-                 const char* capture_driver_name,
-                 const char* playback_driver_name,
-                 jack_nframes_t capture_latency,
-                 jack_nframes_t playback_latency)
+                             jack_nframes_t samplerate,
+                             bool capturing,
+                             bool playing,
+                             int inchannels,
+                             int outchannels,
+                             bool monitor,
+                             const char* capture_driver_name,
+                             const char* playback_driver_name,
+                             jack_nframes_t capture_latency,
+                             jack_nframes_t playback_latency)
 {
     return fDriver->Open(buffer_size, samplerate, capturing, playing, inchannels, outchannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency);
 }
@@ -65,11 +66,6 @@ int JackThreadedDriver::Close()
 int JackThreadedDriver::Process()
 {
     return fDriver->Process();
-}
-
-int JackThreadedDriver::ProcessNull()
-{
-    return fDriver->ProcessNull();
 }
 
 int JackThreadedDriver::Attach()
@@ -127,9 +123,24 @@ void JackThreadedDriver::RemoveSlave(JackDriverInterface* slave)
     fDriver->RemoveSlave(slave);
 }
 
-int JackThreadedDriver::ProcessSlaves()
+int JackThreadedDriver::ProcessReadSlaves()
 {
-    return fDriver->ProcessSlaves();
+    return fDriver->ProcessReadSlaves();
+}
+
+int JackThreadedDriver::ProcessWriteSlaves()
+{
+    return fDriver->ProcessWriteSlaves();
+}
+
+int JackThreadedDriver::ProcessRead()
+{
+    return fDriver->ProcessRead();
+}
+
+int JackThreadedDriver::ProcessWrite()
+{
+    return fDriver->ProcessWrite();
 }
 
 std::list<JackDriverInterface*> JackThreadedDriver::GetSlaves()
@@ -184,7 +195,6 @@ int JackThreadedDriver::Stop()
         case JackThread::kIniting:
             if (fThread.Kill() < 0) {
                 jack_error("Cannot kill thread");
-                return -1;
             }
             break;
 
@@ -192,7 +202,6 @@ int JackThreadedDriver::Stop()
         case JackThread::kRunning:
             if (fThread.Stop() < 0) {
                 jack_error("Cannot stop thread");
-                return -1;
             }
             break;
 
@@ -215,21 +224,30 @@ bool JackThreadedDriver::Execute()
 bool JackThreadedDriver::Init()
 {
     if (fDriver->Initialize())  {
-        if (fDriver->IsRealTime()) {
-            jack_log("JackThreadedDriver::Init IsRealTime");
-            // Will do "something" on OSX only...
-            GetEngineControl()->fPeriod = GetEngineControl()->fConstraint = GetEngineControl()->fPeriodUsecs * 1000;
-            fThread.SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
-            if (fThread.AcquireSelfRealTime(GetEngineControl()->fServerPriority) < 0) {
-                jack_error("AcquireSelfRealTime error");
-            } else {
-                set_threaded_log_function();
-            }
-        }
+        SetRealTime();
         return true;
     } else {
         return false;
     }
 }
+
+void JackThreadedDriver::SetRealTime()
+{
+    if (fDriver->IsRealTime()) {
+        jack_log("JackThreadedDriver::Init real-time");
+        // Will do "something" on OSX only...
+        GetEngineControl()->fPeriod = GetEngineControl()->fConstraint = GetEngineControl()->fPeriodUsecs * 1000;
+        GetEngineControl()->fComputation = JackTools::ComputationMicroSec(GetEngineControl()->fBufferSize) * 1000;
+        fThread.SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
+        if (fThread.AcquireSelfRealTime(GetEngineControl()->fServerPriority) < 0) {
+            jack_error("AcquireSelfRealTime error");
+        } else {
+            set_threaded_log_function();
+        }
+    } else {
+        jack_log("JackThreadedDriver::Init non-realtime");
+    }
+}
+
 
 } // end of namespace

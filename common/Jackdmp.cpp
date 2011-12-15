@@ -115,13 +115,13 @@ static void usage(FILE* file)
             "               [ --version OR -V ]\n"
             "         -d master-backend-name [ ... master-backend args ... ]\n"
 #ifdef __APPLE__
-            "               Available master backends may include: coreaudio, dummy or net.\n\n"
+            "               Available master backends may include: coreaudio, dummy, net or netone.\n\n"
 #endif
 #ifdef WIN32
-            "               Available master backends may include: portaudio, dummy or net.\n\n"
+            "               Available master backends may include: portaudio, dummy, net or netone.\n\n"
 #endif
 #ifdef __linux__
-            "               Available master backends may include: alsa, dummy, freebob, firewire or net\n\n"
+            "               Available master backends may include: alsa, dummy, freebob, firewire, net or netone.\n\n"
 #endif
 #if defined(__sun__) || defined(sun)
             "               Available master backends may include: boomer, oss, dummy or net.\n\n"
@@ -185,13 +185,13 @@ jackctl_get_parameter(
     return NULL;
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char** argv)
 {
     jackctl_server_t * server_ctl;
     const JSList * server_parameters;
     const char* server_name = "default";
     jackctl_driver_t * master_driver_ctl;
-    jackctl_driver_t * loopback_driver_ctl;
+    jackctl_driver_t * loopback_driver_ctl = NULL;
     int replace_registry = 0;
     const char *options = "-d:X:I:P:uvshVrRL:STFl:t:mn:p:"
         "a:"
@@ -261,13 +261,6 @@ int main(int argc, char* argv[])
     }
 
     server_parameters = jackctl_server_get_parameters(server_ctl);
-
-    // Default setting
-    param = jackctl_get_parameter(server_parameters, "realtime");
-    if (param != NULL) {
-        value.b = true;
-        jackctl_parameter_set_value(param, &value);
-    }
 
     opterr = 0;
     while (!master_driver_name &&
@@ -458,6 +451,11 @@ int main(int argc, char* argv[])
         goto destroy_server;
     }
 
+    if (jackctl_driver_get_type(master_driver_ctl) != JackMaster) {
+        fprintf(stderr, "Driver \"%s\" is not a master \n", master_driver_name);
+        goto destroy_server;
+    }
+
     if (optind < argc) {
         master_driver_nargs = 1 + argc - optind;
     } else {
@@ -497,14 +495,20 @@ int main(int argc, char* argv[])
             fprintf(stderr, "Unknown driver \"%s\"\n", *it);
             goto close_server;
         }
-        jackctl_server_add_slave(server_ctl, slave_driver_ctl);
+        if (jackctl_driver_get_type(slave_driver_ctl) != JackSlave) {
+            fprintf(stderr, "Driver \"%s\" is not a slave \n", *it);
+            goto close_server;
+        }
+        if (!jackctl_server_add_slave(server_ctl, slave_driver_ctl)) {
+            fprintf(stderr, "Driver \"%s\" cannot be loaded\n", *it);
+            goto close_server;
+        }
     }
 
     // Loopback driver
     if (loopback > 0) {
         loopback_driver_ctl = jackctl_server_get_driver(server_ctl, "loopback");
 
-        // XX: What if this fails?
         if (loopback_driver_ctl != NULL) {
             const JSList * loopback_parameters = jackctl_driver_get_parameters(loopback_driver_ctl);
             param = jackctl_get_parameter(loopback_parameters, "channels");
@@ -512,9 +516,14 @@ int main(int argc, char* argv[])
                 value.ui = loopback;
                 jackctl_parameter_set_value(param, &value);
             }
-            jackctl_server_add_slave(server_ctl, loopback_driver_ctl);
+            if (!jackctl_server_add_slave(server_ctl, loopback_driver_ctl)) {
+                fprintf(stderr, "Driver \"loopback\" cannot be loaded\n");
+                goto close_server;
+            }
+        } else {
+            fprintf(stderr, "Driver \"loopback\" not found\n");
+            goto close_server;
         }
-
     }
 
     // Start the server
@@ -530,7 +539,10 @@ int main(int argc, char* argv[])
             fprintf(stderr, "Unknown internal \"%s\"\n", *it);
             goto stop_server;
         }
-        jackctl_server_load_internal(server_ctl, internal_driver_ctl);
+        if (!jackctl_server_load_internal(server_ctl, internal_driver_ctl)) {
+            fprintf(stderr, "Internal client \"%s\" cannot be loaded\n", *it);
+            goto stop_server;
+        }
     }
 
     notify_server_start(server_name);
@@ -541,15 +553,33 @@ int main(int argc, char* argv[])
     jackctl_wait_signals(signals);
 
  stop_server:
-    if (! jackctl_server_stop(server_ctl)) {
+    if (!jackctl_server_stop(server_ctl)) {
         fprintf(stderr, "Cannot stop server...\n");
     }
+
+ close_server:
+    if (loopback > 0 && loopback_driver_ctl) {
+        jackctl_server_remove_slave(server_ctl, loopback_driver_ctl);
+    }
+    // Slave drivers
+    for (it = slaves_list.begin(); it != slaves_list.end(); it++) {
+        jackctl_driver_t * slave_driver_ctl = jackctl_server_get_driver(server_ctl, *it);
+        if (slave_driver_ctl)
+            jackctl_server_remove_slave(server_ctl, slave_driver_ctl);
+    }
+
+    // Internal clients
+    for (it = internals_list.begin(); it != internals_list.end(); it++) {
+        jackctl_internal_t * internal_driver_ctl = jackctl_server_get_internal(server_ctl, *it);
+        if (internal_driver_ctl)
+            jackctl_server_unload_internal(server_ctl, internal_driver_ctl);
+    }
+    jackctl_server_close(server_ctl);
+
+ destroy_server:
+    jackctl_server_destroy(server_ctl);
     if (notify_sent) {
         notify_server_stop(server_name);
     }
- close_server:
-    jackctl_server_close(server_ctl);
- destroy_server:
-    jackctl_server_destroy(server_ctl);
     return return_value;
 }

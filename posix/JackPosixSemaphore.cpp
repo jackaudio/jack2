@@ -28,11 +28,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
-void JackPosixSemaphore::BuildName(const char* client_name, const char* server_name, char* res)
+void JackPosixSemaphore::BuildName(const char* client_name, const char* server_name, char* res, int size)
 {
     char ext_client_name[JACK_CLIENT_NAME_SIZE + 1];
     JackTools::RewriteName(client_name, ext_client_name);
-    sprintf(res, "jack_sem.%d_%s_%s", JackTools::GetUID(), server_name, ext_client_name);
+    snprintf(res, size, "jack_sem.%d_%s_%s", JackTools::GetUID(), server_name, ext_client_name);
 }
 
 bool JackPosixSemaphore::Signal()
@@ -40,7 +40,7 @@ bool JackPosixSemaphore::Signal()
     int res;
 
     if (!fSemaphore) {
-        jack_error("JackPosixSemaphore::Signal name = %s already desallocated!!", fName);
+        jack_error("JackPosixSemaphore::Signal name = %s already deallocated!!", fName);
         return false;
     }
 
@@ -58,7 +58,7 @@ bool JackPosixSemaphore::SignalAll()
     int res;
 
     if (!fSemaphore) {
-        jack_error("JackPosixSemaphore::SignalAll name = %s already desallocated!!", fName);
+        jack_error("JackPosixSemaphore::SignalAll name = %s already deallocated!!", fName);
         return false;
     }
 
@@ -77,7 +77,7 @@ bool JackPosixSemaphore::Wait()
     int res;
 
     if (!fSemaphore) {
-        jack_error("JackPosixSemaphore::Wait name = %s already desallocated!!", fName);
+        jack_error("JackPosixSemaphore::Wait name = %s already deallocated!!", fName);
         return false;
     }
 
@@ -102,14 +102,14 @@ bool JackPosixSemaphore::Wait()
 
 #if (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600) // glibc feature test
 
-bool JackPosixSemaphore::TimedWait(long usec) 
+bool JackPosixSemaphore::TimedWait(long usec)
 {
 	int res;
 	struct timeval now;
 	timespec time;
 
 	if (!fSemaphore) {
-		jack_error("JackPosixSemaphore::TimedWait name = %s already desallocated!!", fName);
+		jack_error("JackPosixSemaphore::TimedWait name = %s already deallocated!!", fName);
 		return false;
 	}
 	gettimeofday(&now, 0);
@@ -140,7 +140,7 @@ bool JackPosixSemaphore::TimedWait(long usec)
 // Server side : publish the semaphore in the global namespace
 bool JackPosixSemaphore::Allocate(const char* name, const char* server_name, int value)
 {
-    BuildName(name, server_name, fName);
+    BuildName(name, server_name, fName, sizeof(fName));
     jack_log("JackPosixSemaphore::Allocate name = %s val = %ld", fName, value);
 
     if ((fSemaphore = sem_open(fName, O_CREAT, 0777, value)) == (sem_t*)SEM_FAILED) {
@@ -154,8 +154,8 @@ bool JackPosixSemaphore::Allocate(const char* name, const char* server_name, int
 // Client side : get the published semaphore from server
 bool JackPosixSemaphore::ConnectInput(const char* name, const char* server_name)
 {
-    BuildName(name, server_name, fName);
-    jack_log("JackPosixSemaphore::Connect %s", fName);
+    BuildName(name, server_name, fName, sizeof(fName));
+    jack_log("JackPosixSemaphore::Connect name = %s", fName);
 
     // Temporary...
     if (fSemaphore) {
@@ -187,7 +187,7 @@ bool JackPosixSemaphore::ConnectOutput(const char* name, const char* server_name
 bool JackPosixSemaphore::Disconnect()
 {
     if (fSemaphore) {
-	jack_log("JackPosixSemaphore::Disconnect %s", fName);
+        jack_log("JackPosixSemaphore::Disconnect name = %s", fName);
         if (sem_close(fSemaphore) != 0) {
             jack_error("Disconnect: can't disconnect named semaphore name = %s err = %s", fName, strerror(errno));
             return false;
@@ -204,7 +204,7 @@ bool JackPosixSemaphore::Disconnect()
 void JackPosixSemaphore::Destroy()
 {
     if (fSemaphore != NULL) {
-        jack_log("JackPosixSemaphore::Destroy");
+        jack_log("JackPosixSemaphore::Destroy name = %s", fName);
         sem_unlink(fName);
         if (sem_close(fSemaphore) != 0) {
             jack_error("Destroy: can't destroy semaphore name = %s err = %s", fName, strerror(errno));

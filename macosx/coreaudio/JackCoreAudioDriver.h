@@ -40,8 +40,9 @@ typedef	UInt8	CAAudioHardwareDeviceSectionID;
 #define	kAudioDeviceSectionOutput	((CAAudioHardwareDeviceSectionID)0x00)
 #define	kAudioDeviceSectionGlobal	((CAAudioHardwareDeviceSectionID)0x00)
 #define	kAudioDeviceSectionWildcard	((CAAudioHardwareDeviceSectionID)0xFF)
-    
+
 #define WAIT_COUNTER 60
+#define WAIT_NOTIFICATION_COUNTER 30
 
 /*!
 \brief The CoreAudio driver.
@@ -61,9 +62,9 @@ class JackCoreAudioDriver : public JackAudioDriver
 
         AudioDeviceID fDeviceID;    // Used "duplex" device
         AudioObjectID fPluginID;    // Used for aggregate device
-
+    
         AudioUnitRenderActionFlags* fActionFags;
-        AudioTimeStamp* fCurrentTime;
+        const AudioTimeStamp* fCurrentTime;
 
         bool fState;
         bool fHogged;
@@ -74,25 +75,22 @@ class JackCoreAudioDriver : public JackAudioDriver
         float fIOUsage;
         float fComputationGrain;
         bool fClockDriftCompensate;
+   
     
-        /*    
-    #ifdef MAC_OS_X_VERSION_10_5
-        AudioDeviceIOProcID fMesureCallbackID;
-    #endif
-        */
-    
-        static	OSStatus Render(void *inRefCon,
+        static OSStatus Render(void *inRefCon,
                                AudioUnitRenderActionFlags *ioActionFlags,
                                const AudioTimeStamp *inTimeStamp,
                                UInt32 inBusNumber,
                                UInt32 inNumberFrames,
                                AudioBufferList *ioData);
-
+    
+        static OSStatus AudioHardwareNotificationCallback(AudioHardwarePropertyID inPropertyID,void* inClientData);
+   
         static OSStatus DeviceNotificationCallback(AudioDeviceID inDevice,
-                UInt32 inChannel,
-                Boolean	isInput,
-                AudioDevicePropertyID inPropertyID,
-                void* inClientData);
+                                                    UInt32 inChannel,
+                                                    Boolean	isInput,
+                                                    AudioDevicePropertyID inPropertyID,
+                                                    void* inClientData);
 
         static OSStatus SRNotificationCallback(AudioDeviceID inDevice,
                                                UInt32 inChannel,
@@ -100,19 +98,26 @@ class JackCoreAudioDriver : public JackAudioDriver
                                                AudioDevicePropertyID inPropertyID,
                                                void* inClientData);
 
+        static OSStatus BSNotificationCallback(AudioDeviceID inDevice,
+                                                UInt32 inChannel,
+                                                Boolean	isInput,
+                                                AudioDevicePropertyID inPropertyID,
+                                                void* inClientData);
+
         OSStatus GetDeviceIDFromUID(const char* UID, AudioDeviceID* id);
         OSStatus GetDefaultDevice(AudioDeviceID* id);
         OSStatus GetDefaultInputDevice(AudioDeviceID* id);
         OSStatus GetDefaultOutputDevice(AudioDeviceID* id);
         OSStatus GetDeviceNameFromID(AudioDeviceID id, char* name);
         OSStatus GetTotalChannels(AudioDeviceID device, int& channelCount, bool isInput);
-   
+        OSStatus GetStreamLatencies(AudioDeviceID device, bool isInput, vector<int>& latencies);
+
         // Setup
         OSStatus CreateAggregateDevice(AudioDeviceID captureDeviceID, AudioDeviceID playbackDeviceID, jack_nframes_t samplerate, AudioDeviceID* outAggregateDevice);
         OSStatus CreateAggregateDeviceAux(vector<AudioDeviceID> captureDeviceID, vector<AudioDeviceID> playbackDeviceID, jack_nframes_t samplerate, AudioDeviceID* outAggregateDevice);
         OSStatus DestroyAggregateDevice();
         bool IsAggregateDevice(AudioDeviceID device);
-        
+
         int SetupDevices(const char* capture_driver_uid,
                          const char* playback_driver_uid,
                          char* capture_driver_name,
@@ -140,15 +145,19 @@ class JackCoreAudioDriver : public JackAudioDriver
                       int outchannels,
                       int in_nChannels,
                       int out_nChannels,
+                      const vector<int>& chan_in_list,
+                      const vector<int>& chan_out_list,
                       jack_nframes_t nframes,
                       jack_nframes_t samplerate);
         void CloseAUHAL();
 
         int AddListeners();
         void RemoveListeners();
-        
+
         bool TakeHogAux(AudioDeviceID deviceID, bool isInput);
         bool TakeHog();
+
+        void UpdateLatencies();
 
     public:
 
@@ -159,8 +168,10 @@ class JackCoreAudioDriver : public JackAudioDriver
                  jack_nframes_t samplerate,
                  bool capturing,
                  bool playing,
-                 int chan_in,
-                 int chan_out,
+                 int inchannels,
+                 int outchannels,
+                 const char* chan_in_list,
+                 const char* chan_out_list,
                  bool monitor,
                  const char* capture_driver_name,
                  const char* playback_driver_name,

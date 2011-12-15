@@ -11,6 +11,7 @@ def configure(conf):
     if conf.is_defined('HAVE_SAMPLERATE'):
         conf.env['LIB_SAMPLERATE'] = ['samplerate']
 
+    conf.env['BUILD_NETLIB'] = conf.is_defined('HAVE_SAMPLERATE')
     conf.env['BUILD_ADAPTER'] = conf.is_defined('HAVE_SAMPLERATE')
 
 def create_jack_process_obj(bld, target, sources, uselib = None):
@@ -30,8 +31,8 @@ def create_jack_process_obj(bld, target, sources, uselib = None):
     if bld.env['IS_LINUX']:
         process.env.append_value("CPPFLAGS", "-fvisibility=hidden")
     if bld.env['IS_MACOSX']:
-        process.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
-        #process.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
+        process.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
+        #process.env.append_value("LINKFLAGS", "-arch i386 -arch ppc -arch x86_64")
         process.env.append_value("CPPFLAGS", "-fvisibility=hidden")
     process.install_path = '${ADDON_DIR}/'
     process.uselib_local = uselib.name
@@ -65,7 +66,7 @@ def build(bld):
         ]
 
     includes = ['.', './jack', '..']
-    uselib = ["PTHREAD"]
+    uselib = ["PTHREAD", "CELT"]
 
     if bld.env['IS_LINUX']:
         common_libsources += [
@@ -113,6 +114,7 @@ def build(bld):
     serverlib.source = [] + common_libsources
     serverlib.source += [
         'JackAudioDriver.cpp',
+	'JackTimedDriver.cpp',
         'JackMidiDriver.cpp',
         'JackDriver.cpp',
         'JackEngine.cpp',
@@ -130,8 +132,17 @@ def build(bld):
         'JackNetTool.cpp',
         'JackNetInterface.cpp',
         'JackArgParser.cpp',
-        'JackPhysicalMidiInput.cpp',
-        'JackPhysicalMidiOutput.cpp',
+        'JackMidiAsyncQueue.cpp',
+        'JackMidiAsyncWaitQueue.cpp',
+        'JackMidiBufferReadQueue.cpp',
+        'JackMidiBufferWriteQueue.cpp',
+        'JackMidiRawInputWriteQueue.cpp',
+        'JackMidiRawOutputWriteQueue.cpp',
+        'JackMidiReadQueue.cpp',
+        'JackMidiReceiveQueue.cpp',
+        'JackMidiSendQueue.cpp',
+        'JackMidiUtil.cpp',
+        'JackMidiWriteQueue.cpp'
         ]
 
     if bld.env['IS_LINUX']:
@@ -165,13 +176,47 @@ def build(bld):
 
     if bld.env['IS_MACOSX']:
         serverlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
-        serverlib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
-        #serverlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module -arch i386 -arch ppc")
+        serverlib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
+        #serverlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module -arch i386 -arch ppc -arch x86_64")
         serverlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework CoreFoundation -framework vecLib -single_module")
         serverlib.env.append_value("LINKFLAGS", "-compatibility_version 1 -current_version 1")
 
     if bld.env['IS_SUN']:
         serverlib.env.append_value("LINKFLAGS", "-lnsl -lsocket")
+
+    if bld.env['BUILD_NETLIB'] == True:
+        netlib = bld.new_task_gen('cxx', 'shlib')
+        netlib.features.append('cc')
+        netlib.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
+        netlib.includes = includes
+        netlib.name         = 'netlib'
+        netlib.target       = 'jacknet'
+        netlib.uselib = ['SAMPLERATE', 'CELT', 'PTHREAD' , 'RT']
+        netlib.install_path = '${LIBDIR}'
+        netlib.source = [
+            'JackNetAPI.cpp',
+            'JackNetInterface.cpp',
+            'JackNetTool.cpp',
+            'JackAudioAdapterInterface.cpp',
+            'JackLibSampleRateResampler.cpp',
+            'JackResampler.cpp',
+            'JackGlobals.cpp',
+            'ringbuffer.c']
+
+        if bld.env['IS_LINUX']:
+            netlib.source += ['../posix/JackNetUnixSocket.cpp','../posix/JackPosixThread.cpp', '../linux/JackLinuxTime.c']
+            netlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+
+        if bld.env['IS_SUN']:
+            netlib.source += ['../posix/JackNetUnixSocket.cpp','../posix/JackPosixThread.cpp', '../solaris/JackSolarisTime.c']
+            netlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+       
+
+        if bld.env['IS_MACOSX']:
+            netlib.source += ['../posix/JackNetUnixSocket.cpp','../posix/JackPosixThread.cpp', '../macosx/JackMachThread.cpp', '../macosx/JackMachTime.c']
+            netlib.env.append_value("LINKFLAGS", "-framework CoreAudio -single_module")
+
+        netlib.vnum = bld.env['JACK_API_VERSION']
 
     clientlib = bld.new_task_gen('cxx', 'shlib')
     clientlib.features.append('cc')
@@ -214,8 +259,8 @@ def build(bld):
     
     if bld.env['IS_MACOSX']:
         clientlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
-        clientlib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
-        #clientlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module -arch i386 -arch ppc"
+        clientlib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
+        #clientlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module -arch i386 -arch ppc -arch x86_64"
         clientlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module")
         clientlib.env.append_value("LINKFLAGS", "-compatibility_version 1 -current_version 1")
 

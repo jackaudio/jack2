@@ -35,6 +35,7 @@ namespace Jack
 \brief Base class for port.
 */
 
+PRE_PACKED_STRUCTURE
 class SERVER_EXPORT JackPort
 {
 
@@ -44,9 +45,9 @@ class SERVER_EXPORT JackPort
 
         int fTypeId;
         enum JackPortFlags fFlags;
-        char fName[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-        char fAlias1[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-        char fAlias2[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
+        char fName[REAL_JACK_PORT_NAME_SIZE];
+        char fAlias1[REAL_JACK_PORT_NAME_SIZE];
+        char fAlias2[REAL_JACK_PORT_NAME_SIZE];
         int fRefNum;
 
         jack_nframes_t fLatency;
@@ -107,7 +108,7 @@ class SERVER_EXPORT JackPort
         // Since we are in shared memory, the resulting pointer cannot be cached, so align it here...
         jack_default_audio_sample_t* GetBuffer()
         {
-            return (jack_default_audio_sample_t*)((long)fBuffer & ~15L) + 4;
+            return (jack_default_audio_sample_t*)((uintptr_t)fBuffer & ~15L) + 4;
         }
 
         int GetRefNum() const;

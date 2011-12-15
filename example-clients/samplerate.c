@@ -56,7 +56,7 @@ void parse_arguments(int argc, char *argv[])
 	if (argc==1) {
 		return;
 	}
-	fprintf(stderr, "usage: %s [bufsize]\n", package);
+	fprintf(stderr, "usage: %s\n", package);
 	exit(9);
 }
 

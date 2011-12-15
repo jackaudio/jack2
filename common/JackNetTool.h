@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008 Romain Moret at Grame
+Copyright (C) 2008-2011 Romain Moret at Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackMidiPort.h"
 #include "JackTools.h"
-#include "JackPlatformPlug.h"
 #include "types.h"
 #include "transport.h"
 #ifndef WIN32
@@ -31,13 +30,23 @@ using namespace std;
 
 #ifndef htonll
 #ifdef __BIG_ENDIAN__
-#define htonll(x)   (x)
-#define ntohll(x)   (x)
+#define htonll(x) (x)
+#define ntohll(x) (x)
 #else
-#define htonll(x)   ((((uint64_t)htonl(x)) << 32) + htonl(x >> 32))
-#define ntohll(x)   ((((uint64_t)ntohl(x)) << 32) + ntohl(x >> 32))
+#define htonll(x) ((((uint64_t)htonl(x)) << 32) + htonl(x >> 32))
+#define ntohll(x) ((((uint64_t)ntohl(x)) << 32) + ntohl(x >> 32))
 #endif
 #endif
+
+#define MASTER_PROTOCOL 5
+#define SLAVE_PROTOCOL 5
+
+#define NET_PACKET_ERROR -2
+
+#define OPTIMIZED_PROTOCOL
+
+#define HEADER_SIZE (sizeof(packet_header_t))
+#define PACKET_AVAILABLE_SIZE(params) ((params)->fMtu - sizeof(packet_header_t))
 
 namespace Jack
 {
@@ -47,6 +56,13 @@ namespace Jack
     typedef struct sockaddr socket_address_t;
     typedef struct in_addr address_t;
     typedef jack_default_audio_sample_t sample_t;
+
+    enum JackNetEncoder {
+
+        JackFloatEncoder = 0,
+        JackIntEncoder = 1,
+        JackCeltEncoder = 2,
+    };
 
 //session params ******************************************************************************
 
@@ -67,9 +83,6 @@ namespace Jack
     are kept in LITTLE_ENDIAN format (to avoid 2 conversions in the more common LITTLE_ENDIAN <==> LITTLE_ENDIAN connection case).
     */
 
-    #define MASTER_PROTOCOL 1
-    #define SLAVE_PROTOCOL 1
-
     struct _session_params
     {
         char fPacketType[7];                //packet type ('param')
@@ -81,16 +94,16 @@ namespace Jack
         uint32_t fMtu;                      //connection mtu
         uint32_t fID;                       //slave's ID
         uint32_t fTransportSync;            //is the transport synced ?
-        uint32_t fSendAudioChannels;        //number of master->slave channels
-        uint32_t fReturnAudioChannels;      //number of slave->master channels
-        uint32_t fSendMidiChannels;         //number of master->slave midi channels
-        uint32_t fReturnMidiChannels;       //number of slave->master midi channels
+        int32_t fSendAudioChannels;         //number of master->slave channels
+        int32_t fReturnAudioChannels;       //number of slave->master channels
+        int32_t fSendMidiChannels;          //number of master->slave midi channels
+        int32_t fReturnMidiChannels;        //number of slave->master midi channels
         uint32_t fSampleRate;               //session sample rate
         uint32_t fPeriodSize;               //period size
-        uint32_t fFramesPerPacket;          //complete frames per packet
-        uint32_t fBitdepth;                 //samples bitdepth (unused)
+        uint32_t fSampleEncoder;            //samples encoder
+        uint32_t fKBps;                     //KB per second for CELT encoder
         uint32_t fSlaveSyncMode;            //is the slave in sync mode ?
-        char fNetworkMode;                  //fast, normal or slow mode
+        uint32_t fNetworkLatency;           //network latency
     };
 
 //net status **********************************************************************************
@@ -154,19 +167,16 @@ namespace Jack
 
     struct _packet_header
     {
-        char fPacketType[7];        //packet type ( 'headr' )
+        char fPacketType[7];        //packet type ('headr')
         char fDataType;             //a for audio, m for midi and s for sync
         char fDataStream;           //s for send, r for return
         uint32_t fID;               //unique ID of the slave
-        uint32_t fBitdepth;         //bitdepth of the data samples
-        uint32_t fMidiDataSize;     //size of midi data in bytes
-        uint32_t fNMidiPckt;        //number of midi packets of the cycle
+        uint32_t fNumPacket;        //number of data packets of the cycle
         uint32_t fPacketSize;       //packet size in bytes
+        uint32_t fActivePorts;      //number of active ports
         uint32_t fCycle;            //process cycle counter
         uint32_t fSubCycle;         //midi/audio subcycle counter
         uint32_t fIsLastPckt;       //is it the last packet of a given cycle ('y' or 'n')
-        char fASyncWrongCycle;      //is the current async cycle wrong (slave's side; 'y' or 'n')
-        char fFree[26];             //unused
     };
 
 //net timebase master
@@ -200,7 +210,7 @@ namespace Jack
         jack_position_t fPosition;      //current cycle position
     };
 
-//midi data ***********************************************************************************
+ //midi data ***********************************************************************************
 
     /**
     \Brief Midi buffer and operations class
@@ -220,89 +230,233 @@ namespace Jack
     class SERVER_EXPORT NetMidiBuffer
     {
         private:
+
             int fNPorts;
             size_t fMaxBufsize;
             int fMaxPcktSize;
+
             char* fBuffer;
             char* fNetBuffer;
             JackMidiBuffer** fPortBuffer;
 
+            size_t fCycleBytesSize;  // needed size in bytes ofr an entire cycle
+
         public:
-            NetMidiBuffer ( session_params_t* params, uint32_t nports, char* net_buffer );
+
+            NetMidiBuffer(session_params_t* params, uint32_t nports, char* net_buffer);
             ~NetMidiBuffer();
 
             void Reset();
-            size_t GetSize();
+
+            // needed size in bytes for an entire cycle
+            size_t GetCycleSize();
+            int GetNumPackets(int data_sizen, int max_size);
+
+            void SetBuffer(int index, JackMidiBuffer* buffer);
+            JackMidiBuffer* GetBuffer(int index);
+
             //utility
             void DisplayEvents();
+
             //jack<->buffer
             int RenderFromJackPorts();
-            int RenderToJackPorts();
-            //network<->buffer
-            int RenderFromNetwork ( int subcycle, size_t copy_size );
-            int RenderToNetwork ( int subcycle, size_t total_size );
+            void RenderToJackPorts();
 
-            void SetBuffer ( int index, JackMidiBuffer* buffer );
-            JackMidiBuffer* GetBuffer ( int index );
+            //network<->buffer
+            void RenderFromNetwork(int sub_cycle, size_t copy_size);
+            int RenderToNetwork(int sub_cycle, size_t total_size);
+
     };
 
 // audio data *********************************************************************************
 
-    /**
-    \Brief Audio buffer and operations class
-
-    This class is a toolset to manipulate audio buffers.
-    The manipulation of audio buffers is similar to midi buffer, except those buffers have fixed size.
-    The interleaving/uninterleaving operations are simplier here because audio buffers have fixed size,
-    So there is no need of an intermediate buffer as in NetMidiBuffer.
-
-    */
-
     class SERVER_EXPORT NetAudioBuffer
     {
-        private:
+
+        protected:
+
             int fNPorts;
+            int fLastSubCycle;
+
+            char* fNetBuffer;
+            sample_t** fPortBuffer;
+            bool* fConnectedPorts;
+
             jack_nframes_t fPeriodSize;
             jack_nframes_t fSubPeriodSize;
             size_t fSubPeriodBytesSize;
-            char* fNetBuffer;
-            sample_t** fPortBuffer;
+
+            float fCycleDuration;       // in sec
+            size_t fCycleBytesSize;     // needed size in bytes for an entire cycle
+
+            int CheckPacket(int cycle, int sub_cycle);
+            void NextCycle();
+            void Cleanup();
+
         public:
-            NetAudioBuffer ( session_params_t* params, uint32_t nports, char* net_buffer );
-            ~NetAudioBuffer();
 
-            size_t GetSize();
+            NetAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer);
+            virtual ~NetAudioBuffer();
+
+            bool GetConnected(int port_index) { return fConnectedPorts[port_index]; }
+            void SetConnected(int port_index, bool state) { fConnectedPorts[port_index] = state; }
+
+            // needed syze in bytes ofr an entire cycle
+            virtual size_t GetCycleSize() = 0;
+
+            // cycle duration in sec
+            virtual float GetCycleDuration() = 0;
+
+            virtual int GetNumPackets(int active_ports) = 0;
+
+            virtual void SetBuffer(int index, sample_t* buffer);
+            virtual sample_t* GetBuffer(int index);
+
             //jack<->buffer
-            void RenderFromJackPorts ( int subcycle );
-            void RenderToJackPorts ( int subcycle );
+            virtual int RenderFromJackPorts();
+            virtual void RenderToJackPorts();
 
-            void SetBuffer ( int index, sample_t* buffer );
-            sample_t* GetBuffer ( int index );
+            //network<->buffer
+            virtual int RenderFromNetwork(int cycle, int sub_cycle, uint32_t port_num) = 0;
+            virtual int RenderToNetwork(int sub_cycle, uint32_t port_num) = 0;
+
+            virtual void RenderFromNetwork(char* net_buffer, int active_port, int sub_cycle, size_t copy_size) {}
+            virtual void RenderToNetwork(char* net_buffer, int active_port, int sub_cycle, size_t copy_size) {}
+
+            virtual int ActivePortsToNetwork(char* net_buffer);
+            virtual void ActivePortsFromNetwork(char* net_buffer, uint32_t port_num);
+
     };
 
-//utility *************************************************************************************
+    class SERVER_EXPORT NetFloatAudioBuffer : public NetAudioBuffer
+    {
+
+        private:
+
+            int fPacketSize;
+
+            void UpdateParams(int active_ports);
+
+        public:
+
+            NetFloatAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer);
+            virtual ~NetFloatAudioBuffer();
+
+            // needed size in bytes for an entire cycle
+            size_t GetCycleSize();
+
+            // cycle duration in sec
+            float GetCycleDuration();
+            int GetNumPackets(int active_ports);
+
+            //jack<->buffer
+            int RenderFromNetwork(int cycle, int sub_cycle, uint32_t port_num);
+            int RenderToNetwork(int sub_cycle, uint32_t port_num);
+
+            void RenderFromNetwork(char* net_buffer, int active_port, int sub_cycle);
+            void RenderToNetwork(char* net_buffer, int active_port, int sub_cycle);
+
+    };
+
+#if HAVE_CELT
+
+#include <celt/celt.h>
+
+    class SERVER_EXPORT NetCeltAudioBuffer : public NetAudioBuffer
+    {
+        private:
+
+            CELTMode** fCeltMode;
+            CELTEncoder** fCeltEncoder;
+            CELTDecoder** fCeltDecoder;
+
+            int fCompressedSizeByte;
+            int fNumPackets;
+
+            size_t fLastSubPeriodBytesSize;
+
+            unsigned char** fCompressedBuffer;
+
+            void FreeCelt();
+
+        public:
+
+            NetCeltAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer, int kbps);
+            virtual ~NetCeltAudioBuffer();
+
+            // needed size in bytes for an entire cycle
+            size_t GetCycleSize();
+
+             // cycle duration in sec
+            float GetCycleDuration();
+            int GetNumPackets(int active_ports);
+
+            //jack<->buffer
+            int RenderFromJackPorts();
+            void RenderToJackPorts();
+
+            //network<->buffer
+            int RenderFromNetwork(int cycle, int sub_cycle, uint32_t port_num);
+            int RenderToNetwork(int sub_cycle, uint32_t  port_num);
+    };
+
+#endif
+
+    class SERVER_EXPORT NetIntAudioBuffer : public NetAudioBuffer
+    {
+        private:
+
+            int fCompressedSizeByte;
+            int fNumPackets;
+
+            size_t fLastSubPeriodBytesSize;
+
+            short** fIntBuffer;
+
+        public:
+
+            NetIntAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer);
+            virtual ~NetIntAudioBuffer();
+
+            // needed size in bytes for an entire cycle
+            size_t GetCycleSize();
+
+             // cycle duration in sec
+            float GetCycleDuration();
+            int GetNumPackets(int active_ports);
+
+            //jack<->buffer
+            int RenderFromJackPorts();
+            void RenderToJackPorts();
+
+            //network<->buffer
+            int RenderFromNetwork(int cycle, int sub_cycle, uint32_t port_num);
+            int RenderToNetwork(int sub_cycle, uint32_t port_num);
+    };
+
+    //utility *************************************************************************************
 
     //socket API management
     SERVER_EXPORT int SocketAPIInit();
     SERVER_EXPORT int SocketAPIEnd();
     //n<-->h functions
-    SERVER_EXPORT void SessionParamsHToN ( session_params_t* src_params, session_params_t* dst_params );
-    SERVER_EXPORT void SessionParamsNToH ( session_params_t* src_params, session_params_t* dst_params );
-    SERVER_EXPORT void PacketHeaderHToN ( packet_header_t* src_header, packet_header_t* dst_header );
-    SERVER_EXPORT void PacketHeaderNToH ( packet_header_t* src_header, packet_header_t* dst_header );
-    SERVER_EXPORT void MidiBufferHToN ( JackMidiBuffer* src_buffer, JackMidiBuffer* dst_buffer );
-    SERVER_EXPORT void MidiBufferNToH ( JackMidiBuffer* src_buffer, JackMidiBuffer* dst_buffer );
-    SERVER_EXPORT void TransportDataHToN ( net_transport_data_t* src_params, net_transport_data_t* dst_params );
-    SERVER_EXPORT void TransportDataNToH ( net_transport_data_t* src_params, net_transport_data_t* dst_params );
+    SERVER_EXPORT void SessionParamsHToN(session_params_t* src_params, session_params_t* dst_params);
+    SERVER_EXPORT void SessionParamsNToH(session_params_t* src_params, session_params_t* dst_params);
+    SERVER_EXPORT void PacketHeaderHToN(packet_header_t* src_header, packet_header_t* dst_header);
+    SERVER_EXPORT void PacketHeaderNToH(packet_header_t* src_header, packet_header_t* dst_header);
+    SERVER_EXPORT void MidiBufferHToN(JackMidiBuffer* src_buffer, JackMidiBuffer* dst_buffer);
+    SERVER_EXPORT void MidiBufferNToH(JackMidiBuffer* src_buffer, JackMidiBuffer* dst_buffer);
+    SERVER_EXPORT void TransportDataHToN(net_transport_data_t* src_params, net_transport_data_t* dst_params);
+    SERVER_EXPORT void TransportDataNToH(net_transport_data_t* src_params, net_transport_data_t* dst_params);
     //display session parameters
-    SERVER_EXPORT void SessionParamsDisplay ( session_params_t* params );
+    SERVER_EXPORT void SessionParamsDisplay(session_params_t* params);
     //display packet header
-    SERVER_EXPORT void PacketHeaderDisplay ( packet_header_t* header );
+    SERVER_EXPORT void PacketHeaderDisplay(packet_header_t* header);
     //get the packet type from a sesion parameters
-    SERVER_EXPORT sync_packet_type_t GetPacketType ( session_params_t* params );
+    SERVER_EXPORT sync_packet_type_t GetPacketType(session_params_t* params);
     //set the packet type in a session parameters
-    SERVER_EXPORT int SetPacketType ( session_params_t* params, sync_packet_type_t packet_type );
+    SERVER_EXPORT int SetPacketType(session_params_t* params, sync_packet_type_t packet_type);
     //transport utility
-    SERVER_EXPORT const char* GetTransportState ( int transport_state );
-    SERVER_EXPORT void NetTransportDataDisplay ( net_transport_data_t* data );
+    SERVER_EXPORT const char* GetTransportState(int transport_state);
+    SERVER_EXPORT void NetTransportDataDisplay(net_transport_data_t* data);
 }

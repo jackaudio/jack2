@@ -73,12 +73,12 @@ static inline void CopyAndConvertOut(void *dst, jack_sample_t *src, size_t nfram
             s32dst += channel;
             sample_move_d24_sS((char*)s32dst, src, nframes, chcount<<2, NULL); // No dithering for now...
 			break;
-        }    
+        }
 		case 32: {
             signed int *s32dst = (signed int*)dst;
             s32dst += channel;
             sample_move_d32u24_sS((char*)s32dst, src, nframes, chcount<<2, NULL);
-			break;  
+			break;
         }
 	}
 }
@@ -92,7 +92,7 @@ void JackOSSAdapter::SetSampleFormat()
             fSampleSize = sizeof(int);
 			break;
 		case 32:	/* native-endian 32-bit integer */
-            fSampleFormat = AFMT_S32_NE; 
+            fSampleFormat = AFMT_S32_NE;
             fSampleSize = sizeof(int);
 			break;
 		case 16:	/* native-endian 16-bit integer */
@@ -105,30 +105,30 @@ void JackOSSAdapter::SetSampleFormat()
 
 JackOSSAdapter::JackOSSAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params)
                 :JackAudioAdapterInterface(buffer_size, sample_rate)
-                ,fThread(this), 
-                fInFD(-1), fOutFD(-1), fBits(OSS_DRIVER_DEF_BITS), 
+                ,fThread(this),
+                fInFD(-1), fOutFD(-1), fBits(OSS_DRIVER_DEF_BITS),
                 fSampleFormat(0), fNperiods(OSS_DRIVER_DEF_NPERIODS), fRWMode(0), fIgnoreHW(true), fExcl(false),
                 fInputBufferSize(0), fOutputBufferSize(0),
                 fInputBuffer(NULL), fOutputBuffer(NULL), fFirstCycle(true)
 {
     const JSList* node;
     const jack_driver_param_t* param;
-   
+
     fCaptureChannels = 2;
     fPlaybackChannels = 2;
 
     strcpy(fCaptureDriverName, OSS_DRIVER_DEF_DEV);
     strcpy(fPlaybackDriverName, OSS_DRIVER_DEF_DEV);
-    
+
     for (node = params; node; node = jack_slist_next(node)) {
         param = (const jack_driver_param_t*) node->data;
-        
+
         switch (param->character) {
 
             case 'r':
                 SetAdaptedSampleRate(param->value.ui);
                 break;
-   
+
             case 'p':
                 SetAdaptedBufferSize(param->value.ui);
                 break;
@@ -136,15 +136,15 @@ JackOSSAdapter::JackOSSAdapter(jack_nframes_t buffer_size, jack_nframes_t sample
             case 'n':
                 fNperiods = param->value.ui;
                 break;
-     
+
             case 'w':
                 fBits = param->value.i;
                 break;
-     
+
             case 'i':
                 fCaptureChannels = param->value.ui;
                 break;
-       
+
             case 'o':
                 fPlaybackChannels = param->value.ui;
                 break;
@@ -152,21 +152,21 @@ JackOSSAdapter::JackOSSAdapter(jack_nframes_t buffer_size, jack_nframes_t sample
             case 'e':
                 fExcl = true;
                 break;
-                
+
             case 'C':
                 fRWMode |= kRead;
                 if (strcmp(param->value.str, "none") != 0) {
                    strcpy(fCaptureDriverName, param->value.str);
                 }
                 break;
-                
+
             case 'P':
                 fRWMode |= kWrite;
                 if (strcmp(param->value.str, "none") != 0) {
                    strcpy(fPlaybackDriverName, param->value.str);
                 }
                 break;
-                
+
             case 'd':
                fRWMode |= kRead;
                fRWMode |= kWrite;
@@ -177,11 +177,11 @@ JackOSSAdapter::JackOSSAdapter(jack_nframes_t buffer_size, jack_nframes_t sample
             case 'b':
                 fIgnoreHW = true;
                 break;
-                
+
             case 'q':
                 fQuality = param->value.ui;
                 break;
-                
+
             case 'g':
                 fRingbufferCurSize = param->value.ui;
                 fAdaptative = false;
@@ -200,14 +200,14 @@ void JackOSSAdapter::DisplayDeviceInfo()
     oss_audioinfo ai_in, ai_out;
     memset(&info, 0, sizeof(audio_buf_info));
     int cap = 0;
-    
+
     // Duplex cards : http://manuals.opensound.com/developer/full_duplex.html
-    
+
     jack_info("Audio Interface Description :");
     jack_info("Sampling Frequency : %d, Sample Format : %d, Mode : %d", fAdaptedSampleRate, fSampleFormat, fRWMode);
-    
+
     if (fRWMode & kWrite) {
-    
+
        oss_sysinfo si;
         if (ioctl(fOutFD, OSS_SYSINFO, &si) == -1) {
             jack_error("JackOSSAdapter::DisplayDeviceInfo OSS_SYSINFO failed : %s@%i, errno = %d", __FILE__, __LINE__, errno);
@@ -219,17 +219,17 @@ void JackOSSAdapter::DisplayDeviceInfo()
             jack_info("OSS numaudioengines %d", si.numaudioengines);
             jack_info("OSS numcards %d", si.numcards);
         }
-    
+
         jack_info("Output capabilities - %d channels : ", fPlaybackChannels);
         jack_info("Output block size = %d", fOutputBufferSize);
-    
+
         if (ioctl(fOutFD, SNDCTL_DSP_GETOSPACE, &info) == -1)  {
             jack_error("JackOSSAdapter::DisplayDeviceInfo SNDCTL_DSP_GETOSPACE failed : %s@%i, errno = %d", __FILE__, __LINE__, errno);
         } else {
-            jack_info("output space info: fragments = %d, fragstotal = %d, fragsize = %d, bytes = %d", 
+            jack_info("output space info: fragments = %d, fragstotal = %d, fragsize = %d, bytes = %d",
                 info.fragments, info.fragstotal, info.fragsize, info.bytes);
         }
-    
+
         if (ioctl(fOutFD, SNDCTL_DSP_GETCAPS, &cap) == -1)  {
             jack_error("JackOSSAdapter::DisplayDeviceInfo SNDCTL_DSP_GETCAPS failed : %s@%i, errno = %d", __FILE__, __LINE__, errno);
         } else {
@@ -242,10 +242,10 @@ void JackOSSAdapter::DisplayDeviceInfo()
             if (cap & DSP_CAP_MULTI) 	jack_info(" DSP_CAP_MULTI");
             if (cap & DSP_CAP_BIND) 	jack_info(" DSP_CAP_BIND");
         }
-    }	
-    
+    }
+
     if (fRWMode & kRead) {
-    
+
         oss_sysinfo si;
         if (ioctl(fInFD, OSS_SYSINFO, &si) == -1) {
             jack_error("JackOSSAdapter::DisplayDeviceInfo OSS_SYSINFO failed : %s@%i, errno = %d", __FILE__, __LINE__, errno);
@@ -257,14 +257,14 @@ void JackOSSAdapter::DisplayDeviceInfo()
             jack_info("OSS numaudioengines %d", si.numaudioengines);
             jack_info("OSS numcards %d", si.numcards);
         }
-   
+
         jack_info("Input capabilities - %d channels : ", fCaptureChannels);
         jack_info("Input block size = %d", fInputBufferSize);
-    
-        if (ioctl(fInFD, SNDCTL_DSP_GETOSPACE, &info) == -1) { 
+
+        if (ioctl(fInFD, SNDCTL_DSP_GETOSPACE, &info) == -1) {
             jack_error("JackOSSAdapter::DisplayDeviceInfo SNDCTL_DSP_GETOSPACE failed : %s@%i, errno = %d", __FILE__, __LINE__, errno);
         } else {
-            jack_info("input space info: fragments = %d, fragstotal = %d, fragsize = %d, bytes = %d", 
+            jack_info("input space info: fragments = %d, fragstotal = %d, fragsize = %d, bytes = %d",
                 info.fragments, info.fragstotal, info.fragsize, info.bytes);
         }
 
@@ -281,15 +281,15 @@ void JackOSSAdapter::DisplayDeviceInfo()
             if (cap & DSP_CAP_BIND) 	jack_info(" DSP_CAP_BIND");
         }
     }
-    
+
     if (ioctl(fInFD, SNDCTL_AUDIOINFO, &ai_in) != -1) {
         jack_info("Using audio engine %d = %s for input", ai_in.dev, ai_in.name);
     }
-    
+
     if (ioctl(fOutFD, SNDCTL_AUDIOINFO, &ai_out) != -1) {
         jack_info("Using audio engine %d = %s for output", ai_out.dev, ai_out.name);
     }
-    
+
     if (ai_in.rate_source != ai_out.rate_source) {
         jack_info("Warning : input and output are not necessarily driven by the same clock!");
     }
@@ -301,9 +301,9 @@ int JackOSSAdapter::OpenInput()
     int gFragFormat;
     int cur_sample_format, cur_capture_channels;
     jack_nframes_t cur_sample_rate;
-  
+
     if (fCaptureChannels == 0) fCaptureChannels = 2;
-  
+
     if ((fInFD = open(fCaptureDriverName, O_RDONLY | ((fExcl) ? O_EXCL : 0))) < 0) {
         jack_error("JackOSSAdapter::OpenInput failed to open device : %s@%i, errno = %d", __FILE__, __LINE__, errno);
         return -1;
@@ -316,7 +316,7 @@ int JackOSSAdapter::OpenInput()
         }
     }
 
-    gFragFormat = (2 << 16) + int2pow2(fAdaptedBufferSize * fSampleSize * fCaptureChannels);	
+    gFragFormat = (2 << 16) + int2pow2(fAdaptedBufferSize * fSampleSize * fCaptureChannels);
     if (ioctl(fInFD, SNDCTL_DSP_SETFRAGMENT, &gFragFormat) == -1) {
         jack_error("JackOSSAdapter::OpenInput failed to set fragments : %s@%i, errno = %d", __FILE__, __LINE__, errno);
         goto error;
@@ -330,7 +330,7 @@ int JackOSSAdapter::OpenInput()
     if (cur_sample_format != fSampleFormat) {
         jack_info("JackOSSAdapter::OpenInput driver forced the sample format %ld", fSampleFormat);
     }
-    
+
     cur_capture_channels = fCaptureChannels;
     if (ioctl(fInFD, SNDCTL_DSP_CHANNELS, &fCaptureChannels) == -1) {
         jack_error("JackOSSAdapter::OpenInput failed to set channels : %s@%i, errno = %d", __FILE__, __LINE__, errno);
@@ -339,7 +339,7 @@ int JackOSSAdapter::OpenInput()
     if (cur_capture_channels != fCaptureChannels) {
         jack_info("JackOSSAdapter::OpenInput driver forced the number of capture channels %ld", fCaptureChannels);
     }
-       
+
     cur_sample_rate = fAdaptedSampleRate;
     if (ioctl(fInFD, SNDCTL_DSP_SPEED, &fAdaptedSampleRate) == -1) {
         jack_error("JackOSSAdapter::OpenInput failed to set sample rate : %s@%i, errno = %d", __FILE__, __LINE__, errno);
@@ -354,7 +354,7 @@ int JackOSSAdapter::OpenInput()
         jack_error("JackOSSAdapter::OpenInput failed to get fragments : %s@%i, errno = %d", __FILE__, __LINE__, errno);
         goto error;
     }
-        
+
     if (fInputBufferSize != fAdaptedBufferSize * fSampleSize * fCaptureChannels) {
        if (fIgnoreHW) {
            jack_info("JackOSSAdapter::OpenInput driver forced buffer size %ld", fOutputBufferSize);
@@ -366,16 +366,16 @@ int JackOSSAdapter::OpenInput()
 
     fInputBuffer = (void*)calloc(fInputBufferSize, 1);
     assert(fInputBuffer);
-    
+
     fInputSampleBuffer = (float**)malloc(fCaptureChannels * sizeof(float*));
     assert(fInputSampleBuffer);
-    
+
     for (int i = 0; i < fCaptureChannels; i++) {
         fInputSampleBuffer[i] = (float*)malloc(fAdaptedBufferSize * sizeof(float));
         assert(fInputSampleBuffer[i]);
     }
     return 0;
-    
+
 error:
     ::close(fInFD);
     return -1;
@@ -387,22 +387,22 @@ int JackOSSAdapter::OpenOutput()
     int gFragFormat;
     int cur_sample_format, cur_playback_channels;
     jack_nframes_t cur_sample_rate;
- 
+
     if (fPlaybackChannels == 0) fPlaybackChannels = 2;
-    
+
     if ((fOutFD = open(fPlaybackDriverName, O_WRONLY | ((fExcl) ? O_EXCL : 0))) < 0) {
        jack_error("JackOSSAdapter::OpenOutput failed to open device : %s@%i, errno = %d", __FILE__, __LINE__, errno);
        return -1;
     }
-    
+
     if (fExcl) {
         if (ioctl(fOutFD, SNDCTL_DSP_COOKEDMODE, &flags) == -1) {
             jack_error("JackOSSAdapter::OpenOutput failed to set cooked mode : %s@%i, errno = %d", __FILE__, __LINE__, errno);
             goto error;
-        }  
-    } 
+        }
+    }
 
-    gFragFormat = (2 << 16) + int2pow2(fAdaptedBufferSize * fSampleSize * fPlaybackChannels);	
+    gFragFormat = (2 << 16) + int2pow2(fAdaptedBufferSize * fSampleSize * fPlaybackChannels);
     if (ioctl(fOutFD, SNDCTL_DSP_SETFRAGMENT, &gFragFormat) == -1) {
         jack_error("JackOSSAdapter::OpenOutput failed to set fragments : %s@%i, errno = %d", __FILE__, __LINE__, errno);
         goto error;
@@ -416,7 +416,7 @@ int JackOSSAdapter::OpenOutput()
     if (cur_sample_format != fSampleFormat) {
         jack_info("JackOSSAdapter::OpenOutput driver forced the sample format %ld", fSampleFormat);
     }
-    
+
     cur_playback_channels = fPlaybackChannels;
     if (ioctl(fOutFD, SNDCTL_DSP_CHANNELS, &fPlaybackChannels) == -1) {
         jack_error("JackOSSAdapter::OpenOutput failed to set channels : %s@%i, errno = %d", __FILE__, __LINE__, errno);
@@ -440,7 +440,7 @@ int JackOSSAdapter::OpenOutput()
         jack_error("JackOSSAdapter::OpenOutput failed to get fragments : %s@%i, errno = %d", __FILE__, __LINE__, errno);
         goto error;
     }
-         
+
     if (fOutputBufferSize != fAdaptedBufferSize * fSampleSize * fPlaybackChannels) {
        if (fIgnoreHW) {
            jack_info("JackOSSAdapter::OpenOutput driver forced buffer size %ld", fOutputBufferSize);
@@ -452,18 +452,18 @@ int JackOSSAdapter::OpenOutput()
 
     fOutputBuffer = (void*)calloc(fOutputBufferSize, 1);
     assert(fOutputBuffer);
-    
+
     fOutputSampleBuffer = (float**)malloc(fPlaybackChannels * sizeof(float*));
     assert(fOutputSampleBuffer);
-    
+
     for (int i = 0; i < fPlaybackChannels; i++) {
         fOutputSampleBuffer[i] = (float*)malloc(fAdaptedBufferSize * sizeof(float));
         assert(fOutputSampleBuffer[i]);
     }
-    
+
     fFirstCycle = true;
     return 0;
-    
+
 error:
     ::close(fOutFD);
     return -1;
@@ -472,46 +472,46 @@ error:
 int JackOSSAdapter::Open()
 {
     SetSampleFormat();
-    
+
     if ((fRWMode & kRead) && (OpenInput() < 0)) {
         return -1;
     }
-    
-    if ((fRWMode & kWrite) && (OpenOutput() < 0)) { 
+
+    if ((fRWMode & kWrite) && (OpenOutput() < 0)) {
        return -1;
     }
-    
+
     // In duplex mode, check that input and output use the same buffer size
     if ((fRWMode & kRead) && (fRWMode & kWrite) && (fInputBufferSize != fOutputBufferSize)) {
        jack_error("JackOSSAdapter::OpenAux input and output buffer size are not the same!!");
        goto error;
     }
 
-    DisplayDeviceInfo(); 
+    DisplayDeviceInfo();
 
     //start adapter thread
     if (fThread.StartSync() < 0) {
         jack_error ( "Cannot start audioadapter thread" );
         return -1;
     }
-  
+
     //turn the thread realtime
     fThread.AcquireRealTime(JackServerGlobals::fInstance->GetEngineControl()->fClientPriority);
     return 0;
-    
+
 error:
     CloseAux();
     return -1;
 }
 
- 
+
 int JackOSSAdapter::Close()
 {
 #ifdef JACK_MONITOR
     fTable.Save(fHostBufferSize, fHostSampleRate, fAdaptedSampleRate, fAdaptedBufferSize);
 #endif
     fThread.Stop();
-    CloseAux();  
+    CloseAux();
     return 0;
 }
 
@@ -521,23 +521,23 @@ void JackOSSAdapter::CloseAux()
         close(fInFD);
         fInFD = -1;
     }
-    
+
     if (fRWMode & kWrite) {
         close(fOutFD);
         fOutFD = -1;
     }
-    
+
     free(fInputBuffer);
     fInputBuffer = NULL;
-    
+
     free(fOutputBuffer);
     fOutputBuffer = NULL;
-    
+
     for (int i = 0; i < fCaptureChannels; i++) {
         free(fInputSampleBuffer[i]);
     }
     free(fInputSampleBuffer);
-    
+
     for (int i = 0; i < fPlaybackChannels; i++) {
         free(fOutputSampleBuffer[i]);
     }
@@ -547,13 +547,13 @@ void JackOSSAdapter::CloseAux()
 int JackOSSAdapter::Read()
 {
     ssize_t count = ::read(fInFD, fInputBuffer, fInputBufferSize);
-    
+
     if (count < fInputBufferSize) {
         jack_error("JackOSSAdapter::Read error bytes read = %ld", count);
         return -1;
     } else {
         for (int i = 0; i < fCaptureChannels; i++) {
-             CopyAndConvertIn(fInputSampleBuffer[i], fInputBuffer, fAdaptedBufferSize, i, fCaptureChannels, fBits);        
+             CopyAndConvertIn(fInputSampleBuffer[i], fInputBuffer, fAdaptedBufferSize, i, fCaptureChannels, fBits);
         }
         return 0;
     }
@@ -562,10 +562,10 @@ int JackOSSAdapter::Read()
 int JackOSSAdapter::Write()
 {
     ssize_t count;
-   
+
     // Maybe necessay to write an empty output buffer first time : see http://manuals.opensound.com/developer/fulldup.c.html
     if (fFirstCycle) {
-    
+
         fFirstCycle = false;
         memset(fOutputBuffer, 0, fOutputBufferSize);
 
@@ -577,23 +577,23 @@ int JackOSSAdapter::Write()
                 return -1;
             }
         }
-        
+
         int delay;
         if (ioctl(fOutFD, SNDCTL_DSP_GETODELAY, &delay) == -1) {
             jack_error("JackOSSDriver::Write error get out delay : %s@%i, errno = %d", __FILE__, __LINE__, errno);
             return -1;
         }
-        
+
         delay /= fSampleSize * fPlaybackChannels;
         jack_info("JackOSSDriver::Write output latency frames = %ld", delay);
     }
-    
+
     for (int i = 0; i < fPlaybackChannels; i++) {
         CopyAndConvertOut(fOutputBuffer, fOutputSampleBuffer[i], fAdaptedBufferSize, i, fCaptureChannels, fBits);
     }
-    
+
     count = ::write(fOutFD, fOutputBuffer, fOutputBufferSize);
-  
+
     if (count < fOutputBufferSize) {
         jack_error("JackOSSAdapter::Write error bytes written = %ld", count);
         return -1;
@@ -607,13 +607,13 @@ bool JackOSSAdapter::Execute()
     //read data from audio interface
     if (Read() < 0)
         return false;
-        
+
     PushAndPull(fInputSampleBuffer, fOutputSampleBuffer, fAdaptedBufferSize);
-        
+
     //write data to audio interface
     if (Write() < 0)
         return false;
-   
+
     return true;
 }
 
@@ -623,7 +623,7 @@ int JackOSSAdapter::SetBufferSize(jack_nframes_t buffer_size)
     Close();
     return Open();
 }
-        
+
 } // namespace
 
 #ifdef __cplusplus
@@ -633,123 +633,50 @@ extern "C"
 
     SERVER_EXPORT jack_driver_desc_t* jack_get_descriptor()
     {
-        jack_driver_desc_t *desc;
-        unsigned int i;
-        desc = (jack_driver_desc_t*)calloc(1, sizeof(jack_driver_desc_t));
+        jack_driver_desc_t * desc;
+        jack_driver_desc_filler_t filler;
+        jack_driver_param_value_t value;
 
-        strcpy(desc->name, "audioadapter");                              // size MUST be less then JACK_DRIVER_NAME_MAX + 1
-        strcpy(desc->desc, "netjack audio <==> net backend adapter");    // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
-           
-        desc->nparams = OSS_DRIVER_N_PARAMS;
-        desc->params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
+        desc = jack_driver_descriptor_construct("audioadapter", JackDriverNone, "netjack audio <==> net backend adapter", &filler);
 
-        i = 0;
-        strcpy(desc->params[i].name, "rate");
-        desc->params[i].character = 'r';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = OSS_DRIVER_DEF_FS;
-        strcpy(desc->params[i].short_desc, "Sample rate");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.ui = OSS_DRIVER_DEF_FS;
+        jack_driver_descriptor_add_parameter(desc, &filler, "rate", 'r', JackDriverParamUInt, &value, NULL, "Sample rate", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "period");
-        desc->params[i].character = 'p';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = OSS_DRIVER_DEF_BLKSIZE;
-        strcpy(desc->params[i].short_desc, "Frames per period");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.ui = OSS_DRIVER_DEF_BLKSIZE;
+        jack_driver_descriptor_add_parameter(desc, &filler, "period", 'p', JackDriverParamUInt, &value, NULL, "Frames per period", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "nperiods");
-        desc->params[i].character = 'n';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = OSS_DRIVER_DEF_NPERIODS;
-        strcpy(desc->params[i].short_desc, "Number of periods to prefill output buffer");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.ui = OSS_DRIVER_DEF_NPERIODS;
+        jack_driver_descriptor_add_parameter(desc, &filler, "nperiods", 'n', JackDriverParamUInt, &value, NULL, "Number of periods to prefill output buffer", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "wordlength");
-        desc->params[i].character = 'w';
-        desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.i = OSS_DRIVER_DEF_BITS;
-        strcpy(desc->params[i].short_desc, "Word length");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.i = OSS_DRIVER_DEF_BITS;
+        jack_driver_descriptor_add_parameter(desc, &filler, "wordlength", 'w', JackDriverParamInt, &value, NULL, "Word length", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "inchannels");
-        desc->params[i].character = 'i';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = OSS_DRIVER_DEF_INS;
-        strcpy(desc->params[i].short_desc, "Capture channels");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-        
-        i++;
-        strcpy(desc->params[i].name, "outchannels");
-        desc->params[i].character = 'o';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = OSS_DRIVER_DEF_OUTS;
-        strcpy(desc->params[i].short_desc, "Playback channels");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.ui = OSS_DRIVER_DEF_INS;
+        jack_driver_descriptor_add_parameter(desc, &filler, "in-channels", 'i', JackDriverParamUInt, &value, NULL, "Capture channels", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "excl");
-        desc->params[i].character = 'e';
-        desc->params[i].type = JackDriverParamBool;
-        desc->params[i].value.i = false;
-        strcpy(desc->params[i].short_desc, "Exclusif (O_EXCL) access mode");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.ui = OSS_DRIVER_DEF_OUTS;
+        jack_driver_descriptor_add_parameter(desc, &filler, "out-channels", 'o', JackDriverParamUInt, &value, NULL, "Playback channels", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "capture");
-        desc->params[i].character = 'C';
-        desc->params[i].type = JackDriverParamString;
-        strcpy(desc->params[i].value.str, OSS_DRIVER_DEF_DEV);
-        strcpy(desc->params[i].short_desc, "Input device");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-        
-        i++;
-        strcpy(desc->params[i].name, "playback");
-        desc->params[i].character = 'P';
-        desc->params[i].type = JackDriverParamString;
-        strcpy(desc->params[i].value.str, OSS_DRIVER_DEF_DEV);
-        strcpy(desc->params[i].short_desc, "Output device");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.i  = false;
+        jack_driver_descriptor_add_parameter(desc, &filler, "excl", 'e', JackDriverParamBool, &value, NULL, "Exclusif (O_EXCL) access mode", NULL);
 
-        i++;
-        strcpy (desc->params[i].name, "device");
-        desc->params[i].character = 'd';
-        desc->params[i].type = JackDriverParamString;
-        strcpy(desc->params[i].value.str, OSS_DRIVER_DEF_DEV);
-        strcpy(desc->params[i].short_desc, "OSS device name");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-      
-        i++;
-        strcpy(desc->params[i].name, "ignorehwbuf");
-        desc->params[i].character = 'b';
-        desc->params[i].type = JackDriverParamBool;
-        desc->params[i].value.i = true;
-        strcpy(desc->params[i].short_desc, "Ignore hardware period size");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-        
-        i++;
-        strcpy(desc->params[i].name, "quality");
-        desc->params[i].character = 'q';
-        desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.ui = 0;
-        strcpy(desc->params[i].short_desc, "Resample algorithm quality (0 - 4)");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-        
-        i++;
-        strcpy(desc->params[i].name, "ring-buffer");
-        desc->params[i].character = 'g';
-        desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.ui = 32768;
-        strcpy(desc->params[i].short_desc, "Fixed ringbuffer size");
-        strcpy(desc->params[i].long_desc, "Fixed ringbuffer size (if not set => automatic adaptative)");
-   
+        strcpy(value.str, OSS_DRIVER_DEF_DEV);
+        jack_driver_descriptor_add_parameter(desc, &filler, "capture", 'C', JackDriverParamString, &value, NULL, "Input device", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "playback", 'P', JackDriverParamString, &value, NULL, "Output device", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, NULL, "OSS device name", NULL);
+
+        value.i  = true;
+        jack_driver_descriptor_add_parameter(desc, &filler, "ignorehwbuf", 'b', JackDriverParamBool, &value, NULL, "Ignore hardware period size", NULL);
+
+        value.ui  = 0;
+        jack_driver_descriptor_add_parameter(desc, &filler, "quality", 'q', JackDriverParamInt, &value, NULL, "Resample algorithm quality (0 - 4)", NULL);
+
+        value.i = 32768;
+        jack_driver_descriptor_add_parameter(desc, &filler, "ring-buffer", 'g', JackDriverParamInt, &value, NULL, "Fixed ringbuffer size", "Fixed ringbuffer size (if not set => automatic adaptative)");
+
         return desc;
     }
-   
+
 #ifdef __cplusplus
 }
 #endif

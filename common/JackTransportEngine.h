@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -48,47 +48,48 @@ We have:
 	The current position can be read by clients.
 
 	We use a JackAtomicArrayState pattern that allows to manage several "next" states independantly.
-    
+
     In jack1 implementation, transport code (jack_transport_cycle_end) was not called if the graph could not be locked (see jack_run_one_cycle).
     Here transport cycle (CycleBegin, CycleEnd) has to run in the RT thread concurrently with code executed from the "command" thread.
-    
+
     Each client maintains a state in it's shared memory area defined by:
-    
+
     - it's current transport state
     - a boolean that is "true" when slow-sync cb has to be called
     - a boolean that is "true" when timebase cb is called with new_pos on
-    
+
     Several operations set the "slow-sync cb" flag to true:
-    
+
         - setting a new cb (client)
         - activate (client)
         - transport start (server)
         - new pos (server)
-        
+
     Slow-sync cb calls stops when:
-    
+
         - the cb return true (client)
         - desactivate (client)
         - transport stop (server)
-        
+
     Several operations set the "timebase cb" flag to true:
-    
+
         - setting a new cb (client)
         - activate (client)
         - transport start (server) ??
         - new pos (server)
-        
+
     Timebase cb "new_pos" argument calls stops when:
-    
+
         - after one cb call with "new_pos" argument true (client)
         - desactivate (client)
         - release (client)
         - transport stop (server)
-        
+
 */
 
 class JackClientInterface;
 
+PRE_PACKED_STRUCTURE
 class SERVER_EXPORT JackTransportEngine : public JackAtomicArrayState<jack_position_t>
 {
 
@@ -109,7 +110,7 @@ class SERVER_EXPORT JackTransportEngine : public JackAtomicArrayState<jack_posit
         void MakeAllStartingLocating(JackClientInterface** table);
         void MakeAllStopping(JackClientInterface** table);
         void MakeAllLocating(JackClientInterface** table);
-        
+
         void SyncTimeout(jack_nframes_t frame_rate, jack_nframes_t buffer_size);
 
     public:
@@ -128,22 +129,22 @@ class SERVER_EXPORT JackTransportEngine : public JackAtomicArrayState<jack_posit
         {
             return fTransportState;
         }
-        
+
         void SetState(jack_transport_state_t state)
         {
             fTransportState = state;
         }
-        
+
         /*
-        	\brief 
+        	\brief
         */
         int ResetTimebase(int refnum);
 
         /*
-        	\brief 
+        	\brief
         */
         int SetTimebaseMaster(int refnum, bool conditionnal);
-        
+
         void GetTimebaseMaster(int& refnum, bool& conditionnal)
         {
             refnum = fTimeBaseMaster;
@@ -151,17 +152,17 @@ class SERVER_EXPORT JackTransportEngine : public JackAtomicArrayState<jack_posit
         }
 
         /*
-        	\brief 
+        	\brief
         */
         void CycleBegin(jack_nframes_t frame_rate, jack_time_t time);
 
         /*
-        	\brief 
+        	\brief
         */
         void CycleEnd(JackClientInterface** table, jack_nframes_t frame_rate, jack_nframes_t buffer_size);
 
         /*
-        	\brief 
+        	\brief
         */
         void SetSyncTimeout(jack_time_t timeout)
         {
@@ -174,20 +175,20 @@ class SERVER_EXPORT JackTransportEngine : public JackAtomicArrayState<jack_posit
         {
             return (jack_unique_t)INC_ATOMIC(&fWriteCounter);
         }
-        
+
         void RequestNewPos(jack_position_t* pos);
-        
+
         jack_transport_state_t Query(jack_position_t* pos);
-        
+
         jack_nframes_t GetCurrentFrame();
 
         static void CopyPosition(jack_position_t* from, jack_position_t* to);
-        
+
         bool GetNetworkSync() const
         {
             return fNetworkSync;
         }
-        
+
         void SetNetworkSync(bool sync)
         {
             fNetworkSync = sync;

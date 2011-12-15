@@ -106,14 +106,14 @@ static inline void CopyAndConvertOut(void *dst, jack_sample_t *src, size_t nfram
 		case 24: {
 			signed int *s32dst = (signed int*)dst;
             s32dst += channel;
-            sample_move_d24_sS((char*)s32dst, src, nframes, byte_skip, NULL); 
+            sample_move_d24_sS((char*)s32dst, src, nframes, byte_skip, NULL);
 			break;
-        }    
+        }
 		case 32: {
             signed int *s32dst = (signed int*)dst;
             s32dst += channel;
             sample_move_d32u24_sS((char*)s32dst, src, nframes, byte_skip, NULL);
-			break;  
+			break;
         }
 	}
 }
@@ -127,7 +127,7 @@ void JackBoomerDriver::SetSampleFormat()
             fSampleSize = 4;
 			break;
 		case 32:	/* native-endian 32-bit integer */
-            fSampleFormat = AFMT_S32_NE; 
+            fSampleFormat = AFMT_S32_NE;
             fSampleSize = 4;
 			break;
 		case 16:	/* native-endian 16-bit integer */
@@ -144,13 +144,13 @@ void JackBoomerDriver::DisplayDeviceInfo()
     oss_audioinfo ai_in, ai_out;
     memset(&info, 0, sizeof(audio_buf_info));
     int cap = 0;
-    
+
     // Duplex cards : http://manuals.opensound.com/developer/full_duplex.html
     jack_info("Audio Interface Description :");
     jack_info("Sampling Frequency : %d, Sample Format : %d, Mode : %d", fEngineControl->fSampleRate, fSampleFormat, fRWMode);
-    
+
     if (fRWMode & kWrite) {
-	
+
         oss_sysinfo si;
         if (ioctl(fOutFD, OSS_SYSINFO, &si) == -1) {
             jack_error("JackBoomerDriver::DisplayDeviceInfo OSS_SYSINFO failed : %s@%i, errno = %d", __FILE__, __LINE__, errno);
@@ -162,18 +162,18 @@ void JackBoomerDriver::DisplayDeviceInfo()
             jack_info("OSS numaudioengines %d", si.numaudioengines);
             jack_info("OSS numcards %d", si.numcards);
         }
-	
+
         jack_info("Output capabilities - %d channels : ", fPlaybackChannels);
         jack_info("Output block size = %d", fOutputBufferSize);
-    
+
         if (ioctl(fOutFD, SNDCTL_DSP_GETOSPACE, &info) == -1)  {
             jack_error("JackBoomerDriver::DisplayDeviceInfo SNDCTL_DSP_GETOSPACE failed : %s@%i, errno = %d", __FILE__, __LINE__, errno);
         } else {
-            jack_info("output space info: fragments = %d, fragstotal = %d, fragsize = %d, bytes = %d", 
+            jack_info("output space info: fragments = %d, fragstotal = %d, fragsize = %d, bytes = %d",
                 info.fragments, info.fragstotal, info.fragsize, info.bytes);
             fFragmentSize = info.fragsize;
         }
-    
+
         if (ioctl(fOutFD, SNDCTL_DSP_GETCAPS, &cap) == -1)  {
             jack_error("JackBoomerDriver::DisplayDeviceInfo SNDCTL_DSP_GETCAPS failed : %s@%i, errno = %d", __FILE__, __LINE__, errno);
         } else {
@@ -186,10 +186,10 @@ void JackBoomerDriver::DisplayDeviceInfo()
             if (cap & DSP_CAP_MULTI) 	jack_info(" DSP_CAP_MULTI");
             if (cap & DSP_CAP_BIND) 	jack_info(" DSP_CAP_BIND");
         }
-    }	
-    
+    }
+
     if (fRWMode & kRead) {
-    
+
       	oss_sysinfo si;
         if (ioctl(fInFD, OSS_SYSINFO, &si) == -1) {
             jack_error("JackBoomerDriver::DisplayDeviceInfo OSS_SYSINFO failed : %s@%i, errno = %d", __FILE__, __LINE__, errno);
@@ -201,14 +201,14 @@ void JackBoomerDriver::DisplayDeviceInfo()
             jack_info("OSS numaudioengines %d", si.numaudioengines);
             jack_info("OSS numcards %d", si.numcards);
         }
-    
+
         jack_info("Input capabilities - %d channels : ", fCaptureChannels);
         jack_info("Input block size = %d", fInputBufferSize);
-    
-        if (ioctl(fInFD, SNDCTL_DSP_GETISPACE, &info) == -1) { 
+
+        if (ioctl(fInFD, SNDCTL_DSP_GETISPACE, &info) == -1) {
             jack_error("JackBoomerDriver::DisplayDeviceInfo SNDCTL_DSP_GETOSPACE failed : %s@%i, errno = %d", __FILE__, __LINE__, errno);
         } else {
-            jack_info("input space info: fragments = %d, fragstotal = %d, fragsize = %d, bytes = %d", 
+            jack_info("input space info: fragments = %d, fragstotal = %d, fragsize = %d, bytes = %d",
                 info.fragments, info.fragstotal, info.fragsize, info.bytes);
         }
 
@@ -225,31 +225,30 @@ void JackBoomerDriver::DisplayDeviceInfo()
             if (cap & DSP_CAP_BIND) 	jack_info(" DSP_CAP_BIND");
         }
     }
-     
+
     if (ai_in.rate_source != ai_out.rate_source) {
         jack_info("Warning : input and output are not necessarily driven by the same clock!");
     }
 }
 
 JackBoomerDriver::JackBoomerDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
-                : JackAudioDriver(name, alias, engine, table),
-                fInFD(-1), fOutFD(-1), fBits(0), 
-                fSampleFormat(0), fNperiods(0), fSampleSize(0), fFragmentSize(0),
-                fRWMode(0), fExcl(false), fSyncIO(false),
-                fInputBufferSize(0), fOutputBufferSize(0),
-                fInputBuffer(NULL), fOutputBuffer(NULL),
-                fInputThread(&fInputHandler), fOutputThread(&fOutputHandler),
-                fInputHandler(this), fOutputHandler(this)
-               
+                                : JackAudioDriver(name, alias, engine, table),
+                                fInFD(-1), fOutFD(-1), fBits(0),
+                                fSampleFormat(0), fNperiods(0), fSampleSize(0), fFragmentSize(0),
+                                fRWMode(0), fExcl(false), fSyncIO(false),
+                                fInputBufferSize(0), fOutputBufferSize(0),
+                                fInputBuffer(NULL), fOutputBuffer(NULL),
+                                fInputThread(&fInputHandler), fOutputThread(&fOutputHandler),
+                                fInputHandler(this), fOutputHandler(this)
 {
-    sem_init(&fReadSema, 0, 0); 
-    sem_init(&fWriteSema, 0, 0); 
+    sem_init(&fReadSema, 0, 0);
+    sem_init(&fWriteSema, 0, 0);
 }
 
 JackBoomerDriver::~JackBoomerDriver()
 {
-    sem_destroy(&fReadSema); 
-    sem_destroy(&fWriteSema); 
+    sem_destroy(&fReadSema);
+    sem_destroy(&fWriteSema);
 }
 
 int JackBoomerDriver::OpenInput()
@@ -260,8 +259,9 @@ int JackBoomerDriver::OpenInput()
     int cur_sample_format;
     jack_nframes_t cur_sample_rate;
 
-    if (fCaptureChannels == 0) fCaptureChannels = 2;
-  
+    if (fCaptureChannels == 0)
+        fCaptureChannels = 2;
+
     if ((fInFD = open(fCaptureDriverName, O_RDONLY | ((fExcl) ? O_EXCL : 0))) < 0) {
         jack_error("JackBoomerDriver::OpenInput failed to open device : %s@%i, errno = %d", __FILE__, __LINE__, errno);
         return -1;
@@ -276,7 +276,7 @@ int JackBoomerDriver::OpenInput()
         }
     }
 
-    gFragFormat = (2 << 16) + int2pow2(fEngineControl->fBufferSize * fSampleSize * fCaptureChannels);	
+    gFragFormat = (2 << 16) + int2pow2(fEngineControl->fBufferSize * fSampleSize * fCaptureChannels);
     if (ioctl(fInFD, SNDCTL_DSP_SETFRAGMENT, &gFragFormat) == -1) {
         jack_error("JackBoomerDriver::OpenInput failed to set fragments : %s@%i, errno = %d", __FILE__, __LINE__, errno);
         goto error;
@@ -290,7 +290,7 @@ int JackBoomerDriver::OpenInput()
     if (cur_sample_format != fSampleFormat) {
         jack_info("JackBoomerDriver::OpenInput driver forced the sample format %ld", fSampleFormat);
     }
-    
+
     cur_capture_channels = fCaptureChannels;
     if (ioctl(fInFD, SNDCTL_DSP_CHANNELS, &fCaptureChannels) == -1) {
         jack_error("JackBoomerDriver::OpenInput failed to set channels : %s@%i, errno = %d", __FILE__, __LINE__, errno);
@@ -299,7 +299,7 @@ int JackBoomerDriver::OpenInput()
     if (cur_capture_channels != fCaptureChannels) {
         jack_info("JackBoomerDriver::OpenInput driver forced the number of capture channels %ld", fCaptureChannels);
     }
-       
+
     cur_sample_rate = fEngineControl->fSampleRate;
     if (ioctl(fInFD, SNDCTL_DSP_SPEED, &fEngineControl->fSampleRate) == -1) {
         jack_error("JackBoomerDriver::OpenInput failed to set sample rate : %s@%i, errno = %d", __FILE__, __LINE__, errno);
@@ -315,7 +315,7 @@ int JackBoomerDriver::OpenInput()
     fInputBuffer = (void*)calloc(fInputBufferSize, 1);
     assert(fInputBuffer);
     return 0;
-    
+
 error:
     ::close(fInFD);
     return -1;
@@ -329,28 +329,29 @@ int JackBoomerDriver::OpenOutput()
     int cur_playback_channels;
     jack_nframes_t cur_sample_rate;
 
-    if (fPlaybackChannels == 0) fPlaybackChannels = 2;
-    
+    if (fPlaybackChannels == 0)
+        fPlaybackChannels = 2;
+
     if ((fOutFD = open(fPlaybackDriverName, O_WRONLY | ((fExcl) ? O_EXCL : 0))) < 0) {
        jack_error("JackBoomerDriver::OpenOutput failed to open device : %s@%i, errno = %d", __FILE__, __LINE__, errno);
        return -1;
     }
 
     jack_log("JackBoomerDriver::OpenOutput output fOutFD = %d", fOutFD);
-    
+
     if (fExcl) {
         if (ioctl(fOutFD, SNDCTL_DSP_COOKEDMODE, &flags) == -1) {
             jack_error("JackBoomerDriver::OpenOutput failed to set cooked mode : %s@%i, errno = %d", __FILE__, __LINE__, errno);
             goto error;
-        }  
-    } 
+        }
+    }
 
-    gFragFormat = (2 << 16) + int2pow2(fEngineControl->fBufferSize * fSampleSize * fPlaybackChannels);	
+    gFragFormat = (2 << 16) + int2pow2(fEngineControl->fBufferSize * fSampleSize * fPlaybackChannels);
     if (ioctl(fOutFD, SNDCTL_DSP_SETFRAGMENT, &gFragFormat) == -1) {
         jack_error("JackBoomerDriver::OpenOutput failed to set fragments : %s@%i, errno = %d", __FILE__, __LINE__, errno);
         goto error;
     }
-   
+
     cur_sample_format = fSampleFormat;
     if (ioctl(fOutFD, SNDCTL_DSP_SETFMT, &fSampleFormat) == -1) {
         jack_error("JackBoomerDriver::OpenOutput failed to set format : %s@%i, errno = %d", __FILE__, __LINE__, errno);
@@ -359,7 +360,7 @@ int JackBoomerDriver::OpenOutput()
     if (cur_sample_format != fSampleFormat) {
         jack_info("JackBoomerDriver::OpenOutput driver forced the sample format %ld", fSampleFormat);
     }
-    
+
     cur_playback_channels = fPlaybackChannels;
     if (ioctl(fOutFD, SNDCTL_DSP_CHANNELS, &fPlaybackChannels) == -1) {
         jack_error("JackBoomerDriver::OpenOutput failed to set channels : %s@%i, errno = %d", __FILE__, __LINE__, errno);
@@ -380,33 +381,33 @@ int JackBoomerDriver::OpenOutput()
 
     // Just set the write size to the value we want...
     fOutputBufferSize = fEngineControl->fBufferSize * fSampleSize * fPlaybackChannels;
-    
+
     fOutputBuffer = (void*)calloc(fOutputBufferSize, 1);
     assert(fOutputBuffer);
     return 0;
-    
+
 error:
     ::close(fOutFD);
     return -1;
 }
 
 int JackBoomerDriver::Open(jack_nframes_t nframes,
-                      int user_nperiods, 
-                      jack_nframes_t samplerate,
-                      bool capturing,
-                      bool playing,
-                      int inchannels,
-                      int outchannels,
-                      bool excl,
-                      bool monitor,
-                      const char* capture_driver_uid,
-                      const char* playback_driver_uid,
-                      jack_nframes_t capture_latency,
-                      jack_nframes_t playback_latency,
-                      int bits, bool syncio)
+                          int user_nperiods,
+                          jack_nframes_t samplerate,
+                          bool capturing,
+                          bool playing,
+                          int inchannels,
+                          int outchannels,
+                          bool excl,
+                          bool monitor,
+                          const char* capture_driver_uid,
+                          const char* playback_driver_uid,
+                          jack_nframes_t capture_latency,
+                          jack_nframes_t playback_latency,
+                          int bits, bool syncio)
 {
     // Generic JackAudioDriver Open
-    if (JackAudioDriver::Open(nframes, samplerate, capturing, playing, inchannels, outchannels, monitor, 
+    if (JackAudioDriver::Open(nframes, samplerate, capturing, playing, inchannels, outchannels, monitor,
         capture_driver_uid, playback_driver_uid, capture_latency, playback_latency) != 0) {
         return -1;
     } else {
@@ -422,12 +423,12 @@ int JackBoomerDriver::Open(jack_nframes_t nframes,
         fExcl = excl;
         fNperiods = (user_nperiods == 0) ? 1 : user_nperiods ;
         fSyncIO = syncio;
-   
+
     #ifdef JACK_MONITOR
         // Force memory page in
         memset(&gCycleTable, 0, sizeof(gCycleTable));
     #endif
-        
+
         if (OpenAux() < 0) {
             Close();
             return -1;
@@ -441,14 +442,14 @@ int JackBoomerDriver::Close()
 {
  #ifdef JACK_MONITOR
     FILE* file = fopen("OSSProfiling.log", "w");
-    
+
     if (file) {
         jack_info("Writing OSS driver timing data....");
         for (int i = 1; i < std::min(gCycleReadCount, gCycleWriteCount); i++) {
             int d1 = gCycleTable.fTable[i].fAfterRead - gCycleTable.fTable[i].fBeforeRead;
             int d2 = gCycleTable.fTable[i].fAfterReadConvert - gCycleTable.fTable[i].fAfterRead;
             int d3 = gCycleTable.fTable[i].fAfterWrite - gCycleTable.fTable[i].fBeforeWrite;
-            int d4 = gCycleTable.fTable[i].fBeforeWrite - gCycleTable.fTable[i].fBeforeWriteConvert;     
+            int d4 = gCycleTable.fTable[i].fBeforeWrite - gCycleTable.fTable[i].fBeforeWriteConvert;
             fprintf(file, "%d \t %d \t %d \t %d \t \n", d1, d2, d3, d4);
         }
         fclose(file);
@@ -461,7 +462,7 @@ int JackBoomerDriver::Close()
     if (file == NULL) {
         jack_error("JackBoomerDriver::Close cannot open TimingOSS.plot file");
     } else {
-        
+
         fprintf(file, "set grid\n");
         fprintf(file, "set title \"OSS audio driver timing\"\n");
         fprintf(file, "set xlabel \"audio cycles\"\n");
@@ -470,10 +471,10 @@ int JackBoomerDriver::Close()
                             \"OSSProfiling.log\" using 2 title \"Driver read convert duration\" with lines, \
                             \"OSSProfiling.log\" using 3 title \"Driver write wait\" with lines, \
                             \"OSSProfiling.log\" using 4 title \"Driver write convert duration\" with lines\n");
-    
+
         fprintf(file, "set output 'TimingOSS.pdf\n");
         fprintf(file, "set terminal pdf\n");
-    
+
         fprintf(file, "set grid\n");
         fprintf(file, "set title \"OSS audio driver timing\"\n");
         fprintf(file, "set xlabel \"audio cycles\"\n");
@@ -482,12 +483,12 @@ int JackBoomerDriver::Close()
                             \"OSSProfiling.log\" using 2 title \"Driver read convert duration\" with lines, \
                             \"OSSProfiling.log\" using 3 title \"Driver write wait\" with lines, \
                             \"OSSProfiling.log\" using 4 title \"Driver write convert duration\" with lines\n");
-      
+
         fclose(file);
     }
  #endif
     int res = JackAudioDriver::Close();
-    CloseAux();    
+    CloseAux();
     return res;
 }
 
@@ -498,12 +499,12 @@ int JackBoomerDriver::OpenAux()
     if ((fRWMode & kRead) && (OpenInput() < 0)) {
         return -1;
     }
-  
-    if ((fRWMode & kWrite) && (OpenOutput() < 0)) { 
+
+    if ((fRWMode & kWrite) && (OpenOutput() < 0)) {
         return -1;
     }
-    
-    DisplayDeviceInfo();  
+
+    DisplayDeviceInfo();
     return 0;
 }
 
@@ -513,16 +514,16 @@ void JackBoomerDriver::CloseAux()
         close(fInFD);
         fInFD = -1;
     }
-    
+
     if (fRWMode & kWrite && fOutFD >= 0) {
         close(fOutFD);
         fOutFD = -1;
     }
-    
+
     if (fInputBuffer)
         free(fInputBuffer);
     fInputBuffer = NULL;
-    
+
     if (fOutputBuffer)
         free(fOutputBuffer);
     fOutputBuffer = NULL;
@@ -533,29 +534,29 @@ int JackBoomerDriver::Start()
     jack_log("JackBoomerDriver::Start");
     JackAudioDriver::Start();
 
-    // Input/output synchronisation 
+    // Input/output synchronisation
     if (fInFD >= 0 && fOutFD >= 0 && fSyncIO) {
 
-        jack_log("JackBoomerDriver::Start sync input/output"); 
+        jack_log("JackBoomerDriver::Start sync input/output");
 
         // Create and fill synch group
         int id;
         oss_syncgroup group;
         group.id = 0;
-  
+
         group.mode = PCM_ENABLE_INPUT;
-        if (ioctl(fInFD, SNDCTL_DSP_SYNCGROUP, &group) == -1) 
+        if (ioctl(fInFD, SNDCTL_DSP_SYNCGROUP, &group) == -1)
             jack_error("JackBoomerDriver::Start failed to use SNDCTL_DSP_SYNCGROUP : %s@%i, errno = %d", __FILE__, __LINE__, errno);
-   
+
         group.mode = PCM_ENABLE_OUTPUT;
-        if (ioctl(fOutFD, SNDCTL_DSP_SYNCGROUP, &group) == -1) 
+        if (ioctl(fOutFD, SNDCTL_DSP_SYNCGROUP, &group) == -1)
             jack_error("JackBoomerDriver::Start failed to use SNDCTL_DSP_SYNCGROUP : %s@%i, errno = %d", __FILE__, __LINE__, errno);
 
         // Prefill output buffer : 2 fragments of silence as described in http://manuals.opensound.com/developer/synctest.c.html#LOC6
         char* silence_buf = (char*)malloc(fFragmentSize);
         memset(silence_buf, 0, fFragmentSize);
 
-        jack_log ("JackBoomerDriver::Start prefill size = %d", fFragmentSize); 
+        jack_log ("JackBoomerDriver::Start prefill size = %d", fFragmentSize);
 
         for (int i = 0; i < 2; i++) {
             ssize_t count = ::write(fOutFD, silence_buf, fFragmentSize);
@@ -569,12 +570,12 @@ int JackBoomerDriver::Start()
         // Start input/output in sync
         id = group.id;
 
-        if (ioctl(fInFD, SNDCTL_DSP_SYNCSTART, &id) == -1) 
+        if (ioctl(fInFD, SNDCTL_DSP_SYNCSTART, &id) == -1)
             jack_error("JackBoomerDriver::Start failed to use SNDCTL_DSP_SYNCSTART : %s@%i, errno = %d", __FILE__, __LINE__, errno);
 
     } else if (fOutFD >= 0) {
-        
-        // Maybe necessary to write an empty output buffer first time : see http://manuals.opensound.com/developer/fulldup.c.html   
+
+        // Maybe necessary to write an empty output buffer first time : see http://manuals.opensound.com/developer/fulldup.c.html
         memset(fOutputBuffer, 0, fOutputBufferSize);
 
         // Prefill ouput buffer
@@ -584,8 +585,8 @@ int JackBoomerDriver::Start()
                 jack_error("JackBoomerDriver::Start error bytes written = %ld", count);
             }
         }
-    } 
-   
+    }
+
     // Start input thread only when needed
     if (fInFD >= 0) {
         if (fInputThread.StartSync() < 0) {
@@ -627,44 +628,44 @@ bool JackBoomerDriver::JackBoomerDriverInput::Init()
         if (fDriver->fInputThread.AcquireRealTime(GetEngineControl()->fServerPriority) < 0) {
             jack_error("AcquireRealTime error");
         } else {
-            set_threaded_log_function(); 
+            set_threaded_log_function();
         }
     }
-    
+
     return true;
 }
 
 // TODO : better error handling
 bool JackBoomerDriver::JackBoomerDriverInput::Execute()
 {
-  
+
 #ifdef JACK_MONITOR
     gCycleTable.fTable[gCycleReadCount].fBeforeRead = GetMicroSeconds();
 #endif
 
     audio_errinfo ei_in;
-    ssize_t count = ::read(fDriver->fInFD, fDriver->fInputBuffer, fDriver->fInputBufferSize);  
- 
+    ssize_t count = ::read(fDriver->fInFD, fDriver->fInputBuffer, fDriver->fInputBufferSize);
+
 #ifdef JACK_MONITOR
     if (count > 0 && count != (int)fDriver->fInputBufferSize)
         jack_log("JackBoomerDriverInput::Execute count = %ld", count / (fDriver->fSampleSize * fDriver->fCaptureChannels));
     gCycleTable.fTable[gCycleReadCount].fAfterRead = GetMicroSeconds();
 #endif
-    
+
     // XRun detection
     if (ioctl(fDriver->fInFD, SNDCTL_DSP_GETERROR, &ei_in) == 0) {
 
         if (ei_in.rec_overruns > 0 ) {
             jack_error("JackBoomerDriverInput::Execute overruns");
             jack_time_t cur_time = GetMicroSeconds();
-            fDriver->NotifyXRun(cur_time, float(cur_time - fDriver->fBeginDateUst));   // Better this value than nothing... 
+            fDriver->NotifyXRun(cur_time, float(cur_time - fDriver->fBeginDateUst));   // Better this value than nothing...
         }
 
         if (ei_in.rec_errorcount > 0 && ei_in.rec_lasterror != 0) {
             jack_error("%d OSS rec event(s), last=%05d:%d", ei_in.rec_errorcount, ei_in.rec_lasterror, ei_in.rec_errorparm);
         }
-    }   
-    
+    }
+
     if (count < 0) {
         jack_log("JackBoomerDriverInput::Execute error = %s", strerror(errno));
     } else if (count < (int)fDriver->fInputBufferSize) {
@@ -675,11 +676,11 @@ bool JackBoomerDriver::JackBoomerDriverInput::Execute()
         fDriver->CycleTakeBeginTime();
         for (int i = 0; i < fDriver->fCaptureChannels; i++) {
             if (fDriver->fGraphManager->GetConnectionsNum(fDriver->fCapturePortList[i]) > 0) {
-                CopyAndConvertIn(fDriver->GetInputBuffer(i), 
-                                fDriver->fInputBuffer, 
-                                fDriver->fEngineControl->fBufferSize, 
-                                i, 
-                                fDriver->fCaptureChannels * fDriver->fSampleSize, 
+                CopyAndConvertIn(fDriver->GetInputBuffer(i),
+                                fDriver->fInputBuffer,
+                                fDriver->fEngineControl->fBufferSize,
+                                i,
+                                fDriver->fCaptureChannels * fDriver->fSampleSize,
                                 fDriver->fBits);
             }
         }
@@ -707,18 +708,18 @@ bool JackBoomerDriver::JackBoomerDriverOutput::Init()
         if (fDriver->fOutputThread.AcquireRealTime(GetEngineControl()->fServerPriority) < 0) {
             jack_error("AcquireRealTime error");
         } else {
-            set_threaded_log_function(); 
+            set_threaded_log_function();
         }
     }
-      
+
     int delay;
     if (ioctl(fDriver->fOutFD, SNDCTL_DSP_GETODELAY, &delay) == -1) {
         jack_error("JackBoomerDriverOutput::Init error get out delay : %s@%i, errno = %d", __FILE__, __LINE__, errno);
     }
-        
+
     delay /= fDriver->fSampleSize * fDriver->fPlaybackChannels;
     jack_info("JackBoomerDriverOutput::Init output latency frames = %ld", delay);
- 
+
     return true;
 }
 
@@ -730,21 +731,21 @@ bool JackBoomerDriver::JackBoomerDriverOutput::Execute()
 #ifdef JACK_MONITOR
     gCycleTable.fTable[gCycleWriteCount].fBeforeWriteConvert = GetMicroSeconds();
 #endif
-   
+
     for (int i = 0; i < fDriver->fPlaybackChannels; i++) {
         if (fDriver->fGraphManager->GetConnectionsNum(fDriver->fPlaybackPortList[i]) > 0) {
-              CopyAndConvertOut(fDriver->fOutputBuffer, 
-                                fDriver->GetOutputBuffer(i), 
-                                fDriver->fEngineControl->fBufferSize, 
-                                i, 
-                                fDriver->fPlaybackChannels * fDriver->fSampleSize, 
+              CopyAndConvertOut(fDriver->fOutputBuffer,
+                                fDriver->GetOutputBuffer(i),
+                                fDriver->fEngineControl->fBufferSize,
+                                i,
+                                fDriver->fPlaybackChannels * fDriver->fSampleSize,
                                 fDriver->fBits);
         }
     }
-    
+
 #ifdef JACK_MONITOR
     gCycleTable.fTable[gCycleWriteCount].fBeforeWrite = GetMicroSeconds();
-#endif    
+#endif
 
     ssize_t count = ::write(fDriver->fOutFD, fDriver->fOutputBuffer, fDriver->fOutputBufferSize);
 
@@ -762,20 +763,20 @@ bool JackBoomerDriver::JackBoomerDriverOutput::Execute()
         if (ei_out.play_underruns > 0) {
             jack_error("JackBoomerDriverOutput::Execute underruns");
             jack_time_t cur_time = GetMicroSeconds();
-            fDriver->NotifyXRun(cur_time, float(cur_time - fDriver->fBeginDateUst));   // Better this value than nothing... 
+            fDriver->NotifyXRun(cur_time, float(cur_time - fDriver->fBeginDateUst));   // Better this value than nothing...
         }
 
         if (ei_out.play_errorcount > 0 && ei_out.play_lasterror != 0) {
             jack_error("%d OSS play event(s), last=%05d:%d",ei_out.play_errorcount, ei_out.play_lasterror, ei_out.play_errorparm);
         }
     }
-     
+
     if (count < 0) {
         jack_log("JackBoomerDriverOutput::Execute error = %s", strerror(errno));
     } else if (count < (int)fDriver->fOutputBufferSize) {
         jack_error("JackBoomerDriverOutput::Execute error bytes written = %ld", count);
     }
-    
+
     // Duplex : sync with read thread
     if (fDriver->fInFD >= 0 && fDriver->fOutFD >= 0) {
         fDriver->SynchronizeWrite();
@@ -802,11 +803,10 @@ void JackBoomerDriver::SynchronizeWrite()
 
 int JackBoomerDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
-    CloseAux(); 
-    JackAudioDriver::SetBufferSize(buffer_size); // never fails
+    CloseAux();
+    JackAudioDriver::SetBufferSize(buffer_size); // Generic change, never fails
     return OpenAux();
 }
-
 
 } // end of namespace
 
@@ -817,119 +817,44 @@ extern "C"
 
 SERVER_EXPORT jack_driver_desc_t* driver_get_descriptor()
 {
-    jack_driver_desc_t *desc;
-    unsigned int i;
-    desc = (jack_driver_desc_t*)calloc(1, sizeof(jack_driver_desc_t));
+    jack_driver_desc_t * desc;
+    jack_driver_desc_filler_t filler;
+    jack_driver_param_value_t value;
 
-    strcpy(desc->name, "boomer");                              // size MUST be less then JACK_DRIVER_NAME_MAX + 1
-    strcpy(desc->desc, "Boomer/OSS API based audio backend");  // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
-       
-    desc->nparams = OSS_DRIVER_N_PARAMS;
-    desc->params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
+    desc = jack_driver_descriptor_construct("boomer", JackDriverMaster, "Boomer/OSS API based audio backend", &filler);
 
-    i = 0;
-    strcpy(desc->params[i].name, "rate");
-    desc->params[i].character = 'r';
-    desc->params[i].type = JackDriverParamUInt;
-    desc->params[i].value.ui = OSS_DRIVER_DEF_FS;
-    strcpy(desc->params[i].short_desc, "Sample rate");
-    strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+    value.ui = OSS_DRIVER_DEF_FS;
+    jack_driver_descriptor_add_parameter(desc, &filler, "rate", 'r', JackDriverParamUInt, &value, NULL, "Sample rate", NULL);
 
-    i++;
-    strcpy(desc->params[i].name, "period");
-    desc->params[i].character = 'p';
-    desc->params[i].type = JackDriverParamUInt;
-    desc->params[i].value.ui = OSS_DRIVER_DEF_BLKSIZE;
-    strcpy(desc->params[i].short_desc, "Frames per period");
-    strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+    value.ui = OSS_DRIVER_DEF_BLKSIZE;
+    jack_driver_descriptor_add_parameter(desc, &filler, "period", 'p', JackDriverParamUInt, &value, NULL, "Frames per period", NULL);
 
-    i++;
-    strcpy(desc->params[i].name, "nperiods");
-    desc->params[i].character = 'n';
-    desc->params[i].type = JackDriverParamUInt;
-    desc->params[i].value.ui = OSS_DRIVER_DEF_NPERIODS;
-    strcpy(desc->params[i].short_desc, "Number of periods to prefill output buffer");
-    strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+    value.ui = OSS_DRIVER_DEF_NPERIODS;
+    jack_driver_descriptor_add_parameter(desc, &filler, "nperiods", 'n', JackDriverParamUInt, &value, NULL, "Number of periods to prefill output buffer", NULL);
 
-    i++;
-    strcpy(desc->params[i].name, "wordlength");
-    desc->params[i].character = 'w';
-    desc->params[i].type = JackDriverParamInt;
-    desc->params[i].value.i = OSS_DRIVER_DEF_BITS;
-    strcpy(desc->params[i].short_desc, "Word length");
-    strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+    value.i = OSS_DRIVER_DEF_BITS;
+    jack_driver_descriptor_add_parameter(desc, &filler, "wordlength", 'w', JackDriverParamInt, &value, NULL, "Word length", NULL);
 
-    i++;
-    strcpy(desc->params[i].name, "inchannels");
-    desc->params[i].character = 'i';
-    desc->params[i].type = JackDriverParamUInt;
-    desc->params[i].value.ui = OSS_DRIVER_DEF_INS;
-    strcpy(desc->params[i].short_desc, "Capture channels");
-    strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-    
-    i++;
-    strcpy(desc->params[i].name, "outchannels");
-    desc->params[i].character = 'o';
-    desc->params[i].type = JackDriverParamUInt;
-    desc->params[i].value.ui = OSS_DRIVER_DEF_OUTS;
-    strcpy(desc->params[i].short_desc, "Playback channels");
-    strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-    
-    i++;
-    strcpy(desc->params[i].name, "excl");
-    desc->params[i].character = 'e';
-    desc->params[i].type = JackDriverParamBool;
-    desc->params[i].value.i = false;
-    strcpy(desc->params[i].short_desc, "Exclusif (O_EXCL) access mode");
-    strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+    value.ui = OSS_DRIVER_DEF_INS;
+    jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamUInt, &value, NULL, "Capture channels", NULL);
 
-    i++;
-    strcpy(desc->params[i].name, "capture");
-    desc->params[i].character = 'C';
-    desc->params[i].type = JackDriverParamString;
-    strcpy(desc->params[i].value.str, OSS_DRIVER_DEF_DEV);
-    strcpy(desc->params[i].short_desc, "Input device");
-    strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-    
-    i++;
-    strcpy(desc->params[i].name, "playback");
-    desc->params[i].character = 'P';
-    desc->params[i].type = JackDriverParamString;
-    strcpy(desc->params[i].value.str, OSS_DRIVER_DEF_DEV);
-    strcpy(desc->params[i].short_desc, "Output device");
-    strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+    value.ui = OSS_DRIVER_DEF_OUTS;
+    jack_driver_descriptor_add_parameter(desc, &filler, "outchannels", 'o', JackDriverParamUInt, &value, NULL, "Playback channels", NULL);
 
-    i++;
-    strcpy (desc->params[i].name, "device");
-    desc->params[i].character = 'd';
-    desc->params[i].type = JackDriverParamString;
-    strcpy(desc->params[i].value.str, OSS_DRIVER_DEF_DEV);
-    strcpy(desc->params[i].short_desc, "OSS device name");
-    strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-    
-    i++;
-    strcpy(desc->params[i].name, "input-latency");
-    desc->params[i].character = 'I';
-    desc->params[i].type = JackDriverParamUInt;
-    desc->params[i].value.i = 0;
-    strcpy(desc->params[i].short_desc, "Extra input latency");
-    strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+    value.i = false;
+    jack_driver_descriptor_add_parameter(desc, &filler, "excl", 'e', JackDriverParamBool, &value, NULL, "Exclusif (O_EXCL) access mode", NULL);
 
-    i++;
-    strcpy(desc->params[i].name, "output-latency");
-    desc->params[i].character = 'O';
-    desc->params[i].type = JackDriverParamUInt;
-    desc->params[i].value.i = 0;
-    strcpy(desc->params[i].short_desc, "Extra output latency");
-    strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+    strcpy(value.str, OSS_DRIVER_DEF_DEV);
+    jack_driver_descriptor_add_parameter(desc, &filler, "capture", 'C', JackDriverParamString, &value, NULL, "Input device", NULL);
+    jack_driver_descriptor_add_parameter(desc, &filler, "playback", 'P', JackDriverParamString, &value, NULL, "Output device", NULL);
+    jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, NULL, "OSS device name", NULL);
 
-    i++;
-    strcpy(desc->params[i].name, "sync-io");
-    desc->params[i].character = 'S';
-    desc->params[i].type = JackDriverParamBool;
-    desc->params[i].value.i = false;
-    strcpy(desc->params[i].short_desc, "In duplex mode, synchronize input and output");
-    strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+    value.ui = 0;
+    jack_driver_descriptor_add_parameter(desc, &filler, "input-latency", 'I', JackDriverParamUInt, &value, NULL, "Extra input latency", NULL);
+    jack_driver_descriptor_add_parameter(desc, &filler, "output-latency", 'O', JackDriverParamUInt, &value, NULL, "Extra output latency", NULL);
+
+    value.i = false;
+    jack_driver_descriptor_add_parameter(desc, &filler, "sync-io", 'S', JackDriverParamBool, &value, NULL, "In duplex mode, synchronize input and output", NULL);
 
     return desc;
 }
@@ -953,13 +878,13 @@ EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine
     const jack_driver_param_t *param;
     jack_nframes_t systemic_input_latency = 0;
     jack_nframes_t systemic_output_latency = 0;
- 
+
     for (node = params; node; node = jack_slist_next(node)) {
-    
+
         param = (const jack_driver_param_t *)node->data;
 
         switch (param->character) {
-        
+
         case 'r':
             srate = param->value.ui;
             break;
@@ -983,7 +908,7 @@ EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine
         case 'o':
             chan_out = (int)param->value.ui;
             break;
-            
+
         case 'C':
             capture = true;
             if (strcmp(param->value.str, "none") != 0) {
@@ -1002,11 +927,11 @@ EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine
             playback_pcm_name = param->value.str;
             capture_pcm_name = param->value.str;
             break;
-            
+
         case 'e':
             excl = true;
             break;
-		
+
         case 'I':
             systemic_input_latency = param->value.ui;
             break;
@@ -1028,9 +953,9 @@ EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine
     }
 
     Jack::JackBoomerDriver* boomer_driver = new Jack::JackBoomerDriver("system", "boomer", engine, table);
-    
+
     // Special open for Boomer driver...
-    if (boomer_driver->Open(frames_per_interrupt, nperiods, srate, capture, playback, chan_in, chan_out, excl, 
+    if (boomer_driver->Open(frames_per_interrupt, nperiods, srate, capture, playback, chan_in, chan_out, excl,
         monitor, capture_pcm_name, playback_pcm_name, systemic_input_latency, systemic_output_latency, bits, syncio) == 0) {
         return boomer_driver;
     } else {

@@ -25,8 +25,11 @@ example_programs = {
     'jack_simple_session_client' : 'simple_session_client.c',
     'jack_session_notify' : 'session_notify.c',
     'jack_server_control' : 'server_control.cpp',
+    'jack_net_slave' : 'netslave.c',
+    'jack_net_master' : 'netmaster.c',
     'jack_latent_client' : 'latent_client.c',
     'jack_midi_dump' : 'midi_dump.c',
+    'jack_midi_latency_test' : 'midi_latency_test.c'
     }
 
 example_libs = {
@@ -36,11 +39,6 @@ example_libs = {
 def configure(conf):
     e = conf.check_cc(header_name='sndfile.h', define_name="HAVE_SNDFILE")
  
-    conf.check_cc(header_name='samplerate.h', define_name="HAVE_SAMPLERATE")
-   
-    if conf.is_defined('HAVE_SAMPLERATE'):
-        conf.env['LIB_SAMPLERATE'] = ['samplerate']
-
     if conf.is_defined('HAVE_SNDFILE'):
         conf.env['LIB_SNDFILE'] = ['sndfile']
 
@@ -71,22 +69,34 @@ def build(bld):
     if bld.env['IS_SUN']:
         os_incdir = ['../solaris', '../posix']
     for example_program, example_program_source in example_programs.items():
+        if example_program == 'jack_server_control':
+            uselib_local = 'serverlib'
+        elif example_program == 'jack_net_slave':
+            if not bld.env['BUILD_NETLIB']:
+                continue
+            uselib_local = 'netlib'
+        elif example_program == 'jack_net_master':
+            if not bld.env['BUILD_NETLIB']:
+                continue
+            uselib_local = 'netlib'
+        else:
+            uselib_local = 'clientlib'
+
         prog = bld.new_task_gen('cxx', 'program')
         prog.features.append('cc')
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = example_program_source
         if bld.env['IS_MACOSX']:
-            prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
-            #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
+            prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
+            #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc -arch x86_64")
             prog.env.append_value("LINKFLAGS", "")
         if bld.env['IS_LINUX']:
             prog.uselib = 'RT'
         if bld.env['IS_SUN']:
             prog.env.append_value("LINKFLAGS", "-lm")
-        if example_program == 'jack_server_control':
-            prog.uselib_local = 'serverlib'
-        else:
-            prog.uselib_local = 'clientlib'              
+
+        prog.uselib_local = uselib_local
+                     
         prog.target = example_program
    
     if bld.env['BUILD_EXAMPLE_CLIENT_TRANSPORT']:
@@ -94,8 +104,8 @@ def build(bld):
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = 'transport.c'
         if bld.env['IS_MACOSX']:
-            prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
-            #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
+            prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
+            #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc -arch x86_64")
             prog.env.append_value("LINKFLAGS", "")
         if bld.env['IS_LINUX']:
             prog.uselib = 'RT READLINE NCURSES'
@@ -109,8 +119,8 @@ def build(bld):
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = 'capture_client.c'
         if bld.env['IS_MACOSX']:
-            prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
-            #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
+            prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
+            #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc -arch x86_64")
             prog.env.append_value("LINKFLAGS", "")
             prog.uselib = 'SNDFILE'
         if bld.env['IS_LINUX']:
@@ -153,8 +163,8 @@ def build(bld):
         lib.target = example_lib
         lib.source = example_lib_source
         if bld.env['IS_MACOSX']:
-            lib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
-            #lib.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
+            lib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
+            #lib.env.append_value("LINKFLAGS", "-arch i386 -arch ppc -arch x86_64")
             lib.env.append_value("LINKFLAGS", "")
         if bld.env['IS_SUN']:
 	        lib.env.append_value("LINKFLAGS", "-lm")

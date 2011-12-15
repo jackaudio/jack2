@@ -21,17 +21,29 @@
 #define __weakjack_h__
 
 /**
- * @defgroup WeakLinkage managing support for newer/older versions of JACK
- * @{ One challenge faced by developers is that of taking advantage of new features introduced in new versions of [ JACK ] while still
- *    supporting older versions of the system. Normally, if an application uses a new feature in a library/API, it is unable to run on
- *    earlier versions of the library/API that do not support that feature. Such applications would either fail to launch or crash when
- *    an attempt to use the feature was made. This problem cane be solved using weakly-linked symbols.
+ * @defgroup WeakLinkage Managing support for newer/older versions of JACK
+ * @{ One challenge faced by developers is that of taking
+ *    advantage of new features introduced in new versions
+ *    of [ JACK ] while still supporting older versions of
+ *    the system. Normally, if an application uses a new
+ *    feature in a library/API, it is unable to run on
+ *    earlier versions of the library/API that do not
+ *    support that feature. Such applications would either
+ *    fail to launch or crash when an attempt to use the
+ *    feature was made. This problem cane be solved using
+ *    weakly-linked symbols.
  *
- *    When a symbol in a framework is defined as weakly linked, the symbol does not have to be present at runtime for a process to
- *    continue running. The static linker identifies a weakly linked symbol as such in any code module that references the symbol. The
- *    dynamic linker uses this same information at runtime to determine whether a process can continue running. If a weakly linked symbol
- *    is not present in the framework, the code module can continue to run as long as it does not reference the symbol. However, if the
- *    symbol is present, the code can use it normally.
+ *    When a symbol in a framework is defined as weakly
+ *    linked, the symbol does not have to be present at
+ *    runtime for a process to continue running. The static
+ *    linker identifies a weakly linked symbol as such in
+ *    any code module that references the symbol. The
+ *    dynamic linker uses this same information at runtime
+ *    to determine whether a process can continue
+ *    running. If a weakly linked symbol is not present in
+ *    the framework, the code module can continue to run as
+ *    long as it does not reference the symbol. However, if
+ *    the symbol is present, the code can use it normally.
  *
  *        (adapted from: http://developer.apple.com/library/mac/#documentation/MacOSX/Conceptual/BPFrameworks/Concepts/WeakLinking.html)
  *
@@ -73,6 +85,12 @@
  *
  */
 
+#ifdef __APPLE__
+#define WEAK_ATTRIBUTE weak_import
+#else
+#define WEAK_ATTRIBUTE __weak__
+#endif
+
 #ifndef JACK_OPTIONAL_WEAK_EXPORT
 /* JACK_OPTIONAL_WEAK_EXPORT needs to be a macro which
    expands into a compiler directive. If non-null, the directive
@@ -81,7 +99,7 @@
    require linker arguments for the client as well.
 */
 #ifdef __GNUC__
-#define JACK_OPTIONAL_WEAK_EXPORT __attribute__((__weak__))
+#define JACK_OPTIONAL_WEAK_EXPORT __attribute__((WEAK_ATTRIBUTE))
 #else
 /* Add other things here for non-gcc platforms */
 #endif
@@ -96,7 +114,7 @@
    linker arguments for the client as well.
 */
 #ifdef __GNUC__
-#define JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT __attribute__((__weak__,__deprecated__))
+#define JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT __attribute__((WEAK_ATTRIBUTE,__deprecated__))
 #else
 /* Add other things here for non-gcc platforms */
 #endif

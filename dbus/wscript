@@ -49,17 +49,19 @@ def build(bld):
         sysdeps_dbus_include = ['../macosx', '../posix']
 
     obj.includes = sysdeps_dbus_include + ['.', '../', '../common', '../common/jack']
+    obj.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
     obj.source = [
         'jackdbus.c',
         'controller.c',
+        'params.c',
         'controller_iface_configure.c',
         'controller_iface_control.c',
         'controller_iface_introspectable.c',
         'controller_iface_patchbay.c',
+        'controller_iface_session_manager.c',
         'controller_iface_transport.c',
         'xml.c',
         'xml_expat.c',
-        #'xml_libxml.c',
         #'xml_nop.c',
         'xml_write_raw.c',
         'sigsegv.c',

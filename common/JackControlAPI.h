@@ -28,6 +28,7 @@
 #ifdef WIN32
 #ifdef __MINGW32__
 #include <sys/types.h>
+typedef _sigset_t	sigset_t;
 #else
 typedef HANDLE sigset_t;
 #endif
@@ -42,6 +43,13 @@ typedef enum
     JackParamString,			/**< @brief value type is a string with max size of ::JACK_PARAM_STRING_MAX+1 chars */
     JackParamBool,				/**< @brief value type is a boolean */
 } jackctl_param_type_t;
+
+/** Driver types, intentionally similar to jack_driver_type_t */
+typedef enum
+{
+    JackMaster = 1,         /**< @brief master driver */
+    JackSlave,              /**< @brief slave driver */
+} jackctl_driver_type_t;
 
 /** @brief Max value that jackctl_param_type_t type can have */
 #define JACK_PARAM_MAX (JackParamBool + 1)
@@ -79,164 +87,168 @@ extern "C" {
 } /* Adjust editor indent */
 #endif
 
-EXPORT sigset_t
+SERVER_EXPORT sigset_t
 jackctl_setup_signals(
     unsigned int flags);
 
-EXPORT void
+SERVER_EXPORT void
 jackctl_wait_signals(
     sigset_t signals);
 
-EXPORT jackctl_server_t *
+SERVER_EXPORT jackctl_server_t *
 jackctl_server_create(
     bool (* on_device_acquire)(const char * device_name),
     void (* on_device_release)(const char * device_name));
 
-EXPORT void
+SERVER_EXPORT void
 jackctl_server_destroy(
 	jackctl_server_t * server);
 
-EXPORT const JSList *
+SERVER_EXPORT const JSList *
 jackctl_server_get_drivers_list(
 	jackctl_server_t * server);
 
-EXPORT bool
+SERVER_EXPORT bool
 jackctl_server_open(
     jackctl_server_t * server,
     jackctl_driver_t * driver);
 
-EXPORT bool
+SERVER_EXPORT bool
 jackctl_server_start(
     jackctl_server_t * server);
 
-EXPORT bool
+SERVER_EXPORT bool
 jackctl_server_stop(
     jackctl_server_t * server);
 
-EXPORT bool
+SERVER_EXPORT bool
 jackctl_server_close(
     jackctl_server_t * server);
 
-EXPORT const JSList *
+SERVER_EXPORT const JSList *
 jackctl_server_get_parameters(
 	jackctl_server_t * server);
 
-EXPORT const char *
+SERVER_EXPORT const char *
 jackctl_driver_get_name(
 	jackctl_driver_t * driver);
 
-EXPORT const JSList *
+SERVER_EXPORT jackctl_driver_type_t
+jackctl_driver_get_type(
+	jackctl_driver_t * driver);
+
+SERVER_EXPORT const JSList *
 jackctl_driver_get_parameters(
 	jackctl_driver_t * driver);
 
-EXPORT const char *
+SERVER_EXPORT const char *
 jackctl_parameter_get_name(
 	jackctl_parameter_t * parameter);
 
-EXPORT const char *
+SERVER_EXPORT const char *
 jackctl_parameter_get_short_description(
 	jackctl_parameter_t * parameter);
 
-EXPORT const char *
+SERVER_EXPORT const char *
 jackctl_parameter_get_long_description(
 	jackctl_parameter_t * parameter);
 
-EXPORT jackctl_param_type_t
+SERVER_EXPORT jackctl_param_type_t
 jackctl_parameter_get_type(
 	jackctl_parameter_t * parameter);
 
-EXPORT char
+SERVER_EXPORT char
 jackctl_parameter_get_id(
 	jackctl_parameter_t * parameter);
 
-EXPORT bool
+SERVER_EXPORT bool
 jackctl_parameter_is_set(
 	jackctl_parameter_t * parameter);
 
-EXPORT bool
+SERVER_EXPORT bool
 jackctl_parameter_reset(
 	jackctl_parameter_t * parameter);
 
-EXPORT union jackctl_parameter_value
+SERVER_EXPORT union jackctl_parameter_value
 jackctl_parameter_get_value(
 	jackctl_parameter_t * parameter);
 
-EXPORT bool
+SERVER_EXPORT bool
 jackctl_parameter_set_value(
 	jackctl_parameter_t * parameter,
 	const union jackctl_parameter_value * value_ptr);
 
-EXPORT union jackctl_parameter_value
+SERVER_EXPORT union jackctl_parameter_value
 jackctl_parameter_get_default_value(
 	jackctl_parameter_t * parameter);
-    
-EXPORT union jackctl_parameter_value 
+
+SERVER_EXPORT union jackctl_parameter_value
 jackctl_parameter_get_default_value(
     jackctl_parameter *parameter_ptr);
-    
-EXPORT bool
+
+SERVER_EXPORT bool
 jackctl_parameter_has_range_constraint(
 	jackctl_parameter_t * parameter_ptr);
 
-EXPORT bool
+SERVER_EXPORT bool
 jackctl_parameter_has_enum_constraint(
 	jackctl_parameter_t * parameter_ptr);
 
-EXPORT uint32_t
+SERVER_EXPORT uint32_t
 jackctl_parameter_get_enum_constraints_count(
 	jackctl_parameter_t * parameter_ptr);
 
-EXPORT union jackctl_parameter_value
+SERVER_EXPORT union jackctl_parameter_value
 jackctl_parameter_get_enum_constraint_value(
 	jackctl_parameter_t * parameter_ptr,
 	uint32_t index);
 
-EXPORT const char *
+SERVER_EXPORT const char *
 jackctl_parameter_get_enum_constraint_description(
 	jackctl_parameter_t * parameter_ptr,
 	uint32_t index);
 
-EXPORT void
+SERVER_EXPORT void
 jackctl_parameter_get_range_constraint(
 	jackctl_parameter_t * parameter_ptr,
 	union jackctl_parameter_value * min_ptr,
 	union jackctl_parameter_value * max_ptr);
 
-EXPORT bool
+SERVER_EXPORT bool
 jackctl_parameter_constraint_is_strict(
 	jackctl_parameter_t * parameter_ptr);
 
-EXPORT bool
+SERVER_EXPORT bool
 jackctl_parameter_constraint_is_fake_value(
 	jackctl_parameter_t * parameter_ptr);
 
-EXPORT const JSList * 
+SERVER_EXPORT const JSList *
 jackctl_server_get_internals_list(
     jackctl_server *server_ptr);
-    
-EXPORT const char * 
+
+SERVER_EXPORT const char *
 jackctl_internal_get_name(
     jackctl_internal *internal_ptr);
-    
-EXPORT const JSList * 
+
+SERVER_EXPORT const JSList *
 jackctl_internal_get_parameters(
     jackctl_internal *internal_ptr);
-    
-EXPORT bool jackctl_server_load_internal(
+
+SERVER_EXPORT bool jackctl_server_load_internal(
     jackctl_server * server,
     jackctl_internal * internal);
-    
-EXPORT bool jackctl_server_unload_internal(
+
+SERVER_EXPORT bool jackctl_server_unload_internal(
     jackctl_server * server,
     jackctl_internal * internal);
-    
-EXPORT bool jackctl_server_add_slave(jackctl_server_t * server,
+
+SERVER_EXPORT bool jackctl_server_add_slave(jackctl_server_t * server,
                             jackctl_driver_t * driver);
 
-EXPORT bool jackctl_server_remove_slave(jackctl_server_t * server,
+SERVER_EXPORT bool jackctl_server_remove_slave(jackctl_server_t * server,
                             jackctl_driver_t * driver);
 
-EXPORT bool 
+SERVER_EXPORT bool
 jackctl_server_switch_master(jackctl_server_t * server,
                             jackctl_driver_t * driver);
 
@@ -248,3 +260,4 @@ jackctl_server_switch_master(jackctl_server_t * server,
 #endif
 
 #endif
+

@@ -30,6 +30,7 @@
 
 #include "jackdbus.h"
 #include "controller_internal.h"
+#include "xml.h"
 
 #define JACK_DBUS_IFACE_NAME "org.jackaudio.JackControl"
 
@@ -121,14 +122,19 @@ jack_control_run_method(
     }
     else if (strcmp (call->method_name, "SwitchMaster") == 0)
     {
-        if (!jack_controller_switch_master(controller_ptr, call))
+        if (!controller_ptr->started)
         {
-            /* the reply is set by the failed function */
-            assert(call->reply != NULL);
-            return true;
+            goto not_started;
         }
-
-        jack_controller_control_send_signal_server_stopped();
+        else
+        {
+            if (!jack_controller_switch_master(controller_ptr, call))
+            {
+                /* the reply is set by the failed function */
+                assert(call->reply != NULL);
+                return true;
+            }
+        }
     }
     else if (strcmp (call->method_name, "GetLoad") == 0)
     {
@@ -221,7 +227,7 @@ jack_control_run_method(
             */
             goto exit;
         }
-    
+
         if (!jack_controller_load_internal(controller_ptr, internal_name)) {
             jack_dbus_error(
                 call,
@@ -229,9 +235,14 @@ jack_control_run_method(
                 "jack_controller_load_internal failed for internal (%s)", internal_name);
         }
     }
-    else if (strcmp (call->method_name, "AddSlave") == 0)
+    else if (strcmp (call->method_name, "AddSlaveDriver") == 0)
     {
         const char *driver_name;
+
+        if (controller_ptr->started)
+        {
+            goto fail_started;
+        }
 
         if (!jack_dbus_get_method_args(call, DBUS_TYPE_STRING, &driver_name, DBUS_TYPE_INVALID))
         {
@@ -240,17 +251,27 @@ jack_control_run_method(
             */
             goto exit;
         }
-        
-        if (!jack_controller_add_slave(controller_ptr, driver_name)) {
+
+        if (!jack_controller_add_slave_driver(controller_ptr, driver_name))
+        {
             jack_dbus_error(
                 call,
                 JACK_DBUS_ERROR_GENERIC,
-                "jack_controller_add_slave failed for driver (%s)", driver_name);
+                "jack_controller_add_slave_driver failed for driver (%s)", driver_name);
+        }
+        else
+        {
+            jack_controller_pending_save(controller_ptr);
         }
     }
-    else if (strcmp (call->method_name, "RemoveSlave") == 0)
+    else if (strcmp (call->method_name, "RemoveSlaveDriver") == 0)
     {
         const char *driver_name;
+
+        if (controller_ptr->started)
+        {
+            goto fail_started;
+        }
 
         if (!jack_dbus_get_method_args(call, DBUS_TYPE_STRING, &driver_name, DBUS_TYPE_INVALID))
         {
@@ -259,12 +280,17 @@ jack_control_run_method(
             */
             goto exit;
         }
-        
-        if (!jack_controller_remove_slave(controller_ptr, driver_name)) {
+
+        if (!jack_controller_remove_slave_driver(controller_ptr, driver_name))
+        {
             jack_dbus_error(
                 call,
                 JACK_DBUS_ERROR_GENERIC,
-                "jack_controller_remove_slave failed for driver (%s)", driver_name);
+                "jack_controller_remove_slave_driver failed for driver (%s)", driver_name);
+        }
+        else
+        {
+            jack_controller_pending_save(controller_ptr);
         }
     }
     else if (strcmp (call->method_name, "UnloadInternal") == 0)
@@ -278,7 +304,7 @@ jack_control_run_method(
             */
             goto exit;
         }
-        
+
         if (!jack_controller_unload_internal(controller_ptr, internal_name)) {
             jack_dbus_error(
                 call,
@@ -293,8 +319,7 @@ jack_control_run_method(
     }
 
     jack_dbus_construct_method_return_single(call, type, arg);
-
-    return true;
+    goto exit;
 
 not_started:
     jack_dbus_only_error(
@@ -302,6 +327,15 @@ not_started:
         JACK_DBUS_ERROR_SERVER_NOT_RUNNING,
         "Can't execute method '%s' with stopped JACK server",
         call->method_name);
+    goto exit;
+
+fail_started:
+    jack_dbus_only_error(
+        call,
+        JACK_DBUS_ERROR_SERVER_RUNNING,
+        "Can't execute method '%s' with started JACK server",
+        call->method_name);
+    goto exit;
 
 exit:
     return true;
@@ -361,12 +395,12 @@ JACK_DBUS_METHOD_ARGUMENTS_BEGIN(UnloadInternal)
     JACK_DBUS_METHOD_ARGUMENT("internal", "s", false)
 JACK_DBUS_METHOD_ARGUMENTS_END
 
-JACK_DBUS_METHOD_ARGUMENTS_BEGIN(AddSlave)
-    JACK_DBUS_METHOD_ARGUMENT("internal", "s", false)
+JACK_DBUS_METHOD_ARGUMENTS_BEGIN(AddSlaveDriver)
+    JACK_DBUS_METHOD_ARGUMENT("driver_name", "s", false)
 JACK_DBUS_METHOD_ARGUMENTS_END
 
-JACK_DBUS_METHOD_ARGUMENTS_BEGIN(RemoveSlave)
-    JACK_DBUS_METHOD_ARGUMENT("internal", "s", false)
+JACK_DBUS_METHOD_ARGUMENTS_BEGIN(RemoveSlaveDriver)
+    JACK_DBUS_METHOD_ARGUMENT("driver_name", "s", false)
 JACK_DBUS_METHOD_ARGUMENTS_END
 
 JACK_DBUS_METHODS_BEGIN
@@ -384,8 +418,8 @@ JACK_DBUS_METHODS_BEGIN
     JACK_DBUS_METHOD_DESCRIBE(ResetXruns, NULL)
     JACK_DBUS_METHOD_DESCRIBE(LoadInternal, NULL)
     JACK_DBUS_METHOD_DESCRIBE(UnloadInternal, NULL)
-    JACK_DBUS_METHOD_DESCRIBE(AddSlave, NULL)
-    JACK_DBUS_METHOD_DESCRIBE(RemoveSlave, NULL)
+    JACK_DBUS_METHOD_DESCRIBE(AddSlaveDriver, NULL)
+    JACK_DBUS_METHOD_DESCRIBE(RemoveSlaveDriver, NULL)
 JACK_DBUS_METHODS_END
 
 JACK_DBUS_SIGNAL_ARGUMENTS_BEGIN(ServerStarted)

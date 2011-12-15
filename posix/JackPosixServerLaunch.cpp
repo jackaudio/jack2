@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -209,6 +209,8 @@ static int server_connect(char* server_name)
     JackClientChannel channel;
     int res = channel.ServerCheck(server_name);
     channel.Close();
+    JackSleep(2000); // Added by JE - 02-01-2009 (gives
+                     // the channel some time to close)
     return res;
 }
 
@@ -236,3 +238,4 @@ int try_start_server(jack_varargs_t* va, jack_options_t options, jack_status_t* 
 
     return 0;
 }
+

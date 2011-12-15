@@ -23,7 +23,7 @@ namespace Jack
 {
 
 bool JackGlobals::fVerbose = 0;
-    
+
 jack_tls_key JackGlobals::fRealTime;
 static bool gKeyRealtimeInitialized = jack_tls_allocate_key(&JackGlobals::fRealTime);
 
@@ -31,13 +31,13 @@ jack_tls_key JackGlobals::fKeyLogFunction;
 static bool fKeyLogFunctionInitialized = jack_tls_allocate_key(&JackGlobals::fKeyLogFunction);
 
 JackMutex* JackGlobals::fOpenMutex = new JackMutex();
-bool JackGlobals::fServerRunning = false;
+volatile bool JackGlobals::fServerRunning = false;
 JackClient* JackGlobals::fClientTable[CLIENT_NUM] = {};
 
 #ifndef WIN32
 jack_thread_creator_t JackGlobals::fJackThreadCreator = pthread_create;
 #endif
-    
+
 #ifdef __CLIENTDEBUG__
 std::ofstream* JackGlobals::fStream = NULL;
 
@@ -52,13 +52,13 @@ void JackGlobals::CheckContext(const char* name)
         curtime = time (NULL);
         /* Convert it to local time representation. */
         loctime = localtime (&curtime);
-        strftime (buffer, 256, "%I-%M", loctime);
-        sprintf(provstr, "JackAPICall-%s.log", buffer);
+        strftime(buffer, 256, "%I-%M", loctime);
+        snprintf(provstr, sizeof(provstr), "JackAPICall-%s.log", buffer);
         JackGlobals::fStream = new std::ofstream(provstr, std::ios_base::ate);
         JackGlobals::fStream->is_open();
     }
     (*fStream) << "JACK API call : " << name << ", calling thread : " << pthread_self() << std::endl;
 }
-#endif    
+#endif
 
 } // end of namespace

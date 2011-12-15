@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "JackPlatformPlug.h"
 #include "JackPosixMutex.h"
+#include "JackException.h"
 #include <sys/time.h>
 #include <unistd.h>
 
@@ -43,7 +44,8 @@ class JackProcessSync : public JackBasePosixMutex
 
         JackProcessSync():JackBasePosixMutex()
         {
-            pthread_cond_init(&fCond, NULL);
+            int res = pthread_cond_init(&fCond, NULL);
+            ThrowIf(res != 0, JackException("JackBasePosixMutex: could not init the cond variable"));
         }
 
         virtual ~JackProcessSync()
@@ -53,16 +55,16 @@ class JackProcessSync : public JackBasePosixMutex
 
         bool TimedWait(long usec);
         bool LockedTimedWait(long usec);
-        
+
         void Wait();
         void LockedWait();
-         
+
         void Signal();
         void LockedSignal();
-         
+
         void SignalAll();
         void LockedSignalAll();
-  
+
 };
 
 } // end of namespace

@@ -52,10 +52,11 @@ SERVER_EXPORT jack_midi_data_t* JackMidiBuffer::ReserveEvent(jack_nframes_t time
 {
     jack_shmsize_t space = MaxEventSize();
     if (space == 0 || size > space) {
+        jack_error("JackMidiBuffer::ReserveEvent - the buffer does not have "
+                   "enough room to enqueue a %lu byte event", size);
         lost_events++;
         return 0;
     }
-
     JackMidiEvent* event = &events[event_count++];
     event->time = time;
     event->size = size;
@@ -90,7 +91,7 @@ static void MidiBufferMixdown(void* mixbuffer, void** src_buffers, int src_count
 {
     JackMidiBuffer* mix = static_cast<JackMidiBuffer*>(mixbuffer);
     if (!mix->IsValid()) {
-        jack_error("MIDI: invalid mix buffer");
+        jack_error("Jack::MidiBufferMixdown - invalid mix buffer");
         return;
     }
     mix->Reset(nframes);
@@ -98,8 +99,10 @@ static void MidiBufferMixdown(void* mixbuffer, void** src_buffers, int src_count
     int event_count = 0;
     for (int i = 0; i < src_count; ++i) {
         JackMidiBuffer* buf = static_cast<JackMidiBuffer*>(src_buffers[i]);
-        if (!buf->IsValid())
+        if (!buf->IsValid()) {
+            jack_error("Jack::MidiBufferMixdown - invalid source buffer");
             return;
+        }
         buf->mix_index = 0;
         event_count += buf->event_count;
         mix->lost_events += buf->lost_events;

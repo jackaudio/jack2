@@ -53,23 +53,37 @@ void JackEngineControl::CalcCPULoad(JackClientInterface** table,
     }
 
     // Store the execution time for later averaging
-    fRollingClientUsecs[fRollingClientUsecsIndex++] = last_cycle_end - fPrevCycleTime;
+    if (last_cycle_end > 0)
+        fRollingClientUsecs[fRollingClientUsecsIndex++] = last_cycle_end - fPrevCycleTime;
     if (fRollingClientUsecsIndex >= JACK_ENGINE_ROLLING_COUNT)
         fRollingClientUsecsIndex = 0;
 
-    // Every so often, recompute the current maximum use over the
-    // last JACK_ENGINE_ROLLING_COUNT client iterations.
-
-    if (++fRollingClientUsecsCnt % fRollingInterval == 0) {
-
+    // Each time we have a full set of iterations, recompute the current
+    // usage from the latest JACK_ENGINE_ROLLING_COUNT client entries.
+    if (fRollingClientUsecsCnt && (fRollingClientUsecsIndex == 0)) {
+        jack_time_t avg_usecs = 0;
         jack_time_t max_usecs = 0;
-        for (int i = 0; i < JACK_ENGINE_ROLLING_COUNT; i++)
+
+        for (int i = 0; i < JACK_ENGINE_ROLLING_COUNT; i++) {
+            avg_usecs += fRollingClientUsecs[i]; // This is really a running
+                                                 // total to be averaged later
             max_usecs = JACK_MAX(fRollingClientUsecs[i], max_usecs);
+        }
 
         fMaxUsecs = JACK_MAX(fMaxUsecs, max_usecs);
-        fSpareUsecs = jack_time_t((max_usecs < fPeriodUsecs) ? fPeriodUsecs - max_usecs : 0);
+
+        if (max_usecs < ((fPeriodUsecs * 95) / 100)) {
+            // Average the values from our JACK_ENGINE_ROLLING_COUNT array
+            fSpareUsecs = (jack_time_t)(fPeriodUsecs - (avg_usecs / JACK_ENGINE_ROLLING_COUNT));
+        } else {
+            // Use the 'worst case' value (or zero if we exceeded 'fPeriodUsecs')
+            fSpareUsecs = jack_time_t((max_usecs < fPeriodUsecs) ? fPeriodUsecs - max_usecs : 0);
+        }
+
         fCPULoad = ((1.f - (float(fSpareUsecs) / float(fPeriodUsecs))) * 50.f + (fCPULoad * 0.5f));
     }
+
+    fRollingClientUsecsCnt++;
 }
 
 void JackEngineControl::ResetRollingUsecs()

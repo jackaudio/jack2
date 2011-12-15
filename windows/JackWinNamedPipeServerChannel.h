@@ -93,6 +93,7 @@ class JackWinNamedPipeServerChannel : public JackRunnableInterface
         void Close();                                           // Close the Server/Client connection
 
         int Start();
+        void Stop();
 
         // JackRunnableInterface interface
         bool Init();

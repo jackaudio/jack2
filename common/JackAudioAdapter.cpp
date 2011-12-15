@@ -32,158 +32,188 @@ using namespace std;
 namespace Jack
 {
 
-//static methods ***********************************************************
-    int JackAudioAdapter::Process (jack_nframes_t frames, void* arg)
-    {
-        JackAudioAdapter* adapter = static_cast<JackAudioAdapter*>(arg);
-        jack_default_audio_sample_t* inputBuffer[adapter->fAudioAdapter->GetInputs()];
-        jack_default_audio_sample_t* outputBuffer[adapter->fAudioAdapter->GetOutputs()];
+int JackAudioAdapter::Process(jack_nframes_t frames, void* arg)
+{
+    JackAudioAdapter* adapter = static_cast<JackAudioAdapter*>(arg);
+    jack_default_audio_sample_t* inputBuffer[adapter->fAudioAdapter->GetInputs()];
+    jack_default_audio_sample_t* outputBuffer[adapter->fAudioAdapter->GetOutputs()];
 
-        // Always clear output
+    // Always clear output
+    for (int i = 0; i < adapter->fAudioAdapter->GetInputs(); i++) {
+        inputBuffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(adapter->fCapturePortList[i], frames);
+        memset(inputBuffer[i], 0, frames * sizeof(jack_default_audio_sample_t));
+    }
+
+    for (int i = 0; i < adapter->fAudioAdapter->GetOutputs(); i++) {
+        outputBuffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(adapter->fPlaybackPortList[i], frames);
+    }
+
+    adapter->fAudioAdapter->PullAndPush(inputBuffer, outputBuffer, frames);
+    return 0;
+}
+
+int JackAudioAdapter::BufferSize(jack_nframes_t buffer_size, void* arg)
+{
+    JackAudioAdapter* adapter = static_cast<JackAudioAdapter*>(arg);
+    adapter->Reset();
+    adapter->fAudioAdapter->SetHostBufferSize(buffer_size);
+    return 0;
+}
+
+int JackAudioAdapter::SampleRate(jack_nframes_t sample_rate, void* arg)
+{
+    JackAudioAdapter* adapter = static_cast<JackAudioAdapter*>(arg);
+    adapter->Reset();
+    adapter->fAudioAdapter->SetHostSampleRate(sample_rate);
+    return 0;
+}
+
+void JackAudioAdapter::Latency(jack_latency_callback_mode_t mode, void* arg)
+{
+    JackAudioAdapter* adapter = static_cast<JackAudioAdapter*>(arg);
+
+    if (mode == JackCaptureLatency) {
         for (int i = 0; i < adapter->fAudioAdapter->GetInputs(); i++) {
-            inputBuffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(adapter->fCapturePortList[i], frames);
-            memset(inputBuffer[i], 0, frames * sizeof(jack_default_audio_sample_t));
+            jack_latency_range_t range;
+            range.min = range.max = adapter->fAudioAdapter->GetInputLatency(i);
+            jack_port_set_latency_range(adapter->fCapturePortList[i], JackCaptureLatency, &range);
         }
 
+    } else {
         for (int i = 0; i < adapter->fAudioAdapter->GetOutputs(); i++) {
-            outputBuffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(adapter->fPlaybackPortList[i], frames);
-        }
-
-        adapter->fAudioAdapter->PullAndPush(inputBuffer, outputBuffer, frames);
-      	return 0;
-    }
-
-    int JackAudioAdapter::BufferSize ( jack_nframes_t buffer_size, void* arg )
-    {
-        JackAudioAdapter* adapter = static_cast<JackAudioAdapter*> ( arg );
-        adapter->Reset();
-        adapter->fAudioAdapter->SetHostBufferSize ( buffer_size );
-        return 0;
-    }
-
-    int JackAudioAdapter::SampleRate ( jack_nframes_t sample_rate, void* arg )
-    {
-        JackAudioAdapter* adapter = static_cast<JackAudioAdapter*> ( arg );
-        adapter->Reset();
-        adapter->fAudioAdapter->SetHostSampleRate ( sample_rate );
-        return 0;
-    }
-
-//JackAudioAdapter *********************************************************
-
-     JackAudioAdapter::JackAudioAdapter (jack_client_t* jack_client, JackAudioAdapterInterface* audio_io, const JSList* params, bool system)
-        :fJackClient(jack_client), fAudioAdapter(audio_io)
-    {
-        const JSList* node;
-        const jack_driver_param_t* param;
-        fAutoConnect = false;
-
-        for (node = params; node; node = jack_slist_next(node)) {
-            param = (const jack_driver_param_t*) node->data;
-            switch (param->character) {
-                case 'c':
-                    fAutoConnect = true;
-                    break;
-            }
+            jack_latency_range_t range;
+            range.min = range.max = adapter->fAudioAdapter->GetOutputLatency(i);
+            jack_port_set_latency_range(adapter->fPlaybackPortList[i], JackPlaybackLatency, &range);
         }
     }
+}
 
-    JackAudioAdapter::~JackAudioAdapter()
-    {
-        // When called, Close has already been used for the client, thus ports are already unregistered.
-        delete fAudioAdapter;
-    }
+JackAudioAdapter::JackAudioAdapter(jack_client_t* client, JackAudioAdapterInterface* audio_io, const JSList* params)
+    :fClient(client), fAudioAdapter(audio_io)
+{
+    const JSList* node;
+    const jack_driver_param_t* param;
+    fAutoConnect = false;
 
-    void JackAudioAdapter::FreePorts()
-    {
-        for (int i = 0; i < fAudioAdapter->GetInputs(); i++ )
-            if ( fCapturePortList[i] )
-                jack_port_unregister ( fJackClient, fCapturePortList[i] );
-        for (int i = 0; i < fAudioAdapter->GetOutputs(); i++ )
-            if ( fPlaybackPortList[i] )
-                jack_port_unregister ( fJackClient, fPlaybackPortList[i] );
-
-        delete[] fCapturePortList;
-        delete[] fPlaybackPortList;
-    }
-
-    void JackAudioAdapter::ConnectPorts()
-    {
-        const char **ports;
-
-        ports = jack_get_ports(fJackClient, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
-        if (ports != NULL) {
-            for (int i = 0; i < fAudioAdapter->GetInputs() && ports[i]; i++) {
-                jack_connect(fJackClient,jack_port_name(fCapturePortList[i]),  ports[i]);
-            }
-            free(ports);
+    for (node = params; node; node = jack_slist_next(node)) {
+        param = (const jack_driver_param_t*)node->data;
+        switch (param->character) {
+            case 'c':
+                fAutoConnect = true;
+                break;
         }
+    }
+}
 
-        ports = jack_get_ports(fJackClient, NULL, NULL, JackPortIsPhysical | JackPortIsOutput);
-        if (ports != NULL) {
-            for (int i = 0; i < fAudioAdapter->GetOutputs() && ports[i]; i++) {
-                jack_connect(fJackClient, ports[i], jack_port_name(fPlaybackPortList[i]));
-            }
-            free(ports);
+JackAudioAdapter::~JackAudioAdapter()
+{
+    // When called, Close has already been used for the client, thus ports are already unregistered.
+    delete fAudioAdapter;
+}
+
+void JackAudioAdapter::FreePorts()
+{
+    for (int i = 0; i < fAudioAdapter->GetInputs(); i++) {
+        if (fCapturePortList[i]) {
+            jack_port_unregister(fClient, fCapturePortList[i]);
+        }
+    }
+    for (int i = 0; i < fAudioAdapter->GetOutputs(); i++) {
+        if (fPlaybackPortList[i]) {
+            jack_port_unregister(fClient, fPlaybackPortList[i]);
         }
     }
 
-    void JackAudioAdapter::Reset()
-    {
-        fAudioAdapter->Reset();
+    delete[] fCapturePortList;
+    delete[] fPlaybackPortList;
+}
+
+void JackAudioAdapter::ConnectPorts()
+{
+    const char** ports;
+
+    ports = jack_get_ports(fClient, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
+    if (ports != NULL) {
+        for (int i = 0; i < fAudioAdapter->GetInputs() && ports[i]; i++) {
+            jack_connect(fClient, jack_port_name(fCapturePortList[i]), ports[i]);
+        }
+        jack_free(ports);
     }
 
-    int JackAudioAdapter::Open()
-    {
-        char name[32];
-        jack_log("JackAudioAdapter::Open fCaptureChannels %d fPlaybackChannels %d", fAudioAdapter->GetInputs(), fAudioAdapter->GetOutputs());
-        fAudioAdapter->Create();
-
-        //jack ports
-        fCapturePortList = new jack_port_t*[fAudioAdapter->GetInputs()];
-        fPlaybackPortList = new jack_port_t*[fAudioAdapter->GetOutputs()];
-
-        for (int i = 0; i < fAudioAdapter->GetInputs(); i++)
-        {
-            sprintf(name, "capture_%d", i + 1);
-            if ((fCapturePortList[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0)) == NULL)
-                goto fail;
+    ports = jack_get_ports(fClient, NULL, NULL, JackPortIsPhysical | JackPortIsOutput);
+    if (ports != NULL) {
+        for (int i = 0; i < fAudioAdapter->GetOutputs() && ports[i]; i++) {
+            jack_connect(fClient, ports[i], jack_port_name(fPlaybackPortList[i]));
         }
+        jack_free(ports);
+    }
+}
 
-        for (int i = 0; i < fAudioAdapter->GetOutputs(); i++)
-        {
-            sprintf(name, "playback_%d", i + 1);
-            if ((fPlaybackPortList[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0 )) == NULL)
-                goto fail;
-        }
+void JackAudioAdapter::Reset()
+{
+    fAudioAdapter->Reset();
+}
 
-        //callbacks and activation
-        if ( jack_set_process_callback ( fJackClient, Process, this ) < 0 )
+int JackAudioAdapter::Open()
+{
+    char name[32];
+    jack_log("JackAudioAdapter::Open fCaptureChannels %d fPlaybackChannels %d", fAudioAdapter->GetInputs(), fAudioAdapter->GetOutputs());
+    fAudioAdapter->Create();
+
+    //jack ports
+    fCapturePortList = new jack_port_t*[fAudioAdapter->GetInputs()];
+    fPlaybackPortList = new jack_port_t*[fAudioAdapter->GetOutputs()];
+
+    for (int i = 0; i < fAudioAdapter->GetInputs(); i++) {
+        snprintf(name, sizeof(name), "capture_%d", i + 1);
+        if ((fCapturePortList[i] = jack_port_register(fClient, name, JACK_DEFAULT_AUDIO_TYPE, CaptureDriverFlags, 0)) == NULL) {
             goto fail;
-        if ( jack_set_buffer_size_callback ( fJackClient, BufferSize, this ) < 0 )
-            goto fail;
-        if ( jack_set_sample_rate_callback ( fJackClient, SampleRate, this ) < 0 )
-            goto fail;
-        if ( jack_activate ( fJackClient ) < 0 )
-            goto fail;
-
-        if (fAutoConnect)
-            ConnectPorts();
-
-        // Ring buffer are now allocated..
-        return fAudioAdapter->Open();
-
-    fail:
-        FreePorts();
-        fAudioAdapter->Destroy();
-        return -1;
+        }
     }
 
-    int JackAudioAdapter::Close()
-    {
-        fAudioAdapter->Close();
-        fAudioAdapter->Destroy();
-        return 0;
+    for (int i = 0; i < fAudioAdapter->GetOutputs(); i++) {
+        snprintf(name, sizeof(name), "playback_%d", i + 1);
+        if ((fPlaybackPortList[i] = jack_port_register(fClient, name, JACK_DEFAULT_AUDIO_TYPE, PlaybackDriverFlags, 0)) == NULL) {
+            goto fail;
+        }
     }
+
+    //callbacks and activation
+    if (jack_set_process_callback(fClient, Process, this) < 0) {
+        goto fail;
+    }
+    if (jack_set_buffer_size_callback(fClient, BufferSize, this) < 0) {
+        goto fail;
+    }
+    if (jack_set_sample_rate_callback(fClient, SampleRate, this) < 0) {
+        goto fail;
+    }
+    if (jack_set_latency_callback(fClient, Latency, this) < 0) {
+        goto fail;
+    }
+    if (jack_activate(fClient) < 0) {
+        goto fail;
+    }
+
+    if (fAutoConnect) {
+        ConnectPorts();
+    }
+
+    // Ring buffers are now allocated...
+    return fAudioAdapter->Open();
+    return 0;
+
+fail:
+    FreePorts();
+    fAudioAdapter->Destroy();
+    return -1;
+}
+
+int JackAudioAdapter::Close()
+{
+    fAudioAdapter->Close();
+    fAudioAdapter->Destroy();
+    return 0;
+}
 
 } //namespace

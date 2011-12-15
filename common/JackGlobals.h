@@ -21,14 +21,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define __JackGlobals__
 
 #include "JackPlatformPlug.h"
+#include "JackSystemDeps.h"
 #include "JackConstants.h"
 
-#ifdef __CLIENTDEBUG__ 
+#ifdef __CLIENTDEBUG__
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <time.h>
-#endif 
+#endif
 
 namespace Jack
 {
@@ -39,13 +40,13 @@ struct JackGlobals {
     static jack_tls_key fRealTime;
     static jack_tls_key fKeyLogFunction;
     static JackMutex* fOpenMutex;
-    static bool fServerRunning;
+    static volatile bool fServerRunning;
     static JackClient* fClientTable[];
     static bool fVerbose;
 #ifndef WIN32
     static jack_thread_creator_t fJackThreadCreator;
 #endif
-    
+
 #ifdef __CLIENTDEBUG__
     static std::ofstream* fStream;
     static void CheckContext(const char* name);
@@ -53,9 +54,9 @@ struct JackGlobals {
 };
 
 // Each "side" server and client will implement this to get the shared graph manager, engine control and inter-process synchro table.
-extern EXPORT JackGraphManager* GetGraphManager();
-extern EXPORT JackEngineControl* GetEngineControl();
-extern EXPORT JackSynchro* GetSynchroTable();
+extern SERVER_EXPORT JackGraphManager* GetGraphManager();
+extern SERVER_EXPORT JackEngineControl* GetEngineControl();
+extern SERVER_EXPORT JackSynchro* GetSynchroTable();
 
 } // end of namespace
 

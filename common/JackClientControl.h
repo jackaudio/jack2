@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackPort.h"
 #include "JackSynchro.h"
 #include "JackNotification.h"
-#include "session.h"
+#include "JackSession.h"
 
 namespace Jack
 {
@@ -34,6 +34,7 @@ namespace Jack
 \brief Client control possibly in shared memory.
 */
 
+PRE_PACKED_STRUCTURE
 struct JackClientControl : public JackShmMemAble
 {
     char fName[JACK_CLIENT_NAME_SIZE + 1];

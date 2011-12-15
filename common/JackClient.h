@@ -27,7 +27,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackSynchro.h"
 #include "JackPlatformPlug.h"
 #include "JackChannel.h"
-#include "session.h"
 #include "varargs.h"
 #include <list>
 
@@ -94,7 +93,7 @@ class SERVER_EXPORT JackClient : public JackClientInterface, public JackRunnable
         JackSynchro* fSynchroTable;
         std::list<jack_port_id_t> fPortList;
 
-        bool fImmediateSessionReply;
+        JackSessionReply fSessionReply;
 
         int StartThread();
         void SetupDriverSync(bool freewheel);
@@ -165,7 +164,7 @@ class SERVER_EXPORT JackClient : public JackClientInterface, public JackRunnable
         virtual void TransportLocate(jack_nframes_t frame);
         virtual jack_transport_state_t TransportQuery(jack_position_t* pos);
         virtual jack_nframes_t GetCurrentTransportFrame();
-        virtual int TransportReposition(jack_position_t* pos);
+        virtual int TransportReposition(const jack_position_t* pos);
         virtual void TransportStart();
         virtual void TransportStop();
 

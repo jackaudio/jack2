@@ -116,6 +116,7 @@ extern "C"
      * attached to the address space.
      */
 
+    PRE_PACKED_STRUCTURE
     typedef struct _jack_shm_info {
         jack_shm_registry_index_t index;       /* offset into the registry */
         uint32_t size;
@@ -124,9 +125,13 @@ extern "C"
             char ptr_size[8];
         } ptr;  /* a "pointer" that has the same 8 bytes size when compling in 32 or 64 bits */
     }
+#ifdef _MSC_VER
+    jack_shm_info_t; POST_PACKED_STRUCTURE
+#else
     POST_PACKED_STRUCTURE jack_shm_info_t;
+#endif
 
-    /* utility functions used only within JACK */
+	/* utility functions used only within JACK */
 
     void jack_shm_copy_from_registry (jack_shm_info_t*,
                 jack_shm_registry_index_t);
@@ -147,9 +152,12 @@ extern "C"
     int jack_shmalloc (const char *shm_name, jack_shmsize_t size,
                                   jack_shm_info_t* result);
     void jack_release_shm (jack_shm_info_t*);
+    void jack_release_lib_shm (jack_shm_info_t*);
     void jack_destroy_shm (jack_shm_info_t*);
     int jack_attach_shm (jack_shm_info_t*);
+    int jack_attach_lib_shm (jack_shm_info_t*);
     int jack_attach_shm_read (jack_shm_info_t*);
+    int jack_attach_lib_shm_read (jack_shm_info_t*);
     int jack_resize_shm (jack_shm_info_t*, jack_shmsize_t size);
 
 #ifdef __cplusplus

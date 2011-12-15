@@ -20,6 +20,7 @@
 
 
 #define __STDC_FORMAT_MACROS   // For inttypes.h to work in C++
+#define _GNU_SOURCE            /* for strcasestr() from string.h */
 
 #include <math.h>
 #include <stdio.h>
@@ -51,6 +52,8 @@ extern void show_wait_times ();
 extern void show_work_times ();
 
 #undef DEBUG_WAKEUP
+
+char* strcasestr(const char* haystack, const char* needle);
 
 /* Delay (in process calls) before jackd will report an xrun */
 #define XRUN_REPORT_DELAY 0
@@ -151,7 +154,7 @@ alsa_driver_check_card_type (alsa_driver_t *driver)
 		 * should be hw:x where x is the card number */
 
 		char tmp[5];
-		strncpy(tmp,strstr(driver->alsa_name_playback,"hw"),4);
+		strncpy(tmp,strcasestr(driver->alsa_name_playback,"hw"),4);
 		tmp[4]='\0';
 		jack_info("control device %s",tmp);
 		ctl_name = strdup(tmp);
@@ -204,8 +207,8 @@ alsa_driver_ice1712_hardware (alsa_driver_t *driver)
 static int
 alsa_driver_usx2y_hardware (alsa_driver_t *driver)
 {
-        driver->hw = jack_alsa_usx2y_hw_new (driver);
-	return 0;
+    driver->hw = jack_alsa_usx2y_hw_new (driver);
+    return 0;
 }
 */
 
@@ -1823,6 +1826,107 @@ alsa_driver_delete (alsa_driver_t *driver)
 	free (driver);
 }
 
+static char*
+discover_alsa_using_apps ()
+{
+        char found[2048];
+        char command[5192];
+        char* path = getenv ("PATH");
+        char* dir;
+        size_t flen = 0;
+        int card;
+        int device;
+        size_t cmdlen = 0;
+
+        if (!path) {
+                return NULL;
+        }
+
+        /* look for lsof and give up if its not in PATH */
+
+        path = strdup (path);
+        dir = strtok (path, ":");
+        while (dir) {
+                char maybe[PATH_MAX+1];
+                snprintf (maybe, sizeof(maybe), "%s/lsof", dir);
+                if (access (maybe, X_OK)) {
+                        break;
+                }
+                dir = strtok (NULL, ":");
+        }
+        free (path);
+
+        if (!dir) {
+                return NULL;
+        }
+
+        snprintf (command, sizeof (command), "lsof -Fc0 ");
+        cmdlen = strlen (command);
+
+        for (card = 0; card < 8; ++card) {
+                for (device = 0; device < 8; ++device)  {
+                        char buf[32];
+
+                        snprintf (buf, sizeof (buf), "/dev/snd/pcmC%dD%dp", card, device);
+                        if (access (buf, F_OK) == 0) {
+                                snprintf (command+cmdlen, sizeof(command)-cmdlen, "%s ", buf);
+                        }
+                        cmdlen = strlen (command);
+
+                        snprintf (buf, sizeof (buf), "/dev/snd/pcmC%dD%dc", card, device);
+                        if (access (buf, F_OK) == 0) {
+                                snprintf (command+cmdlen, sizeof(command)-cmdlen, "%s ", buf);
+                        }
+                        cmdlen = strlen (command);
+                }
+        }
+
+        FILE* f = popen (command, "r");
+
+        if (!f) {
+                return NULL;
+        }
+
+        while (!feof (f)) {
+                char buf[1024]; /* lsof doesn't output much */
+
+                if (!fgets (buf, sizeof (buf), f)) {
+                        break;
+                }
+
+                if (*buf != 'p') {
+                        return NULL;
+                }
+
+                /* buf contains NULL as a separator between the process field and the command field */
+                char *pid = buf;
+                ++pid; /* skip leading 'p' */
+                char *cmd = pid;
+
+                /* skip to NULL */
+                while (*cmd) {
+                        ++cmd;
+                }
+                ++cmd; /* skip to 'c' */
+                ++cmd; /* skip to first character of command */
+
+                snprintf (found+flen, sizeof (found)-flen, "%s (process ID %s)\n", cmd, pid);
+                flen = strlen (found);
+
+                if (flen >= sizeof (found)) {
+                        break;
+                }
+        }
+
+        pclose (f);
+
+        if (flen) {
+                return strdup (found);
+        } else {
+                return NULL;
+        }
+}
+
 jack_driver_t *
 alsa_driver_new (char *name, char *playback_alsa_device,
 		 char *capture_alsa_device,
@@ -1846,7 +1950,7 @@ alsa_driver_new (char *name, char *playback_alsa_device,
 		 )
 {
 	int err;
-
+    char* current_apps;
 	alsa_driver_t *driver;
 
 	jack_info ("creating alsa driver ... %s|%s|%" PRIu32 "|%" PRIu32
@@ -1944,14 +2048,25 @@ alsa_driver_new (char *name, char *playback_alsa_device,
 				  SND_PCM_NONBLOCK) < 0) {
 			switch (errno) {
 			case EBUSY:
-				jack_error ("the playback device \"%s\" is "
-					    "already in use. Please stop the"
-					    " application using it and "
-					    "run JACK again",
-					    playback_alsa_device);
-				alsa_driver_delete (driver);
+                current_apps = discover_alsa_using_apps ();
+                if (current_apps) {
+                        jack_error ("\n\nATTENTION: The playback device \"%s\" is "
+                                    "already in use. The following applications "
+                                    " are using your soundcard(s) so you should "
+                                    " check them and stop them as necessary before "
+                                    " trying to start JACK again:\n\n%s",
+                                    playback_alsa_device,
+                                    current_apps);
+                        free (current_apps);
+                } else {
+                        jack_error ("\n\nATTENTION: The playback device \"%s\" is "
+                                    "already in use. Please stop the"
+                                    " application using it and "
+                                    "run JACK again",
+                                    playback_alsa_device);
+                }
+                alsa_driver_delete (driver);
 				return NULL;
-				break;
 
 			case EPERM:
 				jack_error ("you do not have permission to open "
@@ -1977,11 +2092,23 @@ alsa_driver_new (char *name, char *playback_alsa_device,
 				  SND_PCM_NONBLOCK) < 0) {
 			switch (errno) {
 			case EBUSY:
-				jack_error ("the capture device \"%s\" is "
-					    "already in use. Please stop the"
-					    " application using it and "
-					    "run JACK again",
-					    capture_alsa_device);
+                current_apps = discover_alsa_using_apps ();
+                if (current_apps) {
+                        jack_error ("\n\nATTENTION: The capture device \"%s\" is "
+                                    "already in use. The following applications "
+                                    " are using your soundcard(s) so you should "
+                                    " check them and stop them as necessary before "
+                                    " trying to start JACK again:\n\n%s",
+                                    capture_alsa_device,
+                                    current_apps);
+                        free (current_apps);
+                } else {
+                        jack_error ("\n\nATTENTION: The capture (recording) device \"%s\" is "
+                                    "already in use. Please stop the"
+                                    " application using it and "
+                                    "run JACK again",
+                                    capture_alsa_device);
+                }
 				alsa_driver_delete (driver);
 				return NULL;
 				break;

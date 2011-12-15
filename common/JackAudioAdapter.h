@@ -34,14 +34,15 @@ namespace Jack
     {
         private:
 
-            static int Process ( jack_nframes_t, void* arg );
-            static int BufferSize ( jack_nframes_t buffer_size, void *arg );
-            static int SampleRate ( jack_nframes_t sample_rate, void *arg );
+            static int Process(jack_nframes_t, void* arg);
+            static int BufferSize(jack_nframes_t buffer_size, void* arg);
+            static int SampleRate(jack_nframes_t sample_rate, void* arg);
+            static void Latency(jack_latency_callback_mode_t mode, void* arg);
 
             jack_port_t** fCapturePortList;
             jack_port_t** fPlaybackPortList;
 
-            jack_client_t* fJackClient;
+            jack_client_t* fClient;
             JackAudioAdapterInterface* fAudioAdapter;
             bool fAutoConnect;
 
@@ -51,7 +52,7 @@ namespace Jack
 
         public:
 
-            JackAudioAdapter(jack_client_t* jack_client, JackAudioAdapterInterface* audio_io, const JSList* params = NULL, bool system = false);
+            JackAudioAdapter(jack_client_t* client, JackAudioAdapterInterface* audio_io, const JSList* params = NULL);
             ~JackAudioAdapter();
 
             int Open();
@@ -59,5 +60,8 @@ namespace Jack
     };
 
 }
+
+#define CaptureDriverFlags  static_cast<JackPortFlags>(JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal)
+#define PlaybackDriverFlags static_cast<JackPortFlags>(JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal)
 
 #endif

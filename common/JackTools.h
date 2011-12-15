@@ -63,13 +63,24 @@ namespace Jack
 
         static int MkDir(const char* path);
         static char* UserDir();
-        static char* ServerDir ( const char* server_name, char* server_dir );
+        static char* ServerDir(const char* server_name, char* server_dir);
         static const char* DefaultServerName();
-        static void CleanupFiles ( const char* server_name );
+        static void CleanupFiles(const char* server_name);
         static int GetTmpdir();
-        static void RewriteName ( const char* name, char* new_name );
-        
+        static void RewriteName(const char* name, char* new_name);
         static void ThrowJackNetException();
+
+        // For OSX only
+        static int ComputationMicroSec(int buffer_size)
+        {
+            if (buffer_size < 128) {
+                return 500;
+            } else if (buffer_size < 256) {
+                return 300;
+            } else {
+                return 100;
+            }
+        }
     };
 
     /*!
@@ -141,7 +152,7 @@ namespace Jack
 
             T Add ( T measure_point )
             {
-				return fCurrentMeasure[fMeasureId++] = measure_point;
+                return fCurrentMeasure[fMeasureId++] = measure_point;
             }
 
             uint32_t AddLast ( T measure_point )

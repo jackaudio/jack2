@@ -32,6 +32,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <assert.h>
 #include <signal.h>
 
+#ifdef WIN32
+#ifdef __MINGW32__
+#include <sys/types.h>
+typedef _sigset_t sigset_t;
+#else
+typedef HANDLE sigset_t;
+#endif
+#endif
 
 namespace Jack
 {
@@ -42,7 +50,7 @@ class JackClient;
 \brief Global library static structure: singleton kind of pattern.
 */
 
-struct SERVER_EXPORT JackLibGlobals
+struct LIB_EXPORT JackLibGlobals
 {
     JackShmReadWritePtr<JackGraphManager> fGraphManager;	/*! Shared memory Port manager */
     JackShmReadWritePtr<JackEngineControl> fEngineControl;	/*! Shared engine control */  // transport engine has to be writable

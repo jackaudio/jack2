@@ -27,10 +27,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackDriver.h"
 #include "JackSystemDeps.h"
 
-typedef jack_driver_desc_t * (*JackDriverDescFunction) ();
+typedef jack_driver_desc_t* (*JackDriverDescFunction) ();
 typedef Jack::JackDriverClientInterface* (*driverInitialize) (Jack::JackLockedEngine*, Jack::JackSynchro*, const JSList*);
 
-class JackDriverInfo
+class SERVER_EXPORT JackDriverInfo
 {
 
     private:
@@ -54,14 +54,23 @@ class JackDriverInfo
 
 };
 
-jack_driver_desc_t * jack_find_driver_descriptor(JSList * drivers, const char * name);
+jack_driver_desc_t* jack_find_driver_descriptor(JSList* drivers, const char* name);
 
-JSList * jack_drivers_load(JSList * drivers);
-JSList * jack_internals_load(JSList * internals);
+JSList* jack_drivers_load(JSList* drivers);
+JSList* jack_internals_load(JSList* internals);
 
-EXPORT int jackctl_parse_driver_params (jackctl_driver * driver_ptr, int argc, char* argv[]);
-EXPORT void jack_free_driver_params(JSList * param_ptr);
-EXPORT void jack_print_driver_options(jack_driver_desc_t* desc, FILE* file);
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+SERVER_EXPORT int jackctl_parse_driver_params(jackctl_driver * driver_ptr, int argc, char* argv[]);
+SERVER_EXPORT void jack_free_driver_params(JSList * param_ptr);
+SERVER_EXPORT void jack_print_driver_options(jack_driver_desc_t* desc, FILE* file);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

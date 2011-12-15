@@ -35,6 +35,7 @@ JackPort::JackPort()
 bool JackPort::Allocate(int refnum, const char* port_name, const char* port_type, JackPortFlags flags)
 {
     jack_port_type_id_t id = GetPortTypeId(port_type);
+    assert(id >= 0 && id <= PORT_TYPES_MAX);
     if (id == PORT_TYPES_MAX)
         return false;
     fTypeId = id;
@@ -44,6 +45,7 @@ bool JackPort::Allocate(int refnum, const char* port_name, const char* port_type
     fInUse = true;
     fLatency = 0;
     fTotalLatency = 0;
+    fMonitorRequests = 0;
     fPlaybackLatency.min = fPlaybackLatency.max = 0;
     fCaptureLatency.min = fCaptureLatency.max = 0;
     fTied = NO_PORT;
@@ -65,6 +67,8 @@ void JackPort::Release()
     fLatency = 0;
     fTotalLatency = 0;
     fMonitorRequests = 0;
+    fPlaybackLatency.min = fPlaybackLatency.max = 0;
+    fCaptureLatency.min = fCaptureLatency.max = 0;
     fTied = NO_PORT;
     fAlias1[0] = '\0';
     fAlias2[0] = '\0';
@@ -107,7 +111,7 @@ void JackPort::SetLatencyRange(jack_latency_callback_mode_t mode, jack_latency_r
     if (mode == JackCaptureLatency) {
 		fCaptureLatency = *range;
 
-		/* hack to set port->shared->latency up for
+		/* hack to set latency up for
 		 * backend ports
 		 */
 		if ((fFlags & JackPortIsOutput) && (fFlags & JackPortIsPhysical))
@@ -115,7 +119,7 @@ void JackPort::SetLatencyRange(jack_latency_callback_mode_t mode, jack_latency_r
 	} else {
         fPlaybackLatency = *range;
 
-		/* hack to set port->shared->latency up for
+		/* hack to set latency up for
 		 * backend ports
 		 */
 		if ((fFlags & JackPortIsInput) && (fFlags & JackPortIsPhysical))
@@ -221,7 +225,7 @@ void JackPort::SetName(const char* new_name)
 
 bool JackPort::NameEquals(const char* target)
 {
-    char buf[JACK_PORT_NAME_SIZE + 1];
+    char buf[REAL_JACK_PORT_NAME_SIZE];
 
     /* this nasty, nasty kludge is here because between 0.109.0 and 0.109.1,
        the ALSA audio backend had the name "ALSA", whereas as before and
@@ -245,12 +249,12 @@ int JackPort::GetAliases(char* const aliases[2])
     int cnt = 0;
 
     if (fAlias1[0] != '\0') {
-        snprintf(aliases[0], JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE, "%s", fAlias1);
+        snprintf(aliases[0], REAL_JACK_PORT_NAME_SIZE, "%s", fAlias1);
         cnt++;
     }
 
     if (fAlias2[0] != '\0') {
-        snprintf(aliases[1], JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE, "%s", fAlias2);
+        snprintf(aliases[1], REAL_JACK_PORT_NAME_SIZE, "%s", fAlias2);
         cnt++;
     }
 

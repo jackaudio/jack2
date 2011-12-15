@@ -20,7 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef __JackChannel__
 #define __JackChannel__
 
-#include "session.h"
+#include "types.h"
+#include "JackSession.h"
 
 namespace Jack
 {
@@ -73,7 +74,7 @@ class JackClientChannelInterface
             return -1;
         }
 
-        virtual void ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status, int* result)
+        virtual void ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status, int* result, int open)
         {}
         virtual void ClientOpen(const char* name, int pid, int uuid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
         {}

@@ -143,7 +143,7 @@ static jack_time_t jack_get_mhz (void)
 		exit(1);
 	}
 
-	for ( ; ; )
+	for (;;)
 	{
 		jack_time_t mhz;
 		int ret;
@@ -166,6 +166,8 @@ static jack_time_t jack_get_mhz (void)
 		ret = sscanf(buf, "Clocking:       %" SCNu64, &mhz);
 #elif defined( __s390__  )
 		ret = sscanf(buf, "bogomips per cpu: %" SCNu64, &mhz);
+#elif defined( __sh__  )
+		ret = sscanf(buf, "bogomips        : %" SCNu64, &mhz);
 #else /* MIPS, ARM, alpha */
 		ret = sscanf(buf, "BogoMIPS        : %" SCNu64, &mhz);
 #endif

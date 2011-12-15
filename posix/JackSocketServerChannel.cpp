@@ -66,8 +66,7 @@ int JackSocketServerChannel::Open(const char* server_name, JackServer* server)
 
 void JackSocketServerChannel::Close()
 {
-    fThread.Stop();
-    fRequestListenSocket.Close();
+   fRequestListenSocket.Close();
 
     // Close remaining client sockets
     std::map<int, std::pair<int, JackClientSocket*> >::iterator it;
@@ -85,9 +84,14 @@ int JackSocketServerChannel::Start()
     if (fThread.Start() != 0) {
         jack_error("Cannot start Jack server listener");
         return -1;
+    } else {
+        return 0;
     }
+}
 
-    return 0;
+void JackSocketServerChannel::Stop()
+{
+    fThread.Kill();
 }
 
 void JackSocketServerChannel::ClientCreate()
@@ -164,7 +168,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
     JackRequest header;
     if (header.Read(socket) < 0) {
         jack_log("HandleRequest: cannot read header");
-        ClientKill(fd);  // TO CHECK SOLARIS
+        ClientKill(fd);
         return false;
     }
 
@@ -185,6 +189,9 @@ bool JackSocketServerChannel::HandleRequest(int fd)
                 res.fResult = fServer->GetEngine()->ClientCheck(req.fName, req.fUUID, res.fName, req.fProtocol, req.fOptions, &res.fStatus);
             if (res.Write(socket) < 0)
                 jack_error("JackRequest::ClientCheck write error name = %s", req.fName);
+            // Atomic ClientCheck followed by ClientOpen on same socket
+            if (req.fOpen)
+                HandleRequest(fd);
             break;
         }
 
@@ -426,9 +433,8 @@ bool JackSocketServerChannel::HandleRequest(int fd)
         case JackRequest::kSessionNotify: {
             jack_log("JackRequest::SessionNotify");
             JackSessionNotifyRequest req;
-            JackSessionNotifyResult res;
             if (req.Read(socket) == 0) {
-                fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath, socket);
+                fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath, socket, NULL);
             }
             break;
         }
@@ -487,7 +493,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             JackClientHasSessionCallbackRequest req;
             JackResult res;
             if (req.Read(socket) == 0) {
-                fServer->GetEngine()->ClientHasSessionCallbackRequest(req.fName, &res.fResult);
+                fServer->GetEngine()->ClientHasSessionCallback(req.fName, &res.fResult);
             }
             if (res.Write(socket) < 0)
                 jack_error("JackRequest::ClientHasSessionCallback write error");
@@ -571,7 +577,7 @@ bool JackSocketServerChannel::Execute()
         return true;
 
     } catch (JackQuitException& e) {
-        jack_log("JackMachServerChannel::Execute JackQuitException");
+        jack_log("JackSocketServerChannel::Execute JackQuitException");
         return false;
     }
 }

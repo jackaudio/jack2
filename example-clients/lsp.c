@@ -246,3 +246,4 @@ error:
 	jack_client_close (client);
 	exit (0);
 }
+

@@ -55,8 +55,8 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         jack_time_t fLastSwitchUsecs;
 
         int fSessionPendingReplies;
-        JackChannelTransaction *fSessionTransaction;
-        JackSessionNotifyResult *fSessionResult;
+        JackChannelTransaction* fSessionTransaction;
+        JackSessionNotifyResult* fSessionResult;
         std::map<int,std::string> fReservationMap;
         int fMaxUUID;
 
@@ -148,13 +148,13 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         void NotifyQuit();
 
         // Session management
-        void SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket);
+        void SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket, JackSessionNotifyResult** result);
         void SessionReply(int refnum);
 
         void GetUUIDForClientName(const char *client_name, char *uuid_res, int *result);
         void GetClientNameForUUID(const char *uuid, char *name_res, int *result);
         void ReserveClientName(const char *name, const char *uuid, int *result);
-        void ClientHasSessionCallbackRequest(const char *name, int *result);
+        void ClientHasSessionCallback(const char *name, int *result);
 };
 
 

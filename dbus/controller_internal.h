@@ -1,6 +1,6 @@
 /* -*- Mode: C ; c-basic-offset: 4 -*- */
 /*
-    Copyright (C) 2007,2008 Nedko Arnaudov
+    Copyright (C) 2007,2008,2011 Nedko Arnaudov
     Copyright (C) 2007-2008 Juuso Alasuutari
     
     This program is free software; you can redistribute it and/or modify
@@ -25,11 +25,33 @@
 #include "jslist.h"
 #include "jack/control.h"
 #include "jack/jack.h"
+#include "jack/session.h"
 #include "jackdbus.h"
+#include "list.h"
+#include "params.h"
+
+struct jack_controller_slave_driver
+{
+    struct list_head siblings;
+    char * name;
+    jackctl_driver_t * handle;
+    bool loaded;
+};
+
+struct jack_session_pending_command
+{
+    struct list_head siblings;
+    DBusConnection * connection;
+    DBusMessage * message;
+    jack_session_event_type_t type;
+    const char * target;
+    const char * path;
+};
 
 struct jack_controller
 {
     jackctl_server_t *server;
+    jack_params_handle params;
 
     void *patchbay_context;
 
@@ -37,16 +59,17 @@ struct jack_controller
     jack_client_t *client;
     unsigned int xruns;
 
-    const char **driver_names;
-    unsigned int drivers_count;
-    
-    const char **internal_names;
-    unsigned int internals_count;
-
-    jackctl_driver_t *driver;
-    bool driver_set;            /* whether driver is manually set, if false - DEFAULT_DRIVER is auto set */
+    struct list_head slave_drivers;
+    bool slave_drivers_set;
+    struct jack_parameter slave_drivers_vparam;
+    union jackctl_parameter_value slave_drivers_vparam_value;
 
     struct jack_dbus_object_descriptor dbus_descriptor;
+
+    pthread_mutex_t lock;
+    struct list_head session_pending_commands;
+
+    long pending_save;          /* uptime seconds */
 };
 
 #define DEFAULT_DRIVER "dummy"
@@ -56,20 +79,9 @@ struct jack_controller
     "You probably don't want to edit this because\n"        \
     "it will be overwritten next time jackdbus saves.\n"
 
-jackctl_driver_t *
-jack_controller_find_driver(
-    jackctl_server_t *server,
-    const char *driver_name);
-    
-jackctl_internal_t *
-jack_controller_find_internal(
-    jackctl_server_t *server,
-    const char *internal_name);
-
-jackctl_parameter_t *
-jack_controller_find_parameter(
-    const JSList *parameters_list,
-    const char *parameter_name);
+void
+jack_controller_pending_save(
+    struct jack_controller *controller_ptr);
 
 bool
 jack_controller_start_server(
@@ -87,12 +99,12 @@ jack_controller_switch_master(
     void *dbus_call_context_ptr);
     
 bool
-jack_controller_add_slave(
+jack_controller_add_slave_driver(
     struct jack_controller *controller_ptr,
     const char * driver_name);
     
 bool
-jack_controller_remove_slave(
+jack_controller_remove_slave_driver(
     struct jack_controller *controller_ptr,
     const char * driver_name);
 
@@ -112,47 +124,15 @@ jack_controller_unload_internal(
     const char * internal_name);
 
 void
-jack_controller_settings_set_driver_option(
-    jackctl_driver_t *driver,
-    const char *option_name,
-    const char *option_value);
+jack_controller_deserialize_parameter_value(
+    struct jack_controller *controller_ptr,
+    const char * const * address,
+    const char * value);
 
 void
-jack_controller_settings_set_internal_option(
-    jackctl_internal_t *internal,
-    const char *option_name,
-    const char *option_value);
-
-void
-jack_controller_settings_set_engine_option(
-    struct jack_controller *controller_ptr,
-    const char *option_name,
-    const char *option_value);
-
-bool
-jack_controller_settings_save_engine_options(
-    void *context,
-    struct jack_controller *controller_ptr,
-    void *dbus_call_context_ptr);
-
-bool
-jack_controller_settings_write_option(
-    void *context,
-    const char *name,
-    const char *content,
-    void *dbus_call_context_ptr);
-
-bool
-jack_controller_settings_save_driver_options(
-    void *context,
-    jackctl_driver_t *driver,
-    void *dbus_call_context_ptr);
-
-bool
-jack_controller_settings_save_internal_options(
-    void *context,
-    jackctl_internal_t *internal,
-    void *dbus_call_context_ptr);
+jack_controller_serialize_parameter_value(
+    const struct jack_parameter * param_ptr,
+    char * value_buffer);
 
 bool
 jack_controller_patchbay_init(
@@ -223,6 +203,7 @@ extern struct jack_dbus_interface_descriptor g_jack_controller_iface_introspecta
 extern struct jack_dbus_interface_descriptor g_jack_controller_iface_control;
 extern struct jack_dbus_interface_descriptor g_jack_controller_iface_configure;
 extern struct jack_dbus_interface_descriptor g_jack_controller_iface_patchbay;
+extern struct jack_dbus_interface_descriptor g_jack_controller_iface_session_manager;
 extern struct jack_dbus_interface_descriptor g_jack_controller_iface_transport;
 
 #endif /* #ifndef CONTROLLER_INTERNAL_H__04D54D51_3D79_49A2_A1DA_F8587E9E7F42__INCLUDED */
