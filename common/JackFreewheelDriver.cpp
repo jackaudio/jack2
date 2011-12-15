@@ -26,6 +26,8 @@
 namespace Jack
 {
 
+// When used in "master" mode
+
 int JackFreewheelDriver::Process()
 {
    int res = 0;
@@ -54,15 +56,7 @@ int JackFreewheelDriver::Process()
    return res;
 }
 
-int JackFreewheelDriver::ProcessRead()
-{
-    return (fEngineControl->fSyncMode) ? ProcessReadSync() : ProcessReadAsync();
-}
-
-int JackFreewheelDriver::ProcessWrite()
-{
-    return (fEngineControl->fSyncMode) ? ProcessWriteSync() : ProcessWriteAsync();
-}
+// When used in "slave" mode
 
 int JackFreewheelDriver::ProcessReadSync()
 {

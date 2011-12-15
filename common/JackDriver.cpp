@@ -343,10 +343,30 @@ int JackDriver::ProcessWriteSlaves()
 
 int JackDriver::ProcessRead()
 {
-    return 0;
+    return (fEngineControl->fSyncMode) ? ProcessReadSync() : ProcessReadAsync();
 }
 
 int JackDriver::ProcessWrite()
+{
+    return (fEngineControl->fSyncMode) ? ProcessWriteSync() : ProcessWriteAsync();
+}
+
+int JackDriver::ProcessReadSync()
+{
+    return 0;
+}
+
+int JackDriver::ProcessWriteSync()
+{
+    return 0;
+}
+
+int JackDriver::ProcessReadAsync()
+{
+    return 0;
+}
+
+int JackDriver::ProcessWriteAsync()
 {
     return 0;
 }
@@ -382,13 +402,13 @@ int JackDriver::Start()
         fEngineControl->InitFrameTime();
     }
     fIsRunning = true;
-    return 0;
+    return StartSlaves();
 }
 
 int JackDriver::Stop()
 {
     fIsRunning = false;
-    return 0;
+    return StopSlaves();
 }
 
 int JackDriver::StartSlaves()

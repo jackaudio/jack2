@@ -97,11 +97,19 @@ class SERVER_EXPORT JackDriverInterface
 
         virtual std::list<JackDriverInterface*> GetSlaves() = 0;
 
+        // For "master" driver
         virtual int ProcessReadSlaves() = 0;
         virtual int ProcessWriteSlaves() = 0;
 
+        // For "slave" driver
         virtual int ProcessRead() = 0;
         virtual int ProcessWrite() = 0;
+
+        virtual int ProcessReadSync() = 0;
+        virtual int ProcessWriteSync() = 0;
+
+        virtual int ProcessReadAsync() = 0;
+        virtual int ProcessWriteAsync() = 0;
 
         virtual bool IsRealTime() const = 0;
         virtual bool IsRunning() const = 0;
@@ -172,6 +180,12 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         void NotifySampleRate(jack_nframes_t sample_rate);                  // SampleRate notification sent by the driver
         void NotifyFailure(int code, const char* reason);                   // Failure notification sent by the driver
 
+        virtual void SaveConnections();
+        virtual void RestoreConnections();
+
+        virtual int StartSlaves();
+        virtual int StopSlaves();
+
     public:
 
         JackDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table);
@@ -191,7 +205,7 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
 
         virtual int Open();
 
-        virtual int Open (bool capturing,
+        virtual int Open(bool capturing,
                          bool playing,
                          int inchannels,
                          int outchannels,
@@ -212,6 +226,7 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
                          const char* playback_driver_name,
                          jack_nframes_t capture_latency,
                          jack_nframes_t playback_latency);
+
         virtual int Close();
 
         virtual int Process();
@@ -225,17 +240,19 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         virtual int Start();
         virtual int Stop();
 
-        virtual int StartSlaves();
-        virtual int StopSlaves();
-
+        // For "master" driver
         int ProcessReadSlaves();
         int ProcessWriteSlaves();
 
+        // For "slave" driver
         int ProcessRead();
         int ProcessWrite();
 
-        virtual void SaveConnections();
-        virtual void RestoreConnections();
+        int ProcessReadSync();
+        int ProcessWriteSync();
+
+        int ProcessReadAsync();
+        int ProcessWriteAsync();
 
         virtual bool IsFixedBufferSize();
         virtual int SetBufferSize(jack_nframes_t buffer_size);

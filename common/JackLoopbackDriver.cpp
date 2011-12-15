@@ -30,15 +30,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-int JackLoopbackDriver::ProcessRead()
-{
-    return (fEngineControl->fSyncMode) ? ProcessReadSync() : ProcessReadAsync();
-}
-
-int JackLoopbackDriver::ProcessWrite()
-{
-    return (fEngineControl->fSyncMode) ? ProcessWriteSync() : ProcessWriteAsync();
-}
+// When used in "slave" mode
 
 int JackLoopbackDriver::ProcessReadSync()
 {

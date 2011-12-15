@@ -47,9 +47,6 @@ class JackFreewheelDriver : public JackDriver
 
         int Process();
 
-        int ProcessRead();
-        int ProcessWrite();
-
         int ProcessReadSync();
         int ProcessWriteSync();
 
