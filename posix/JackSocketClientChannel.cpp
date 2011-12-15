@@ -368,7 +368,6 @@ bool JackSocketClientChannel::Execute()
     JackResult res;
 
     if (event.Read(fNotificationSocket) < 0) {
-        fNotificationSocket->Close();
         jack_error("JackSocketClientChannel read fail");
         goto error;
     }
@@ -377,7 +376,6 @@ bool JackSocketClientChannel::Execute()
 
     if (event.fSync) {
         if (res.Write(fNotificationSocket) < 0) {
-            fNotificationSocket->Close();
             jack_error("JackSocketClientChannel write fail");
             goto error;
         }
@@ -385,6 +383,7 @@ bool JackSocketClientChannel::Execute()
     return true;
 
 error:
+    fNotificationSocket->Close();
     fClient->ShutDown();
     return false;
 }
