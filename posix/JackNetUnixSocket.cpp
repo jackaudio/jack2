@@ -99,8 +99,11 @@ namespace Jack
 
         /* Enable address reuse */
         int res, on = 1;
-        //if ((res = setsockopt(fSockfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on))) < 0) {
+    #ifdef __APPLE__
         if ((res = setsockopt(fSockfd, SOL_SOCKET, SO_REUSEPORT, &on, sizeof(on))) < 0) {
+    #else
+        if ((res = setsockopt(fSockfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on))) < 0) {
+    #endif
             StrError(NET_ERROR_CODE);
         }
         return fSockfd;
