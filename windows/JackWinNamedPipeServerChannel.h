@@ -23,6 +23,7 @@
 
 #include "JackWinNamedPipe.h"
 #include "JackPlatformPlug.h"
+#include "JackConstants.h"
 #include <list>
 
 namespace Jack
