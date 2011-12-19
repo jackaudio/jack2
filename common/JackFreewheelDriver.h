@@ -32,6 +32,9 @@ namespace Jack
 
 class JackFreewheelDriver : public JackDriver
 {
+    protected:
+
+        int SuspendRefNum();
 
     public:
 
@@ -46,9 +49,6 @@ class JackFreewheelDriver : public JackDriver
         }
 
         int Process();
-
-        int ProcessRead();
-        int ProcessWrite();
 
         int ProcessReadSync();
         int ProcessWriteSync();

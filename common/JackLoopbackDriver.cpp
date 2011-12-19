@@ -30,15 +30,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-int JackLoopbackDriver::ProcessRead()
-{
-    return (fEngineControl->fSyncMode) ? ProcessReadSync() : ProcessReadAsync();
-}
-
-int JackLoopbackDriver::ProcessWrite()
-{
-    return (fEngineControl->fSyncMode) ? ProcessWriteSync() : ProcessWriteAsync();
-}
+// When used in "slave" mode
 
 int JackLoopbackDriver::ProcessReadSync()
 {
@@ -49,7 +41,7 @@ int JackLoopbackDriver::ProcessReadSync()
         memcpy(GetInputBuffer(i), GetOutputBuffer(i), sizeof(jack_default_audio_sample_t) * fEngineControl->fBufferSize);
     }
 
-    if (fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable) < 0) {
+    if (ResumeRefNum() < 0) {
         jack_error("JackLoopbackDriver::ProcessReadSync - ResumeRefNum error");
         res = -1;
     }
@@ -59,7 +51,7 @@ int JackLoopbackDriver::ProcessReadSync()
 
 int JackLoopbackDriver::ProcessWriteSync()
 {
-    if (fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable, DRIVER_TIMEOUT_FACTOR * fEngineControl->fTimeOutUsecs) < 0) {
+    if (SuspendRefNum() < 0) {
         jack_error("JackLoopbackDriver::ProcessWriteSync SuspendRefNum error");
         return -1;
     }
@@ -75,7 +67,7 @@ int JackLoopbackDriver::ProcessReadAsync()
         memcpy(GetInputBuffer(i), GetOutputBuffer(i), sizeof(jack_default_audio_sample_t) * fEngineControl->fBufferSize);
     }
 
-    if (fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable) < 0) {
+    if (ResumeRefNum() < 0) {
         jack_error("JackLoopbackDriver::ProcessReadAsync - ResumeRefNum error");
         res = -1;
     }

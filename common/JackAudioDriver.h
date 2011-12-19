@@ -49,8 +49,8 @@ class SERVER_EXPORT JackAudioDriver : public JackDriver
 
         int ProcessSync();
         void ProcessGraphSync();
-        int ProcessGraphSyncMaster();
-        int ProcessGraphSyncSlave();
+        void ProcessGraphSyncMaster();
+        void ProcessGraphSyncSlave();
 
     public:
 
@@ -83,9 +83,6 @@ class SERVER_EXPORT JackAudioDriver : public JackDriver
 
         virtual int Attach();
         virtual int Detach();
-
-        virtual int Start();
-        virtual int Stop();
 
         virtual int Write();
 

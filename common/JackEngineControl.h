@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -63,7 +63,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
     int fServerPriority;
     int fClientPriority;
     int fMaxClientPriority;
-    char fServerName[64];
+    char fServerName[JACK_SERVER_CONTROL_NAME_SIZE];
     JackTransportEngine fTransport;
     jack_timer_type_t fClockSource;
     int fDriverNum;
@@ -87,10 +87,10 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
 
     // Timer
     JackFrameTimer fFrameTimer;
-    
+
 #ifdef JACK_MONITOR
     JackEngineProfiling fProfiler;
-#endif   
+#endif
 
     JackEngineControl(bool sync, bool temporary, long timeout, bool rt, long priority, bool verbose, jack_timer_type_t clock, const char* server_name)
     {
@@ -121,7 +121,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
         fClockSource = clock;
         fDriverNum = 0;
    }
-    
+
     ~JackEngineControl()
     {}
 
@@ -161,7 +161,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
     {
         fFrameTimer.ReadFrameTime(timer);
     }
-    
+
     // XRun
     void NotifyXRun(jack_time_t callback_usecs, float delayed_usecs);
     void ResetXRun()

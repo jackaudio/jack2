@@ -55,7 +55,12 @@ int JackThreadedDriver::Open(jack_nframes_t buffer_size,
                              jack_nframes_t capture_latency,
                              jack_nframes_t playback_latency)
 {
-    return fDriver->Open(buffer_size, samplerate, capturing, playing, inchannels, outchannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency);
+    return fDriver->Open(buffer_size,
+                        samplerate, capturing,
+                        playing, inchannels,
+                        outchannels, monitor,
+                        capture_driver_name, playback_driver_name,
+                        capture_latency, playback_latency);
 }
 
 int JackThreadedDriver::Close()
@@ -141,6 +146,26 @@ int JackThreadedDriver::ProcessRead()
 int JackThreadedDriver::ProcessWrite()
 {
     return fDriver->ProcessWrite();
+}
+
+int JackThreadedDriver::ProcessReadSync()
+{
+    return fDriver->ProcessReadSync();
+}
+
+int JackThreadedDriver::ProcessWriteSync()
+{
+    return fDriver->ProcessWriteSync();
+}
+
+int JackThreadedDriver::ProcessReadAsync()
+{
+    return fDriver->ProcessReadAsync();
+}
+
+int JackThreadedDriver::ProcessWriteAsync()
+{
+    return fDriver->ProcessWriteAsync();
 }
 
 std::list<JackDriverInterface*> JackThreadedDriver::GetSlaves()

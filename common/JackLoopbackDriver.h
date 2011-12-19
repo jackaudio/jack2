@@ -48,9 +48,6 @@ class JackLoopbackDriver : public JackAudioDriver
         {}
         virtual ~JackLoopbackDriver()
         {}
-
-        virtual int ProcessRead();
-        virtual int ProcessWrite();
 };
 
 } // end of namespace

@@ -65,9 +65,6 @@ class SERVER_EXPORT JackMidiDriver : public JackDriver
 
         virtual int SetBufferSize(jack_nframes_t buffer_size);
 
-        virtual int ProcessRead();
-        virtual int ProcessWrite();
-
         virtual int Attach();
         virtual int Detach();
 

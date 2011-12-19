@@ -37,9 +37,9 @@ namespace Jack
 {
 
 JackDriver::JackDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
-    :fClientControl(name),
-    fCaptureChannels(0),
+    :fCaptureChannels(0),
     fPlaybackChannels(0),
+    fClientControl(name),
     fWithMonitorPorts(false)
 {
     assert(strlen(name) < JACK_CLIENT_NAME_SIZE);
@@ -343,10 +343,30 @@ int JackDriver::ProcessWriteSlaves()
 
 int JackDriver::ProcessRead()
 {
-    return 0;
+    return (fEngineControl->fSyncMode) ? ProcessReadSync() : ProcessReadAsync();
 }
 
 int JackDriver::ProcessWrite()
+{
+    return (fEngineControl->fSyncMode) ? ProcessWriteSync() : ProcessWriteAsync();
+}
+
+int JackDriver::ProcessReadSync()
+{
+    return 0;
+}
+
+int JackDriver::ProcessWriteSync()
+{
+    return 0;
+}
+
+int JackDriver::ProcessReadAsync()
+{
+    return 0;
+}
+
+int JackDriver::ProcessWriteAsync()
 {
     return 0;
 }
@@ -382,13 +402,13 @@ int JackDriver::Start()
         fEngineControl->InitFrameTime();
     }
     fIsRunning = true;
-    return 0;
+    return StartSlaves();
 }
 
 int JackDriver::Stop()
 {
     fIsRunning = false;
-    return 0;
+    return StopSlaves();
 }
 
 int JackDriver::StartSlaves()
@@ -456,7 +476,6 @@ bool JackDriver::Initialize()
     return true;
 }
 
-
 void JackDriver::SaveConnections()
 {
     const char** connections;
@@ -509,5 +528,16 @@ void JackDriver::RestoreConnections()
         fEngine->PortConnect(fClientControl.fRefNum, connection.first.c_str(), connection.second.c_str());
     }
 }
+
+int JackDriver::ResumeRefNum()
+{
+    return fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable);
+}
+
+int JackDriver::SuspendRefNum()
+{
+    return fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable, DRIVER_TIMEOUT_FACTOR * fEngineControl->fTimeOutUsecs);
+}
+
 
 } // end of namespace
