@@ -20,6 +20,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackSystemDeps.h"
 #include "JackDriverLoader.h"
+#include "JackDriverInfo.h"
 #include "JackConstants.h"
 #include "JackError.h"
 #include <getopt.h>

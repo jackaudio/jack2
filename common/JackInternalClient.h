@@ -63,7 +63,6 @@ class JackInternalClient : public JackClient
 typedef int (*InitializeCallback)(jack_client_t*, const char*);
 typedef int (*InternalInitializeCallback)(jack_client_t*, const JSList* params);
 typedef void (*FinishCallback)(void *);
-typedef jack_driver_desc_t * (*JackDriverDescFunction) ();
 
 class JackLoadableInternalClient : public JackInternalClient
 {
@@ -92,7 +91,7 @@ class JackLoadableInternalClient1 : public JackLoadableInternalClient
 
         InitializeCallback fInitialize;
         char fObjectData[JACK_LOAD_INIT_LIMIT];
-    
+
     public:
 
         JackLoadableInternalClient1(JackServer* server, JackSynchro* table, const char* object_data);
@@ -111,7 +110,7 @@ class JackLoadableInternalClient2 : public JackLoadableInternalClient
 
         InternalInitializeCallback fInitialize;
         const JSList* fParameters;
-  
+
     public:
 
         JackLoadableInternalClient2(JackServer* server, JackSynchro* table, const JSList*  parameters);

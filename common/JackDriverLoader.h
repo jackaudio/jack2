@@ -24,38 +24,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "driver_interface.h"
 #include "JackControlAPI.h"
 #include "JackPlatformPlug.h"
-#include "JackDriver.h"
-#include "JackSystemDeps.h"
-
-typedef jack_driver_desc_t* (*JackDriverDescFunction) ();
-typedef Jack::JackDriverClientInterface* (*driverInitialize) (Jack::JackLockedEngine*, Jack::JackSynchro*, const JSList*);
-
-class SERVER_EXPORT JackDriverInfo
-{
-
-    private:
-
-        driverInitialize fInitialize;
-        DRIVER_HANDLE fHandle;
-        Jack::JackDriverClientInterface* fBackend;
-
-    public:
-
-        JackDriverInfo():fInitialize(NULL),fHandle(NULL),fBackend(NULL)
-        {}
-        ~JackDriverInfo();
-
-        Jack::JackDriverClientInterface* Open(jack_driver_desc_t* driver_desc, Jack::JackLockedEngine*, Jack::JackSynchro*, const JSList*);
-
-        Jack::JackDriverClientInterface* GetBackend()
-        {
-            return fBackend;
-        }
-
-};
+//#include "JackDriver.h"
+//#include "JackSystemDeps.h"
 
 jack_driver_desc_t* jack_find_driver_descriptor(JSList* drivers, const char* name);
-
 JSList* jack_drivers_load(JSList* drivers);
 JSList* jack_internals_load(JSList* internals);
 

@@ -146,6 +146,8 @@ jack_driver_descriptor_add_parameter(
     const char * short_desc,            /* A short (~30 chars) description for the user */
     const char * long_desc);            /* A longer description for the user, if NULL short_desc will be used */
 
+typedef jack_driver_desc_t * (*JackDriverDescFunction) ();
+
 #ifdef __cplusplus
 }
 #endif

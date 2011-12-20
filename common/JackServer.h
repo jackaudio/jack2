@@ -24,6 +24,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackCompilerDeps.h"
 #include "driver_interface.h"
 #include "JackDriverLoader.h"
+#include "JackDriverInfo.h"
 #include "JackConnectionManager.h"
 #include "JackGlobals.h"
 #include "JackPlatformPlug.h"
