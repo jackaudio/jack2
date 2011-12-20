@@ -36,6 +36,10 @@ John Emmas
   Jackdmp changes log
 ---------------------------
 
+2011-12-20 Stephane Letz  <letz@grame.fr>
+
+	* Version 1.9.9 started. 
+
 2011-11-25 Stephane Letz  <letz@grame.fr>
 
 	* More robust dynamic port management in JACK/CoreMidi bridge.
