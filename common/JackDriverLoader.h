@@ -24,8 +24,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "driver_interface.h"
 #include "JackControlAPI.h"
 #include "JackPlatformPlug.h"
-//#include "JackDriver.h"
-//#include "JackSystemDeps.h"
 
 jack_driver_desc_t* jack_find_driver_descriptor(JSList* drivers, const char* name);
 JSList* jack_drivers_load(JSList* drivers);
