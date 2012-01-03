@@ -290,9 +290,9 @@ bool JackWinNamedPipeServer::Accept()
     if (ConnectNamedPipe(fNamedPipe, NULL)) {
         return true;
     } else {
-        jack_error("Cannot bind server pipe name = %s err = %ld", fName, GetLastError());
+        jack_error("Cannot connect server pipe name = %s err = %ld", fName, GetLastError());
         if (GetLastError() == ERROR_PIPE_CONNECTED) {
-            jack_error("pipe already connnected = %s ", fName);
+            jack_error("Pipe already connnected = %s", fName);
             return true;
         } else {
             return false;
@@ -303,20 +303,18 @@ bool JackWinNamedPipeServer::Accept()
 JackWinNamedPipeClient* JackWinNamedPipeServer::AcceptClient()
 {
     if (ConnectNamedPipe(fNamedPipe, NULL)) {
-        JackWinNamedPipeClient* client = new JackWinNamedPipeClient(fNamedPipe, fName);
         // Init the pipe to the default value
         fNamedPipe = INVALID_HANDLE_VALUE;
-        return client;
+        return new JackWinNamedPipeClient(fNamedPipe, fName);;
     } else {
-        switch (GetLastError()) {
-
-            case ERROR_PIPE_CONNECTED:
-                return new JackWinNamedPipeClient(fNamedPipe, fName);
-
-            default:
-                jack_error("Cannot connect server pipe name = %s  err = %ld", fName, GetLastError());
-                return NULL;
-                break;
+        jack_error("Cannot connect server pipe name = %s err = %ld", fName, GetLastError());
+        if (GetLastError() == ERROR_PIPE_CONNECTED) {
+            jack_error("Pipe already connnected = %s", fName);
+            // Init the pipe to the default value
+            fNamedPipe = INVALID_HANDLE_VALUE;
+            return new JackWinNamedPipeClient(fNamedPipe, fName);
+        } else {
+            return NULL;
         }
     }
 }

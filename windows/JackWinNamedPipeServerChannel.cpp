@@ -507,7 +507,7 @@ void JackWinNamedPipeServerChannel::Stop()
 
 bool JackWinNamedPipeServerChannel::Init()
 {
-    jack_log("JackWinNamedPipeServerChannel::Init ");
+    jack_log("JackWinNamedPipeServerChannel::Init");
     JackWinNamedPipeClient* pipe;
 
     // Accept first client, that is the JackWinNamedPipeServerNotifyChannel object
