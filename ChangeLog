@@ -36,7 +36,11 @@ John Emmas
   Jackdmp changes log
 ---------------------------
 
-2012-01-01 Stephane Letz  <letz@grame.fr>
+2012-01-04 Stephane Letz  <letz@grame.fr>
+
+	* Fix library symbols export issue.
+
+2012-01-02 Stephane Letz  <letz@grame.fr>
 
 	* Adrian Knoth fix in midiseq.c.
 

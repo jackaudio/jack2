@@ -50,7 +50,7 @@ class JackClient;
 \brief Global library static structure: singleton kind of pattern.
 */
 
-struct LIB_EXPORT JackLibGlobals
+struct JackLibGlobals
 {
     JackShmReadWritePtr<JackGraphManager> fGraphManager;	/*! Shared memory Port manager */
     JackShmReadWritePtr<JackEngineControl> fEngineControl;	/*! Shared engine control */  // transport engine has to be writable
