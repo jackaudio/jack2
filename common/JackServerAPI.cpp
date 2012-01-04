@@ -47,10 +47,6 @@ extern "C"
 
 using namespace Jack;
 
-static jack_client_t * jack_client_open_aux (const char *client_name,
-            jack_options_t options,
-            jack_status_t *status, va_list ap);
-
 jack_client_t* jack_client_new_aux(const char* client_name, jack_options_t options, jack_status_t* status)
 {
     jack_varargs_t va;          /* variable arguments */

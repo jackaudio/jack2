@@ -5,15 +5,15 @@ JACK2 on Windows
 This folder contains all the windows specific sources.
 You will also find two sets of files :
 - VisualC++6 workspace and project files, in order to compile JACK with MSVC
-- Code::Blocks (8.02) workspace and project files, in order to compile JACK with MingW
+- Code::Blocks (10.05) workspace and project files, in order to compile JACK with MingW
 
 The built binaries will be located in '/Release/bin' (or '/Debug/bin' if you build the Debug target). Once compiled, you'll find there everything you need :
-- the two 'libjackmp.dll' and 'libjackservermp.dll', client and server jack libraries
+- the two 'libjackmp.dll' and 'libjackservermp.dll', client and server jack libraries.
 - the 'jackdmp.exe', main application : the JACK server
 - the 'jack_xxx.exe' utilities and examples
-- in the jackmp directory, you'll find the driver's DLL's ('jack_portaudio.dll' and 'jack_netdriver.dll') and some tools ('netmanager.dll', 'audioadapter.dll', 'netadapter.dll' for example)
+- in the jackmp directory, you'll find the driver's DLL's ('jack_portaudio.dll', 'jack_dummy.dll', 'jack_winmme.dll',  and 'jack_net.dll' and 'jack_netone.dll') and some tools ('netmanager.dll', 'audioadapter.dll', 'netadapter.dll' for example)
 
-In Code::Blocks all the projects are automatically built in a correct order (dll's then apps) by doing 'build->build workspace'.
+In Code::Blocks all the projects are automatically built in a correct order (DLL's then apps) by doing 'build->build workspace'.
 In VC6, you'll have to build the projects one by one.
 
 The needed regexp library TRE can be found here http://laurikari.net/tre/. Unzip and place the "tre-0.8.0" folder into the "windows" folder. 
@@ -24,8 +24,7 @@ Notes about VC and GCC versions
 -------------------------------
 
 The Visual Studio workspace is limited to VC6. JACK will not compile on most recent MSVC's. The fact is recent compilers (MSVC7, 8 or 9) don't agree with some of the JACK sources.
-But now you can compile JACK using GCC, with MingW.
-The project is actually organized in a Code::Blocks workspace. This is a simple and efficient way to compile the whole project.
+But now you can compile JACK using GCC, with MingW. The project is actually organized in a Code::Blocks workspace. This is a simple and efficient way to compile the whole project.
 
 But for some reasons, you need to compile JACK using a SJLJ version of G++ (available on MingW website).
 Current GCC/G++ version (3.4.5) doesn't includes SJLJ so you'll have to use another one.
@@ -33,16 +32,16 @@ JACK needs the use of SJLJ exceptions instead of DW2 because exceptions are exch
 
 The ressources files has been created with ResEdit (ANSI build). VisualStudio uses 'ressource.rc' and 'ressource_vc.h'. The other files are used by MingW.
 
-You can make a small installer ('setup.exe') with CreateInstallFree, a little freeware. For this you have the little script 'jack.ci'.The installer contains everything jack needs to be intagreted in windows (including register entries and shortcuts).
-A binary version of qjackctl is also included.
+You can make a small installer ('setup.exe') with CreateInstallFree, a little freeware. For this you have the little script 'jack.ci' for 32 bits version and 'jack64.c' for mixed 64/32 bits version. The installer contains everything jack needs to be integrated in windows (including register entries and shortcuts).
+A binary version of QJAckCtl is also included.
 
 -------------------------------
 Running JACK on Windows
 -------------------------------
 
 You can use two drivers : PortAudio and NetDriver.
-The PortAudio backend allow the use of many soundcards, using ASIO, DirectSound or WMME drivers (any ASIO driver can be seen by PortAudio).
-The NetDriver allow you to use NetJack2 on windows. Thus you can easily exchange midi and audio streams bitween computers (Linux, MacOSX or Windows).
+The PortAudio backend allows the use of many soundcards, using ASIO, DirectSound or WMME drivers (any ASIO driver can be seen by PortAudio).
+The NetDriver allows you to use NetJack2 on windows. Thus you can easily exchange midi and audio streams between computers (Linux, MacOSX or Windows).
 In both cases, you have to use the minimalist :
     'jackd -R -d ...' command. With PortAudio, you can have a list of supported drivers with :
     'jackd -R -S -d portaudio -l'

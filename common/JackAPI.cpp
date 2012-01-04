@@ -246,10 +246,6 @@ extern "C"
             const char* client_name,
             jack_options_t options,
             jack_status_t *status, ...);
-    LIB_EXPORT jack_intclient_t jack_internal_client_load_aux(jack_client_t *client,
-            const char* client_name,
-            jack_options_t options,
-            jack_status_t *status, va_list ap);
 
     LIB_EXPORT jack_status_t jack_internal_client_unload(jack_client_t *client,
             jack_intclient_t intclient);
@@ -1867,7 +1863,7 @@ LIB_EXPORT jack_intclient_t jack_internal_client_handle(jack_client_t* ext_clien
     }
 }
 
-LIB_EXPORT jack_intclient_t jack_internal_client_load_aux(jack_client_t* ext_client, const char* client_name, jack_options_t options, jack_status_t* status, va_list ap)
+static jack_intclient_t jack_internal_client_load_aux(jack_client_t* ext_client, const char* client_name, jack_options_t options, jack_status_t* status, va_list ap)
 {
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_internal_client_load_aux");
