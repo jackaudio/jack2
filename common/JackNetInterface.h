@@ -21,6 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackNetInterface__
 
 #include "JackNetTool.h"
+#include <limits.h>
 
 namespace Jack
 {

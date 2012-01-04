@@ -23,6 +23,8 @@
 #define __JackPosixMutex__
 
 #include "JackException.h"
+#include "JackCompilerDeps.h"
+
 #include <pthread.h>
 #include <stdio.h>
 #include <assert.h>
@@ -33,7 +35,7 @@ namespace Jack
 \brief Mutex abstraction.
 */
 
-class JackBasePosixMutex
+class SERVER_EXPORT JackBasePosixMutex
 {
 
     protected:
@@ -60,7 +62,7 @@ class JackBasePosixMutex
 
 };
 
-class JackPosixMutex
+class SERVER_EXPORT JackPosixMutex
 {
     protected:
 
