@@ -24,7 +24,6 @@
 					<Add option="-DLIBJACKDMP_EXPORTS" />
 					<Add option="-DREGEX_MALLOC" />
 					<Add option="-DSTDC_HEADERS" />
-					<Add option="-DSERVER_SIDE" />
 					<Add option="-D__SMP__" />
                     <Add option="-DJACK_32_64" />
 					<Add directory="." />
@@ -55,7 +54,6 @@
 					<Add option="-DLIBJACKDMP_EXPORTS" />
 					<Add option="-DREGEX_MALLOC" />
 					<Add option="-DSTDC_HEADERS" />
-					<Add option="-DSERVER_SIDE" />
 					<Add option="-D__SMP__" />
                     <Add option="-DJACK_32_64" />
 					<Add directory="." />
@@ -86,7 +84,6 @@
 					<Add option="-DLIBJACKDMP_EXPORTS" />
 					<Add option="-DREGEX_MALLOC" />
 					<Add option="-DSTDC_HEADERS" />
-					<Add option="-DSERVER_SIDE" />
 					<Add option="-D__SMP__" />
                     <Add option="-DJACK_32_64" />
 					<Add option="-DJACK_MONITOR" />
@@ -119,7 +116,6 @@
 					<Add option="-DLIBJACKDMP_EXPORTS" />
 					<Add option="-DREGEX_MALLOC" />
 					<Add option="-DSTDC_HEADERS" />
-					<Add option="-DSERVER_SIDE" />
 					<Add option="-D__SMP__" />
                     <Add option="-DJACK_32_64" />
 					<Add directory="." />
@@ -155,7 +151,6 @@
 					<Add option="-DLIBJACKDMP_EXPORTS" />
 					<Add option="-DREGEX_MALLOC" />
 					<Add option="-DSTDC_HEADERS" />
-					<Add option="-DSERVER_SIDE" />
 					<Add option="-D__SMP__" />
                     <Add option="-DJACK_32_64" />
 					<Add directory="." />
@@ -191,7 +186,6 @@
 					<Add option="-DLIBJACKDMP_EXPORTS" />
 					<Add option="-DREGEX_MALLOC" />
 					<Add option="-DSTDC_HEADERS" />
-					<Add option="-DSERVER_SIDE" />
 					<Add option="-D__SMP__" />
                     <Add option="-DJACK_32_64" />
 					<Add option="-DJACK_MONITOR" />

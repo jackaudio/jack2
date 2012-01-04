@@ -86,41 +86,41 @@ extern "C"
     typedef int (*JackNetSlaveSampleRateCallback) (jack_nframes_t nframes, void *arg);
     typedef void (*JackNetSlaveShutdownCallback) (void* data);
 
-    SERVER_EXPORT jack_net_slave_t* jack_net_slave_open(const char* ip, int port, const char* name, jack_slave_t* request, jack_master_t* result);
-    SERVER_EXPORT int jack_net_slave_close(jack_net_slave_t* net);
+    LIB_EXPORT jack_net_slave_t* jack_net_slave_open(const char* ip, int port, const char* name, jack_slave_t* request, jack_master_t* result);
+    LIB_EXPORT int jack_net_slave_close(jack_net_slave_t* net);
 
-    SERVER_EXPORT int jack_net_slave_activate(jack_net_slave_t* net);
-    SERVER_EXPORT int jack_net_slave_deactivate(jack_net_slave_t* net);
+    LIB_EXPORT int jack_net_slave_activate(jack_net_slave_t* net);
+    LIB_EXPORT int jack_net_slave_deactivate(jack_net_slave_t* net);
 
-    SERVER_EXPORT int jack_set_net_slave_process_callback(jack_net_slave_t* net, JackNetSlaveProcessCallback net_callback, void *arg);
-    SERVER_EXPORT int jack_set_net_slave_buffer_size_callback(jack_net_slave_t* net, JackNetSlaveBufferSizeCallback bufsize_callback, void *arg);
-    SERVER_EXPORT int jack_set_net_slave_sample_rate_callback(jack_net_slave_t* net, JackNetSlaveSampleRateCallback samplerate_callback, void *arg);
-    SERVER_EXPORT int jack_set_net_slave_shutdown_callback(jack_net_slave_t* net, JackNetSlaveShutdownCallback shutdown_callback, void *arg);
+    LIB_EXPORT int jack_set_net_slave_process_callback(jack_net_slave_t* net, JackNetSlaveProcessCallback net_callback, void *arg);
+    LIB_EXPORT int jack_set_net_slave_buffer_size_callback(jack_net_slave_t* net, JackNetSlaveBufferSizeCallback bufsize_callback, void *arg);
+    LIB_EXPORT int jack_set_net_slave_sample_rate_callback(jack_net_slave_t* net, JackNetSlaveSampleRateCallback samplerate_callback, void *arg);
+    LIB_EXPORT int jack_set_net_slave_shutdown_callback(jack_net_slave_t* net, JackNetSlaveShutdownCallback shutdown_callback, void *arg);
 
     // NetJack master API
 
     typedef struct _jack_net_master jack_net_master_t;
 
-    SERVER_EXPORT jack_net_master_t* jack_net_master_open(const char* ip, int port, const char* name, jack_master_t* request, jack_slave_t* result);
-    SERVER_EXPORT int jack_net_master_close(jack_net_master_t* net);
+    LIB_EXPORT jack_net_master_t* jack_net_master_open(const char* ip, int port, const char* name, jack_master_t* request, jack_slave_t* result);
+    LIB_EXPORT int jack_net_master_close(jack_net_master_t* net);
 
-    SERVER_EXPORT int jack_net_master_recv(jack_net_master_t* net, int audio_input, float** audio_input_buffer, int midi_input, void** midi_input_buffer);
-    SERVER_EXPORT int jack_net_master_send(jack_net_master_t* net, int audio_output, float** audio_output_buffer, int midi_output, void** midi_output_buffer);
+    LIB_EXPORT int jack_net_master_recv(jack_net_master_t* net, int audio_input, float** audio_input_buffer, int midi_input, void** midi_input_buffer);
+    LIB_EXPORT int jack_net_master_send(jack_net_master_t* net, int audio_output, float** audio_output_buffer, int midi_output, void** midi_output_buffer);
 
     // NetJack adapter API
 
     typedef struct _jack_adapter jack_adapter_t;
 
-    SERVER_EXPORT jack_adapter_t* jack_create_adapter(int input, int output,
+    LIB_EXPORT jack_adapter_t* jack_create_adapter(int input, int output,
                                                     jack_nframes_t host_buffer_size,
                                                     jack_nframes_t host_sample_rate,
                                                     jack_nframes_t adapted_buffer_size,
                                                     jack_nframes_t adapted_sample_rate);
-    SERVER_EXPORT int jack_destroy_adapter(jack_adapter_t* adapter);
-    SERVER_EXPORT void jack_flush_adapter(jack_adapter_t* adapter);
+    LIB_EXPORT int jack_destroy_adapter(jack_adapter_t* adapter);
+    LIB_EXPORT void jack_flush_adapter(jack_adapter_t* adapter);
 
-    SERVER_EXPORT int jack_adapter_push_and_pull(jack_adapter_t* adapter, float** input, float** output, unsigned int frames);
-    SERVER_EXPORT int jack_adapter_pull_and_push(jack_adapter_t* adapter, float** input, float** output, unsigned int frames);
+    LIB_EXPORT int jack_adapter_push_and_pull(jack_adapter_t* adapter, float** input, float** output, unsigned int frames);
+    LIB_EXPORT int jack_adapter_pull_and_push(jack_adapter_t* adapter, float** input, float** output, unsigned int frames);
 
 #ifdef __cplusplus
 }
@@ -855,7 +855,7 @@ struct JackNetAdapter : public JackAudioAdapterInterface {
 
 using namespace Jack;
 
-SERVER_EXPORT jack_net_slave_t* jack_net_slave_open(const char* ip, int port, const char* name, jack_slave_t* request, jack_master_t* result)
+LIB_EXPORT jack_net_slave_t* jack_net_slave_open(const char* ip, int port, const char* name, jack_slave_t* request, jack_master_t* result)
 {
     JackNetExtSlave* slave = new JackNetExtSlave(ip, port, name, request);
     if (slave->Open(result) == 0) {
@@ -866,7 +866,7 @@ SERVER_EXPORT jack_net_slave_t* jack_net_slave_open(const char* ip, int port, co
     }
 }
 
-SERVER_EXPORT int jack_net_slave_close(jack_net_slave_t* net)
+LIB_EXPORT int jack_net_slave_close(jack_net_slave_t* net)
 {
     JackNetExtSlave* slave = (JackNetExtSlave*)net;
     slave->Close();
@@ -874,37 +874,37 @@ SERVER_EXPORT int jack_net_slave_close(jack_net_slave_t* net)
     return 0;
 }
 
-SERVER_EXPORT int jack_set_net_slave_process_callback(jack_net_slave_t* net, JackNetSlaveProcessCallback net_callback, void *arg)
+LIB_EXPORT int jack_set_net_slave_process_callback(jack_net_slave_t* net, JackNetSlaveProcessCallback net_callback, void *arg)
 {
      JackNetExtSlave* slave = (JackNetExtSlave*)net;
      return slave->SetProcessCallback(net_callback, arg);
 }
 
-SERVER_EXPORT int jack_net_slave_activate(jack_net_slave_t* net)
+LIB_EXPORT int jack_net_slave_activate(jack_net_slave_t* net)
 {
     JackNetExtSlave* slave = (JackNetExtSlave*)net;
     return slave->Start();
 }
 
-SERVER_EXPORT int jack_net_slave_deactivate(jack_net_slave_t* net)
+LIB_EXPORT int jack_net_slave_deactivate(jack_net_slave_t* net)
 {
     JackNetExtSlave* slave = (JackNetExtSlave*)net;
     return slave->Stop();
 }
 
-SERVER_EXPORT int jack_set_net_slave_buffer_size_callback(jack_net_slave_t *net, JackNetSlaveBufferSizeCallback bufsize_callback, void *arg)
+LIB_EXPORT int jack_set_net_slave_buffer_size_callback(jack_net_slave_t *net, JackNetSlaveBufferSizeCallback bufsize_callback, void *arg)
 {
     JackNetExtSlave* slave = (JackNetExtSlave*)net;
     return slave->SetBufferSizeCallback(bufsize_callback, arg);
 }
 
-SERVER_EXPORT int jack_set_net_slave_sample_rate_callback(jack_net_slave_t *net, JackNetSlaveSampleRateCallback samplerate_callback, void *arg)
+LIB_EXPORT int jack_set_net_slave_sample_rate_callback(jack_net_slave_t *net, JackNetSlaveSampleRateCallback samplerate_callback, void *arg)
 {
     JackNetExtSlave* slave = (JackNetExtSlave*)net;
     return slave->SetSampleRateCallback(samplerate_callback, arg);
 }
 
-SERVER_EXPORT int jack_set_net_slave_shutdown_callback(jack_net_slave_t *net, JackNetSlaveShutdownCallback shutdown_callback, void *arg)
+LIB_EXPORT int jack_set_net_slave_shutdown_callback(jack_net_slave_t *net, JackNetSlaveShutdownCallback shutdown_callback, void *arg)
 {
     JackNetExtSlave* slave = (JackNetExtSlave*)net;
     return slave->SetShutdownCallback(shutdown_callback, arg);
@@ -912,7 +912,7 @@ SERVER_EXPORT int jack_set_net_slave_shutdown_callback(jack_net_slave_t *net, Ja
 
 // Master API
 
-SERVER_EXPORT jack_net_master_t* jack_net_master_open(const char* ip, int port, const char* name, jack_master_t* request, jack_slave_t* result)
+LIB_EXPORT jack_net_master_t* jack_net_master_open(const char* ip, int port, const char* name, jack_master_t* request, jack_slave_t* result)
 {
     JackNetExtMaster* master = new JackNetExtMaster(ip, port, name, request);
     if (master->Open(result) == 0) {
@@ -923,20 +923,20 @@ SERVER_EXPORT jack_net_master_t* jack_net_master_open(const char* ip, int port, 
     }
 }
 
-SERVER_EXPORT int jack_net_master_close(jack_net_master_t* net)
+LIB_EXPORT int jack_net_master_close(jack_net_master_t* net)
 {
     JackNetExtMaster* master = (JackNetExtMaster*)net;
     master->Close();
     delete master;
     return 0;
 }
-SERVER_EXPORT int jack_net_master_recv(jack_net_master_t* net, int audio_input, float** audio_input_buffer, int midi_input, void** midi_input_buffer)
+LIB_EXPORT int jack_net_master_recv(jack_net_master_t* net, int audio_input, float** audio_input_buffer, int midi_input, void** midi_input_buffer)
 {
     JackNetExtMaster* master = (JackNetExtMaster*)net;
     return master->Read(audio_input, audio_input_buffer, midi_input, midi_input_buffer);
 }
 
-SERVER_EXPORT int jack_net_master_send(jack_net_master_t* net, int audio_output, float** audio_output_buffer, int midi_output, void** midi_output_buffer)
+LIB_EXPORT int jack_net_master_send(jack_net_master_t* net, int audio_output, float** audio_output_buffer, int midi_output, void** midi_output_buffer)
 {
     JackNetExtMaster* master = (JackNetExtMaster*)net;
     return master->Write(audio_output, audio_output_buffer, midi_output, midi_output_buffer);
@@ -944,7 +944,7 @@ SERVER_EXPORT int jack_net_master_send(jack_net_master_t* net, int audio_output,
 
 // Adapter API
 
-SERVER_EXPORT jack_adapter_t* jack_create_adapter(int input, int output,
+LIB_EXPORT jack_adapter_t* jack_create_adapter(int input, int output,
                                                 jack_nframes_t host_buffer_size,
                                                 jack_nframes_t host_sample_rate,
                                                 jack_nframes_t adapted_buffer_size,
@@ -957,25 +957,25 @@ SERVER_EXPORT jack_adapter_t* jack_create_adapter(int input, int output,
     }
 }
 
-SERVER_EXPORT int jack_destroy_adapter(jack_adapter_t* adapter)
+LIB_EXPORT int jack_destroy_adapter(jack_adapter_t* adapter)
 {
     delete((JackNetAdapter*)adapter);
     return 0;
 }
 
-SERVER_EXPORT void jack_flush_adapter(jack_adapter_t* adapter)
+LIB_EXPORT void jack_flush_adapter(jack_adapter_t* adapter)
 {
     JackNetAdapter* slave = (JackNetAdapter*)adapter;
     slave->Flush();
 }
 
-SERVER_EXPORT int jack_adapter_push_and_pull(jack_adapter_t* adapter, float** input, float** output, unsigned int frames)
+LIB_EXPORT int jack_adapter_push_and_pull(jack_adapter_t* adapter, float** input, float** output, unsigned int frames)
 {
     JackNetAdapter* slave = (JackNetAdapter*)adapter;
     return slave->PushAndPull(input, output, frames);
 }
 
-SERVER_EXPORT int jack_adapter_pull_and_push(jack_adapter_t* adapter, float** input, float** output, unsigned int frames)
+LIB_EXPORT int jack_adapter_pull_and_push(jack_adapter_t* adapter, float** input, float** output, unsigned int frames)
 {
     JackNetAdapter* slave = (JackNetAdapter*)adapter;
     return slave->PullAndPush(input, output, frames);
@@ -1002,7 +1002,7 @@ static void jack_format_and_log(int level, const char *prefix, const char *fmt, 
     printf("\n");
 }
 
-SERVER_EXPORT void jack_error(const char *fmt, ...)
+LIB_EXPORT void jack_error(const char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
@@ -1010,7 +1010,7 @@ SERVER_EXPORT void jack_error(const char *fmt, ...)
     va_end(ap);
 }
 
-SERVER_EXPORT void jack_info(const char *fmt, ...)
+LIB_EXPORT void jack_info(const char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
@@ -1018,7 +1018,7 @@ SERVER_EXPORT void jack_info(const char *fmt, ...)
     va_end(ap);
 }
 
-SERVER_EXPORT void jack_log(const char *fmt, ...)
+LIB_EXPORT void jack_log(const char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
@@ -1030,13 +1030,13 @@ SERVER_EXPORT void jack_log(const char *fmt, ...)
 
 // Empty code for now..
 
-SERVER_EXPORT void jack_error(const char *fmt, ...)
+LIB_EXPORT void jack_error(const char *fmt, ...)
 {}
 
-SERVER_EXPORT void jack_info(const char *fmt, ...)
+LIB_EXPORT void jack_info(const char *fmt, ...)
 {}
 
-SERVER_EXPORT void jack_log(const char *fmt, ...)
+LIB_EXPORT void jack_log(const char *fmt, ...)
 {}
 
 #endif

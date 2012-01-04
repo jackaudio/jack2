@@ -21,7 +21,6 @@
 					<Add option="-D_WINDOWS" />
 					<Add option="-D_MBCS" />
 					<Add option="-D_USRDLL" />
-					<Add option="-DLIBJACKMP_EXPORTS" />
 					<Add option="-DREGEX_MALLOC" />
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-D__SMP__" />
@@ -65,7 +64,6 @@
 					<Add option="-D_CONSOLE" />
 					<Add option="-D_MBCS" />
 					<Add option="-D_USRDLL" />
-					<Add option="-DLIBJACKMP_EXPORTS" />
 					<Add option="-DREGEX_MALLOC" />
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-D__SMP__" />
@@ -109,7 +107,6 @@
 					<Add option="-D_WINDOWS" />
 					<Add option="-D_MBCS" />
 					<Add option="-D_USRDLL" />
-					<Add option="-DLIBJACKMP_EXPORTS" />
 					<Add option="-DREGEX_MALLOC" />
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-D__SMP__" />
@@ -155,7 +152,6 @@
 					<Add option="-D_WINDOWS" />
 					<Add option="-D_MBCS" />
 					<Add option="-D_USRDLL" />
-					<Add option="-DLIBJACKMP_EXPORTS" />
 					<Add option="-DREGEX_MALLOC" />
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-D__SMP__" />
@@ -204,7 +200,6 @@
 					<Add option="-D_CONSOLE" />
 					<Add option="-D_MBCS" />
 					<Add option="-D_USRDLL" />
-					<Add option="-DLIBJACKMP_EXPORTS" />
 					<Add option="-DREGEX_MALLOC" />
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-D__SMP__" />
@@ -253,7 +248,6 @@
 					<Add option="-D_WINDOWS" />
 					<Add option="-D_MBCS" />
 					<Add option="-D_USRDLL" />
-					<Add option="-DLIBJACKMP_EXPORTS" />
 					<Add option="-DREGEX_MALLOC" />
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-D__SMP__" />
