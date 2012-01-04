@@ -206,16 +206,7 @@ namespace Jack
             void FatalRecvError();
             void FatalSendError();
 
-            void InitAPI()
-            {
-                // open Socket API with the first slave
-                if (fSlaveCounter++ == 0) {
-                    if (SocketAPIInit() < 0) {
-                        jack_error("Can't init Socket API, exiting...");
-                        throw std::bad_alloc();
-                    }
-                }
-            }
+            void InitAPI();
 
         public:
 

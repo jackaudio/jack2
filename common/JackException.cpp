@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008-2011 Romain Moret at Grame
+Copyright (C) 2008 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,32 +17,18 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifndef __JackNetSocket__
-#define __JackNetSocket__
-
-#include "JackCompilerDeps.h"
-
-#include <cstdlib>
-#include <cstdio>
-#include <iostream>
-#include <errno.h>
+#include "JackException.h"
+#include "JackError.h"
 
 namespace Jack
 {
-    //get host name*********************************
-    SERVER_EXPORT int GetHostName(char * name, int size);
 
-    //net errors ***********************************
-    enum _net_error
+    void JackException::PrintMessage()
     {
-        NET_CONN_ERROR = 10000,
-        NET_OP_ERROR,
-        NET_NO_DATA,
-        NET_NO_NETWORK,
-        NET_NO_ERROR
-    };
+        std::string str = what();
+        if (str != "") {
+            jack_info(str.c_str());
+        }
+    }
 
-    typedef enum _net_error net_error_t;
 }
-
-#endif

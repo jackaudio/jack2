@@ -232,6 +232,7 @@
 		<Unit filename="..\common\JackNetInterface.cpp" />
 		<Unit filename="..\common\JackNetTool.cpp" />
 		<Unit filename="..\common\JackResampler.cpp" />
+                <Unit filename="..\common\JackException.cpp" />
 		<Unit filename="..\common\ringbuffer.c">
 			<Option compilerVar="CC" />
 		</Unit>

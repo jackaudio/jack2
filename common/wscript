@@ -46,6 +46,7 @@ def build(bld):
         'JackConnectionManager.cpp',
         'ringbuffer.c',
         'JackError.cpp',
+	'JackException.cpp',
         'JackFrameTimer.cpp',
         'JackGraphManager.cpp',
         'JackPort.cpp',
@@ -72,8 +73,8 @@ def build(bld):
         common_libsources += [
             '../posix/JackPosixThread.cpp',
             '../posix/JackPosixSemaphore.cpp',
-            '../posix/JackFifo.cpp',
             '../posix/JackProcessSync.cpp',
+	    '../posix/JackPosixMutex.cpp',
             '../posix/JackSocket.cpp',
             '../linux/JackLinuxTime.c',
             ]
@@ -86,6 +87,7 @@ def build(bld):
            '../posix/JackPosixThread.cpp',
            '../posix/JackFifo.cpp',
            '../posix/JackProcessSync.cpp',
+           '../posix/JackPosixMutex.cpp',
            '../posix/JackSocket.cpp',
            '../solaris/JackSolarisTime.c',
            ]
@@ -197,6 +199,7 @@ def build(bld):
             'JackNetAPI.cpp',
             'JackNetInterface.cpp',
             'JackNetTool.cpp',
+	    'JackException.cpp',
             'JackAudioAdapterInterface.cpp',
             'JackLibSampleRateResampler.cpp',
             'JackResampler.cpp',

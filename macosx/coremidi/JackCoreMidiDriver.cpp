@@ -18,13 +18,14 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#include <stdexcept>
-
-#include <mach/mach_time.h>
-
+#include "JackCompilerDeps.h"
 #include "JackCoreMidiDriver.h"
 #include "JackCoreMidiUtil.h"
 #include "JackEngineControl.h"
+#include "driver_interface.h"
+
+#include <stdexcept>
+#include <mach/mach_time.h>
 
 using Jack::JackCoreMidiDriver;
 

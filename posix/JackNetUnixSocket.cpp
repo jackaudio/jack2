@@ -18,6 +18,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "JackNetUnixSocket.h"
+#include "JackError.h"
+
 #include <unistd.h>
 #include <fcntl.h>
 

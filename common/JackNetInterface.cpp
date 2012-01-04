@@ -18,6 +18,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackNetInterface.h"
 #include "JackException.h"
+#include "JackError.h"
+
 #include <assert.h>
 
 using namespace std;
@@ -607,6 +609,17 @@ namespace Jack
 // JackNetSlaveInterface ************************************************************************************************
 
     uint JackNetSlaveInterface::fSlaveCounter = 0;
+
+    void JackNetSlaveInterface::InitAPI()
+    {
+        // open Socket API with the first slave
+        if (fSlaveCounter++ == 0) {
+            if (SocketAPIInit() < 0) {
+                jack_error("Can't init Socket API, exiting...");
+                throw std::bad_alloc();
+            }
+        }
+    }
 
     bool JackNetSlaveInterface::Init()
     {

@@ -21,12 +21,13 @@
 #ifndef __JackWinMutex__
 #define __JackWinMutex__
 
-#include "JackError.h"
+
 #include "JackException.h"
 #include <windows.h>
 
 namespace Jack
 {
+
 /*!
 \brief Mutex abstraction.
 */
@@ -52,57 +53,10 @@ class JackBaseWinMutex
             CloseHandle(fMutex);
         }
 
-        bool Lock()
-        {
-            if (fOwner != GetCurrentThreadId()) {
-                DWORD res = WaitForSingleObject(fMutex, INFINITE);
-                if (res == WAIT_OBJECT_0) {
-                    fOwner = GetCurrentThreadId();
-                    return true;
-                } else {
-                    jack_log("JackWinMutex::Lock res = %d", res);
-                    return false;
-                }
-            } else {
-                jack_error("JackWinMutex::Lock mutex already locked by thread = %d", GetCurrentThreadId());
-                return false;
-            }
-        }
-
-        bool Trylock()
-        {
-            if (fOwner != GetCurrentThreadId()) {
-                DWORD res = WaitForSingleObject(fMutex, 0);
-                if (res == WAIT_OBJECT_0) {
-                    fOwner = GetCurrentThreadId();
-                    return true;
-                } else {
-                    jack_log("JackWinMutex::Trylock res = %d", res);
-                    return false;
-                }
-            } else {
-                jack_error("JackWinMutex::Trylock mutex already locked by thread = %d", GetCurrentThreadId());
-                return false;
-            }
-        }
-
-        bool Unlock()
-        {
-            if (fOwner == GetCurrentThreadId()) {
-                fOwner = 0;
-                int res = ReleaseMutex(fMutex);
-                if (res != 0) {
-                    return true;
-                } else {
-                    jack_log("JackWinMutex::Unlock res = %d", res);
-                    return false;
-                }
-            } else {
-                jack_error("JackWinMutex::Unlock mutex not locked by thread = %d", GetCurrentThreadId());
-                return false;
-            }
-        }
-
+        bool Lock();
+        bool Trylock();
+        bool Unlock();
+    
 };
 
 class JackWinMutex
@@ -125,20 +79,9 @@ class JackWinMutex
             CloseHandle(fMutex);
         }
 
-        bool Lock()
-        {
-            return (WAIT_OBJECT_0 == WaitForSingleObject(fMutex, INFINITE));
-        }
-
-        bool Trylock()
-        {
-            return (WAIT_OBJECT_0 == WaitForSingleObject(fMutex, 0));
-        }
-
-        bool Unlock()
-        {
-            return(ReleaseMutex(fMutex) != 0);
-        }
+        bool Lock();
+        bool Trylock();
+        bool Unlock();
 
 };
 
@@ -146,3 +89,4 @@ class JackWinMutex
 } // namespace
 
 #endif
+

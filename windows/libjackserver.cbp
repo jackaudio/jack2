@@ -259,6 +259,7 @@
 			<Option target="Win32 Profiling" />
 		</Unit>
 		<Unit filename="..\common\JackError.cpp" />
+	        <Unit filename="..\common\JackException.cpp" />
 		<Unit filename="..\common\JackExternalClient.cpp" />
 		<Unit filename="..\common\JackFrameTimer.cpp" />
 		<Unit filename="..\common\JackFreewheelDriver.cpp" />
@@ -306,6 +307,7 @@
 		<Unit filename="JackWinProcessSync.cpp" />
 		<Unit filename="JackWinSemaphore.cpp" />
 		<Unit filename="JackWinThread.cpp" />
+                <Unit filename="JackWinMutex.cpp" />
 		<Unit filename="JackWinTime.c">
 			<Option compilerVar="CC" />
 		</Unit>

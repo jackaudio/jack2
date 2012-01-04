@@ -23,6 +23,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackConstants.h"
 
 #if __GNUC__
+
     #define PRE_PACKED_STRUCTURE
 
     #ifndef POST_PACKED_STRUCTURE

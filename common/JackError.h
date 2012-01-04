@@ -31,14 +31,8 @@ extern "C"
 {
 #endif
 
-#define LOG_LEVEL_INFO   1
-#define LOG_LEVEL_ERROR  2
-
     SERVER_EXPORT void jack_error(const char *fmt, ...);
-
     SERVER_EXPORT void jack_info(const char *fmt, ...);
-
-    // like jack_info() but only if verbose mode is enabled
     SERVER_EXPORT void jack_log(const char *fmt, ...);
 
     SERVER_EXPORT extern void (*jack_error_callback)(const char *desc);
@@ -47,14 +41,16 @@ extern "C"
     SERVER_EXPORT extern void default_jack_error_callback(const char *desc);
     SERVER_EXPORT extern void default_jack_info_callback(const char *desc);
 
-    SERVER_EXPORT extern void silent_jack_error_callback(const char *desc);
-    SERVER_EXPORT extern void silent_jack_info_callback(const char *desc);
-
-    typedef void (* jack_log_function_t)(int level, const char *message);
-
-    void jack_log_function(int level, const char *message);
+    SERVER_EXPORT void silent_jack_error_callback(const char *desc);
+    SERVER_EXPORT void silent_jack_info_callback(const char *desc);
 
     SERVER_EXPORT int set_threaded_log_function();
+
+    #define LOG_LEVEL_INFO   1
+    #define LOG_LEVEL_ERROR  2
+
+    void jack_log_function(int level, const char *message);
+    typedef void (* jack_log_function_t)(int level, const char *message);
 
 #ifdef __cplusplus
 }

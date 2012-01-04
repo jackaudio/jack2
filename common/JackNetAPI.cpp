@@ -19,9 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include <assert.h>
 #include <stdarg.h>
+
 #include "JackNetInterface.h"
-#include "JackError.h"
-#include "JackException.h"
 #include "JackAudioAdapterInterface.h"
 
 #ifdef __cplusplus
@@ -121,6 +120,13 @@ extern "C"
 
     LIB_EXPORT int jack_adapter_push_and_pull(jack_adapter_t* adapter, float** input, float** output, unsigned int frames);
     LIB_EXPORT int jack_adapter_pull_and_push(jack_adapter_t* adapter, float** input, float** output, unsigned int frames);
+
+    #define LOG_LEVEL_INFO   1
+    #define LOG_LEVEL_ERROR  2
+
+    LIB_EXPORT void jack_error(const char *fmt, ...);
+    LIB_EXPORT void jack_info(const char *fmt, ...);
+    LIB_EXPORT void jack_log(const char *fmt, ...);
 
 #ifdef __cplusplus
 }

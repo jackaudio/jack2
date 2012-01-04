@@ -185,6 +185,9 @@ jackctl_get_parameter(
     return NULL;
 }
 
+// Prototype to be found in libjackserver
+extern "C" void silent_jack_error_callback(const char *desc);
+
 int main(int argc, char** argv)
 {
     jackctl_server_t * server_ctl;
