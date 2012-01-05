@@ -21,7 +21,7 @@
 #ifndef __JackWinMutex__
 #define __JackWinMutex__
 
-
+#include "JackCompilerDeps.h"
 #include "JackException.h"
 #include <windows.h>
 
@@ -31,7 +31,7 @@ namespace Jack
 /*!
 \brief Mutex abstraction.
 */
-class JackBaseWinMutex
+class SERVER_EXPORT JackBaseWinMutex
 {
 
     protected:
@@ -56,10 +56,10 @@ class JackBaseWinMutex
         bool Lock();
         bool Trylock();
         bool Unlock();
-    
+
 };
 
-class JackWinMutex
+class SERVER_EXPORT JackWinMutex
 {
 
     protected:

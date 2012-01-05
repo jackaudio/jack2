@@ -44,8 +44,11 @@ static HMODULE libjack_handle = 0;
 #else
 static void *libjack_handle = 0;
 #endif
-
+#ifndef WIN32
 static void __attribute__((constructor)) tryload_libjack()
+#else
+void tryload_libjack()
+#endif
 {
     if (getenv("SKIP_LIBJACK") == 0) { // just in case libjack is causing troubles..
     #ifdef __APPLE__

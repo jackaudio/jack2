@@ -22,6 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackEngineControl.h"
 #include "JackWinMMEDriver.h"
+#include "driver_interface.h"
 
 using Jack::JackWinMMEDriver;
 

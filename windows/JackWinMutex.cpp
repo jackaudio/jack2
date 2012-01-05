@@ -23,9 +23,6 @@
 namespace Jack
 {
 
-class JackBaseWinMutex
-{
-
     bool JackBaseWinMutex::Lock()
     {
         if (fOwner != GetCurrentThreadId()) {

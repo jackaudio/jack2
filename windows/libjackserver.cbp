@@ -8,7 +8,7 @@
 		<Build>
 			<Target title="Win32 Release 64bits">
 				<Option output="Release64\bin\libjackserver64" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Release64" />
+				<Option object_output="Release64\libjackserver" />
 				<Option type="3" />
 				<Option compiler="mingw_64" />
 				<Option createDefFile="1" />
@@ -41,7 +41,7 @@
 			</Target>
 			<Target title="Win32 Debug 64bits">
 				<Option output="Debug64\bin\libjackserver64" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Debug64" />
+				<Option object_output="Debug64\libjackserver" />
 				<Option type="3" />
 				<Option compiler="mingw_64" />
 				<Option createDefFile="1" />
@@ -74,7 +74,7 @@
 			</Target>
 			<Target title="Win32 Profiling 64bits">
 				<Option output="Release64\bin\libjackserver64" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Release64" />
+				<Option object_output="Release64\libjackserver" />
 				<Option type="3" />
 				<Option compiler="mingw_64" />
 				<Option createDefFile="1" />
@@ -108,7 +108,7 @@
 			</Target>
 			<Target title="Win32 Release 32bits">
 				<Option output="Release\bin\libjackserver" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Release" />
+				<Option object_output="Release\libjackserver" />
 				<Option type="3" />
 				<Option compiler="mingw_64" />
 				<Option createDefFile="1" />
@@ -141,12 +141,12 @@
 					<Add directory="Release\bin" />
 				</Linker>
 				<ExtraCommands>
-					<Add before="windres -F pe-i386 -O coff -o Release/libjackserver.res libjackserver.rc" />
+					<Add before="windres -F pe-i386 -O coff -o Release/libjackserver/libjackserver.res libjackserver.rc" />
 				</ExtraCommands>
 			</Target>
 			<Target title="Win32 Debug 32bits">
 				<Option output="Debug\bin\libjackserver" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Debug" />
+				<Option object_output="Debug\libjackserver" />
 				<Option type="3" />
 				<Option compiler="mingw_64" />
 				<Option createDefFile="1" />
@@ -179,12 +179,12 @@
 					<Add directory="Debug\bin" />
 				</Linker>
 				<ExtraCommands>
-					<Add before="windres -F pe-i386 -O coff -o Debug/libjackserver.res libjackserver.rc" />
+					<Add before="windres -F pe-i386 -O coff -o Debug/libjackserver/libjackserver.res libjackserver.rc" />
 				</ExtraCommands>
 			</Target>
 			<Target title="Win32 Profiling 32bits">
 				<Option output="Release\bin\libjackserver" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Release" />
+				<Option object_output="Release\libjackserver" />
 				<Option type="3" />
 				<Option compiler="mingw_64" />
 				<Option createDefFile="1" />
@@ -218,7 +218,7 @@
 					<Add directory="Release\bin" />
 				</Linker>
 				<ExtraCommands>
-					<Add before="windres -F pe-i386 -O coff -o Release/libjackserver.res libjackserver.rc" />
+					<Add before="windres -F pe-i386 -O coff -o Release/libjackserver/libjackserver.res libjackserver.rc" />
 				</ExtraCommands>
 			</Target>
 		</Build>
@@ -259,7 +259,7 @@
 			<Option target="Win32 Profiling" />
 		</Unit>
 		<Unit filename="..\common\JackError.cpp" />
-	        <Unit filename="..\common\JackException.cpp" />
+		<Unit filename="..\common\JackException.cpp" />
 		<Unit filename="..\common\JackExternalClient.cpp" />
 		<Unit filename="..\common\JackFrameTimer.cpp" />
 		<Unit filename="..\common\JackFreewheelDriver.cpp" />
@@ -299,6 +299,7 @@
 		</Unit>
 		<Unit filename="JackMMCSS.cpp" />
 		<Unit filename="JackNetWinSocket.cpp" />
+		<Unit filename="JackWinMutex.cpp" />
 		<Unit filename="JackWinNamedPipe.cpp" />
 		<Unit filename="JackWinNamedPipeClientChannel.cpp" />
 		<Unit filename="JackWinNamedPipeNotifyChannel.cpp" />
@@ -307,7 +308,6 @@
 		<Unit filename="JackWinProcessSync.cpp" />
 		<Unit filename="JackWinSemaphore.cpp" />
 		<Unit filename="JackWinThread.cpp" />
-                <Unit filename="JackWinMutex.cpp" />
 		<Unit filename="JackWinTime.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -17,7 +17,7 @@
 
  */
 
-
+#include "JackError.h"
 #include "JackNetWinSocket.h"
 
 namespace Jack
