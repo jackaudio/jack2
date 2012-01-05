@@ -2402,6 +2402,7 @@ extern "C"
 
                 case 'l':
                     Jack::DisplayDeviceNames();
+                    // Stops the server in this case
                     return NULL;
 
                 case 'H':

@@ -425,7 +425,8 @@ extern "C"
 
             case 'l':
                 pa_devices->DisplayDevicesNames();
-                break;
+                // Stops the server in this case
+                return NULL;
             }
         }
 
