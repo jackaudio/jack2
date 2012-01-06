@@ -99,15 +99,15 @@ int JackWinNamedPipeClient::ConnectAux()
             return 0;
         }
 
-        // Exit if an error other than ERROR_PIPE_BUSY occurs.
-        if (GetLastError() != ERROR_PIPE_BUSY) {
+        // Exit if an error other than ERROR_PIPE_BUSY or ERROR_FILE_NOT_FOUND occurs.
+        if ((GetLastError() != ERROR_PIPE_BUSY) && (GetLastError() != ERROR_FILE_NOT_FOUND)) {
             jack_error("Cannot connect to named pipe = %s err = %ld", fName, GetLastError());
             return -1;
         }
 
         // All pipe instances are busy, so wait for 2 seconds.
         if (!WaitNamedPipe(fName, 2000)) {
-            jack_error("Cannot connect to named pipe = %s err = %ld", fName, GetLastError());
+            jack_error("Cannot connect to named pipe after wait = %s err = %ld", fName, GetLastError());
             return -1;
         }
     }
