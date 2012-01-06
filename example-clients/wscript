@@ -44,11 +44,6 @@ def configure(conf):
 
     conf.check_cfg(package='celt', atleast_version='0.5.0', args='--cflags --libs')
 
-    e = conf.check_cc(header_name='ncurses.h', define_name="HAVE_NCURSES")
-
-    if conf.is_defined('HAVE_NCURSES'):
-        conf.env['LIB_NCURSES'] = ['ncurses']
-
     e = conf.check_cc(lib='readline', define_name="HAVE_READLINE")
 
     # define_name="HAVE_READLINE" has no effect, LIB_READLINE is defined if readline is available
