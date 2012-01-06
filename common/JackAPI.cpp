@@ -1804,7 +1804,11 @@ LIB_EXPORT int jack_client_kill_thread(jack_client_t* client, jack_native_thread
 #ifndef WIN32
 LIB_EXPORT void jack_set_thread_creator (jack_thread_creator_t jtc)
 {
-    JackGlobals::fJackThreadCreator = (jtc == NULL) ? pthread_create : jtc;
+    if (jtc == NULL) {
+        JackGlobals::fJackThreadCreator = pthread_create;
+	} else {
+        JackGlobals::fJackThreadCreator = jtc;
+	}
 }
 #endif
 

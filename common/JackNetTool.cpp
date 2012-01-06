@@ -628,7 +628,7 @@ namespace Jack
 
     int NetCeltAudioBuffer::RenderFromJackPorts()
     {
-        float buffer[fPeriodSize];
+        float buffer[BUFFER_SIZE_MAX];
 
         for (int port_index = 0; port_index < fNPorts; port_index++) {
             if (fPortBuffer[port_index]) {

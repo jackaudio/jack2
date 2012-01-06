@@ -36,6 +36,10 @@ John Emmas
   Jackdmp changes log
 ---------------------------
 
+2012-01-06 Stephane Letz  <letz@grame.fr>
+
+	* Fix for compilation on Solaris.
+
 2012-01-04 Stephane Letz  <letz@grame.fr>
 
 	* Fix library symbols export issue.

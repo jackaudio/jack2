@@ -31,7 +31,7 @@
 
 #include <jack/jslist.h>
 #include <jack/systemdeps.h>
-#if !defined (__sun__)
+#if !defined(sun) && !defined(__sun__)
 #include <stdbool.h>
 #endif
 

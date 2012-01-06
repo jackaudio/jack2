@@ -67,6 +67,10 @@
 #endif
 #endif
 
+#ifndef JACK_WEAK_EXPORT
+#define JACK_WEAK_EXPORT
+#endif
+
 #ifndef JACK_OPTIONAL_WEAK_EXPORT
 #define JACK_OPTIONAL_WEAK_EXPORT
 #endif
@@ -82,6 +86,11 @@
 #endif
 
 #endif /* __GNUC__ */
+
+#ifndef JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT
+#define JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT
+#endif
+
 #endif
 
 #endif /* __weakmacros_h__ */

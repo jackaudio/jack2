@@ -495,7 +495,7 @@ void JackDriver::SaveConnections()
                 fConnections.push_back(make_pair(aliases[0], connections[j]));
                 jack_info("Save connection: %s %s", aliases[0], connections[j]);
                 */
-                fConnections.push_back(make_pair(fGraphManager->GetPort(fCapturePortList[i])->GetName(), connections[j]));
+                fConnections.push_back(make_pair(string(fGraphManager->GetPort(fCapturePortList[i])->GetName()), string(connections[j])));
                 jack_info("Save connection: %s %s", fGraphManager->GetPort(fCapturePortList[i])->GetName(), connections[j]);
             }
             free(connections);
@@ -510,7 +510,7 @@ void JackDriver::SaveConnections()
                 fConnections.push_back(make_pair(connections[j], aliases[0]));
                 jack_info("Save connection: %s %s", connections[j], aliases[0]);
                 */
-                fConnections.push_back(make_pair(connections[j], fGraphManager->GetPort(fPlaybackPortList[i])->GetName()));
+                fConnections.push_back(make_pair(string(connections[j]), string(fGraphManager->GetPort(fPlaybackPortList[i])->GetName())));
                 jack_info("Save connection: %s %s", connections[j], fGraphManager->GetPort(fPlaybackPortList[i])->GetName());
             }
             free(connections);
