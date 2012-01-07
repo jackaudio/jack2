@@ -30,8 +30,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "types.h"
 #include "jack.h"
+#include "control.h"
+
 #include "JackConstants.h"
-#include "JackDriverLoader.h"
+#include "JackPlatformPlug.h"
 
 #if defined(JACK_DBUS) && defined(__linux__)
 #include <dbus/dbus.h>
@@ -130,23 +132,15 @@ static void usage(FILE* file)
             "             to display options for each master backend\n\n");
 }
 
-// To put in the control.h interface??
-static jackctl_driver_t *
-jackctl_server_get_driver(
-    jackctl_server_t *server,
-    const char *driver_name)
+// To put in the control.h interface ??
+static jackctl_driver_t * jackctl_server_get_driver(jackctl_server_t *server, const char *driver_name)
 {
-    const JSList * node_ptr;
+    const JSList * node_ptr = jackctl_server_get_drivers_list(server);
 
-    node_ptr = jackctl_server_get_drivers_list(server);
-
-    while (node_ptr)
-    {
-        if (strcmp(jackctl_driver_get_name((jackctl_driver_t *)node_ptr->data), driver_name) == 0)
-        {
+    while (node_ptr) {
+        if (strcmp(jackctl_driver_get_name((jackctl_driver_t *)node_ptr->data), driver_name) == 0) {
             return (jackctl_driver_t *)node_ptr->data;
         }
-
         node_ptr = jack_slist_next(node_ptr);
     }
 
@@ -167,18 +161,12 @@ static jackctl_internal_t * jackctl_server_get_internal(jackctl_server_t *server
     return NULL;
 }
 
-static jackctl_parameter_t *
-jackctl_get_parameter(
-    const JSList * parameters_list,
-    const char * parameter_name)
+static jackctl_parameter_t * jackctl_get_parameter(const JSList * parameters_list, const char * parameter_name)
 {
-    while (parameters_list)
-    {
-        if (strcmp(jackctl_parameter_get_name((jackctl_parameter_t *)parameters_list->data), parameter_name) == 0)
-        {
+    while (parameters_list) {
+        if (strcmp(jackctl_parameter_get_name((jackctl_parameter_t *)parameters_list->data), parameter_name) == 0) {
             return (jackctl_parameter_t *)parameters_list->data;
         }
-
         parameters_list = jack_slist_next(parameters_list);
     }
 
@@ -457,7 +445,7 @@ int main(int argc, char** argv)
         master_driver_args[i] = argv[optind++];
     }
 
-    if (jackctl_parse_driver_params(master_driver_ctl, master_driver_nargs, master_driver_args)) {
+    if (jackctl_driver_params_parse(master_driver_ctl, master_driver_nargs, master_driver_args)) {
         goto destroy_server;
     }
 

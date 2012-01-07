@@ -34,7 +34,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 jack_driver_desc_t* jackctl_driver_get_desc(jackctl_driver_t * driver);
 
-SERVER_EXPORT void jack_print_driver_options(jack_driver_desc_t* desc, FILE* file)
+void jack_print_driver_options(jack_driver_desc_t* desc, FILE* file)
 {
     unsigned long i;
     char arg_default[JACK_DRIVER_PARAM_STRING_MAX + 1];
@@ -77,7 +77,7 @@ static void jack_print_driver_param_usage (jack_driver_desc_t* desc, unsigned lo
     fprintf (file, "%s\n", desc->params[param].long_desc);
 }
 
-SERVER_EXPORT void jack_free_driver_params(JSList * driver_params)
+void jack_free_driver_params(JSList * driver_params)
 {
     JSList*node_ptr = driver_params;
     JSList*next_node_ptr;
@@ -217,7 +217,7 @@ SERVER_EXPORT int jack_parse_driver_params(jack_driver_desc_t* desc, int argc, c
     return 0;
 }
 
-SERVER_EXPORT int jackctl_parse_driver_params(jackctl_driver *driver_ptr, int argc, char* argv[])
+SERVER_EXPORT int jackctl_driver_params_parse(jackctl_driver *driver_ptr, int argc, char* argv[])
 {
     struct option* long_options;
     char* options, * options_ptr;

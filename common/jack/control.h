@@ -331,6 +331,21 @@ jackctl_driver_get_parameters(
 	jackctl_driver_t * driver);
 
 /**
+ * Call this function to parse parameters for a driver.
+ *
+ * @param driver driver object handle
+ * @param argc parameter list len
+ * @param argv parameter list, as an array of char*
+ *
+ * @return success status: true - success, false - fail
+ */
+int
+jackctl_driver_params_parse(
+    jackctl_driver * driver,
+    int argc,
+    char* argv[]);
+
+/**
  * Call this function to get name of internal client.
  *
  * @param internal internal object handle to get name of

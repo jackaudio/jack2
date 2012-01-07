@@ -252,6 +252,9 @@ SERVER_EXPORT bool
 jackctl_server_switch_master(jackctl_server_t * server,
                             jackctl_driver_t * driver);
 
+SERVER_EXPORT int
+jackctl_parse_driver_params(jackctl_driver * driver_ptr, int argc, char* argv[]);
+
 #if 0
 { /* Adjust editor indent */
 #endif
