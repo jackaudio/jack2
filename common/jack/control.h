@@ -341,7 +341,7 @@ jackctl_driver_get_parameters(
  */
 int
 jackctl_driver_params_parse(
-    jackctl_driver * driver,
+    jackctl_driver_t * driver,
     int argc,
     char* argv[]);
 

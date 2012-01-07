@@ -33,7 +33,7 @@
 char * __cxa_demangle(const char * __mangled_name, char * __output_buffer, size_t * __length, int * __status);
 #endif
 
-#include "JackError.h"
+#include "jack/control.h"
 
 #if defined(REG_RIP)
 # define SIGSEGV_STACK_IA64
