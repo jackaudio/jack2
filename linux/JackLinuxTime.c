@@ -43,11 +43,11 @@ jack_time_t (*_jack_get_microseconds)(void) = 0;
 
 #if defined(__gnu_linux__) && (defined(__i386__) || defined(__x86_64__))
 #define HPET_SUPPORT
-#define HPET_MMAP_SIZE			1024
+#define HPET_MMAP_SIZE		1024
 #define HPET_CAPS			0x000
 #define HPET_PERIOD			0x004
-#define HPET_COUNTER			0x0f0
-#define HPET_CAPS_COUNTER_64BIT		(1 << 13)
+#define HPET_COUNTER		0x0f0
+#define HPET_CAPS_COUNTER_64BIT	(1 << 13)
 #if defined(__x86_64__)
 typedef uint64_t hpet_counter_t;
 #else
@@ -220,7 +220,7 @@ SERVER_EXPORT void InitTime()
 	__jack_cpu_mhz = jack_get_mhz ();
 }
 
-SERVER_EXPORT void SetClockSource(jack_timer_type_t source)
+void SetClockSource(jack_timer_type_t source)
 {
         jack_log("Clock source : %s", ClockSourceName(source));
 
@@ -245,7 +245,7 @@ SERVER_EXPORT void SetClockSource(jack_timer_type_t source)
 	}
 }
 
-SERVER_EXPORT const char* ClockSourceName(jack_timer_type_t source)
+const char* ClockSourceName(jack_timer_type_t source)
 {
 	switch (source) {
 	case JACK_TIMER_CYCLE_COUNTER:

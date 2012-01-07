@@ -936,6 +936,7 @@ LIB_EXPORT int jack_net_master_close(jack_net_master_t* net)
     delete master;
     return 0;
 }
+
 LIB_EXPORT int jack_net_master_recv(jack_net_master_t* net, int audio_input, float** audio_input_buffer, int midi_input, void** midi_input_buffer)
 {
     JackNetExtMaster* master = (JackNetExtMaster*)net;
