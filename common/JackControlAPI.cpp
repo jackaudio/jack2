@@ -249,7 +249,7 @@ jackctl_add_driver_parameters(
             jackctl_value.b = descriptor_ptr->value.i;
             break;
         default:
-            jack_error("unknown driver parameter type %i", (int)descriptor_ptr->type);
+            jack_error("Unknown driver parameter type %i", (int)descriptor_ptr->type);
             assert(0);
             goto fail;
         }
@@ -293,7 +293,7 @@ jackctl_drivers_load(
     descriptor_node_ptr = jack_drivers_load(NULL);
     if (descriptor_node_ptr == NULL)
     {
-        jack_error("could not find any drivers in driver directory!");
+        jack_error("Could not find any drivers in driver directory!");
         return false;
     }
 
@@ -302,7 +302,7 @@ jackctl_drivers_load(
         driver_ptr = (struct jackctl_driver *)malloc(sizeof(struct jackctl_driver));
         if (driver_ptr == NULL)
         {
-            jack_error("memory allocation of jackctl_driver structure failed.");
+            jack_error("Memory allocation of jackctl_driver structure failed.");
             goto next;
         }
 
@@ -363,7 +363,7 @@ jackctl_internals_load(
     descriptor_node_ptr = jack_internals_load(NULL);
     if (descriptor_node_ptr == NULL)
     {
-        jack_error("could not find any internals in driver directory!");
+        jack_error("Could not find any internals in driver directory!");
         return false;
     }
 
@@ -372,7 +372,7 @@ jackctl_internals_load(
         internal_ptr = (struct jackctl_internal *)malloc(sizeof(struct jackctl_internal));
         if (internal_ptr == NULL)
         {
-            jack_error("memory allocation of jackctl_driver structure failed.");
+            jack_error("Memory allocation of jackctl_driver structure failed.");
             goto next;
         }
 
@@ -444,7 +444,7 @@ static HANDLE waitEvent;
 
 static void do_nothing_handler(int signum)
 {
-    printf("jack main caught signal %d\n", signum);
+    printf("Jack main caught signal %d\n", signum);
     (void) signal(SIGINT, SIG_DFL);
     SetEvent(waitEvent);
 }
@@ -483,7 +483,7 @@ do_nothing_handler(int sig)
        another signal.
     */
     char buf[64];
-    snprintf (buf, sizeof(buf), "received signal %d during shutdown (ignored)\n", sig);
+    snprintf (buf, sizeof(buf), "Received signal %d during shutdown (ignored)\n", sig);
 }
 
 SERVER_EXPORT sigset_t
@@ -576,7 +576,7 @@ jackctl_wait_signals(sigset_t signals)
     #else
         sigwait(&signals, &sig);
     #endif
-        fprintf(stderr, "jack main caught signal %d\n", sig);
+        fprintf(stderr, "Jack main caught signal %d\n", sig);
 
         switch (sig) {
             case SIGUSR1:
@@ -845,15 +845,15 @@ SERVER_EXPORT bool jackctl_server_close(jackctl_server *server_ptr)
         delete server_ptr->engine;
 
         /* clean up shared memory and files from this server instance */
-        jack_log("cleaning up shared memory");
+        jack_log("Cleaning up shared memory");
 
         jack_cleanup_shm();
 
-        jack_log("cleaning up files");
+        jack_log("Cleaning up files");
 
         JackTools::CleanupFiles(server_ptr->name.str);
 
-        jack_log("unregistering server `%s'", server_ptr->name.str);
+        jack_log("Unregistering server `%s'", server_ptr->name.str);
 
         jack_unregister_server(server_ptr->name.str);
 
@@ -888,14 +888,14 @@ jackctl_server_open(
             jack_error("`%s' server already active", server_ptr->name.str);
             goto fail;
         case ENOSPC:
-            jack_error("too many servers already active");
+            jack_error("Too many servers already active");
             goto fail;
         case ENOMEM:
-            jack_error("no access to shm registry");
+            jack_error("No access to shm registry");
             goto fail;
         }
 
-        jack_log("server `%s' registered", server_ptr->name.str);
+        jack_log("Server `%s' registered", server_ptr->name.str);
 
         /* clean up shared memory and files from any previous
          * instance of this server name */
@@ -908,7 +908,7 @@ jackctl_server_open(
 
         /* check port max value before allocating server */
         if (server_ptr->port_max.ui > PORT_NUM_MAX) {
-            jack_error("JACK server started with too much ports %d (when port max can be %d)", server_ptr->port_max.ui, PORT_NUM_MAX);
+            jack_error("Jack server started with too much ports %d (when port max can be %d)", server_ptr->port_max.ui, PORT_NUM_MAX);
             goto fail;
         }
 
@@ -947,15 +947,15 @@ fail_delete:
     server_ptr->engine = NULL;
 
 fail_unregister:
-    jack_log("cleaning up shared memory");
+    jack_log("Cleaning up shared memory");
 
     jack_cleanup_shm();
 
-    jack_log("cleaning up files");
+    jack_log("Cleaning up files");
 
     JackTools::CleanupFiles(server_ptr->name.str);
 
-    jack_log("unregistering server `%s'", server_ptr->name.str);
+    jack_log("Unregistering server `%s'", server_ptr->name.str);
 
     jack_unregister_server(server_ptr->name.str);
 
@@ -1066,7 +1066,7 @@ SERVER_EXPORT union jackctl_parameter_value jackctl_parameter_get_enum_constrain
         strcpy(jackctl_value.str, value_ptr->str);
         break;
     default:
-        jack_error("bad driver parameter type %i (enum constraint)", (int)parameter_ptr->type);
+        jack_error("Bad driver parameter type %i (enum constraint)", (int)parameter_ptr->type);
         assert(0);
     }
 
@@ -1095,7 +1095,7 @@ SERVER_EXPORT void jackctl_parameter_get_range_constraint(jackctl_parameter *par
         max_ptr->ui = parameter_ptr->constraint_ptr->constraint.range.max.ui;
         return;
     default:
-        jack_error("bad driver parameter type %i (range constraint)", (int)parameter_ptr->type);
+        jack_error("Bad driver parameter type %i (range constraint)", (int)parameter_ptr->type);
         assert(0);
     }
 }
@@ -1199,7 +1199,7 @@ SERVER_EXPORT bool jackctl_parameter_set_value(jackctl_parameter *parameter_ptr,
             parameter_ptr->driver_parameter_ptr->value.i = value_ptr->b;
             break;
         default:
-            jack_error("unknown parameter type %i", (int)parameter_ptr->type);
+            jack_error("Unknown parameter type %i", (int)parameter_ptr->type);
             assert(0);
 
             if (new_driver_parameter)
@@ -1283,7 +1283,7 @@ SERVER_EXPORT bool jackctl_server_add_slave(jackctl_server * server_ptr, jackctl
 {
     if (server_ptr && server_ptr->engine) {
         if (server_ptr->engine->IsRunning()) {
-            jack_error("cannot add a slave in a running server");
+            jack_error("Cannot add a slave in a running server");
             return false;
         } else {
             JackDriverInfo* info = server_ptr->engine->AddSlave(driver_ptr->desc_ptr, driver_ptr->set_parameters);
@@ -1303,7 +1303,7 @@ SERVER_EXPORT bool jackctl_server_remove_slave(jackctl_server * server_ptr, jack
 {
     if (server_ptr && server_ptr->engine) {
         if (server_ptr->engine->IsRunning()) {
-            jack_error("cannot remove a slave from a running server");
+            jack_error("Cannot remove a slave from a running server");
             return false;
         } else {
             if (driver_ptr->infos) {

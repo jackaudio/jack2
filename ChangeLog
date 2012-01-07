@@ -38,6 +38,10 @@ John Emmas
 
 2012-01-06 Stephane Letz  <letz@grame.fr>
 
+	* Cleanup drivers and internals loading code.
+
+2012-01-06 Stephane Letz  <letz@grame.fr>
+
 	* Fix for compilation on Solaris.
 
 2012-01-04 Stephane Letz  <letz@grame.fr>
