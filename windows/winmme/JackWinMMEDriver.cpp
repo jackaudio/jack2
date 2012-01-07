@@ -363,8 +363,6 @@ extern "C"
 
     SERVER_EXPORT jack_driver_desc_t * driver_get_descriptor()
     {
-        jack_driver_desc_t * desc;
-
         return jack_driver_descriptor_construct("winmme", JackDriverSlave, "WinMME API based MIDI backend", NULL);
     }
 

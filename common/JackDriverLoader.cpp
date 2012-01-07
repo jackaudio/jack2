@@ -70,7 +70,7 @@ static char* locate_system_driver_dir()
     }
 }
 
-static char* locate_driver_dir(HANDLE file&, WIN32_FIND_DATA& filedata)
+static char* locate_driver_dir(HANDLE& file, WIN32_FIND_DATA& filedata)
 {
     char dll_filename[512];
 
@@ -450,7 +450,7 @@ static void* check_symbol(const char* sofile, const char* symbol, const char* dr
         jack_error ("Could not open component .so '%s': %s", filename, dlerror());
 #endif
     } else {
-        res = GetDriverProc(dlhandle, symbol);
+        res = (void*)GetDriverProc(dlhandle, symbol);
         if (res_dllhandle) {
             *res_dllhandle = dlhandle;
         } else {

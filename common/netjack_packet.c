@@ -505,11 +505,11 @@ packet_cache_drain_socket( packet_cache *pcache, int sockfd )
     cache_packet *cpack;
     struct sockaddr_in sender_address;
 #ifdef WIN32
-    size_t senderlen = sizeof( struct sockaddr_in );
+    int senderlen = sizeof( struct sockaddr_in );
     u_long parm = 1;
     ioctlsocket( sockfd, FIONBIO, &parm );
 #else
-    socklen_t senderlen = sizeof( struct sockaddr_in );
+    int senderlen = sizeof( struct sockaddr_in );
 #endif
     while (1) {
 #ifdef WIN32

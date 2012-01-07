@@ -56,7 +56,7 @@ JackNetOneDriver::JackNetOneDriver(const char* name, const char* alias, JackLock
 
 #ifdef WIN32
     WSADATA wsa;
-    int rc = WSAStartup(MAKEWORD(2, 0), &wsa);
+    WSAStartup(MAKEWORD(2, 0), &wsa);
 #endif
 
     netjack_init(& (this->netj),

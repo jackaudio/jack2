@@ -192,6 +192,8 @@ JackWinMMEInputPort::ProcessJack(JackMidiBuffer *port_buffer,
             // Fallthrough on purpose
         case JackMidiWriteQueue::OK:
             continue;
+        default:
+            break;
         }
         break;
     }
