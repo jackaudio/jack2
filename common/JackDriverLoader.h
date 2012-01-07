@@ -28,20 +28,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 jack_driver_desc_t* jack_find_driver_descriptor(JSList* drivers, const char* name);
 JSList* jack_drivers_load(JSList* drivers);
 JSList* jack_internals_load(JSList* internals);
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-SERVER_EXPORT int jackctl_driver_params_parse(jackctl_driver * driver, int argc, char* argv[]);
-
 void jack_free_driver_params(JSList * param_ptr);
 void jack_print_driver_options(jack_driver_desc_t* desc, FILE* file);
 
-#ifdef __cplusplus
-}
-#endif
+// External control.h API
+extern "C" SERVER_EXPORT int jackctl_driver_params_parse(jackctl_driver * driver, int argc, char* argv[]);
 
 #endif
 

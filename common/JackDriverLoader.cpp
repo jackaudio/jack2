@@ -90,7 +90,7 @@ void jack_free_driver_params(JSList * driver_params)
     }
 }
 
-SERVER_EXPORT int jack_parse_driver_params(jack_driver_desc_t* desc, int argc, char* argv[], JSList** param_ptr)
+int jack_parse_driver_params(jack_driver_desc_t* desc, int argc, char* argv[], JSList** param_ptr)
 {
     struct option * long_options;
     char* options, * options_ptr;

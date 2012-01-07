@@ -28,6 +28,7 @@ extern "C"
 
 #include <limits.h>
 #include "jslist.h"
+
 #include "JackCompilerDeps.h"
 #include "JackSystemDeps.h"
 
@@ -75,7 +76,6 @@ typedef struct {
 
 typedef struct {
     uint32_t flags;         /**< JACK_CONSTRAINT_FLAG_XXX */
-
     union {
         struct {
             jack_driver_param_value_t min;
@@ -124,22 +124,24 @@ typedef struct {
 }
 jack_driver_desc_filler_t;
 
-SERVER_EXPORT int jack_parse_driver_params(jack_driver_desc_t * desc, int argc, char* argv[], JSList ** param_ptr);
+int jack_parse_driver_params(jack_driver_desc_t * desc, int argc, char* argv[], JSList ** param_ptr);
 
-SERVER_EXPORT jack_driver_desc_t *            /* newlly allocated driver descriptor, NULL on failure */
+// To be used by drivers
+
+SERVER_EXPORT jack_driver_desc_t *            /* Newly allocated driver descriptor, NULL on failure */
 jack_driver_descriptor_construct(
-    const char * name,          /* driver name */
-    jack_driver_type_t type,    /* driver type */
-    const char * description,   /* driver description */
+    const char * name,          /* Driver name */
+    jack_driver_type_t type,    /* Driver type */
+    const char * description,   /* Driver description */
     jack_driver_desc_filler_t * filler); /* Pointer to stack var to be supplied to jack_driver_descriptor_add_parameter() as well.
                                             Can be NULL for drivers that have no parameters. */
 
 SERVER_EXPORT int                            /* 0 on failure */
 jack_driver_descriptor_add_parameter(
-    jack_driver_desc_t * driver_descr,  /* pointer to driver descriptor as returned by jack_driver_descriptor_construct() */
+    jack_driver_desc_t * driver_descr,  /* Pointer to driver descriptor as returned by jack_driver_descriptor_construct() */
     jack_driver_desc_filler_t * filler, /* Pointer to the stack var that was supplied to jack_driver_descriptor_add_parameter(). */
-    const char * name,                  /* parameter's name */
-    char character,                     /* parameter's character (for getopt, etc) */
+    const char * name,                  /* Parameter's name */
+    char character,                     /* Parameter's character (for getopt, etc) */
     jack_driver_param_type_t type,      /* The parameter's type */
     const jack_driver_param_value_t * value_ptr, /* Pointer to parameter's (default) value */
     jack_driver_param_constraint_desc_t * constraint, /* Pointer to parameter constraint descriptor. NULL if there is no constraint */
