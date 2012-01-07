@@ -32,6 +32,74 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <dirent.h>
 #endif
 
+#ifdef WIN32
+
+static char* locate_application_driver_dir()
+{
+    char driver_dir_storage[512];
+
+    // For WIN32 ADDON_DIR is defined in JackConstants.h as relative path
+    if (3 < GetModuleFileName(NULL, driver_dir_storage, 512)) {
+        char *p = strrchr(driver_dir_storage, '\\');
+        if (p && (p != driver_dir_storage)) {
+            *p = 0;
+        } else {
+            GetCurrentDirectory(512, driver_dir_storage);
+        }
+    } else {
+        GetCurrentDirectory(512, driver_dir_storage);
+    }
+
+    strcat(driver_dir_storage, "/");
+    strcat(driver_dir_storage, ADDON_DIR);
+    return strdup(driver_dir_storage);
+}
+
+static char* locate_system_driver_dir()
+{
+    char driver_dir_storage[512];
+
+    // For WIN32 ADDON_DIR is defined in JackConstants.h as relative path
+    if (3 < GetSystemDirectory(driver_dir_storage, 512)) {
+        strcat(driver_dir_storage, "/");
+        strcat(driver_dir_storage, ADDON_DIR);
+        return strdup(driver_dir_storage);
+    } else {
+        jack_error("Cannot get system directory : %d", GetLastError());
+        return NULL;
+    }
+}
+
+static char* locate_driver_dir(HANDLE file&, WIN32_FIND_DATA& filedata)
+{
+    char dll_filename[512];
+
+    // Search drivers/internals near the application
+    char* driver_dir = locate_application_driver_dir();
+    snprintf(dll_filename, sizeof(dll_filename), "%s/*.dll", driver_dir);
+    file = (HANDLE)FindFirstFile(dll_filename, &filedata);
+
+    if (file == INVALID_HANDLE_VALUE) {
+        jack_error("Drivers not found near application");
+
+        // Otherwise search drivers/internals in the system
+        free(driver_dir);
+        driver_dir = locate_system_driver_dir();
+        snprintf(dll_filename, sizeof(dll_filename), "%s/*.dll", driver_dir);
+        file = (HANDLE)FindFirstFile(dll_filename, &filedata);
+
+        if (file == INVALID_HANDLE_VALUE) {
+            jack_error("Drivers not found in system location");
+            free(driver_dir);
+            return NULL;
+        }
+    }
+
+    return driver_dir;
+}
+
+#endif
+
 jack_driver_desc_t* jackctl_driver_get_desc(jackctl_driver_t * driver);
 
 void jack_print_driver_options(jack_driver_desc_t* desc, FILE* file)
@@ -436,41 +504,42 @@ error:
 
 #ifdef WIN32
 
-JSList * jack_drivers_load (JSList * drivers)
+JSList * jack_drivers_load(JSList * drivers)
 {
-    char* driver_dir;
-    char driver_dir_storage[512];
-    char dll_filename[512];
+    //char dll_filename[512];
     WIN32_FIND_DATA filedata;
     HANDLE file;
     const char* ptr = NULL;
     JSList* driver_list = NULL;
     jack_driver_desc_t* desc = NULL;
 
-    if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) {
-        // for WIN32 ADDON_DIR is defined in JackConstants.h as relative path
-        if (3 < GetModuleFileName(NULL, driver_dir_storage, 512)) {
-            char *p = strrchr(driver_dir_storage, '\\');
-            if (p && (p != driver_dir_storage))
-                *p = 0;
-            else
-                GetCurrentDirectory(512, driver_dir_storage);
-        } else {
-            GetCurrentDirectory(512, driver_dir_storage);
-        }
-        strcat(driver_dir_storage, "/");
-        strcat(driver_dir_storage, ADDON_DIR);
-        driver_dir = driver_dir_storage;
+    char* driver_dir = locate_driver_dir(file, filedata);
+    if (!driver_dir) {
+        jack_error("Driver folder not found");
+        goto error;
     }
 
+    /*
+    char* driver_dir = locate_application_driver_dir();
     snprintf(dll_filename, sizeof(dll_filename), "%s/*.dll", driver_dir);
-
-    file = (HANDLE )FindFirstFile(dll_filename, &filedata);
+    file = (HANDLE)FindFirstFile(dll_filename, &filedata);
 
     if (file == INVALID_HANDLE_VALUE) {
-        jack_error("Error invalid handle");
-        return NULL;
+        jack_error("Drivers not found near application");
+
+        // Now try system; location
+        free(driver_dir);
+        driver_dir = locate_system_driver_dir();
+        snprintf(dll_filename, sizeof(dll_filename), "%s/*.dll", driver_dir);
+        file = (HANDLE)FindFirstFile(dll_filename, &filedata);
+
+        if (file == INVALID_HANDLE_VALUE) {
+            jack_error("Drivers not found in system location");
+            free(driver_dir);
+            return NULL;
+        }
     }
+    */
 
     do {
         /* check the filename is of the right format */
@@ -504,9 +573,13 @@ JSList * jack_drivers_load (JSList * drivers)
 
     if (!driver_list) {
         jack_error ("Could not find any drivers in %s!", driver_dir);
-        return NULL;
     }
 
+error:
+    if (driver_dir) {
+        free(driver_dir);
+    }
+    FindClose(file);
     return driver_list;
 }
 
@@ -582,42 +655,42 @@ JSList* jack_drivers_load (JSList * drivers)
 
 #ifdef WIN32
 
-JSList* jack_internals_load (JSList * internals)
+JSList* jack_internals_load(JSList * internals)
 {
-    char* driver_dir;
-    char driver_dir_storage[512];
-    char dll_filename[512];
+    ///char dll_filename[512];
     WIN32_FIND_DATA filedata;
     HANDLE file;
     const char* ptr = NULL;
     JSList* driver_list = NULL;
     jack_driver_desc_t* desc;
 
-    if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) {
-        // for WIN32 ADDON_DIR is defined in JackConstants.h as relative path
-        if (3 < GetModuleFileName(NULL, driver_dir_storage, 512)) {
-            char *p = strrchr(driver_dir_storage, '\\');
-            if (p && (p != driver_dir_storage))
-                *p = 0;
-            else
-                GetCurrentDirectory(512, driver_dir_storage);
-        } else {
-            GetCurrentDirectory(512, driver_dir_storage);
-        }
-        strcat(driver_dir_storage, "/");
-        strcat(driver_dir_storage, ADDON_DIR);
-        driver_dir = driver_dir_storage;
+    char* driver_dir = locate_driver_dir(file, filedata);
+    if (!driver_dir) {
+        jack_error("Driver folder not found");
+        goto error;
     }
 
+    /*
+    char* driver_dir = locate_application_driver_dir();
     snprintf(dll_filename, sizeof(dll_filename), "%s/*.dll", driver_dir);
-
-    file = (HANDLE )FindFirstFile(dll_filename, &filedata);
+    file = (HANDLE)FindFirstFile(dll_filename, &filedata);
 
     if (file == INVALID_HANDLE_VALUE) {
-        jack_error("Could not open driver directory %s", driver_dir);
-        return NULL;
-    }
+        jack_error("Drivers not found near application");
 
+        // Now try system; location
+        free(driver_dir);
+        driver_dir = locate_system_driver_dir();
+        snprintf(dll_filename, sizeof(dll_filename), "%s/*.dll", driver_dir);
+        file = (HANDLE)FindFirstFile(dll_filename, &filedata);
+
+        if (file == INVALID_HANDLE_VALUE) {
+            jack_error("Drivers not found in system location");
+            free(driver_dir);
+            return NULL;
+        }
+    }
+    */
     do {
 
         ptr = strrchr (filedata.cFileName, '.');
@@ -646,9 +719,13 @@ JSList* jack_internals_load (JSList * internals)
 
     if (!driver_list) {
         jack_error ("Could not find any internals in %s!", driver_dir);
-        return NULL;
     }
 
+ error:
+    if (driver_dir) {
+        free(driver_dir);
+    }
+    FindClose(file);
     return driver_list;
 }
 

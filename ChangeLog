@@ -40,6 +40,7 @@ John Emmas
 
 	* Cleanup drivers and internals loading code.
 	* jackctl_driver_params_parse API moved in public control.h.
+	* More general drivers/internals loading model on Windows.
 
 2012-01-06 Stephane Letz  <letz@grame.fr>
 
