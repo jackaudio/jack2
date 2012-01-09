@@ -80,7 +80,7 @@ static char* locate_driver_dir(HANDLE& file, WIN32_FIND_DATA& filedata)
     file = (HANDLE)FindFirstFile(dll_filename, &filedata);
 
     if (file == INVALID_HANDLE_VALUE) {
-        jack_error("Drivers not found near application");
+        jack_info("Drivers/internals not found near application");
 
         // Otherwise search drivers/internals in the system
         free(driver_dir);
@@ -89,10 +89,14 @@ static char* locate_driver_dir(HANDLE& file, WIN32_FIND_DATA& filedata)
         file = (HANDLE)FindFirstFile(dll_filename, &filedata);
 
         if (file == INVALID_HANDLE_VALUE) {
-            jack_error("Drivers not found in system location");
+            jack_info("Drivers/internals not found in system location");
             free(driver_dir);
             return NULL;
+        } else {
+            jack_info("Drivers/internals found in system location");
         }
+    } else {
+        jack_info("Drivers/internals found near application");
     }
 
     return driver_dir;
