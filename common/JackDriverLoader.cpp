@@ -70,6 +70,33 @@ static char* locate_system_driver_dir()
     }
 }
 
+static char* locate_dll_driver_dir()
+{
+#ifdef _WIN64
+    HMODULE libjack_handle = LoadLibrary("libjackserver64.dll");
+#else
+    HMODULE libjack_handle = LoadLibrary("libjackserver.dll");
+#endif
+
+    // For WIN32 ADDON_DIR is defined in JackConstants.h as relative path
+    char driver_dir_storage[512];
+    if (3 < GetModuleFileName(libjack_handle, driver_dir_storage, 512)) {
+        char *p = strrchr(driver_dir_storage, '\\');
+        if (p && (p != driver_dir_storage)) {
+            *p = 0;
+        } else {
+            GetCurrentDirectory(512, driver_dir_storage);
+        }
+    } else {
+        GetCurrentDirectory(512, driver_dir_storage);
+    }
+
+    strcat(driver_dir_storage, "/");
+    strcat(driver_dir_storage, ADDON_DIR);
+    return strdup(driver_dir_storage);
+}
+
+/*
 static char* locate_driver_dir(HANDLE& file, WIN32_FIND_DATA& filedata)
 {
     char dll_filename[512];
@@ -100,6 +127,24 @@ static char* locate_driver_dir(HANDLE& file, WIN32_FIND_DATA& filedata)
     }
 
     return driver_dir;
+}
+*/
+
+static char* locate_driver_dir(HANDLE& file, WIN32_FIND_DATA& filedata)
+{
+    // Search drivers/internals iin the same folder of "libjackserver.dll"
+    char* driver_dir = locate_dll_driver_dir();
+    char dll_filename[512];
+    snprintf(dll_filename, sizeof(dll_filename), "%s/*.dll", driver_dir);
+    file = (HANDLE)FindFirstFile(dll_filename, &filedata);
+
+    if (file == INVALID_HANDLE_VALUE) {
+        jack_error("Drivers not found ");
+        free(driver_dir)
+        return NULL;
+    } else {
+        return driver_dir;
+    }
 }
 
 #endif
