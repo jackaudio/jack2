@@ -34,42 +34,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #ifdef WIN32
 
-static char* locate_application_driver_dir()
-{
-    char driver_dir_storage[512];
-
-    // For WIN32 ADDON_DIR is defined in JackConstants.h as relative path
-    if (3 < GetModuleFileName(NULL, driver_dir_storage, 512)) {
-        char *p = strrchr(driver_dir_storage, '\\');
-        if (p && (p != driver_dir_storage)) {
-            *p = 0;
-        } else {
-            GetCurrentDirectory(512, driver_dir_storage);
-        }
-    } else {
-        GetCurrentDirectory(512, driver_dir_storage);
-    }
-
-    strcat(driver_dir_storage, "/");
-    strcat(driver_dir_storage, ADDON_DIR);
-    return strdup(driver_dir_storage);
-}
-
-static char* locate_system_driver_dir()
-{
-    char driver_dir_storage[512];
-
-    // For WIN32 ADDON_DIR is defined in JackConstants.h as relative path
-    if (3 < GetSystemDirectory(driver_dir_storage, 512)) {
-        strcat(driver_dir_storage, "/");
-        strcat(driver_dir_storage, ADDON_DIR);
-        return strdup(driver_dir_storage);
-    } else {
-        jack_error("Cannot get system directory : %d", GetLastError());
-        return NULL;
-    }
-}
-
 static char* locate_dll_driver_dir()
 {
 #ifdef _WIN64
@@ -84,51 +48,18 @@ static char* locate_dll_driver_dir()
         char *p = strrchr(driver_dir_storage, '\\');
         if (p && (p != driver_dir_storage)) {
             *p = 0;
-        } else {
-            GetCurrentDirectory(512, driver_dir_storage);
         }
+        jack_info("Drivers/internals found in : %s", driver_dir_storage);
+        strcat(driver_dir_storage, "/");
+        strcat(driver_dir_storage, ADDON_DIR);
+        FreeLibrary(libjack_handle);
+        return strdup(driver_dir_storage);
     } else {
-        GetCurrentDirectory(512, driver_dir_storage);
+        jack_error("Cannot get JACK dll directory : %d", GetLastError());
+        FreeLibrary(libjack_handle);
+        return NULL;
     }
-
-    strcat(driver_dir_storage, "/");
-    strcat(driver_dir_storage, ADDON_DIR);
-    return strdup(driver_dir_storage);
 }
-
-/*
-static char* locate_driver_dir(HANDLE& file, WIN32_FIND_DATA& filedata)
-{
-    char dll_filename[512];
-
-    // Search drivers/internals near the application
-    char* driver_dir = locate_application_driver_dir();
-    snprintf(dll_filename, sizeof(dll_filename), "%s/*.dll", driver_dir);
-    file = (HANDLE)FindFirstFile(dll_filename, &filedata);
-
-    if (file == INVALID_HANDLE_VALUE) {
-        jack_info("Drivers/internals not found near application");
-
-        // Otherwise search drivers/internals in the system
-        free(driver_dir);
-        driver_dir = locate_system_driver_dir();
-        snprintf(dll_filename, sizeof(dll_filename), "%s/*.dll", driver_dir);
-        file = (HANDLE)FindFirstFile(dll_filename, &filedata);
-
-        if (file == INVALID_HANDLE_VALUE) {
-            jack_info("Drivers/internals not found in system location");
-            free(driver_dir);
-            return NULL;
-        } else {
-            jack_info("Drivers/internals found in system location");
-        }
-    } else {
-        jack_info("Drivers/internals found near application");
-    }
-
-    return driver_dir;
-}
-*/
 
 static char* locate_driver_dir(HANDLE& file, WIN32_FIND_DATA& filedata)
 {
@@ -140,7 +71,7 @@ static char* locate_driver_dir(HANDLE& file, WIN32_FIND_DATA& filedata)
 
     if (file == INVALID_HANDLE_VALUE) {
         jack_error("Drivers not found ");
-        free(driver_dir)
+        free(driver_dir);
         return NULL;
     } else {
         return driver_dir;
