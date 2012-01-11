@@ -44,12 +44,6 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
         virtual ~JackInternalClientChannel()
         {}
 
-        // Open the Server/Client connection
-        virtual int Open(const char* name, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
-        {
-            return 0;
-        }
-
         void ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status, int* result, int open)
         {
             *result = fEngine->ClientCheck(name, uuid, name_res, protocol, options, status);

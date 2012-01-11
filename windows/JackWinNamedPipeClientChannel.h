@@ -29,6 +29,8 @@
 namespace Jack
 {
 
+class JackClient;
+
 /*!
 \brief JackClientChannel using pipes.
 */
@@ -40,6 +42,7 @@ class JackWinNamedPipeClientChannel : public JackGenericClientChannel, public Ja
 
         JackWinNamedPipeServer fNotificationListenPipe;	// Pipe listener for server notification
         JackThread fThread;                             // Thread to execute the event loop
+        JackClient* fClient;
 
     public:
 

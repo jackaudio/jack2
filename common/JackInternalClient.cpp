@@ -27,7 +27,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackServer.h"
 #include "JackEngineControl.h"
 #include "JackClientControl.h"
+
 #include "JackInternalClientChannel.h"
+#include "JackGenericClientChannel.h"
+
 #include "JackTools.h"
 #include <assert.h>
 
@@ -56,6 +59,7 @@ SERVER_EXPORT JackSynchro* GetSynchroTable()
 JackInternalClient::JackInternalClient(JackServer* server, JackSynchro* table): JackClient(table)
 {
     fChannel = new JackInternalClientChannel(server);
+    //fChannel = new JackGenericClientChannel();
 }
 
 JackInternalClient::~JackInternalClient()
@@ -98,7 +102,6 @@ int JackInternalClient::Open(const char* server_name, const char* name, int uuid
     return 0;
 
 error:
-    fChannel->Stop();
     fChannel->Close();
     return -1;
 }

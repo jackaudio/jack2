@@ -28,6 +28,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
+class JackClient;
+
 /*!
 \brief JackClientChannel using sockets.
 */
@@ -40,6 +42,7 @@ class JackSocketClientChannel : public JackGenericClientChannel, public JackRunn
         JackServerSocket fNotificationListenSocket; // Socket listener for server notification
         JackClientSocket* fNotificationSocket;      // Socket for server notification
         JackThread fThread;                         // Thread to execute the event loop
+        JackClient* fClient;
 
     public:
 

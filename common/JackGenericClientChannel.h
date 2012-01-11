@@ -39,7 +39,6 @@ class JackGenericClientChannel : public detail::JackClientChannelInterface
     protected:
 
         detail::JackClientRequestInterface* fRequest;
-        JackClient* fClient;
 
         void ServerSyncCall(JackRequest* req, JackResult* res, int* result);
         void ServerAsyncCall(JackRequest* req, JackResult* res, int* result);
