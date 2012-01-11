@@ -932,7 +932,7 @@ int JackEngine::PortRename(int refnum, jack_port_id_t port, const char* name)
 // Session management
 //--------------------
 
-void JackEngine::SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket, JackSessionNotifyResult** result)
+void JackEngine::SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, detail::JackChannelTransactionInterface *socket, JackSessionNotifyResult** result)
 {
     if (fSessionPendingReplies != 0) {
         JackSessionNotifyResult res(-1);

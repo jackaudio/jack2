@@ -26,6 +26,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackMutex.h"
 #include "JackTransportEngine.h"
 #include "JackPlatformPlug.h"
+#include "JackRequest.h"
 #include <map>
 
 namespace Jack
@@ -34,6 +35,7 @@ namespace Jack
 class JackClientInterface;
 struct JackEngineControl;
 class JackExternalClient;
+class detail::JackChannelTransactionInterface;
 
 /*!
 \brief Engine description.
@@ -54,7 +56,7 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         jack_time_t fLastSwitchUsecs;
 
         int fSessionPendingReplies;
-        JackChannelTransaction* fSessionTransaction;
+        detail::JackChannelTransactionInterface* fSessionTransaction;
         JackSessionNotifyResult* fSessionResult;
         std::map<int,std::string> fReservationMap;
         int fMaxUUID;
@@ -145,7 +147,7 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         void NotifyQuit();
 
         // Session management
-        void SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket, JackSessionNotifyResult** result);
+        void SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, detail::JackChannelTransactionInterface *socket, JackSessionNotifyResult** result);
         void SessionReply(int refnum);
 
         void GetUUIDForClientName(const char *client_name, char *uuid_res, int *result);

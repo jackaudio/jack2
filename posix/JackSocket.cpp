@@ -36,7 +36,7 @@ static void BuildName(const char* client_name, char* res, const char* dir, int w
     sprintf(res, "%s/jack_%s_%d_%d", dir, ext_client_name, JackTools::GetUID(), which);
 }
 
-JackClientSocket::JackClientSocket(int socket): fSocket(socket),fTimeOut(0)
+JackClientSocket::JackClientSocket(int socket): JackClientRequestInterface(), fSocket(socket),fTimeOut(0)
 {}
 
 #if defined(__sun__) || defined(sun)

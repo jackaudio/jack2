@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -23,11 +23,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <sys/types.h>
 #include <sys/un.h>
 #include <sys/socket.h>
-#include <sys/ioctl.h> 
+#include <sys/ioctl.h>
 #include <sys/time.h>
 #include <arpa/inet.h>
 #include <errno.h>
 #include <unistd.h>
+
+#include "JackChannel.h"
 
 namespace Jack
 {
@@ -36,17 +38,17 @@ namespace Jack
 \brief Client socket.
 */
 
-class JackClientSocket
+class JackClientSocket : public detail::JackClientRequestInterface
 {
 
     private:
 
         int fSocket;
         int fTimeOut;
-   
+
     public:
 
-        JackClientSocket(): fSocket( -1),fTimeOut(0)
+        JackClientSocket():JackClientRequestInterface(), fSocket( -1),fTimeOut(0)
         {}
         JackClientSocket(int socket);
 
@@ -60,7 +62,7 @@ class JackClientSocket
         }
         void SetReadTimeOut(long sec);
         void SetWriteTimeOut(long sec);
-        
+
         void SetNonBlocking(bool onoff);
 };
 

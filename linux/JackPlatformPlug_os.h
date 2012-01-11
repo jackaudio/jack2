@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -28,7 +28,7 @@ namespace Jack
 {
     struct JackRequest;
     struct JackResult;
-    
+
     class JackPosixMutex;
     class JackPosixThread;
     class JackFifo;
@@ -58,14 +58,16 @@ namespace Jack { typedef JackFifo JackSynchro; }
 namespace Jack { typedef JackPosixSemaphore JackSynchro; }
 
 /* __JackPlatformChannelTransaction__ */
+/*
 #include "JackSocket.h"
 namespace Jack { typedef JackClientSocket JackChannelTransaction; }
+*/
 
 #include "JackProcessSync.h"
 /* __JackPlatformProcessSync__ */
 /* Only on windows a special JackProcessSync is used. It is directly defined by including JackProcessSync.h here */
 
-/* __JackPlatformServerChannel__ */ 
+/* __JackPlatformServerChannel__ */
 #include "JackSocketServerChannel.h"
 namespace Jack { typedef JackSocketServerChannel JackServerChannel; }
 

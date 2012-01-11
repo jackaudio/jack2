@@ -64,12 +64,6 @@ namespace Jack { typedef JackMachThread JackThread; }
 namespace Jack { typedef JackMachSemaphore JackSynchro; }
 #endif
 
-#include "JackSocket.h"
-namespace Jack { typedef JackClientSocket JackChannelTransaction; }
-
-#include "JackSocket.h"
-namespace Jack { typedef JackClientSocket JackChannelTransaction; }
-
 /* __JackPlatformProcessSync__ */
 #include "JackProcessSync.h"
 /* Only on windows a special JackProcessSync is used. It is directly defined by including JackProcessSync.h here */

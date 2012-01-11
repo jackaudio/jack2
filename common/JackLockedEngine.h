@@ -325,7 +325,7 @@ class SERVER_EXPORT JackLockedEngine
             CATCH_EXCEPTION
         }
 
-        void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket, JackSessionNotifyResult** result)
+        void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char *path, detail::JackChannelTransactionInterface *socket, JackSessionNotifyResult** result)
         {
             TRY_CALL
             JackLock lock(&fEngine);
