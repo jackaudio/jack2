@@ -263,6 +263,7 @@
 		<Unit filename="..\common\JackExternalClient.cpp" />
 		<Unit filename="..\common\JackFrameTimer.cpp" />
 		<Unit filename="..\common\JackFreewheelDriver.cpp" />
+		<Unit filename="..\common\JackGenericClientChannel.cpp" />
 		<Unit filename="..\common\JackGlobals.cpp" />
 		<Unit filename="..\common\JackGraphManager.cpp" />
 		<Unit filename="..\common\JackInternalClient.cpp" />

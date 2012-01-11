@@ -311,6 +311,7 @@
 		<Unit filename="..\common\JackError.cpp" />
 		<Unit filename="..\common\JackException.cpp" />
 		<Unit filename="..\common\JackFrameTimer.cpp" />
+		<Unit filename="..\common\JackGenericClientChannel.cpp" />
 		<Unit filename="..\common\JackGlobals.cpp" />
 		<Unit filename="..\common\JackGraphManager.cpp" />
 		<Unit filename="..\common\JackLibAPI.cpp" />
