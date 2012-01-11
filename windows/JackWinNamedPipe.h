@@ -56,7 +56,7 @@ class JackWinNamedPipe : public detail::JackChannelTransactionInterface
 class JackWinNamedPipeClient : public detail::JackClientRequestInterface
 {
 
-    private:
+    protected:
 
         int ConnectAux();
 
