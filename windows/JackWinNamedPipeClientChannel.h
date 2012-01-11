@@ -33,7 +33,7 @@ namespace Jack
 \brief JackClientChannel using pipes.
 */
 
-class JackWinNamedPipeClientChannel : public detail::JackClientChannelInterface, public JackRunnableInterface
+class JackWinNamedPipeClientChannel : public JackGenericClientChannel, public JackRunnableInterface
 {
 
     private:

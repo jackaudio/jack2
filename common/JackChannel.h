@@ -50,7 +50,22 @@ class JackChannelTransactionInterface
 
 };
 
-class JackClientRequestInterface : public JackChannelTransactionInterface
+class JackRequestInterface
+{
+
+    public:
+
+        JackRequestInterface()
+        {}
+        virtual ~JackRequestInterface()
+        {}
+
+        virtual int Connect(const char* dir, const char* name, int which) = 0;
+        virtual int Close() = 0;
+
+};
+
+class JackClientRequestInterface : public JackChannelTransactionInterface, public JackRequestInterface
 {
 
     public:
@@ -59,9 +74,6 @@ class JackClientRequestInterface : public JackChannelTransactionInterface
         {}
         virtual ~JackClientRequestInterface()
         {}
-
-        virtual int Connect(const char* dir, const char* name, int which) = 0;
-        virtual int Close() = 0;
 
 };
 

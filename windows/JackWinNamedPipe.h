@@ -23,10 +23,12 @@
 
 #include <windows.h>
 
+#include "JackChannel.h"
+
 namespace Jack
 {
 
-class JackWinNamedPipe
+class JackWinNamedPipe : public JackChannelTransactionInterface
 {
 
     protected:
@@ -51,7 +53,7 @@ class JackWinNamedPipe
 \brief Client named pipe.
 */
 
-class JackWinNamedPipeClient : public JackWinNamedPipe
+class JackWinNamedPipeClient : public JackWinNamedPipe, public JackRequestInterface
 {
 
     private:
