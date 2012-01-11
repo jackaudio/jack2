@@ -52,6 +52,30 @@ int JackWinNamedPipe::Write(void* data, int len)
     }
 }
 
+int JackWinNamedPipeClient::Read(void* data, int len)
+{
+    DWORD read;
+    BOOL res = ReadFile(fNamedPipe, data, len, &read, NULL);
+    if (res && read == (DWORD)len) {
+        return 0;
+    } else {
+        jack_error("Cannot read named pipe name = %s err = %ld", fName, GetLastError());
+        return -1;
+    }
+}
+
+int JackWinNamedPipeClient::Write(void* data, int len)
+{
+    DWORD written;
+    BOOL res = WriteFile(fNamedPipe, data, len, &written, NULL);
+    if (res && written == (DWORD)len) {
+        return 0;
+    } else {
+        jack_error("Cannot write named pipe name = %s err = %ld", fName, GetLastError());
+        return -1;
+    }
+}
+
 /*
 See :
     http://answers.google.com/answers/threadview?id=430173

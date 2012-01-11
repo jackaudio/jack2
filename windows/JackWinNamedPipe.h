@@ -28,7 +28,7 @@
 namespace Jack
 {
 
-class JackWinNamedPipe : public JackChannelTransactionInterface
+class JackWinNamedPipe : public detail::JackChannelTransactionInterface
 {
 
     protected:
@@ -53,20 +53,24 @@ class JackWinNamedPipe : public JackChannelTransactionInterface
 \brief Client named pipe.
 */
 
-class JackWinNamedPipeClient : public JackWinNamedPipe, public JackRequestInterface
+class JackWinNamedPipeClient : public detail::JackClientRequestInterface
 {
 
     private:
 
         int ConnectAux();
 
+        HANDLE fNamedPipe;
+        char fName[256];
+
     public:
 
-        JackWinNamedPipeClient(): JackWinNamedPipe()
+        JackWinNamedPipeClient()
         {}
-        JackWinNamedPipeClient(HANDLE pipe, const char* name): JackWinNamedPipe(pipe)
+        JackWinNamedPipeClient(HANDLE pipe, const char* name)
         {
             strcpy(fName, name);
+            fNamedPipe = pipe;
         }
 
         virtual ~JackWinNamedPipeClient()
@@ -75,6 +79,10 @@ class JackWinNamedPipeClient : public JackWinNamedPipe, public JackRequestInterf
         virtual int Connect(const char* dir, int which);
         virtual int Connect(const char* dir, const char* name, int which);
         virtual int Close();
+
+        int Read(void* data, int len);
+        int Write(void* data, int len);
+
         virtual void SetReadTimeOut(long sec);
         virtual void SetWriteTimeOut(long sec);
 };
