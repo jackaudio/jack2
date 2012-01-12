@@ -511,7 +511,7 @@ namespace Jack
         DecodeSyncPacket();
 
 #ifdef JACK_MONITOR
-        fNetTimeMon->Add((float(GetMicroSeconds() - fRcvSyncUst) / float(fEngineControl->fPeriodUsecs) * 100.f);
+        fNetTimeMon->Add(float(GetMicroSeconds() - fRcvSyncUst) / float(fEngineControl->fPeriodUsecs) * 100.f);
 #endif
         //audio, midi or sync if driver is late
         int res = DataRecv();
@@ -526,7 +526,7 @@ namespace Jack
         JackDriver::CycleTakeBeginTime();
 
 #ifdef JACK_MONITOR
-        fNetTimeMon->Add((float(GetMicroSeconds() - fRcvSyncUst) / float(fEngineControl->fPeriodUsecs) * 100.f);
+        fNetTimeMon->Add(float(GetMicroSeconds() - fRcvSyncUst) / float(fEngineControl->fPeriodUsecs) * 100.f);
 #endif
 
         return 0;
@@ -557,7 +557,7 @@ namespace Jack
         }
 
 #ifdef JACK_MONITOR
-        fNetTimeMon->AddLast((float(GetMicroSeconds() - fRcvSyncUst) / float(fEngineControl->fPeriodUsecs) * 100.f);
+        fNetTimeMon->AddLast(float(GetMicroSeconds() - fRcvSyncUst) / float(fEngineControl->fPeriodUsecs) * 100.f);
 #endif
 
         //sync
