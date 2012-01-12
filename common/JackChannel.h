@@ -74,6 +74,12 @@ class JackClientRequestInterface : public JackChannelTransactionInterface, publi
         {}
         virtual ~JackClientRequestInterface()
         {}
+        
+        virtual int Read(void* data, int len) { return -1; }
+        virtual int Write(void* data, int len) { return -1; }
+        
+        virtual int Connect(const char* dir, const char* name, int which) { return -1; }
+        virtual int Close() { return -1; }
 
 };
 
