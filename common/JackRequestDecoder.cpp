@@ -37,17 +37,12 @@ JackRequestDecoder::JackRequestDecoder(JackServer* server, JackClientHandlerInte
 JackRequestDecoder::~JackRequestDecoder()
 {}
 
-bool JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* socket)
+void JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* socket, int type_aux)
 {
-    // Read header
-    JackRequest header;
-    if (header.Read(socket) < 0) {
-        jack_log("HandleRequest: cannot read header");
-        return false;
-    }
-
+    JackRequest::RequestType type = (JackRequest::RequestType)type_aux;
+    
    // Read data
-    switch (header.fType) {
+    switch (type) {
 
         case JackRequest::kClientCheck: {
             jack_log("JackRequest::ClientCheck");
@@ -58,8 +53,11 @@ bool JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* 
             if (res.Write(socket) < 0)
                 jack_error("JackRequest::ClientCheck write error name = %s", req.fName);
             // Atomic ClientCheck followed by ClientOpen on same socket
-            if (req.fOpen)
-                HandleRequest(socket);
+            if (req.fOpen) {
+                JackRequest header;
+                header.Read(socket);
+                HandleRequest(socket, header.fType);
+            }
             break;
         }
 
@@ -369,11 +367,9 @@ bool JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* 
         }
 
         default:
-            jack_error("Unknown request %ld", header.fType);
+            jack_error("Unknown request %ld", type);
             break;
     }
-
-    return true;
 }
 
 } // end of namespace

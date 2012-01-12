@@ -52,7 +52,7 @@ class JackRequestDecoder
         JackRequestDecoder(JackServer* server, JackClientHandlerInterface* handler);
         virtual ~JackRequestDecoder();
 
-        bool HandleRequest(detail::JackChannelTransactionInterface* socket);
+        void HandleRequest(detail::JackChannelTransactionInterface* socket, int type);
 };
 
 } // end of namespace

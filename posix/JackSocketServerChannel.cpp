@@ -236,9 +236,15 @@ bool JackSocketServerChannel::Execute()
                     jack_log("Poll client error err = %s", strerror(errno));
                     ClientKill(fd);
                 } else if (fPollTable[i].revents & POLLIN) {
-                    if (!fDecoder->HandleRequest(fSocketTable[fd].second)) {
-                        jack_log("Could not handle external client request");
+                    // Read header
+                    JackClientSocket* socket = fSocketTable[fd].second;
+                    JackRequest header;
+                    if (header.Read(socket) < 0) {
+                        jack_log("HandleRequest: cannot read header");
                         ClientKill(fd);
+                        return false;
+                    } else {
+                        fDecoder->HandleRequest(socket, header.fType);
                     }
                 }
             }

@@ -88,18 +88,24 @@ bool JackClientPipeThread::Execute()
     try{
         jack_log("JackClientPipeThread::Execute");
         
+        JackRequest header;
+        if (header.Read(socket) < 0) {
+            jack_log("HandleRequest: cannot read header");
+            ClientKill(fd);
+            return false;
+        } 
+        
         // Lock the global mutex
         if (WaitForSingleObject(fMutex, INFINITE) == WAIT_FAILED) {
             jack_error("JackClientPipeThread::HandleRequest: mutex wait error");
         }
-
-        bool res = fDecoder->HandleRequest(fPipe);
-        if (!res) {
-            ClientKill();
-        }
+        
+        fDecoder->HandleRequest(fPipe, header.fType);
         
         // Unlock the global mutex
-        ReleaseMutex(fMutex);
+        if (!ReleaseMutex(fMutex)) {
+            jack_error("JackClientPipeThread::HandleRequest: mutex release error");
+        }
         return res;
        
     } catch (JackQuitException& e) {
