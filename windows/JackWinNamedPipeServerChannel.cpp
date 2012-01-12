@@ -94,6 +94,9 @@ bool JackClientPipeThread::Execute()
         }
 
         bool res = fDecoder->HandleRequest(fPipe);
+        if (!res) {
+            ClientKill();
+        }
         
         // Unlock the global mutex
         ReleaseMutex(fMutex);
@@ -126,7 +129,7 @@ void JackClientPipeThread::ClientRemove()
 
 void JackClientPipeThread::ClientAdd(detail::JackChannelTransactionInterface* socket, JackClientOpenRequest* req, JackClientOpenResult *res)
 {
-    jack_log("JackClientPipeThread::ClientAdd %s", name);
+    jack_log("JackClientPipeThread::ClientAdd %s", req->fName);
     fRefNum = -1;
     res->fResult = fServer->GetEngine()->ClientExternalOpen(req->fName, req->fPID, req->fUUID, &fRefNum, &res->fSharedEngine, &res->fSharedClient, &res->fSharedGraph);
 }

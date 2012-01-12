@@ -27,6 +27,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackTransportEngine.h"
 #include "JackPlatformPlug.h"
 #include "JackRequest.h"
+#include "JackChannel.h"
 #include <map>
 
 namespace Jack
@@ -35,7 +36,6 @@ namespace Jack
 class JackClientInterface;
 struct JackEngineControl;
 class JackExternalClient;
-class detail::JackChannelTransactionInterface;
 
 /*!
 \brief Engine description.
