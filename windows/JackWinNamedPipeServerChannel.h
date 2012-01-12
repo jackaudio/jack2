@@ -24,6 +24,9 @@
 #include "JackWinNamedPipe.h"
 #include "JackPlatformPlug.h"
 #include "JackConstants.h"
+
+#include "JackRequestDecoder.h"
+
 #include <list>
 
 namespace Jack
@@ -31,18 +34,23 @@ namespace Jack
 
 class JackServer;
 
-class JackClientPipeThread : public JackRunnableInterface
+class JackClientPipeThread : public JackRunnableInterface, public JackClientHandlerInterface
 {
 
     private:
 
         JackWinNamedPipeClient* fPipe;
+        JackRequestDecoder* fDecoder;
         JackServer*	fServer;
         JackThread fThread;
         int fRefNum;
 
-        void ClientAdd(char* name, int pid, int uuid, int* shared_engine, int* shared_client, int* shared_graph, int* result);
-        void ClientRemove();
+        //void ClientAdd(char* name, int pid, int uuid, int* shared_engine, int* shared_client, int* shared_graph, int* result);
+        //void ClientRemove();
+        
+        void ClientAdd(detail::JackChannelTransactionInterface* socket, JackClientOpenRequest* req, JackClientOpenResult *res);
+        void ClientRemove(detail::JackChannelTransactionInterface* socket, int refnum);
+
         void ClientKill();
 
         static HANDLE fMutex;
@@ -55,7 +63,7 @@ class JackClientPipeThread : public JackRunnableInterface
         int Open(JackServer* server);   // Open the Server/Client connection
         void Close();                   // Close the Server/Client connection
 
-        bool HandleRequest();
+        //bool HandleRequest();
 
         // JackRunnableInterface interface
         bool Execute();

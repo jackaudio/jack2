@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "JackSocket.h"
 #include "JackPlatformPlug.h"
+#include "JackRequestDecoder.h"
+
 #include <poll.h>
 #include <map>
 
@@ -34,25 +36,29 @@ class JackServer;
 \brief JackServerChannel using sockets.
 */
 
-class JackSocketServerChannel : public JackRunnableInterface
+class JackSocketServerChannel : public JackRunnableInterface, public JackClientHandlerInterface
 {
 
     private:
 
         JackServerSocket fRequestListenSocket;  // Socket to create request socket for the client
         JackThread fThread;                     // Thread to execute the event loop
+        JackRequestDecoder* fDecoder;
         JackServer* fServer;
+
         pollfd* fPollTable;
         bool fRebuild;
         std::map<int, std::pair<int, JackClientSocket*> > fSocketTable;
 
-        bool HandleRequest(int fd);
         void BuildPoolTable();
 
         void ClientCreate();
-        void ClientAdd(int fd, char* name, int pid, int uuid, int* shared_engine, int* shared_client, int* shared_graph, int* result);
-        void ClientRemove(int fd, int refnum);
         void ClientKill(int fd);
+  
+        void ClientAdd(detail::JackChannelTransactionInterface* socket, JackClientOpenRequest* req, JackClientOpenResult *res);
+        void ClientRemove(detail::JackChannelTransactionInterface* socket, int refnum);
+
+        int GetFd(JackClientSocket* socket);
 
     public:
 

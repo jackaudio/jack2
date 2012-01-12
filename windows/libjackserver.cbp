@@ -282,6 +282,7 @@
 		<Unit filename="..\common\JackNetTool.cpp" />
 		<Unit filename="..\common\JackPort.cpp" />
 		<Unit filename="..\common\JackPortType.cpp" />
+		<Unit filename="..\common\JackRequestDecoder.cpp" />
 		<Unit filename="..\common\JackRestartThreadedDriver.cpp" />
 		<Unit filename="..\common\JackServer.cpp" />
 		<Unit filename="..\common\JackServerAPI.cpp" />

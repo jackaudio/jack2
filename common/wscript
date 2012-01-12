@@ -135,6 +135,7 @@ def build(bld):
         'JackNetTool.cpp',
         'JackNetInterface.cpp',
         'JackArgParser.cpp',
+    	'JackRequestDecoder.cpp',
         'JackMidiAsyncQueue.cpp',
         'JackMidiAsyncWaitQueue.cpp',
         'JackMidiBufferReadQueue.cpp',
