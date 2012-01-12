@@ -27,7 +27,6 @@ namespace Jack
 
 struct JackRequest;
 struct JackResult;
-class detail::JackClientRequestInterface;
 
 /*!
 \brief Generic JackClientChannel class.
