@@ -333,42 +333,42 @@ class SERVER_EXPORT JackLockedEngine
             CATCH_EXCEPTION
         }
 
-        void SessionReply(int refnum)
+        int SessionReply(int refnum)
         {
             TRY_CALL
             JackLock lock(&fEngine);
-            fEngine.SessionReply(refnum);
-            CATCH_EXCEPTION
+            return fEngine.SessionReply(refnum);
+            CATCH_EXCEPTION_RETURN
         }
 
-        void GetUUIDForClientName(const char *client_name, char *uuid_res, int *result)
+        int GetUUIDForClientName(const char *client_name, char *uuid_res)
         {
             TRY_CALL
             JackLock lock(&fEngine);
-            fEngine.GetUUIDForClientName(client_name, uuid_res, result);
-            CATCH_EXCEPTION
+            return fEngine.GetUUIDForClientName(client_name, uuid_res);
+            CATCH_EXCEPTION_RETURN
         }
-        void GetClientNameForUUID(const char *uuid, char *name_res, int *result)
+        int GetClientNameForUUID(const char *uuid, char *name_res)
         {
             TRY_CALL
             JackLock lock(&fEngine);
-            fEngine.GetClientNameForUUID(uuid, name_res, result);
-            CATCH_EXCEPTION
+            return fEngine.GetClientNameForUUID(uuid, name_res);
+            CATCH_EXCEPTION_RETURN
         }
-        void ReserveClientName(const char *name, const char *uuid, int *result)
+        int ReserveClientName(const char *name, const char *uuid)
         {
             TRY_CALL
             JackLock lock(&fEngine);
-            fEngine.ReserveClientName(name, uuid, result);
-            CATCH_EXCEPTION
+            return fEngine.ReserveClientName(name, uuid);
+            CATCH_EXCEPTION_RETURN
         }
 
-        void ClientHasSessionCallback(const char *name, int *result)
+        int ClientHasSessionCallback(const char *name)
         {
             TRY_CALL
             JackLock lock(&fEngine);
-            fEngine.ClientHasSessionCallback(name, result);
-            CATCH_EXCEPTION
+            return fEngine.ClientHasSessionCallback(name);
+            CATCH_EXCEPTION_RETURN
         }
 };
 

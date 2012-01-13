@@ -42,7 +42,7 @@ void* JackPosixThread::ThreadHandler(void* arg)
     }
 
     // Signal creation thread when started with StartSync
-    jack_log("ThreadHandler: start");
+    jack_log("JackPosixThread::ThreadHandler : start");
     obj->fStatus = kIniting;
 
     // Call Init method
@@ -59,7 +59,7 @@ void* JackPosixThread::ThreadHandler(void* arg)
         res = runnable->Execute();
     }
 
-    jack_log("ThreadHandler: exit");
+    jack_log("JackPosixThread::ThreadHandler : exit");
     pthread_exit(0);
     return 0; // never reached
 }
@@ -112,7 +112,7 @@ int JackPosixThread::StartImp(jack_native_thread_t* thread, int priority, int re
 
     if (realtime) {
 
-        jack_log("Create RT thread");
+        jack_log("JackPosixThread::StartImp : create RT thread");
 
         if ((res = pthread_attr_setinheritsched(&attributes, PTHREAD_EXPLICIT_SCHED))) {
             jack_error("Cannot request explicit scheduling for RT thread res = %d", res);
@@ -133,7 +133,7 @@ int JackPosixThread::StartImp(jack_native_thread_t* thread, int priority, int re
         }
 
     } else {
-        jack_log("Create non RT thread");
+        jack_log("JackPosixThread::StartImp : create non RT thread");
     }
 
     if ((res = pthread_attr_setstacksize(&attributes, THREAD_STACK))) {

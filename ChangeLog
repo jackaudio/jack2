@@ -36,9 +36,13 @@ John Emmas
   Jackdmp changes log
 ---------------------------
 
+2012-01-13 Stephane Letz  <letz@grame.fr>
+
+	* More robust server/client protocol.
+
 2012-01-11 Stephane Letz  <letz@grame.fr>
 
-	* Factorize code the server/client request.
+	* Factorize code the server/client request in JackRequestDecoder class.
 
 2012-01-06 Stephane Letz  <letz@grame.fr>
 

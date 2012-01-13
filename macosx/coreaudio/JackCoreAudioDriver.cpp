@@ -287,7 +287,7 @@ OSStatus JackCoreAudioDriver::Render(void* inRefCon,
     // Setup threaded based log function et get RT thread parameters once...
     if (set_threaded_log_function()) {
 
-        jack_log("set_threaded_log_function");
+        jack_log("JackCoreAudioDriver::Render : set_threaded_log_function");
         JackMachThread::GetParams(pthread_self(), &driver->fEngineControl->fPeriod, &driver->fEngineControl->fComputation, &driver->fEngineControl->fConstraint);
 
         if (driver->fComputationGrain > 0) {
@@ -302,8 +302,8 @@ OSStatus JackCoreAudioDriver::Render(void* inRefCon,
     driver->CycleTakeBeginTime();
 
     if (driver->Process() < 0) {
-        jack_error("Process error, stopping driver.");
-        driver->NotifyFailure(JackBackendError, "Process error, stopping driver.");    // Message length limited to JACK_MESSAGE_SIZE
+        jack_error("Process error, stopping driver");
+        driver->NotifyFailure(JackBackendError, "Process error, stopping driver");    // Message length limited to JACK_MESSAGE_SIZE
         driver->Stop();
         kill(JackTools::GetPID(), SIGINT);
         return kAudioHardwareUnsupportedOperationError;
@@ -359,7 +359,7 @@ OSStatus JackCoreAudioDriver::SRNotificationCallback(AudioDeviceID inDevice,
                 jack_error("Cannot get current sample rate");
                 printError(err);
             } else {
-                jack_log("SRNotificationCallback : checked sample rate = %f", tmp_sample_rate);
+                jack_log("JackCoreAudioDriver::SRNotificationCallback : checked sample rate = %f", tmp_sample_rate);
             }
             driver->fState = true;
             break;
@@ -389,7 +389,7 @@ OSStatus JackCoreAudioDriver::BSNotificationCallback(AudioDeviceID inDevice,
                 jack_error("Cannot get current buffer size");
                 printError(err);
             } else {
-                jack_log("BSNotificationCallback : checked buffer size = %d", tmp_buffer_size);
+                jack_log("JackCoreAudioDriver::BSNotificationCallback : checked buffer size = %d", tmp_buffer_size);
             }
             driver->fState = true;
             break;
@@ -469,7 +469,7 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
 
         case kAudioDevicePropertyStreamConfiguration: {
             jack_error("Cannot handle kAudioDevicePropertyStreamConfiguration : server will quit...");
-            driver->NotifyFailure(JackBackendError, "Another application has changed the device configuration.");   // Message length limited to JACK_MESSAGE_SIZE
+            driver->NotifyFailure(JackBackendError, "Another application has changed the device configuration");   // Message length limited to JACK_MESSAGE_SIZE
             driver->CloseAUHAL();
             kill(JackTools::GetPID(), SIGINT);
             return kAudioHardwareUnsupportedOperationError;
@@ -492,7 +492,7 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
                // Digidesign hardware, so "special" code : change the SR again here
                if (strncmp(device_name, digidesign_name, 10) == 0) {
 
-                    jack_log("Digidesign HW = %s", device_name);
+                    jack_log("JackCoreAudioDriver::DeviceNotificationCallback Digidesign HW = %s", device_name);
 
                     // Set sample rate again...
                     sample_rate = driver->fEngineControl->fSampleRate;
@@ -501,7 +501,7 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
                         jack_error("Cannot set sample rate = %f", sample_rate);
                         printError(err);
                     } else {
-                        jack_log("Set sample rate = %f", sample_rate);
+                        jack_log("JackCoreAudioDriver::DeviceNotificationCallback : set sample rate = %f", sample_rate);
                     }
 
                     // Check new sample rate again...
@@ -511,12 +511,12 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
                         jack_error("Cannot get current sample rate");
                         printError(err);
                     } else {
-                        jack_log("Checked sample rate = %f", sample_rate);
+                        jack_log("JackCoreAudioDriver::DeviceNotificationCallback : checked sample rate = %f", sample_rate);
                     }
                     return noErr;
 
                 } else {
-                    driver->NotifyFailure(JackBackendError, "Another application has changed the sample rate.");    // Message length limited to JACK_MESSAGE_SIZE
+                    driver->NotifyFailure(JackBackendError, "Another application has changed the sample rate");    // Message length limited to JACK_MESSAGE_SIZE
                     driver->CloseAUHAL();
                     kill(JackTools::GetPID(), SIGINT);
                     return kAudioHardwareUnsupportedOperationError;
@@ -539,7 +539,7 @@ OSStatus JackCoreAudioDriver::GetDeviceIDFromUID(const char* UID, AudioDeviceID*
     } else {
         OSStatus res = AudioHardwareGetProperty(kAudioHardwarePropertyDeviceForUID, &size, &value);
         CFRelease(inIUD);
-        jack_log("GetDeviceIDFromUID %s %ld", UID, *id);
+        jack_log("JackCoreAudioDriver::GetDeviceIDFromUID %s %ld", UID, *id);
         return (*id == kAudioDeviceUnknown) ? kAudioHardwareBadDeviceError : res;
     }
 }
@@ -559,7 +559,7 @@ OSStatus JackCoreAudioDriver::GetDefaultDevice(AudioDeviceID* id)
         return res;
     }
 
-    jack_log("GetDefaultDevice: input = %ld output = %ld", inDefault, outDefault);
+    jack_log("JackCoreAudioDriver::GetDefaultDevice : input = %ld output = %ld", inDefault, outDefault);
 
     // Get the device only if default input and output are the same
     if (inDefault != outDefault) {
@@ -588,7 +588,7 @@ OSStatus JackCoreAudioDriver::GetDefaultInputDevice(AudioDeviceID* id)
         jack_error("Error: default input device is 0, please select a correct one !!");
         return -1;
     }
-    jack_log("GetDefaultInputDevice: input = %ld ", inDefault);
+    jack_log("JackCoreAudioDriver::GetDefaultInputDevice : input = %ld ", inDefault);
     *id = inDefault;
     return noErr;
 }
@@ -607,7 +607,7 @@ OSStatus JackCoreAudioDriver::GetDefaultOutputDevice(AudioDeviceID* id)
         jack_error("Error: default output device is 0, please select a correct one !!");
         return -1;
     }
-    jack_log("GetDefaultOutputDevice: output = %ld", outDefault);
+    jack_log("JackCoreAudioDriver::GetDefaultOutputDevice : output = %ld", outDefault);
     *id = outDefault;
     return noErr;
 }
@@ -741,11 +741,11 @@ OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceI
     vector<AudioDeviceID> captureDeviceIDArray;
 
     if (err != noErr) {
-        jack_log("Input device does not have subdevices");
+        jack_log("JackCoreAudioDriver::CreateAggregateDevice : input device does not have subdevices");
         captureDeviceIDArray.push_back(captureDeviceID);
     } else {
         int num_devices = outSize / sizeof(AudioObjectID);
-        jack_log("Input device has %d subdevices", num_devices);
+        jack_log("JackCoreAudioDriver::CreateAggregateDevice :Input device has %d subdevices", num_devices);
         for (int i = 0; i < num_devices; i++) {
             captureDeviceIDArray.push_back(sub_device[i]);
         }
@@ -755,11 +755,11 @@ OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceI
     vector<AudioDeviceID> playbackDeviceIDArray;
 
     if (err != noErr) {
-        jack_log("Output device does not have subdevices");
+        jack_log("JackCoreAudioDriver::CreateAggregateDevice : output device does not have subdevices");
         playbackDeviceIDArray.push_back(playbackDeviceID);
     } else {
         int num_devices = outSize / sizeof(AudioObjectID);
-        jack_log("Output device has %d subdevices", num_devices);
+        jack_log("JackCoreAudioDriver::CreateAggregateDevice : output device has %d subdevices", num_devices);
         for (int i = 0; i < num_devices; i++) {
             playbackDeviceIDArray.push_back(sub_device[i]);
         }
@@ -1107,7 +1107,7 @@ OSStatus JackCoreAudioDriver::CreateAggregateDeviceAux(vector<AudioDeviceID> cap
         CFRelease(playbackDeviceUID[i]);
     }
 
-    jack_log("New aggregate device %ld", *outAggregateDevice);
+    jack_log("JackCoreAudioDriver::CreateAggregateDeviceAux : new aggregate device %ld", *outAggregateDevice);
     return noErr;
 
 error:
@@ -1126,13 +1126,13 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid,
 
     // Duplex
     if (strcmp(capture_driver_uid, "") != 0 && strcmp(playback_driver_uid, "") != 0) {
-        jack_log("JackCoreAudioDriver::Open duplex");
+        jack_log("JackCoreAudioDriver::SetupDevices : duplex");
 
         // Same device for capture and playback...
         if (strcmp(capture_driver_uid, playback_driver_uid) == 0)  {
 
             if (GetDeviceIDFromUID(playback_driver_uid, &fDeviceID) != noErr) {
-                jack_log("Will take default in/out");
+                jack_log("JackCoreAudioDriver::SetupDevices : will take default in/out");
                 if (GetDefaultDevice(&fDeviceID) != noErr) {
                     jack_error("Cannot open default device");
                     return -1;
@@ -1149,7 +1149,7 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid,
             AudioDeviceID captureID, playbackID;
 
             if (GetDeviceIDFromUID(capture_driver_uid, &captureID) != noErr) {
-                jack_log("Will take default input");
+                jack_log("JackCoreAudioDriver::SetupDevices : will take default input");
                 if (GetDefaultInputDevice(&captureID) != noErr) {
                     jack_error("Cannot open default input device");
                     return -1;
@@ -1157,7 +1157,7 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid,
             }
 
             if (GetDeviceIDFromUID(playback_driver_uid, &playbackID) != noErr) {
-                jack_log("Will take default output");
+                jack_log("JackCoreAudioDriver::SetupDevices : will take default output");
                 if (GetDefaultOutputDevice(&playbackID) != noErr) {
                     jack_error("Cannot open default output device");
                     return -1;
@@ -1174,9 +1174,9 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid,
 
     // Capture only
     } else if (strcmp(capture_driver_uid, "") != 0) {
-        jack_log("JackCoreAudioDriver::Open capture only");
+        jack_log("JackCoreAudioDriver::SetupDevices : capture only");
         if (GetDeviceIDFromUID(capture_driver_uid, &fDeviceID) != noErr) {
-            jack_log("Will take default input");
+            jack_log("JackCoreAudioDriver::SetupDevices : will take default input");
             if (GetDefaultInputDevice(&fDeviceID) != noErr) {
                 jack_error("Cannot open default input device");
                 return -1;
@@ -1189,9 +1189,9 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid,
 
     // Playback only
     } else if (strcmp(playback_driver_uid, "") != 0) {
-        jack_log("JackCoreAudioDriver::Open playback only");
+        jack_log("JackCoreAudioDriver::SetupDevices : playback only");
         if (GetDeviceIDFromUID(playback_driver_uid, &fDeviceID) != noErr) {
-            jack_log("Will take default output");
+            jack_log("JackCoreAudioDriver::SetupDevices : will take default output");
             if (GetDefaultOutputDevice(&fDeviceID) != noErr) {
                 jack_error("Cannot open default output device");
                 return -1;
@@ -1204,7 +1204,7 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid,
 
     // Use default driver in duplex mode
     } else {
-        jack_log("JackCoreAudioDriver::Open default driver");
+        jack_log("JackCoreAudioDriver::SetupDevices : default driver");
         if (GetDefaultDevice(&fDeviceID) != noErr) {
             jack_error("Cannot open default device in duplex mode, so aggregate default input and default output");
 
@@ -1212,7 +1212,7 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid,
             AudioDeviceID captureID, playbackID;
 
             if (GetDeviceIDFromUID(capture_driver_uid, &captureID) != noErr) {
-                jack_log("Will take default input");
+                jack_log("JackCoreAudioDriver::SetupDevices : will take default input");
                 if (GetDefaultInputDevice(&captureID) != noErr) {
                     jack_error("Cannot open default input device");
                     return -1;
@@ -1220,7 +1220,7 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid,
             }
 
             if (GetDeviceIDFromUID(playback_driver_uid, &playbackID) != noErr) {
-                jack_log("Will take default output");
+                jack_log("JackCoreAudioDriver::SetupDevices : will take default output");
                 if (GetDefaultOutputDevice(&playbackID) != noErr) {
                     jack_error("Cannot open default output device");
                     return -1;
@@ -1255,11 +1255,11 @@ int JackCoreAudioDriver::SetupChannels(bool capturing, bool playing, int& inchan
     if (capturing) {
         err = GetTotalChannels(fDeviceID, in_nChannels, true);
         if (err != noErr) {
-            jack_error("Cannot get input channel number");
+            jack_error("JackCoreAudioDriver::SetupChannels : cannot get input channel number");
             printError(err);
             return -1;
         } else {
-            jack_log("Max input channels : %d", in_nChannels);
+            jack_log("JackCoreAudioDriver::SetupChannels : max input channels : %d", in_nChannels);
         }
     }
 
@@ -1270,7 +1270,7 @@ int JackCoreAudioDriver::SetupChannels(bool capturing, bool playing, int& inchan
             printError(err);
             return -1;
         } else {
-            jack_log("Max output channels : %d", out_nChannels);
+            jack_log("JackCoreAudioDriver::SetupChannels : max output channels : %d", out_nChannels);
         }
     }
 
@@ -1289,12 +1289,12 @@ int JackCoreAudioDriver::SetupChannels(bool capturing, bool playing, int& inchan
     }
 
     if (inchannels == -1) {
-        jack_log("Setup max in channels = %d", in_nChannels);
+        jack_log("JackCoreAudioDriver::SetupChannels : setup max in channels = %d", in_nChannels);
         inchannels = in_nChannels;
     }
 
     if (outchannels == -1) {
-        jack_log("Setup max out channels = %d", out_nChannels);
+        jack_log("JackCoreAudioDriver::SetupChannels : setup max out channels = %d", out_nChannels);
         outchannels = out_nChannels;
     }
 
@@ -1314,7 +1314,7 @@ int JackCoreAudioDriver::SetupBufferSize(jack_nframes_t buffer_size)
         printError(err);
         return -1;
     } else {
-        jack_log("Current buffer size = %ld", tmp_buffer_size);
+        jack_log("JackCoreAudioDriver::SetupBufferSize : current buffer size = %ld", tmp_buffer_size);
     }
 
     // If needed, set new buffer size
@@ -1335,14 +1335,14 @@ int JackCoreAudioDriver::SetupBufferSize(jack_nframes_t buffer_size)
 
         err = AudioDeviceSetProperty(fDeviceID, NULL, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyBufferFrameSize, outSize, &tmp_buffer_size);
         if (err != noErr) {
-            jack_error("Cannot set buffer size = %ld", tmp_buffer_size);
+            jack_error("JackCoreAudioDriver::SetupBufferSize : cannot set buffer size = %ld", tmp_buffer_size);
             printError(err);
             goto error;
         }
 
         while (!fState && count++ < WAIT_NOTIFICATION_COUNTER) {
             usleep(100000);
-            jack_log("Wait count = %d", count);
+            jack_log("JackCoreAudioDriver::SetupBufferSize : wait count = %d", count);
         }
 
         if (count >= WAIT_NOTIFICATION_COUNTER) {
@@ -1357,7 +1357,7 @@ int JackCoreAudioDriver::SetupBufferSize(jack_nframes_t buffer_size)
             jack_error("Cannot get current buffer size");
             printError(err);
         } else {
-            jack_log("Checked buffer size = %ld", tmp_buffer_size);
+            jack_log("JackCoreAudioDriver::SetupBufferSize : checked buffer size = %ld", tmp_buffer_size);
         }
 
         // Remove BS change notification
@@ -1393,7 +1393,7 @@ int JackCoreAudioDriver::SetupSampleRateAux(AudioDeviceID inDevice, jack_nframes
         printError(err);
         return -1;
     } else {
-        jack_log("Current sample rate = %f", tmp_sample_rate);
+        jack_log("JackCoreAudioDriver::SetupSampleRateAux : current sample rate = %f", tmp_sample_rate);
     }
 
     // If needed, set new sample rate
@@ -1421,7 +1421,7 @@ int JackCoreAudioDriver::SetupSampleRateAux(AudioDeviceID inDevice, jack_nframes
 
         while (!fState && count++ < WAIT_NOTIFICATION_COUNTER) {
             usleep(100000);
-            jack_log("Wait count = %d", count);
+            jack_log("JackCoreAudioDriver::SetupSampleRateAux : wait count = %d", count);
         }
 
         if (count >= WAIT_NOTIFICATION_COUNTER) {
@@ -1436,7 +1436,7 @@ int JackCoreAudioDriver::SetupSampleRateAux(AudioDeviceID inDevice, jack_nframes
             jack_error("Cannot get current sample rate");
             printError(err);
         } else {
-            jack_log("Checked sample rate = %f", tmp_sample_rate);
+            jack_log("JackCoreAudioDriver::SetupSampleRateAux : checked sample rate = %f", tmp_sample_rate);
         }
 
         // Remove SR change notification
@@ -1469,7 +1469,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
     AudioDeviceID currAudioDeviceID;
     UInt32 size;
 
-    jack_log("OpenAUHAL capturing = %d playing = %d inchannels = %d outchannels = %d in_nChannels = %d out_nChannels = %d chan_in_list = %d chan_out_list = %d",
+    jack_log("JackCoreAudioDriver::OpenAUHAL : capturing = %d playing = %d inchannels = %d outchannels = %d in_nChannels = %d out_nChannels = %d chan_in_list = %d chan_out_list = %d",
         capturing, playing, inchannels, outchannels, in_nChannels, out_nChannels, chan_in_list.size(), chan_out_list.size());
 
     if (inchannels == 0 && outchannels == 0) {
@@ -1498,10 +1498,10 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
     // Start I/O
     if (capturing && inchannels > 0) {
         enableIO = 1;
-        jack_log("Setup AUHAL input on");
+        jack_log("JackCoreAudioDriver::OpenAUHAL : setup AUHAL input on");
     } else {
         enableIO = 0;
-        jack_log("Setup AUHAL input off");
+        jack_log("JackCoreAudioDriver::OpenAUHAL : setup AUHAL input off");
     }
 
     err1 = AudioUnitSetProperty(fAUHAL, kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Input, 1, &enableIO, sizeof(enableIO));
@@ -1513,10 +1513,10 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
 
     if (playing && outchannels > 0) {
         enableIO = 1;
-        jack_log("Setup AUHAL output on");
+        jack_log("JackCoreAudioDriver::OpenAUHAL : setup AUHAL output on");
     } else {
         enableIO = 0;
-        jack_log("Setup AUHAL output off");
+        jack_log("JackCoreAudioDriver::OpenAUHAL : setup AUHAL output off");
     }
 
     err1 = AudioUnitSetProperty(fAUHAL, kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Output, 0, &enableIO, sizeof(enableIO));
@@ -1533,7 +1533,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
         printError(err1);
         goto error;
     } else {
-        jack_log("AudioUnitGetPropertyCurrentDevice = %d", currAudioDeviceID);
+        jack_log("JackCoreAudioDriver::OpenAUHAL : AudioUnitGetPropertyCurrentDevice = %d", currAudioDeviceID);
     }
 
     // Setup up choosen device, in both input and output cases
@@ -1643,7 +1643,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
         }
         PrintStreamDesc(&srcFormat);
 
-        jack_log("Setup AUHAL input stream converter SR = %ld", sample_rate);
+        jack_log("JackCoreAudioDriver::OpenAUHAL : setup AUHAL input stream converter SR = %ld", sample_rate);
         srcFormat.mSampleRate = sample_rate;
         srcFormat.mFormatID = kAudioFormatLinearPCM;
         srcFormat.mFormatFlags = kAudioFormatFlagsNativeFloatPacked | kLinearPCMFormatFlagIsNonInterleaved;
@@ -1673,7 +1673,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
         }
         PrintStreamDesc(&dstFormat);
 
-        jack_log("Setup AUHAL output stream converter SR = %ld", sample_rate);
+        jack_log("JackCoreAudioDriver::OpenAUHAL : setup AUHAL output stream converter SR = %ld", sample_rate);
         dstFormat.mSampleRate = sample_rate;
         dstFormat.mFormatID = kAudioFormatLinearPCM;
         dstFormat.mFormatFlags = kAudioFormatFlagsNativeFloatPacked | kLinearPCMFormatFlagIsNonInterleaved;
@@ -2043,18 +2043,18 @@ int JackCoreAudioDriver::Attach()
     char name[REAL_JACK_PORT_NAME_SIZE];
     char alias[REAL_JACK_PORT_NAME_SIZE];
 
-    jack_log("JackCoreAudioDriver::Attach fBufferSize %ld fSampleRate %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
+    jack_log("JackCoreAudioDriver::Attach : fBufferSize %ld fSampleRate %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
 
     for (int i = 0; i < fCaptureChannels; i++) {
 
         err = AudioDeviceGetPropertyInfo(fDeviceID, i + 1, true, kAudioDevicePropertyChannelName, &size, &isWritable);
         if (err != noErr) {
-            jack_log("AudioDeviceGetPropertyInfo kAudioDevicePropertyChannelName error");
+            jack_log("JackCoreAudioDriver::Attach : AudioDeviceGetPropertyInfo kAudioDevicePropertyChannelName error");
         }
         if (err == noErr && size > 0) {
             err = AudioDeviceGetProperty(fDeviceID, i + 1, true, kAudioDevicePropertyChannelName, &size, channel_name);
             if (err != noErr) {
-                jack_log("AudioDeviceGetProperty kAudioDevicePropertyChannelName error");
+                jack_log("JackCoreAudioDriver::Attach : AudioDeviceGetProperty kAudioDevicePropertyChannelName error");
             }
             snprintf(alias, sizeof(alias), "%s:%s:out_%s%u", fAliasName, fCaptureDriverName, channel_name, i + 1);
         } else {
@@ -2077,12 +2077,12 @@ int JackCoreAudioDriver::Attach()
 
         err = AudioDeviceGetPropertyInfo(fDeviceID, i + 1, false, kAudioDevicePropertyChannelName, &size, &isWritable);
         if (err != noErr) {
-            jack_log("AudioDeviceGetPropertyInfo kAudioDevicePropertyChannelName error");
+            jack_log("JackCoreAudioDriver::Attach : AudioDeviceGetPropertyInfo kAudioDevicePropertyChannelName error");
         }
         if (err == noErr && size > 0) {
             err = AudioDeviceGetProperty(fDeviceID, i + 1, false, kAudioDevicePropertyChannelName, &size, channel_name);
             if (err != noErr) {
-                jack_log("AudioDeviceGetProperty kAudioDevicePropertyChannelName error");
+                jack_log("JackCoreAudioDriver::Attach : AudioDeviceGetProperty kAudioDevicePropertyChannelName error");
             }
             snprintf(alias, sizeof(alias), "%s:%s:in_%s%u", fAliasName, fPlaybackDriverName, channel_name, i + 1);
         } else {
@@ -2102,7 +2102,7 @@ int JackCoreAudioDriver::Attach()
 
         // Monitor ports
         if (fWithMonitorPorts) {
-            jack_log("Create monitor port");
+            jack_log("JackCoreAudioDriver::Attach : create monitor port");
             snprintf(name, sizeof(name), "%s:monitor_%u", fClientControl.fName, i + 1);
             if (fEngine->PortRegister(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, MonitorDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
                 jack_error("Cannot register monitor port for %s", name);
@@ -2137,7 +2137,7 @@ int JackCoreAudioDriver::Start()
 
             while (!fState && count++ < WAIT_COUNTER) {
                 usleep(100000);
-                jack_log("JackCoreAudioDriver::Start wait count = %d", count);
+                jack_log("JackCoreAudioDriver::Start : wait count = %d", count);
             }
 
             if (count < WAIT_COUNTER) {
@@ -2215,11 +2215,11 @@ bool JackCoreAudioDriver::TakeHog()
     err = AudioDeviceGetProperty(fDeviceID, 0, kAudioDeviceSectionGlobal, kAudioAggregateDevicePropertyActiveSubDeviceList, &outSize, sub_device);
 
     if (err != noErr) {
-        jack_log("Device does not have subdevices");
+        jack_log("JackCoreAudioDriver::TakeHog : device does not have subdevices");
         return TakeHogAux(fDeviceID, true);
     } else {
         int num_devices = outSize / sizeof(AudioObjectID);
-        jack_log("Device does has %d subdevices", num_devices);
+        jack_log("JackCoreAudioDriver::TakeHog : device does has %d subdevices", num_devices);
         for (int i = 0; i < num_devices; i++) {
             if (!TakeHogAux(sub_device[i], true)) {
                 return false;

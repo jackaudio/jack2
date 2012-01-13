@@ -148,12 +148,12 @@ class SERVER_EXPORT JackEngine : public JackLockAble
 
         // Session management
         void SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, detail::JackChannelTransactionInterface *socket, JackSessionNotifyResult** result);
-        void SessionReply(int refnum);
+        int SessionReply(int refnum);
 
-        void GetUUIDForClientName(const char *client_name, char *uuid_res, int *result);
-        void GetClientNameForUUID(const char *uuid, char *name_res, int *result);
-        void ReserveClientName(const char *name, const char *uuid, int *result);
-        void ClientHasSessionCallback(const char *name, int *result);
+        int GetUUIDForClientName(const char *client_name, char *uuid_res);
+        int GetClientNameForUUID(const char *uuid, char *name_res);
+        int ReserveClientName(const char *name, const char *uuid);
+        int ClientHasSessionCallback(const char *name);
 };
 
 

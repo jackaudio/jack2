@@ -141,7 +141,7 @@ void JackSocketServerChannel::ClientAdd(detail::JackChannelTransactionInterface*
     #ifdef __APPLE__
         int on = 1;
         if (setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, (const char*)&on, sizeof(on)) < 0) {
-            jack_log("setsockopt SO_NOSIGPIPE fd = %ld err = %s", fd, strerror(errno));
+            jack_log("JackSocketServerChannel::ClientAdd :  setsockopt SO_NOSIGPIPE fd = %ld err = %s", fd, strerror(errno));
         }
     #endif
     } else {
@@ -202,7 +202,7 @@ void JackSocketServerChannel::BuildPoolTable()
         int i;
 
         for (i = 1, it = fSocketTable.begin(); it != fSocketTable.end(); it++, i++) {
-            jack_log("fSocketTable i = %ld fd = %ld", i, it->first);
+            jack_log("JackSocketServerChannel::BuildPoolTable fSocketTable i = %ld fd = %ld", i, it->first);
             fPollTable[i].fd = it->first;
             fPollTable[i].events = POLLIN | POLLPRI | POLLERR | POLLHUP | POLLNVAL;
         }
@@ -224,44 +224,46 @@ bool JackSocketServerChannel::Execute()
 
         // Global poll
         if ((poll(fPollTable, fSocketTable.size() + 1, 10000) < 0) && (errno != EINTR)) {
-            jack_error("Engine poll failed err = %s request thread quits...", strerror(errno));
+            jack_error("JackSocketServerChannel::Execute : engine poll failed err = %s request thread quits...", strerror(errno));
             return false;
         } else {
 
             // Poll all clients
             for (unsigned int i = 1; i < fSocketTable.size() + 1; i++) {
                 int fd = fPollTable[i].fd;
-                jack_log("fPollTable i = %ld fd = %ld", i, fd);
+                jack_log("JackSocketServerChannel::Execute : fPollTable i = %ld fd = %ld", i, fd);
                 if (fPollTable[i].revents & ~POLLIN) {
-                    jack_log("Poll client error err = %s", strerror(errno));
+                    jack_log("JackSocketServerChannel::Execute : poll client error err = %s", strerror(errno));
                     ClientKill(fd);
                 } else if (fPollTable[i].revents & POLLIN) {
-                    // Read header
                     JackClientSocket* socket = fSocketTable[fd].second;
+                    // Decode header
                     JackRequest header;
                     if (header.Read(socket) < 0) {
-                        jack_log("HandleRequest: cannot read header");
+                        jack_log("JackSocketServerChannel::Execute : cannot decode header");
                         ClientKill(fd);
-                        return false;
-                    } else {
-                        fDecoder->HandleRequest(socket, header.fType);
+                    // Decode request
+                    } else if (fDecoder->HandleRequest(socket, header.fType) < 0) {
+                        jack_log("JackSocketServerChannel::Execute : cannot decode request");
                     }
                 }
             }
 
             // Check the server request socket */
-            if (fPollTable[0].revents & POLLERR)
+            if (fPollTable[0].revents & POLLERR) {
                 jack_error("Error on server request socket err = %s", strerror(errno));
+            }
 
-            if (fPollTable[0].revents & POLLIN)
+            if (fPollTable[0].revents & POLLIN) {
                 ClientCreate();
+            }
         }
 
         BuildPoolTable();
         return true;
 
     } catch (JackQuitException& e) {
-        jack_log("JackSocketServerChannel::Execute JackQuitException");
+        jack_log("JackSocketServerChannel::Execute : JackQuitException");
         return false;
     }
 }
