@@ -78,7 +78,7 @@ void JackClientPipeThread::Close()                                      // Close
     fThread.Kill();
     fPipe->Close();
     fRefNum = -1;
-    
+
     delete fDecoder;
     fDecoder = NULL;
 }
@@ -87,27 +87,30 @@ bool JackClientPipeThread::Execute()
 {
     try{
         jack_log("JackClientPipeThread::Execute");
-        
+
         JackRequest header;
-        if (header.Read(socket) < 0) {
-            jack_log("HandleRequest: cannot read header");
-            ClientKill(fd);
-            return false;
-        } 
-        
+        int res = header.Read(fPipe);
+        bool ret = true;
+
         // Lock the global mutex
         if (WaitForSingleObject(fMutex, INFINITE) == WAIT_FAILED) {
             jack_error("JackClientPipeThread::HandleRequest: mutex wait error");
         }
-        
+
+        if (res < 0) {
+            jack_log("HandleRequest: cannot read header");
+            ClientKill();
+            ret = false;
+        }
+
         fDecoder->HandleRequest(fPipe, header.fType);
-        
+
         // Unlock the global mutex
         if (!ReleaseMutex(fMutex)) {
             jack_error("JackClientPipeThread::HandleRequest: mutex release error");
         }
-        return res;
-       
+        return ret;
+
     } catch (JackQuitException& e) {
         jack_log("JackClientPipeThread::Execute JackQuitException");
         return false;
@@ -135,14 +138,14 @@ void JackClientPipeThread::ClientRemove()
 
 void JackClientPipeThread::ClientAdd(detail::JackChannelTransactionInterface* socket, JackClientOpenRequest* req, JackClientOpenResult *res)
 {
-    jack_log("JackClientPipeThread::ClientAdd %s", req->fName);
+    jack_info("JackClientPipeThread::ClientAdd %s", req->fName);
     fRefNum = -1;
     res->fResult = fServer->GetEngine()->ClientExternalOpen(req->fName, req->fPID, req->fUUID, &fRefNum, &res->fSharedEngine, &res->fSharedClient, &res->fSharedGraph);
 }
 
 void JackClientPipeThread::ClientRemove(detail::JackChannelTransactionInterface* socket_aux, int refnum)
 {
-    jack_log("JackClientPipeThread::ClientRemove ref = %d", refnum);
+    jack_info("JackClientPipeThread::ClientRemove ref = %d", refnum);
     // TODO : solve WIN32 thread Kill issue
     //Close();
     //
@@ -589,11 +592,11 @@ void JackWinNamedPipeServerChannel::ClientAdd(JackWinNamedPipeClient* pipe)
     std::list<JackClientPipeThread*>::iterator it = fClientList.begin();
     JackClientPipeThread* client;
 
-    jack_log("ClientAdd size  %ld", fClientList.size());
+    jack_info("ClientAdd size %ld", fClientList.size());
 
     while (it != fClientList.end()) {
         client = *it;
-        jack_log("Remove dead client = %x running =  %ld", client, client->IsRunning());
+        jack_info("Remove dead client = %x running =  %ld", client, client->IsRunning());
         if (client->IsRunning()) {
             it++;
         } else {
