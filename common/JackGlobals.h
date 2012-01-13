@@ -49,8 +49,8 @@ struct JackGlobals {
 
 #ifdef __CLIENTDEBUG__
     static std::ofstream* fStream;
-    static void CheckContext(const char* name);
 #endif
+     static void CheckContext(const char* name);
 };
 
 // Each "side" server and client will implement this to get the shared graph manager, engine control and inter-process synchro table.

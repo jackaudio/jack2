@@ -39,6 +39,8 @@ jack_thread_creator_t JackGlobals::fJackThreadCreator = pthread_create;
 #endif
 
 #ifdef __CLIENTDEBUG__
+
+#include "JackLibGlobals.h"
 std::ofstream* JackGlobals::fStream = NULL;
 
 void JackGlobals::CheckContext(const char* name)
@@ -59,6 +61,12 @@ void JackGlobals::CheckContext(const char* name)
     }
     (*fStream) << "JACK API call : " << name << ", calling thread : " << pthread_self() << std::endl;
 }
+
+#else
+
+void JackGlobals::CheckContext(const char* name)
+{}
+
 #endif
 
 } // end of namespace
