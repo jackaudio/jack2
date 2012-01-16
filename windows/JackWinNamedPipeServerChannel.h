@@ -35,6 +35,7 @@ namespace Jack
 class JackServer;
 
 class JackClientPipeThread : public JackRunnableInterface, public JackClientHandlerInterface
+//class JackClientPipeThread : public JackRunnableInterface
 {
 
     private:
@@ -47,7 +48,7 @@ class JackClientPipeThread : public JackRunnableInterface, public JackClientHand
 
         //void ClientAdd(char* name, int pid, int uuid, int* shared_engine, int* shared_client, int* shared_graph, int* result);
         //void ClientRemove();
-        
+
         void ClientAdd(detail::JackChannelTransactionInterface* socket, JackClientOpenRequest* req, JackClientOpenResult *res);
         void ClientRemove(detail::JackChannelTransactionInterface* socket, int refnum);
 

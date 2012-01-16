@@ -79,14 +79,14 @@ void JackClientPipeThread::Close()                                      // Close
     fPipe->Close();
     fRefNum = -1;
 
-    delete fDecoder;
+    //delete fDecoder;
     fDecoder = NULL;
 }
 
 bool JackClientPipeThread::Execute()
 {
     try {
-    
+
         jack_log("JackClientPipeThread::Execute");
         JackRequest header;
         int res = header.Read(fPipe);
@@ -103,7 +103,7 @@ bool JackClientPipeThread::Execute()
             ClientKill();
             ret = false;
         // Decode request
-        } else if {fDecoder->HandleRequest(fPipe, header.fType) < 0) {
+        } else if (fDecoder->HandleRequest(fPipe, header.fType) < 0) {
             jack_log("JackClientPipeThread::Execute : cannot decode request");
         }
 
@@ -154,6 +154,8 @@ void JackClientPipeThread::ClientRemove(detail::JackChannelTransactionInterface*
     fRefNum = -1;
     fPipe->Close();
 }
+
+
 
 /*
 bool JackClientPipeThread::HandleRequest()
@@ -432,7 +434,7 @@ bool JackClientPipeThread::HandleRequest()
                 JackGetClientNameRequest req;
                 JackClientNameResult res;
                 if (req.Read(fPipe) == 0) {
-                    fServer->GetEngine()->GetClientNameForUUID(req.fUUID, res.fName, &res.fResult);
+                    res.fResult = fServer->GetEngine()->GetClientNameForUUID(req.fUUID, res.fName);
                 }
                 res.Write(fPipe);
                 break;
@@ -443,7 +445,7 @@ bool JackClientPipeThread::HandleRequest()
                 JackGetUUIDRequest req;
                 JackUUIDResult res;
                 if (req.Read(fPipe) == 0) {
-                    fServer->GetEngine()->GetUUIDForClientName(req.fName, res.fUUID, &res.fResult);
+                    res.fResult = fServer->GetEngine()->GetUUIDForClientName(req.fName, res.fUUID);
                 }
                 res.Write(fPipe);
                 break;
@@ -454,7 +456,7 @@ bool JackClientPipeThread::HandleRequest()
                 JackReserveNameRequest req;
                 JackResult res;
                 if (req.Read(fPipe) == 0) {
-                    fServer->GetEngine()->ReserveClientName(req.fName, req.fUUID, &res.fResult);
+                    res.fResult = fServer->GetEngine()->ReserveClientName(req.fName, req.fUUID);
                 }
                 res.Write(fPipe);
                 break;
@@ -465,7 +467,7 @@ bool JackClientPipeThread::HandleRequest()
                 JackClientHasSessionCallbackRequest req;
                 JackResult res;
                 if (req.Read(fPipe) == 0) {
-                    fServer->GetEngine()->ClientHasSessionCallback(req.fName, &res.fResult);
+                    res.fResult = fServer->GetEngine()->ClientHasSessionCallback(req.fName);
                 }
                 res.Write(fPipe);
                 break;
