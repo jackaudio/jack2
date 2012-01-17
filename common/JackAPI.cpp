@@ -310,8 +310,9 @@ LIB_EXPORT jack_client_t* jack_client_new(const char* client_name)
         JackGlobals::fOpenMutex->Lock();
         jack_error("jack_client_new: deprecated");
         int options = JackUseExactName;
-        if (getenv("JACK_START_SERVER") == NULL)
+        if (getenv("JACK_START_SERVER") == NULL) {
             options |= JackNoStartServer;
+        }
         jack_client_t* res = jack_client_new_aux(client_name, (jack_options_t)options, NULL);
         JackGlobals::fOpenMutex->Unlock();
         return res;

@@ -523,7 +523,7 @@ JackWinNamedPipeServerChannel::~JackWinNamedPipeServerChannel()
 
 int JackWinNamedPipeServerChannel::Open(const char* server_name, JackServer* server)
 {
-    jack_log("JackWinNamedPipeServerChannel::Open ");
+    jack_log("JackWinNamedPipeServerChannel::Open");
     snprintf(fServerName, sizeof(fServerName), server_name);
 
     // Needed for internal connection from JackWinNamedPipeServerNotifyChannel object

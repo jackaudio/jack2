@@ -116,7 +116,7 @@ int JackSocketServerChannel::GetFd(JackClientSocket* socket_aux)
 {
     std::map<int, std::pair<int, JackClientSocket*> >::iterator it;
 
-     for (it = fSocketTable.begin(); it != fSocketTable.end(); it++) {
+    for (it = fSocketTable.begin(); it != fSocketTable.end(); it++) {
         pair<int, JackClientSocket*> elem = (*it).second;
         JackClientSocket* socket = elem.second;
         if (socket_aux == socket) {
@@ -141,7 +141,7 @@ void JackSocketServerChannel::ClientAdd(detail::JackChannelTransactionInterface*
     #ifdef __APPLE__
         int on = 1;
         if (setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, (const char*)&on, sizeof(on)) < 0) {
-            jack_log("JackSocketServerChannel::ClientAdd :  setsockopt SO_NOSIGPIPE fd = %ld err = %s", fd, strerror(errno));
+            jack_log("JackSocketServerChannel::ClientAdd : setsockopt SO_NOSIGPIPE fd = %ld err = %s", fd, strerror(errno));
         }
     #endif
     } else {

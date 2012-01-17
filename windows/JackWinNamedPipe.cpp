@@ -81,7 +81,7 @@ int JackWinNamedPipeClient::ConnectAux()
 
 int JackWinNamedPipeClient::ConnectAux()
 {
-    jack_log("Connect: fName %s", fName);
+    jack_log("JackWinNamedPipeClient::ConnectAux : fName %s", fName);
 
     while (true) {
 
@@ -254,7 +254,7 @@ int JackWinAsyncNamedPipeClient::Write(void* data, int len)
 // Server side
 int JackWinNamedPipeServer::BindAux()
 {
-    jack_log("Bind: fName %s", fName);
+    jack_log("JackWinNamedPipeServer::BindAux : fName %s", fName);
 
     if ((fNamedPipe = CreateNamedPipe(fName,
                                       PIPE_ACCESS_DUPLEX,       // read/write access
@@ -338,7 +338,7 @@ int JackWinNamedPipeServer::Close()
 
 int JackWinAsyncNamedPipeServer::BindAux()
 {
-    jack_log("Bind: fName %s", fName);
+    jack_log("JackWinAsyncNamedPipeServer::BindAux : fName %s", fName);
 
     if ((fNamedPipe = CreateNamedPipe(fName,
                                       PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,  // read/write access

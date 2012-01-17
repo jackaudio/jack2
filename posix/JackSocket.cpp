@@ -120,7 +120,7 @@ int JackClientSocket::Connect(const char* dir, const char* name, int which) // A
 
     addr.sun_family = AF_UNIX;
     BuildName(name, addr.sun_path, dir, which);
-    jack_log("Connect: addr.sun_path %s", addr.sun_path);
+    jack_log("JackClientSocket::Connect : addr.sun_path %s", addr.sun_path);
 
     if (connect(fSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
         jack_error("Cannot connect to server socket err = %s", strerror(errno));
@@ -254,7 +254,7 @@ int JackServerSocket::Bind(const char* dir, const char* name, int which) // A re
     BuildName(name, fName, dir, which);
     strncpy(addr.sun_path, fName, sizeof(addr.sun_path) - 1);
 
-    jack_log("Bind: addr.sun_path %s", addr.sun_path);
+    jack_log("JackServerSocket::Bind : addr.sun_path %s", addr.sun_path);
     unlink(fName); // Security...
 
     if (bind(fSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {

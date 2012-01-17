@@ -42,7 +42,7 @@ JackRequestDecoder::JackRequestDecoder(JackServer* server, JackClientHandlerInte
 JackRequestDecoder::~JackRequestDecoder()
 {}
 
-int  JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* socket, int type_aux)
+int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* socket, int type_aux)
 {
     JackRequest::RequestType type = (JackRequest::RequestType)type_aux;
     
