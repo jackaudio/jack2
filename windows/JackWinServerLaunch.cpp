@@ -286,8 +286,11 @@ static int server_connect(const char* server_name)
 	JackClientChannel channel;
 	int res = channel.ServerCheck(server_name);
 	channel.Close();
+	/*
 	JackSleep(2000); // Added by JE - 02-01-2009 (gives
 	                 // the channel some time to close)
+	                 */
+    JackSleep(500);
 	return res;
 }
 

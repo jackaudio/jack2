@@ -35,7 +35,6 @@ namespace Jack
 class JackServer;
 
 class JackClientPipeThread : public JackRunnableInterface, public JackClientHandlerInterface
-//class JackClientPipeThread : public JackRunnableInterface
 {
 
     private:
@@ -45,9 +44,6 @@ class JackClientPipeThread : public JackRunnableInterface, public JackClientHand
         JackServer*	fServer;
         JackThread fThread;
         int fRefNum;
-
-        //void ClientAdd(char* name, int pid, int uuid, int* shared_engine, int* shared_client, int* shared_graph, int* result);
-        //void ClientRemove();
 
         void ClientAdd(detail::JackChannelTransactionInterface* socket, JackClientOpenRequest* req, JackClientOpenResult *res);
         void ClientRemove(detail::JackChannelTransactionInterface* socket, int refnum);
@@ -64,15 +60,14 @@ class JackClientPipeThread : public JackRunnableInterface, public JackClientHand
         int Open(JackServer* server);   // Open the Server/Client connection
         void Close();                   // Close the Server/Client connection
 
-        //bool HandleRequest();
-
         // JackRunnableInterface interface
         bool Execute();
 
         // To be used for find out if the object can be deleted
-        bool IsRunning();
-
-        int GetRefNum() { return fRefNum; }
+        bool IsRunning()
+        {
+            return (fRefNum >= 0);
+        }
 
 };
 

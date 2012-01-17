@@ -45,7 +45,7 @@ JackRequestDecoder::~JackRequestDecoder()
 int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* socket, int type_aux)
 {
     JackRequest::RequestType type = (JackRequest::RequestType)type_aux;
-    
+
    // Read data
     switch (type) {
 
@@ -83,7 +83,8 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             res.fResult = fServer->GetEngine()->ClientExternalClose(req.fRefNum);
             CheckWriteRefNum("JackRequest::ClientClose", socket);
             fHandler->ClientRemove(socket, req.fRefNum);
-            break;
+            // Will cause the wrapping thread to stop
+            return -1;
         }
 
         case JackRequest::kActivateClient: {
@@ -341,7 +342,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             jack_error("Unknown request %ld", type);
             return -1;
     }
-    
+
     return 0;
 }
 
