@@ -35,7 +35,7 @@ int JackWinNamedPipeAux::ReadAux(void* data, int len)
     if (res && read == (DWORD)len) {
         return 0;
     } else {
-        jack_error("Cannot read named pipe name = %s err = %ld", fName, GetLastError());
+        jack_log("Cannot read named pipe name = %s err = %ld", fName, GetLastError());
         return -1;
     }
 }
@@ -47,7 +47,7 @@ int JackWinNamedPipeAux::WriteAux(void* data, int len)
     if (res && written == (DWORD)len) {
         return 0;
     } else {
-        jack_error("Cannot write named pipe name = %s err = %ld", fName, GetLastError());
+        jack_log("Cannot write named pipe name = %s err = %ld", fName, GetLastError());
         return -1;
     }
 }
