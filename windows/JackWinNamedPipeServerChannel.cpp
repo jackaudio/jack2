@@ -39,7 +39,7 @@ HANDLE JackClientPipeThread::fMutex = NULL;  // Never released....
 // fRefNum = -1 correspond to already removed client
 
 JackClientPipeThread::JackClientPipeThread(JackWinNamedPipeClient* pipe)
-    :fPipe(pipe), fServer(NULL), fDecoder(NULL), fThread(this), fRefNum(0)
+    :fPipe(pipe), fDecoder(NULL), fServer(NULL), fThread(this), fRefNum(0)
 {
     // First one allocated the static fMutex
     if (fMutex == NULL) {
@@ -53,17 +53,24 @@ JackClientPipeThread::~JackClientPipeThread()
     delete fPipe;
 }
 
+ bool JackClientPipeThread::IsRunning()
+{
+    return (fRefNum >= 0);
+    //return (fRefNum >= GetEngineControl()->fDriverNum);
+}
+
+
 int JackClientPipeThread::Open(JackServer* server)      // Open the Server/Client connection
 {
     // Start listening
     if (fThread.Start() != 0) {
         jack_error("Cannot start Jack server listener\n");
         return -1;
+    } else {
+        fDecoder = new JackRequestDecoder(server, this);
+        fServer = server;
+        return 0;
     }
-
-    fDecoder = new JackRequestDecoder(server, this);
-    fServer = server;
-    return 0;
 }
 
 void JackClientPipeThread::Close()                                      // Close the Server/Client connection
@@ -79,7 +86,7 @@ void JackClientPipeThread::Close()                                      // Close
     fPipe->Close();
     fRefNum = -1;
 
-    //delete fDecoder;
+    delete fDecoder;
     fDecoder = NULL;
 }
 
@@ -520,13 +527,13 @@ int JackWinNamedPipeServerChannel::Open(const char* server_name, JackServer* ser
     snprintf(fServerName, sizeof(fServerName), server_name);
 
     // Needed for internal connection from JackWinNamedPipeServerNotifyChannel object
-    if (fRequestListenPipe.Bind(jack_server_dir, server_name, 0) < 0) {
+    if (ClientListen()) {
+        fServer = server;
+        return 0;
+    } else {
         jack_error("JackWinNamedPipeServerChannel::Open : cannot create result listen pipe");
         return -1;
     }
-
-    fServer = server;
-    return 0;
 }
 
 void JackWinNamedPipeServerChannel::Close()
@@ -557,14 +564,30 @@ void JackWinNamedPipeServerChannel::Stop()
     fThread.Kill();
 }
 
+
 bool JackWinNamedPipeServerChannel::Init()
 {
     jack_log("JackWinNamedPipeServerChannel::Init");
-    JackWinNamedPipeClient* pipe;
-
     // Accept first client, that is the JackWinNamedPipeServerNotifyChannel object
-    if ((pipe = fRequestListenPipe.AcceptClient()) == NULL) {
-        jack_error("JackWinNamedPipeServerChannel::Init : cannot connect pipe");
+    return ClientAccept();
+}
+
+bool JackWinNamedPipeServerChannel::ClientListen()
+{
+     if (fRequestListenPipe.Bind(jack_server_dir, fServerName, 0) < 0) {
+        jack_error("JackWinNamedPipeServerChannel::ClientListen : cannot create result listen pipe");
+        return false;
+    } else {
+        return true;
+    }
+}
+
+bool JackWinNamedPipeServerChannel::ClientAccept()
+{
+     JackWinNamedPipeClient* pipe;
+
+     if ((pipe = fRequestListenPipe.AcceptClient()) == NULL) {
+        jack_error("JackWinNamedPipeServerChannel::ClientAccept : cannot connect pipe");
         return false;
     } else {
         ClientAdd(pipe);
@@ -574,20 +597,11 @@ bool JackWinNamedPipeServerChannel::Init()
 
 bool JackWinNamedPipeServerChannel::Execute()
 {
-    JackWinNamedPipeClient* pipe;
-
-    if (fRequestListenPipe.Bind(jack_server_dir, fServerName, 0) < 0) {
-        jack_error("JackWinNamedPipeServerChannel::Open : cannot create result listen pipe");
-        return false;
+    if (!ClientListen()) {
+       return false;
     }
 
-    if ((pipe = fRequestListenPipe.AcceptClient()) == NULL) {
-        jack_error("JackWinNamedPipeServerChannel::Open : cannot connect pipe");
-        return false;
-    }
-
-    ClientAdd(pipe);
-    return true;
+    return ClientAccept();
 }
 
 void JackWinNamedPipeServerChannel::ClientAdd(JackWinNamedPipeClient* pipe)
@@ -596,11 +610,11 @@ void JackWinNamedPipeServerChannel::ClientAdd(JackWinNamedPipeClient* pipe)
     std::list<JackClientPipeThread*>::iterator it = fClientList.begin();
     JackClientPipeThread* client;
 
-    jack_info("ClientAdd size %ld", fClientList.size());
+    jack_info("JackWinNamedPipeServerChannel::ClientAdd size %ld", fClientList.size());
 
     while (it != fClientList.end()) {
         client = *it;
-        jack_info("Remove dead client = %x running =  %ld", client, client->IsRunning());
+        jack_info("Remove dead client = %x running = %ld ref = %d", client, client->IsRunning(), client->GetRefNum());
         if (client->IsRunning()) {
             it++;
         } else {

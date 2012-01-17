@@ -70,10 +70,10 @@ class JackClientPipeThread : public JackRunnableInterface, public JackClientHand
         bool Execute();
 
         // To be used for find out if the object can be deleted
-        bool IsRunning()
-        {
-            return (fRefNum >= 0);
-        }
+        bool IsRunning();
+
+        int GetRefNum() { return fRefNum; }
+
 };
 
 /*!
@@ -93,6 +93,9 @@ class JackWinNamedPipeServerChannel : public JackRunnableInterface
         std::list<JackClientPipeThread*> fClientList;
 
         void ClientAdd(JackWinNamedPipeClient* pipe);
+
+        bool ClientListen();
+        bool ClientAccept();
 
     public:
 
