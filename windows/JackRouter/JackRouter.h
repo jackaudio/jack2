@@ -46,7 +46,6 @@ static int	kNumOutputs = 4;
 #include "combase.h"
 #include "iasiodrv.h"
 
-#define MAX_PORTS 32
 #define LONG_SAMPLE 1
 #define PATH_SEP "\\"
 
@@ -135,14 +134,14 @@ private:
 	ASIOTimeStamp fTheSystemTime;
 
 #ifdef LONG_SAMPLE
-	long* fInputBuffers[MAX_PORTS * 2];
-	long* fOutputBuffers[MAX_PORTS * 2];
+	long** fInputBuffers;
+	long** fOutputBuffers;
 #else
-	float* fInputBuffers[MAX_PORTS * 2];
-	float* fOutputBuffers[MAX_PORTS * 2];
+	float** fInputBuffers;
+	float** fOutputBuffers;
 #endif
-	long fInMap[MAX_PORTS];
-	long fOutMap[MAX_PORTS];
+	long* fInMap;
+	long* fOutMap;
 
 	long fInputLatency;
 	long fOutputLatency;
@@ -159,8 +158,8 @@ private:
 
 	// Jack part
 	jack_client_t* fClient;
-	jack_port_t* fInputPorts[MAX_PORTS];
-	jack_port_t* fOutputPorts[MAX_PORTS];
+	jack_port_t** fInputPorts;
+	jack_port_t** fOutputPorts;
 	long fBufferSize;
 	ASIOSampleRate fSampleRate;
 

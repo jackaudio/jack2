@@ -157,7 +157,6 @@ JackRouter::JackRouter() : AsioDriver()
 #endif
 {
 	long i;
-
 	fSamplePosition = 0;
 	fActive = false;
 	fStarted = false;
@@ -166,23 +165,13 @@ JackRouter::JackRouter() : AsioDriver()
 	fClient = NULL;
 	fAutoConnectIn = true;
 	fAutoConnectOut = true;
-
-	for (i = 0; i < kNumInputs; i++) {
-		fInputBuffers[i] = 0;
-		fInputPorts[i] = 0;
-		fInMap[i] = 0;
-	}
-	for (i = 0; i < kNumOutputs; i++) {
-		fOutputBuffers[i] = 0;
-		fOutputPorts[i] = 0;
-		fOutMap[i] = 0;
-	}
 	fCallbacks = 0;
 	fActiveInputs = fActiveOutputs = 0;
 	fToggle = 0;
 	fBufferSize = 512;
 	fSampleRate = 44100;
-	printf("Constructor\n");
+	
+     printf("Constructor\n");
 
 	// Use "jackrouter.ini" parameters if available
 	HMODULE handle = LoadLibrary(JACK_ROUTER);
@@ -212,15 +201,46 @@ JackRouter::JackRouter() : AsioDriver()
 	} else {
 		printf("LoadLibrary error\n");
 	}
+    
+ #ifdef LONG_SAMPLE
+	fInputBuffers = new long*[kNumInputs];
+	fOutputBuffers = new long*[kNumOutputs];
+#else
+	fInputBuffers = new float*[kNumInputs];
+	fOutputBuffers = new float*[kNumOutputs];
+#endif
+
+    fInMap = new long[kNumInputs];
+	fOutMap = new long[kNumOutputs];
+    
+    fInputPorts new jack_port_t*[kNumInputs];
+    fOutputPorts new jack_port_t*[kNumOutputs];
+ 
+	for (i = 0; i < kNumInputs; i++) {
+		fInputBuffers[i] = 0;
+		fInputPorts[i] = 0;
+		fInMap[i] = 0;
+	}
+	for (i = 0; i < kNumOutputs; i++) {
+		fOutputBuffers[i] = 0;
+		fOutputPorts[i] = 0;
+		fOutMap[i] = 0;
+	}
 }
 
 //------------------------------------------------------------------------------------------
 JackRouter::~JackRouter()
 {
+    printf("Destructor\n");
 	stop ();
 	disposeBuffers ();
 	jack_client_close(fClient);
-	printf("Destructor\n");
+	delete[] fInputBuffers;
+    delete[] fOutputBuffers;
+    delete[] fInputPorts;
+    delete[] fOutputPorts;
+    delete[] fInMap;
+    delete[] fOutMap;
 }
 
 //------------------------------------------------------------------------------------------
@@ -654,7 +674,6 @@ error:
 		fAsioTime.timeInfo.samplePosition.hi = fAsioTime.timeInfo.samplePosition.lo = 0;
 		fAsioTime.timeInfo.sampleRate = fSampleRate;
 		fAsioTime.timeInfo.flags = kSystemTimeValid | kSamplePositionValid | kSampleRateValid;
-
 		fAsioTime.timeCode.speed = 1.;
 		fAsioTime.timeCode.timeCodeSamples.lo = fAsioTime.timeCode.timeCodeSamples.hi = 0;
 		fAsioTime.timeCode.flags = kTcValid | kTcRunning ;

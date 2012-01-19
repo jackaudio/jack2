@@ -306,6 +306,7 @@ namespace Jack
             SessionParamsNToH(&net_params, &host_params);
         }
         while ((GetPacketType(&host_params) != START_MASTER) && (++attempt < SLAVE_SETUP_RETRY));
+        
         if (attempt == SLAVE_SETUP_RETRY) {
             jack_error("Slave doesn't respond, exiting");
             return false;
@@ -353,16 +354,6 @@ namespace Jack
             jack_error("NetAudioBuffer allocation error...");
             return false;
         }
-
-        // set the new timeout for the socket
-         //float time = 3 * 1000000.f * (float(fParams.fPeriodSize) / float(fParams.fSampleRate));
-        
-        /*
-        if (fSocket.SetTimeOut(PACKET_TIMEOUT) == SOCKET_ERROR) {
-            jack_error("Can't set rx timeout : %s", StrError(NET_ERROR_CODE));
-            goto error;
-        }
-        */
 
         // set the new rx buffer size
         if (SetNetBufferSize() == SOCKET_ERROR) {
@@ -829,14 +820,6 @@ namespace Jack
             jack_error("NetAudioBuffer allocation error...");
             return false;
         }
-        
-        /*
-        if (fSocket.SetTimeOut(PACKET_TIMEOUT) == SOCKET_ERROR) {
-            jack_error("Can't set rx timeout : %s", StrError(NET_ERROR_CODE));
-            goto error;
-        }
-        */
-        
 
         // set the new buffer sizes
         if (SetNetBufferSize() == SOCKET_ERROR) {
