@@ -40,6 +40,7 @@
 	09/27/2007 SL : Add AUDO_CONNECT property in JackRouter.ini file.
 	10/10/2007 SL : Use ASIOSTInt32LSB instead of ASIOSTInt16LSB.
 	12/04/2011 SL : Compilation on Windows 64.
+	12/04/2011 SL : Dynamic port allocation. Correct JACK port naming.
  */
 
 //------------------------------------------------------------------------------------------
@@ -213,8 +214,8 @@ JackRouter::JackRouter() : AsioDriver()
     fInMap = new long[kNumInputs];
 	fOutMap = new long[kNumOutputs];
     
-    fInputPorts new jack_port_t*[kNumInputs];
-    fOutputPorts new jack_port_t*[kNumOutputs];
+    fInputPorts = new jack_port_t*[kNumInputs];
+    fOutputPorts = new jack_port_t*[kNumOutputs];
  
 	for (i = 0; i < kNumInputs; i++) {
 		fInputBuffers[i] = 0;
@@ -302,7 +303,6 @@ void JackRouter::shutdown(void* arg)
 	/*
 	//exit(1);
 	char errstr[128];
-
 	memset(errstr,0,128);
 	sprintf(errstr,"JACK server has quitted");
 	MessageBox(0,(LPCTSTR)errstr,(LPCTSTR)"JackRouter",MB_OK);
@@ -448,8 +448,8 @@ ASIOError JackRouter::start()
 //------------------------------------------------------------------------------------------
 ASIOError JackRouter::stop()
 {
-	fStarted = false;
 	printf("Stop ASIO Jack\n");
+	fStarted = false;
 	SaveConnections();
 	jack_deactivate(fClient);
 	return ASE_OK;
@@ -474,7 +474,7 @@ ASIOError JackRouter::getLatencies(long *_inputLatency, long *_outputLatency)
 //------------------------------------------------------------------------------------------
 ASIOError JackRouter::getBufferSize(long *minSize, long *maxSize, long *preferredSize, long *granularity)
 {
-	*minSize = *maxSize = *preferredSize = fBufferSize;		// allow this size only
+	*minSize = *maxSize = *preferredSize = fBufferSize;		// Allows this size only
 	*granularity = 0;
 	return ASE_OK;
 }
@@ -615,7 +615,7 @@ ASIOError JackRouter::createBuffers(ASIOBufferInfo *bufferInfos, long numChannel
 				notEnoughMem = true;
 			}
 
-			_snprintf(buf, sizeof(buf) - 1, "in%d", fActiveInputs + 1);
+			_snprintf(buf, sizeof(buf) - 1, "in%d", info->channelNum + 1);
 			fInputPorts[fActiveInputs]
 				= jack_port_register(fClient, buf, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput,0);
 			if (fInputPorts[fActiveInputs] == NULL)
@@ -645,8 +645,8 @@ error:
 				info->buffers[0] = info->buffers[1] = 0;
 				notEnoughMem = true;
 			}
-
-			_snprintf(buf, sizeof(buf) - 1, "out%d", fActiveOutputs + 1);
+			
+			_snprintf(buf, sizeof(buf) - 1, "out%d", info->channelNum + 1);
 			fOutputPorts[fActiveOutputs]
 				= jack_port_register(fClient, buf, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput,0);
 			if (fOutputPorts[fActiveOutputs] == NULL)
