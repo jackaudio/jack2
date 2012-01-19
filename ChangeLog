@@ -36,6 +36,10 @@ John Emmas
   Jackdmp changes log
 ---------------------------
 
+2012-01-19 Stephane Letz  <letz@grame.fr>
+
+	* Implement shutdown for in server clients.
+
 2012-01-13 Stephane Letz  <letz@grame.fr>
 
 	* More robust server/client protocol.

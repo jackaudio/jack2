@@ -33,8 +33,8 @@ namespace Jack
         jack_log("JackNetMaster::JackNetMaster");
 
         //settings
-        fClientName = const_cast<char*>(fParams.fName);
-        fJackClient = NULL;
+        fName = const_cast<char*>(fParams.fName);
+        fClient = NULL;
         fSendTransportData.fState = -1;
         fReturnTransportData.fState = -1;
         fLastTransportState = -1;
@@ -91,10 +91,10 @@ namespace Jack
     {
         jack_log("JackNetMaster::~JackNetMaster ID = %u", fParams.fID);
 
-        if (fJackClient) {
-            jack_deactivate(fJackClient);
+        if (fClient) {
+            jack_deactivate(fClient);
             FreePorts();
-            jack_client_close(fJackClient);
+            jack_client_close(fClient);
         }
         delete[] fAudioCapturePorts;
         delete[] fAudioPlaybackPorts;
@@ -122,16 +122,16 @@ namespace Jack
 
         //jack client and process
         jack_status_t status;
-        if ((fJackClient = jack_client_open(fClientName, JackNullOption, &status, NULL)) == NULL) {
+        if ((fClient = jack_client_open(fName, JackNullOption, &status, NULL)) == NULL) {
             jack_error("Can't open a new JACK client");
             return false;
         }
-
-        if (jack_set_process_callback(fJackClient, SetProcess, this) < 0) {
+        
+        if (jack_set_process_callback(fClient, SetProcess, this) < 0) {
             goto fail;
         }
 
-        if (jack_set_buffer_size_callback(fJackClient, SetBufferSize, this) < 0) {
+        if (jack_set_buffer_size_callback(fClient, SetBufferSize, this) < 0) {
             goto fail;
         }
 
@@ -144,7 +144,7 @@ namespace Jack
         fRunning = true;
 
         //finally activate jack client
-        if (jack_activate(fJackClient) != 0) {
+        if (jack_activate(fClient) != 0) {
             jack_error("Can't activate JACK client");
             goto fail;
         }
@@ -157,8 +157,8 @@ namespace Jack
 
     fail:
         FreePorts();
-        jack_client_close(fJackClient);
-        fJackClient = NULL;
+        jack_client_close(fClient);
+        fClient = NULL;
         return false;
     }
 
@@ -167,7 +167,7 @@ namespace Jack
     {
         int i;
         char name[24];
-        jack_nframes_t port_latency = jack_get_buffer_size(fJackClient);
+        jack_nframes_t port_latency = jack_get_buffer_size(fClient);
         jack_latency_range_t range;
 
         jack_log("JackNetMaster::AllocPorts");
@@ -175,7 +175,7 @@ namespace Jack
         //audio
         for (i = 0; i < fParams.fSendAudioChannels; i++) {
             snprintf(name, sizeof(name), "to_slave_%d", i+1);
-            if ((fAudioCapturePorts[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput | JackPortIsTerminal, 0)) == NULL)
+            if ((fAudioCapturePorts[i] = jack_port_register(fClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput | JackPortIsTerminal, 0)) == NULL)
                 return -1;
             //port latency
             range.min = range.max = 0;
@@ -184,7 +184,7 @@ namespace Jack
 
         for (i = 0; i < fParams.fReturnAudioChannels; i++) {
             snprintf(name, sizeof(name), "from_slave_%d", i+1);
-            if ((fAudioPlaybackPorts[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput | JackPortIsTerminal, 0)) == NULL)
+            if ((fAudioPlaybackPorts[i] = jack_port_register(fClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput | JackPortIsTerminal, 0)) == NULL)
                 return -1;
             //port latency
             range.min = range.max = fParams.fNetworkLatency * port_latency + (fParams.fSlaveSyncMode) ? 0 : port_latency;
@@ -194,7 +194,7 @@ namespace Jack
         //midi
         for (i = 0; i < fParams.fSendMidiChannels; i++) {
             snprintf(name, sizeof(name), "midi_to_slave_%d", i+1);
-            if ((fMidiCapturePorts[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_MIDI_TYPE, JackPortIsInput | JackPortIsTerminal, 0)) == NULL)
+            if ((fMidiCapturePorts[i] = jack_port_register(fClient, name, JACK_DEFAULT_MIDI_TYPE, JackPortIsInput | JackPortIsTerminal, 0)) == NULL)
                 return -1;
             //port latency
             range.min = range.max = 0;
@@ -203,7 +203,7 @@ namespace Jack
 
         for (i = 0; i < fParams.fReturnMidiChannels; i++) {
             snprintf(name, sizeof(name), "midi_from_slave_%d", i+1);
-            if ((fMidiPlaybackPorts[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_MIDI_TYPE,  JackPortIsOutput | JackPortIsTerminal, 0)) == NULL)
+            if ((fMidiPlaybackPorts[i] = jack_port_register(fClient, name, JACK_DEFAULT_MIDI_TYPE,  JackPortIsOutput | JackPortIsTerminal, 0)) == NULL)
                 return -1;
             //port latency
             range.min = range.max = fParams.fNetworkLatency * port_latency + (fParams.fSlaveSyncMode) ? 0 : port_latency;
@@ -216,18 +216,18 @@ namespace Jack
     {
         const char **ports;
 
-        ports = jack_get_ports(fJackClient, NULL, NULL, JackPortIsPhysical | JackPortIsOutput);
+        ports = jack_get_ports(fClient, NULL, NULL, JackPortIsPhysical | JackPortIsOutput);
         if (ports != NULL) {
             for (int i = 0; i < fParams.fSendAudioChannels && ports[i]; i++) {
-                jack_connect(fJackClient, ports[i], jack_port_name(fAudioCapturePorts[i]));
+                jack_connect(fClient, ports[i], jack_port_name(fAudioCapturePorts[i]));
             }
             free(ports);
         }
 
-        ports = jack_get_ports(fJackClient, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
+        ports = jack_get_ports(fClient, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
         if (ports != NULL) {
             for (int i = 0; i < fParams.fReturnAudioChannels && ports[i]; i++) {
-                jack_connect(fJackClient, jack_port_name(fAudioPlaybackPorts[i]), ports[i]);
+                jack_connect(fClient, jack_port_name(fAudioPlaybackPorts[i]), ports[i]);
             }
             free(ports);
         }
@@ -240,22 +240,22 @@ namespace Jack
         int port_index;
         for (port_index = 0; port_index < fParams.fSendAudioChannels; port_index++) {
             if (fAudioCapturePorts[port_index]) {
-                jack_port_unregister(fJackClient, fAudioCapturePorts[port_index]);
+                jack_port_unregister(fClient, fAudioCapturePorts[port_index]);
             }
         }
         for (port_index = 0; port_index < fParams.fReturnAudioChannels; port_index++) {
             if (fAudioPlaybackPorts[port_index]) {
-                jack_port_unregister(fJackClient, fAudioPlaybackPorts[port_index]);
+                jack_port_unregister(fClient, fAudioPlaybackPorts[port_index]);
             }
         }
         for (port_index = 0; port_index < fParams.fSendMidiChannels; port_index++) {
             if (fMidiCapturePorts[port_index]) {
-                jack_port_unregister(fJackClient, fMidiCapturePorts[port_index]);
+                jack_port_unregister(fClient, fMidiCapturePorts[port_index]);
             }
         }
         for (port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++) {
             if (fMidiPlaybackPorts[port_index]) {
-                jack_port_unregister(fJackClient, fMidiPlaybackPorts[port_index]);
+                jack_port_unregister(fClient, fMidiPlaybackPorts[port_index]);
             }
         }
     }
@@ -268,7 +268,7 @@ namespace Jack
         fSendTransportData.fTimebaseMaster = NO_CHANGE;
 
         //update state and position
-        fSendTransportData.fState = static_cast<uint>(jack_transport_query(fJackClient, &fSendTransportData.fPosition));
+        fSendTransportData.fState = static_cast<uint>(jack_transport_query(fClient, &fSendTransportData.fPosition));
 
         //is it a new state ?
         fSendTransportData.fNewState = ((fSendTransportData.fState != fLastTransportState) && (fSendTransportData.fState != fReturnTransportData.fState));
@@ -287,7 +287,7 @@ namespace Jack
             switch (fReturnTransportData.fTimebaseMaster)
             {
                 case RELEASE_TIMEBASEMASTER :
-                    timebase = jack_release_timebase(fJackClient);
+                    timebase = jack_release_timebase(fClient);
                     if (timebase < 0) {
                         jack_error("Can't release timebase master");
                     } else {
@@ -296,7 +296,7 @@ namespace Jack
                     break;
 
                 case TIMEBASEMASTER :
-                    timebase = jack_set_timebase_callback(fJackClient, 0, SetTimebaseCallback, this);
+                    timebase = jack_set_timebase_callback(fClient, 0, SetTimebaseCallback, this);
                     if (timebase < 0) {
                         jack_error("Can't set a new timebase master");
                     } else {
@@ -305,7 +305,7 @@ namespace Jack
                     break;
 
                 case CONDITIONAL_TIMEBASEMASTER :
-                    timebase = jack_set_timebase_callback(fJackClient, 1, SetTimebaseCallback, this);
+                    timebase = jack_set_timebase_callback(fClient, 1, SetTimebaseCallback, this);
                     if (timebase != EBUSY) {
                         if (timebase < 0)
                             jack_error("Can't set a new timebase master");
@@ -317,19 +317,19 @@ namespace Jack
         }
 
         //is the slave in a new transport state and is this state different from master's ?
-        if (fReturnTransportData.fNewState && (fReturnTransportData.fState != jack_transport_query(fJackClient, NULL))) {
+        if (fReturnTransportData.fNewState && (fReturnTransportData.fState != jack_transport_query(fClient, NULL))) {
 
             switch (fReturnTransportData.fState)
             {
                 case JackTransportStopped :
-                    jack_transport_stop(fJackClient);
+                    jack_transport_stop(fClient);
                     jack_info("'%s' stops transport", fParams.fName);
                     break;
 
                 case JackTransportStarting :
-                    if (jack_transport_reposition(fJackClient, &fReturnTransportData.fPosition) == EINVAL)
+                    if (jack_transport_reposition(fClient, &fReturnTransportData.fPosition) == EINVAL)
                         jack_error("Can't set new position");
-                    jack_transport_start(fJackClient);
+                    jack_transport_start(fClient);
                     jack_info("'%s' starts transport frame = %d", fParams.fName, fReturnTransportData.fPosition.frame);
                     break;
 
@@ -551,15 +551,17 @@ namespace Jack
     {
         jack_log("JackNetMasterManager::JackNetMasterManager");
 
-        fManagerClient = client;
-        fManagerName = jack_get_client_name(fManagerClient);
+        fClient = client;
+        fName = jack_get_client_name(fClient);
         fGlobalID = 0;
         fRunning = true;
         fAutoConnect = false;
 
         const JSList* node;
         const jack_driver_param_t* param;
-
+     
+        jack_on_shutdown(fClient, ShutDown, this);
+    
         // Possibly use env variable
         const char* default_udp_port = getenv("JACK_NETJACK_PORT");
         fSocket.SetPort((default_udp_port) ? atoi(default_udp_port) : DEFAULT_PORT);
@@ -595,15 +597,15 @@ namespace Jack
         }
 
         //set sync callback
-        jack_set_sync_callback(fManagerClient, SetSyncCallback, this);
+        jack_set_sync_callback(fClient, SetSyncCallback, this);
 
         //activate the client (for sync callback)
-        if (jack_activate(fManagerClient) != 0) {
+        if (jack_activate(fClient) != 0) {
             jack_error("Can't activate the NetManager client, transport disabled");
         }
 
         //launch the manager thread
-        if (jack_client_create_thread(fManagerClient, &fManagerThread, 0, 0, NetManagerThread, this)) {
+        if (jack_client_create_thread(fClient, &fThread, 0, 0, NetManagerThread, this)) {
             jack_error("Can't create the NetManager control thread");
         }
     }
@@ -613,7 +615,7 @@ namespace Jack
         jack_log("JackNetMasterManager::~JackNetMasterManager");
         jack_info("Exiting NetManager...");
         fRunning = false;
-        jack_client_kill_thread(fManagerClient, fManagerThread);
+        //jack_client_kill_thread(fClient, fThread);
         master_list_t::iterator it;
         for (it = fMasterList.begin(); it != fMasterList.end(); it++) {
             delete(*it);
@@ -628,16 +630,23 @@ namespace Jack
         int count = 0;
         jack_port_t* port;
 
-        ports = jack_get_ports(fManagerClient, NULL, NULL, flags);
+        ports = jack_get_ports(fClient, NULL, NULL, flags);
         if (ports != NULL) {
             while (ports[count]
-                    && (port = jack_port_by_name(fManagerClient, ports[count]))
+                    && (port = jack_port_by_name(fClient, ports[count]))
                     && (strcmp(jack_port_type(port), JACK_DEFAULT_AUDIO_TYPE) == 0)) {
                 count++;
             }
             free(ports);
         }
         return count;
+    }
+    
+    void JackNetMasterManager::ShutDown(void* arg)
+    {
+        jack_log("JackNetMasterManager::ShutDown");
+        JackNetMasterManager* manager = (JackNetMasterManager*)arg;
+        jack_client_kill_thread(manager->fClient, manager->fThread);
     }
 
     int JackNetMasterManager::SetSyncCallback(jack_transport_state_t state, jack_position_t* pos, void* arg)
@@ -764,8 +773,8 @@ namespace Jack
         //settings
         fSocket.GetName(params.fMasterNetName);
         params.fID = ++fGlobalID;
-        params.fSampleRate = jack_get_sample_rate(fManagerClient);
-        params.fPeriodSize = jack_get_buffer_size(fManagerClient);
+        params.fSampleRate = jack_get_sample_rate(fClient);
+        params.fPeriodSize = jack_get_buffer_size(fClient);
 
         if (params.fSendAudioChannels == -1) {
             params.fSendAudioChannels = CountIO(JackPortIsPhysical | JackPortIsOutput);

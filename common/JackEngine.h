@@ -99,6 +99,8 @@ class SERVER_EXPORT JackEngine : public JackLockAble
 
         int Open();
         int Close();
+        
+        void ShutDown();
 
         // Client management
         int ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status);

@@ -188,6 +188,8 @@ int JackServer::Stop()
 {
     jack_log("JackServer::Stop");
     fChannel.Stop();
+    
+    fEngine->ShutDown();
 
     if (fFreewheel) {
         return fThreadedFreewheelDriver->Stop();
