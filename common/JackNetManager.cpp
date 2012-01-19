@@ -614,8 +614,10 @@ namespace Jack
     {
         jack_log("JackNetMasterManager::~JackNetMasterManager");
         jack_info("Exiting NetManager...");
-        fRunning = false;
-        //jack_client_kill_thread(fClient, fThread);
+        if (fRunning) {
+            jack_client_kill_thread(fClient, fThread);
+            fRunning = false;
+        }
         master_list_t::iterator it;
         for (it = fMasterList.begin(); it != fMasterList.end(); it++) {
             delete(*it);
@@ -646,7 +648,10 @@ namespace Jack
     {
         jack_log("JackNetMasterManager::ShutDown");
         JackNetMasterManager* manager = (JackNetMasterManager*)arg;
-        jack_client_kill_thread(manager->fClient, manager->fThread);
+        if (manager->fRunning) {
+            jack_client_kill_thread(manager->fClient, manager->fThread);
+            manager->fRunning = false;
+        }
     }
 
     int JackNetMasterManager::SetSyncCallback(jack_transport_state_t state, jack_position_t* pos, void* arg)
@@ -737,7 +742,7 @@ namespace Jack
             }
 
             if (rx_bytes == sizeof(session_params_t)) {
-                switch (GetPacketType (&host_params))
+                switch (GetPacketType(&host_params))
                 {
                     case SLAVE_AVAILABLE:
                         if ((net_master = InitMaster(host_params))) {
@@ -884,7 +889,7 @@ extern "C"
     SERVER_EXPORT void jack_finish(void* arg)
     {
         if (master_manager) {
-            jack_log ("Unloading Master Manager");
+            jack_log("Unloading Master Manager");
             delete master_manager;
             master_manager = NULL;
         }

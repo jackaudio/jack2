@@ -39,6 +39,7 @@ John Emmas
 2012-01-19 Stephane Letz  <letz@grame.fr>
 
 	* Implement shutdown for in server clients.
+	* Better time-out management in NetJack2.
 
 2012-01-13 Stephane Letz  <letz@grame.fr>
 

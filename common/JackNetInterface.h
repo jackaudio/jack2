@@ -32,9 +32,10 @@ namespace Jack
 
 #define SLAVE_SETUP_RETRY   5
 
-#define MANAGER_INIT_TIMEOUT    2000000      // in usec
-#define MASTER_INIT_TIMEOUT     1000000      // in usec
-#define SLAVE_INIT_TIMEOUT      1000000      // in usec
+#define MANAGER_INIT_TIMEOUT    2000000         // in usec
+#define MASTER_INIT_TIMEOUT     1000000 * 10    // in usec
+#define SLAVE_INIT_TIMEOUT      1000000 * 10    // in usec
+#define PACKET_TIMEOUT          500000          // in usec
 
 #define NETWORK_MAX_LATENCY     20
 
@@ -46,6 +47,8 @@ namespace Jack
     {
 
         protected:
+        
+            bool fSetTimeOut;
 
             void Initialize();
 
@@ -107,6 +110,8 @@ namespace Jack
             int AudioRecv(packet_header_t* rx_head, NetAudioBuffer* buffer);
 
             int FinishRecv(NetAudioBuffer* buffer);
+            
+            void SetRcvTimeOut();
 
             NetAudioBuffer* AudioBufferFactory(int nports, char* buffer);
 
@@ -136,7 +141,6 @@ namespace Jack
             int fLastfCycleOffset;
 
             bool Init();
-            int SetRxTimeout();
             bool SetParams();
 
             void Exit();

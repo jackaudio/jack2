@@ -54,6 +54,7 @@ namespace Jack
 
     void JackNetInterface::Initialize()
     {
+        fSetTimeOut = false;
         fTxBuffer = NULL;
         fRxBuffer = NULL;
         fNetAudioCaptureBuffer = NULL;
@@ -244,6 +245,17 @@ namespace Jack
         }
         return NULL;
     }
+    
+    void JackNetInterface::SetRcvTimeOut()
+    {
+        if (!fSetTimeOut) {
+            if (fSocket.SetTimeOut(PACKET_TIMEOUT) == SOCKET_ERROR) {
+                jack_error("Can't set rx timeout : %s", StrError(NET_ERROR_CODE));
+                return;
+            }
+            fSetTimeOut = true;
+        }
+    }
 
     // JackNetMasterInterface ************************************************************************************
 
@@ -262,8 +274,9 @@ namespace Jack
         }
 
         // timeout on receive (for init)
-        if (fSocket.SetTimeOut(MASTER_INIT_TIMEOUT) < 0)
-            jack_error("Can't set timeout : %s", StrError(NET_ERROR_CODE));
+        if (fSocket.SetTimeOut(MASTER_INIT_TIMEOUT) < 0) {
+            jack_error("Can't set init timeout : %s", StrError(NET_ERROR_CODE));
+        }
 
         // connect
         if (fSocket.Connect() == SOCKET_ERROR) {
@@ -299,13 +312,6 @@ namespace Jack
         }
 
         return true;
-    }
-
-    int JackNetMasterInterface::SetRxTimeout()
-    {
-        jack_log("JackNetMasterInterface::SetRxTimeout");
-        float time = 3 * 1000000.f * (static_cast<float>(fParams.fPeriodSize) / static_cast<float>(fParams.fSampleRate));
-        return fSocket.SetTimeOut(static_cast<int>(time));
     }
 
     bool JackNetMasterInterface::SetParams()
@@ -349,8 +355,10 @@ namespace Jack
         }
 
         // set the new timeout for the socket
+         //float time = 3 * 1000000.f * (float(fParams.fPeriodSize) / float(fParams.fSampleRate));
+        
         /*
-        if (SetRxTimeout() == SOCKET_ERROR) {
+        if (fSocket.SetTimeOut(PACKET_TIMEOUT) == SOCKET_ERROR) {
             jack_error("Can't set rx timeout : %s", StrError(NET_ERROR_CODE));
             goto error;
         }
@@ -468,6 +476,8 @@ namespace Jack
 
     int JackNetMasterInterface::SyncSend()
     {
+        SetRcvTimeOut();
+        
         fTxHeader.fCycle++;
         fTxHeader.fSubCycle = 0;
         fTxHeader.fDataType = 's';
@@ -718,13 +728,15 @@ namespace Jack
             }
         }
 
-        // timeout on receive
-        if (fSocket.SetTimeOut(SLAVE_INIT_TIMEOUT) == SOCKET_ERROR)
-            jack_error("Can't set timeout : %s", StrError(NET_ERROR_CODE));
+        // timeout on receive (for init)
+        if (fSocket.SetTimeOut(SLAVE_INIT_TIMEOUT) == SOCKET_ERROR) {
+            jack_error("Can't set init timeout : %s", StrError(NET_ERROR_CODE));
+        }
 
         // disable local loop
-        if (fSocket.SetLocalLoop() == SOCKET_ERROR)
+        if (fSocket.SetLocalLoop() == SOCKET_ERROR) {
             jack_error("Can't disable multicast loop : %s", StrError(NET_ERROR_CODE));
+        }
 
         // send 'AVAILABLE' until 'SLAVE_SETUP' received
         jack_info("Waiting for a master...");
@@ -817,6 +829,14 @@ namespace Jack
             jack_error("NetAudioBuffer allocation error...");
             return false;
         }
+        
+        /*
+        if (fSocket.SetTimeOut(PACKET_TIMEOUT) == SOCKET_ERROR) {
+            jack_error("Can't set rx timeout : %s", StrError(NET_ERROR_CODE));
+            goto error;
+        }
+        */
+        
 
         // set the new buffer sizes
         if (SetNetBufferSize() == SOCKET_ERROR) {
@@ -894,6 +914,7 @@ namespace Jack
     {
         int rx_bytes = 0;
         packet_header_t* rx_head = reinterpret_cast<packet_header_t*>(fRxBuffer);
+        
 
         // receive sync (launch the cycle)
         do {
@@ -906,6 +927,8 @@ namespace Jack
         while ((strcmp(rx_head->fPacketType, "header") != 0) && (rx_head->fDataType != 's'));
 
         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
+        
+        SetRcvTimeOut();
         return rx_bytes;
     }
 
