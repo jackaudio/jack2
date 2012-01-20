@@ -228,7 +228,7 @@ void PortAudioDevices::DisplayDevicesNames()
         }
 
         /* print device info fields */
-        jack_info ("Name                        = %s", GetFullName (id).c_str());
+        jack_info ("Name                        = %s", GetFullName(id).c_str());
         jack_info ("Max inputs                  = %d", fDeviceInfo[id]->maxInputChannels);
         jack_info ("Max outputs                 = %d", fDeviceInfo[id]->maxOutputChannels);
 
@@ -269,7 +269,7 @@ void PortAudioDevices::DisplayDevicesNames()
     jack_info("**************************** End of list ****************************");
 }
 
-bool PortAudioDevices::IsDuplex (PaDeviceIndex id)
+bool PortAudioDevices::IsDuplex(PaDeviceIndex id)
 {
     //does the device has in and out facilities
     if (fDeviceInfo[id]->maxInputChannels && fDeviceInfo[id]->maxOutputChannels) {
@@ -277,7 +277,7 @@ bool PortAudioDevices::IsDuplex (PaDeviceIndex id)
     }
     //else is another complementary device ? (search in devices with the same name)
     for (PaDeviceIndex i = 0; i < fNumDevice; i++) {
-        if ((i != id) && (GetDeviceName (i) == GetDeviceName (id))) {
+        if ((i != id) && (GetDeviceName(i) == GetDeviceName(id))) {
             if ((fDeviceInfo[i]->maxInputChannels && fDeviceInfo[id]->maxOutputChannels)
                     || (fDeviceInfo[i]->maxOutputChannels && fDeviceInfo[id]->maxInputChannels)) {
                 return true;

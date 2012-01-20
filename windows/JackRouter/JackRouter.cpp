@@ -821,6 +821,7 @@ void JackRouter::RestoreConnections()
     fConnections.clear();
 }
 
+
 //------------------------------------------------------------------------------------------
 void JackRouter::AutoConnect()
 {
@@ -831,10 +832,19 @@ void JackRouter::AutoConnect()
 	} else {
 		if (fAutoConnectIn) {
 			for (int i = 0; i < fActiveInputs; i++) {
+                /*
 				if (!ports[i]) {
 					printf("source port is null i = %ld\n", i);
 					break;
 				} else if (jack_connect(fClient, ports[i], jack_port_name(fInputPorts[i])) != 0) {
+					printf("Cannot connect input ports\n");
+				}
+                */
+                long ASIO_channel = fInMap[i];
+                if (!ports[ASIO_channel]) {
+					printf("source port is null ASIO_channel = %ld\n", ASIO_channel);
+					break;
+				} else if (jack_connect(fClient, ports[ASIO_channel], jack_port_name(fInputPorts[i])) != 0) {
 					printf("Cannot connect input ports\n");
 				}
 			}
@@ -847,10 +857,19 @@ void JackRouter::AutoConnect()
 	} else {
 		if (fAutoConnectOut) {
 			for (int i = 0; i < fActiveOutputs; i++) {
-				if (!ports[i]){
+                /*
+                if (!ports[i]){
 					printf("destination port is null i = %ld\n", i);
 					break;
 				} else if (jack_connect(fClient, jack_port_name(fOutputPorts[i]), ports[i]) != 0) {
+					printf("Cannot connect output ports\n");
+				}
+                */
+                long ASIO_channel = fOutMap[i];
+				if (!ports[ASIO_channel]){
+					printf("destination port is null ASIO_channel = %ld\n", ASIO_channel);
+					break;
+				} else if (jack_connect(fClient, jack_port_name(fOutputPorts[i]), ports[ASIO_channel]) != 0) {
 					printf("Cannot connect output ports\n");
 				}
 			}
