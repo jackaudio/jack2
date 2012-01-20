@@ -419,19 +419,6 @@ namespace Jack
         int rx_bytes;
 
         if (((rx_bytes = fSocket.Recv(fRxBuffer, size, flags)) == SOCKET_ERROR) && fRunning) {
-
-            /*
-            net_error_t error = fSocket.GetError();
-            // no data isn't really a network error, so just return 0 available read bytes
-            if (error == NET_NO_DATA) {
-                return 0;
-            } else if (error == NET_CONN_ERROR) {
-                FatalRecvError();
-            } else {
-                jack_error("Error in master receive : %s", StrError(NET_ERROR_CODE));
-            }
-            */
-
             FatalRecvError();
         }
 
@@ -447,14 +434,6 @@ namespace Jack
         PacketHeaderHToN(header, header);
 
         if (((tx_bytes = fSocket.Send(fTxBuffer, size, flags)) == SOCKET_ERROR) && fRunning) {
-            /*
-            net_error_t error = fSocket.GetError();
-            if (error == NET_CONN_ERROR) {
-                FatalSendError();
-            } else {
-                jack_error("Error in master send : %s", StrError(NET_ERROR_CODE));
-            }
-            */
             FatalSendError();
         }
         return tx_bytes;
@@ -492,17 +471,6 @@ namespace Jack
     {
         int rx_bytes = 0;
         packet_header_t* rx_head = reinterpret_cast<packet_header_t*>(fRxBuffer);
-
-        /*
-        int rx_bytes = Recv(fParams.fMtu, MSG_PEEK);
-
-        if ((rx_bytes == 0) || (rx_bytes == SOCKET_ERROR)) {
-            // 0 bytes considered an error (lost connection)
-            return SOCKET_ERROR;
-        }
-
-        fCurrentCycleOffset = fTxHeader.fCycle - rx_head->fCycle;
-        */
 
         // receive sync (launch the cycle)
         do {
@@ -849,20 +817,9 @@ namespace Jack
     int JackNetSlaveInterface::Recv(size_t size, int flags)
     {
         int rx_bytes = fSocket.Recv(fRxBuffer, size, flags);
+        
         // handle errors
         if (rx_bytes == SOCKET_ERROR) {
-            /*
-            net_error_t error = fSocket.GetError();
-            // no data isn't really an error in realtime processing, so just return 0
-            if (error == NET_NO_DATA) {
-                jack_error("No data, is the master still running ?");
-            // if a network error occurs, this exception will restart the driver
-            } else if (error == NET_CONN_ERROR) {
-                FatalRecvError();
-            } else {
-                jack_error("Fatal error in slave receive : %s", StrError(NET_ERROR_CODE));
-            }
-            */
             FatalRecvError();
         }
 
@@ -879,17 +836,9 @@ namespace Jack
 
         // handle errors
         if (tx_bytes == SOCKET_ERROR) {
-            /*
-            net_error_t error = fSocket.GetError();
-            // if a network error occurs, this exception will restart the driver
-            if (error == NET_CONN_ERROR) {
-                FatalSendError();
-            } else {
-                jack_error("Fatal error in slave send : %s", StrError(NET_ERROR_CODE));
-            }
-            */
             FatalSendError();
         }
+        
         return tx_bytes;
     }
 
@@ -897,8 +846,7 @@ namespace Jack
     {
         int rx_bytes = 0;
         packet_header_t* rx_head = reinterpret_cast<packet_header_t*>(fRxBuffer);
-        
-
+     
         // receive sync (launch the cycle)
         do {
             rx_bytes = Recv(fParams.fMtu, 0);

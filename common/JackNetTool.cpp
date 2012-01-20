@@ -275,7 +275,7 @@ namespace Jack
                 *active_port_address = htonl(port_index);
                 active_port_address++;
                 active_ports++;
-                assert(active_ports < 256);
+                assert(active_ports < 256); 
             }
         }
 
@@ -307,7 +307,6 @@ namespace Jack
         // Count active ports
         int active_ports = 0;
         for (int port_index = 0; port_index < fNPorts; port_index++) {
-
             if (fPortBuffer[port_index]) {
                 active_ports++;
             }
