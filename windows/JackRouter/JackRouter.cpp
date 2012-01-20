@@ -172,7 +172,7 @@ JackRouter::JackRouter() : AsioDriver()
 	fBufferSize = 512;
 	fSampleRate = 44100;
 	
-     printf("Constructor\n");
+    printf("Constructor\n");
 
 	// Use "jackrouter.ini" parameters if available
 	HMODULE handle = LoadLibrary(JACK_ROUTER);
@@ -301,7 +301,6 @@ void JackRouter::shutdown(void* arg)
 {
 	JackRouter* driver = (JackRouter*)arg;
 	/*
-	//exit(1);
 	char errstr[128];
 	memset(errstr,0,128);
 	sprintf(errstr,"JACK server has quitted");
@@ -388,14 +387,14 @@ ASIOBool JackRouter::init(void* sysRef)
 	}
 
 	if (fClient) {
-		printf("Error: jack client still present...\n");
+		printf("Error: JACK client still present...\n");
 		return true;
 	}
 
 	fClient = jack_client_open(name, JackNullOption, NULL);
 	if (fClient == NULL) {
-		strcpy (fErrorMessage, "Open error: is jack server running?");
-		printf("Open error: is jack server running?\n");
+		strcpy(fErrorMessage, "Open error: is JACK server running?");
+		printf("Open error: is JACK server running?\n");
 		return false;
 	}
 
@@ -411,7 +410,7 @@ ASIOBool JackRouter::init(void* sysRef)
 	// Typically fBufferSize * 2; try to get 1 by offering direct buffer
 	// access, and using asioPostOutput for lower latency
 
-	printf("Init ASIO Jack\n");
+	printf("Init ASIO JACK\n");
 	fActive = true;
 	return true;
 }
@@ -424,7 +423,7 @@ ASIOError JackRouter::start()
 		fTheSystemTime.lo = fTheSystemTime.hi = 0;
 		fToggle = 0;
 		fStarted = true;
-		printf("Start ASIO Jack\n");
+		printf("Start ASIO JACK\n");
 
 		if (jack_activate(fClient) == 0) {
 
@@ -448,7 +447,7 @@ ASIOError JackRouter::start()
 //------------------------------------------------------------------------------------------
 ASIOError JackRouter::stop()
 {
-	printf("Stop ASIO Jack\n");
+	printf("Stop ASIO JACK\n");
 	fStarted = false;
 	SaveConnections();
 	jack_deactivate(fClient);
@@ -545,8 +544,9 @@ ASIOError JackRouter::getSamplePosition(ASIOSamples *sPos, ASIOTimeStamp *tStamp
 //------------------------------------------------------------------------------------------
 ASIOError JackRouter::getChannelInfo(ASIOChannelInfo *info)
 {
-	if (info->channel < 0 || (info->isInput ? info->channel >= kNumInputs : info->channel >= kNumOutputs))
+	if (info->channel < 0 || (info->isInput ? info->channel >= kNumInputs : info->channel >= kNumOutputs)) {
 		return ASE_InvalidParameter;
+    }
 #ifdef LONG_SAMPLE
 	info->type = ASIOSTInt32LSB;
 #else
@@ -562,9 +562,6 @@ ASIOError JackRouter::getChannelInfo(ASIOChannelInfo *info)
 		for (i = 0; i < fActiveInputs; i++) {
 			if (fInMap[i] == info->channel) {
 				info->isActive = ASIOTrue;
-				//_snprintf(buf, sizeof(buf) - 1, "Jack::In%d ", info->channel);
-				//strcpy(info->name, buf);
-				//strcpy(info->name, jack_port_name(fInputPorts[i]));
 				break;
 			}
 		}
@@ -572,11 +569,8 @@ ASIOError JackRouter::getChannelInfo(ASIOChannelInfo *info)
 		strcpy(info->name, buf);
 	} else {
 		for (i = 0; i < fActiveOutputs; i++) {
-			if (fOutMap[i] == info->channel) {  //NOT USED !!
+			if (fOutMap[i] == info->channel) {  
 				info->isActive = ASIOTrue;
-				//_snprintf(buf, sizeof(buf) - 1, "Jack::Out%d ", info->channel);
-				//strcpy(info->name, buf);
-				//strcpy(info->name, jack_port_name(fOutputPorts[i]));
 				break;
 			}
 		}
@@ -717,8 +711,8 @@ ASIOError JackRouter::controlPanel()
 ASIOError JackRouter::future(long selector, void* opt)	// !!! check properties
 {
 	ASIOTransportParameters* tp = (ASIOTransportParameters*)opt;
-	switch (selector)
-	{
+    
+	switch (selector) {
 		case kAsioEnableTimeCodeRead:	fTcRead = true;	return ASE_SUCCESS;
 		case kAsioDisableTimeCodeRead:	fTcRead = false; return ASE_SUCCESS;
 		case kAsioSetInputMonitor:		return ASE_SUCCESS;	// for testing!!!
@@ -726,6 +720,7 @@ ASIOError JackRouter::future(long selector, void* opt)	// !!! check properties
 		case kAsioCanTimeInfo:			return ASE_SUCCESS;
 		case kAsioCanTimeCode:			return ASE_SUCCESS;
 	}
+    
 	return ASE_NotPresent;
 }
 
