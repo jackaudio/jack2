@@ -198,7 +198,7 @@ JackRouter::JackRouter() : AsioDriver()
 		fAutoConnectIn = get_private_profile_int("AUTO_CONNECT", "input", 1, confPath.c_str());
 		fAutoConnectOut = get_private_profile_int("AUTO_CONNECT", "output", 1, confPath.c_str());
         
-        fFloatSample = get_private_profile_int("IO", "float-samples", 1, confPath.c_str());
+        fFloatSample = get_private_profile_int("IO", "float-sample", 1, confPath.c_str());
 
 		FreeLibrary(handle);
 
@@ -207,11 +207,11 @@ JackRouter::JackRouter() : AsioDriver()
 	}
     
     if (!fFloatSample) {
-        fInputBuffers = new long*[kNumInputs];
-        fOutputBuffers = new long*[kNumOutputs];
+        fInputBuffers = (void**)new long*[kNumInputs];
+        fOutputBuffers = (void**)new long*[kNumOutputs];
     } else {
-        fInputBuffers = new float*[kNumInputs];
-        fOutputBuffers = new float*[kNumOutputs];
+        fInputBuffers = (void**)new float*[kNumInputs];
+        fOutputBuffers = (void**)new float*[kNumOutputs];
     }
 
     fInMap = new long[kNumInputs];
@@ -319,14 +319,14 @@ int JackRouter::process(jack_nframes_t nframes, void* arg)
 	int pos = (driver->fToggle) ? 0 : driver->fBufferSize ;
 
 	for (i = 0; i < driver->fActiveInputs; i++) {
-        if (!fFloatSample) {
+        if (!driver->fFloatSample) {
             jack_default_audio_sample_t* buffer = (jack_default_audio_sample_t*)jack_port_get_buffer(driver->fInputPorts[i], nframes);
-            long* in = driver->fInputBuffers[i] + pos;
+            long* in = (long*)driver->fInputBuffers[i] + pos;
             for (j = 0; j < nframes; j++) {
                 in[j] = buffer[j] * jack_default_audio_sample_t(0x7fffffff);
             }
         } else {
-            memcpy(driver->fInputBuffers[i] + pos,
+            memcpy((float*)driver->fInputBuffers[i] + pos,
                     jack_port_get_buffer(driver->fInputPorts[i], nframes),
                     nframes * sizeof(jack_default_audio_sample_t));
         }
@@ -335,16 +335,16 @@ int JackRouter::process(jack_nframes_t nframes, void* arg)
 	driver->bufferSwitch();
 
 	for (i = 0; i < driver->fActiveOutputs; i++) {
-        if (!fFloatSample) {
+        if (!driver->fFloatSample) {
             jack_default_audio_sample_t* buffer = (jack_default_audio_sample_t*)jack_port_get_buffer(driver->fOutputPorts[i], nframes);
-            long* out = driver->fOutputBuffers[i] + pos;
+            long* out = (long*)driver->fOutputBuffers[i] + pos;
             jack_default_audio_sample_t gain = jack_default_audio_sample_t(1)/jack_default_audio_sample_t(0x7fffffff);
             for (j = 0; j < nframes; j++) {
                 buffer[j] = out[j] * gain;
             }
         } else {
             memcpy(jack_port_get_buffer(driver->fOutputPorts[i], nframes),
-                    driver->fOutputBuffers[i] + pos,
+                    (float*)driver->fOutputBuffers[i] + pos,
                     nframes * sizeof(jack_default_audio_sample_t));
         }
 	}
@@ -599,12 +599,12 @@ ASIOError JackRouter::createBuffers(ASIOBufferInfo *bufferInfos, long numChannel
 			fInMap[fActiveInputs] = info->channelNum;
             if (!fFloatSample) {
                 fInputBuffers[fActiveInputs] = new long[fBufferSize * 2];	// double buffer
-            }
+            } else {
                 fInputBuffers[fActiveInputs] = new jack_default_audio_sample_t[fBufferSize * 2];	// double buffer
             }
 			if (fInputBuffers[fActiveInputs]) {
 				info->buffers[0] = fInputBuffers[fActiveInputs];
-				info->buffers[1] = fInputBuffers[fActiveInputs] + fBufferSize;
+				info->buffers[1] = (fFloatSample) ? (void*)((float*)fInputBuffers[fActiveInputs] + fBufferSize) : (void*)((long*)fInputBuffers[fActiveInputs] + fBufferSize);
 			} else {
 				info->buffers[0] = info->buffers[1] = 0;
 				notEnoughMem = true;
@@ -635,7 +635,7 @@ error:
 
 			if (fOutputBuffers[fActiveOutputs]) {
 				info->buffers[0] = fOutputBuffers[fActiveOutputs];
-				info->buffers[1] = fOutputBuffers[fActiveOutputs] + fBufferSize;
+				info->buffers[1] = (fFloatSample) ? (void*)((float*)fOutputBuffers[fActiveOutputs] + fBufferSize) : (void*)((long*)fOutputBuffers[fActiveOutputs] + fBufferSize);
 			} else {
 				info->buffers[0] = info->buffers[1] = 0;
 				notEnoughMem = true;
