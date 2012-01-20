@@ -248,6 +248,7 @@ int JackPortAudioDriver::Close()
     return res;
 }
 
+/*
 int JackPortAudioDriver::Attach()
 {
     if (JackAudioDriver::Attach() == 0) {
@@ -255,13 +256,13 @@ int JackPortAudioDriver::Attach()
         char alias[REAL_JACK_PORT_NAME_SIZE];
         
         for (int i = 0; i < fCaptureChannels; i++) {
-            snprintf(alias, sizeof(alias), "%s:out%d", fPaDevices->GetDeviceName(fInputDevice), i + 1);
+            snprintf(alias, sizeof(alias), "%s:out%d", fPaDevices->GetDeviceName(fInputDevice).c_str(), i + 1);
             JackPort* port = fGraphManager->GetPort(fCapturePortList[i]);
             port->SetAlias(alias);
         }
         
         for (int i = 0; i < fPlaybackChannels; i++) {
-            snprintf(alias, sizeof(alias), "%s:in%d", fPaDevices->GetDeviceName(fOutputDevice), i + 1);
+            snprintf(alias, sizeof(alias), "%s:in%d", fPaDevices->GetDeviceName(fOutputDevice).c_str(), i + 1);
             JackPort* port = fGraphManager->GetPort(fPlaybackPortList[i]);
             port->SetAlias(alias);
         }
@@ -270,6 +271,7 @@ int JackPortAudioDriver::Attach()
         return -1;
     }
 }
+*/
 
 int JackPortAudioDriver::Start()
 {

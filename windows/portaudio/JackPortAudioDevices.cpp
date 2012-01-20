@@ -168,7 +168,7 @@ void PortAudioDevices::PrintSupportedStandardSampleRates(const PaStreamParameter
 
 int PortAudioDevices::GetInputDeviceFromName(const char* devicename, PaDeviceIndex& id, int& max_input)
 {
-    string fullname = string (devicename);
+    string fullname = string(devicename);
     PaDeviceInfo* device = GetDeviceFromFullName (fullname, id, true);
     if (device) {
         max_input = device->maxInputChannels;
@@ -187,7 +187,7 @@ int PortAudioDevices::GetInputDeviceFromName(const char* devicename, PaDeviceInd
 
 int PortAudioDevices::GetOutputDeviceFromName(const char* devicename, PaDeviceIndex& id, int& max_output)
 {
-    string fullname = string (devicename);
+    string fullname = string(devicename);
     PaDeviceInfo* device = GetDeviceFromFullName (fullname, id, false);
     if (device) {
         max_output = device->maxOutputChannels;
