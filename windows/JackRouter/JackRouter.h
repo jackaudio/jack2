@@ -84,8 +84,9 @@ public:
 	~JackRouter();
 #endif
 
-	static int process(jack_nframes_t nframes, void* arg);
-	static void shutdown(void* arg);
+	static int processCallback(jack_nframes_t nframes, void* arg);
+    static void connectCallback(jack_port_id_t a, jack_port_id_t b, int connect, void* arg);
+	static void shutdownCallback(void* arg);
 
 	ASIOBool init(void* sysRef);
 	void getDriverName(char *name);		// max 32 bytes incl. terminating zero
@@ -146,6 +147,7 @@ private:
 	long fMilliSeconds;
 	bool fActive, fStarted;
     bool fFloatSample;
+    bool fAliasSystem;
 	bool fTimeInfoMode, fTcRead;
 	char fErrorMessage[128];
 

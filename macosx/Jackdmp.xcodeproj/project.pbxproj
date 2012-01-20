@@ -1395,6 +1395,13 @@
 			remoteGlobalIDString = 4BA7FEB90D8E76270017FF73;
 			remoteInfo = "jack_control Universal";
 		};
+		4BAA1A7514CA08FE003269AD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4B35C61F0D4731D2000DE7AE /* jack_portaudio 64 bits */;
+			remoteInfo = "jack_portaudio 64 bits";
+		};
 		4BB492A61372A393005F2601 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
@@ -5161,6 +5168,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				4BAA1A7614CA08FE003269AD /* PBXTargetDependency */,
 			);
 			name = "jack_coreaudio 64 bits";
 			productName = jack_coreaudio;
@@ -8381,6 +8389,11 @@
 			isa = PBXTargetDependency;
 			target = 4BA7FEB90D8E76270017FF73 /* jack_server_control Universal */;
 			targetProxy = 4BA7FECC0D8E76810017FF73 /* PBXContainerItemProxy */;
+		};
+		4BAA1A7614CA08FE003269AD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4B35C61F0D4731D2000DE7AE /* jack_portaudio 64 bits */;
+			targetProxy = 4BAA1A7514CA08FE003269AD /* PBXContainerItemProxy */;
 		};
 		4BB492A71372A393005F2601 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

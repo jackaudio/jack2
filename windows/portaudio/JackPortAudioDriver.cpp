@@ -248,30 +248,36 @@ int JackPortAudioDriver::Close()
     return res;
 }
 
-/*
 int JackPortAudioDriver::Attach()
 {
     if (JackAudioDriver::Attach() == 0) {
     
-        char alias[REAL_JACK_PORT_NAME_SIZE];
+        char* alias;
         
-        for (int i = 0; i < fCaptureChannels; i++) {
-            snprintf(alias, sizeof(alias), "%s:out%d", fPaDevices->GetDeviceName(fInputDevice).c_str(), i + 1);
-            JackPort* port = fGraphManager->GetPort(fCapturePortList[i]);
-            port->SetAlias(alias);
+        if (fPaDevices->GetHostFromDevice(fInputDevice) == "ASIO") 
+            for (int i = 0; i < fCaptureChannels; i++) {
+                PaError err = PaAsio_GetInputChannelName(fInputDevice, i, &alias);
+                if (err == paNoError) {
+                    JackPort* port = fGraphManager->GetPort(fCapturePortList[i]);
+                    port->SetAlias(alias);
+                }
+            }
         }
         
-        for (int i = 0; i < fPlaybackChannels; i++) {
-            snprintf(alias, sizeof(alias), "%s:in%d", fPaDevices->GetDeviceName(fOutputDevice).c_str(), i + 1);
-            JackPort* port = fGraphManager->GetPort(fPlaybackPortList[i]);
-            port->SetAlias(alias);
+        if (fPaDevices->GetHostFromDevice(fOutputDevice) == "ASIO")
+            for (int i = 0; i < fPlaybackChannels; i++) {
+                PaError err = PaAsio_GetInputChannelName(fOutputDevice, i, &alias);
+                if (err == paNoError) {
+                    JackPort* port = fGraphManager->GetPort(fPlaybackPortList[i]);
+                    port->SetAlias(alias);
+                }
+            }
         }
     
     } else {
         return -1;
     }
 }
-*/
 
 int JackPortAudioDriver::Start()
 {

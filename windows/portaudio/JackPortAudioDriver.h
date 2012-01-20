@@ -80,7 +80,7 @@ class JackPortAudioDriver : public JackMMCSS, public JackAudioDriver
 
         int Close();
         
-        //int Attach();
+        int Attach();
 
         int Start();
         int Stop();

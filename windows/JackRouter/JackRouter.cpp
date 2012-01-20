@@ -199,6 +199,8 @@ JackRouter::JackRouter() : AsioDriver()
 		fAutoConnectOut = get_private_profile_int("AUTO_CONNECT", "output", 1, confPath.c_str());
         
         fFloatSample = get_private_profile_int("IO", "float-sample", 1, confPath.c_str());
+        
+        fAliasSystem = get_private_profile_int("AUTO_CONNECT", "alias", 1, confPath.c_str());
 
 		FreeLibrary(handle);
 
@@ -300,7 +302,13 @@ static inline jack_default_audio_sample_t ClipFloat(jack_default_audio_sample_t 
 }
 
 //------------------------------------------------------------------------------------------
-void JackRouter::shutdown(void* arg)
+void JackRouter::connectCallback(jack_port_id_t a, jack_port_id_t b, int connect, void* arg)
+{
+    JackRouter* driver = (JackRouter*)arg;
+}
+
+//------------------------------------------------------------------------------------------
+void JackRouter::shutdownCallback(void* arg)
 {
 	JackRouter* driver = (JackRouter*)arg;
 	/*
@@ -312,7 +320,7 @@ void JackRouter::shutdown(void* arg)
 }
 
 //------------------------------------------------------------------------------------------
-int JackRouter::process(jack_nframes_t nframes, void* arg)
+int JackRouter::processCallback(jack_nframes_t nframes, void* arg)
 {
 	JackRouter* driver = (JackRouter*)arg;
 	int i,j;
@@ -400,8 +408,10 @@ ASIOBool JackRouter::init(void* sysRef)
 
 	fBufferSize = jack_get_buffer_size(fClient);
 	fSampleRate = jack_get_sample_rate(fClient);
-	jack_set_process_callback(fClient, process, this);
-	jack_on_shutdown(fClient, shutdown, this);
+    
+	jack_set_process_callback(fClient, processCallback, this);
+	jack_on_shutdown(fClient, shutdownCallback, this);
+    jack_set_port_connect_callback(fClient, connectCallback, this);
 
 	fInputLatency = fBufferSize;		// typically
 	fOutputLatency = fBufferSize * 2;
@@ -566,8 +576,18 @@ ASIOError JackRouter::getChannelInfo(ASIOChannelInfo *info)
 				break;
 			}
 		}
-		_snprintf(buf, sizeof(buf) - 1, "In%d ", info->channel);
-		strcpy(info->name, buf);
+		
+        jack_port_t* port = fInputPorts[i];
+        char* aliases[2];
+        
+        // A alias on system is wanted
+        if (fAliasSystem && jack_port_get_aliases(port, aliases) == 2) {
+            strncpy(info->name, aliases[1], 32);
+        } else {
+            _snprintf(buf, sizeof(buf) - 1, "In%d ", info->channel);
+            strcpy(info->name, buf);
+        }
+        
 	} else {
 		for (i = 0; i < fActiveOutputs; i++) {
 			if (fOutMap[i] == info->channel) {  
@@ -575,9 +595,19 @@ ASIOError JackRouter::getChannelInfo(ASIOChannelInfo *info)
 				break;
 			}
 		}
-		_snprintf(buf, sizeof(buf) - 1, "Out%d ", info->channel);
-		strcpy(info->name, buf);
-	}
+        
+        jack_port_t* port = fOutputPorts[i];
+        char* aliases[2];
+        
+        // A alias on system is wanted
+        if (fAliasSystem && jack_port_get_aliases(port, aliases) == 2) {
+            strncpy(info->name, aliases[1], 32);
+        } else {
+            _snprintf(buf, sizeof(buf) - 1, "Out%d ", info->channel);
+            strcpy(info->name, buf);
+        }
+ 
+    }
 	return ASE_OK;
 }
 
@@ -746,7 +776,7 @@ void JackRouter::bufferSwitch()
 
 //---------------------------------------------------------------------------------------------
 // asio2 buffer switch
-void JackRouter::bufferSwitchX ()
+void JackRouter::bufferSwitchX()
 {
 	getSamplePosition (&fAsioTime.timeInfo.samplePosition, &fAsioTime.timeInfo.systemTime);
 	long offset = fToggle ? fBufferSize : 0;
@@ -846,7 +876,15 @@ void JackRouter::AutoConnect()
 					break;
 				} else if (jack_connect(fClient, ports[ASIO_channel], jack_port_name(fInputPorts[i])) != 0) {
 					printf("Cannot connect input ports\n");
-				}
+				} else if (fAliasSystem) {
+                    jack_port_t* input_port = jack_port_by_name(fClient, ports[ASIO_channel]);
+                    if (input_port) {
+                        char* aliases[2];
+                        if (jack_port_get_aliases(input_port, aliases) == 2) {
+                            jack_port_set_alias(fInputPorts[i], aliases[1]);
+                        }
+                    }
+                }
 			}
 		}
 		jack_free(ports);
@@ -871,7 +909,15 @@ void JackRouter::AutoConnect()
 					break;
 				} else if (jack_connect(fClient, jack_port_name(fOutputPorts[i]), ports[ASIO_channel]) != 0) {
 					printf("Cannot connect output ports\n");
-				}
+				} else if (fAliasSystem) {
+                    jack_port_t* output_port = jack_port_by_name(fClient, ports[ASIO_channel]);
+                    if (output_port) {
+                        char* aliases[2];
+                        if (jack_port_get_aliases(output_port, aliases) == 2) {
+                            jack_port_set_alias(fOutputPorts[i], aliases[1]);
+                        }
+                    }
+                }
 			}
 		}
 		jack_free(ports);
