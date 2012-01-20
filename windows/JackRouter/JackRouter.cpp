@@ -171,6 +171,7 @@ JackRouter::JackRouter() : AsioDriver()
 	fToggle = 0;
 	fBufferSize = 512;
 	fSampleRate = 44100;
+    fFloatSample = true;    // float by default
 	
     printf("Constructor\n");
 
@@ -196,6 +197,8 @@ JackRouter::JackRouter() : AsioDriver()
 
 		fAutoConnectIn = get_private_profile_int("AUTO_CONNECT", "input", 1, confPath.c_str());
 		fAutoConnectOut = get_private_profile_int("AUTO_CONNECT", "output", 1, confPath.c_str());
+        
+        fFloatSample = get_private_profile_int("IO", "float-samples", 1, confPath.c_str());
 
 		FreeLibrary(handle);
 
@@ -203,13 +206,13 @@ JackRouter::JackRouter() : AsioDriver()
 		printf("LoadLibrary error\n");
 	}
     
- #ifdef LONG_SAMPLE
-	fInputBuffers = new long*[kNumInputs];
-	fOutputBuffers = new long*[kNumOutputs];
-#else
-	fInputBuffers = new float*[kNumInputs];
-	fOutputBuffers = new float*[kNumOutputs];
-#endif
+    if (!fFloatSample) {
+        fInputBuffers = new long*[kNumInputs];
+        fOutputBuffers = new long*[kNumOutputs];
+    } else {
+        fInputBuffers = new float*[kNumInputs];
+        fOutputBuffers = new float*[kNumOutputs];
+    }
 
     fInMap = new long[kNumInputs];
 	fOutMap = new long[kNumOutputs];
@@ -316,37 +319,34 @@ int JackRouter::process(jack_nframes_t nframes, void* arg)
 	int pos = (driver->fToggle) ? 0 : driver->fBufferSize ;
 
 	for (i = 0; i < driver->fActiveInputs; i++) {
-
-#ifdef LONG_SAMPLE
-		jack_default_audio_sample_t* buffer = (jack_default_audio_sample_t*)jack_port_get_buffer(driver->fInputPorts[i], nframes);
-		long* in = driver->fInputBuffers[i] + pos;
-		for (j = 0; j < nframes; j++) {
-			in[j] = buffer[j] * jack_default_audio_sample_t(0x7fffffff);
-		}
-#else
-		memcpy(driver->fInputBuffers[i] + pos,
-				jack_port_get_buffer(driver->fInputPorts[i], nframes),
-				nframes * sizeof(jack_default_audio_sample_t));
-#endif
-
+        if (!fFloatSample) {
+            jack_default_audio_sample_t* buffer = (jack_default_audio_sample_t*)jack_port_get_buffer(driver->fInputPorts[i], nframes);
+            long* in = driver->fInputBuffers[i] + pos;
+            for (j = 0; j < nframes; j++) {
+                in[j] = buffer[j] * jack_default_audio_sample_t(0x7fffffff);
+            }
+        } else {
+            memcpy(driver->fInputBuffers[i] + pos,
+                    jack_port_get_buffer(driver->fInputPorts[i], nframes),
+                    nframes * sizeof(jack_default_audio_sample_t));
+        }
 	}
 
 	driver->bufferSwitch();
 
 	for (i = 0; i < driver->fActiveOutputs; i++) {
-
-#ifdef LONG_SAMPLE
-		jack_default_audio_sample_t* buffer = (jack_default_audio_sample_t*)jack_port_get_buffer(driver->fOutputPorts[i], nframes);
-		long* out = driver->fOutputBuffers[i] + pos;
-		jack_default_audio_sample_t gain = jack_default_audio_sample_t(1)/jack_default_audio_sample_t(0x7fffffff);
-		for (j = 0; j < nframes; j++) {
-			buffer[j] = out[j] * gain;
-		}
-#else
-		memcpy(jack_port_get_buffer(driver->fOutputPorts[i], nframes),
-				driver->fOutputBuffers[i] + pos,
-				nframes * sizeof(jack_default_audio_sample_t));
-#endif
+        if (!fFloatSample) {
+            jack_default_audio_sample_t* buffer = (jack_default_audio_sample_t*)jack_port_get_buffer(driver->fOutputPorts[i], nframes);
+            long* out = driver->fOutputBuffers[i] + pos;
+            jack_default_audio_sample_t gain = jack_default_audio_sample_t(1)/jack_default_audio_sample_t(0x7fffffff);
+            for (j = 0; j < nframes; j++) {
+                buffer[j] = out[j] * gain;
+            }
+        } else {
+            memcpy(jack_port_get_buffer(driver->fOutputPorts[i], nframes),
+                    driver->fOutputBuffers[i] + pos,
+                    nframes * sizeof(jack_default_audio_sample_t));
+        }
 	}
 
 	return 0;
@@ -547,11 +547,12 @@ ASIOError JackRouter::getChannelInfo(ASIOChannelInfo *info)
 	if (info->channel < 0 || (info->isInput ? info->channel >= kNumInputs : info->channel >= kNumOutputs)) {
 		return ASE_InvalidParameter;
     }
-#ifdef LONG_SAMPLE
-	info->type = ASIOSTInt32LSB;
-#else
-	info->type = ASIOSTFloat32LSB;
-#endif
+    
+    if (!fFloatSample) {
+        info->type = ASIOSTInt32LSB;
+    } else {
+        info->type = ASIOSTFloat32LSB;
+    }
 
 	info->channelGroup = 0;
 	info->isActive = ASIOFalse;
@@ -596,11 +597,11 @@ ASIOError JackRouter::createBuffers(ASIOBufferInfo *bufferInfos, long numChannel
 			if (info->channelNum < 0 || info->channelNum >= kNumInputs)
 				goto error;
 			fInMap[fActiveInputs] = info->channelNum;
-		#ifdef LONG_SAMPLE
-			fInputBuffers[fActiveInputs] = new long[fBufferSize * 2];	// double buffer
-		#else
-			fInputBuffers[fActiveInputs] = new jack_default_audio_sample_t[fBufferSize * 2];	// double buffer
-		#endif
+            if (!fFloatSample) {
+                fInputBuffers[fActiveInputs] = new long[fBufferSize * 2];	// double buffer
+            }
+                fInputBuffers[fActiveInputs] = new jack_default_audio_sample_t[fBufferSize * 2];	// double buffer
+            }
 			if (fInputBuffers[fActiveInputs]) {
 				info->buffers[0] = fInputBuffers[fActiveInputs];
 				info->buffers[1] = fInputBuffers[fActiveInputs] + fBufferSize;
@@ -626,11 +627,11 @@ error:
 				goto error;
 			fOutMap[fActiveOutputs] = info->channelNum;
 
-		#ifdef LONG_SAMPLE
-			fOutputBuffers[fActiveOutputs] = new long[fBufferSize * 2];	// double buffer
-		#else
-			fOutputBuffers[fActiveOutputs] = new jack_default_audio_sample_t[fBufferSize * 2];	// double buffer
-		#endif
+            if (!fFloatSample) {
+                fOutputBuffers[fActiveOutputs] = new long[fBufferSize * 2];	// double buffer
+            } else {
+                fOutputBuffers[fActiveOutputs] = new jack_default_audio_sample_t[fBufferSize * 2];	// double buffer
+            }
 
 			if (fOutputBuffers[fActiveOutputs]) {
 				info->buffers[0] = fOutputBuffers[fActiveOutputs];

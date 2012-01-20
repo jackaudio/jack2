@@ -46,7 +46,6 @@ static int	kNumOutputs = 4;
 #include "combase.h"
 #include "iasiodrv.h"
 
-#define LONG_SAMPLE 1
 #define PATH_SEP "\\"
 
 #include <list>
@@ -133,13 +132,9 @@ private:
 	ASIOTime fAsioTime;
 	ASIOTimeStamp fTheSystemTime;
 
-#ifdef LONG_SAMPLE
-	long** fInputBuffers;
-	long** fOutputBuffers;
-#else
-	float** fInputBuffers;
-	float** fOutputBuffers;
-#endif
+	void** fInputBuffers;
+	void** fOutputBuffers;
+
 	long* fInMap;
 	long* fOutMap;
 
@@ -150,6 +145,7 @@ private:
 	long fToggle;
 	long fMilliSeconds;
 	bool fActive, fStarted;
+    bool fFloatSample;
 	bool fTimeInfoMode, fTcRead;
 	char fErrorMessage[128];
 
