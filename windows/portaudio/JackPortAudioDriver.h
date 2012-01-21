@@ -79,7 +79,7 @@ class JackPortAudioDriver : public JackMMCSS, public JackAudioDriver
                  jack_nframes_t playback_latency);
 
         int Close();
-        
+
         int Attach();
 
         int Start();

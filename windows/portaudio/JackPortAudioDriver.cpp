@@ -251,10 +251,10 @@ int JackPortAudioDriver::Close()
 int JackPortAudioDriver::Attach()
 {
     if (JackAudioDriver::Attach() == 0) {
-    
-        char* alias;
-        
-        if (fPaDevices->GetHostFromDevice(fInputDevice) == "ASIO") 
+
+        const char* alias;
+
+        if (fPaDevices->GetHostFromDevice(fInputDevice) == "ASIO") {
             for (int i = 0; i < fCaptureChannels; i++) {
                 PaError err = PaAsio_GetInputChannelName(fInputDevice, i, &alias);
                 if (err == paNoError) {
@@ -263,8 +263,8 @@ int JackPortAudioDriver::Attach()
                 }
             }
         }
-        
-        if (fPaDevices->GetHostFromDevice(fOutputDevice) == "ASIO")
+
+        if (fPaDevices->GetHostFromDevice(fOutputDevice) == "ASIO") {
             for (int i = 0; i < fPlaybackChannels; i++) {
                 PaError err = PaAsio_GetInputChannelName(fOutputDevice, i, &alias);
                 if (err == paNoError) {
@@ -273,7 +273,9 @@ int JackPortAudioDriver::Attach()
                 }
             }
         }
-    
+
+        return 0;
+
     } else {
         return -1;
     }
