@@ -243,8 +243,9 @@ bool JackSocketServerChannel::Execute()
                         jack_log("JackSocketServerChannel::Execute : cannot decode header");
                         ClientKill(fd);
                     // Decode request
-                    } else if (fDecoder->HandleRequest(socket, header.fType) < 0) {
-                        jack_log("JackSocketServerChannel::Execute : cannot decode request");
+                    } else {
+                        // Result is not needed here
+                        fDecoder->HandleRequest(socket, header.fType);
                     }
                 }
             }

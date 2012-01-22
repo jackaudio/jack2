@@ -99,7 +99,6 @@ bool JackClientPipeThread::Execute()
             ret = false;
         // Decode request
         } else if (fDecoder->HandleRequest(fPipe, header.fType) < 0) {
-            jack_log("JackClientPipeThread::Execute : cannot decode request");
             ret = false;
         }
 

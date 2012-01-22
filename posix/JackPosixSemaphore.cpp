@@ -120,8 +120,8 @@ bool JackPosixSemaphore::TimedWait(long usec)
 
     while ((res = sem_timedwait(fSemaphore, &time)) < 0) {
         jack_error("JackPosixSemaphore::TimedWait err = %s", strerror(errno));
-        jack_log("now %ld %ld ", now.tv_sec, now.tv_usec);
-        jack_log("next %ld %ld ", time.tv_sec, time.tv_nsec/1000);
+        jack_log("JackPosixSemaphore::TimedWait now : %ld %ld ", now.tv_sec, now.tv_usec);
+        jack_log("JackPosixSemaphore::TimedWait next : %ld %ld ", time.tv_sec, time.tv_nsec/1000);
         if (errno != EINTR)
             break;
     }
