@@ -499,28 +499,6 @@ JSList * jack_drivers_load(JSList * drivers)
         goto error;
     }
 
-    /*
-    char* driver_dir = locate_application_driver_dir();
-    snprintf(dll_filename, sizeof(dll_filename), "%s/*.dll", driver_dir);
-    file = (HANDLE)FindFirstFile(dll_filename, &filedata);
-
-    if (file == INVALID_HANDLE_VALUE) {
-        jack_error("Drivers not found near application");
-
-        // Now try system; location
-        free(driver_dir);
-        driver_dir = locate_system_driver_dir();
-        snprintf(dll_filename, sizeof(dll_filename), "%s/*.dll", driver_dir);
-        file = (HANDLE)FindFirstFile(dll_filename, &filedata);
-
-        if (file == INVALID_HANDLE_VALUE) {
-            jack_error("Drivers not found in system location");
-            free(driver_dir);
-            return NULL;
-        }
-    }
-    */
-
     do {
         /* check the filename is of the right format */
         if (strncmp ("jack_", filedata.cFileName, 5) != 0) {
@@ -650,27 +628,6 @@ JSList* jack_internals_load(JSList * internals)
         goto error;
     }
 
-    /*
-    char* driver_dir = locate_application_driver_dir();
-    snprintf(dll_filename, sizeof(dll_filename), "%s/*.dll", driver_dir);
-    file = (HANDLE)FindFirstFile(dll_filename, &filedata);
-
-    if (file == INVALID_HANDLE_VALUE) {
-        jack_error("Drivers not found near application");
-
-        // Now try system; location
-        free(driver_dir);
-        driver_dir = locate_system_driver_dir();
-        snprintf(dll_filename, sizeof(dll_filename), "%s/*.dll", driver_dir);
-        file = (HANDLE)FindFirstFile(dll_filename, &filedata);
-
-        if (file == INVALID_HANDLE_VALUE) {
-            jack_error("Drivers not found in system location");
-            free(driver_dir);
-            return NULL;
-        }
-    }
-    */
     do {
 
         ptr = strrchr (filedata.cFileName, '.');

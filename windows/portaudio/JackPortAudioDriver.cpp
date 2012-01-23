@@ -44,7 +44,7 @@ int JackPortAudioDriver::Render(const void* inputBuffer, void* outputBuffer,
     driver->fInputBuffer = (jack_default_audio_sample_t**)inputBuffer;
     driver->fOutputBuffer = (jack_default_audio_sample_t**)outputBuffer;
 
-    MMCSSAcquireRealTime(GetCurrentThread());
+    //MMCSSAcquireRealTime(GetCurrentThread());
 
     if (statusFlags) {
         if (statusFlags & paOutputUnderflow)

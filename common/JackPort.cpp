@@ -49,6 +49,8 @@ bool JackPort::Allocate(int refnum, const char* port_name, const char* port_type
     fPlaybackLatency.min = fPlaybackLatency.max = 0;
     fCaptureLatency.min = fCaptureLatency.max = 0;
     fTied = NO_PORT;
+    fAlias1[0] = '\0';
+    fAlias2[0] = '\0';
     // DB: At this point we do not know current buffer size in frames,
     // but every time buffer will be returned to any user,
     // it will be called with either ClearBuffer or MixBuffers

@@ -121,7 +121,7 @@ public:
 	void bufferSwitch();
 	long getMilliSeconds() {return fMilliSeconds;}
 
-	static bool fFirstActivate;
+	bool fFirstActivate;
 	static std::list<std::pair<std::string, std::string> > fConnections;  // Connections list
 
 private:
