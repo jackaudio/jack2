@@ -643,14 +643,17 @@ ASIOError JackRouter::createBuffers(ASIOBufferInfo *bufferInfos, long numChannel
 
 	for (i = 0; i < numChannels; i++, info++) {
 		if (info->isInput) {
+            
 			if (info->channelNum < 0 || info->channelNum >= kNumInputs)
 				goto error;
 			fInMap[fActiveInputs] = info->channelNum;
+            
             if (!fFloatSample) {
                 fInputBuffers[fActiveInputs] = new long[fBufferSize * 2];	// double buffer
             } else {
                 fInputBuffers[fActiveInputs] = new jack_default_audio_sample_t[fBufferSize * 2];	// double buffer
             }
+            
 			if (fInputBuffers[fActiveInputs]) {
 				info->buffers[0] = fInputBuffers[fActiveInputs];
 				info->buffers[1] = (fFloatSample) ? (void*)((float*)fInputBuffers[fActiveInputs] + fBufferSize) : (void*)((long*)fInputBuffers[fActiveInputs] + fBufferSize);
@@ -671,8 +674,9 @@ error:
 				disposeBuffers();
 				return ASE_InvalidParameter;
 			}
-		} else {	// output
-			if (info->channelNum < 0 || info->channelNum >= kNumOutputs)
+		} else {	
+        
+     		if (info->channelNum < 0 || info->channelNum >= kNumOutputs)
 				goto error;
 			fOutMap[fActiveOutputs] = info->channelNum;
 
