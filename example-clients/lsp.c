@@ -241,6 +241,10 @@ main (int argc, char *argv[])
 	}
 
 error:
+    if (show_aliases) {
+        free(aliases[0]);
+        free(aliases[1]);
+    }
     if (ports)
         jack_free (ports);
 	jack_client_close (client);

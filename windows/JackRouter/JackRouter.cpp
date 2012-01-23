@@ -569,13 +569,15 @@ ASIOError JackRouter::getChannelInfo(ASIOChannelInfo *info)
 	info->isActive = ASIOFalse;
 	long i;
 	char buf[32];
+    const char** ports;
 
 	char* aliases[2];
 	aliases[0] = (char*)malloc(jack_port_name_size());
 	aliases[1] = (char*)malloc(jack_port_name_size());
 
-	if (!aliases[0] || !aliases[1])
+	if (!aliases[0] || !aliases[1]) {
 		return ASE_NoMemory;
+    }
 
 	if (info->isInput) {
 		for (i = 0; i < fActiveInputs; i++) {
@@ -585,17 +587,20 @@ ASIOError JackRouter::getChannelInfo(ASIOChannelInfo *info)
 			}
 		}
 		
-        jack_port_t* port = fInputPorts[i];
-        
         // A alias on system is wanted
-        if (fAliasSystem && jack_port_get_aliases(port, aliases) == 1) {
-            strncpy(info->name, aliases[0], 32);
-			//strcpy(info->name, "toto");
-        } else {
-            _snprintf(buf, sizeof(buf) - 1, "In%d", info->channel);
-            strcpy(info->name, buf);
-        }
-        
+        if (fAliasSystem && fAutoConnectIn && (ports = jack_get_ports(fClient, NULL, NULL, JackPortIsPhysical | JackPortIsOutput))) {
+            jack_port_t* port = jack_port_by_name(fClient, ports[info->channel]);
+            if (port) {	
+                if (jack_port_get_aliases(port, aliases) == 2) {
+                    strncpy(info->name, aliases[1], 32);
+                    goto end:
+                }	
+            }
+        } 
+            
+        _snprintf(buf, sizeof(buf) - 1, "In%d", info->channel);
+        strcpy(info->name, buf);
+         
 	} else {
 		for (i = 0; i < fActiveOutputs; i++) {
 			if (fOutMap[i] == info->channel) {  
@@ -604,18 +609,21 @@ ASIOError JackRouter::getChannelInfo(ASIOChannelInfo *info)
 			}
 		}
         
-        jack_port_t* port = fOutputPorts[i];
-        
         // A alias on system is wanted
-        if (fAliasSystem && jack_port_get_aliases(port, aliases) == 1) {
-            strncpy(info->name, aliases[0], 32);
-			//strcpy(info->name, "toto");
-        } else {
-            _snprintf(buf, sizeof(buf) - 1, "Out%d", info->channel);
-            strcpy(info->name, buf);
-        }
- 
+        if (fAliasSystem && fAutoConnectOut && (ports = jack_get_ports(fClient, NULL, NULL, JackPortIsPhysical | JackPortIsInput))) {
+            jack_port_t* port = jack_port_by_name(fClient, ports[info->channel]);
+            if (port) {	
+                if (jack_port_get_aliases(port, aliases) == 2) {
+                    strncpy(info->name, aliases[1], 32);
+                    goto end:
+                }	
+            }
+        } 
+        _snprintf(buf, sizeof(buf) - 1, "Out%d", info->channel);
+        strcpy(info->name, buf);
     }
+    
+end:
 
 	free(aliases[0]);
 	free(aliases[1]);
@@ -921,7 +929,7 @@ void JackRouter::AutoConnect()
 				}
                 */
                 long ASIO_channel = fOutMap[i];
-				if (!ports[ASIO_channel]){
+				if (!ports[ASIO_channel]) {
 					printf("destination port is null ASIO_channel = %ld\n", ASIO_channel);
 					break;
 				} else if (jack_connect(fClient, jack_port_name(fOutputPorts[i]), ports[ASIO_channel]) != 0) {

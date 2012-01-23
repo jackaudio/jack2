@@ -48,7 +48,7 @@ class JackClientSocket : public detail::JackClientRequestInterface
 
     public:
 
-        JackClientSocket():JackClientRequestInterface(), fSocket( -1),fTimeOut(0)
+        JackClientSocket():JackClientRequestInterface(), fSocket(-1), fTimeOut(0)
         {}
         JackClientSocket(int socket);
 
