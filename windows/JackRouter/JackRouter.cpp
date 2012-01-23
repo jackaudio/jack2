@@ -593,12 +593,12 @@ ASIOError JackRouter::getChannelInfo(ASIOChannelInfo *info)
             if (port) {	
                 if (jack_port_get_aliases(port, aliases) == 2) {
                     strncpy(info->name, aliases[1], 32);
-                    goto end:
+                    goto end;
                 }	
             }
         } 
             
-        _snprintf(buf, sizeof(buf) - 1, "In%d", info->channel);
+        _snprintf(buf, sizeof(buf) - 1, "In%d", info->channel + 1);
         strcpy(info->name, buf);
          
 	} else {
@@ -615,11 +615,11 @@ ASIOError JackRouter::getChannelInfo(ASIOChannelInfo *info)
             if (port) {	
                 if (jack_port_get_aliases(port, aliases) == 2) {
                     strncpy(info->name, aliases[1], 32);
-                    goto end:
+                    goto end;
                 }	
             }
         } 
-        _snprintf(buf, sizeof(buf) - 1, "Out%d", info->channel);
+        _snprintf(buf, sizeof(buf) - 1, "Out%d", info->channel + 1);
         strcpy(info->name, buf);
     }
     
@@ -875,12 +875,6 @@ void JackRouter::RestoreConnections()
 void JackRouter::AutoConnect()
 {
 	const char** ports;
-	char* aliases[2];
-	aliases[0] = (char*)malloc(jack_port_name_size());
-	aliases[1] = (char*)malloc(jack_port_name_size());
-
-	if (!aliases[0] || !aliases[1])
-		return;
 
 	if ((ports = jack_get_ports(fClient, NULL, NULL, JackPortIsPhysical | JackPortIsOutput)) == NULL) {
 		printf("Cannot find any physical capture ports\n");
@@ -902,14 +896,7 @@ void JackRouter::AutoConnect()
 					break;
 				} else if (jack_connect(fClient, ports[ASIO_channel], jack_port_name(fInputPorts[i])) != 0) {
 					printf("Cannot connect input ports\n");
-				} else if (fAliasSystem) {
-                    jack_port_t* input_port = jack_port_by_name(fClient, ports[ASIO_channel]);
-                    if (input_port) {	
-                        if (jack_port_get_aliases(input_port, aliases) == 2) {
-                           jack_port_set_alias(fInputPorts[i], aliases[1]);
-                        }	
-                    }
-                }
+				}
 			}
 		}
 		jack_free(ports);
@@ -934,18 +921,10 @@ void JackRouter::AutoConnect()
 					break;
 				} else if (jack_connect(fClient, jack_port_name(fOutputPorts[i]), ports[ASIO_channel]) != 0) {
 					printf("Cannot connect output ports\n");
-				} else if (fAliasSystem) {
-                    jack_port_t* output_port = jack_port_by_name(fClient, ports[ASIO_channel]);
-                    if (output_port) {
-				        if (jack_port_get_aliases(output_port, aliases) == 2) {
-                            jack_port_set_alias(fOutputPorts[i], aliases[1]);
-                        }	
-                    }
-                }
+				}
 			}
 		}
-		free(aliases[0]);
-		free(aliases[1]);
+
 		jack_free(ports);
 	}
 }
