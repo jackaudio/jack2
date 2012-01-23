@@ -59,7 +59,9 @@ namespace Jack
         static void KillServer();
 
         static int MkDir(const char* path);
+        /* returns the name of the per-user subdirectory of jack_tmpdir */
         static char* UserDir();
+        /* returns the name of the per-server subdirectory of jack_user_dir() */
         static char* ServerDir(const char* server_name, char* server_dir);
         static const char* DefaultServerName();
         static void CleanupFiles(const char* server_name);
