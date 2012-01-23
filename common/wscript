@@ -63,6 +63,7 @@ def build(bld):
         'JackTransportEngine.cpp',
         'timestamps.c',
         'JackTools.cpp',
+        'JackGnuPlotMonitor.cpp',
         'JackMessageBuffer.cpp',
         'JackEngineProfiling.cpp',
         ]
