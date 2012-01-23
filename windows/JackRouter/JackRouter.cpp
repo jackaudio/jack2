@@ -69,6 +69,9 @@ static const double twoRaisedTo32Reciprocal = 1. / twoRaisedTo32;
 
 using namespace std;
 
+#include <fstream>
+std::ofstream* fStream;
+
 // class id.
 // {838FE50A-C1AB-4b77-B9B6-0A40788B53F3}
 CLSID IID_ASIO_DRIVER = { 0x838fe50a, 0xc1ab, 0x4b77, { 0xb9, 0xb6, 0xa, 0x40, 0x78, 0x8b, 0x53, 0xf3 } };
@@ -157,6 +160,9 @@ JackRouter::JackRouter() : AsioDriver()
 
 #endif
 {
+
+    fStream = new ofstream("JackRouter.log", ios_base::ate);
+ 
 	long i;
 	fSamplePosition = 0;
 	fActive = false;
@@ -248,6 +254,8 @@ JackRouter::~JackRouter()
     delete[] fOutputPorts;
     delete[] fInMap;
     delete[] fOutMap;
+    
+    delete fStream;
 }
 
 //------------------------------------------------------------------------------------------
@@ -564,6 +572,8 @@ ASIOError JackRouter::getChannelInfo(ASIOChannelInfo *info)
     } else {
         info->type = ASIOSTFloat32LSB;
     }
+    
+    *fStream << "getChannelInfo" << std::endl;
 
 	info->channelGroup = 0;
 	info->isActive = ASIOFalse;
@@ -593,6 +603,9 @@ ASIOError JackRouter::getChannelInfo(ASIOChannelInfo *info)
             if (port) {	
                 if (jack_port_get_aliases(port, aliases) == 2) {
                     strncpy(info->name, aliases[1], 32);
+                    
+                    *fStream << "Input " << "fActiveInputs = " << i << "ASIO_channel = " << info->channel <<  std::endl;
+                    
                     goto end;
                 }	
             }
@@ -615,6 +628,9 @@ ASIOError JackRouter::getChannelInfo(ASIOChannelInfo *info)
             if (port) {	
                 if (jack_port_get_aliases(port, aliases) == 2) {
                     strncpy(info->name, aliases[1], 32);
+                    
+                    *fStream << "Output " << "fActiveOutputs = " << i << "ASIO_channel = " << info->channel <<  std::endl;
+                    
                     goto end;
                 }	
             }
@@ -640,6 +656,8 @@ ASIOError JackRouter::createBuffers(ASIOBufferInfo *bufferInfos, long numChannel
 	char buf[256];
 	fActiveInputs = 0;
 	fActiveOutputs = 0;
+    
+    *fStream << "createBuffers" << std::endl;
 
 	for (i = 0; i < numChannels; i++, info++) {
 		if (info->isInput) {
@@ -661,6 +679,8 @@ ASIOError JackRouter::createBuffers(ASIOBufferInfo *bufferInfos, long numChannel
 				info->buffers[0] = info->buffers[1] = 0;
 				notEnoughMem = true;
 			}
+            
+            *fStream << "Input " << "fActiveInputs = " << i << "ASIO_channel = " << info->channelNum <<  std::endl;
 
 			_snprintf(buf, sizeof(buf) - 1, "in%d", info->channelNum + 1);
 			fInputPorts[fActiveInputs]
@@ -693,6 +713,8 @@ error:
 				info->buffers[0] = info->buffers[1] = 0;
 				notEnoughMem = true;
 			}
+            
+            *fStream << "Input " << "fActiveOutputs = " << i << "ASIO_channel = " << info->channelNum <<  std::endl;
 			
 			_snprintf(buf, sizeof(buf) - 1, "out%d", info->channelNum + 1);
 			fOutputPorts[fActiveOutputs]
@@ -879,13 +901,16 @@ void JackRouter::RestoreConnections()
 void JackRouter::AutoConnect()
 {
 	const char** ports;
+    
+    *fStream << "AutoConnect" << std::endl;
 
 	if ((ports = jack_get_ports(fClient, NULL, NULL, JackPortIsPhysical | JackPortIsOutput)) == NULL) {
 		printf("Cannot find any physical capture ports\n");
 	} else {
 
 		if (fAutoConnectIn) {
-			for (int i = 0; i < fActiveInputs; i++) {
+        
+        	for (int i = 0; i < fActiveInputs; i++) {
                 /*
 				if (!ports[i]) {
 					printf("source port is null i = %ld\n", i);
@@ -900,7 +925,9 @@ void JackRouter::AutoConnect()
 					break;
 				} else if (jack_connect(fClient, ports[ASIO_channel], jack_port_name(fInputPorts[i])) != 0) {
 					printf("Cannot connect input ports\n");
-				}
+				} else {
+                    *fStream << "Input " << "fActiveInputs = " << i << "ASIO_channel = " << ASIO_channel <<  std::endl;
+                }
 			}
 		}
 		jack_free(ports);
@@ -925,7 +952,9 @@ void JackRouter::AutoConnect()
 					break;
 				} else if (jack_connect(fClient, jack_port_name(fOutputPorts[i]), ports[ASIO_channel]) != 0) {
 					printf("Cannot connect output ports\n");
-				}
+				} else {
+                    *fStream << "Output " << "fActiveOutputs = " << i << "ASIO_channel = " << ASIO_channel <<  std::endl;
+                }
 			}
 		}
 
