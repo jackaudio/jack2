@@ -3,7 +3,7 @@
 	<Workspace title="jack">
 		<Project filename="libjack.cbp" />
 		<Project filename="libjacknet.cbp" />
-		<Project filename="libjackserver.cbp" active="1" />
+		<Project filename="libjackserver.cbp" />
 		<Project filename="jack_portaudio.cbp" />
 		<Project filename="jack_netdriver.cbp" />
 		<Project filename="jack_netonedriver.cbp" />
@@ -13,7 +13,7 @@
 		<Project filename="jack_load.cbp" />
 		<Project filename="jack_unload.cbp" />
 		<Project filename="jack_lsp.cbp" />
-		<Project filename="jack_latent_client.cbp" />
+		<Project filename="jack_latent_client.cbp" active="1" />
 		<Project filename="jack_metro.cbp" />
 		<Project filename="jack_connect.cbp" />
 		<Project filename="jack_disconnect.cbp" />

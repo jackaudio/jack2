@@ -115,7 +115,11 @@ int JackDebugClient::Close()
 
 void JackDebugClient::CheckClient(const char* function_name) const
 {
+#ifdef WIN32
+    *fStream << "CheckClient : " << function_name << ", calling thread : " << GetCurrentThread() << endl;
+#else
     *fStream << "CheckClient : " << function_name << ", calling thread : " << pthread_self() << endl;
+#endif
 
     if (fIsClosed > 0)  {
         *fStream << "!!! ERROR !!! : Accessing a client '" << fClientName << "' already closed " << "from " << function_name << endl;

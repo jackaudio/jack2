@@ -304,6 +304,10 @@
 		<Unit filename="..\common\JackAudioPort.cpp" />
 		<Unit filename="..\common\JackClient.cpp" />
 		<Unit filename="..\common\JackConnectionManager.cpp" />
+		<Unit filename="..\common\JackDebugClient.cpp">
+			<Option target="Win32 Debug 64bits" />
+			<Option target="Win32 Debug 32bits" />
+		</Unit>
 		<Unit filename="..\common\JackEngineControl.cpp" />
 		<Unit filename="..\common\JackEngineProfiling.cpp">
 			<Option target="Win32 Profiling" />
