@@ -69,8 +69,12 @@ static const double twoRaisedTo32Reciprocal = 1. / twoRaisedTo32;
 
 using namespace std;
 
+#define JACK_LOG 1
+
+#ifdef JACK_LOG
 #include <fstream>
-std::ofstream* fStream;
+static std::ofstream* fStream;
+#endif
 
 // class id.
 // {838FE50A-C1AB-4b77-B9B6-0A40788B53F3}
@@ -250,8 +254,9 @@ JackRouter::~JackRouter()
     delete[] fOutputPorts;
     delete[] fInMap;
     delete[] fOutMap;
-    
+#ifdef JACK_LOG  
     delete fStream;
+#endif
 }
 
 //------------------------------------------------------------------------------------------
@@ -403,7 +408,10 @@ ASIOBool JackRouter::init(void* sysRef)
 	}
 
 	_snprintf(name_log, sizeof(name_log) - 1, "JackRouter_%s.log", name);
+    
+#ifdef JACK_LOG
 	fStream = new ofstream(name_log, ios_base::ate);
+#endif
 
 	fClient = jack_client_open(name, JackNullOption, NULL);
 	if (fClient == NULL) {
@@ -571,10 +579,12 @@ ASIOError JackRouter::getChannelInfo(ASIOChannelInfo *info)
     } else {
         info->type = ASIOSTFloat32LSB;
     }
-    
+
+#ifdef JACK_LOG    
 	*fStream << "===============" << std::endl;
     *fStream << "getChannelInfo" << std::endl;
 	*fStream << "===============" << std::endl;
+#endif
 
 	info->channelGroup = 0;
 	info->isActive = ASIOFalse;
@@ -604,9 +614,9 @@ ASIOError JackRouter::getChannelInfo(ASIOChannelInfo *info)
             if (port) {	
                 if (jack_port_get_aliases(port, aliases) == 2) {
                     strncpy(info->name, aliases[1], 32);
-                    
+                #ifdef JACK_LOG
                     *fStream << "Input " << "fActiveInputs = " << i << " ASIO_channel = " << info->channel <<  std::endl;
-                    
+                #endif
                     goto end;
                 }	
             }
@@ -629,9 +639,9 @@ ASIOError JackRouter::getChannelInfo(ASIOChannelInfo *info)
             if (port) {	
                 if (jack_port_get_aliases(port, aliases) == 2) {
                     strncpy(info->name, aliases[1], 32);
-                    
+                #ifdef JACK_LOG
                     *fStream << "Output " << "fActiveOutputs = " << i << " ASIO_channel = " << info->channel <<  std::endl;
-                    
+                #endif    
                     goto end;
                 }	
             }
@@ -657,10 +667,12 @@ ASIOError JackRouter::createBuffers(ASIOBufferInfo *bufferInfos, long numChannel
 	char buf[256];
 	fActiveInputs = 0;
 	fActiveOutputs = 0;
-    
+
+#ifdef JACK_LOG    
 	*fStream << "===============" << std::endl;
     *fStream << "createBuffers" << std::endl;
 	*fStream << "===============" << std::endl;
+#endif
 
 	for (i = 0; i < numChannels; i++, info++) {
 		if (info->isInput) {
@@ -682,9 +694,9 @@ ASIOError JackRouter::createBuffers(ASIOBufferInfo *bufferInfos, long numChannel
 				info->buffers[0] = info->buffers[1] = 0;
 				notEnoughMem = true;
 			}
-            
+        #ifdef JACK_LOG
             *fStream << "Input " << "fActiveInputs = " << i << " ASIO_channel = " << info->channelNum <<  std::endl;
-
+        #endif
 			_snprintf(buf, sizeof(buf) - 1, "in%d", info->channelNum + 1);
 			fInputPorts[fActiveInputs]
 				= jack_port_register(fClient, buf, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput,0);
@@ -716,9 +728,9 @@ error:
 				info->buffers[0] = info->buffers[1] = 0;
 				notEnoughMem = true;
 			}
-            
+        #ifdef JACK_LOG
             *fStream << "Input " << "fActiveOutputs = " << i << " ASIO_channel = " << info->channelNum <<  std::endl;
-			
+		#endif	
 			_snprintf(buf, sizeof(buf) - 1, "out%d", info->channelNum + 1);
 			fOutputPorts[fActiveOutputs]
 				= jack_port_register(fClient, buf, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput,0);
@@ -907,10 +919,12 @@ void JackRouter::restoreConnections()
 void JackRouter::autoConnect()
 {
 	const char** ports;
-    
+
+#ifdef JACK_LOG    
 	*fStream << "===============" << std::endl;
     *fStream << "autoConnect" << std::endl;
 	*fStream << "===============" << std::endl;
+#endif
 
 	if ((ports = jack_get_ports(fClient, NULL, NULL, JackPortIsPhysical | JackPortIsOutput)) == NULL) {
 		printf("Cannot find any physical capture ports\n");
@@ -934,7 +948,9 @@ void JackRouter::autoConnect()
 				} else if (jack_connect(fClient, ports[ASIO_channel], jack_port_name(fInputPorts[i])) != 0) {
 					printf("Cannot connect input ports\n");
 				} else {
+                #ifdef JACK_LOG
                     *fStream << "Input " << "fActiveInputs = " << i << " ASIO_channel = " << ASIO_channel <<  std::endl;
+                #endif
                 }
 			}
 		}
@@ -961,7 +977,9 @@ void JackRouter::autoConnect()
 				} else if (jack_connect(fClient, jack_port_name(fOutputPorts[i]), ports[ASIO_channel]) != 0) {
 					printf("Cannot connect output ports\n");
 				} else {
+                #ifdef JACK_LOG
                     *fStream << "Output " << "fActiveOutputs = " << i << " ASIO_channel = " << ASIO_channel <<  std::endl;
+                #endif
                 }
 			}
 		}

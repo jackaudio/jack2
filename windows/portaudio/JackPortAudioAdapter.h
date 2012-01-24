@@ -41,23 +41,23 @@ namespace Jack
         PaDeviceIndex fInputDevice;
         PaDeviceIndex fOutputDevice;
 
-        static int Render ( const void* inputBuffer, void* outputBuffer,
+        static int Render(const void* inputBuffer, void* outputBuffer,
                             unsigned long framesPerBuffer,
                             const PaStreamCallbackTimeInfo* timeInfo,
                             PaStreamCallbackFlags statusFlags,
-                            void* userData );
+                            void* userData);
 
     public:
 
-        JackPortAudioAdapter ( jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params );
+        JackPortAudioAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params);
         ~JackPortAudioAdapter()
         {}
 
         int Open();
         int Close();
 
-        int SetSampleRate ( jack_nframes_t sample_rate );
-        int SetBufferSize ( jack_nframes_t buffer_size );
+        int SetSampleRate(jack_nframes_t sample_rate);
+        int SetBufferSize(jack_nframes_t buffer_size);
 
     };
 
