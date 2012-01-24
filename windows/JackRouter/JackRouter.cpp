@@ -69,7 +69,7 @@ static const double twoRaisedTo32Reciprocal = 1. / twoRaisedTo32;
 
 using namespace std;
 
-#define JACK_LOG 1
+//#define JACK_LOG 1
 
 #ifdef JACK_LOG
 #include <fstream>
@@ -146,9 +146,7 @@ HRESULT _stdcall DllUnregisterServer()
 }
 
 // Globals
-
 list<pair<string, string> > JackRouter::fConnections;
-
 
 //------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------
@@ -206,7 +204,6 @@ JackRouter::JackRouter() : AsioDriver()
 		fAutoConnectOut = get_private_profile_int("AUTO_CONNECT", "output", 1, confPath.c_str());
         
         fFloatSample = get_private_profile_int("IO", "float-sample", 0, confPath.c_str());
-        
         fAliasSystem = get_private_profile_int("AUTO_CONNECT", "alias", 0, confPath.c_str());
 
 		FreeLibrary(handle);

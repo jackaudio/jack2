@@ -88,6 +88,19 @@ JackClient::JackClient(JackSynchro* table):fThread(this)
 JackClient::~JackClient()
 {}
 
+void JackClient::ShutDown()
+{
+    jack_log("JackClient::ShutDown");
+ 
+    if (fInfoShutdown) {
+        fInfoShutdown(JackFailure, "JACK server has been closed", fInfoShutdownArg);
+        fInfoShutdown = NULL;
+    } else if (fShutdown) {
+        fShutdown(fShutdownArg);
+        fShutdown = NULL;
+    }
+}
+
 int JackClient::Close()
 {
     jack_log("JackClient::Close ref = %ld", GetClientControl()->fRefNum);
@@ -745,27 +758,6 @@ int JackClient::ComputeTotalLatencies()
     int result = -1;
     fChannel->ComputeTotalLatencies(&result);
     return result;
-}
-
-/*
-ShutDown is called:
-- from the RT thread when Execute method fails
-- possibly from a "closed" notification channel
-(Not needed since the synch object used (Sema of Fifo will fails when server quits... see ShutDown))
-*/
-
-void JackClient::ShutDown()
-{
-    jack_log("JackClient::ShutDown");
-    JackGlobals::fServerRunning = false;
-
-    if (fInfoShutdown) {
-        fInfoShutdown(JackFailure, "JACK server has been closed", fInfoShutdownArg);
-        fInfoShutdown = NULL;
-    } else if (fShutdown) {
-        fShutdown(fShutdownArg);
-        fShutdown = NULL;
-    }
 }
 
 //----------------------

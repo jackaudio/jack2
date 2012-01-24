@@ -78,14 +78,13 @@ int JackEngine::Close()
         if (JackLoadableInternalClient* loadable_client = dynamic_cast<JackLoadableInternalClient*>(fClientTable[i])) {
             jack_log("JackEngine::Close loadable client = %s", loadable_client->GetClientControl()->fName);
             loadable_client->Close();
-            // Close does not delete the pointer for internal clients
             fClientTable[i] = NULL;
             delete loadable_client;
         } else if (JackExternalClient* external_client = dynamic_cast<JackExternalClient*>(fClientTable[i])) {
             jack_log("JackEngine::Close external client = %s", external_client->GetClientControl()->fName);
             external_client->Close();
-            // Close deletes the pointer for external clients
             fClientTable[i] = NULL;
+            delete external_client;
         }
     }
 
@@ -671,6 +670,8 @@ error:
 // Used for external clients
 int JackEngine::ClientExternalClose(int refnum)
 {
+    jack_log("JackEngine::ClientExternalClose ref = %ld", refnum);
+    
     JackClientInterface* client = fClientTable[refnum];
     fEngineControl->fTransport.ResetTimebase(refnum);
     int res = ClientCloseAux(refnum, client, true);
@@ -682,7 +683,10 @@ int JackEngine::ClientExternalClose(int refnum)
 // Used for server internal clients or drivers when the RT thread is stopped
 int JackEngine::ClientInternalClose(int refnum, bool wait)
 {
+    jack_log("JackEngine::ClientInternalClose ref = %ld", refnum);
+    
     JackClientInterface* client = fClientTable[refnum];
+    fEngineControl->fTransport.ResetTimebase(refnum);
     return ClientCloseAux(refnum, client, wait);
 }
 

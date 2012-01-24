@@ -560,7 +560,7 @@ namespace Jack
         const JSList* node;
         const jack_driver_param_t* param;
      
-        jack_on_shutdown(fClient, ShutDown, this);
+        jack_on_shutdown(fClient, SetShutDown, this);
     
         // Possibly use env variable
         const char* default_udp_port = getenv("JACK_NETJACK_PORT");
@@ -613,17 +613,7 @@ namespace Jack
     JackNetMasterManager::~JackNetMasterManager()
     {
         jack_log("JackNetMasterManager::~JackNetMasterManager");
-        jack_info("Exiting NetManager...");
-        if (fRunning) {
-            jack_client_kill_thread(fClient, fThread);
-            fRunning = false;
-        }
-        master_list_t::iterator it;
-        for (it = fMasterList.begin(); it != fMasterList.end(); it++) {
-            delete(*it);
-        }
-        fSocket.Close();
-        SocketAPIEnd();
+        ShutDown();
     }
 
     int JackNetMasterManager::CountIO(int flags)
@@ -644,14 +634,25 @@ namespace Jack
         return count;
     }
     
-    void JackNetMasterManager::ShutDown(void* arg)
+    void JackNetMasterManager::SetShutDown(void* arg)
+    {
+        static_cast<JackNetMasterManager*>(arg)->ShutDown();
+    }
+    
+    void JackNetMasterManager::ShutDown()
     {
         jack_log("JackNetMasterManager::ShutDown");
-        JackNetMasterManager* manager = (JackNetMasterManager*)arg;
-        if (manager->fRunning) {
-            jack_client_kill_thread(manager->fClient, manager->fThread);
-            manager->fRunning = false;
+        if (fRunning) {
+            jack_client_kill_thread(fClient, fThread);
+            fRunning = false;
         }
+        master_list_t::iterator it;
+        for (it = fMasterList.begin(); it != fMasterList.end(); it++) {
+            delete(*it);
+        }
+        fMasterList.clear();
+        fSocket.Close();
+        SocketAPIEnd();
     }
 
     int JackNetMasterManager::SetSyncCallback(jack_transport_state_t state, jack_position_t* pos, void* arg)

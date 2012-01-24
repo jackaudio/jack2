@@ -96,7 +96,7 @@ namespace Jack
 
         private:
 
-            static void ShutDown(void* arg);
+            static void SetShutDown(void* arg);
             static int SetSyncCallback(jack_transport_state_t state, jack_position_t* pos, void* arg);
             static void* NetManagerThread(void* arg);
 
@@ -116,6 +116,7 @@ namespace Jack
             int KillMaster(session_params_t* params);
             int SyncCallback(jack_transport_state_t state, jack_position_t* pos);
             int CountIO(int flags);
+            void ShutDown();
 
         public:
 
