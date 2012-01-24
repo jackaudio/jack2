@@ -90,7 +90,7 @@ PaError JackPortAudioDriver::OpenStream(jack_nframes_t buffer_size)
 {
     PaStreamParameters inputParameters;
     PaStreamParameters outputParameters;
-    
+
     jack_log("JackPortAudioDriver::OpenStream buffer_size = %d", buffer_size);
 
     // Update parameters
@@ -256,7 +256,7 @@ int JackPortAudioDriver::Attach()
 
         const char* alias;
 
-        if (fPaDevices->GetHostFromDevice(fInputDevice) == "ASIO") {
+        if (fInputDevice != paNoDevice && fPaDevices->GetHostFromDevice(fInputDevice) == "ASIO") {
             for (int i = 0; i < fCaptureChannels; i++) {
                 PaError err = PaAsio_GetInputChannelName(fInputDevice, i, &alias);
                 if (err == paNoError) {
@@ -266,7 +266,7 @@ int JackPortAudioDriver::Attach()
             }
         }
 
-        if (fPaDevices->GetHostFromDevice(fOutputDevice) == "ASIO") {
+        if (fOutputDevice != paNoDevice && fPaDevices->GetHostFromDevice(fOutputDevice) == "ASIO") {
             for (int i = 0; i < fPlaybackChannels; i++) {
                 PaError err = PaAsio_GetInputChannelName(fOutputDevice, i, &alias);
                 if (err == paNoError) {

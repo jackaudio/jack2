@@ -121,7 +121,6 @@ public:
 	void bufferSwitch();
 	long getMilliSeconds() {return fMilliSeconds;}
 
-	bool fFirstActivate;
 	static std::list<std::pair<std::string, std::string> > fConnections;  // Connections list
 
 private:
@@ -145,7 +144,8 @@ private:
 	long fActiveOutputs;
 	long fToggle;
 	long fMilliSeconds;
-	bool fActive, fStarted;
+	bool fRunning;
+	bool fFirstActivate;
     bool fFloatSample;
     bool fAliasSystem;
 	bool fTimeInfoMode, fTcRead;
@@ -161,9 +161,9 @@ private:
 	long fBufferSize;
 	ASIOSampleRate fSampleRate;
 
-	void AutoConnect();
-	void SaveConnections();
-    void RestoreConnections();
+	void autoConnect();
+	void saveConnections();
+    void restoreConnections();
 
 };
 
