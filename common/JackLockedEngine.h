@@ -104,7 +104,7 @@ class SERVER_EXPORT JackLockedEngine
             CATCH_EXCEPTION_RETURN
         }
         
-        int ShutDown()
+        void ShutDown()
         {
             // No lock needed
             TRY_CALL
