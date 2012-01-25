@@ -237,7 +237,7 @@ void PortAudioDevices::DisplayDevicesNames()
         if (Pa_GetHostApiInfo(fDeviceInfo[id]->hostApi)->type == paASIO) {
             long minLatency, maxLatency, preferredLatency, granularity;
 
-            PaAsio_GetAvailableLatencyValues (id, &minLatency, &maxLatency, &preferredLatency, &granularity);
+            PaAsio_GetAvailableBufferSizes (id, &minLatency, &maxLatency, &preferredLatency, &granularity);
 
             jack_info ("ASIO minimum buffer size    = %ld", minLatency);
             jack_info ("ASIO maximum buffer size    = %ld", maxLatency);

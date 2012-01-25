@@ -164,6 +164,9 @@ private:
 	void autoConnect();
 	void saveConnections();
     void restoreConnections();
+    
+    void processInputs();
+    void processOutputs();
 
 };
 

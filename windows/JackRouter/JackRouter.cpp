@@ -327,42 +327,51 @@ void JackRouter::shutdownCallback(void* arg)
 }
 
 //------------------------------------------------------------------------------------------
-int JackRouter::processCallback(jack_nframes_t nframes, void* arg)
+void JackRouter::processInputs()
 {
-	JackRouter* driver = (JackRouter*)arg;
-	int i,j;
-	int pos = (driver->fToggle) ? 0 : driver->fBufferSize ;
-
-	for (i = 0; i < driver->fActiveInputs; i++) {
-        if (!driver->fFloatSample) {
-            jack_default_audio_sample_t* buffer = (jack_default_audio_sample_t*)jack_port_get_buffer(driver->fInputPorts[i], nframes);
-            long* in = (long*)driver->fInputBuffers[i] + pos;
-            for (j = 0; j < nframes; j++) {
+    int pos = (fToggle) ? 0 : fBufferSize;
+    
+    for (i = 0; i < fActiveInputs; i++) {
+        if (!fFloatSample) {
+            jack_default_audio_sample_t* buffer = (jack_default_audio_sample_t*)jack_port_get_buffer(fInputPorts[i], fBufferSize);
+            long* in = (long*)fInputBuffers[i] + pos;
+            for (j = 0; j < fBufferSize; j++) {
                 in[j] = buffer[j] * jack_default_audio_sample_t(0x7fffffff);
             }
         } else {
-            memcpy((float*)driver->fInputBuffers[i] + pos,
-                    jack_port_get_buffer(driver->fInputPorts[i], nframes),
-                    nframes * sizeof(jack_default_audio_sample_t));
+            memcpy((float*)fInputBuffers[i] + pos,
+                    jack_port_get_buffer(fInputPorts[i], fBufferSize),
+                    fBufferSize * sizeof(jack_default_audio_sample_t));
         }
 	}
+}
 
-	driver->bufferSwitch();
-
-	for (i = 0; i < driver->fActiveOutputs; i++) {
-        if (!driver->fFloatSample) {
-            jack_default_audio_sample_t* buffer = (jack_default_audio_sample_t*)jack_port_get_buffer(driver->fOutputPorts[i], nframes);
-            long* out = (long*)driver->fOutputBuffers[i] + pos;
+//------------------------------------------------------------------------------------------
+void JackRouter::processOutputs()
+{
+    int pos = (fToggle) ? 0 : fBufferSize;
+    
+    for (i = 0; i < fActiveOutputs; i++) {
+        if (!fFloatSample) {
+            jack_default_audio_sample_t* buffer = (jack_default_audio_sample_t*)jack_port_get_buffer(fOutputPorts[i], fBufferSize);
+            long* out = (long*)fOutputBuffers[i] + pos;
             jack_default_audio_sample_t gain = jack_default_audio_sample_t(1)/jack_default_audio_sample_t(0x7fffffff);
-            for (j = 0; j < nframes; j++) {
+            for (j = 0; j < fBufferSize; j++) {
                 buffer[j] = out[j] * gain;
             }
         } else {
-            memcpy(jack_port_get_buffer(driver->fOutputPorts[i], nframes),
-                    (float*)driver->fOutputBuffers[i] + pos,
-                    nframes * sizeof(jack_default_audio_sample_t));
+            memcpy(jack_port_get_buffer(fOutputPorts[i], fBufferSize),
+                    (float*)fOutputBuffers[i] + pos,
+                    fBufferSize * sizeof(jack_default_audio_sample_t));
         }
 	}
+}
+
+//------------------------------------------------------------------------------------------
+int JackRouter::processCallback(jack_nframes_t nframes, void* arg)
+{
+	JackRouter* driver = (JackRouter*)arg;
+  	driver->bufferSwitch();
 
 	return 0;
 }
@@ -674,8 +683,9 @@ ASIOError JackRouter::createBuffers(ASIOBufferInfo *bufferInfos, long numChannel
 	for (i = 0; i < numChannels; i++, info++) {
 		if (info->isInput) {
             
-			if (info->channelNum < 0 || info->channelNum >= kNumInputs)
+			if (info->channelNum < 0 || info->channelNum >= kNumInputs) {
 				goto error;
+            }
 			fInMap[fActiveInputs] = info->channelNum;
             
             if (!fFloatSample) {
@@ -697,8 +707,9 @@ ASIOError JackRouter::createBuffers(ASIOBufferInfo *bufferInfos, long numChannel
 			_snprintf(buf, sizeof(buf) - 1, "in%d", info->channelNum + 1);
 			fInputPorts[fActiveInputs]
 				= jack_port_register(fClient, buf, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput,0);
-			if (fInputPorts[fActiveInputs] == NULL)
+			if (fInputPorts[fActiveInputs] == NULL) {
 				goto error;
+            }
 
 			fActiveInputs++;
 			if (fActiveInputs > kNumInputs) {
@@ -708,8 +719,9 @@ error:
 			}
 		} else {	
         
-     		if (info->channelNum < 0 || info->channelNum >= kNumOutputs)
+     		if (info->channelNum < 0 || info->channelNum >= kNumOutputs) {
 				goto error;
+            }
 			fOutMap[fActiveOutputs] = info->channelNum;
 
             if (!fFloatSample) {
@@ -731,8 +743,9 @@ error:
 			_snprintf(buf, sizeof(buf) - 1, "out%d", info->channelNum + 1);
 			fOutputPorts[fActiveOutputs]
 				= jack_port_register(fClient, buf, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput,0);
-			if (fOutputPorts[fActiveOutputs] == NULL)
+			if (fOutputPorts[fActiveOutputs] == NULL) {
 				goto error;
+            }
 
 			fActiveOutputs++;
 			if (fActiveOutputs > kNumOutputs) {
@@ -824,9 +837,11 @@ void JackRouter::bufferSwitch()
 {
 	if (fRunning && fCallbacks) {
 		getNanoSeconds(&fTheSystemTime);			// latch system time
+        processInputs();
+        processOutputs();
 		fSamplePosition += fBufferSize;
 		if (fTimeInfoMode) {
-			bufferSwitchX ();
+			bufferSwitchX();
 		} else {
 			fCallbacks->bufferSwitch(fToggle, ASIOFalse);
 		}

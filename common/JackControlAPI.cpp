@@ -932,7 +932,7 @@ jackctl_server_open(
         rc = server_ptr->engine->Open(driver_ptr->desc_ptr, driver_ptr->set_parameters);
         if (rc < 0)
         {
-            jack_error("JackServer::Open() failed with %d", rc);
+            jack_error("JackServer::Open failed with %d", rc);
             goto fail_delete;
         }
 

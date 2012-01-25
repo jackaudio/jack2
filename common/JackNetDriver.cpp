@@ -623,8 +623,11 @@ namespace Jack
             strcpy(value.str, "'hostname'");
             jack_driver_descriptor_add_parameter(desc, &filler, "client-name", 'n', JackDriverParamString, &value, NULL, "Name of the jack client", NULL);
 
+/*  
+Deactivated for now..
             value.ui = 0U;
             jack_driver_descriptor_add_parameter(desc, &filler, "transport-sync", 't', JackDriverParamUInt, &value, NULL, "Sync transport with master's", NULL);
+*/
 
             value.ui = 5U;
             jack_driver_descriptor_add_parameter(desc, &filler, "latency", 'l', JackDriverParamUInt, &value, NULL, "Network latency", NULL);
@@ -699,9 +702,12 @@ namespace Jack
                     case 'n' :
                         strncpy(net_name, param->value.str, JACK_CLIENT_NAME_SIZE);
                         break;
+                    /*
+                    Deactivated for now..
                     case 't' :
                         transport_sync = param->value.ui;
                         break;
+                    */
                     case 'l' :
                         network_latency = param->value.ui;
                         if (network_latency > NETWORK_MAX_LATENCY) {
