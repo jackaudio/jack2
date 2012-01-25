@@ -390,8 +390,6 @@ namespace Jack
 
     int JackNetMaster::Process()
     {
-        int res;
-
         if (!fRunning) {
             return 0;
         }
@@ -478,30 +476,10 @@ namespace Jack
         }
 
         //receive sync
-        res = SyncRecv();
+        int res = SyncRecv();
         if ((res == 0) || (res == SOCKET_ERROR)) {
             return res;
         }
-
-        /*
-        switch (SyncRecv()) {
-
-            case 0:
-                jack_error("Connection is not yet synched, skip cycle...");
-                return 0;
-
-            case SOCKET_ERROR:
-                jack_error("Connection is lost, quit master...");
-                //ask to the manager to properly remove the master
-                Exit();
-                //UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
-                ThreadExit();
-                break;
-
-            default:
-                break;
-        }
-        */
 
 #ifdef JACK_MONITOR
         fNetTimeMon->Add((((float)(GetMicroSeconds() - begin_time)) / (float) fPeriodUsecs) * 100.f);
@@ -518,26 +496,6 @@ namespace Jack
             // Well not a real XRun...
             JackServerGlobals::fInstance->GetEngine()->NotifyXRun(GetMicroSeconds(), 0);
         }
-
-        /*
-        switch (DataRecv()) {
-
-            case 0:
-                jack_error("Connection is not yet synched, skip cycle...");
-                return 0;
-
-            case SOCKET_ERROR:
-                jack_error("Connection is lost, quit master...");
-                //ask to the manager to properly remove the master
-                Exit();
-                //UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
-                ThreadExit();
-                break;
-
-            default:
-                break;
-        }
-        */
 
 #ifdef JACK_MONITOR
         fNetTimeMon->AddLast((((float)(GetMicroSeconds() - begin_time)) / (float) fPeriodUsecs) * 100.f);

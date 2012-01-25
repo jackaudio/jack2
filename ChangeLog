@@ -36,9 +36,13 @@ John Emmas
   Jackdmp changes log
 ---------------------------
 
+2012-01-25 Stephane Letz  <letz@grame.fr>
+
+	* Fix NetJack2 initialisation bug.
+
 2012-01-24 Stephane Letz  <letz@grame.fr>
 
-	* Improve ShutDown in NetManager
+	* Improve ShutDown in NetManager.
 	* Correct ShutDown in JackInternalClient and JackLibClient.
 
 2012-01-20 Stephane Letz  <letz@grame.fr>

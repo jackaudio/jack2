@@ -135,11 +135,9 @@ namespace Jack
         protected:
 
             bool fRunning;
-
             int fCurrentCycleOffset;
             int fMaxCycleOffset;
-            int fLastfCycleOffset;
-
+       
             bool Init();
             bool SetParams();
 
@@ -165,10 +163,10 @@ namespace Jack
 
         public:
 
-            JackNetMasterInterface() : JackNetInterface(), fRunning(false), fCurrentCycleOffset(0), fMaxCycleOffset(0), fLastfCycleOffset(0)
+            JackNetMasterInterface() : JackNetInterface(), fRunning(false), fCurrentCycleOffset(0), fMaxCycleOffset(0)
             {}
             JackNetMasterInterface(session_params_t& params, JackNetSocket& socket, const char* multicast_ip)
-                    : JackNetInterface(params, socket, multicast_ip)
+                    : JackNetInterface(params, socket, multicast_ip), fRunning(false), fCurrentCycleOffset(0), fMaxCycleOffset(0)
             {}
 
             virtual~JackNetMasterInterface()
