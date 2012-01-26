@@ -69,7 +69,7 @@
 <_><src>..\Release\bin\libjackserver.lib</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\libjackserver.def</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\libjackserver.dll</><dest>sys</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\portaudio_x86.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\portaudio_x86.dll</><dest>sys</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\jack_connect.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\jack_disconnect.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\jack_load.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
