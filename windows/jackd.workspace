@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_workspace_file>
 	<Workspace title="jack">
-		<Project filename="libjack.cbp" />
+		<Project filename="libjack.cbp" active="1" />
 		<Project filename="libjacknet.cbp" />
 		<Project filename="libjackserver.cbp" />
 		<Project filename="jack_portaudio.cbp" />
@@ -13,7 +13,7 @@
 		<Project filename="jack_load.cbp" />
 		<Project filename="jack_unload.cbp" />
 		<Project filename="jack_lsp.cbp" />
-		<Project filename="jack_latent_client.cbp" active="1" />
+		<Project filename="jack_latent_client.cbp" />
 		<Project filename="jack_metro.cbp" />
 		<Project filename="jack_connect.cbp" />
 		<Project filename="jack_disconnect.cbp" />

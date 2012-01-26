@@ -242,6 +242,7 @@
 			<Add library="odbc32" />
 			<Add library="odbccp32" />
 			<Add library="ws2_32" />
+			<Add library="winmm" />
 		</Linker>
 		<Unit filename="..\common\JackAPI.cpp" />
 		<Unit filename="..\common\JackActivationCount.cpp" />

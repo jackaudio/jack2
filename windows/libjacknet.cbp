@@ -224,6 +224,7 @@
 			<Add library="odbc32" />
 			<Add library="odbccp32" />
 			<Add library="ws2_32" />
+			<Add library="winmm" />
 		</Linker>
 		<Unit filename="..\common\JackAudioAdapterInterface.cpp" />
 		<Unit filename="..\common\JackException.cpp" />

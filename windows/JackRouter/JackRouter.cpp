@@ -342,11 +342,11 @@ void JackRouter::processInputs()
 {
     int pos = (fToggle) ? 0 : fBufferSize;
     
-    for (i = 0; i < fActiveInputs; i++) {
+    for (int i = 0; i < fActiveInputs; i++) {
         if (!fFloatSample) {
             jack_default_audio_sample_t* buffer = (jack_default_audio_sample_t*)jack_port_get_buffer(fInputPorts[i], fBufferSize);
             long* in = (long*)fInputBuffers[i] + pos;
-            for (j = 0; j < fBufferSize; j++) {
+            for (int j = 0; j < fBufferSize; j++) {
                 in[j] = buffer[j] * jack_default_audio_sample_t(0x7fffffff);
             }
         } else {
@@ -362,12 +362,12 @@ void JackRouter::processOutputs()
 {
     int pos = (fToggle) ? 0 : fBufferSize;
     
-    for (i = 0; i < fActiveOutputs; i++) {
+    for (int i = 0; i < fActiveOutputs; i++) {
         if (!fFloatSample) {
             jack_default_audio_sample_t* buffer = (jack_default_audio_sample_t*)jack_port_get_buffer(fOutputPorts[i], fBufferSize);
             long* out = (long*)fOutputBuffers[i] + pos;
             jack_default_audio_sample_t gain = jack_default_audio_sample_t(1)/jack_default_audio_sample_t(0x7fffffff);
-            for (j = 0; j < fBufferSize; j++) {
+            for (int j = 0; j < fBufferSize; j++) {
                 buffer[j] = out[j] * gain;
             }
         } else {
