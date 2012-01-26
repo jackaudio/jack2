@@ -36,6 +36,10 @@ John Emmas
   Jackdmp changes log
 ---------------------------
 
+2012-01-26 Stephane Letz  <letz@grame.fr>
+
+	* Add EndTime function (especially for Windows).
+
 2012-01-25 Stephane Letz  <letz@grame.fr>
 
 	* Fix NetJack2 initialisation bug.

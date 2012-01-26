@@ -127,6 +127,7 @@ struct JackLibGlobals
     {
         if (--fClientCount == 0 && fGlobals) {
             jack_log("JackLibGlobals Destroy %x", fGlobals);
+            EndTime();
             delete fGlobals;
             fGlobals = NULL;
         }

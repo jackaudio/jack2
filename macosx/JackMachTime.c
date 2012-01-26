@@ -39,6 +39,9 @@ SERVER_EXPORT void InitTime()
 	__jack_time_ratio = ((float)info.numer / info.denom) / 1000;
 }
 
+SERVER_EXPORT void EndTime()
+{}
+
 SERVER_EXPORT jack_time_t GetMicroSeconds(void)
 {
     return (jack_time_t) (mach_absolute_time () * __jack_time_ratio);

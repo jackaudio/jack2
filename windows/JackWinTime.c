@@ -19,8 +19,10 @@
 
 
 #include "JackTime.h"
+#include "JackError.h"
 
 static LARGE_INTEGER _jack_freq;
+static UINT gPeriod = 0;
 
 SERVER_EXPORT void JackSleep(long usec)
 {
@@ -30,6 +32,25 @@ SERVER_EXPORT void JackSleep(long usec)
 SERVER_EXPORT void InitTime()
 {
 	QueryPerformanceFrequency(&_jack_freq);
+    TIMECAPS caps;
+    if (timeGetDevCaps(&caps, sizeof(TIMECAPS)) != TIMERR_NOERROR) {
+        jack_error("InitTime : could not get timer device");
+    } else {
+        gPeriod = caps.wPeriodMin;
+        if (timeBeginPeriod(gPeriod) != TIMERR_NOERROR) {
+            jack_error("InitTime : could not set minimum timer");
+            gPeriod = 0;
+        } else {
+            jack_info("InitTime : multimedia timer resolution set to %d milliseconds", gPeriod);
+       }
+    }
+}
+
+SERVER_EXPORT void EndTime()
+{
+    if (gPeriod > 0) {
+        timeEndPeriod(gPeriod);
+    }
 }
 
 SERVER_EXPORT jack_time_t GetMicroSeconds(void)

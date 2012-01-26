@@ -30,6 +30,7 @@ extern "C"
 #endif
 
     SERVER_EXPORT void InitTime();
+    SERVER_EXPORT void EndTime();
     SERVER_EXPORT jack_time_t GetMicroSeconds(void);
     SERVER_EXPORT void JackSleep(long usec);
 

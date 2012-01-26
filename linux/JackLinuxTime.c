@@ -220,6 +220,9 @@ SERVER_EXPORT void InitTime()
 	__jack_cpu_mhz = jack_get_mhz ();
 }
 
+SERVER_EXPORT void EndTime()
+{}
+
 void SetClockSource(jack_timer_type_t source)
 {
         jack_log("Clock source : %s", ClockSourceName(source));

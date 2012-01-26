@@ -31,6 +31,9 @@ SERVER_EXPORT void JackSleep(long usec)
 SERVER_EXPORT void InitTime()
 {}
 
+SERVER_EXPORT void EndTime()
+{}
+
 SERVER_EXPORT jack_time_t GetMicroSeconds(void)
 {
     return (jack_time_t)(gethrtime() / 1000);

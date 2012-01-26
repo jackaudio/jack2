@@ -140,6 +140,7 @@ int JackServer::Close()
     fEngine->Close();
     // TODO: move that in reworked JackServerGlobals::Destroy()
     JackMessageBuffer::Destroy();
+    EndTime();
     return 0;
 }
 
