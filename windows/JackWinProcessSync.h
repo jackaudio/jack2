@@ -42,7 +42,9 @@ class JackWinProcessSync : public JackWinMutex
         JackWinProcessSync(const char* name = NULL):JackWinMutex()
         {
             //fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-            fEvent = CreateEvent(NULL, TRUE, FALSE, (LPCTSTR)name);  // Needs ResetEvent
+            char buffer[MAX_PATH];
+            snprintf(buffer, sizeof(buffer), "%s_%s", "WinProcessSync", name);
+            fEvent = CreateEvent(NULL, TRUE, FALSE, buffer);  // Needs ResetEvent
         }
         virtual ~JackWinProcessSync()
         {

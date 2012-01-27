@@ -71,7 +71,9 @@ class SERVER_EXPORT JackWinMutex
         JackWinMutex(const char* name = NULL)
         {
             // In recursive mode by default
-            fMutex = CreateMutex(NULL, FALSE, name);
+            char buffer[MAX_PATH];
+            snprintf(buffer, sizeof(buffer), "%s_%s", "JackWinMutex", name);
+            fMutex = CreateMutex(NULL, FALSE, buffer);
         }
 
         virtual ~JackWinMutex()
