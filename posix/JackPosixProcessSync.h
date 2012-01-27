@@ -41,7 +41,7 @@ class JackPosixProcessSync : public JackBasePosixMutex
 
     public:
 
-        JackPosixProcessSync():JackBasePosixMutex()
+        JackPosixProcessSync(const char* name = NULL):JackBasePosixMutex()
         {
             int res = pthread_cond_init(&fCond, NULL);
             ThrowIf(res != 0, JackException("JackBasePosixMutex: could not init the cond variable"));

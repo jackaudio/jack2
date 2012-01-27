@@ -29,7 +29,14 @@ namespace Jack
 JackMessageBuffer* JackMessageBuffer::fInstance = NULL;
 
 JackMessageBuffer::JackMessageBuffer()
-    :fInit(NULL),fInitArg(NULL),fThread(this),fInBuffer(0),fOutBuffer(0),fOverruns(0),fRunning(false)
+    :fInit(NULL),
+    fInitArg(NULL),
+    fThread(this),
+    fGuard("JackMessageBuffer"),
+    fInBuffer(0),
+    fOutBuffer(0),
+    fOverruns(0),
+    fRunning(false)
 {}
 
 JackMessageBuffer::~JackMessageBuffer()

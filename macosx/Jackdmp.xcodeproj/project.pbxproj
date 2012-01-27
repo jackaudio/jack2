@@ -3309,8 +3309,8 @@
 				4B1499EE14BDA5B300A51A3C /* JackGenericClientChannel.cpp */,
 				4B1499EF14BDA5B300A51A3C /* JackGenericClientChannel.h */,
 				4BF8D1AF0834EEC400C94B91 /* JackChannel.h */,
-				4BB371D40C1AD85A0050C1E4 /* JackNotification.h */,
 				4BF8D1B30834EED500C94B91 /* JackInternalClientChannel.h */,
+				4BB371D40C1AD85A0050C1E4 /* JackNotification.h */,
 				4BFB299908AF452300D450D4 /* Socket */,
 			);
 			name = Channels;

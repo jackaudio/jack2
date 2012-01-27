@@ -38,13 +38,16 @@ namespace Jack
 
 JackEngine::JackEngine(JackGraphManager* manager,
                        JackSynchro* table,
-                       JackEngineControl* control)
+                       JackEngineControl* control) 
+                    : fSignal(control->fServerName)
+            
 {
     fGraphManager = manager;
     fSynchroTable = table;
     fEngineControl = control;
-    for (int i = 0; i < CLIENT_NUM; i++)
+    for (int i = 0; i < CLIENT_NUM; i++) {
         fClientTable[i] = NULL;
+    }
     fLastSwitchUsecs = 0;
     fMaxUUID = 0;
     fSessionPendingReplies = 0;
@@ -132,8 +135,9 @@ void JackEngine::ReleaseRefnum(int ref)
     if (fEngineControl->fTemporary) {
         int i;
         for (i = fEngineControl->fDriverNum; i < CLIENT_NUM; i++) {
-            if (fClientTable[i])
+            if (fClientTable[i]) {
                 break;
+            }
         }
         if (i == CLIENT_NUM) {
             // last client and temporay case: quit the server

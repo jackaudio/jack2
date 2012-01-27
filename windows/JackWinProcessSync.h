@@ -39,12 +39,12 @@ class JackWinProcessSync : public JackWinMutex
 
     public:
 
-        JackWinProcessSync():JackWinMutex()
+        JackWinProcessSync(const char* name = NULL):JackWinMutex()
         {
-            //fEvent = (HANDLE)CreateEvent(NULL, FALSE, FALSE, NULL);
-            fEvent = (HANDLE)CreateEvent(NULL, TRUE, FALSE, NULL);  // Needs ResetEvent
+            //fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+            fEvent = CreateEvent(NULL, TRUE, FALSE, (LPCTSTR)name);  // Needs ResetEvent
         }
-        ~JackWinProcessSync()
+        virtual ~JackWinProcessSync()
         {
             CloseHandle(fEvent);
         }

@@ -44,7 +44,7 @@ class SERVER_EXPORT JackBaseWinMutex
         JackBaseWinMutex():fOwner(0)
         {
             // In recursive mode by default
-            fMutex = (HANDLE)CreateMutex(0, FALSE, 0);
+            fMutex = CreateMutex(NULL, FALSE, NULL);
             ThrowIf(fMutex == 0, JackException("JackWinMutex: could not init the mutex"));
         }
 
@@ -71,7 +71,7 @@ class SERVER_EXPORT JackWinMutex
         JackWinMutex()
         {
             // In recursive mode by default
-            fMutex = (HANDLE)CreateMutex(0, FALSE, 0);
+            fMutex = CreateMutex(NULL, FALSE, NULL);
         }
 
         virtual ~JackWinMutex()
