@@ -74,7 +74,7 @@ def build(bld):
         common_libsources += [
             '../posix/JackPosixThread.cpp',
             '../posix/JackPosixSemaphore.cpp',
-            '../posix/JackProcessSync.cpp',
+            '../posix/JackPosixProcessSync.cpp',
 	    '../posix/JackPosixMutex.cpp',
             '../posix/JackSocket.cpp',
             '../linux/JackLinuxTime.c',
@@ -87,7 +87,7 @@ def build(bld):
         common_libsources += [
            '../posix/JackPosixThread.cpp',
            '../posix/JackFifo.cpp',
-           '../posix/JackProcessSync.cpp',
+           '../posix/JackPosixProcessSync.cpp',
            '../posix/JackPosixMutex.cpp',
            '../posix/JackSocket.cpp',
            '../solaris/JackSolarisTime.c',
@@ -97,7 +97,7 @@ def build(bld):
 
     if bld.env['IS_MACOSX']:
         common_libsources += [
-            '../posix/JackProcessSync.cpp',
+            '../posix/JackPosixProcessSync.cpp',
             '../posix/JackPosixThread.cpp',
             '../macosx/JackMachThread.cpp',
             '../macosx/JackMachSemaphore.cpp',

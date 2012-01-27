@@ -17,10 +17,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#ifndef __JackProcessSync__
-#define __JackProcessSync__
+#ifndef __JackPosixProcessSync__
+#define __JackPosixProcessSync__
 
-#include "JackPlatformPlug.h"
 #include "JackPosixMutex.h"
 #include "JackException.h"
 #include <sys/time.h>
@@ -30,10 +29,10 @@ namespace Jack
 {
 
 /*!
-\brief  A synchronization primitive built using a condition variable.
+\brief A synchronization primitive built using a condition variable.
 */
 
-class JackProcessSync : public JackBasePosixMutex
+class JackPosixProcessSync : public JackBasePosixMutex
 {
 
     private:
@@ -42,13 +41,13 @@ class JackProcessSync : public JackBasePosixMutex
 
     public:
 
-        JackProcessSync():JackBasePosixMutex()
+        JackPosixProcessSync():JackBasePosixMutex()
         {
             int res = pthread_cond_init(&fCond, NULL);
             ThrowIf(res != 0, JackException("JackBasePosixMutex: could not init the cond variable"));
         }
 
-        virtual ~JackProcessSync()
+        virtual ~JackPosixProcessSync()
         {
             pthread_cond_destroy(&fCond);
         }

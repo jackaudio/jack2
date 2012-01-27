@@ -65,8 +65,8 @@ namespace Jack { typedef JackMachSemaphore JackSynchro; }
 #endif
 
 /* __JackPlatformProcessSync__ */
-#include "JackProcessSync.h"
-/* Only on windows a special JackProcessSync is used. It is directly defined by including JackProcessSync.h here */
+#include "JackPosixProcessSync.h"
+namespace Jack { typedef JackPosixProcessSync JackProcessSync; }
 
 #ifndef MY_TARGET_OS_IPHONE
 /* __JackPlatformServerChannel__ */
