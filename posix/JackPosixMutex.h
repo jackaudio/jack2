@@ -45,7 +45,7 @@ class SERVER_EXPORT JackBasePosixMutex
 
     public:
 
-        JackBasePosixMutex():fOwner(0)
+        JackBasePosixMutex(const char* name = NULL):fOwner(0)
         {
             int res = pthread_mutex_init(&fMutex, NULL);
             ThrowIf(res != 0, JackException("JackBasePosixMutex: could not init the mutex"));
@@ -70,7 +70,7 @@ class SERVER_EXPORT JackPosixMutex
 
     public:
 
-        JackPosixMutex()
+        JackPosixMutex(const char* name = NULL)
         {
             // Use recursive mutex
             pthread_mutexattr_t mutex_attr;

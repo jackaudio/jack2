@@ -68,10 +68,10 @@ class SERVER_EXPORT JackWinMutex
 
     public:
 
-        JackWinMutex()
+        JackWinMutex(const char* name = NULL)
         {
             // In recursive mode by default
-            fMutex = CreateMutex(NULL, FALSE, NULL);
+            fMutex = CreateMutex(NULL, FALSE, name);
         }
 
         virtual ~JackWinMutex()

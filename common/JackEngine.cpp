@@ -39,8 +39,8 @@ namespace Jack
 JackEngine::JackEngine(JackGraphManager* manager,
                        JackSynchro* table,
                        JackEngineControl* control) 
-                    : fSignal(control->fServerName)
-            
+                    : JackLockAble(control->fServerName), 
+                    fSignal(control->fServerName)
 {
     fGraphManager = manager;
     fSynchroTable = table;
