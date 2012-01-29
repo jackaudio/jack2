@@ -30,8 +30,7 @@ namespace Jack
 \brief  A synchronization primitive built using a condition variable.
 */
 
-//class JackWinProcessSync : public JackWinMutex
-class JackWinProcessSync : public JackWinCriticalSection
+class JackWinProcessSync : public JackWinMutex
 {
 
     private:

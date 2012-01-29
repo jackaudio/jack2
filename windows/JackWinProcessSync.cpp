@@ -36,7 +36,6 @@ void JackWinProcessSync::LockedSignal()
     if (res != WAIT_OBJECT_0) {
         jack_error("JackWinProcessSync::LockedSignal WaitForSingleObject err = %d", GetLastError());
     }
-    
     if (!SetEvent(fEvent)) {
         jack_error("JackWinProcessSync::LockedSignal SetEvent err = %d", GetLastError());
     }

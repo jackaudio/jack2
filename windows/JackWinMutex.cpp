@@ -86,7 +86,7 @@ namespace Jack
 
     bool JackWinMutex::Unlock()
     {
-        return(ReleaseMutex(fMutex) != 0);
+        return (ReleaseMutex(fMutex) != 0);
     }
     
     bool JackWinCriticalSection::Lock()
