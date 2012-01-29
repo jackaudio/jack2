@@ -137,10 +137,23 @@ int JackWinNamedPipeClient::Close()
 }
 
 void JackWinNamedPipeClient::SetReadTimeOut(long sec)
-{}
+{
+    COMMTIMEOUTS timeout;
+    if (GetCommTimeouts(fNamedPipe, &timeout)) {
+        jack_info("JackWinNamedPipeClient::SetReadTimeOut ReadIntervalTimeout = %d", timeout.ReadIntervalTimeout);
+        jack_info("JackWinNamedPipeClient::SetReadTimeOut ReadTotalTimeoutMultiplier = %d", timeout.ReadTotalTimeoutMultiplier);
+        jack_info("JackWinNamedPipeClient::SetReadTimeOut ReadTotalTimeoutConstant = %d", timeout.ReadTotalTimeoutConstant);
+    }
+}
 
 void JackWinNamedPipeClient::SetWriteTimeOut(long sec)
-{}
+{
+    COMMTIMEOUTS timeout;
+    if (GetCommTimeouts(fNamedPipe, &timeout)) {
+        jack_info("JackWinNamedPipeClient::SetWriteTimeOut WriteTotalTimeoutMultiplier = %d", timeout.WriteTotalTimeoutMultiplier);
+        jack_info("JackWinNamedPipeClient::SetWriteTimeOut WriteTotalTimeoutConstant = %d", timeout.WriteTotalTimeoutConstant);
+    }
+}
 
 JackWinAsyncNamedPipeClient::JackWinAsyncNamedPipeClient()
         : JackWinNamedPipeClient(), fPendingIO(false), fIOState(kIdle)
