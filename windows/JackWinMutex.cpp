@@ -88,6 +88,24 @@ namespace Jack
     {
         return(ReleaseMutex(fMutex) != 0);
     }
+    
+    bool JackWinCriticalSection::Lock()
+    {
+        EnterCriticalSection(&fSection);
+        return true;
+    }
+
+    bool JackWinCriticalSection::Trylock()
+    {
+        return (TryEnterCriticalSection(&fSection));
+    }
+
+    bool JackWinCriticalSection::Unlock()
+    {
+        LeaveCriticalSection(&fSection);
+        return true;
+    }
+
 
 
 } // namespace

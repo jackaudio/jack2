@@ -89,6 +89,31 @@ class SERVER_EXPORT JackWinMutex
 
 };
 
+class SERVER_EXPORT JackWinCriticalSection
+{
+
+    protected:
+
+        LPCRITICAL_SECTION fSection;
+
+    public:
+
+        JackWinCriticalSection(const char* name = NULL)
+        {
+            InitializeCriticalSection(&fSection);
+        }
+
+        virtual ~JackWinCriticalSection()
+        {
+            DeleteCriticalSection(&fSection);
+        }
+
+        bool Lock();
+        bool Trylock();
+        bool Unlock();
+
+};
+
 
 } // namespace
 
