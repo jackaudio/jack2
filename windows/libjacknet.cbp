@@ -32,7 +32,7 @@
 					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
-					<Add library="libsamplerate_x86_64" />
+					<Add library="libsamplerate_x86_64.a" />
 					<Add directory="Release64\bin" />
 				</Linker>
 			</Target>
@@ -62,7 +62,7 @@
 					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
-					<Add library="libsamplerate_x86_64" />
+					<Add library="libsamplerate_x86_64.a" />
 					<Add directory="Debug64\bin" />
 				</Linker>
 			</Target>
@@ -93,7 +93,7 @@
 					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
-					<Add library="libsamplerate_x86_64" />
+					<Add library="libsamplerate_x86_64.a" />
 					<Add directory="Release64\bin" />
 				</Linker>
 			</Target>
@@ -125,7 +125,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-m32" />
-					<Add library="libsamplerate_x86" />
+					<Add library="libsamplerate_x86.a" />
 					<Add directory="Release\bin" />
 				</Linker>
 				<ExtraCommands>
@@ -160,7 +160,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-m32" />
-					<Add library="libsamplerate_x86" />
+					<Add library="libsamplerate_x86.a" />
 					<Add directory="Debug\bin" />
 				</Linker>
 				<ExtraCommands>
@@ -196,7 +196,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-m32" />
-					<Add library="libsamplerate_x86" />
+					<Add library="libsamplerate_x86.a" />
 					<Add directory="Release\bin" />
 				</Linker>
 				<ExtraCommands>

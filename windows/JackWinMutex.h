@@ -24,6 +24,7 @@
 #include "JackCompilerDeps.h"
 #include "JackException.h"
 #include <windows.h>
+#include <stdio.h>
 
 namespace Jack
 {

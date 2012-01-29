@@ -30,7 +30,9 @@
 				</Compiler>
 				<Linker>
 					<Add library="libjackserver64" />
-					<Add library="portaudio_x86_64" />
+					<Add library="libportaudio_x86_64.a" />
+					<Add library="winmm" />
+					<Add library="ole32" />
 					<Add directory="..\windows" />
 					<Add directory="Release64\bin" />
 				</Linker>
@@ -59,7 +61,7 @@
 				</Compiler>
 				<Linker>
 					<Add library="libjackserver64" />
-					<Add library="portaudio_x86_64" />
+					<Add library="libportaudio_x86_64.a" />
 					<Add directory="Debug64\bin" />
 					<Add directory="..\windows" />
 				</Linker>
@@ -89,7 +91,7 @@
 				</Compiler>
 				<Linker>
 					<Add library="libjackserver64" />
-					<Add library="portaudio_x86_64" />
+					<Add library="libportaudio_x86_64.a" />
 					<Add directory="Release64\bin" />
 					<Add directory="..\windows" />
 				</Linker>
@@ -120,7 +122,9 @@
 				<Linker>
 					<Add option="-m32" />
 					<Add library="libjackserver" />
-					<Add library="portaudio_x86" />
+					<Add library="libportaudio_x86.a" />
+					<Add library="winmm" />
+					<Add library="ole32" />
 					<Add directory="..\windows" />
 					<Add directory="Release\bin" />
 				</Linker>
@@ -154,7 +158,7 @@
 				<Linker>
 					<Add option="-m32" />
 					<Add library="libjackserver" />
-					<Add library="portaudio_x86" />
+					<Add library="libportaudio_x86.a" />
 					<Add directory="Debug\bin" />
 					<Add directory="..\windows" />
 				</Linker>
@@ -189,7 +193,7 @@
 				<Linker>
 					<Add option="-m32" />
 					<Add library="libjackserver" />
-					<Add library="portaudio_x86" />
+					<Add library="libportaudio_x86.a" />
 					<Add directory="Release\bin" />
 					<Add directory="..\windows" />
 				</Linker>

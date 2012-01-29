@@ -69,8 +69,6 @@
 <_><src>..\Release\bin\jackd.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\libjack.dll</><dest>sys</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\libjackserver.dll</><dest>sys</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\libsamplerate_x86.dll</><dest>sys</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\portaudio_x86.dll</><dest>sys</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jack\jack_net.dll</><dest>sys</><custom>jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jack\jack_netone.dll</><dest>sys</><custom>jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jack_netsource.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
@@ -99,7 +97,6 @@
 <_><src>.\src\32bits\JackRouter.ini</><dest>inst</><custom>32bits</><ifexist>overnewer</><recurs>0</></>
 <_><src>.\src\32bits\msvcr100.dll</><dest>inst</><custom>32bits</><ifexist>overnewer</><recurs>0</></>
 <_><src>.\src\32bits\msvcp100.dll</><dest>inst</><custom>32bits</><ifexist>overnewer</><recurs>0</></>
-<_><src>.\src\32bits\portaudio_x86.lib</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\mingwm10.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\qjackctl.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\QtCore4.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
