@@ -161,7 +161,7 @@ void JackMessageBufferAdd(int level, const char *message)
 
 void JackMessageBuffer::SetInitCallback(JackThreadInitCallback callback, void *arg)
 {
-    if (fInstance && fInit && fGuard.Lock()) {
+    if (fInstance && fInit && fRunning && fGuard.Lock()) {
         /* set up the callback */
         fInitArg = arg;
         fInit = callback;
