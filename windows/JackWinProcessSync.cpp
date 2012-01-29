@@ -55,11 +55,15 @@ void JackWinProcessSync::LockedSignalAll()
     LockedSignal();
 }
 
-/*
 void JackWinProcessSync::Wait()
 {
-    ReleaseMutex(fMutex);
-	WaitForSingleObject(fEvent, INFINITE);
+    if (!ReleaseMutex(fMutex)) {
+        jack_error("JackWinProcessSync::Wait ReleaseMutex err = %d", GetLastError());
+    }
+	DWORD res = WaitForSingleObject(fEvent, INFINITE);
+    if (res != WAIT_OBJECT_0) {
+        jack_error("JackWinProcessSync::Wait WaitForSingleObject err = %d", GetLastError());
+    }
 }
 
 void JackWinProcessSync::LockedWait()
@@ -70,8 +74,15 @@ void JackWinProcessSync::LockedWait()
 
 bool JackWinProcessSync::TimedWait(long usec)
 {
-    ReleaseMutex(fMutex);
+    if (!ReleaseMutex(fMutex)) {
+        jack_error("JackWinProcessSync::TimedWait ReleaseMutex err = %d", GetLastError());
+    }
+    
 	DWORD res = WaitForSingleObject(fEvent, usec / 1000);
+    if (res != WAIT_OBJECT_0) {
+        jack_error("JackWinProcessSync::TimedWait WaitForSingleObject err = %d", GetLastError());
+    }
+    
 	return (res == WAIT_OBJECT_0);
 }
 
@@ -80,8 +91,9 @@ bool JackWinProcessSync::LockedTimedWait(long usec)
     // Does it make sense on Windows, use non-locked version for now...
     return TimedWait(usec);
 }
-*/
 
+
+/*
 // Code from APPLE CAGuard.cpp : does not seem to work as expected...
 
 void JackWinProcessSync::Wait()
@@ -144,7 +156,7 @@ bool JackWinProcessSync::LockedTimedWait(long usec)
     
     return (res == WAIT_OBJECT_0);
 }
-
+*/
 
 } // end of namespace
 

@@ -41,10 +41,11 @@ class JackWinProcessSync : public JackWinMutex
 
         JackWinProcessSync(const char* name = NULL):JackWinMutex()
         {
-            //fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
             char buffer[MAX_PATH];
             snprintf(buffer, sizeof(buffer), "%s_%s", "WinProcessSync", name);
-            fEvent = CreateEvent(NULL, TRUE, FALSE, buffer);  // Needs ResetEvent
+            //fEvent = CreateEvent(NULL, TRUE, FALSE, buffer);  // Needs ResetEvent
+            fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);   // Audo-reset event
+            ThrowIf((fEvent == 0), JackException("JackWinProcessSync: could not init the event"));
         }
         virtual ~JackWinProcessSync()
         {

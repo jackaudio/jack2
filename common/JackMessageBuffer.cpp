@@ -127,7 +127,7 @@ bool JackMessageBuffer::Create()
     if (fInstance == NULL) {
         fInstance = new JackMessageBuffer();
         if (!fInstance->Start()) {
-            jack_error("JackMessageBuffer::Create cannot start thread...");
+            jack_error("JackMessageBuffer::Create cannot start thread");
             delete fInstance;
             fInstance = NULL;
             return false;

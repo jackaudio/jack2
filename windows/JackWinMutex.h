@@ -46,7 +46,7 @@ class SERVER_EXPORT JackBaseWinMutex
         {
             // In recursive mode by default
             fMutex = CreateMutex(NULL, FALSE, NULL);
-            ThrowIf(fMutex == 0, JackException("JackWinMutex: could not init the mutex"));
+            ThrowIf((fMutex == 0), JackException("JackBaseWinMutex: could not init the mutex"));
         }
 
         virtual ~JackBaseWinMutex()
@@ -75,6 +75,7 @@ class SERVER_EXPORT JackWinMutex
             char buffer[MAX_PATH];
             snprintf(buffer, sizeof(buffer), "%s_%s", "JackWinMutex", name);
             fMutex = CreateMutex(NULL, FALSE, buffer);
+            ThrowIf((fMutex == 0), JackException("JackWinMutex: could not init the mutex"));
         }
 
         virtual ~JackWinMutex()
