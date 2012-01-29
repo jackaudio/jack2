@@ -76,19 +76,34 @@ namespace Jack
 
     bool JackWinMutex::Lock()
     {
-        return (WAIT_OBJECT_0 == WaitForSingleObject(fMutex, INFINITE));
+        if (WAIT_OBJECT_0 == WaitForSingleObject(fMutex, INFINITE)) {
+            return true;
+        } else  {
+            jack_log("JackWinProcessSync::Lock WaitForSingleObject err = %d", GetLastError());
+            return false;
+        }
     }
 
     bool JackWinMutex::Trylock()
     {
-        return (WAIT_OBJECT_0 == WaitForSingleObject(fMutex, 0));
+        if (WAIT_OBJECT_0 == WaitForSingleObject(fMutex, 0)) {
+            return true;
+        } else  {
+            jack_log("JackWinProcessSync::Lock WaitForSingleObject err = %d", GetLastError());
+            return false;
+        }
     }
 
     bool JackWinMutex::Unlock()
     {
-        return (ReleaseMutex(fMutex) != 0);
+        if (!ReleaseMutex(fMutex)) {
+            jack_log("JackWinProcessSync::Unlock ReleaseMutex err = %d", GetLastError());
+            return false;
+        } else  {
+            return true;
+        }
     }
-    
+
     bool JackWinCriticalSection::Lock()
     {
         EnterCriticalSection(&fSection);
@@ -105,8 +120,6 @@ namespace Jack
         LeaveCriticalSection(&fSection);
         return true;
     }
-
-
 
 } // namespace
 

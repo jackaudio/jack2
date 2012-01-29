@@ -32,7 +32,7 @@ JackMessageBuffer::JackMessageBuffer()
     :fInit(NULL),
     fInitArg(NULL),
     fThread(this),
-    fGuard("JackMessageBuffer"),
+    fGuard(),
     fInBuffer(0),
     fOutBuffer(0),
     fOverruns(0),
@@ -49,7 +49,7 @@ bool JackMessageBuffer::Start()
         return true;
     } else {
         return false;
-    }   
+    }
 }
 
 bool JackMessageBuffer::Stop()
@@ -133,7 +133,7 @@ bool JackMessageBuffer::Create()
             return false;
         }
     }
-    
+
     return true;
 }
 

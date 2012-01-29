@@ -72,9 +72,14 @@ class SERVER_EXPORT JackWinMutex
         JackWinMutex(const char* name = NULL)
         {
             // In recursive mode by default
-            char buffer[MAX_PATH];
-            snprintf(buffer, sizeof(buffer), "%s_%s", "JackWinMutex", name);
-            fMutex = CreateMutex(NULL, FALSE, buffer);
+            if (name) {
+                char buffer[MAX_PATH];
+                snprintf(buffer, sizeof(buffer), "%s_%s", "JackWinMutex", name);
+                fMutex = CreateMutex(NULL, FALSE, buffer);
+            } else {
+                fMutex = CreateMutex(NULL, FALSE, NULL);
+            }
+
             ThrowIf((fMutex == 0), JackException("JackWinMutex: could not init the mutex"));
         }
 
@@ -94,7 +99,7 @@ class SERVER_EXPORT JackWinCriticalSection
 
     protected:
 
-        LPCRITICAL_SECTION fSection;
+        CRITICAL_SECTION fSection;
 
     public:
 

@@ -15,8 +15,7 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
- */
-
+*/
 
 #ifndef __JackWinProcessSync__
 #define __JackWinProcessSync__
@@ -39,12 +38,17 @@ class JackWinProcessSync : public JackWinMutex
 
     public:
 
-        JackWinProcessSync(const char* name = NULL):JackWinMutex()
+        JackWinProcessSync(const char* name = NULL):JackWinMutex(name)
         {
-            char buffer[MAX_PATH];
-            snprintf(buffer, sizeof(buffer), "%s_%s", "WinProcessSync", name);
-            //fEvent = CreateEvent(NULL, TRUE, FALSE, buffer);  // Needs ResetEvent
-            fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);   // Audo-reset event
+            if (name) {
+                char buffer[MAX_PATH];
+                snprintf(buffer, sizeof(buffer), "%s_%s", "JackWinProcessSync", name);
+                //fEvent = CreateEvent(NULL, TRUE, FALSE, buffer);  // Needs ResetEvent
+                fEvent = CreateEvent(NULL, FALSE, FALSE, buffer);   // Auto-reset event
+            } else {
+                fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);   // Auto-reset event
+            }
+
             ThrowIf((fEvent == 0), JackException("JackWinProcessSync: could not init the event"));
         }
         virtual ~JackWinProcessSync()
