@@ -25,26 +25,34 @@ namespace Jack
 
 void JackWinProcessSync::Signal()
 {
-    SetEvent(fEvent);
+    if (!SetEvent(fEvent)) {
+        jack_error("JackWinProcessSync::Signal SetEvent err = %d", GetLastError());
+    }
 }
 
 void JackWinProcessSync::LockedSignal()
 {
-    WaitForSingleObject(fMutex, INFINITE);
-    SetEvent(fEvent);
-    ReleaseMutex(fMutex);
+    DWORD res = WaitForSingleObject(fMutex, INFINITE);
+    if (res != WAIT_OBJECT_0) {
+        jack_error("JackWinProcessSync::LockedSignal WaitForSingleObject err = %d", GetLastError());
+    }
+    
+    if (!SetEvent(fEvent)) {
+        jack_error("JackWinProcessSync::LockedSignal SetEvent err = %d", GetLastError());
+    }
+    if (!ReleaseMutex(fMutex)) {
+        jack_error("JackWinProcessSync::LockedSignal ReleaseMutex err = %d", GetLastError());
+    }
 }
 
 void JackWinProcessSync::SignalAll()
 {
-    SetEvent(fEvent);
+    Signal();
 }
 
 void JackWinProcessSync::LockedSignalAll()
 {
-    WaitForSingleObject(fMutex, INFINITE);
-    SetEvent(fEvent);
-    ReleaseMutex(fMutex);
+    LockedSignal();
 }
 
 /*
@@ -76,42 +84,64 @@ bool JackWinProcessSync::LockedTimedWait(long usec)
 
 // Code from APPLE CAGuard.cpp : does not seem to work as expected...
 
-
 void JackWinProcessSync::Wait()
 {
-    ReleaseMutex(fMutex);
-	HANDLE handles[] = { fMutex, fEvent };
-	DWORD res = WaitForMultipleObjects(2, handles, true, INFINITE);
-	if (res != WAIT_OBJECT_0)
-        jack_error("Wait error err = %d", GetLastError());
-    ResetEvent(fEvent);
+    if (!ReleaseMutex(fMutex)) {
+        jack_error("JackWinProcessSync::Wait ReleaseMutex err = %d", GetLastError());
+    }
+	DWORD res = WaitForSingleObject(fEvent, INFINITE);
+    if (res != WAIT_OBJECT_0) {
+        jack_error("JackWinProcessSync::Wait WaitForSingleObject err = %d", GetLastError());
+    }
 }
 
 void JackWinProcessSync::LockedWait()
 {
-    // Does it make sense on Windows, use non-locked version for now...
-    Wait();
+    if (!ReleaseMutex(fMutex)) {
+        jack_error("JackWinProcessSync::LockedWait ReleaseMutex err = %d", GetLastError());
+    }
+    
+	HANDLE handles[] = { fMutex, fEvent };
+	DWORD res = WaitForMultipleObjects(2, handles, true, INFINITE);
+	if (res != WAIT_OBJECT_0) {
+        jack_error("JackWinProcessSync::LockedWait WaitForMultipleObjects err = %d", GetLastError());
+    }
+    
+    if (!ResetEvent(fEvent)) {
+        jack_error("JackWinProcessSync::LockedWait ResetEvent err = %d", GetLastError());
+    }
 }
 
 bool JackWinProcessSync::TimedWait(long usec)
 {
-  	ReleaseMutex(fMutex);
-	HANDLE handles[] = { fMutex, fEvent };
-	DWORD res = WaitForMultipleObjects(2, handles, true, usec / 1000);
-	if ((res != WAIT_OBJECT_0) && (res != WAIT_TIMEOUT))
-        jack_error("TimedWait error err = %d", GetLastError());
-    ResetEvent(fEvent);
-    return (res == WAIT_OBJECT_0);
+  	if (!ReleaseMutex(fMutex)) {
+        jack_error("JackWinProcessSync::TimedWait ReleaseMutex err = %d", GetLastError());
+    }
+    
+	DWORD res = WaitForSingleObject(fEvent, usec / 1000);
+    if (res != WAIT_OBJECT_0) {
+        jack_error("JackWinProcessSync::TimedWait WaitForSingleObject err = %d", GetLastError());
+    }
+    
+	return (res == WAIT_OBJECT_0);
 }
 
 bool JackWinProcessSync::LockedTimedWait(long usec)
 {
-    // Does it make sense on Windows, use non-locked version for now...
-    //return TimedWait(usec);
-    bool res = TimedWait(usec);
-    if (!res)
-        jack_error("LockedTimedWait error usec = %d", usec);
-    return res;
+   if (!ReleaseMutex(fMutex)) {
+        jack_error("JackWinProcessSync::LockedTimedWait ReleaseMutex err = %d", GetLastError());
+    }
+    
+	HANDLE handles[] = { fMutex, fEvent };
+	DWORD res = WaitForMultipleObjects(2, handles, true, usec / 1000);
+	if ((res != WAIT_OBJECT_0) && (res != WAIT_TIMEOUT))
+        jack_error("ackWinProcessSync::LockedTimedWait WaitForMultipleObjects err = %d", GetLastError());
+        
+    if (!ResetEvent(fEvent)) {
+        jack_error("JackWinProcessSync::LockedTimedWait ResetEvent err = %d", GetLastError());
+    }
+    
+    return (res == WAIT_OBJECT_0);
 }
 
 

@@ -36,6 +36,10 @@ John Emmas
   Jackdmp changes log
 ---------------------------
 
+2012-01-29 Stephane Letz  <letz@grame.fr>
+
+	* A bit more robust JackMessageBuffer implementation (in progress).
+
 2012-01-27 Stephane Letz  <letz@grame.fr>
 
 	* Rename JackProcessSync in JackPosixProcessSync.

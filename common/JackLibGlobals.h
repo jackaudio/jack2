@@ -63,7 +63,9 @@ struct JackLibGlobals
     JackLibGlobals()
     {
         jack_log("JackLibGlobals");
-        JackMessageBuffer::Create();
+        if (!JackMessageBuffer::Create()) {
+            jack_error("Cannot create message buffer");
+        }
         fGraphManager = -1;
         fEngineControl = -1;
 

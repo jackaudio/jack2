@@ -42,13 +42,13 @@ JackMessageBuffer::JackMessageBuffer()
 JackMessageBuffer::~JackMessageBuffer()
 {}
 
-void JackMessageBuffer::Start()
+bool JackMessageBuffer::Start()
 {
     fRunning = true;
-    fThread.StartSync();
+    return fThread.StartSync();
 }
 
-void JackMessageBuffer::Stop()
+bool JackMessageBuffer::Stop()
 {
     if (fOverruns > 0) {
         jack_error("WARNING: %d message buffer overruns!", fOverruns);
@@ -66,6 +66,7 @@ void JackMessageBuffer::Stop()
     }
 
     Flush();
+    return true;
 }
 
 void JackMessageBuffer::Flush()
@@ -117,20 +118,30 @@ bool JackMessageBuffer::Execute()
     return false;
 }
 
-void JackMessageBuffer::Create()
+bool JackMessageBuffer::Create()
 {
     if (fInstance == NULL) {
         fInstance = new JackMessageBuffer();
-        fInstance->Start();
+        if (!fInstance->Start()) {
+            jack_error("JackMessageBuffer::Create cannot start thread...");
+            delete fInstance;
+            fInstance = NULL;
+            return false;
+        }
     }
+    
+    return true;
 }
 
-void JackMessageBuffer::Destroy()
+bool JackMessageBuffer::Destroy()
 {
     if (fInstance != NULL) {
         fInstance->Stop();
         delete fInstance;
         fInstance = NULL;
+        return true;
+    } else {
+        return false;
     }
 }
 
@@ -146,7 +157,7 @@ void JackMessageBufferAdd(int level, const char *message)
 
 void JackMessageBuffer::SetInitCallback(JackThreadInitCallback callback, void *arg)
 {
-    if (fGuard.Lock()) {
+    if (fInstance && fGuard.Lock()) {
         /* set up the callback */
         fInitArg = arg;
         fInit = callback;
@@ -157,7 +168,7 @@ void JackMessageBuffer::SetInitCallback(JackThreadInitCallback callback, void *a
         /* and we're done */
         fGuard.Unlock();
     } else {
-        jack_error("JackMessageBuffer::SetInitCallback lock cannot be taken");
+        jack_error("JackMessageBuffer::SetInitCallback : callback cannot be executed");
     }
 }
 
