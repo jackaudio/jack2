@@ -44,8 +44,12 @@ JackMessageBuffer::~JackMessageBuffer()
 
 bool JackMessageBuffer::Start()
 {
-    fRunning = true;
-    return fThread.StartSync();
+    if (fThread.StartSync() == 0) {
+        fRunning = true;
+        return true;
+    } else {
+        return false;
+    }   
 }
 
 bool JackMessageBuffer::Stop()
@@ -157,7 +161,7 @@ void JackMessageBufferAdd(int level, const char *message)
 
 void JackMessageBuffer::SetInitCallback(JackThreadInitCallback callback, void *arg)
 {
-    if (fInstance && fGuard.Lock()) {
+    if (fInstance && fInit && fGuard.Lock()) {
         /* set up the callback */
         fInitArg = arg;
         fInit = callback;

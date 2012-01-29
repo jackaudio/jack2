@@ -134,8 +134,9 @@ bool JackWinProcessSync::LockedTimedWait(long usec)
     
 	HANDLE handles[] = { fMutex, fEvent };
 	DWORD res = WaitForMultipleObjects(2, handles, true, usec / 1000);
-	if ((res != WAIT_OBJECT_0) && (res != WAIT_TIMEOUT))
-        jack_error("ackWinProcessSync::LockedTimedWait WaitForMultipleObjects err = %d", GetLastError());
+	if ((res != WAIT_OBJECT_0) && (res != WAIT_TIMEOUT)) {
+        jack_error("JackWinProcessSync::LockedTimedWait WaitForMultipleObjects err = %d", GetLastError());
+    }
         
     if (!ResetEvent(fEvent)) {
         jack_error("JackWinProcessSync::LockedTimedWait ResetEvent err = %d", GetLastError());
