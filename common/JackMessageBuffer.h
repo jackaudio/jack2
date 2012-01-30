@@ -84,7 +84,7 @@ class JackMessageBuffer : public JackRunnableInterface
 	    bool static Destroy();
 
         void AddMessage(int level, const char *message);
-        void SetInitCallback(JackThreadInitCallback callback, void *arg);
+        int SetInitCallback(JackThreadInitCallback callback, void *arg);
 
 	    static JackMessageBuffer* fInstance;
 };
