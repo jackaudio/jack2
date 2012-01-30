@@ -199,6 +199,7 @@ namespace Jack
         fRxHeader.fCycle = rx_head->fCycle;
         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
         buffer->RenderFromNetwork(rx_head->fSubCycle, rx_bytes - HEADER_SIZE);
+        
         // Last midi packet is received, so finish rendering...
         if (++recvd_midi_pckt == rx_head->fNumPacket) {
             buffer->RenderToJackPorts();
@@ -214,6 +215,7 @@ namespace Jack
         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
         fRxHeader.fActivePorts = rx_head->fActivePorts;
         rx_bytes = buffer->RenderFromNetwork(rx_head->fCycle, rx_head->fSubCycle, fRxHeader.fActivePorts);
+        
         // Last audio packet is received, so finish rendering...
         if (fRxHeader.fIsLastPckt) {
             buffer->RenderToJackPorts();
@@ -223,7 +225,6 @@ namespace Jack
 
     int JackNetInterface::FinishRecv(NetAudioBuffer* buffer)
     {
-        // TODO : finish midi and audio rendering ?
         buffer->RenderToJackPorts();
         return NET_PACKET_ERROR;
     }
@@ -656,8 +657,9 @@ namespace Jack
             // then tell the master we are ready
             jack_info("Initializing connection with %s...", fParams.fMasterNetName);
             status = SendStartToMaster();
-            if (status == NET_ERROR)
+            if (status == NET_ERROR) {
                 return false;
+            }
         }
         while (status != NET_ROLLING);
 
@@ -704,8 +706,9 @@ namespace Jack
             session_params_t net_params;
             memset(&net_params, 0, sizeof(session_params_t));
             SessionParamsHToN(&fParams, &net_params);
-            if (fSocket.SendTo(&net_params, sizeof(session_params_t), 0, fMulticastIP) == SOCKET_ERROR)
+            if (fSocket.SendTo(&net_params, sizeof(session_params_t), 0, fMulticastIP) == SOCKET_ERROR) {
                 jack_error("Error in data send : %s", StrError(NET_ERROR_CODE));
+            }
 
             // filter incoming packets : don't exit while no error is detected
             memset(&net_params, 0, sizeof(session_params_t));

@@ -496,11 +496,13 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
 
     int Open(jack_master_t* result)
     {
+        // Check CELT encoder parameters
         if ((fParams.fSampleEncoder == JackCeltEncoder) && (fParams.fKBps == 0)) {
             jack_error("CELT encoder with 0 for kps...");
             return -1;
         }
         
+        // Check latency
         if (fParams.fNetworkLatency > NETWORK_MAX_LATENCY) {
             jack_error("Error : network latency is limited to %d", NETWORK_MAX_LATENCY);
             return -1;
@@ -552,7 +554,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
             return -1;
         }
 
-         // Finish connection...
+         // Finish connection
         if (!JackNetSlaveInterface::InitRendering()) {
             jack_error("Starting network fails...");
             return -1;
@@ -615,29 +617,33 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
     void FreePorts()
     {
         if (fAudioCaptureBuffer) {
-            for (int audio_port_index = 0; audio_port_index < fParams.fSendAudioChannels; audio_port_index++)
+            for (int audio_port_index = 0; audio_port_index < fParams.fSendAudioChannels; audio_port_index++) {
                 delete[] fAudioCaptureBuffer[audio_port_index];
+            }
             delete[] fAudioCaptureBuffer;
             fAudioCaptureBuffer = NULL;
         }
 
         if (fMidiCaptureBuffer) {
-            for (int midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++)
+            for (int midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++) {
                 delete[] (fMidiCaptureBuffer[midi_port_index]);
+            }
             delete[] fMidiCaptureBuffer;
             fMidiCaptureBuffer = NULL;
         }
 
         if (fAudioPlaybackBuffer) {
-            for (int audio_port_index = 0; audio_port_index < fParams.fReturnAudioChannels; audio_port_index++)
+            for (int audio_port_index = 0; audio_port_index < fParams.fReturnAudioChannels; audio_port_index++) {
                 delete[] fAudioPlaybackBuffer[audio_port_index];
+            }
             delete[] fAudioPlaybackBuffer;
             fAudioPlaybackBuffer = NULL;
         }
 
         if (fMidiPlaybackBuffer) {
-            for (int midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++)
+            for (int midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++) {
                 delete[] fMidiPlaybackBuffer[midi_port_index];
+            }
             delete[] fMidiPlaybackBuffer;
             fMidiPlaybackBuffer = NULL;
         }
@@ -995,8 +1001,8 @@ LIB_EXPORT int jack_adapter_pull_and_push(jack_adapter_t* adapter, float** input
 
 static void jack_format_and_log(int level, const char *prefix, const char *fmt, va_list ap)
 {
-    const char* netjack_log = getenv("JACK_NETJACK_LOG");
-    bool is_netjack_log = (netjack_log) ? atoi(netjack_log) : 0;
+    static const char* netjack_log = getenv("JACK_NETJACK_LOG");
+    static bool is_netjack_log = (netjack_log) ? atoi(netjack_log) : 0;
 
     if (is_netjack_log) {
         char buffer[300];

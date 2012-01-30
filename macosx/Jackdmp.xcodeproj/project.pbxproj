@@ -1743,9 +1743,6 @@
 		4B370A21133DD7E300237B68 /* JackCoreMidiVirtualInputPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackCoreMidiVirtualInputPort.h; path = ../../coremidi/JackCoreMidiVirtualInputPort.h; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B370A22133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackCoreMidiVirtualOutputPort.cpp; path = ../../coremidi/JackCoreMidiVirtualOutputPort.cpp; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B370A23133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackCoreMidiVirtualOutputPort.h; path = ../../coremidi/JackCoreMidiVirtualOutputPort.h; sourceTree = BUILT_PRODUCTS_DIR; };
-		4B37C20306DF1FBE0016E567 /* CALatencyLog.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = CALatencyLog.cpp; path = /Developer/Examples/CoreAudio/PublicUtility/CALatencyLog.cpp; sourceTree = "<absolute>"; };
-		4B37C20406DF1FBE0016E567 /* CALatencyLog.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CALatencyLog.h; path = /Developer/Examples/CoreAudio/PublicUtility/CALatencyLog.h; sourceTree = "<absolute>"; };
-		4B37C20906DF1FE20016E567 /* latency.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = latency.c; path = /Developer/Examples/CoreAudio/PublicUtility/latency.c; sourceTree = "<absolute>"; };
 		4B38115F1326878E00C61B14 /* jack_latent_client */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_latent_client; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B3811971326884E00C61B14 /* jack_latent_client */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_latent_client; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B3811FA13269C8300C61B14 /* latent_client.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = latent_client.c; path = "../example-clients/latent_client.c"; sourceTree = SOURCE_ROOT; };
@@ -3049,9 +3046,6 @@
 		4B37C20006DF1F900016E567 /* Latency */ = {
 			isa = PBXGroup;
 			children = (
-				4B37C20906DF1FE20016E567 /* latency.c */,
-				4B37C20306DF1FBE0016E567 /* CALatencyLog.cpp */,
-				4B37C20406DF1FBE0016E567 /* CALatencyLog.h */,
 			);
 			name = Latency;
 			sourceTree = "<group>";
