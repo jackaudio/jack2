@@ -496,6 +496,11 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
 
     int Open(jack_master_t* result)
     {
+        if ((fParams.fSampleEncoder == JackCeltEncoder) && (fParams.fKBps == 0)) {
+            jack_error("CELT encoder with 0 for kps...");
+            return -1;
+        }
+        
         if (fParams.fNetworkLatency > NETWORK_MAX_LATENCY) {
             jack_error("Error : network latency is limited to %d", NETWORK_MAX_LATENCY);
             return -1;
@@ -988,25 +993,26 @@ LIB_EXPORT int jack_adapter_pull_and_push(jack_adapter_t* adapter, float** input
     return slave->PullAndPush(input, output, frames);
 }
 
-
-//#ifdef MY_TARGET_OS_IPHONE
-#if 1
-
 static void jack_format_and_log(int level, const char *prefix, const char *fmt, va_list ap)
 {
-    char buffer[300];
-    size_t len;
+    const char* netjack_log = getenv("JACK_NETJACK_LOG");
+    bool is_netjack_log = (netjack_log) ? atoi(netjack_log) : 0;
 
-    if (prefix != NULL) {
-        len = strlen(prefix);
-        memcpy(buffer, prefix, len);
-    } else {
-        len = 0;
+    if (is_netjack_log) {
+        char buffer[300];
+        size_t len;
+
+        if (prefix != NULL) {
+            len = strlen(prefix);
+            memcpy(buffer, prefix, len);
+        } else {
+            len = 0;
+        }
+
+        vsnprintf(buffer + len, sizeof(buffer) - len, fmt, ap);
+        printf("%s", buffer);
+        printf("\n");
     }
-
-    vsnprintf(buffer + len, sizeof(buffer) - len, fmt, ap);
-    printf("%s", buffer);
-    printf("\n");
 }
 
 LIB_EXPORT void jack_error(const char *fmt, ...)
@@ -1032,19 +1038,3 @@ LIB_EXPORT void jack_log(const char *fmt, ...)
     jack_format_and_log(LOG_LEVEL_INFO, "Jack: ", fmt, ap);
     va_end(ap);
 }
-
-#else
-
-// Empty code for now..
-
-LIB_EXPORT void jack_error(const char *fmt, ...)
-{}
-
-LIB_EXPORT void jack_info(const char *fmt, ...)
-{}
-
-LIB_EXPORT void jack_log(const char *fmt, ...)
-{}
-
-#endif
-
