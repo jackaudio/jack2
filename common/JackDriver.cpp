@@ -129,10 +129,7 @@ int JackDriver::Open(bool capturing,
     strcpy(fCaptureDriverName, capture_driver_name);
     strcpy(fPlaybackDriverName, playback_driver_name);
 
-    fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize); // in microsec
-    if (!fEngineControl->fTimeOut) {
-        fEngineControl->fTimeOutUsecs = jack_time_t(2.f * fEngineControl->fPeriodUsecs);
-    }
+    fEngineControl->UpdateTimeOut();
 
     fGraphManager->DirectConnect(fClientControl.fRefNum, fClientControl.fRefNum); // Connect driver to itself for "sync" mode
     SetupDriverSync(fClientControl.fRefNum, false);
@@ -183,10 +180,7 @@ int JackDriver::Open(jack_nframes_t buffer_size,
     strcpy(fCaptureDriverName, capture_driver_name);
     strcpy(fPlaybackDriverName, playback_driver_name);
 
-    fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize); // in microsec
-    if (!fEngineControl->fTimeOut) {
-        fEngineControl->fTimeOutUsecs = jack_time_t(2.f * fEngineControl->fPeriodUsecs);
-    }
+    fEngineControl->UpdateTimeOut();
 
     fGraphManager->SetBufferSize(buffer_size);
     fGraphManager->DirectConnect(fClientControl.fRefNum, fClientControl.fRefNum); // Connect driver to itself for "sync" mode

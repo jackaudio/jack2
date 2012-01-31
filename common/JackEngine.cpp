@@ -163,8 +163,9 @@ void JackEngine::ProcessNext(jack_time_t cur_cycle_begin)
 
 void JackEngine::ProcessCurrent(jack_time_t cur_cycle_begin)
 {
-    if (cur_cycle_begin < fLastSwitchUsecs + 2 * fEngineControl->fPeriodUsecs) // Signal XRun only for the first failing cycle
+    if (cur_cycle_begin < fLastSwitchUsecs + 2 * fEngineControl->fPeriodUsecs) { // Signal XRun only for the first failing cycle
         CheckXRun(cur_cycle_begin);
+    }
     fGraphManager->RunCurrentGraph();
 }
 
@@ -265,10 +266,12 @@ void JackEngine::NotifyClient(int refnum, int event, int sync, const char* messa
                 Important for internal clients : unlock before calling the notification callbacks.
             */
             bool res = Unlock();
-            if (client->ClientNotify(refnum, client->GetClientControl()->fName, event, sync, message, value1, value2) < 0)
+            if (client->ClientNotify(refnum, client->GetClientControl()->fName, event, sync, message, value1, value2) < 0) {
                 jack_error("NotifyClient fails name = %s event = %ld val1 = %ld val2 = %ld", client->GetClientControl()->fName, event, value1, value2);
-            if (res)
+            }
+            if (res) {
                 Lock();
+            }
 
         } else {
             jack_log("JackEngine::NotifyClient: no callback for event = %ld", event);
@@ -508,13 +511,15 @@ bool JackEngine::ClientCheckName(const char* name)
 {
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
-        if (client && (strcmp(client->GetClientControl()->fName, name) == 0))
+        if (client && (strcmp(client->GetClientControl()->fName, name) == 0)) {
             return true;
+        }
     }
 
     for (std::map<int,std::string>::iterator i = fReservationMap.begin(); i != fReservationMap.end(); i++) {
-        if (i->second == name)
+        if (i->second == name) {
             return true;
+        }
     }
 
     return false;
@@ -527,8 +532,9 @@ int JackEngine::GetNewUUID()
 
 void JackEngine::EnsureUUID(int uuid)
 {
-    if (uuid > fMaxUUID)
-        fMaxUUID = uuid+1;
+    if (uuid > fMaxUUID) {
+        fMaxUUID = uuid + 1;
+    }
 
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
@@ -542,8 +548,9 @@ int JackEngine::GetClientPID(const char* name)
 {
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
-        if (client && (strcmp(client->GetClientControl()->fName, name) == 0))
+        if (client && (strcmp(client->GetClientControl()->fName, name) == 0)) {
             return client->GetClientControl()->fPID;
+        }
     }
 
     return 0;
@@ -553,8 +560,9 @@ int JackEngine::GetClientRefNum(const char* name)
 {
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
-        if (client && (strcmp(client->GetClientControl()->fName, name) == 0))
+        if (client && (strcmp(client->GetClientControl()->fName, name) == 0)) {
             return client->GetClientControl()->fRefNum;
+        }
     }
 
     return -1;

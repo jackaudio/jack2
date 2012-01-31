@@ -124,6 +124,14 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
 
     ~JackEngineControl()
     {}
+    
+    void UpdateTimeOut()
+    {
+        fPeriodUsecs = jack_time_t(1000000.f / fSampleRate * fBufferSize); // In microsec
+        if (!(fTimeOut && fTimeOutUsecs > 2 * fPeriodUsecs)) {
+            fTimeOutUsecs = 2 * fPeriodUsecs;
+        }
+    }
 
     // Cycle
     void CycleIncTime(jack_time_t callback_usecs)
