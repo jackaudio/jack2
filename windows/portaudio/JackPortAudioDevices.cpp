@@ -106,10 +106,12 @@ PaDeviceInfo* PortAudioDevices::GetDeviceFromFullName (string fullname, PaDevice
         return NULL;
     }
     //first get host and device names from fullname
-    string::size_type separator = fullname.find ("::", 0);
-    if (separator == 0) {
+    string::size_type separator = fullname.find("::", 0);
+
+    if (separator == string::npos) {
         return NULL;
     }
+
     char* hostname = (char*)malloc(separator + 9);
     fill_n (hostname, separator + 9, 0);
     fullname.copy (hostname, separator);
