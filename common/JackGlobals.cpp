@@ -40,7 +40,6 @@ jack_thread_creator_t JackGlobals::fJackThreadCreator = pthread_create;
 
 #ifdef __CLIENTDEBUG__
 
-#include "JackLibGlobals.h"
 std::ofstream* JackGlobals::fStream = NULL;
 
 void JackGlobals::CheckContext(const char* name)
