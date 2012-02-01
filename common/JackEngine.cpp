@@ -696,10 +696,8 @@ error:
 int JackEngine::ClientExternalClose(int refnum)
 {
     jack_log("JackEngine::ClientExternalClose ref = %ld", refnum);
-    
     JackClientInterface* client = fClientTable[refnum];
-    fEngineControl->fTransport.ResetTimebase(refnum);
-    int res = ClientCloseAux(refnum, client, true);
+    int res = ClientCloseAux(refnum, true);
     client->Close();
     delete client;
     return res;
@@ -709,15 +707,15 @@ int JackEngine::ClientExternalClose(int refnum)
 int JackEngine::ClientInternalClose(int refnum, bool wait)
 {
     jack_log("JackEngine::ClientInternalClose ref = %ld", refnum);
+    return ClientCloseAux(refnum, wait);
+}
+
+int JackEngine::ClientCloseAux(int refnum, bool wait)
+{
+    jack_log("JackEngine::ClientCloseAux ref = %ld", refnum);
     
     JackClientInterface* client = fClientTable[refnum];
     fEngineControl->fTransport.ResetTimebase(refnum);
-    return ClientCloseAux(refnum, client, wait);
-}
-
-int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wait)
-{
-    jack_log("JackEngine::ClientCloseAux ref = %ld", refnum);
 
     // Unregister all ports ==> notifications are sent
     jack_int_t ports[PORT_NUM_FOR_CLIENT];

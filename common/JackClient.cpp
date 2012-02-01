@@ -585,19 +585,22 @@ inline void JackClient::ExecuteThread()
 
 inline jack_nframes_t JackClient::CycleWaitAux()
 {
-    if (!WaitSync())
+    if (!WaitSync()) {
         Error();   // Terminates the thread
+    }
     CallSyncCallbackAux();
     return GetEngineControl()->fBufferSize;
 }
 
 inline void JackClient::CycleSignalAux(int status)
 {
-    if (status == 0)
+    if (status == 0) {
         CallTimebaseCallbackAux();
+    }
     SignalSync();
-    if (status != 0)
+    if (status != 0) {
         End();     // Terminates the thread
+    }
 }
 
 jack_nframes_t JackClient::CycleWait()
@@ -784,8 +787,9 @@ inline int JackClient::ActivateAux()
         jack_log("JackClient::ActivateAux");
 
         // RT thread is started
-        if (StartThread() < 0)
+        if (StartThread() < 0) {
             return -1;
+        }
 
         int result = -1;
         GetClientControl()->fCallback[kRealTimeCallback] = IsRealTime();
@@ -1045,8 +1049,9 @@ int JackClient::SetSampleRateCallback(JackSampleRateCallback callback, void *arg
         fSampleRateArg = arg;
         fSampleRate = callback;
         // Now invoke it
-        if (callback)
+        if (callback) {
             callback(GetEngineControl()->fSampleRate, arg);
+        }
         return 0;
     }
 }
@@ -1125,7 +1130,7 @@ int JackClient::SetProcessThread(JackThreadCallback fun, void *arg)
         jack_error("You cannot set callbacks on an active client");
         return -1;
     } else if (fProcess) {
-        jack_error ("A process callback has already been setup, both models cannot be used at the same time!");
+        jack_error("A process callback has already been setup, both models cannot be used at the same time!");
         return -1;
     } else {
         fThreadFun = fun;
