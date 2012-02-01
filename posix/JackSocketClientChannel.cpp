@@ -107,8 +107,14 @@ bool JackSocketClientChannel::Init()
 {
     jack_log("JackSocketClientChannel::Init");
     fNotificationSocket = fNotificationListenSocket.Accept();
+    
     // No more needed
     fNotificationListenSocket.Close();
+    
+    // Setup context
+    if (!jack_tls_set(JackGlobals::fNotificationThread, this)) {
+        jack_error("Failed to set thread notification key");
+    }
 
     if (!fNotificationSocket) {
         jack_error("JackSocketClientChannel: cannot establish notication socket");

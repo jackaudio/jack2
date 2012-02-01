@@ -747,8 +747,9 @@ int JackEngine::ClientActivate(int refnum, bool is_real_time)
     JackClientInterface* client = fClientTable[refnum];
     jack_log("JackEngine::ClientActivate ref = %ld name = %s", refnum, client->GetClientControl()->fName);
 
-    if (is_real_time)
+    if (is_real_time) {
         fGraphManager->Activate(refnum);
+    }
 
     // Wait for graph state change to be effective
     if (!fSignal.LockedTimedWait(fEngineControl->fTimeOutUsecs * 10)) {
@@ -832,8 +833,9 @@ int JackEngine::PortRegister(int refnum, const char* name, const char *type, uns
     // buffer_size is actually ignored...
     *port_index = fGraphManager->AllocatePort(refnum, name, type, (JackPortFlags)flags, fEngineControl->fBufferSize);
     if (*port_index != NO_PORT) {
-        if (client->GetClientControl()->fActive)
+        if (client->GetClientControl()->fActive) {
             NotifyPortRegistation(*port_index, true);
+        }
         return 0;
     } else {
         return -1;
@@ -849,8 +851,9 @@ int JackEngine::PortUnRegister(int refnum, jack_port_id_t port_index)
     PortDisconnect(refnum, port_index, ALL_PORTS);
 
     if (fGraphManager->ReleasePort(refnum, port_index) == 0) {
-        if (client->GetClientControl()->fActive)
+        if (client->GetClientControl()->fActive) {
             NotifyPortRegistation(port_index, false);
+        }
         return 0;
     } else {
         return -1;
@@ -873,8 +876,9 @@ int JackEngine::PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
     JackClientInterface* client;
     int ref;
 
-    if (fGraphManager->CheckPorts(src, dst) < 0)
+    if (fGraphManager->CheckPorts(src, dst) < 0) {
         return -1;
+    }
 
     ref = fGraphManager->GetOutputRefNum(src);
     assert(ref >= 0);
@@ -897,8 +901,9 @@ int JackEngine::PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
     }
 
     int res = fGraphManager->Connect(src, dst);
-    if (res == 0)
+    if (res == 0) {
         NotifyPortConnect(src, dst, true);
+    }
     return res;
 }
 
@@ -997,8 +1002,9 @@ void JackEngine::SessionNotify(int refnum, const char *target, jack_session_even
             snprintf(path_buf, sizeof(path_buf), "%s%s%c", path, client->GetClientControl()->fName, DIR_SEPARATOR);
 
             int res = JackTools::MkDir(path_buf);
-            if (res)
+            if (res) {
                 jack_error("JackEngine::SessionNotify: can not create session directory '%s'", path_buf);
+            }
 
             int result = client->ClientNotify(i, client->GetClientControl()->fName, kSessionCallback, true, path_buf, (int)type, 0);
 
@@ -1043,8 +1049,7 @@ int JackEngine::SessionReply(int refnum)
 
     if (fSessionPendingReplies == 0) {
         fSessionResult->Write(fSessionTransaction);
-        if (fSessionTransaction != NULL)
-        {
+        if (fSessionTransaction != NULL) {
             delete fSessionResult;
         }
         fSessionResult = NULL;

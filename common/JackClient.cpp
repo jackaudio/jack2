@@ -359,15 +359,18 @@ int JackClient::HandleLatencyCallback(int status)
                 if (port->GetFlags() & JackPortIsOutput) {
 					jack_latency_range_t other_latency;
 					port->GetLatencyRange(mode, &other_latency);
-					if (other_latency.max > latency.max)
+					if (other_latency.max > latency.max) {
 						latency.max = other_latency.max;
-					if (other_latency.min < latency.min)
+                    }
+					if (other_latency.min < latency.min) {
 						latency.min = other_latency.min;
+                    }
 				}
 			}
 
-			if (latency.min == UINT32_MAX)
+			if (latency.min == UINT32_MAX) {
 				latency.min = 0;
+            }
 
 			/* now set the found latency on all input ports
 			 */
@@ -386,15 +389,18 @@ int JackClient::HandleLatencyCallback(int status)
 				if (port->GetFlags() & JackPortIsInput) {
 					jack_latency_range_t other_latency;
                     port->GetLatencyRange(mode, &other_latency);
-					if (other_latency.max > latency.max)
+					if (other_latency.max > latency.max) {
 						latency.max = other_latency.max;
-					if (other_latency.min < latency.min)
+                    }
+					if (other_latency.min < latency.min) {
 						latency.min = other_latency.min;
+                    }
 				}
 			}
 
-			if (latency.min == UINT32_MAX)
+			if (latency.min == UINT32_MAX) {
 				latency.min = 0;
+            }
 
 			/* now set the found latency on all output ports
 			 */
@@ -422,13 +428,15 @@ connected to the client may not be activated.
 int JackClient::Activate()
 {
     jack_log("JackClient::Activate");
-    if (IsActive())
+    if (IsActive()) {
         return 0;
+    }
 
     // RT thread is started only when needed...
     if (IsRealTime()) {
-        if (StartThread() < 0)
+        if (StartThread() < 0) {
             return -1;
+        }
     }
 
     /*
@@ -453,8 +461,9 @@ int JackClient::Activate()
 int JackClient::Deactivate()
 {
     jack_log("JackClient::Deactivate");
-    if (!IsActive())
+    if (!IsActive()) {
         return 0;
+    }
 
     GetClientControl()->fActive = false;
 
@@ -468,8 +477,9 @@ int JackClient::Deactivate()
     jack_log("JackClient::Deactivate res = %ld", result);
 
     // RT thread is stopped only when needed...
-    if (IsRealTime())
+    if (IsRealTime()) {
         fThread.Kill();
+    }
     return result;
 }
 
@@ -506,11 +516,13 @@ bool JackClient::Init()
     InitAux();
 
     // Setup context
-    if (!jack_tls_set(JackGlobals::fRealTime, this))
-        jack_error("failed to set thread realtime key");
+    if (!jack_tls_set(JackGlobals::fRealTimeThread, this)) {
+        jack_error("Failed to set thread realtime key");
+    }
 
-    if (GetEngineControl()->fRealTime)
+    if (GetEngineControl()->fRealTime) {
         set_threaded_log_function();
+    }
 
     // Setup RT
     if (GetEngineControl()->fRealTime) {

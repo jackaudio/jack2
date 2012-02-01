@@ -34,7 +34,7 @@ JackGenericClientChannel::~JackGenericClientChannel()
 int JackGenericClientChannel::ServerCheck(const char* server_name)
 {
     jack_log("JackGenericClientChannel::ServerCheck = %s", server_name);
-
+  
     // Connect to server
     if (fRequest->Connect(jack_server_dir, server_name, 0) < 0) {
         jack_error("Cannot connect to server request channel");
@@ -46,6 +46,13 @@ int JackGenericClientChannel::ServerCheck(const char* server_name)
 
 void JackGenericClientChannel::ServerSyncCall(JackRequest* req, JackResult* res, int* result)
 {
+    // Check call context
+    if (jack_tls_get(JackGlobals::fNotificationThread)) {
+        jack_error("Cannot callback the server in notification thread!");
+        *result = -1;
+        return;
+    }
+    
     if (req->Write(fRequest) < 0) {
         jack_error("Could not write request type = %ld", req->fType);
         *result = -1;
@@ -63,6 +70,13 @@ void JackGenericClientChannel::ServerSyncCall(JackRequest* req, JackResult* res,
 
 void JackGenericClientChannel::ServerAsyncCall(JackRequest* req, JackResult* res, int* result)
 {
+    // Check call context
+    if (jack_tls_get(JackGlobals::fNotificationThread)) {
+        jack_error("Cannot callback the server in notification thread!");
+        *result = -1;
+        return;
+    }
+    
     if (req->Write(fRequest) < 0) {
         jack_error("Could not write request type = %ld", req->fType);
         *result = -1;

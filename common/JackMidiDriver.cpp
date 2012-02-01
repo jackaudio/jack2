@@ -201,7 +201,7 @@ int JackMidiDriver::ProcessReadAsync()
 
 int JackMidiDriver::ProcessWriteAsync()
 {
-jack_log("JackMidiDriver::ProcessWriteAsync");
+    jack_log("JackMidiDriver::ProcessWriteAsync");
     return 0;
 }
 

@@ -24,8 +24,11 @@ namespace Jack
 
 bool JackGlobals::fVerbose = 0;
 
-jack_tls_key JackGlobals::fRealTime;
-static bool gKeyRealtimeInitialized = jack_tls_allocate_key(&JackGlobals::fRealTime);
+jack_tls_key JackGlobals::fRealTimeThread;
+static bool gKeyRealtimeThreadInitialized = jack_tls_allocate_key(&JackGlobals::fRealTimeThread);
+
+jack_tls_key JackGlobals::fNotificationThread;
+static bool gKeyNotificationThreadInitialized = jack_tls_allocate_key(&JackGlobals::fNotificationThread);
 
 jack_tls_key JackGlobals::fKeyLogFunction;
 static bool fKeyLogFunctionInitialized = jack_tls_allocate_key(&JackGlobals::fKeyLogFunction);

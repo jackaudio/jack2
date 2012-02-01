@@ -37,7 +37,8 @@ namespace Jack
 // Globals used for client management on server or library side.
 struct JackGlobals {
 
-    static jack_tls_key fRealTime;
+    static jack_tls_key fRealTimeThread;
+    static jack_tls_key fNotificationThread;
     static jack_tls_key fKeyLogFunction;
     static JackMutex* fOpenMutex;
     static volatile bool fServerRunning;

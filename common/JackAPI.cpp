@@ -279,7 +279,7 @@ static inline void WaitGraphChange()
     graph change in RT context (just read the current graph state).
     */
 
-    if (jack_tls_get(JackGlobals::fRealTime) == NULL) {
+    if (jack_tls_get(JackGlobals::fRealTimeThread) == NULL) {
         JackGraphManager* manager = GetGraphManager();
         JackEngineControl* control = GetEngineControl();
         assert(manager);
@@ -1180,7 +1180,7 @@ LIB_EXPORT int jack_disconnect(jack_client_t* ext_client, const char* src, const
         jack_error("jack_disconnect called with a NULL client");
         return -1;
     } else if ((src == NULL) || (dst == NULL)) {
-        jack_error("jack_connect called with a NULL port name");
+        jack_error("jack_disconnect called with a NULL port name");
         return -1;
     } else {
         return client->PortDisconnect(src, dst);

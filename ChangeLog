@@ -36,6 +36,10 @@ John Emmas
   Jackdmp changes log
 ---------------------------
 
+2012-02-01 Stephane Letz  <letz@grame.fr>
+
+	* Check server API callback from notification thread.
+
 2012-01-29 Stephane Letz  <letz@grame.fr>
 
 	* A bit more robust JackMessageBuffer implementation (in progress).
