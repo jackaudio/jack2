@@ -43,6 +43,7 @@ namespace Jack
             static int SetProcess(jack_nframes_t nframes, void* arg);
             static int SetBufferSize(jack_nframes_t nframes, void* arg);
             static void SetTimebaseCallback(jack_transport_state_t state, jack_nframes_t nframes, jack_position_t* pos, int new_pos, void* arg);
+            static void SetConnectCallback(jack_port_id_t a, jack_port_id_t b, int connect, void* arg);
 
             //jack client
             jack_client_t* fClient;
@@ -74,6 +75,7 @@ namespace Jack
             int Process();
             void TimebaseCallback(jack_position_t* pos);
             void ConnectPorts();
+            void ConnectCallback(jack_port_id_t a, jack_port_id_t b, int connect);
 
         public:
 

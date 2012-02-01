@@ -37,6 +37,7 @@ int JackWinNamedPipeNotifyChannel::Open(const char* name)
         return -1;
     }
     // TODO : use a time out for notifications
+    fNotifyPipe.SetWriteTimeOut(SOCKET_TIME_OUT);
     fNotifyPipe.SetReadTimeOut(SOCKET_TIME_OUT);
     return 0;
 }
@@ -55,7 +56,7 @@ void JackWinNamedPipeNotifyChannel::ClientNotify(int refnum, const char* name, i
     // Send notification
     if (event.Write(&fNotifyPipe) < 0) {
         jack_error("Could not write notification");
-        fNotifyPipe.Close();
+        //fNotifyPipe.Close();
         *result = -1;
         return;
     }
@@ -65,7 +66,7 @@ void JackWinNamedPipeNotifyChannel::ClientNotify(int refnum, const char* name, i
         // Get result : use a time out
         if (res.Read(&fNotifyPipe) < 0) {
             jack_error("Could not read result");
-            fNotifyPipe.Close();
+            //fNotifyPipe.Close();
             *result = -1;
         } else {
             *result = res.fResult;

@@ -39,6 +39,7 @@ John Emmas
 2012-02-01 Stephane Letz  <letz@grame.fr>
 
 	* Check server API callback from notification thread.
+	* Use a time-out in notification channel write function.
 
 2012-01-29 Stephane Letz  <letz@grame.fr>
 

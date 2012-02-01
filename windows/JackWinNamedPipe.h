@@ -111,6 +111,8 @@ class JackWinNamedPipeClient : public JackWinNamedPipeAux, public detail::JackCl
 
         virtual void SetReadTimeOut(long sec);
         virtual void SetWriteTimeOut(long sec);
+        
+        virtual void SetNonBlocking(bool onoff);
 };
 
 class JackWinAsyncNamedPipeClient : public JackWinNamedPipeClient

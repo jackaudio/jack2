@@ -134,6 +134,12 @@ namespace Jack
         if (jack_set_buffer_size_callback(fClient, SetBufferSize, this) < 0) {
             goto fail;
         }
+        
+        /*
+        if (jack_set_port_connect_callback(fClient, SetConnectCallback, this) < 0) {
+            goto fail;
+        }
+        */
 
         if (AllocPorts() != 0) {
             jack_error("Can't allocate JACK ports");
@@ -385,6 +391,19 @@ namespace Jack
             return static_cast<JackNetMaster*>(arg)->Process();
         } catch (JackNetException& e) {
             return 0;
+        }
+    }
+    
+    void JackNetMaster::SetConnectCallback(jack_port_id_t a, jack_port_id_t b, int connect, void* arg)
+    {
+        static_cast<JackNetMaster*>(arg)->ConnectCallback(a, b, connect);
+    }
+    
+    void JackNetMaster::ConnectCallback(jack_port_id_t a, jack_port_id_t b, int connect)
+    {
+        jack_info("JackNetMaster::ConnectCallback a = %d b = %d connect = %d", a, b, connect);
+        if (connect) {
+            jack_connect(fClient, jack_port_name(jack_port_by_id(fClient, a)), "system:playback_1");
         }
     }
 
