@@ -37,7 +37,6 @@ int JackSocketNotifyChannel::Open(const char* name)
     }
     
     // Use a time out for notifications
-    fNotifySocket.SetWriteTimeOut(SOCKET_TIME_OUT);
     fNotifySocket.SetReadTimeOut(SOCKET_TIME_OUT);
     return 0;
 }
@@ -56,7 +55,6 @@ void JackSocketNotifyChannel::ClientNotify(int refnum, const char* name, int not
     // Send notification
     if (event.Write(&fNotifySocket) < 0) {
         jack_error("Could not write notification");
-        //fNotifySocket.Close();
         *result = -1;
         return;
     }
@@ -66,7 +64,6 @@ void JackSocketNotifyChannel::ClientNotify(int refnum, const char* name, int not
         // Get result : use a time out
         if (res.Read(&fNotifySocket) < 0) {
             jack_error("Could not read notification result");
-            //fNotifySocket.Close();
             *result = -1;
         } else {
             *result = res.fResult;

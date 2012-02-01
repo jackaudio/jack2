@@ -40,6 +40,7 @@ John Emmas
 
 	* Check server API callback from notification thread.
 	* Use a time-out in notification channel write function.
+	* Fix lock management in JackEngine.
 
 2012-01-29 Stephane Letz  <letz@grame.fr>
 

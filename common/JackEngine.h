@@ -64,7 +64,7 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         int ClientCloseAux(int refnum, JackClientInterface* client, bool wait);
         void CheckXRun(jack_time_t callback_usecs);
 
-        int NotifyAddClient(JackClientInterface* new_client, const char* name, int refnum);
+        int NotifyAddClient(JackClientInterface* new_client, const char* new_name, int refnum);
         void NotifyRemoveClient(const char* name, int refnum);
 
         void ProcessNext(jack_time_t callback_usecs);
@@ -76,6 +76,8 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         int AllocateRefnum();
         void ReleaseRefnum(int ref);
 
+        int ClientNotify(JackClientInterface* client, int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2);
+        
         void NotifyClient(int refnum, int event, int sync, const char*  message, int value1, int value2);
         void NotifyClients(int event, int sync, const char*  message,  int value1, int value2);
 

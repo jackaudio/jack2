@@ -254,28 +254,42 @@ int JackEngine::ComputeTotalLatencies()
 // Notifications
 //---------------
 
+int JackEngine::ClientNotify(JackClientInterface* client, int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2)
+{   
+    if (!client) {
+        return 0;
+    }
+    
+    if (!client->GetClientControl()->fCallback[notify]) {
+        jack_log("JackEngine::ClientNotify: no callback for notification = %ld", notify);
+        return 0;
+    }
+    
+    int ret;
+   
+    // External client
+    if (dynamic_cast<JackExternalClient*>(client)) {
+       ret = client->ClientNotify(refnum, name, notify, sync, message, value1, value2);
+    // Important for internal client : unlock before calling the notification callbacks
+    } else {
+        bool res = Unlock();
+        ret = client->ClientNotify(refnum, name, notify, sync, message, value1, value2);
+        if (res) {
+            Lock();
+        }
+    }
+    
+    if (ret < 0) {
+        jack_error("NotifyClient fails name = %s notification = %ld val1 = %ld val2 = %ld", name, notify, value1, value2);
+    }
+    return ret;
+}
+
 void JackEngine::NotifyClient(int refnum, int event, int sync, const char* message, int value1, int value2)
 {
     JackClientInterface* client = fClientTable[refnum];
-
-    // The client may be notified by the RT thread while closing
     if (client) {
-
-        if (client->GetClientControl()->fCallback[event]) {
-            /*
-                Important for internal clients : unlock before calling the notification callbacks.
-            */
-            bool res = Unlock();
-            if (client->ClientNotify(refnum, client->GetClientControl()->fName, event, sync, message, value1, value2) < 0) {
-                jack_error("NotifyClient fails name = %s event = %ld val1 = %ld val2 = %ld", client->GetClientControl()->fName, event, value1, value2);
-            }
-            if (res) {
-                Lock();
-            }
-
-        } else {
-            jack_log("JackEngine::NotifyClient: no callback for event = %ld", event);
-        }
+        ClientNotify(client, refnum, client->GetClientControl()->fName, event, sync, message, value1, value2);
     }
 }
 
@@ -286,19 +300,21 @@ void JackEngine::NotifyClients(int event, int sync, const char* message, int val
     }
 }
 
-int JackEngine::NotifyAddClient(JackClientInterface* new_client, const char* name, int refnum)
+int JackEngine::NotifyAddClient(JackClientInterface* new_client, const char* new_name, int refnum)
 {
-    jack_log("JackEngine::NotifyAddClient: name = %s", name);
+    jack_log("JackEngine::NotifyAddClient: name = %s", new_name);
+    
     // Notify existing clients of the new client and new client of existing clients.
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* old_client = fClientTable[i];
         if (old_client && old_client != new_client) {
-            if (old_client->ClientNotify(refnum, name, kAddClient, false, "", 0, 0) < 0) {
-                jack_error("NotifyAddClient old_client fails name = %s", old_client->GetClientControl()->fName);
+            char* old_name = old_client->GetClientControl()->fName;
+            if (ClientNotify(old_client, refnum, new_name, kAddClient, false, "", 0, 0) < 0) {
+                jack_error("NotifyAddClient old_client fails name = %s", old_name);
                 // Not considered as a failure...
             }
-            if (new_client->ClientNotify(i, old_client->GetClientControl()->fName, kAddClient, true, "", 0, 0) < 0) {
-                jack_error("NotifyAddClient new_client fails name = %s", name);
+            if (ClientNotify(new_client, i, old_name, kAddClient, true, "", 0, 0) < 0) {
+                jack_error("NotifyAddClient new_client fails name = %s", new_name);
                 return -1;
             }
         }
@@ -311,10 +327,7 @@ void JackEngine::NotifyRemoveClient(const char* name, int refnum)
 {
     // Notify existing clients (including the one beeing suppressed) of the removed client
     for (int i = 0; i < CLIENT_NUM; i++) {
-        JackClientInterface* client = fClientTable[i];
-        if (client) {
-            client->ClientNotify(refnum, name, kRemoveClient, false, "", 0, 0);
-        }
+        ClientNotify(fClientTable[i], refnum, name, kRemoveClient, false, "", 0, 0);
     }
 }
 
