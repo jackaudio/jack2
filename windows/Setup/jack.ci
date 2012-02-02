@@ -85,12 +85,14 @@
 <_><src>..\..\common\jack\jack.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\jslist.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\midiport.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\net.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\ringbuffer.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\session.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\statistics.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\systemdeps.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
 <_><src>..\..\common\jack\thread.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\transport.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\types.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\..\common\jack\systemdeps.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
 <_><src>..\..\common\jack\weakjack.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
 <_><src>..\..\common\jack\weakmacros.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
 <_><src>.\src\32bits\JackRouter.dll</><dest>inst</><custom>32bits</><ifexist>overnewer</><recurs>0</></>
