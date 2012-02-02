@@ -186,7 +186,8 @@ int JackClientSocket::Read(void* data, int len)
             return 0;  // For a non blocking socket, a read failure is not considered as an error
         } else if (res != 0) {
             jack_error("Cannot read socket fd = %d err = %s", fSocket, strerror(errno));
-            return 0;
+            //return 0;
+            return -1;
         } else {
             jack_error("Cannot read socket fd = %d err = %s", fSocket, strerror(errno));
             return -1;
@@ -231,7 +232,8 @@ int JackClientSocket::Write(void* data, int len)
             return 0;  // For a non blocking socket, a write failure is not considered as an error
         } else if (res != 0) {
             jack_error("Cannot write socket fd = %ld err = %s", fSocket, strerror(errno));
-            return 0;
+            //return 0;
+            return -1;
         } else {
             jack_error("Cannot write socket fd = %ld err = %s", fSocket, strerror(errno));
             return -1;

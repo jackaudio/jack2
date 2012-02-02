@@ -128,7 +128,6 @@ int JackSocketServerChannel::GetFd(JackClientSocket* socket_aux)
 
 void JackSocketServerChannel::ClientAdd(detail::JackChannelTransactionInterface* socket_aux, JackClientOpenRequest* req, JackClientOpenResult *res)
 {
-    jack_log("JackSocketServerChannel::ClientAdd");
     int refnum = -1;
     res->fResult = fServer->GetEngine()->ClientExternalOpen(req->fName, req->fPID, req->fUUID, &refnum, &res->fSharedEngine, &res->fSharedClient, &res->fSharedGraph);
     if (res->fResult == 0) {
@@ -138,6 +137,7 @@ void JackSocketServerChannel::ClientAdd(detail::JackChannelTransactionInterface*
         assert(fd >= 0);
         fSocketTable[fd].first = refnum;
         fRebuild = true;
+        jack_log("JackSocketServerChannel::ClientAdd ref = %d fd = %d", refnum, fd);
     #ifdef __APPLE__
         int on = 1;
         if (setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, (const char*)&on, sizeof(on)) < 0) {
@@ -156,7 +156,7 @@ void JackSocketServerChannel::ClientRemove(detail::JackChannelTransactionInterfa
     int fd = GetFd(socket);
     assert(fd >= 0);
 
-    jack_log("JackSocketServerChannel::ClientRemove ref = %d", refnum);
+    jack_log("JackSocketServerChannel::ClientRemove ref = %d fd = %d", refnum, fd);
     fSocketTable.erase(fd);
     socket->Close();
     delete socket;
@@ -168,16 +168,15 @@ void JackSocketServerChannel::ClientKill(int fd)
     pair<int, JackClientSocket*> elem = fSocketTable[fd];
     JackClientSocket* socket = elem.second;
     int refnum = elem.first;
-
     assert(socket);
-    jack_log("JackSocketServerChannel::ClientKill ref = %d", refnum);
-
+    
     if (refnum == -1) {  // Should never happen... correspond to a client that started the socket but never opened...
         jack_log("Client was not opened : probably correspond to server_check");
     } else {
         fServer->ClientKill(refnum);
     }
 
+    jack_log("JackSocketServerChannel::ClientKill ref = %d fd = %d", refnum, fd);
     fSocketTable.erase(fd);
     socket->Close();
     delete socket;
