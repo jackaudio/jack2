@@ -93,7 +93,6 @@
 <_><src>..\..\common\jack\jack.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\jslist.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\midiport.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\..\common\jack\net.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\ringbuffer.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\session.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\statistics.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
