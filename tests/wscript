@@ -29,6 +29,6 @@ def build(bld):
         if bld.env['IS_MACOSX']:
             prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
             #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc -arch x86_64")
-	    prog.env.append_value("LINKFLAGS", "")
+        prog.env.append_value("LINKFLAGS", "")
         prog.uselib_local = 'clientlib'
         prog.target = test_program
