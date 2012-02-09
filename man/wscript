@@ -4,7 +4,6 @@
 import Build
 import re
 import os
-import misc
 
 
 def build(bld):
