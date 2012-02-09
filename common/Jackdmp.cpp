@@ -227,7 +227,7 @@ int main(int argc, char** argv)
     int do_unlock = 0;
     int loopback = 0;
     bool show_version = false;
-    sigset_t signals;
+    jackctl_sigmask_t * sigmask;
     jackctl_parameter_t* param;
     union jackctl_parameter_value value;
 
@@ -450,7 +450,7 @@ int main(int argc, char** argv)
     }
 
     // Setup signals
-    signals = jackctl_setup_signals(0);
+    sigmask = jackctl_setup_signals(0);
 
     // Open server
     if (! jackctl_server_open(server_ctl, master_driver_ctl)) {
@@ -520,7 +520,7 @@ int main(int argc, char** argv)
     return_value = 0;
 
     // Waits for signal
-    jackctl_wait_signals(signals);
+    jackctl_wait_signals(sigmask);
 
  stop_server:
     if (!jackctl_server_stop(server_ctl)) {

@@ -221,7 +221,6 @@ struct JackNetExtMaster : public JackNetMasterInterface {
             }
 
             if (rx_bytes == sizeof(session_params_t ))  {
-
                 switch (GetPacketType(&fParams)) {
 
                     case SLAVE_AVAILABLE:
@@ -245,7 +244,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
         }
         while (fRunning);
 
-        // Set result paramaters
+        // Set result parameters
         result->audio_input = fParams.fSendAudioChannels;
         result->audio_output = fParams.fReturnAudioChannels;
         result->midi_input = fParams.fSendMidiChannels;
