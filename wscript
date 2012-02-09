@@ -248,8 +248,8 @@ def configure(conf):
         version_msg += " svn revision will checked and eventually updated during build"
     print(version_msg)
 
-    print("Build with a maximum of %d JACK clients" % conf.env['CLIENT_NUM'])
-    print("Build with a maximum of %d ports per application" % conf.env['PORT_NUM_FOR_CLIENT'])
+    print("Build with a maximum of %d JACK clients" % Options.options.clients)
+    print("Build with a maximum of %d ports per application" % Options.options.application_ports)
  
     display_msg("Install prefix", conf.env['PREFIX'], 'CYAN')
     display_msg("Library directory", conf.env['LIBDIR'], 'CYAN')
