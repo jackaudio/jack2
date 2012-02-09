@@ -10,6 +10,7 @@ import shutil
 import Task
 import re
 import Logs
+import sys
 
 VERSION='1.9.9'
 APPNAME='jack'
@@ -77,9 +78,9 @@ def set_options(opt):
     opt.sub_options('dbus')
 
 def configure(conf):
-    platform = Utils.detect_platform()
+    platform = sys.platform
     conf.env['IS_MACOSX'] = platform == 'darwin'
-    conf.env['IS_LINUX'] = platform == 'linux' or platform == 'posix'
+    conf.env['IS_LINUX'] = platform == 'linux' or platform == 'linux2' or platform == 'posix'
     conf.env['IS_SUN'] = platform == 'sunos'
 
     if conf.env['IS_LINUX']:
