@@ -136,25 +136,25 @@ def configure(conf):
 
     conf.sub_config('example-clients')
 
-    if conf.check_cfg(package='celt', atleast_version='0.11.0', args='--cflags --libs'):
+    if conf.check_cfg(package='celt', atleast_version='0.11.0', args='--cflags --libs', mandatory=False):
         conf.define('HAVE_CELT', 1)
         conf.define('HAVE_CELT_API_0_11', 1)
         conf.define('HAVE_CELT_API_0_8', 0)
         conf.define('HAVE_CELT_API_0_7', 0)
         conf.define('HAVE_CELT_API_0_5', 0)
-    elif conf.check_cfg(package='celt', atleast_version='0.8.0', args='--cflags --libs'):
+    elif conf.check_cfg(package='celt', atleast_version='0.8.0', args='--cflags --libs', mandatory=False):
         conf.define('HAVE_CELT', 1)
         conf.define('HAVE_CELT_API_0_11', 0)
         conf.define('HAVE_CELT_API_0_8', 1)
         conf.define('HAVE_CELT_API_0_7', 0)
         conf.define('HAVE_CELT_API_0_5', 0)
-    elif conf.check_cfg(package='celt', atleast_version='0.7.0', args='--cflags --libs'):
+    elif conf.check_cfg(package='celt', atleast_version='0.7.0', args='--cflags --libs', mandatory=False):
         conf.define('HAVE_CELT', 1)
         conf.define('HAVE_CELT_API_0_11', 0)
         conf.define('HAVE_CELT_API_0_8', 0)
         conf.define('HAVE_CELT_API_0_7', 1)
         conf.define('HAVE_CELT_API_0_5', 0)
-    elif conf.check_cfg(package='celt', atleast_version='0.5.0', args='--cflags --libs', required=True):
+    elif conf.check_cfg(package='celt', atleast_version='0.5.0', args='--cflags --libs', mandatory=False):
         conf.define('HAVE_CELT', 1)
         conf.define('HAVE_CELT_API_0_11', 0)
         conf.define('HAVE_CELT_API_0_8', 0)
