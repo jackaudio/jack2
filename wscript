@@ -56,7 +56,7 @@ def create_svnversion_task(bld, header='svnversion.h', define=None):
     tsk.inputs = []
     tsk.outputs = [bld.path.find_or_declare(header)]
 
-def set_options(opt):
+def options(opt):
     # options provided by the modules
     opt.tool_options('compiler_cxx')
     opt.tool_options('compiler_cc')
