@@ -105,7 +105,7 @@ def build(bld):
         if bld.env['IS_LINUX']:
             prog.uselib = 'RT READLINE NCURSES'
         if bld.env['IS_MACOSX']:
-	    prog.uselib = 'READLINE NCURSES'
+            prog.uselib = 'READLINE NCURSES'
         prog.uselib_local = 'clientlib'
         prog.target = 'jack_transport'
 
