@@ -322,8 +322,7 @@ def build(bld):
     bld.install_files('${PREFIX}/include/jack', 'jack/*.h')
 
     # process jack.pc.in -> jack.pc
-    import misc
-    obj = bld.new_task_gen('subst')
+    obj = bld.new_task_gen('subst_pc')
     obj.source = '../jack.pc.in'
     obj.target = 'jack.pc'
     obj.dict = {'PREFIX': bld.env['PREFIX'],
@@ -333,4 +332,3 @@ def build(bld):
                 'JACK_VERSION': bld.env['JACK_VERSION'],
                 }
     obj.install_path = '${LIBDIR}/pkgconfig/'
-    obj.fun = misc.subst_func
