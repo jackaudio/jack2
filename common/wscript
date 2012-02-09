@@ -273,7 +273,7 @@ def build(bld):
         clientlib.env.append_value("LINKFLAGS", "-lnsl -lsocket")
 
     if bld.env['BUILD_WITH_32_64']:
-        print "create 32bit lib..."
+        print("create 32bit lib...")
         clientlib32bit = clientlib.clone('lib32')
   
     create_jack_process_obj(bld, 'netmanager', 'JackNetManager.cpp', serverlib)

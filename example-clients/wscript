@@ -63,7 +63,7 @@ def build(bld):
         os_incdir = ['../macosx', '../posix']
     if bld.env['IS_SUN']:
         os_incdir = ['../solaris', '../posix']
-    for example_program, example_program_source in example_programs.items():
+    for example_program, example_program_source in list(example_programs.items()):
         if example_program == 'jack_server_control':
             uselib_local = 'serverlib'
         elif example_program == 'jack_net_slave':
@@ -151,7 +151,7 @@ def build(bld):
  	    prog.uselib_local = 'clientlib'
  	    prog.target = 'alsa_out'
 
-    for example_lib, example_lib_source in example_libs.items():
+    for example_lib, example_lib_source in list(example_libs.items()):
         lib = bld.new_task_gen('cc', 'shlib')
         lib.env['shlib_PATTERN'] = '%s.so'
         lib.includes = os_incdir + ['../common/jack', '../common']
@@ -168,4 +168,4 @@ def build(bld):
 
     bld.symlink_as('${PREFIX}/bin/jack_disconnect', 'jack_connect')
 
-    bld.install_files('${PREFIX}/bin', 'jack_control', chmod=0755)
+    bld.install_files('${PREFIX}/bin', 'jack_control', chmod=0o755)

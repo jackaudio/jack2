@@ -4,7 +4,7 @@
 import os
 import Utils
 import Options
-import commands
+import subprocess
 g_maxlen = 40
 import shutil
 import Task
@@ -24,10 +24,10 @@ def display_msg(msg, status = None, color = None):
     global g_maxlen
     g_maxlen = max(g_maxlen, len(msg))
     if status:
-        print "%s :" % msg.ljust(g_maxlen),
+        print("%s :" % msg.ljust(g_maxlen), end=' ')
         Utils.pprint(color, status)
     else:
-        print "%s" % msg.ljust(g_maxlen)
+        print("%s" % msg.ljust(g_maxlen))
 
 def display_feature(msg, build):
     if build:
@@ -238,17 +238,17 @@ def configure(conf):
             conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib32'
         conf.write_config_header('config.h')
 
-    print
+    print()
     display_msg("==================")
     version_msg = "JACK " + VERSION
     if svnrev:
         version_msg += " exported from r" + svnrev
     else:
         version_msg += " svn revision will checked and eventually updated during build"
-    print version_msg
+    print(version_msg)
 
-    print "Build with a maximum of %d JACK clients" % conf.env['CLIENT_NUM']
-    print "Build with a maximum of %d ports per application" % conf.env['PORT_NUM_FOR_CLIENT']
+    print("Build with a maximum of %d JACK clients" % conf.env['CLIENT_NUM'])
+    print("Build with a maximum of %d ports per application" % conf.env['PORT_NUM_FOR_CLIENT'])
  
     display_msg("Install prefix", conf.env['PREFIX'], 'CYAN')
     display_msg("Library directory", conf.env['LIBDIR'], 'CYAN')
@@ -265,8 +265,8 @@ def configure(conf):
     display_feature('Build D-Bus JACK (jackdbus)', conf.env['BUILD_JACKDBUS'])
 
     if conf.env['BUILD_JACKDBUS'] and conf.env['BUILD_JACKD']:
-        print Logs.colors.RED + 'WARNING !! mixing both jackd and jackdbus may cause issues:' + Logs.colors.NORMAL
-        print Logs.colors.RED + 'WARNING !! jackdbus does not use .jackdrc nor qjackctl settings' + Logs.colors.NORMAL
+        print(Logs.colors.RED + 'WARNING !! mixing both jackd and jackdbus may cause issues:' + Logs.colors.NORMAL)
+        print(Logs.colors.RED + 'WARNING !! jackdbus does not use .jackdrc nor qjackctl settings' + Logs.colors.NORMAL)
 
     if conf.env['IS_LINUX']:
         display_feature('Build with ALSA support', conf.env['BUILD_DRIVER_ALSA'] == True)
@@ -278,21 +278,21 @@ def configure(conf):
         #display_msg('Settings persistence', xxx)
 
         if conf.env['DBUS_SERVICES_DIR'] != conf.env['DBUS_SERVICES_DIR_REAL']:
-            print
-            print Logs.colors.RED + "WARNING: D-Bus session services directory as reported by pkg-config is"
-            print Logs.colors.RED + "WARNING:",
-            print Logs.colors.CYAN + conf.env['DBUS_SERVICES_DIR_REAL']
-            print Logs.colors.RED + 'WARNING: but service file will be installed in'
-            print Logs.colors.RED + "WARNING:",
-            print Logs.colors.CYAN + conf.env['DBUS_SERVICES_DIR']
-            print Logs.colors.RED + 'WARNING: You may need to adjust your D-Bus configuration after installing jackdbus'
-            print 'WARNING: You can override dbus service install directory'
-            print 'WARNING: with --enable-pkg-config-dbus-service-dir option to this script'
-            print Logs.colors.NORMAL,
-    print
+            print()
+            print(Logs.colors.RED + "WARNING: D-Bus session services directory as reported by pkg-config is")
+            print(Logs.colors.RED + "WARNING:", end=' ')
+            print(Logs.colors.CYAN + conf.env['DBUS_SERVICES_DIR_REAL'])
+            print(Logs.colors.RED + 'WARNING: but service file will be installed in')
+            print(Logs.colors.RED + "WARNING:", end=' ')
+            print(Logs.colors.CYAN + conf.env['DBUS_SERVICES_DIR'])
+            print(Logs.colors.RED + 'WARNING: You may need to adjust your D-Bus configuration after installing jackdbus')
+            print('WARNING: You can override dbus service install directory')
+            print('WARNING: with --enable-pkg-config-dbus-service-dir option to this script')
+            print(Logs.colors.NORMAL, end=' ')
+    print()
 
 def build(bld):
-    print ("make[1]: Entering directory `" + os.getcwd() + "/" + blddir + "'" )
+    print(("make[1]: Entering directory `" + os.getcwd() + "/" + blddir + "'" ))
     if not os.access('svnversion.h', os.R_OK):
         create_svnversion_task(bld)
 
