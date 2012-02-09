@@ -21,7 +21,7 @@ def create_jack_process_obj(bld, target, sources, uselib = None):
     if bld.env['IS_MACOSX']:
         env_includes = ['../macosx', '../posix', '../macosx/coreaudio']
     if bld.env['IS_LINUX']:
-	env_includes = ['../linux', '../posix', '../linux/alsa']
+        env_includes = ['../linux', '../posix', '../linux/alsa']
     if bld.env['IS_SUN']:
         env_includes = ['../solaris', '../posix', '../solaris/oss']
     process.includes = ['.'] + env_includes + ['jack', '..']
