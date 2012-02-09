@@ -37,14 +37,15 @@ def display_feature(msg, build):
         display_msg(msg, "no", 'YELLOW')
 
 def create_svnversion_task(bld, header='svnversion.h', define=None):
-    import Constants, Build
+    import Build
 
     cmd = '../svnversion_regenerate.sh ${TGT}'
     if define:
         cmd += " " + define
 
     cls = Task.simple_task_type('svnversion', cmd, color='BLUE', before='cc')
-    cls.runnable_status = lambda self: Constants.RUN_ME
+    # FIXME: Constants is no longer available.
+    #cls.runnable_status = lambda self: Constants.RUN_ME
 
     def post_run(self):
         sg = Utils.h_file(self.outputs[0].abspath(self.env))
@@ -294,8 +295,10 @@ def configure(conf):
 
 def build(bld):
     print(("make[1]: Entering directory `" + os.getcwd() + "/" + blddir + "'" ))
-    if not os.access('svnversion.h', os.R_OK):
-        create_svnversion_task(bld)
+    # FIXME: temporarily disabled. Replace it with a git version hash or
+    # something similarly.
+    #if not os.access('svnversion.h', os.R_OK):
+    #    create_svnversion_task(bld)
 
    # process subfolders from here
     bld.add_subdirs('common')
