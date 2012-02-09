@@ -25,8 +25,8 @@ def display_msg(msg, status = None, color = None):
     global g_maxlen
     g_maxlen = max(g_maxlen, len(msg))
     if status:
-        print("%s :" % msg.ljust(g_maxlen), end=' ')
-        Utils.pprint(color, status)
+        Logs.pprint('NORMAL', "%s :" % msg.ljust(g_maxlen), sep=' ')
+        Logs.pprint(color, status)
     else:
         print("%s" % msg.ljust(g_maxlen))
 
@@ -84,13 +84,13 @@ def configure(conf):
     conf.env['IS_SUN'] = platform == 'sunos'
 
     if conf.env['IS_LINUX']:
-        Utils.pprint('CYAN', "Linux detected")
+        Logs.pprint('CYAN', "Linux detected")
 
     if conf.env['IS_MACOSX']:
-        Utils.pprint('CYAN', "MacOS X detected")
+        Logs.pprint('CYAN', "MacOS X detected")
 
     if conf.env['IS_SUN']:
-        Utils.pprint('CYAN', "SunOS detected")
+        Logs.pprint('CYAN', "SunOS detected")
 
     if conf.env['IS_LINUX']:
         conf.check_tool('compiler_cxx')
@@ -327,27 +327,27 @@ def build(bld):
         html_docs_install_dir = share_dir + '/reference/html/'
         if Options.commands['install']:
             if os.path.isdir(html_docs_install_dir):
-                Utils.pprint('CYAN', "Removing old doxygen documentation installation...")
+                Logs.pprint('CYAN', "Removing old doxygen documentation installation...")
                 shutil.rmtree(html_docs_install_dir)
-                Utils.pprint('CYAN', "Removing old doxygen documentation installation done.")
-            Utils.pprint('CYAN', "Installing doxygen documentation...")
+                Logs.pprint('CYAN', "Removing old doxygen documentation installation done.")
+            Logs.pprint('CYAN', "Installing doxygen documentation...")
             shutil.copytree(html_docs_source_dir, html_docs_install_dir)
-            Utils.pprint('CYAN', "Installing doxygen documentation done.")
+            Logs.pprint('CYAN', "Installing doxygen documentation done.")
         elif Options.commands['uninstall']:
-            Utils.pprint('CYAN', "Uninstalling doxygen documentation...")
+            Logs.pprint('CYAN', "Uninstalling doxygen documentation...")
             if os.path.isdir(share_dir):
                 shutil.rmtree(share_dir)
-            Utils.pprint('CYAN', "Uninstalling doxygen documentation done.")
+            Logs.pprint('CYAN', "Uninstalling doxygen documentation done.")
         elif Options.commands['clean']:
             if os.access(html_docs_source_dir, os.R_OK):
-                Utils.pprint('CYAN', "Removing doxygen generated documentation...")
+                Logs.pprint('CYAN', "Removing doxygen generated documentation...")
                 shutil.rmtree(html_docs_source_dir)
-                Utils.pprint('CYAN', "Removing doxygen generated documentation done.")
+                Logs.pprint('CYAN', "Removing doxygen generated documentation done.")
         elif Options.commands['build']:
             if not os.access(html_docs_source_dir, os.R_OK):
                 os.popen("doxygen").read()
             else:
-                Utils.pprint('CYAN', "doxygen documentation already built.")
+                Logs.pprint('CYAN', "doxygen documentation already built.")
 
 def dist_hook():
     os.remove('svnversion_regenerate.sh')
