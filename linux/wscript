@@ -36,10 +36,10 @@ def build(bld):
         jackd.includes = ['../linux', '../posix', '../common/jack', '../common', '../dbus']
         jackd.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
         jackd.source = ['../common/Jackdmp.cpp']
-	if bld.env['IS_LINUX'] and bld.env['BUILD_JACKDBUS']: 
+        if bld.env['IS_LINUX'] and bld.env['BUILD_JACKDBUS']: 
             jackd.source += ['../dbus/reserve.c', '../dbus/audio_reserve.c'] 
             jackd.uselib = 'PTHREAD DL RT DBUS-1'
-	else:
+        else:
             jackd.uselib = 'PTHREAD DL RT'		
         jackd.uselib_local = 'serverlib'
         jackd.target = 'jackd'
