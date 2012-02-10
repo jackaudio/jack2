@@ -41,6 +41,7 @@ def configure(conf):
 
 def build(bld):
     obj = bld.new_task_gen('cc', 'program')
+    obj.features += 'cc'
     if bld.env['IS_LINUX']:
         sysdeps_dbus_include = ['../linux', '../posix']
     if bld.env['IS_MACOSX']:
