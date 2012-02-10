@@ -63,7 +63,7 @@ def build(bld):
         os_incdir = ['../macosx', '../posix']
     if bld.env['IS_SUN']:
         os_incdir = ['../solaris', '../posix']
-    for example_program, example_program_source in example_programs.items():
+    for example_program, example_program_source in list(example_programs.items()):
         if example_program == 'jack_server_control':
             uselib_local = 'serverlib'
         elif example_program == 'jack_net_slave':
@@ -105,12 +105,13 @@ def build(bld):
         if bld.env['IS_LINUX']:
             prog.uselib = 'RT READLINE NCURSES'
         if bld.env['IS_MACOSX']:
-	    prog.uselib = 'READLINE NCURSES'
+            prog.uselib = 'READLINE NCURSES'
         prog.uselib_local = 'clientlib'
         prog.target = 'jack_transport'
 
     if bld.env['BUILD_EXAMPLE_CLIENT_REC']:
         prog = bld.new_task_gen('cc', 'program')
+        prog.features += 'cc'
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = 'capture_client.c'
         if bld.env['IS_MACOSX']:
@@ -127,6 +128,7 @@ def build(bld):
 
     if bld.env['IS_LINUX'] or bld.env['IS_MACOSX']:
         prog = bld.new_task_gen('cc', 'program')
+        prog.features += 'cc'
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = ['netsource.c', '../common/netjack_packet.c']
         prog.env.append_value("CCFLAGS", "-DNO_JACK_ERROR")
@@ -135,24 +137,27 @@ def build(bld):
         prog.target = 'jack_netsource'
 
     if bld.env['IS_LINUX'] and bld.env['BUILD_EXAMPLE_ALSA_IO']:
- 	    prog = bld.new_task_gen('cc', 'program')
- 	    prog.includes = os_incdir + ['../common/jack', '../common']
- 	    prog.source = ['alsa_in.c', '../common/memops.c']
- 	    prog.env.append_value("CCFLAGS", "-DNO_JACK_ERROR")
- 	    prog.uselib = 'ALSA SAMPLERATE'
- 	    prog.uselib_local = 'clientlib'
- 	    prog.target = 'alsa_in'
+        prog = bld.new_task_gen('cc', 'program')
+        prog.features += 'cc'
+        prog.includes = os_incdir + ['../common/jack', '../common']
+        prog.source = ['alsa_in.c', '../common/memops.c']
+        prog.env.append_value("CCFLAGS", "-DNO_JACK_ERROR")
+        prog.uselib = 'ALSA SAMPLERATE'
+        prog.uselib_local = 'clientlib'
+        prog.target = 'alsa_in'
 
- 	    prog = bld.new_task_gen('cc', 'program')
- 	    prog.includes = os_incdir + ['../common/jack', '../common']
- 	    prog.source = ['alsa_out.c', '../common/memops.c']
- 	    prog.env.append_value("CCFLAGS", "-DNO_JACK_ERROR")
- 	    prog.uselib = 'ALSA SAMPLERATE'
- 	    prog.uselib_local = 'clientlib'
- 	    prog.target = 'alsa_out'
+        prog = bld.new_task_gen('cc', 'program')
+        prog.features += 'cc'
+        prog.includes = os_incdir + ['../common/jack', '../common']
+        prog.source = ['alsa_out.c', '../common/memops.c']
+        prog.env.append_value("CCFLAGS", "-DNO_JACK_ERROR")
+        prog.uselib = 'ALSA SAMPLERATE'
+        prog.uselib_local = 'clientlib'
+        prog.target = 'alsa_out'
 
-    for example_lib, example_lib_source in example_libs.items():
+    for example_lib, example_lib_source in list(example_libs.items()):
         lib = bld.new_task_gen('cc', 'shlib')
+        lib.features += 'cc'
         lib.env['shlib_PATTERN'] = '%s.so'
         lib.includes = os_incdir + ['../common/jack', '../common']
         lib.target = example_lib
@@ -162,10 +167,10 @@ def build(bld):
             #lib.env.append_value("LINKFLAGS", "-arch i386 -arch ppc -arch x86_64")
             lib.env.append_value("LINKFLAGS", "")
         if bld.env['IS_SUN']:
-	        lib.env.append_value("LINKFLAGS", "-lm")
+            lib.env.append_value("LINKFLAGS", "-lm")
         lib.uselib_local = 'serverlib'
         lib.install_path = '${ADDON_DIR}/'
 
     bld.symlink_as('${PREFIX}/bin/jack_disconnect', 'jack_connect')
 
-    bld.install_files('${PREFIX}/bin', 'jack_control', chmod=0755)
+    bld.install_files('${PREFIX}/bin', 'jack_control', chmod=0o755)

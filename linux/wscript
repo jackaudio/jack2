@@ -2,13 +2,13 @@
 # encoding: utf-8
 
 def configure(conf):
-    conf.check_cfg(package='alsa', atleast_version='1.0.18', args='--cflags --libs')
+    conf.check_cfg(package='alsa', atleast_version='1.0.18', args='--cflags --libs', mandatory=False)
     conf.env['BUILD_DRIVER_ALSA'] = conf.is_defined('HAVE_ALSA')
 
-    conf. check_cfg(package='libfreebob', atleast_version='1.0.0', args='--cflags --libs')
+    conf. check_cfg(package='libfreebob', atleast_version='1.0.0', args='--cflags --libs', mandatory=False)
     conf.env['BUILD_DRIVER_FREEBOB'] = conf.is_defined('HAVE_LIBFREEBOB')
 
-    conf. check_cfg(package='libffado', atleast_version='1.999.17', args='--cflags --libs')
+    conf. check_cfg(package='libffado', atleast_version='1.999.17', args='--cflags --libs', mandatory=False)
     conf.env['BUILD_DRIVER_FFADO'] = conf.is_defined('HAVE_LIBFFADO')
 
     conf.define('HAVE_PPOLL', 1 )
@@ -21,7 +21,7 @@ def create_jack_driver_obj(bld, target, sources, uselib = None):
     #driver.defines = ['HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL']
     driver.defines = ['HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL', 'HAVE_TIMERFD']
 
-    driver.includes = ['.', '../linux', '../posix', '../common', '../common/jack', '../dbus']
+    driver.includes = ['.', '../linux', '../posix', '../common', '../common/jack', '../dbus', '../']
     driver.target = target
     driver.source = sources
     driver.install_path = '${ADDON_DIR}/'
@@ -31,16 +31,19 @@ def create_jack_driver_obj(bld, target, sources, uselib = None):
     return driver
 
 def build(bld):
+    jackd = bld.new_task_gen('cxx', 'program')
+    jackd.features += 'cxx'
+    jackd.includes = ['../linux', '../posix', '../common/jack', '../common', '../dbus', '../']
+    jackd.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
+    jackd.source = []
+
     if bld.env['BUILD_JACKD'] == True:
-        jackd = bld.new_task_gen('cxx', 'program')
-        jackd.includes = ['../linux', '../posix', '../common/jack', '../common', '../dbus']
-        jackd.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
         jackd.source = ['../common/Jackdmp.cpp']
-	if bld.env['IS_LINUX'] and bld.env['BUILD_JACKDBUS']: 
-            jackd.source += ['../dbus/reserve.c', '../dbus/audio_reserve.c'] 
-            jackd.uselib = 'PTHREAD DL RT DBUS-1'
-	else:
-            jackd.uselib = 'PTHREAD DL RT'		
+    if bld.env['IS_LINUX'] and bld.env['BUILD_JACKDBUS']: 
+        jackd.source += ['../dbus/reserve.c', '../dbus/audio_reserve.c'] 
+        jackd.uselib = 'PTHREAD DL RT DBUS-1'
+    else:
+        jackd.uselib = 'PTHREAD DL RT'		
         jackd.uselib_local = 'serverlib'
         jackd.target = 'jackd'
   	

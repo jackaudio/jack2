@@ -13,12 +13,12 @@ def configure(conf):
     conf.env['BUILD_JACKDBUS'] = False
 
     if not conf.check_cfg(package='dbus-1', atleast_version='1.0.0', args='--cflags --libs') or not conf.is_defined('HAVE_DBUS_1'):
-        print Logs.colors.RED + 'WARNING !! jackdbus will not be built because libdbus-dev is missing' + Logs.colors.NORMAL
+        print(Logs.colors.RED + 'WARNING !! jackdbus will not be built because libdbus-dev is missing' + Logs.colors.NORMAL)
         return
 
     dbus_dir = conf.check_cfg(package='dbus-1', args='--variable=session_bus_services_dir')
     if not dbus_dir:
-        print Logs.colors.RED + 'WARNING !! jackdbus will not be built because service dir is unknown' + Logs.colors.NORMAL
+        print(Logs.colors.RED + 'WARNING !! jackdbus will not be built because service dir is unknown' + Logs.colors.NORMAL)
         return
 
     dbus_dir = dbus_dir.strip()
@@ -29,20 +29,19 @@ def configure(conf):
     else:
         conf.env['DBUS_SERVICES_DIR'] = os.path.normpath(conf.env['PREFIX'] + '/share/dbus-1/services')
 
-    conf.check_tool('misc')
-
     conf.check(header_name='expat.h', define_name="HAVE_EXPAT")
 
     if conf.is_defined('HAVE_EXPAT'):
         conf.env['LIB_EXPAT'] = ['expat']
     else:
-        print Logs.colors.RED + 'WARNING !! jackdbus will not be built because of expat is missing' + Logs.colors.NORMAL
+        print(Logs.colors.RED + 'WARNING !! jackdbus will not be built because of expat is missing' + Logs.colors.NORMAL)
         return
 
     conf.env['BUILD_JACKDBUS'] = True
 
 def build(bld):
     obj = bld.new_task_gen('cc', 'program')
+    obj.features += 'cc'
     if bld.env['IS_LINUX']:
         sysdeps_dbus_include = ['../linux', '../posix']
     if bld.env['IS_MACOSX']:
@@ -75,10 +74,9 @@ def build(bld):
     obj.target       = 'jackdbus'
 
     # process org.jackaudio.service.in -> org.jackaudio.service
-    import misc
-    obj = bld.new_task_gen('subst')
-    obj.source = 'org.jackaudio.service.in'
-    obj.target = 'org.jackaudio.service'
-    obj.dict = {'BINDIR': bld.env['PREFIX'] + '/bin'}
-    obj.install_path = '${DBUS_SERVICES_DIR}/'
-    obj.fun = misc.subst_func
+    obj = bld(
+            features = 'subst',
+            source = 'org.jackaudio.service.in',
+            target = 'org.jackaudio.service',
+            install_path = '${DBUS_SERVICES_DIR}/',
+            BINDIR = bld.env['PREFIX'] + '/bin')
