@@ -29,8 +29,6 @@ def configure(conf):
     else:
         conf.env['DBUS_SERVICES_DIR'] = os.path.normpath(conf.env['PREFIX'] + '/share/dbus-1/services')
 
-    conf.check_tool('misc')
-
     conf.check(header_name='expat.h', define_name="HAVE_EXPAT")
 
     if conf.is_defined('HAVE_EXPAT'):
@@ -75,10 +73,9 @@ def build(bld):
     obj.target       = 'jackdbus'
 
     # process org.jackaudio.service.in -> org.jackaudio.service
-    import misc
-    obj = bld.new_task_gen('subst')
-    obj.source = 'org.jackaudio.service.in'
-    obj.target = 'org.jackaudio.service'
-    obj.dict = {'BINDIR': bld.env['PREFIX'] + '/bin'}
-    obj.install_path = '${DBUS_SERVICES_DIR}/'
-    obj.fun = misc.subst_func
+    obj = bld(
+            features = 'subst',
+            source = 'org.jackaudio.service.in',
+            target = 'org.jackaudio.service',
+            install_path = '${DBUS_SERVICES_DIR}/',
+            BINDIR = bld.env['PREFIX'] + '/bin')
