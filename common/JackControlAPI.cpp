@@ -444,7 +444,7 @@ struct jackctl_sigmask
 {
     HANDLE wait_event;
 };
- 
+
 static jackctl_sigmask sigmask;
 
 static void signal_handler(int signum)
@@ -472,7 +472,7 @@ jackctl_setup_signals(
 
 void jackctl_wait_signals(jackctl_sigmask_t * signals)
 {
-    if (WaitForSingleObject(waitEvent, INFINITE) != WAIT_OBJECT_0) {
+    if (WaitForSingleObject(signals->wait_event, INFINITE) != WAIT_OBJECT_0) {
         jack_error("WaitForSingleObject fails err = %ld", GetLastError());
     }
 }
@@ -483,7 +483,7 @@ struct jackctl_sigmask
 {
     sigset_t signals;
 };
- 
+
 static jackctl_sigmask sigmask;
 
 static
