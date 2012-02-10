@@ -320,7 +320,7 @@ def build(bld):
     #audio_adapter_sources += ['../windows/JackPortAudioAdapter.cpp']
     #process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
 
-    bld.install_files('${PREFIX}/include/jack', 'jack/*.h')
+    bld.install_files('${PREFIX}/include/jack', bld.path.ant_glob('jack/*.h'))
 
     # process jack.pc.in -> jack.pc
     obj = bld.new_task_gen('subst_pc')
