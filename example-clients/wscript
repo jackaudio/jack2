@@ -137,23 +137,23 @@ def build(bld):
         prog.target = 'jack_netsource'
 
     if bld.env['IS_LINUX'] and bld.env['BUILD_EXAMPLE_ALSA_IO']:
- 	    prog = bld.new_task_gen('cc', 'program')
-	    prog.features += 'cc'
- 	    prog.includes = os_incdir + ['../common/jack', '../common']
- 	    prog.source = ['alsa_in.c', '../common/memops.c']
- 	    prog.env.append_value("CCFLAGS", "-DNO_JACK_ERROR")
- 	    prog.uselib = 'ALSA SAMPLERATE'
- 	    prog.uselib_local = 'clientlib'
- 	    prog.target = 'alsa_in'
+        prog = bld.new_task_gen('cc', 'program')
+        prog.features += 'cc'
+        prog.includes = os_incdir + ['../common/jack', '../common']
+        prog.source = ['alsa_in.c', '../common/memops.c']
+        prog.env.append_value("CCFLAGS", "-DNO_JACK_ERROR")
+        prog.uselib = 'ALSA SAMPLERATE'
+        prog.uselib_local = 'clientlib'
+        prog.target = 'alsa_in'
 
- 	    prog = bld.new_task_gen('cc', 'program')
-	    prog.features += 'cc'
- 	    prog.includes = os_incdir + ['../common/jack', '../common']
- 	    prog.source = ['alsa_out.c', '../common/memops.c']
- 	    prog.env.append_value("CCFLAGS", "-DNO_JACK_ERROR")
- 	    prog.uselib = 'ALSA SAMPLERATE'
- 	    prog.uselib_local = 'clientlib'
- 	    prog.target = 'alsa_out'
+        prog = bld.new_task_gen('cc', 'program')
+        prog.features += 'cc'
+        prog.includes = os_incdir + ['../common/jack', '../common']
+        prog.source = ['alsa_out.c', '../common/memops.c']
+        prog.env.append_value("CCFLAGS", "-DNO_JACK_ERROR")
+        prog.uselib = 'ALSA SAMPLERATE'
+        prog.uselib_local = 'clientlib'
+        prog.target = 'alsa_out'
 
     for example_lib, example_lib_source in list(example_libs.items()):
         lib = bld.new_task_gen('cc', 'shlib')
@@ -167,7 +167,7 @@ def build(bld):
             #lib.env.append_value("LINKFLAGS", "-arch i386 -arch ppc -arch x86_64")
             lib.env.append_value("LINKFLAGS", "")
         if bld.env['IS_SUN']:
-	        lib.env.append_value("LINKFLAGS", "-lm")
+            lib.env.append_value("LINKFLAGS", "-lm")
         lib.uselib_local = 'serverlib'
         lib.install_path = '${ADDON_DIR}/'
 
