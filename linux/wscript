@@ -21,7 +21,7 @@ def create_jack_driver_obj(bld, target, sources, uselib = None):
     #driver.defines = ['HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL']
     driver.defines = ['HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL', 'HAVE_TIMERFD']
 
-    driver.includes = ['.', '../linux', '../posix', '../common', '../common/jack', '../dbus']
+    driver.includes = ['.', '../linux', '../posix', '../common', '../common/jack', '../dbus', '../']
     driver.target = target
     driver.source = sources
     driver.install_path = '${ADDON_DIR}/'
@@ -34,7 +34,7 @@ def build(bld):
     if bld.env['BUILD_JACKD'] == True:
         jackd = bld.new_task_gen('cxx', 'program')
         jackd.features += 'cxx'
-        jackd.includes = ['../linux', '../posix', '../common/jack', '../common', '../dbus']
+        jackd.includes = ['../linux', '../posix', '../common/jack', '../common', '../dbus', '../']
         jackd.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
         jackd.source = ['../common/Jackdmp.cpp']
     if bld.env['IS_LINUX'] and bld.env['BUILD_JACKDBUS']: 
