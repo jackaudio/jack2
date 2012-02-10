@@ -16,6 +16,7 @@ def configure(conf):
 
 def create_jack_process_obj(bld, target, sources, uselib = None):
     process = bld.new_task_gen('cxx', 'shlib')
+    process.features += 'cxx'
     process.env['shlib_PATTERN'] = '%s.so'
     process.defines  = ['HAVE_CONFIG_H','SERVER_SIDE']
     if bld.env['IS_MACOSX']:
