@@ -157,6 +157,8 @@ struct JackNetExtMaster : public JackNetMasterInterface {
         fSocket.SetPort(port);
         fRequest.buffer_size = request->buffer_size;
         fRequest.sample_rate = request->sample_rate;
+        fRequest.audio_input = request->audio_input;
+        fRequest.audio_output = request->audio_output;
         fAudioCaptureBuffer = NULL;
         fAudioPlaybackBuffer = NULL;
         fMidiCaptureBuffer = NULL;
@@ -224,7 +226,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
                 switch (GetPacketType(&fParams)) {
 
                     case SLAVE_AVAILABLE:
-                        if (MasterInit() == 0) {
+                        if (InitMaster(result) == 0) {
                             SessionParamsDisplay(&fParams);
                             fRunning = false;
                         } else {
@@ -243,7 +245,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
             }
         }
         while (fRunning);
-
+ 
         // Set result parameters
         result->audio_input = fParams.fSendAudioChannels;
         result->audio_output = fParams.fReturnAudioChannels;
@@ -258,7 +260,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
         return -1;
     }
 
-    int MasterInit()
+    int InitMaster(jack_slave_t* result)
     {
         // Check MASTER <==> SLAVE network protocol coherency
         if (fParams.fProtocolVersion != MASTER_PROTOCOL) {
@@ -269,14 +271,45 @@ struct JackNetExtMaster : public JackNetMasterInterface {
         // Settings
         fSocket.GetName(fParams.fMasterNetName);
         fParams.fID = 1;
-        fParams.fSampleEncoder = JackFloatEncoder;
         fParams.fPeriodSize = fRequest.buffer_size;
         fParams.fSampleRate = fRequest.sample_rate;
-
+        
+        if (fRequest.audio_input == -1) {
+            if (fParams.fSendAudioChannels == -1) {
+                jack_error("Error : master and slave use -1 for wanted inputs...");
+                return -1;
+            } else {
+                result->audio_input = fParams.fSendAudioChannels;
+                jack_info("Takes slave %d inputs", fParams.fSendAudioChannels);
+            }
+        } else if (fParams.fSendAudioChannels == -1) {
+            fParams.fSendAudioChannels = fRequest.audio_input;
+            jack_info("Takes master %d inputs", fRequest.audio_input);
+        } else if (fParams.fSendAudioChannels != fRequest.audio_input) {
+            jack_error("Error : master wants %d inputs and slave wants %d inputs...", fRequest.audio_input, fParams.fSendAudioChannels);
+            return -1;
+        } 
+                
+        if (fRequest.audio_output == -1) {
+            if (fParams.fReturnAudioChannels == -1) {
+                jack_error("Error : master and slave use -1 for wanted outputs...");
+                return -1;
+            } else {
+                result->audio_output = fParams.fReturnAudioChannels;
+                jack_info("Takes slave %d outputs", fParams.fReturnAudioChannels);
+            }
+        } else if (fParams.fReturnAudioChannels == -1) {
+            fParams.fReturnAudioChannels = fRequest.audio_output;
+            jack_info("Takes master %d outputs", fRequest.audio_output);
+        } else if (fParams.fReturnAudioChannels != fRequest.audio_output) {
+            jack_error("Error : master wants %d outputs and slave wants %d outputs...", fRequest.audio_output, fParams.fReturnAudioChannels);
+            return -1;
+        }
+        
         // Close request socket
         fSocket.Close();
 
-        // Network slave init
+        /// Network init
         if (!JackNetMasterInterface::Init()) {
             return -1;
         }
@@ -366,7 +399,9 @@ struct JackNetExtMaster : public JackNetMasterInterface {
 
     int Read(int audio_input, float** audio_input_buffer, int midi_input, void** midi_input_buffer)
     {
+        
         try {
+           
             assert(audio_input == fParams.fReturnAudioChannels);
 
             for (int audio_port_index = 0; audio_port_index < audio_input; audio_port_index++) {
@@ -376,11 +411,13 @@ struct JackNetExtMaster : public JackNetMasterInterface {
             for (int midi_port_index = 0; midi_port_index < midi_input; midi_port_index++) {
                 fNetMidiPlaybackBuffer->SetBuffer(midi_port_index, ((JackMidiBuffer**)midi_input_buffer)[midi_port_index]);
             }
-
-            if (SyncRecv() == SOCKET_ERROR) {
-                return 0;
+         
+            //receive sync
+            int res = SyncRecv();
+            if ((res == 0) || (res == SOCKET_ERROR)) {
+                return res;
             }
-
+       
             DecodeSyncPacket();
             return DataRecv();
 
@@ -393,6 +430,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
      int Write(int audio_output, float** audio_output_buffer, int midi_output, void** midi_output_buffer)
      {
         try {
+            
             assert(audio_output == fParams.fSendAudioChannels);
 
             for (int audio_port_index = 0; audio_port_index < audio_output; audio_port_index++) {
@@ -402,20 +440,32 @@ struct JackNetExtMaster : public JackNetMasterInterface {
             for (int midi_port_index = 0; midi_port_index < midi_output; midi_port_index++) {
                 fNetMidiCaptureBuffer->SetBuffer(midi_port_index, ((JackMidiBuffer**)midi_output_buffer)[midi_port_index]);
             }
+            
+            
+            if (IsSynched()) {  // only send if connection is "synched"
+            
+                EncodeSyncPacket();
 
-            EncodeSyncPacket();
+                if (SyncSend() == SOCKET_ERROR) {
+                    return SOCKET_ERROR;
+                }
 
-            if (SyncSend() == SOCKET_ERROR) {
-                return SOCKET_ERROR;
+                //send data
+                if (DataSend() == SOCKET_ERROR) {
+                    return SOCKET_ERROR;
+                }
+                
+            } else {
+                jack_info("Connection is not synched, skip cycle...");
             }
-
-            return DataSend();
+            
+            return 0;
 
         } catch (JackNetException& e) {
             jack_error("Connection lost.");
             return -1;
         }
-     }
+    }
 
     // Transport
     void EncodeTransportData()

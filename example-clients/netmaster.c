@@ -26,6 +26,7 @@
 #include <signal.h>
 #include <getopt.h>
 #include <string.h>
+#include <assert.h>
 
 #include <jack/net.h>
 
@@ -99,7 +100,8 @@ main (int argc, char *argv[])
 	}
 
     int i;
-    jack_master_t request = { -1, -1, -1, -1, buffer_size, sample_rate, "master" };
+    jack_master_t request = { 4, 4, -1, -1, buffer_size, sample_rate, "master" };
+    //jack_master_t request = { -1, -1, -1, -1, buffer_size, sample_rate, "master" };
     jack_slave_t result;
     float** audio_input_buffer;
     float** audio_output_buffer;
@@ -127,6 +129,7 @@ main (int argc, char *argv[])
 #endif
 
     // Allocate buffers
+    
     audio_input_buffer = (float**)calloc(result.audio_input, sizeof(float*));
     for (i = 0; i < result.audio_input; i++) {
         audio_input_buffer[i] = (float*)calloc(buffer_size, sizeof(float));
@@ -147,6 +150,7 @@ main (int argc, char *argv[])
   	while (1) {
 
         // Copy input to output
+        assert(result.audio_input == result.audio_output);
         for (i = 0; i < result.audio_input; i++) {
             memcpy(audio_output_buffer[i], audio_input_buffer[i], buffer_size * sizeof(float));
         }

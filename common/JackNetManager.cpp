@@ -491,7 +491,7 @@ namespace Jack
     #endif
 
         } else {
-            jack_error("Connection is not synched, skip cycle...");
+            jack_info("Connection is not synched, skip cycle...");
         }
 
         //receive sync
