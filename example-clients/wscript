@@ -111,6 +111,7 @@ def build(bld):
 
     if bld.env['BUILD_EXAMPLE_CLIENT_REC']:
         prog = bld.new_task_gen('cc', 'program')
+        prog.features += 'cc'
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = 'capture_client.c'
         if bld.env['IS_MACOSX']:
@@ -127,6 +128,7 @@ def build(bld):
 
     if bld.env['IS_LINUX'] or bld.env['IS_MACOSX']:
         prog = bld.new_task_gen('cc', 'program')
+        prog.features += 'cc'
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = ['netsource.c', '../common/netjack_packet.c']
         prog.env.append_value("CCFLAGS", "-DNO_JACK_ERROR")
@@ -136,6 +138,7 @@ def build(bld):
 
     if bld.env['IS_LINUX'] and bld.env['BUILD_EXAMPLE_ALSA_IO']:
  	    prog = bld.new_task_gen('cc', 'program')
+	    prog.features += 'cc'
  	    prog.includes = os_incdir + ['../common/jack', '../common']
  	    prog.source = ['alsa_in.c', '../common/memops.c']
  	    prog.env.append_value("CCFLAGS", "-DNO_JACK_ERROR")
@@ -144,6 +147,7 @@ def build(bld):
  	    prog.target = 'alsa_in'
 
  	    prog = bld.new_task_gen('cc', 'program')
+	    prog.features += 'cc'
  	    prog.includes = os_incdir + ['../common/jack', '../common']
  	    prog.source = ['alsa_out.c', '../common/memops.c']
  	    prog.env.append_value("CCFLAGS", "-DNO_JACK_ERROR")
@@ -153,6 +157,7 @@ def build(bld):
 
     for example_lib, example_lib_source in list(example_libs.items()):
         lib = bld.new_task_gen('cc', 'shlib')
+        lib.features += 'cc'
         lib.env['shlib_PATTERN'] = '%s.so'
         lib.includes = os_incdir + ['../common/jack', '../common']
         lib.target = example_lib
