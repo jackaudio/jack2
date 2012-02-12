@@ -16,12 +16,13 @@ def configure(conf):
 
 def create_jack_process_obj(bld, target, sources, uselib = None):
     process = bld.new_task_gen('cxx', 'shlib')
+    process.features += 'cxx'
     process.env['shlib_PATTERN'] = '%s.so'
     process.defines  = ['HAVE_CONFIG_H','SERVER_SIDE']
     if bld.env['IS_MACOSX']:
         env_includes = ['../macosx', '../posix', '../macosx/coreaudio']
     if bld.env['IS_LINUX']:
-	env_includes = ['../linux', '../posix', '../linux/alsa']
+        env_includes = ['../linux', '../posix', '../linux/alsa']
     if bld.env['IS_SUN']:
         env_includes = ['../solaris', '../posix', '../solaris/oss']
     process.includes = ['.'] + env_includes + ['jack', '..']
@@ -46,7 +47,7 @@ def build(bld):
         'JackConnectionManager.cpp',
         'ringbuffer.c',
         'JackError.cpp',
-	'JackException.cpp',
+        'JackException.cpp',
         'JackFrameTimer.cpp',
         'JackGraphManager.cpp',
         'JackPort.cpp',
@@ -56,7 +57,7 @@ def build(bld):
         'JackMidiAPI.cpp',
         'JackEngineControl.cpp',
         'JackShmMem.cpp',
-	'JackGenericClientChannel.cpp',
+        'JackGenericClientChannel.cpp',
         'shm.c',
         'JackGlobals.cpp',
         'JackDebugClient.cpp',
@@ -75,7 +76,7 @@ def build(bld):
             '../posix/JackPosixThread.cpp',
             '../posix/JackPosixSemaphore.cpp',
             '../posix/JackPosixProcessSync.cpp',
-	    '../posix/JackPosixMutex.cpp',
+            '../posix/JackPosixMutex.cpp',
             '../posix/JackSocket.cpp',
             '../linux/JackLinuxTime.c',
             ]
@@ -117,7 +118,7 @@ def build(bld):
     serverlib.source = [] + common_libsources
     serverlib.source += [
         'JackAudioDriver.cpp',
-	'JackTimedDriver.cpp',
+        'JackTimedDriver.cpp',
         'JackMidiDriver.cpp',
         'JackDriver.cpp',
         'JackEngine.cpp',
@@ -135,7 +136,7 @@ def build(bld):
         'JackNetTool.cpp',
         'JackNetInterface.cpp',
         'JackArgParser.cpp',
-    	'JackRequestDecoder.cpp',
+        'JackRequestDecoder.cpp',
         'JackMidiAsyncQueue.cpp',
         'JackMidiAsyncWaitQueue.cpp',
         'JackMidiBufferReadQueue.cpp',
@@ -201,7 +202,7 @@ def build(bld):
             'JackNetAPI.cpp',
             'JackNetInterface.cpp',
             'JackNetTool.cpp',
-	    'JackException.cpp',
+            'JackException.cpp',
             'JackAudioAdapterInterface.cpp',
             'JackLibSampleRateResampler.cpp',
             'JackResampler.cpp',
@@ -273,7 +274,7 @@ def build(bld):
         clientlib.env.append_value("LINKFLAGS", "-lnsl -lsocket")
 
     if bld.env['BUILD_WITH_32_64']:
-        print "create 32bit lib..."
+        print("create 32bit lib...")
         clientlib32bit = clientlib.clone('lib32')
   
     create_jack_process_obj(bld, 'netmanager', 'JackNetManager.cpp', serverlib)
@@ -319,11 +320,10 @@ def build(bld):
     #audio_adapter_sources += ['../windows/JackPortAudioAdapter.cpp']
     #process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
 
-    bld.install_files('${PREFIX}/include/jack', 'jack/*.h')
+    bld.install_files('${PREFIX}/include/jack', bld.path.ant_glob('jack/*.h'))
 
     # process jack.pc.in -> jack.pc
-    import misc
-    obj = bld.new_task_gen('subst')
+    obj = bld.new_task_gen('subst_pc')
     obj.source = '../jack.pc.in'
     obj.target = 'jack.pc'
     obj.dict = {'PREFIX': bld.env['PREFIX'],
@@ -333,4 +333,3 @@ def build(bld):
                 'JACK_VERSION': bld.env['JACK_VERSION'],
                 }
     obj.install_path = '${LIBDIR}/pkgconfig/'
-    obj.fun = misc.subst_func
