@@ -1,0 +1,4 @@
+build/
+man/*.1
+.waf*
+.lock*
