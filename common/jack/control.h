@@ -82,9 +82,6 @@ typedef struct jackctl_internal jackctl_internal_t;
 /** opaque type for parameter object */
 typedef struct jackctl_parameter jackctl_parameter_t;
 
-/** opaque type for parameter object */
-typedef struct jackctl_parameter jackctl_parameter_t;
-
 /** opaque type for sigmask object */
 typedef struct jackctl_sigmask jackctl_sigmask_t;
 
