@@ -63,7 +63,7 @@ def build(bld):
         #'xml_nop.c',
         'xml_write_raw.c',
         'sigsegv.c',
-	'reserve.c',
+        'reserve.c',
         ]
     obj.use = ['serverlib']
     if bld.env['IS_LINUX']:

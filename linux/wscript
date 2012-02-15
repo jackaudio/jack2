@@ -54,7 +54,7 @@ def build(bld):
                        '../common/memops.c',
                        'alsa/generic_hw.c',
                        'alsa/hdsp.c',
-		       'alsa/alsa_driver.c',
+                       'alsa/alsa_driver.c',
                        'alsa/hammerfall.c',
                        'alsa/ice1712.c'
                        ]
