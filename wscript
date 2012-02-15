@@ -224,7 +224,7 @@ def configure(conf):
         if m != None:
             svnrev = m.group(1)
 
-    conf.env.append_unique('LINKFLAGS', '-lm -lstdc++')
+    conf.env.append_unique('LINKFLAGS', ['-lm', '-lstdc++'])
 
     if Options.options.mixed == True:
         env_variant2 = conf.env.copy()
