@@ -294,7 +294,7 @@ def configure(conf):
     print()
 
 def build(bld):
-    print(("make[1]: Entering directory `" + os.getcwd() + "/" + out + "'" ))
+    print("make[1]: Entering directory `" + os.getcwd() + "/" + out + "'")
     if not os.access('svnversion.h', os.R_OK):
         create_svnversion_task(bld)
 
