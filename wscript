@@ -51,7 +51,7 @@ def create_svnversion_task(bld, header='svnversion.h', define=None):
             rule = cmd,
             name = 'svnversion',
             runnable_status = Task.RUN_ME,
-            before = 'cc',
+            before = 'c',
             color = 'BLUE',
             post_run = post_run,
             target = [bld.path.find_or_declare(header)]
