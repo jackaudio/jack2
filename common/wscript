@@ -106,7 +106,7 @@ def build(bld):
             ]
         includes = ['../macosx', '../macosx/RPC', '../posix'] + includes
 
-    serverlib = bld(features = ['cxx', 'cxxshlib'])
+    serverlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
     serverlib.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
     serverlib.includes = includes
     serverlib.name         = 'serverlib'
@@ -188,7 +188,7 @@ def build(bld):
         serverlib.env.append_value("LINKFLAGS", "-lnsl -lsocket")
 
     if bld.env['BUILD_NETLIB'] == True:
-        netlib = bld(features = ['cxx', 'cxxshlib'])
+        netlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
         netlib.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
         netlib.includes = includes
         netlib.name         = 'netlib'
@@ -221,7 +221,7 @@ def build(bld):
 
         netlib.vnum = bld.env['JACK_API_VERSION']
 
-    clientlib = bld(features = ['cxx', 'cxxshlib'])
+    clientlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
     clientlib.defines = 'HAVE_CONFIG_H'
     clientlib.use = uselib
     clientlib.install_path = '${LIBDIR}'
