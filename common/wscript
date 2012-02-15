@@ -15,8 +15,7 @@ def configure(conf):
     conf.env['BUILD_ADAPTER'] = conf.is_defined('HAVE_SAMPLERATE')
 
 def create_jack_process_obj(bld, target, sources, uselib = None):
-    process = bld.new_task_gen('cxx', 'shlib')
-    process.features += 'cxx'
+    process = bld(features = ['cxx', 'cxxshlib'])
     process.env['shlib_PATTERN'] = '%s.so'
     process.defines  = ['HAVE_CONFIG_H','SERVER_SIDE']
     if bld.env['IS_MACOSX']:
@@ -107,8 +106,7 @@ def build(bld):
             ]
         includes = ['../macosx', '../macosx/RPC', '../posix'] + includes
 
-    serverlib = bld.new_task_gen('cxx', 'shlib')
-    serverlib.features.append('cc')
+    serverlib = bld(features = ['cxx', 'cxxshlib'])
     serverlib.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
     serverlib.includes = includes
     serverlib.name         = 'serverlib'
@@ -190,8 +188,7 @@ def build(bld):
         serverlib.env.append_value("LINKFLAGS", "-lnsl -lsocket")
 
     if bld.env['BUILD_NETLIB'] == True:
-        netlib = bld.new_task_gen('cxx', 'shlib')
-        netlib.features.append('cc')
+        netlib = bld(features = ['cxx', 'cxxshlib'])
         netlib.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
         netlib.includes = includes
         netlib.name         = 'netlib'
@@ -224,8 +221,7 @@ def build(bld):
 
         netlib.vnum = bld.env['JACK_API_VERSION']
 
-    clientlib = bld.new_task_gen('cxx', 'shlib')
-    clientlib.features.append('cc')
+    clientlib = bld(features = ['cxx', 'cxxshlib'])
     clientlib.defines = 'HAVE_CONFIG_H'
     clientlib.uselib = uselib
     clientlib.install_path = '${LIBDIR}'

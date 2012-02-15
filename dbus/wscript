@@ -40,8 +40,7 @@ def configure(conf):
     conf.env['BUILD_JACKDBUS'] = True
 
 def build(bld):
-    obj = bld.new_task_gen('cc', 'program')
-    obj.features += 'cc'
+    obj = bld(features = ['c', 'cprogram'], idx=17)
     if bld.env['IS_LINUX']:
         sysdeps_dbus_include = ['../linux', '../posix']
     if bld.env['IS_MACOSX']:

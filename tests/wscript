@@ -15,8 +15,7 @@ test_programs = {
 
 def build(bld):
     for test_program, test_program_sources in list(test_programs.items()):
-        prog = bld.new_task_gen('cxx', 'program')
-        prog.features.append('cc')
+        prog = bld(features = 'cxx cxxprogram')
         if bld.env['IS_MACOSX']:
 	        prog.includes = ['..','../macosx', '../posix', '../common/jack', '../common']
         if bld.env['IS_LINUX']:
