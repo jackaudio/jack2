@@ -65,12 +65,12 @@ def build(bld):
         'sigsegv.c',
 	'reserve.c',
         ]
+    obj.use = ['serverlib']
     if bld.env['IS_LINUX']:
-        obj.uselib = 'PTHREAD DL RT DBUS-1 EXPAT'
+        obj.use += ['PTHREAD', 'DL', 'RT', 'DBUS-1', 'EXPAT']
     if bld.env['IS_MACOSX']:
-        obj.uselib = 'PTHREAD DL DBUS-1 EXPAT'
-    obj.uselib_local = 'serverlib'
-    obj.target       = 'jackdbus'
+        obj.use += ['PTHREAD', 'DL', 'DBUS-1', 'EXPAT']
+    obj.target = 'jackdbus'
 
     # process org.jackaudio.service.in -> org.jackaudio.service
     obj = bld(

@@ -35,7 +35,7 @@ def create_jack_process_obj(bld, target, sources, uselib = None):
         #process.env.append_value("LINKFLAGS", "-arch i386 -arch ppc -arch x86_64")
         process.env.append_value("CPPFLAGS", "-fvisibility=hidden")
     process.install_path = '${ADDON_DIR}/'
-    process.uselib_local = uselib.name
+    process.use = [uselib.name]
     return process
 
 def build(bld):
@@ -111,7 +111,7 @@ def build(bld):
     serverlib.includes = includes
     serverlib.name         = 'serverlib'
     serverlib.target       = 'jackserver'
-    serverlib.uselib = uselib
+    serverlib.use = uselib
     serverlib.install_path = '${LIBDIR}'
     serverlib.source = [] + common_libsources
     serverlib.source += [
@@ -193,7 +193,7 @@ def build(bld):
         netlib.includes = includes
         netlib.name         = 'netlib'
         netlib.target       = 'jacknet'
-        netlib.uselib = ['SAMPLERATE', 'CELT', 'PTHREAD' , 'RT']
+        netlib.use = ['SAMPLERATE', 'CELT', 'PTHREAD' , 'RT']
         netlib.install_path = '${LIBDIR}'
         netlib.source = [
             'JackNetAPI.cpp',
@@ -223,10 +223,10 @@ def build(bld):
 
     clientlib = bld(features = ['cxx', 'cxxshlib'])
     clientlib.defines = 'HAVE_CONFIG_H'
-    clientlib.uselib = uselib
+    clientlib.use = uselib
     clientlib.install_path = '${LIBDIR}'
     if bld.env['BUILD_JACKDBUS'] == True and bld.env['BUILD_JACKD'] == False:
-        clientlib.uselib.append('DBUS-1')
+        clientlib.use.append('DBUS-1')
     clientlib.includes = includes
     clientlib.name         = 'clientlib'
     clientlib.target       = 'jack'
@@ -287,7 +287,7 @@ def build(bld):
 
     if bld.env['BUILD_ADAPTER'] == True:
         process = create_jack_process_obj(bld, 'netadapter', net_adapter_sources, serverlib)
-        process.uselib = 'SAMPLERATE'
+        process.use = 'SAMPLERATE'
 
     audio_adapter_sources = [
         'JackResampler.cpp',
@@ -301,17 +301,17 @@ def build(bld):
          audio_adapter_sources += ['../macosx/coreaudio/JackCoreAudioAdapter.cpp']
          process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
          process.env.append_value("LINKFLAGS", "-framework CoreAudio -framework AudioUnit -framework AudioToolbox -framework CoreServices")
-         process.uselib = 'SAMPLERATE'
+         process.use = 'SAMPLERATE'
 
     if bld.env['BUILD_ADAPTER'] and bld.env['IS_LINUX'] and bld.env['BUILD_DRIVER_ALSA']:
          audio_adapter_sources += ['../linux/alsa/JackAlsaAdapter.cpp']
          process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
-         process.uselib = ['ALSA', 'SAMPLERATE']
+         process.use = ['ALSA', 'SAMPLERATE']
 
     if bld.env['BUILD_ADAPTER'] and bld.env['IS_SUN']:
          audio_adapter_sources += ['../solaris/oss/JackOSSAdapter.cpp', 'memops.c']
          process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
-         process.uselib = 'SAMPLERATE'
+         process.use = 'SAMPLERATE'
 
     #audio_adapter_sources += ['../windows/JackPortAudioAdapter.cpp']
     #process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
