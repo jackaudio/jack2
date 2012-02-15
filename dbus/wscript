@@ -6,7 +6,7 @@ import Options
 import re # subst_func
 import Logs
 
-def set_options(opt):
+def options(opt):
     opt.add_option('--enable-pkg-config-dbus-service-dir', action='store_true', default=False, help='force D-Bus service install dir to be one returned by pkg-config')
 
 def configure(conf):
