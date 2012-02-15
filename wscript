@@ -18,8 +18,8 @@ APPNAME='jack'
 JACK_API_VERSION = '0.1.0'
 
 # these variables are mandatory ('/' are converted automatically)
-srcdir = '.'
-blddir = 'build'
+top = '.'
+out = 'build'
 
 def display_msg(msg, status = None, color = None):
     sr = msg
@@ -294,7 +294,7 @@ def configure(conf):
     print()
 
 def build(bld):
-    print(("make[1]: Entering directory `" + os.getcwd() + "/" + blddir + "'" ))
+    print(("make[1]: Entering directory `" + os.getcwd() + "/" + out + "'" ))
     if not os.access('svnversion.h', os.R_OK):
         create_svnversion_task(bld)
 
