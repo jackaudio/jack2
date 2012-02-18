@@ -50,10 +50,14 @@ typedef	UInt8	CAAudioHardwareDeviceSectionID;
 \todo hardware monitoring
 */
 
+class JackAC3Encoder;
+
 class JackCoreAudioDriver : public JackAudioDriver
 {
 
     private:
+    
+        JackAC3Encoder* fAC3Encoder;
 
         AudioUnit fAUHAL;
 
@@ -180,7 +184,10 @@ class JackCoreAudioDriver : public JackAudioDriver
                  int async_output_latency,
                  int computation_grain,
                  bool hogged,
-                 bool clock_drift);
+                 bool clock_drift,
+                 bool ac3_encoding,
+                 int ac3_bitrate, 
+                 bool ac3_lfe);
         int Close();
 
         int Attach();
