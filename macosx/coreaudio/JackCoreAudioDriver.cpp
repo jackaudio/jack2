@@ -374,7 +374,7 @@ OSStatus JackCoreAudioDriver::SRNotificationCallback(AudioDeviceID inDevice,
             jack_log("JackCoreAudioDriver::SRNotificationCallback kAudioDevicePropertyNominalSampleRate");
             // Check new sample rate
             Float64 tmp_sample_rate;
-            UInt32 outSize =  sizeof(Float64);
+            UInt32 outSize = sizeof(Float64);
             OSStatus err = AudioDeviceGetProperty(inDevice, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyNominalSampleRate, &outSize, &tmp_sample_rate);
             if (err != noErr) {
                 jack_error("Cannot get current sample rate");
@@ -392,7 +392,7 @@ OSStatus JackCoreAudioDriver::SRNotificationCallback(AudioDeviceID inDevice,
 
 OSStatus JackCoreAudioDriver::BSNotificationCallback(AudioDeviceID inDevice,
                                                      UInt32 inChannel,
-                                                     Boolean	isInput,
+                                                     Boolean isInput,
                                                      AudioDevicePropertyID inPropertyID,
                                                      void* inClientData)
 {
@@ -404,7 +404,7 @@ OSStatus JackCoreAudioDriver::BSNotificationCallback(AudioDeviceID inDevice,
             jack_log("JackCoreAudioDriver::BSNotificationCallback kAudioDevicePropertyBufferFrameSize");
             // Check new buffer size
             UInt32 tmp_buffer_size;
-            UInt32 outSize =  sizeof(UInt32);
+            UInt32 outSize = sizeof(UInt32);
             OSStatus err = AudioDeviceGetProperty(inDevice, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyBufferFrameSize, &outSize, &tmp_buffer_size);
             if (err != noErr) {
                 jack_error("Cannot get current buffer size");
@@ -427,18 +427,17 @@ OSStatus JackCoreAudioDriver::AudioHardwareNotificationCallback(AudioHardwarePro
 
     switch (inPropertyID) {
 
-            case kAudioHardwarePropertyDevices: {
-                jack_log("JackCoreAudioDriver::AudioHardwareNotificationCallback kAudioHardwarePropertyDevices");
-                DisplayDeviceNames();
-                AudioDeviceID captureID, playbackID;
-                if (CheckAvailableDevice(driver->fDeviceID) ||
-                    (CheckAvailableDeviceName(driver->fCaptureUID, &captureID)
-                    && CheckAvailableDeviceName(driver->fPlaybackUID, &playbackID))) {
+        case kAudioHardwarePropertyDevices: {
+            jack_log("JackCoreAudioDriver::AudioHardwareNotificationCallback kAudioHardwarePropertyDevices");
+            DisplayDeviceNames();
+            AudioDeviceID captureID, playbackID;
+            if (CheckAvailableDevice(driver->fDeviceID) ||
+                (CheckAvailableDeviceName(driver->fCaptureUID, &captureID)
+                && CheckAvailableDeviceName(driver->fPlaybackUID, &playbackID))) {
 
-                }
-                break;
             }
-
+            break;
+        }
     }
 
     return noErr;
@@ -707,7 +706,6 @@ OSStatus JackCoreAudioDriver::GetStreamLatencies(AudioDeviceID device, bool isIn
     return err;
 }
 
-
 bool JackCoreAudioDriver::IsDigitalDevice(AudioDeviceID device)
 {
     OSStatus err = noErr;
@@ -771,12 +769,6 @@ bool JackCoreAudioDriver::IsDigitalDevice(AudioDeviceID device)
     }
        
     return is_digital;
-}
-
-bool JackCoreAudioDriver::IsDigitalDeviceStream(AudioDeviceID device, AudioStreamID streamID)
-{
-    // TODO
-    return true;
 }
 
 JackCoreAudioDriver::JackCoreAudioDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
@@ -1447,7 +1439,7 @@ int JackCoreAudioDriver::SetupBufferSize(jack_nframes_t buffer_size)
         }
 
         // Check new buffer size
-        outSize =  sizeof(UInt32);
+        outSize = sizeof(UInt32);
         err = AudioDeviceGetProperty(fDeviceID, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyBufferFrameSize, &outSize, &tmp_buffer_size);
         if (err != noErr) {
             jack_error("Cannot get current buffer size");
@@ -1464,7 +1456,7 @@ int JackCoreAudioDriver::SetupBufferSize(jack_nframes_t buffer_size)
 
 error:
 
-    // Remove SR change notification
+    // Remove BS change notification
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDevicePropertyBufferFrameSize, BSNotificationCallback);
     return -1;
 
@@ -1526,7 +1518,7 @@ int JackCoreAudioDriver::SetupSampleRateAux(AudioDeviceID inDevice, jack_nframes
         }
 
         // Check new sample rate
-        outSize =  sizeof(Float64);
+        outSize = sizeof(Float64);
         err = AudioDeviceGetProperty(inDevice, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyNominalSampleRate, &outSize, &tmp_sample_rate);
         if (err != noErr) {
             jack_error("Cannot get current sample rate");
@@ -2024,7 +2016,7 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
     
     if (ac3_encoding) {
     
-         if (!IsDigitalDevice(fDeviceID)) {
+        if (!IsDigitalDevice(fDeviceID)) {
             jack_error("AC3 encoding can only be used with a digital device");
             goto error;
         }
@@ -2052,6 +2044,11 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
         fPlaybackChannels = outchannels;
         if (ac3_lfe) {
             fPlaybackChannels++;
+        }
+        
+        if (fPlaybackChannels < 2 || fPlaybackChannels > 6) {
+            jack_error("AC3 encoder channels must be between 2 and 6");
+            goto error;
         }
         
         // Force real output channel number to 2
