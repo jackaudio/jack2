@@ -162,6 +162,9 @@ class JackCoreAudioDriver : public JackAudioDriver
         bool TakeHog();
 
         void UpdateLatencies();
+        
+        bool IsDigitalDevice(AudioDeviceID device);
+        bool IsDigitalDeviceStream(AudioDeviceID device, AudioStreamID streamID);
 
     public:
 

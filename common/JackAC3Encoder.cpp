@@ -250,7 +250,7 @@ void JackAC3Encoder::sample_move_dS_s16_24ph(jack_default_audio_sample_t* dst, c
 	}
 }
 
-void JackAC3Encoder::GetChannelName(char* name, int channel)
+void JackAC3Encoder::GetChannelName(const char* name, const char* alias, char* portname, int channel)
 {
     /*
 	 * 2 channels = L, R
@@ -260,39 +260,41 @@ void JackAC3Encoder::GetChannelName(char* name, int channel)
 	 * 6 ch       = L, C, R,  LS, RS, LFE
 	 */
      
+     const char* AC3_name = "";
+     
      switch (channel) {
      
         case 0:
-            strcpy(name, "AC3_1_Left");
+            AC3_name = "AC3_1_Left";
             break;
             
         case 1:
             if (fAftenContext.channels == 2 || fAftenContext.channels == 4) {
-                strcpy(name, "AC3_2_Right");
+                AC3_name = "AC3_2_Right";
             } else {
-                strcpy(name, "AC3_2_Center");
+                AC3_name = "AC3_2_Center";
             }
             break;
             
         case 2:
             if (fAftenContext.channels == 4) {
-                strcpy(name, "AC3_3_LeftSurround");
+                AC3_name = "AC3_3_LeftSurround";
             } else {
-                strcpy(name, "AC3_3_Right");
+                AC3_name = "AC3_3_Right";
             }
             break;
         
         case 3:
             if (fAftenContext.channels == 4) {
-                strcpy(name, "AC3_4_RightSurround");
+                AC3_name = "AC3_4_RightSurround";
             } else {
-                strcpy(name, "AC3_4_LeftSurround");
+                AC3_name = "AC3_4_LeftSurround";
             }
             break;
             
         case 4:
             if (fAftenContext.channels > 4) {
-				strcpy(name, "AC3_5_RightSurround");
+               AC3_name = "AC3_5_RightSurround";
 			}
             break;
             
@@ -302,9 +304,10 @@ void JackAC3Encoder::GetChannelName(char* name, int channel)
      
      // Last channel
      if (fAftenContext.lfe && (channel == fAftenContext.channels - 1)) {
-        sprintf(name, "AC3_%d_LFE", fAftenContext.channels + 1);
+        sprintf(portname, "%s:%s:AC3_%d_LFE", name, alias, fAftenContext.channels);
+     } else {
+        sprintf(portname, "%s:%s:%s", name, alias, AC3_name);
      }
 }
-
 
 } // end of namespace

@@ -707,6 +707,78 @@ OSStatus JackCoreAudioDriver::GetStreamLatencies(AudioDeviceID device, bool isIn
     return err;
 }
 
+
+bool JackCoreAudioDriver::IsDigitalDevice(AudioDeviceID device)
+{
+    OSStatus err = noErr;
+    UInt32 outSize1;
+    bool is_digital = false;
+    
+    /* Get a list of all the streams on this device */
+    AudioObjectPropertyAddress streamsAddress = { kAudioDevicePropertyStreams, kAudioDevicePropertyScopeOutput, kAudioObjectPropertyElementMaster };
+    err = AudioObjectGetPropertyDataSize(device, &streamsAddress, 0, NULL, &outSize1);
+    if (err != noErr) {
+        jack_error("IsDigitalDevice kAudioDevicePropertyStreams err = %d", err);
+        return false;
+    }
+    
+    int stream_count = outSize1 / sizeof(AudioStreamID);
+    AudioStreamID streamIDs[stream_count];
+    
+    err = AudioObjectGetPropertyData(device, &streamsAddress, 0, NULL, &outSize1, streamIDs);
+
+    if (err != noErr) {
+        jack_error("IsDigitalDevice kAudioDevicePropertyStreams list err = %d", err);
+        return false;
+    }
+    
+    AudioObjectPropertyAddress physicalFormatsAddress = { kAudioStreamPropertyAvailablePhysicalFormats, kAudioObjectPropertyScopeGlobal, 0 };
+    
+    for (int i = 0; i < stream_count ; i++) {
+    
+        /* Find a stream with a cac3 stream */
+        int  format_num = 0;
+
+        /* Retrieve all the stream formats supported by each output stream */
+        err = AudioObjectGetPropertyDataSize(streamIDs[i], &physicalFormatsAddress, 0, NULL, &outSize1);
+        
+        if (err != noErr) {
+            jack_error("IsDigitalDevice kAudioStreamPropertyAvailablePhysicalFormats err = %d", err);
+            return false;
+        }
+
+        format_num = outSize1 / sizeof(AudioStreamRangedDescription);
+        AudioStreamRangedDescription format_list[format_num];
+      
+        err = AudioObjectGetPropertyData(streamIDs[i], &physicalFormatsAddress, 0, NULL, &outSize1, format_list);
+         
+        if (err != noErr) {
+            jack_error("IsDigitalDevice could not get the list of streamformats err = %d", err);
+            return false;
+        }
+
+        /* Check if one of the supported formats is a digital format */
+        for (int j = 0; j < format_num; j++) {
+            if (format_list[j].mFormat.mFormatID == 'IAC3' ||
+                format_list[j].mFormat.mFormatID == 'iac3' ||
+                format_list[j].mFormat.mFormatID == kAudioFormat60958AC3 ||
+                format_list[j].mFormat.mFormatID == kAudioFormatAC3 )
+            {
+                is_digital = true;
+                break;
+            }
+        }
+    }
+       
+    return is_digital;
+}
+
+bool JackCoreAudioDriver::IsDigitalDeviceStream(AudioDeviceID device, AudioStreamID streamID)
+{
+    // TODO
+    return true;
+}
+
 JackCoreAudioDriver::JackCoreAudioDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
         : JackAudioDriver(name, alias, engine, table),
         fAC3Encoder(NULL),
@@ -1921,7 +1993,7 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
             printError(osErr);
         }
     }
-
+  
     if (SetupDevices(capture_driver_uid, playback_driver_uid, capture_driver_name, playback_driver_name, sample_rate) < 0) {
         goto error;
     }
@@ -1938,7 +2010,7 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
         goto error;
     }
 
-    if (SetupChannels(capturing, playing, inchannels, outchannels, in_nChannels, out_nChannels, true) < 0) {
+    if (SetupChannels(capturing, playing, inchannels, outchannels, in_nChannels, out_nChannels, !ac3_encoding) < 0) {
         goto error;
     }
 
@@ -1951,6 +2023,18 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
     }
     
     if (ac3_encoding) {
+    
+         if (!IsDigitalDevice(fDeviceID)) {
+            jack_error("AC3 encoding can only be used with a digital device");
+            goto error;
+        }
+        
+        // Force hogged mode
+        fHogged = true;
+        if (TakeHog()) {
+            jack_info("Device = %ld has been hogged", fDeviceID);
+        }
+        
         JackAC3EncoderParams params;
         memset(&params, 0, sizeof(JackAC3EncoderParams));
         params.bitrate = ac3_bitrate;
@@ -1958,11 +2042,27 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
         params.sample_rate = sample_rate;
         params.lfe = ac3_lfe;
         fAC3Encoder = new JackAC3Encoder(params);
+        
         if (!fAC3Encoder || !fAC3Encoder->Init(sample_rate)) {
             jack_error("Cannot allocate of init AC3 encoder");
             goto error;
         }
+        
+        // Setup AC3 channel number
+        fPlaybackChannels = outchannels;
+        if (ac3_lfe) {
+            fPlaybackChannels++;
+        }
+        
+        // Force real output channel number to 2
+        outchannels = out_nChannels = 2;
+        
+    } else {
+        fPlaybackChannels = outchannels;
     }
+    
+    // Core driver may have changed the in/out values
+    fCaptureChannels = inchannels;
 
     if (OpenAUHAL(capturing, playing, inchannels, outchannels, in_nChannels, out_nChannels, parsed_chan_in_list, parsed_chan_out_list, buffer_size, sample_rate) < 0) {
         goto error;
@@ -1977,10 +2077,7 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
     if (AddListeners() < 0) {
         goto error;
     }
-
-    // Core driver may have changed the in/out values
-    fCaptureChannels = inchannels;
-    fPlaybackChannels = outchannels;
+  
     return noErr;
 
 error:
@@ -2157,8 +2254,8 @@ int JackCoreAudioDriver::Attach()
     if (fAC3Encoder) {
         // Setup specific AC3 channels names
         for (int i = 0; i < fPlaybackChannels; i++) {
-            fAC3Encoder->GetChannelName(alias, i);
-            port = fGraphManager->GetPort(port_index);
+            fAC3Encoder->GetChannelName("coreaudio", "", alias, i);
+            port = fGraphManager->GetPort(fPlaybackPortList[i]);
             port->SetAlias(alias);
         }
     }

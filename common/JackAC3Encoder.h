@@ -80,7 +80,7 @@ class JackAC3Encoder
         bool Init(jack_nframes_t sample_rate);
   
         void Process(float** inputs, float** outputs, int nframes);
-        void GetChannelName(char* name, int channel);
+        void GetChannelName(const char* name, const char* alias, char* portname, int channel);
 };
 
 typedef JackAC3Encoder * JackAC3EncoderPtr;
