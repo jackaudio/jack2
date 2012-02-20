@@ -91,7 +91,6 @@ bool JackWinProcessSync::LockedTimedWait(long usec)
     return TimedWait(usec);
 }
 
-
 /*
 // Code from APPLE CAGuard.cpp : does not seem to work as expected...
 
@@ -103,6 +102,28 @@ void JackWinProcessSync::Wait()
 	DWORD res = WaitForSingleObject(fEvent, INFINITE);
     if (res != WAIT_OBJECT_0) {
         jack_error("JackWinProcessSync::Wait WaitForSingleObject err = %d", GetLastError());
+    }
+}
+
+// Variant that behaves differently depending of the mutex state
+void JackWinProcessSync::Wait()
+{
+    if (ReleaseMutex(fMutex)) {
+        HANDLE handles[] = { fMutex, fEvent };
+        DWORD res = WaitForMultipleObjects(2, handles, true, INFINITE);
+        if (res != WAIT_OBJECT_0) {
+            jack_error("JackWinProcessSync::LockedWait WaitForMultipleObjects err = %d", GetLastError());
+        }
+    } else {
+        jack_error("JackWinProcessSync::Wait ReleaseMutex err = %d", GetLastError());
+        DWORD res = WaitForSingleObject(fEvent, INFINITE);
+        if (res != WAIT_OBJECT_0) {
+            jack_error("JackWinProcessSync::Wait WaitForSingleObject err = %d", GetLastError());
+        }
+    }
+	
+    if (!ResetEvent(fEvent)) {
+        jack_error("JackWinProcessSync::LockedWait ResetEvent err = %d", GetLastError());
     }
 }
 
@@ -132,6 +153,30 @@ bool JackWinProcessSync::TimedWait(long usec)
 	DWORD res = WaitForSingleObject(fEvent, usec / 1000);
     if (res != WAIT_OBJECT_0) {
         jack_error("JackWinProcessSync::TimedWait WaitForSingleObject err = %d", GetLastError());
+    }
+    
+	return (res == WAIT_OBJECT_0);
+}
+
+// Variant that behaves differently depending of the mutex state
+bool JackWinProcessSync::TimedWait(long usec)
+{
+  	if (ReleaseMutex(fMutex)) {
+        HANDLE handles[] = { fMutex, fEvent };
+        DWORD res = WaitForMultipleObjects(2, handles, true, usec / 1000);
+        if ((res != WAIT_OBJECT_0) && (res != WAIT_TIMEOUT)) {
+            jack_error("JackWinProcessSync::LockedTimedWait WaitForMultipleObjects err = %d", GetLastError());
+        }
+    } else {
+        jack_error("JackWinProcessSync::TimedWait ReleaseMutex err = %d", GetLastError());
+        DWORD res = WaitForSingleObject(fEvent, usec / 1000);
+        if (res != WAIT_OBJECT_0) {
+            jack_error("JackWinProcessSync::TimedWait WaitForSingleObject err = %d", GetLastError());
+        }
+    }
+    
+	if (!ResetEvent(fEvent)) {
+        jack_error("JackWinProcessSync::LockedTimedWait ResetEvent err = %d", GetLastError());
     }
     
 	return (res == WAIT_OBJECT_0);

@@ -46,6 +46,7 @@ class JackWinProcessSync : public JackWinMutex
                 //fEvent = CreateEvent(NULL, TRUE, FALSE, buffer);  // Needs ResetEvent
                 fEvent = CreateEvent(NULL, FALSE, FALSE, buffer);   // Auto-reset event
             } else {
+                //fEvent = CreateEvent(NULL, TRUE, FALSE, NULL);   // Needs ResetEvent
                 fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);   // Auto-reset event
             }
 

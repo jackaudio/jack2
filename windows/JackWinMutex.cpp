@@ -31,11 +31,11 @@ namespace Jack
                 fOwner = GetCurrentThreadId();
                 return true;
             } else {
-                jack_log("JackWinMutex::Lock res = %d", res);
+                jack_log("JackBaseWinMutex::Lock res = %d", res);
                 return false;
             }
         } else {
-            jack_error("JackWinMutex::Lock mutex already locked by thread = %d", GetCurrentThreadId());
+            jack_error("JackBaseWinMutex::Lock mutex already locked by thread = %d", GetCurrentThreadId());
             return false;
         }
     }
@@ -48,11 +48,11 @@ namespace Jack
                 fOwner = GetCurrentThreadId();
                 return true;
             } else {
-                jack_log("JackWinMutex::Trylock res = %d", res);
+                jack_log("JackBaseWinMutex::Trylock res = %d", res);
                 return false;
             }
         } else {
-            jack_error("JackWinMutex::Trylock mutex already locked by thread = %d", GetCurrentThreadId());
+            jack_error("JackBaseWinMutex::Trylock mutex already locked by thread = %d", GetCurrentThreadId());
             return false;
         }
     }
@@ -65,11 +65,11 @@ namespace Jack
             if (res != 0) {
                 return true;
             } else {
-                jack_log("JackWinMutex::Unlock res = %d", res);
+                jack_log("JackBaseWinMutex::Unlock res = %d", res);
                 return false;
             }
         } else {
-            jack_error("JackWinMutex::Unlock mutex not locked by thread = %d", GetCurrentThreadId());
+            jack_error("JackBaseWinMutex::Unlock mutex not locked by thread = %d", GetCurrentThreadId());
             return false;
         }
     }
@@ -89,7 +89,7 @@ namespace Jack
         if (WAIT_OBJECT_0 == WaitForSingleObject(fMutex, 0)) {
             return true;
         } else  {
-            jack_log("JackWinProcessSync::Lock WaitForSingleObject err = %d", GetLastError());
+            jack_log("JackWinProcessSync::Trylock WaitForSingleObject err = %d", GetLastError());
             return false;
         }
     }
