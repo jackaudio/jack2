@@ -79,8 +79,8 @@ class JackCoreAudioDriver : public JackAudioDriver
         float fIOUsage;
         float fComputationGrain;
         bool fClockDriftCompensate;
+        bool fDigitalPlayback;
    
-    
         static OSStatus Render(void *inRefCon,
                                AudioUnitRenderActionFlags *ioActionFlags,
                                const AudioTimeStamp *inTimeStamp,
@@ -126,7 +126,8 @@ class JackCoreAudioDriver : public JackAudioDriver
                          const char* playback_driver_uid,
                          char* capture_driver_name,
                          char* playback_driver_name,
-                         jack_nframes_t samplerate);
+                         jack_nframes_t samplerate,
+                         bool ac3_encoding);
 
         int SetupChannels(bool capturing,
                           bool playing,
