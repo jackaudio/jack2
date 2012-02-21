@@ -54,6 +54,7 @@ void JackWinProcessSync::LockedSignalAll()
     LockedSignal();
 }
 
+/*
 void JackWinProcessSync::Wait()
 {
     if (!ReleaseMutex(fMutex)) {
@@ -64,6 +65,7 @@ void JackWinProcessSync::Wait()
         jack_error("JackWinProcessSync::Wait WaitForSingleObject err = %d", GetLastError());
     }
 }
+*/
 
 void JackWinProcessSync::LockedWait()
 {
@@ -71,24 +73,75 @@ void JackWinProcessSync::LockedWait()
 	Wait();
 }
 
+/*
 bool JackWinProcessSync::TimedWait(long usec)
 {
     if (!ReleaseMutex(fMutex)) {
         jack_error("JackWinProcessSync::TimedWait ReleaseMutex err = %d", GetLastError());
     }
-    
+
 	DWORD res = WaitForSingleObject(fEvent, usec / 1000);
     if (res != WAIT_OBJECT_0) {
         jack_error("JackWinProcessSync::TimedWait WaitForSingleObject err = %d", GetLastError());
     }
-    
+
 	return (res == WAIT_OBJECT_0);
 }
-
+*/
 bool JackWinProcessSync::LockedTimedWait(long usec)
 {
     // Does it make sense on Windows, use non-locked version for now...
     return TimedWait(usec);
+}
+
+void JackWinProcessSync::Wait()
+{
+    // In case Wait is called in a "locked" context
+    if (ReleaseMutex(fMutex)) {
+        HANDLE handles[] = { fMutex, fEvent };
+        DWORD res = WaitForMultipleObjects(2, handles, true, INFINITE);
+        if (res != WAIT_OBJECT_0) {
+            jack_error("JackWinProcessSync::Wait WaitForMultipleObjects err = %d", GetLastError());
+        }
+    // In case Wait is called in a "non-locked" context
+    } else {
+        jack_error("JackWinProcessSync::Wait ReleaseMutex err = %d", GetLastError());
+        DWORD res = WaitForSingleObject(fEvent, INFINITE);
+        if (res != WAIT_OBJECT_0) {
+            jack_error("JackWinProcessSync::Wait WaitForSingleObject err = %d", GetLastError());
+        }
+    }
+
+    if (!ResetEvent(fEvent)) {
+        jack_error("JackWinProcessSync::Wait ResetEvent err = %d", GetLastError());
+    }
+}
+
+bool JackWinProcessSync::TimedWait(long usec)
+{
+    DWORD res = 0;
+
+    // In case TimedWait is called in a "locked" context
+  	if (ReleaseMutex(fMutex)) {
+        HANDLE handles[] = { fMutex, fEvent };
+        res = WaitForMultipleObjects(2, handles, true, usec / 1000);
+        if ((res != WAIT_OBJECT_0) && (res != WAIT_TIMEOUT)) {
+            jack_error("JackWinProcessSync::TimedWait WaitForMultipleObjects err = %d", GetLastError());
+        }
+    // In case TimedWait is called in a "non-locked" context
+    } else {
+        jack_error("JackWinProcessSync::TimedWait ReleaseMutex err = %d", GetLastError());
+        res = WaitForSingleObject(fEvent, usec / 1000);
+        if (res != WAIT_OBJECT_0) {
+            jack_error("JackWinProcessSync::TimedWait WaitForSingleObject err = %d", GetLastError());
+        }
+    }
+
+	if (!ResetEvent(fEvent)) {
+        jack_error("JackWinProcessSync::TimedWait ResetEvent err = %d", GetLastError());
+    }
+
+	return (res == WAIT_OBJECT_0);
 }
 
 /*
@@ -121,7 +174,7 @@ void JackWinProcessSync::Wait()
             jack_error("JackWinProcessSync::Wait WaitForSingleObject err = %d", GetLastError());
         }
     }
-	
+
     if (!ResetEvent(fEvent)) {
         jack_error("JackWinProcessSync::LockedWait ResetEvent err = %d", GetLastError());
     }
@@ -132,13 +185,13 @@ void JackWinProcessSync::LockedWait()
     if (!ReleaseMutex(fMutex)) {
         jack_error("JackWinProcessSync::LockedWait ReleaseMutex err = %d", GetLastError());
     }
-    
+
 	HANDLE handles[] = { fMutex, fEvent };
 	DWORD res = WaitForMultipleObjects(2, handles, true, INFINITE);
 	if (res != WAIT_OBJECT_0) {
         jack_error("JackWinProcessSync::LockedWait WaitForMultipleObjects err = %d", GetLastError());
     }
-    
+
     if (!ResetEvent(fEvent)) {
         jack_error("JackWinProcessSync::LockedWait ResetEvent err = %d", GetLastError());
     }
@@ -149,12 +202,12 @@ bool JackWinProcessSync::TimedWait(long usec)
   	if (!ReleaseMutex(fMutex)) {
         jack_error("JackWinProcessSync::TimedWait ReleaseMutex err = %d", GetLastError());
     }
-    
+
 	DWORD res = WaitForSingleObject(fEvent, usec / 1000);
     if (res != WAIT_OBJECT_0) {
         jack_error("JackWinProcessSync::TimedWait WaitForSingleObject err = %d", GetLastError());
     }
-    
+
 	return (res == WAIT_OBJECT_0);
 }
 
@@ -174,11 +227,11 @@ bool JackWinProcessSync::TimedWait(long usec)
             jack_error("JackWinProcessSync::TimedWait WaitForSingleObject err = %d", GetLastError());
         }
     }
-    
+
 	if (!ResetEvent(fEvent)) {
         jack_error("JackWinProcessSync::LockedTimedWait ResetEvent err = %d", GetLastError());
     }
-    
+
 	return (res == WAIT_OBJECT_0);
 }
 
@@ -187,17 +240,17 @@ bool JackWinProcessSync::LockedTimedWait(long usec)
    if (!ReleaseMutex(fMutex)) {
         jack_error("JackWinProcessSync::LockedTimedWait ReleaseMutex err = %d", GetLastError());
     }
-    
+
 	HANDLE handles[] = { fMutex, fEvent };
 	DWORD res = WaitForMultipleObjects(2, handles, true, usec / 1000);
 	if ((res != WAIT_OBJECT_0) && (res != WAIT_TIMEOUT)) {
         jack_error("JackWinProcessSync::LockedTimedWait WaitForMultipleObjects err = %d", GetLastError());
     }
-        
+
     if (!ResetEvent(fEvent)) {
         jack_error("JackWinProcessSync::LockedTimedWait ResetEvent err = %d", GetLastError());
     }
-    
+
     return (res == WAIT_OBJECT_0);
 }
 */
