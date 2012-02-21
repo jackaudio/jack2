@@ -49,9 +49,14 @@ JackRouter JACK/ASIO driver
 
 JackRouter is an ASIO driver that allows any ASIO compatible application to become a JACK client, thus exchange audio with any other "native" or "Jackified" application. This driver is registered in the system by the installer and becomes available in the list of ASIO drivers when the JACK server is running. A "JackRouter.ini" configuration file allows the application to configure how the JackRouter driver behaves.
 
-	- [IO]: the application can obtain any number if JACK input/output ports (not necessarily equal to the audio card input/output number). [Note that some applications force their input/output channel number].
+	- [IO]: 
+		- input/output : the application can obtain any number if JACK input/output ports (not necessarily equal to the audio card input/output number). [Note that some applications force their input/output channel number].
+		- float-sample : be default the JackRouter will present audio samples in integer format for the application. Use float-sample=1 so that audio samples are presented in float format for the application (thus saving float/integer conversion time).
+	
 
-	- [AUTO_CONNECT] : when 1, the application JACK port will automatically be connected to the machine input/output JACK ports.
+	- [AUTO_CONNECT] : 
+		- input/output : when 1, the application JACK port will automatically be connected to the machine input/output JACK ports.
+		- alias : with ASIO drivers, real channels names will be associated to the JACK port as aliases and will be returned when the application request channels names.
 
 
 =============================================
