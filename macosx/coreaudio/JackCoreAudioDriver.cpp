@@ -192,7 +192,6 @@ static bool CheckAvailableDevice(AudioDeviceID device_id)
         if (device_id == devices[i]) {
             return true;
         }
-
     }
 
     return false;
@@ -1380,15 +1379,7 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid,
             }
         }
     }
-    
-    /*
-    if (fHogged) {
-        if (TakeHog()) {
-            jack_info("Device = %ld has been hogged", fDeviceID);
-        }
-    }
-    */
-    
+     
     return 0;
 }
 
@@ -2074,22 +2065,7 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
     }
     
     if (ac3_encoding) {
-    
-        /*
-        // Force hogged mode
-        fHogged = true;
-        if (TakeHog()) {
-            jack_info("Device = %ld has been hogged", fDeviceID);
-        } 
-        */
-        
-        /*        
-        if (!IsDigitalDevice(fDeviceID)) {
-            jack_error("AC3 encoding can only be used with a digital device");
-            goto error;
-        }
-        */
-        
+          
         if (!fDigitalPlayback) {
             jack_error("AC3 encoding can only be used with a digital device");
             goto error;
