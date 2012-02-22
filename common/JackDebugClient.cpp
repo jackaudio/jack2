@@ -320,6 +320,12 @@ int JackDebugClient::PortIsMine(jack_port_id_t port_index)
     return fClient->PortIsMine(port_index);
 }
 
+int JackDebugClient::PortRename(jack_port_id_t port_index, const char* name)
+{
+    CheckClient("PortRename");
+    return fClient->PortRename(port_index, name);
+}
+
 //--------------------
 // Context management
 //--------------------
@@ -339,6 +345,12 @@ int JackDebugClient::SetFreeWheel(int onoff)
          *fStream << "!!! ERROR !!! : Freewheel setup seems incorrect : set = OFF while FW is already OFF " << endl;
     fFreewheel = onoff ? true : false;
     return fClient->SetFreeWheel(onoff);
+}
+
+int JackDebugClient::ComputeTotalLatencies()
+{
+    CheckClient("ComputeTotalLatencies");
+    return fClient->ComputeTotalLatencies();
 }
 
 /*
@@ -520,6 +532,13 @@ int JackDebugClient::SetLatencyCallback(JackLatencyCallback callback, void *arg)
     CheckClient("SetLatencyCallback");
     return fClient->SetLatencyCallback(callback, arg);
 }
+
+int JackDebugClient::SetProcessThread(JackThreadCallback fun, void *arg)
+{
+    CheckClient("SetProcessThread");
+    return fClient->SetProcessThread(fun, arg);
+}
+
 
 jack_session_command_t* JackDebugClient::SessionNotify(const char* target, jack_session_event_type_t type, const char* path)
 {
