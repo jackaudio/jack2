@@ -73,14 +73,24 @@ class JackAC3Encoder
         void sample_move_dS_s16_24ph(jack_default_audio_sample_t* dst, char *src, jack_nframes_t nsamples, unsigned long src_skip);
 
     public:
-
+    
+    #ifdef __ppc__
+        JackAC3Encoder(const JackAC3EncoderParams& params) {}
+        virtual ~JackAC3Encoder() {}
+  
+        bool Init(jack_nframes_t sample_rate) {return false;}
+  
+        void Process(float** inputs, float** outputs, int nframes) {}
+        void GetChannelName(const char* name, const char* alias, char* portname, int channel) {}
+    #else
         JackAC3Encoder(const JackAC3EncoderParams& params);
         virtual ~JackAC3Encoder();
-        
+    
         bool Init(jack_nframes_t sample_rate);
-  
+    
         void Process(float** inputs, float** outputs, int nframes);
         void GetChannelName(const char* name, const char* alias, char* portname, int channel);
+    #endif
 };
 
 typedef JackAC3Encoder * JackAC3EncoderPtr;

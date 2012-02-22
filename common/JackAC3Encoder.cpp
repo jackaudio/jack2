@@ -29,6 +29,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 namespace Jack
 {
+    
+#ifndef __ppc__
 
 JackAC3Encoder::JackAC3Encoder(const JackAC3EncoderParams& params)
 {
@@ -309,5 +311,7 @@ void JackAC3Encoder::GetChannelName(const char* name, const char* alias, char* p
         sprintf(portname, "%s:%s:%s", name, alias, AC3_name);
      }
 }
+    
+#endif
 
 } // end of namespace

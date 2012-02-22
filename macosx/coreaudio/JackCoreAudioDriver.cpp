@@ -604,7 +604,7 @@ OSStatus JackCoreAudioDriver::GetDefaultInputDevice(AudioDeviceID* id)
     }
 
     if (inDefault == 0) {
-        jack_error("Error: default input device is 0, please select a correct one !!");
+        jack_error("Error default input device is 0, please select a correct one !!");
         return -1;
     }
     jack_log("JackCoreAudioDriver::GetDefaultInputDevice : input = %ld ", inDefault);
@@ -623,7 +623,7 @@ OSStatus JackCoreAudioDriver::GetDefaultOutputDevice(AudioDeviceID* id)
     }
 
     if (outDefault == 0) {
-        jack_error("Error: default output device is 0, please select a correct one !!");
+        jack_error("Error default output device is 0, please select a correct one !!");
         return -1;
     }
     jack_log("JackCoreAudioDriver::GetDefaultOutputDevice : output = %ld", outDefault);
@@ -647,13 +647,13 @@ OSStatus JackCoreAudioDriver::GetTotalChannels(AudioDeviceID device, int& channe
     err = AudioDeviceGetPropertyInfo(device, 0, isInput, kAudioDevicePropertyStreamConfiguration, &outSize, &outWritable);
     if (err == noErr) {
         int stream_count = outSize / sizeof(AudioBufferList);
-        jack_log(" JackCoreAudioDriver::GetTotalChannels stream_count = %d", stream_count);
+        jack_log("JackCoreAudioDriver::GetTotalChannels stream_count = %d", stream_count);
         AudioBufferList bufferList[stream_count];
         err = AudioDeviceGetProperty(device, 0, isInput, kAudioDevicePropertyStreamConfiguration, &outSize, bufferList);
         if (err == noErr) {
             for (uint i = 0; i < bufferList->mNumberBuffers; i++) {
                 channelCount += bufferList->mBuffers[i].mNumberChannels;
-                jack_log(" JackCoreAudioDriver::GetTotalChannels stream = %d channels = %d", i, bufferList->mBuffers[i].mNumberChannels);
+                jack_log("JackCoreAudioDriver::GetTotalChannels stream = %d channels = %d", i, bufferList->mBuffers[i].mNumberChannels);
             }
         }
     }
@@ -2465,6 +2465,7 @@ extern "C"
         value.i  = 0;
         jack_driver_descriptor_add_parameter(desc, &filler, "monitor", 'm', JackDriverParamBool, &value, NULL, "Provide monitor ports for the output", NULL);
         
+#ifndef __ppc__
         value.i  = 0;
         jack_driver_descriptor_add_parameter(desc, &filler, "AC3-encoding", 'a', JackDriverParamBool, &value, NULL, "AC3 multi-channels encoding", NULL);
         
@@ -2473,7 +2474,7 @@ extern "C"
        
         value.i  = 0;
         jack_driver_descriptor_add_parameter(desc, &filler, "AC3-LFE", 'f', JackDriverParamBool, &value, NULL, "AC3 LFE channel", NULL);
-
+#endif
         value.i  = TRUE;
         jack_driver_descriptor_add_parameter(desc, &filler, "duplex", 'D', JackDriverParamBool, &value, NULL, "Provide both capture and playback ports", NULL);
 
@@ -2586,10 +2587,11 @@ extern "C"
                     monitor = param->value.i;
                     break;
                     
+            #ifndef __ppc__            
                 case 'a':
                     ac3_encoding = param->value.i;
                     break;
-                    
+                     
                 case 'b':
                     ac3_bitrate = param->value.i;
                     break;
@@ -2597,6 +2599,7 @@ extern "C"
                 case 'f':
                     ac3_lfe = param->value.i;
                     break;
+            #endif
 
                 case 'r':
                     srate = param->value.ui;

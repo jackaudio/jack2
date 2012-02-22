@@ -6363,7 +6363,6 @@
 			isa = PBXProject;
 			buildConfigurationList = 4B699DD5097D427F00A18468 /* Build configuration list for PBXProject "Jackdmp" */;
 			compatibilityVersion = "Xcode 2.4";
-			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -11810,6 +11809,8 @@
 					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
+					libaften_static.a,
+					libaften_pcm.a,
 					"-framework",
 					Jackservermp,
 					"-framework",
@@ -16085,6 +16086,8 @@
 				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
+					libaften_static.a,
+					libaften_pcm.a,
 					"-framework",
 					Jackservermp,
 					"-framework",
@@ -16137,6 +16140,8 @@
 				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
+					libaften_static.a,
+					libaften_pcm.a,
 					"-framework",
 					Jackservermp,
 					"-framework",
