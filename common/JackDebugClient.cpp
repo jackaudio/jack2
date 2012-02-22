@@ -451,10 +451,11 @@ int JackDebugClient::TimeCallback(jack_nframes_t nframes, void *arg)
     jack_time_t t1 = GetMicroSeconds();
     int res = client->fProcessTimeCallback(nframes, client->fProcessTimeCallbackArg);
     if (res == 0) {
-    jack_time_t t2 = GetMicroSeconds();
+        jack_time_t t2 = GetMicroSeconds();
         long delta = long((t2 - t1) - client->GetEngineControl()->fPeriodUsecs);
-        if (delta > 0 && !client->fFreewheel)
+        if (delta > 0 && !client->fFreewheel) {
             *client->fStream << "!!! ERROR !!! : Process overload of " << delta << " us" << endl;
+        }
     }
     return res;
 }
@@ -462,9 +463,17 @@ int JackDebugClient::TimeCallback(jack_nframes_t nframes, void *arg)
 int JackDebugClient::SetProcessCallback(JackProcessCallback callback, void *arg)
 {
     CheckClient("SetProcessCallback");
+    
     fProcessTimeCallback = callback;
     fProcessTimeCallbackArg = arg;
-    return fClient->SetProcessCallback(TimeCallback, this);
+        
+    if (callback == NULL) {
+        // Clear the callback...
+        return fClient->SetProcessCallback(callback, arg);
+    } else {
+        // Setup the measuring version...
+        return fClient->SetProcessCallback(TimeCallback, this);
+    }
 }
 
 int JackDebugClient::SetXRunCallback(JackXRunCallback callback, void *arg)
@@ -538,7 +547,6 @@ int JackDebugClient::SetProcessThread(JackThreadCallback fun, void *arg)
     CheckClient("SetProcessThread");
     return fClient->SetProcessThread(fun, arg);
 }
-
 
 jack_session_command_t* JackDebugClient::SessionNotify(const char* target, jack_session_event_type_t type, const char* path)
 {
