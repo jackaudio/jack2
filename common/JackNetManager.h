@@ -21,6 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JACKNETMANAGER_H__
 
 #include "JackNetInterface.h"
+#include "JackGnuPlotMonitor.h"
 #include "thread.h"
 #include "jack.h"
 #include "jslist.h"

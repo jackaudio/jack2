@@ -22,6 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackTimedDriver.h"
 #include "JackNetInterface.h"
+#include "JackGnuPlotMonitor.h"
 
 //#define JACK_MONITOR
 

@@ -38,12 +38,6 @@
 #include "jslist.h"
 #include "JackCompilerDeps.h"
 
-#include <string>
-#include <algorithm>
-#include <vector>
-#include <iostream>
-#include <fstream>
-
 namespace Jack
 {
 
@@ -59,7 +53,9 @@ namespace Jack
         static void KillServer();
 
         static int MkDir(const char* path);
+        /* returns the name of the per-user subdirectory of jack_tmpdir */
         static char* UserDir();
+        /* returns the name of the per-server subdirectory of jack_user_dir() */
         static char* ServerDir(const char* server_name, char* server_dir);
         static const char* DefaultServerName();
         static void CleanupFiles(const char* server_name);
@@ -78,57 +74,6 @@ namespace Jack
                 return 100;
             }
         }
-    };
-
-    /*!
-    \brief Generic monitoring class. Saves data to GnuPlot files ('.plt' and '.log' datafile)
-
-    This template class allows to manipulate monitoring records, and automatically generate the GnuPlot config and data files.
-    Operations are RT safe because it uses fixed size data buffers.
-    You can set the number of measure points, and the number of records.
-
-    To use it :
-    - create a JackGnuPlotMonitor, you can use the data type you want.
-    - create a temporary array for your measure
-    - once you have filled this array with 'measure points' value, call write() to add it to the record
-    - once you've done with your measurment, just call save() to save your data file
-
-    You can also call SetPlotFile() to automatically generate '.plt' file from an options list.
-
-    */
-
-    template <class T> class JackGnuPlotMonitor
-    {
-        private:
-            uint32_t fMeasureCnt;
-            uint32_t fMeasurePoints;
-            uint32_t fMeasureId;
-            T* fCurrentMeasure;
-            T** fMeasureTable;
-            uint32_t fTablePos;
-            std::string fName;
-
-        public:
-
-            JackGnuPlotMonitor(uint32_t measure_cnt = 512, uint32_t measure_points = 5, std::string name = std::string("default"));
-
-            ~JackGnuPlotMonitor();
-
-            T AddNew(T measure_point);
-
-			uint32_t New();
-
-            T Add(T measure_point);
-
-            uint32_t AddLast(T measure_point);
-
-            uint32_t Write();
-
-            int Save(std::string name = std::string(""));
-
-            int SetPlotFile(std::string* options_list = NULL, uint32_t options_number = 0,
-                            std::string* field_names = NULL, uint32_t field_number = 0,
-                            std::string name = std::string(""));
     };
 
     void BuildClientPath(char* path_to_so, int path_len, const char* so_name);

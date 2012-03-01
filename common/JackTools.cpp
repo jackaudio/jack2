@@ -29,54 +29,29 @@
 #include <process.h>
 #endif
 
+#define DEFAULT_TMP_DIR "/tmp"
 
 using namespace std;
 
 namespace Jack {
 
-    void JackTools::KillServer()
-    {
-#ifdef WIN32
-        exit(1);
-#else
-        kill(GetPID(), SIGINT);
-#endif
-    }
+    char* jack_tmpdir = (char*)DEFAULT_TMP_DIR;
 
     void JackTools::ThrowJackNetException()
     {
         throw JackNetException();
     }
 
-     int JackTools::MkDir(const char* path)
-     {
-#ifdef WIN32
-        return CreateDirectory(path, NULL) == 0;
-#else
-        return mkdir(path, 0777) != 0;
-#endif
-    }
-
-#define DEFAULT_TMP_DIR "/tmp"
-    char* jack_tmpdir = (char*)DEFAULT_TMP_DIR;
-
-    int JackTools::GetPID()
+    void JackTools::RewriteName(const char* name, char* new_name)
     {
-#ifdef WIN32
-        return _getpid();
-#else
-        return getpid();
-#endif
-    }
-
-    int JackTools::GetUID()
-    {
-#ifdef WIN32
-        return  _getpid();
-        //#error "No getuid function available"
-#else
-        return getuid();
-#endif
+        size_t i;
+        for (i = 0; i < strlen(name); i++) {
+            if ((name[i] == '/') || (name[i] == '\\'))
+                new_name[i] = '_';
+            else
+                new_name[i] = name[i];
+        }
+        new_name[i] = '\0';
     }
 
     const char* JackTools::DefaultServerName()
@@ -87,8 +62,27 @@ namespace Jack {
         return server_name;
     }
 
-    /* returns the name of the per-user subdirectory of jack_tmpdir */
 #ifdef WIN32
+    void JackTools::KillServer()
+    {
+        exit(1);
+    }
+
+    int JackTools::MkDir(const char* path)
+    {
+        return CreateDirectory(path, NULL) == 0;
+    }
+
+    int JackTools::GetPID()
+    {
+        return _getpid();
+    }
+
+    int JackTools::GetUID()
+    {
+        return  _getpid();
+        //#error "No getuid function available"
+    }
 
     char* JackTools::UserDir()
     {
@@ -107,7 +101,62 @@ namespace Jack {
         return 0;
     }
 
+    void BuildClientPath(char* path_to_so, int path_len, const char* so_name)
+    {
+        snprintf(path_to_so, path_len, ADDON_DIR "/%s.dll", so_name);
+    }
+
+    void PrintLoadError(const char* so_name)
+    {
+        // Retrieve the system error message for the last-error code
+        LPVOID lpMsgBuf;
+        LPVOID lpDisplayBuf;
+        DWORD dw = GetLastError();
+
+        FormatMessage(
+            FORMAT_MESSAGE_ALLOCATE_BUFFER |
+            FORMAT_MESSAGE_FROM_SYSTEM |
+            FORMAT_MESSAGE_IGNORE_INSERTS,
+            NULL,
+            dw,
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            (LPTSTR) &lpMsgBuf,
+            0, NULL );
+
+        // Display the error message and exit the process
+        lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
+            (lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)so_name) + 40) * sizeof(TCHAR));
+        _snprintf((LPTSTR)lpDisplayBuf, LocalSize(lpDisplayBuf) / sizeof(TCHAR),
+            TEXT("error loading %s err = %s"), so_name, lpMsgBuf);
+
+        jack_error((LPCTSTR)lpDisplayBuf);
+
+        LocalFree(lpMsgBuf);
+        LocalFree(lpDisplayBuf);
+    }
+
+
 #else
+    void JackTools::KillServer()
+    {
+        kill(GetPID(), SIGINT);
+    }
+
+    int JackTools::MkDir(const char* path)
+    {
+        return mkdir(path, 0777) != 0;
+    }
+
+    int JackTools::GetPID()
+    {
+        return getpid();
+    }
+
+    int JackTools::GetUID()
+    {
+        return getuid();
+    }
+
     char* JackTools::UserDir()
     {
         static char user_dir[JACK_PATH_MAX + 1] = "";
@@ -124,7 +173,6 @@ namespace Jack {
         return user_dir;
     }
 
-    /* returns the name of the per-server subdirectory of jack_user_dir() */
     char* JackTools::ServerDir(const char* server_name, char* server_dir)
     {
         /* format the path name into the suppled server_dir char array,
@@ -223,194 +271,24 @@ namespace Jack {
         pclose(in);
         return 0;
     }
-#endif
 
-    void JackTools::RewriteName(const char* name, char* new_name)
+    void BuildClientPath(char* path_to_so, int path_len, const char* so_name)
     {
-        size_t i;
-        for (i = 0; i < strlen(name); i++) {
-            if ((name[i] == '/') || (name[i] == '\\'))
-                new_name[i] = '_';
-            else
-                new_name[i] = name[i];
+        const char* internal_dir;
+        if ((internal_dir = getenv("JACK_INTERNAL_DIR")) == 0) {
+            if ((internal_dir = getenv("JACK_DRIVER_DIR")) == 0) {
+                internal_dir = ADDON_DIR;
+            }
         }
-        new_name[i] = '\0';
+
+        snprintf(path_to_so, path_len, "%s/%s.so", internal_dir, so_name);
     }
 
-#ifdef WIN32
-
-void BuildClientPath(char* path_to_so, int path_len, const char* so_name)
-{
-    snprintf(path_to_so, path_len, ADDON_DIR "/%s.dll", so_name);
-}
-
-void PrintLoadError(const char* so_name)
-{
-    // Retrieve the system error message for the last-error code
-    LPVOID lpMsgBuf;
-    LPVOID lpDisplayBuf;
-    DWORD dw = GetLastError();
-
-    FormatMessage(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER |
-        FORMAT_MESSAGE_FROM_SYSTEM |
-        FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL,
-        dw,
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        (LPTSTR) &lpMsgBuf,
-        0, NULL );
-
-    // Display the error message and exit the process
-    lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
-        (lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)so_name) + 40) * sizeof(TCHAR));
-    _snprintf((LPTSTR)lpDisplayBuf, LocalSize(lpDisplayBuf) / sizeof(TCHAR),
-        TEXT("error loading %s err = %s"), so_name, lpMsgBuf);
-
-    jack_error((LPCTSTR)lpDisplayBuf);
-
-    LocalFree(lpMsgBuf);
-    LocalFree(lpDisplayBuf);
-}
-
-#else
-
-void PrintLoadError(const char* so_name)
-{
-    jack_log("error loading %s err = %s", so_name, dlerror());
-}
-
-void BuildClientPath(char* path_to_so, int path_len, const char* so_name)
-{
-    const char* internal_dir;
-    if ((internal_dir = getenv("JACK_INTERNAL_DIR")) == 0) {
-        if ((internal_dir = getenv("JACK_DRIVER_DIR")) == 0) {
-            internal_dir = ADDON_DIR;
-        }
+    void PrintLoadError(const char* so_name)
+    {
+        jack_log("error loading %s err = %s", so_name, dlerror());
     }
-
-    snprintf(path_to_so, path_len, "%s/%s.so", internal_dir, so_name);
-}
-
 #endif
-
-template <class T>
-JackGnuPlotMonitor<T>::JackGnuPlotMonitor(uint32_t measure_cnt, uint32_t measure_points, std::string name)
-{
-    jack_log ( "JackGnuPlotMonitor::JackGnuPlotMonitor %u measure points - %u measures", measure_points, measure_cnt );
-
-    fMeasureCnt = measure_cnt;
-    fMeasurePoints = measure_points;
-    fTablePos = 0;
-    fName = name;
-    fCurrentMeasure = new T[fMeasurePoints];
-    fMeasureTable = new T*[fMeasureCnt];
-    for ( uint32_t cnt = 0; cnt < fMeasureCnt; cnt++ )
-    {
-        fMeasureTable[cnt] = new T[fMeasurePoints];
-        fill_n ( fMeasureTable[cnt], fMeasurePoints, 0 );
-    }
-}
-
-template <class T>
-JackGnuPlotMonitor<T>::~JackGnuPlotMonitor()
-{
-    jack_log ( "JackGnuPlotMonitor::~JackGnuPlotMonitor" );
-
-    for ( uint32_t cnt = 0; cnt < fMeasureCnt; cnt++ )
-        delete[] fMeasureTable[cnt];
-    delete[] fMeasureTable;
-    delete[] fCurrentMeasure;
-}
-
-template <class T>
-T JackGnuPlotMonitor<T>::AddNew(T measure_point)
-{
-    fMeasureId = 0;
-    return fCurrentMeasure[fMeasureId++] = measure_point;
-}
-
-template <class T>
-uint32_t JackGnuPlotMonitor<T>::New()
-{
-    return fMeasureId = 0;
-}
-
-template <class T>
-T JackGnuPlotMonitor<T>::Add(T measure_point)
-{
-    return fCurrentMeasure[fMeasureId++] = measure_point;
-}
-
-template <class T>
-uint32_t JackGnuPlotMonitor<T>::AddLast(T measure_point)
-{
-    fCurrentMeasure[fMeasureId] = measure_point;
-    fMeasureId = 0;
-    return Write();
-}
-
-template <class T>
-uint32_t JackGnuPlotMonitor<T>::Write()
-{
-    for ( uint32_t point = 0; point < fMeasurePoints; point++ )
-        fMeasureTable[fTablePos][point] = fCurrentMeasure[point];
-    if ( ++fTablePos == fMeasureCnt )
-        fTablePos = 0;
-    return fTablePos;
-}
-
-template <class T>
-int JackGnuPlotMonitor<T>::Save(std::string name)
-{
-    std::string filename = ( name.empty() ) ? fName : name;
-    filename += ".log";
-
-    jack_log ( "JackGnuPlotMonitor::Save filename %s", filename.c_str() );
-
-    std::ofstream file ( filename.c_str() );
-
-    for ( uint32_t cnt = 0; cnt < fMeasureCnt; cnt++ )
-    {
-        for ( uint32_t point = 0; point < fMeasurePoints; point++ )
-            file << fMeasureTable[cnt][point] << " \t";
-        file << std::endl;
-    }
-
-    file.close();
-    return 0;
-}
-
-template <class T>
-int JackGnuPlotMonitor<T>::SetPlotFile(std::string* options_list, uint32_t options_number,
-                std::string* field_names, uint32_t field_number,
-                std::string name)
-{
-    std::string title = ( name.empty() ) ? fName : name;
-    std::string plot_filename = title + ".plt";
-    std::string data_filename = title + ".log";
-
-    std::ofstream file ( plot_filename.c_str() );
-
-    file << "set multiplot" << std::endl;
-    file << "set grid" << std::endl;
-    file << "set title \"" << title << "\"" << std::endl;
-
-    for ( uint32_t i = 0; i < options_number; i++ )
-        file << options_list[i] << std::endl;
-
-    file << "plot ";
-    for ( uint32_t row = 1; row <= field_number; row++ )
-    {
-        file << "\"" << data_filename << "\" using " << row << " title \"" << field_names[row-1] << "\" with lines";
-        file << ( ( row < field_number ) ? ", " : "\n" );
-    }
-
-    jack_log ( "JackGnuPlotMonitor::SetPlotFile - Save GnuPlot file to '%s'", plot_filename.c_str() );
-
-    file.close();
-    return 0;
-}
 
 }  // end of namespace
 
