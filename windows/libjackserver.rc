@@ -11,8 +11,8 @@
 //
 LANGUAGE LANG_FRENCH, SUBLANG_DEFAULT
 1 VERSIONINFO
-    FILEVERSION     1,9,9,1
-    PRODUCTVERSION  1,9,9,1
+    FILEVERSION     1,9,9,2
+    PRODUCTVERSION  1,9,9,2
     FILEOS          VOS_UNKNOWN
     FILETYPE        VFT_DLL
 BEGIN
@@ -23,14 +23,14 @@ BEGIN
             VALUE "Comments", "\0"
             VALUE "CompanyName", "Grame\0"
             VALUE "FileDescription", "Jack server library for Windows\0"
-            VALUE "FileVersion", "1, 9, 9, 1\0"
+            VALUE "FileVersion", "1, 9, 9, 2\0"
             VALUE "InternalName", "libjackserver\0"
             VALUE "LegalCopyright", "Copyright Grame © 2006-2012\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "libjackserver.dll\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "libjackserver\0"
-            VALUE "ProductVersion", "1, 9, 9, 1\0"
+            VALUE "ProductVersion", "1, 9, 9, 2\0"
             VALUE "SpecialBuild", "\0"
         END
     END
