@@ -35,10 +35,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
         */
         #if (__GNUC__< 4)  /* Does not seem to work with GCC 3.XX serie */
             #define POST_PACKED_STRUCTURE
-        #elif defined(JACK_32_64)
-            #define POST_PACKED_STRUCTURE __attribute__((__packed__))
         #else
-            #define POST_PACKED_STRUCTURE
+            #define POST_PACKED_STRUCTURE __attribute__((__packed__))
         #endif
     #endif
     #define MEM_ALIGN(x,y) x __attribute__((aligned(y)))
