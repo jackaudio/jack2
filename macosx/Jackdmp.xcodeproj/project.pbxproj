@@ -9129,10 +9129,8 @@
 				INSTALL_PATH = /usr/local/lib;
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DSERVER_SIDE",
-					"-DJACK_32_64",
 					"-DHAVE_CELT",
 					"-DHAVE_CELT_API_0_7",
 					"-DMACH_RPC_MACH_SEMA",
@@ -9180,13 +9178,11 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DSERVER_SIDE",
 					"-DHAVE_CELT",
 					"-DHAVE_CELT_API_0_7",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					libcelt.a,
@@ -9522,12 +9518,10 @@
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
 					"-D__SMP__",
-					"-DJACK_32_64",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DMACH_RPC_MACH_SEMA",
 					"-D__SMP__",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -9578,12 +9572,10 @@
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
 					"-D__SMP__",
-					"-DJACK_32_64",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DMACH_RPC_MACH_SEMA",
 					"-D__SMP__",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -9629,12 +9621,10 @@
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
 					"-D__SMP__",
-					"-DJACK_32_64",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DMACH_RPC_MACH_SEMA",
 					"-D__SMP__",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -9697,13 +9687,11 @@
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
-					"-DJACK_32_64",
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DMACH_RPC_MACH_SEMA",
 					"-D__SMP__",
-					"-DJACK_32_64",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2)",
 				);
@@ -9763,12 +9751,10 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
-					"-DJACK_32_64",
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2)",
@@ -9819,12 +9805,10 @@
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
-					"-DJACK_32_64",
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2)",
@@ -9884,7 +9868,6 @@
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OTHER_CFLAGS = (
 					"-DSERVER_SIDE",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"-DUSE_POSIX_SHM",
 				);
@@ -9892,7 +9875,6 @@
 					"-DHAVE_CELT_API_0_7",
 					"-DHAVE_CELT",
 					"-DSERVER_SIDE",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"-DMACH_RPC_MACH_SEMA",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
@@ -9954,7 +9936,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
 					"-DSERVER_SIDE",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"-DUSE_POSIX_SHM",
 				);
@@ -9962,7 +9943,6 @@
 					"-DHAVE_CELT_API_0_7",
 					"-DHAVE_CELT",
 					"-DSERVER_SIDE",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"-DMACH_RPC_MACH_SEMA",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
@@ -10015,12 +9995,10 @@
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OTHER_CFLAGS = (
 					"-D__SMP__",
-					"-DJACK_32_64",
 					"-DUSE_POSIX_SHM",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-D__SMP__",
-					"-DJACK_32_64",
 					"-DMACH_RPC_MACH_SEMA",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2)",
@@ -11803,11 +11781,9 @@
 				INSTALL_PATH = /usr/local/lib;
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					libaften_static.a,
@@ -11858,11 +11834,9 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					libaften_pcm.a,
@@ -11999,11 +11973,7 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
-				OTHER_CFLAGS = "-DJACK_32_64";
-				OTHER_CPLUSPLUSFLAGS = (
-					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
-				);
+				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
 					libportaudio.a,
 					"-framework",
@@ -12098,11 +12068,9 @@
 				INSTALL_PATH = /usr/local/lib;
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -12150,11 +12118,9 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -12280,7 +12246,6 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -12380,7 +12345,6 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = All;
@@ -13501,11 +13465,9 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -13603,14 +13565,12 @@
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
-					"-DJACK_32_64",
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-D__CLIENTDEBUG__",
 					"-DMACH_RPC_MACH_SEMA",
 					"-D__SMP__",
-					"-DJACK_32_64",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2)",
 				);
@@ -13670,13 +13630,11 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
-					"-DJACK_32_64",
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-D__CLIENTDEBUG__",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2)",
@@ -13727,12 +13685,10 @@
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
-					"-DJACK_32_64",
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2)",
@@ -16409,14 +16365,12 @@
 				);
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
-					"-DJACK_32_64",
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DHAVE_CELT_API_0_7",
 					"-DHAVE_CELT",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DJACK_LOCATION=\\\"/usr/local/bin\\\"";
@@ -16481,14 +16435,12 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
-					"-DJACK_32_64",
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DHAVE_CELT_API_0_7",
 					"-DHAVE_CELT",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
@@ -16537,12 +16489,10 @@
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
-					"-DJACK_32_64",
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2)",
@@ -16937,7 +16887,6 @@
 				OTHER_CFLAGS = (
 					"-DJACK_MONITOR",
 					"-DSERVER_SIDE",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"-DUSE_POSIX_SHM",
 				);
@@ -16946,7 +16895,6 @@
 					"-DHAVE_CELT",
 					"-DJACK_MONITOR",
 					"-DSERVER_SIDE",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"-DMACH_RPC_MACH_SEMA",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
@@ -17008,7 +16956,6 @@
 				OTHER_CFLAGS = (
 					"-DJACK_MONITOR",
 					"-DSERVER_SIDE",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"-DUSE_POSIX_SHM",
 				);
@@ -17017,7 +16964,6 @@
 					"-DHAVE_CELT",
 					"-DJACK_MONITOR",
 					"-DSERVER_SIDE",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"-DMACH_RPC_MACH_SEMA",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
@@ -17070,12 +17016,10 @@
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OTHER_CFLAGS = (
 					"-D__SMP__",
-					"-DJACK_32_64",
 					"-DUSE_POSIX_SHM",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-D__SMP__",
-					"-DJACK_32_64",
 					"-DMACH_RPC_MACH_SEMA",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2)",
@@ -17538,7 +17482,6 @@
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -17590,7 +17533,6 @@
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -17687,7 +17629,6 @@
 					"-DHAVE_CELT",
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -17737,7 +17678,6 @@
 					"-DHAVE_CELT",
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -17873,7 +17813,6 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DSERVER_SIDE",
 					"$(OTHER_CFLAGS)",
@@ -18027,7 +17966,6 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DSERVER_SIDE",
 					"$(OTHER_CFLAGS)",
@@ -18129,9 +18067,7 @@
 				INSTALL_PATH = /usr/local/lib;
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = (
-					"-DJACK_32_64",
 					"-DHAVE_CELT",
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
@@ -18187,9 +18123,7 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = (
-					"-DJACK_32_64",
 					"-DHAVE_CELT",
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",

@@ -61,7 +61,7 @@ using namespace std;
 
 struct Meta : map<const char*, const char*>
 {
-    void declare (const char* key, const char* value) { (*this)[key]=value; }
+    void declare (const char* key, const char* value) { (*this)[key] = value; }
 };
 
 //inline void *aligned_calloc(size_t nmemb, size_t size) { return (void*)((unsigned)(calloc((nmemb*size)+15,sizeof(char)))+15 & 0xfffffff0); }
@@ -191,15 +191,15 @@ public:
 		
 	// -- passive widgets
 	
-	virtual void addNumDisplay(const char* label, float* zone, int precision) 						{}
+	virtual void addNumDisplay(const char* label, float* zone, int precision)                           {}
 	virtual void addTextDisplay(const char* label, float* zone, char* names[], float min, float max) 	{}
 	virtual void addHorizontalBargraph(const char* label, float* zone, float min, float max) 			{}
-	virtual void addVerticalBargraph(const char* label, float* zone, float min, float max) 			{}
+	virtual void addVerticalBargraph(const char* label, float* zone, float min, float max)              {}
 
 	virtual void openFrameBox(const char* label)		{ openAnyBox(label); }
-	virtual void openTabBox(const char* label)		{ openAnyBox(label); }
+	virtual void openTabBox(const char* label)          { openAnyBox(label); }
 	virtual void openHorizontalBox(const char* label)	{ openAnyBox(label); }
-	virtual void openVerticalBox(const char* label)	{ openAnyBox(label); }
+	virtual void openVerticalBox(const char* label)     { openAnyBox(label); }
 	
 	virtual void closeBox() 					{ fPrefix.pop(); }
 	
@@ -2612,8 +2612,6 @@ class mydsp : public dsp{
 		}
 	}
 };
-
-
 				
 mydsp	DSP;
 

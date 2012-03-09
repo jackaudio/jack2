@@ -21,7 +21,6 @@
 					<Add option="-D_USRDLL" />
 					<Add option="-DJACK_PORTAUDIO_EXPORTS" />
 					<Add option="-DSERVER_SIDE" />
-					<Add option="-DJACK_32_64" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -52,7 +51,6 @@
 					<Add option="-D_USRDLL" />
 					<Add option="-DJACK_PORTAUDIO_EXPORTS" />
 					<Add option="-DSERVER_SIDE" />
-					<Add option="-DJACK_32_64" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -84,7 +82,6 @@
 					<Add option="-DJACK_PORTAUDIO_EXPORTS" />
 					<Add option="-DJACK_MONITOR" />
 					<Add option="-DSERVER_SIDE" />
-					<Add option="-DJACK_32_64" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -116,7 +113,6 @@
 					<Add option="-D_USRDLL" />
 					<Add option="-DJACK_PORTAUDIO_EXPORTS" />
 					<Add option="-DSERVER_SIDE" />
-					<Add option="-DJACK_32_64" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -152,7 +148,6 @@
 					<Add option="-D_USRDLL" />
 					<Add option="-DJACK_PORTAUDIO_EXPORTS" />
 					<Add option="-DSERVER_SIDE" />
-					<Add option="-DJACK_32_64" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -189,7 +184,6 @@
 					<Add option="-DJACK_PORTAUDIO_EXPORTS" />
 					<Add option="-DJACK_MONITOR" />
 					<Add option="-DSERVER_SIDE" />
-					<Add option="-DJACK_32_64" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />

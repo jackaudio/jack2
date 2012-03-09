@@ -17,7 +17,6 @@
 					<Add option="-DBUILD_DLL" />
 					<Add option="-D__SMP__" />
 					<Add option="-DSERVER_SIDE" />
-					<Add option="-DJACK_32_64" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
@@ -43,7 +42,6 @@
 					<Add option="-DBUILD_DLL" />
 					<Add option="-D__SMP__" />
 					<Add option="-DSERVER_SIDE" />
-					<Add option="-DJACK_32_64" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
@@ -70,7 +68,6 @@
 					<Add option="-D__SMP__" />
 					<Add option="-DJACK_MONITOR" />
 					<Add option="-DSERVER_SIDE" />
-					<Add option="-DJACK_32_64" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
@@ -97,7 +94,6 @@
 					<Add option="-DBUILD_DLL" />
 					<Add option="-D__SMP__" />
 					<Add option="-DSERVER_SIDE" />
-					<Add option="-DJACK_32_64" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
@@ -128,7 +124,6 @@
 					<Add option="-DBUILD_DLL" />
 					<Add option="-D__SMP__" />
 					<Add option="-DSERVER_SIDE" />
-					<Add option="-DJACK_32_64" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
@@ -160,7 +155,6 @@
 					<Add option="-D__SMP__" />
 					<Add option="-DJACK_MONITOR" />
 					<Add option="-DSERVER_SIDE" />
-					<Add option="-DJACK_32_64" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />

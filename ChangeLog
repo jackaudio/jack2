@@ -36,6 +36,10 @@ John Emmas
   Jackdmp changes log
 ---------------------------
 
+2012-03-09 Stephane Letz  <letz@grame.fr>
+
+	* Remove JACK_32_64 flag, so POST_PACKED_STRUCTURE now always used.
+
 2012-02-10 Stephane Letz  <letz@grame.fr>
 
 	* Improve libjacknet master mode.
