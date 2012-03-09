@@ -104,6 +104,7 @@
 <_><src>.\qjackctl\QtCore4.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\QtGui4.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\QtXml4.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>.\qjackctl\libgcc_s_dw2-1.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\src\COPYING</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\src\README</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 
