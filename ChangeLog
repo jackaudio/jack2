@@ -36,6 +36,10 @@ John Emmas
   Jackdmp changes log
 ---------------------------
 
+2012-03-15 Stephane Letz  <letz@grame.fr>
+
+	* POST_PACKED_STRUCTURE used for jack_latency_range_t type.
+
 2012-03-09 Stephane Letz  <letz@grame.fr>
 
 	* Remove JACK_32_64 flag, so POST_PACKED_STRUCTURE now always used.

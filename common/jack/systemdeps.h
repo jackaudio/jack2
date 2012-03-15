@@ -49,6 +49,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
             #define POST_PACKED_STRUCTURE ;__pragma(pack(pop))
             /* and POST_PACKED_STRUCTURE needs to be a macro which
             restores the packing to its previous setting */
+        #else
+            #define PRE_PACKED_STRUCTURE
+            #define POST_PACKED_STRUCTURE
         #endif
 
     #endif

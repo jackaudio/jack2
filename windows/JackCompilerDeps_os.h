@@ -22,6 +22,7 @@
 #define __JackCompilerDeps_WIN32__
 
 #define	LIB_EXPORT __declspec(dllexport)
+
 #ifdef SERVER_SIDE
     #define	SERVER_EXPORT __declspec(dllexport)
 #else
@@ -67,6 +68,10 @@
         #define POST_PACKED_STRUCTURE
     #endif
     
+#endif
+
+#if defined(_MSC_VER) /* Added by JE - 31-01-2012 */
+#define snprintf _snprintf
 #endif
 
 #endif
