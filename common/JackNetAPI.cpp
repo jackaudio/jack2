@@ -727,9 +727,9 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
             }
             return false;
         } catch (JackNetException& e) {
-
             // Otherwise just restart...
             e.PrintMessage();
+            jack_info("NetSlave is restarted");
             fThread.DropRealTime();
             fThread.SetStatus(JackThread::kIniting);
             FreePorts();

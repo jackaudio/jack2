@@ -260,6 +260,7 @@ namespace Jack
                 }
             return false;
         } catch (JackNetException& e) {
+            // Otherwise just restart...
             e.PrintMessage();
             jack_info("NetAdapter is restarted");
             Reset();

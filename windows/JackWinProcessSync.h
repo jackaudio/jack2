@@ -26,7 +26,7 @@ namespace Jack
 {
 
 /*!
-\brief  A synchronization primitive built using a condition variable.
+\brief A synchronization primitive built using a condition variable.
 */
 
 class JackWinProcessSync : public JackWinMutex
@@ -69,6 +69,93 @@ class JackWinProcessSync : public JackWinMutex
         void SignalAll();
         void LockedSignalAll();
 };
+
+#ifdef __MINGW64__
+
+class JackWinCondVar {
+
+        CONDITION_VARIABLE fCondVar;
+        CRITICAL_SECTION fMutex;
+
+    public:
+    
+        JackWinCondVar(const char* name = NULL)
+        {
+             InitializeCriticalSection(&fMutex);
+             InitializeConditionVariable(&fCondVar);
+        }
+        
+        virtual ~JackWinCondVar()
+        {
+             DeleteCriticalSection(&fMutex);
+        }
+        
+        bool TimedWait(long usec);
+        {
+            return SleepConditionVariableCS(&fCondVar, &fMutex, usec / 1000);
+        }
+        
+        bool LockedTimedWait(long usec);
+        {
+            EnterCriticalSection(&fMutex);
+            return SleepConditionVariableCS(&fCondVar, &fMutex, usec / 1000);
+        }
+        
+        void Wait()
+        {
+            SleepConditionVariableCS(&fCondVar, &fMutex, INFINITE);
+        }
+        
+        void LockedWait()
+        {
+            EnterCriticalSection(&fMutex);
+            SleepConditionVariableCS(&fCondVar, &fMutex, INFINITE);
+        }
+        
+        void Signal()
+        {
+            WakeConditionVariable(&fCondVar);
+        }
+        
+        void LockedSignal()
+        {
+            EnterCriticalSection(&fMutex);
+            WakeConditionVariable(&fCondVar);
+            LeaveCriticalSection(&fMutex);
+        }
+
+        void SignalAll()
+        {
+            WakeAllConditionVariable(&fCondVar);
+        }
+        
+        void LockedSignalAll()
+        {
+            EnterCriticalSection(&fMutex);
+            WakeAllConditionVariable(&fCondVar);
+            LeaveCriticalSection(&fMutex);
+        }
+               
+        bool Lock()
+        {
+            EnterCriticalSection(&fMutex);
+            return true;
+        }
+
+        bool Trylock()
+        {
+            return (TryEnterCriticalSection(&fMutex));
+        }
+
+        bool Unlock()
+        {
+            LeaveCriticalSection(&fMutex);
+            return true;
+        }
+        
+};
+
+#endif
 
 } // end of namespace
 
