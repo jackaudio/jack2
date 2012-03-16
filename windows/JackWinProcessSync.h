@@ -90,12 +90,12 @@ class JackWinCondVar {
              DeleteCriticalSection(&fMutex);
         }
         
-        bool TimedWait(long usec);
+        bool TimedWait(long usec)
         {
             return SleepConditionVariableCS(&fCondVar, &fMutex, usec / 1000);
         }
         
-        bool LockedTimedWait(long usec);
+        bool LockedTimedWait(long usec)
         {
             EnterCriticalSection(&fMutex);
             return SleepConditionVariableCS(&fCondVar, &fMutex, usec / 1000);
