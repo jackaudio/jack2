@@ -57,7 +57,7 @@ class JackMessageBuffer : public JackRunnableInterface
 
     private:
 
-        JackThreadInitCallback fInit;
+        volatile JackThreadInitCallback fInit;
         void* fInitArg;
         JackMessage fBuffers[MB_BUFFERS];
         JackThread fThread;
