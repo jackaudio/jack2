@@ -206,6 +206,7 @@ def build(bld):
             'JackLibSampleRateResampler.cpp',
             'JackResampler.cpp',
             'JackGlobals.cpp',
+            'JackPosixMutex.cpp',
             'ringbuffer.c']
 
         if bld.env['IS_LINUX']:

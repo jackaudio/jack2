@@ -70,7 +70,7 @@ class JackWinProcessSync : public JackWinMutex
         void LockedSignalAll();
 };
 
-#ifdef __MINGW64__
+#ifdef __WIN64__
 
 class JackWinCondVar {
 

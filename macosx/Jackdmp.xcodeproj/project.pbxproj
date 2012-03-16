@@ -985,6 +985,8 @@
 		4BE5FED10E725C320020B576 /* JackCoreAudioAdapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE5FECF0E725C320020B576 /* JackCoreAudioAdapter.cpp */; };
 		4BE5FED20E725C320020B576 /* JackCoreAudioAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BE5FED00E725C320020B576 /* JackCoreAudioAdapter.h */; };
 		4BE6C6AD0A3E0A65005A203A /* test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE6C6AC0A3E0A65005A203A /* test.cpp */; };
+		4BF1007C15135D8200B88F80 /* JackPosixMutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B327BA614B4B50400976483 /* JackPosixMutex.cpp */; };
+		4BF1007D15135D8800B88F80 /* JackPosixMutex.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BB4214814D2C0A700A1CAE1 /* JackPosixMutex.h */; };
 		4BF2841A0F31B4BC00B05BE3 /* JackArgParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF284160F31B4BC00B05BE3 /* JackArgParser.cpp */; };
 		4BF2841B0F31B4BC00B05BE3 /* JackArgParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF284170F31B4BC00B05BE3 /* JackArgParser.h */; };
 		4BF3391A0F8B86DC0080FB5B /* JackCoreMidiDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF339140F8B86DC0080FB5B /* JackCoreMidiDriver.h */; };
@@ -4310,6 +4312,7 @@
 				4B86934E1371DEBD00D2D11B /* JackLibSampleRateResampler.h in Headers */,
 				4B49D44E14865F22003390F8 /* net.h in Headers */,
 				4B49D44F14865F22003390F8 /* session.h in Headers */,
+				4BF1007D15135D8800B88F80 /* JackPosixMutex.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7831,6 +7834,7 @@
 				4B86932C1371DD9B00D2D11B /* ringbuffer.c in Sources */,
 				4B86934D1371DEBA00D2D11B /* JackLibSampleRateResampler.cpp in Sources */,
 				4B327BD614B4B6E700976483 /* JackException.cpp in Sources */,
+				4BF1007C15135D8200B88F80 /* JackPosixMutex.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
