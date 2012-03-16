@@ -169,14 +169,20 @@ int JackMessageBuffer::SetInitCallback(JackThreadInitCallback callback, void *ar
         fInitArg = arg;
         fInit = callback;
         
+        /*
+        The condition variable emulation code does not work reliably on Windows (lost signal).
+        So use a "hachish" way to signal/wait for the result.
+        Probaly better in the long term : use pthread-win32 (http://sourceware.org/pthreads-win32/)
+        fGuard.Wait();
+        */
+
         int count = 0;
         while (fInit && ++count < 1000) {
             /* wake msg buffer thread */
             fGuard.Signal();
             JackSleep(1000);
         }
-        //fGuard.Wait();
-        
+               
         /* and we're done */
         fGuard.Unlock();
         if (count == 1000) goto error;
