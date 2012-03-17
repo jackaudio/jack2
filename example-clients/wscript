@@ -127,7 +127,7 @@ def build(bld):
         prog = bld(features = 'c cprogram')
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = ['netsource.c', '../common/netjack_packet.c']
-        prog.env.append_value("CCFLAGS", "-DNO_JACK_ERROR")
+        prog.env.append_value("CFLAGS", "-DNO_JACK_ERROR")
         prog.use = ['CELT', 'SAMPLERATE']
         prog.uselib_local = 'clientlib'
         prog.target = 'jack_netsource'
