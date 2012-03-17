@@ -3,6 +3,7 @@ Copyright (C) 2001 Paul Davis
 Copyright (C) 2004 Grame
 Copyright (C) 2007 Pieter Palmers
 Copyright (C) 2009 Devin Anderson
+Copyright (C) 2012 Jonathan Woithe, Adrian Knoth
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -48,7 +49,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
+// Basic functionality requires API version 8.  If version 9 or later
+// is present the buffers can be resized at runtime.
 #define FIREWIRE_REQUIRED_FFADO_API_VERSION 8
+#define FIREWIRE_REQUIRED_FFADO_API_VERSION_FOR_SETBUFSIZE 9
 
 #define jack_get_microseconds GetMicroSeconds
 
@@ -281,19 +285,68 @@ JackFFADODriver::UpdateLatencies(void)
 int
 JackFFADODriver::SetBufferSize (jack_nframes_t nframes)
 {
-    printError("Buffer size change requested but not supported!!!");
+    ffado_driver_t* driver = (ffado_driver_t*)fDriver;
+    signed int chn;
 
-    /*
+    // The speed of this function isn't critical; we can afford the
+    // time to check the FFADO API version.
+    if (ffado_get_api_version() < FIREWIRE_REQUIRED_FFADO_API_VERSION_FOR_SETBUFSIZE ||
+		    ffado_streaming_set_period_size == NULL) {
+	    printError("unsupported on current version of FFADO; please upgrade FFADO");
+	    return -1;
+    }
+
     driver->period_size = nframes;
     driver->period_usecs =
             (jack_time_t) floor ((((float) nframes) / driver->sample_rate)
                                  * 1000000.0f);
-    */
+
+
+    // Reallocate the null and scratch buffers.
+    driver->nullbuffer = (ffado_sample_t*) calloc(driver->period_size, sizeof(ffado_sample_t));
+    if(driver->nullbuffer == NULL) {
+	    printError("could not allocate memory for null buffer");
+	    return -1;
+    }
+    driver->scratchbuffer = (ffado_sample_t*) calloc(driver->period_size, sizeof(ffado_sample_t));
+    if(driver->scratchbuffer == NULL) {
+	    printError("could not allocate memory for scratch buffer");
+	    return -1;
+    }
+
+    // MIDI buffers need reallocating
+    for (chn = 0; chn < driver->capture_nchannels; chn++) {
+	    if(driver->capture_channels[chn].stream_type == ffado_stream_type_midi) {
+		    // setup the midi buffer
+		    if (driver->capture_channels[chn].midi_buffer != NULL)
+			    free(driver->capture_channels[chn].midi_buffer);
+		    driver->capture_channels[chn].midi_buffer = (ffado_sample_t*) calloc(driver->period_size, sizeof(uint32_t));
+	    }
+    }
+    for (chn = 0; chn < driver->playback_nchannels; chn++) {
+	    if(driver->playback_channels[chn].stream_type == ffado_stream_type_midi) {
+		    if (driver->playback_channels[chn].midi_buffer != NULL)
+			    free(driver->playback_channels[chn].midi_buffer);
+		    driver->playback_channels[chn].midi_buffer = (ffado_sample_t*) calloc(driver->period_size, sizeof(uint32_t));
+	    }
+    }
+
+    // Notify FFADO of the period size change
+    if (ffado_streaming_set_period_size(driver->dev, nframes) != 0) {
+	    printError("could not alter FFADO device period size");
+	    return -1;
+    }
+
+    // This is needed to give the shadow variables a chance to
+    // properly update to the changes.
+    sleep(1);
 
     /* tell the engine to change its buffer size */
-    //driver->engine->set_buffer_size (driver->engine, nframes);
+    JackAudioDriver::SetBufferSize(nframes);  // Generic change, never fails
 
-    return -1; // unsupported
+    UpdateLatencies();
+
+    return 0;
 }
 
 typedef void (*JackDriverFinishFunction) (jack_driver_t *);
@@ -306,7 +359,7 @@ JackFFADODriver::ffado_driver_new (const char *name,
 
     assert(params);
 
-    if (ffado_get_api_version() != FIREWIRE_REQUIRED_FFADO_API_VERSION) {
+    if (ffado_get_api_version() < FIREWIRE_REQUIRED_FFADO_API_VERSION) {
         printError("Incompatible libffado version! (%s)", ffado_get_version());
         return NULL;
     }
