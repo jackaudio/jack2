@@ -128,7 +128,10 @@ main (int argc, char *argv[])
 		return 1;
 	}
 
-	if (argc < 3) show_usage(my_name);
+	if (argc < 3) {
+		show_usage(my_name);
+		return 1;
+	}
 
 	/* try to become a client of the JACK server */
 

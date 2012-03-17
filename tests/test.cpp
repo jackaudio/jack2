@@ -553,6 +553,8 @@ int main (int argc, char *argv[])
 
     client_name1 = "jack_test";
     time_to_run = 1;
+    //verbose_mode = 1;
+    //RT = 1;
     while ((opt = getopt_long (argc, argv, options, long_options, &option_index)) != EOF) {
         switch (opt) {
             case 'k':
@@ -1201,8 +1203,8 @@ int main (int argc, char *argv[])
      * (as mentionned in the doc of jack_get_ports)
      *
      */
-    free(inports);
-    free(outports);
+    jack_free(inports);
+    jack_free(outports);
 
     /**
      * Try to "reactivate" the client whereas it's already activated...
@@ -1241,7 +1243,7 @@ int main (int argc, char *argv[])
         printf("!!! ERROR !!! %i ports have been created, and %i callback reg ports have been received !\n", j, port_callback_reg);
     }
 
-    free(inports); // free array of ports (as mentionned in the doc of jack_get_ports)
+    jack_free(inports); // free array of ports (as mentionned in the doc of jack_get_ports)
 
     /**
      *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -1405,7 +1407,7 @@ int main (int argc, char *argv[])
         connexions2 = jack_port_get_all_connections(client1, jack_port_by_name(client1, inports[0]));
     }
 
-    free (inports);
+    jack_free (inports);
     if (connexions1 == NULL) {
         Log("checking jack_port_get_connections() for external client... ok\n");
     } else {
@@ -1648,7 +1650,7 @@ int main (int argc, char *argv[])
     } else {
         Log("Checking renaming of an unregistered port... ok\n");
     }
-    free (inports);
+    jack_free (inports);
 
 
     /**
@@ -1664,6 +1666,7 @@ int main (int argc, char *argv[])
     Log("Checking about latency functions...\n");
     t_error = 0;
     jack_recompute_total_latencies(client1);
+    Log("jack_recompute_total_latencies...\n");
     if ((jack_port_get_latency (output_port1) != 0) ||
             (jack_port_get_total_latency(client1, output_port1) != 0) ) {
         t_error = 1;
@@ -1753,8 +1756,8 @@ int main (int argc, char *argv[])
 
 	jack_sleep(1000);
 
-    free(inports);
-    free(outports);
+    jack_free(inports);
+    jack_free(outports);
 
     /**
      * Checking transport API.

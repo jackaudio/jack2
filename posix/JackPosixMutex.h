@@ -45,16 +45,8 @@ class SERVER_EXPORT JackBasePosixMutex
 
     public:
 
-        JackBasePosixMutex(const char* name = NULL):fOwner(0)
-        {
-            int res = pthread_mutex_init(&fMutex, NULL);
-            ThrowIf(res != 0, JackException("JackBasePosixMutex: could not init the mutex"));
-        }
-
-        virtual ~JackBasePosixMutex()
-        {
-            pthread_mutex_destroy(&fMutex);
-        }
+        JackBasePosixMutex(const char* name = NULL);
+        virtual ~JackBasePosixMutex();
 
         bool Lock();
         bool Trylock();
@@ -70,30 +62,13 @@ class SERVER_EXPORT JackPosixMutex
 
     public:
 
-        JackPosixMutex(const char* name = NULL)
-        {
-            // Use recursive mutex
-            pthread_mutexattr_t mutex_attr;
-            int res;
-            res = pthread_mutexattr_init(&mutex_attr);
-            ThrowIf(res != 0, JackException("JackBasePosixMutex: could not init the mutex attribute"));
-            res = pthread_mutexattr_settype(&mutex_attr, PTHREAD_MUTEX_RECURSIVE);
-            ThrowIf(res != 0, JackException("JackBasePosixMutex: could not settype the mutex"));
-            res = pthread_mutex_init(&fMutex, &mutex_attr);
-            ThrowIf(res != 0, JackException("JackBasePosixMutex: could not init the mutex"));
-            pthread_mutexattr_destroy(&mutex_attr);
-        }
-
-        virtual ~JackPosixMutex()
-        {
-            pthread_mutex_destroy(&fMutex);
-        }
+        JackPosixMutex(const char* name = NULL);
+        virtual ~JackPosixMutex();
 
         bool Lock();
         bool Trylock();
         bool Unlock();
 };
-
 
 } // namespace
 

@@ -491,7 +491,7 @@ namespace Jack
     #endif
 
         } else {
-            jack_error("Connection is not synched, skip cycle...");
+            jack_info("Connection is not synched, skip cycle...");
         }
 
         //receive sync
@@ -711,6 +711,7 @@ namespace Jack
             session_params_t net_params;
             rx_bytes = fSocket.CatchHost(&net_params, sizeof(session_params_t), 0);
             SessionParamsNToH(&net_params, &host_params);
+            
             if ((rx_bytes == SOCKET_ERROR) && (fSocket.GetError() != NET_NO_DATA)) {
                 jack_error("Error in receive : %s", StrError(NET_ERROR_CODE));
                 if (++attempt == 10) {

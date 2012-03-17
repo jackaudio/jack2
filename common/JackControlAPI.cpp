@@ -440,57 +440,68 @@ jackctl_server_free_parameters(
 
 #ifdef WIN32
 
-static HANDLE waitEvent;
+struct jackctl_sigmask
+{
+    HANDLE wait_event;
+};
 
-static void do_nothing_handler(int signum)
+static jackctl_sigmask sigmask;
+
+static void signal_handler(int signum)
 {
     printf("Jack main caught signal %d\n", signum);
     (void) signal(SIGINT, SIG_DFL);
-    SetEvent(waitEvent);
+    SetEvent(sigmask.wait_event);
 }
 
-sigset_t
+jackctl_sigmask_t *
 jackctl_setup_signals(
     unsigned int flags)
 {
-    if ((waitEvent = CreateEvent(NULL, FALSE, FALSE, NULL)) == NULL) {
+    if ((sigmask.wait_event = CreateEvent(NULL, FALSE, FALSE, NULL)) == NULL) {
         jack_error("CreateEvent fails err = %ld", GetLastError());
         return 0;
     }
 
-    (void) signal(SIGINT, do_nothing_handler);
-    (void) signal(SIGABRT, do_nothing_handler);
-    (void) signal(SIGTERM, do_nothing_handler);
+    (void) signal(SIGINT, signal_handler);
+    (void) signal(SIGABRT, signal_handler);
+    (void) signal(SIGTERM, signal_handler);
 
-    return (sigset_t)waitEvent;
+    return &sigmask;
 }
 
-void jackctl_wait_signals(sigset_t signals)
+void jackctl_wait_signals(jackctl_sigmask_t * signals)
 {
-    if (WaitForSingleObject(waitEvent, INFINITE) != WAIT_OBJECT_0) {
+    if (WaitForSingleObject(signals->wait_event, INFINITE) != WAIT_OBJECT_0) {
         jack_error("WaitForSingleObject fails err = %ld", GetLastError());
     }
 }
 
 #else
 
+struct jackctl_sigmask
+{
+    sigset_t signals;
+};
+
+static jackctl_sigmask sigmask;
+
 static
 void
-do_nothing_handler(int sig)
+signal_handler(int sig)
 {
     /* this is used by the child (active) process, but it never
        gets called unless we are already shutting down after
        another signal.
     */
     char buf[64];
-    snprintf (buf, sizeof(buf), "Received signal %d during shutdown (ignored)\n", sig);
+    snprintf(buf, sizeof(buf), "Received signal %d during shutdown (ignored)\n", sig);
 }
 
-SERVER_EXPORT sigset_t
+SERVER_EXPORT jackctl_sigmask_t *
 jackctl_setup_signals(
     unsigned int flags)
 {
-    sigset_t signals;
     sigset_t allsignals;
     struct sigaction action;
     int i;
@@ -529,52 +540,52 @@ jackctl_setup_signals(
        after a return from sigwait().
     */
 
-    sigemptyset(&signals);
-    sigaddset(&signals, SIGHUP);
-    sigaddset(&signals, SIGINT);
-    sigaddset(&signals, SIGQUIT);
-    sigaddset(&signals, SIGPIPE);
-    sigaddset(&signals, SIGTERM);
-    sigaddset(&signals, SIGUSR1);
-    sigaddset(&signals, SIGUSR2);
+    sigemptyset(&sigmask.signals);
+    sigaddset(&sigmask.signals, SIGHUP);
+    sigaddset(&sigmask.signals, SIGINT);
+    sigaddset(&sigmask.signals, SIGQUIT);
+    sigaddset(&sigmask.signals, SIGPIPE);
+    sigaddset(&sigmask.signals, SIGTERM);
+    sigaddset(&sigmask.signals, SIGUSR1);
+    sigaddset(&sigmask.signals, SIGUSR2);
 
     /* all child threads will inherit this mask unless they
      * explicitly reset it
      */
 
-    pthread_sigmask(SIG_BLOCK, &signals, 0);
+    pthread_sigmask(SIG_BLOCK, &sigmask.signals, 0);
 
     /* install a do-nothing handler because otherwise pthreads
        behaviour is undefined when we enter sigwait.
     */
 
     sigfillset(&allsignals);
-    action.sa_handler = do_nothing_handler;
+    action.sa_handler = signal_handler;
     action.sa_mask = allsignals;
     action.sa_flags = SA_RESTART|SA_RESETHAND;
 
     for (i = 1; i < NSIG; i++)
     {
-        if (sigismember (&signals, i))
+        if (sigismember (&sigmask.signals, i))
         {
             sigaction(i, &action, 0);
         }
     }
 
-    return signals;
+    return &sigmask;
 }
 
 SERVER_EXPORT void
-jackctl_wait_signals(sigset_t signals)
+jackctl_wait_signals(jackctl_sigmask_t * sigmask)
 {
     int sig;
     bool waiting = true;
 
     while (waiting) {
     #if defined(sun) && !defined(__sun__) // SUN compiler only, to check
-        sigwait(&signals);
+        sigwait(&sigmask->signals);
     #else
-        sigwait(&signals, &sig);
+        sigwait(&sigmask->signals, &sig);
     #endif
         fprintf(stderr, "Jack main caught signal %d\n", sig);
 
@@ -598,7 +609,7 @@ jackctl_wait_signals(sigset_t signals)
         // unblock signals so we can see them during shutdown.
         // this will help prod developers not to lose sight of
         // bugs that cause segfaults etc. during shutdown.
-        sigprocmask(SIG_UNBLOCK, &signals, 0);
+        sigprocmask(SIG_UNBLOCK, &sigmask->signals, 0);
     }
 }
 #endif

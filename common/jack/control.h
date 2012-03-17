@@ -82,6 +82,9 @@ typedef struct jackctl_internal jackctl_internal_t;
 /** opaque type for parameter object */
 typedef struct jackctl_parameter jackctl_parameter_t;
 
+/** opaque type for sigmask object */
+typedef struct jackctl_sigmask jackctl_sigmask_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -103,7 +106,7 @@ extern "C" {
  *
  * @return the configurated signal set.
  */
-sigset_t
+jackctl_sigmask_t *
 jackctl_setup_signals(
     unsigned int flags);
 
@@ -114,7 +117,7 @@ jackctl_setup_signals(
  */
 void
 jackctl_wait_signals(
-    sigset_t signals);
+    jackctl_sigmask_t * signals);
 
 /**
  * Call this function to create server object.

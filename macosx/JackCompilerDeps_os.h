@@ -34,11 +34,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
         than use the natural alignment of the processor and/or
         compiler.
         */
-        #if defined(JACK_32_64)
-            #define POST_PACKED_STRUCTURE __attribute__((__packed__))
-        #else
-            #define POST_PACKED_STRUCTURE
-        #endif
+        #define POST_PACKED_STRUCTURE __attribute__((__packed__))
     #endif
     #define MEM_ALIGN(x,y) x __attribute__((aligned(y)))
     #define LIB_EXPORT __attribute__((visibility("default")))

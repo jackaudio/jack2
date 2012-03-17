@@ -294,13 +294,13 @@ int JackDebugClient::PortDisconnect(jack_port_id_t src)
 {
     CheckClient("PortDisconnect");
     if (!fIsActivated)
-        *fStream << "!!! ERROR !!! : Trying to disconnect port  " << src << " while that client has not been activated !" << endl;
+        *fStream << "!!! ERROR !!! : Trying to disconnect port " << src << " while that client has not been activated !" << endl;
     int res = fClient->PortDisconnect(src);
     int i;
     for (i = (fTotalPortNumber - 1); i >= 0; i--) {             // We search the record into the history
         if (fPortList[i].idport == src) {                               // We found the record in sources
             if (fPortList[i].IsUnregistered != 0)
-                *fStream << "!!! ERROR !!! : Disconnecting port  " << src << " previoulsy unregistered !" << endl;
+                *fStream << "!!! ERROR !!! : Disconnecting port " << src << " previoulsy unregistered !" << endl;
             fPortList[i].IsConnected--;
             *fStream << "Disconnecting port " << src << ". " << endl;
             break;
@@ -317,7 +317,15 @@ int JackDebugClient::PortDisconnect(jack_port_id_t src)
 int JackDebugClient::PortIsMine(jack_port_id_t port_index)
 {
     CheckClient("PortIsMine");
+    *fStream << "JackClientDebug : PortIsMine port_index " << port_index << endl;
     return fClient->PortIsMine(port_index);
+}
+
+int JackDebugClient::PortRename(jack_port_id_t port_index, const char* name)
+{
+    CheckClient("PortRename");
+    *fStream << "JackClientDebug : PortRename port_index " << port_index << "name" << name << endl;
+    return fClient->PortRename(port_index, name);
 }
 
 //--------------------
@@ -327,6 +335,7 @@ int JackDebugClient::PortIsMine(jack_port_id_t port_index)
 int JackDebugClient::SetBufferSize(jack_nframes_t buffer_size)
 {
     CheckClient("SetBufferSize");
+    *fStream << "JackClientDebug : SetBufferSize buffer_size " << buffer_size << endl;
     return fClient->SetBufferSize(buffer_size);
 }
 
@@ -334,11 +343,17 @@ int JackDebugClient::SetFreeWheel(int onoff)
 {
     CheckClient("SetFreeWheel");
     if (onoff && fFreewheel)
-         *fStream << "!!! ERROR !!! : Freewheel setup seems incorrect : set = ON while FW is already ON " << endl;
+        *fStream << "!!! ERROR !!! : Freewheel setup seems incorrect : set = ON while FW is already ON " << endl;
     if (!onoff && !fFreewheel)
-         *fStream << "!!! ERROR !!! : Freewheel setup seems incorrect : set = OFF while FW is already OFF " << endl;
+        *fStream << "!!! ERROR !!! : Freewheel setup seems incorrect : set = OFF while FW is already OFF " << endl;
     fFreewheel = onoff ? true : false;
     return fClient->SetFreeWheel(onoff);
+}
+
+int JackDebugClient::ComputeTotalLatencies()
+{
+    CheckClient("ComputeTotalLatencies");
+    return fClient->ComputeTotalLatencies();
 }
 
 /*
@@ -350,6 +365,7 @@ ShutDown is called:
 
 void JackDebugClient::ShutDown()
 {
+    CheckClient("ShutDown");
     fClient->ShutDown();
 }
 
@@ -372,6 +388,7 @@ int JackDebugClient::SetSyncCallback(JackSyncCallback sync_callback, void* arg)
 int JackDebugClient::SetSyncTimeout(jack_time_t timeout)
 {
     CheckClient("SetSyncTimeout");
+    *fStream << "JackClientDebug : SetSyncTimeout timeout " << timeout << endl;
     return fClient->SetSyncTimeout(timeout);
 }
 
@@ -384,6 +401,7 @@ int JackDebugClient::SetTimebaseCallback(int conditional, JackTimebaseCallback t
 void JackDebugClient::TransportLocate(jack_nframes_t frame)
 {
     CheckClient("TransportLocate");
+    *fStream << "JackClientDebug : TransportLocate frame " << frame << endl;
     fClient->TransportLocate(frame);
 }
 
@@ -439,10 +457,11 @@ int JackDebugClient::TimeCallback(jack_nframes_t nframes, void *arg)
     jack_time_t t1 = GetMicroSeconds();
     int res = client->fProcessTimeCallback(nframes, client->fProcessTimeCallbackArg);
     if (res == 0) {
-    jack_time_t t2 = GetMicroSeconds();
+        jack_time_t t2 = GetMicroSeconds();
         long delta = long((t2 - t1) - client->GetEngineControl()->fPeriodUsecs);
-        if (delta > 0 && !client->fFreewheel)
+        if (delta > 0 && !client->fFreewheel) {
             *client->fStream << "!!! ERROR !!! : Process overload of " << delta << " us" << endl;
+        }
     }
     return res;
 }
@@ -450,9 +469,17 @@ int JackDebugClient::TimeCallback(jack_nframes_t nframes, void *arg)
 int JackDebugClient::SetProcessCallback(JackProcessCallback callback, void *arg)
 {
     CheckClient("SetProcessCallback");
+    
     fProcessTimeCallback = callback;
     fProcessTimeCallbackArg = arg;
-    return fClient->SetProcessCallback(TimeCallback, this);
+        
+    if (callback == NULL) {
+        // Clear the callback...
+        return fClient->SetProcessCallback(callback, arg);
+    } else {
+        // Setup the measuring version...
+        return fClient->SetProcessCallback(TimeCallback, this);
+    }
 }
 
 int JackDebugClient::SetXRunCallback(JackXRunCallback callback, void *arg)
@@ -521,9 +548,16 @@ int JackDebugClient::SetLatencyCallback(JackLatencyCallback callback, void *arg)
     return fClient->SetLatencyCallback(callback, arg);
 }
 
+int JackDebugClient::SetProcessThread(JackThreadCallback fun, void *arg)
+{
+    CheckClient("SetProcessThread");
+    return fClient->SetProcessThread(fun, arg);
+}
+
 jack_session_command_t* JackDebugClient::SessionNotify(const char* target, jack_session_event_type_t type, const char* path)
 {
     CheckClient("SessionNotify");
+    *fStream << "JackClientDebug : SessionNotify target " << target << "type " << type << "path " << path << endl;
     return fClient->SessionNotify(target, type, path);
 }
 
@@ -536,24 +570,28 @@ int JackDebugClient::SessionReply(jack_session_event_t* ev)
 char* JackDebugClient::GetUUIDForClientName(const char* client_name)
 {
     CheckClient("GetUUIDForClientName");
+    *fStream << "JackClientDebug : GetUUIDForClientName client_name " << client_name << endl;
     return fClient->GetUUIDForClientName(client_name);
 }
 
 char* JackDebugClient::GetClientNameByUUID(const char* uuid)
 {
     CheckClient("GetClientNameByUUID");
+    *fStream << "JackClientDebug : GetClientNameByUUID uuid " << uuid << endl;
     return fClient->GetClientNameByUUID(uuid);
 }
 
 int JackDebugClient::ReserveClientName(const char* client_name, const char* uuid)
 {
     CheckClient("ReserveClientName");
+    *fStream << "JackClientDebug : ReserveClientName client_name " << client_name << "uuid " << uuid << endl;
     return fClient->ReserveClientName(client_name, uuid);
 }
 
 int JackDebugClient::ClientHasSessionCallback(const char* client_name)
 {
     CheckClient("ClientHasSessionCallback");
+    *fStream << "JackClientDebug : ClientHasSessionCallback client_name " << client_name << endl;
     return fClient->ClientHasSessionCallback(client_name);
 }
 

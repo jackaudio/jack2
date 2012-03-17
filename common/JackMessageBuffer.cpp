@@ -22,6 +22,7 @@
 #include "JackMessageBuffer.h"
 #include "JackGlobals.h"
 #include "JackError.h"
+#include "JackTime.h"
 
 namespace Jack
 {
@@ -167,17 +168,33 @@ int JackMessageBuffer::SetInitCallback(JackThreadInitCallback callback, void *ar
         /* set up the callback */
         fInitArg = arg;
         fInit = callback;
-        /* wake msg buffer thread */
-        fGuard.Signal();
-        /* wait for it to be done */
+        
+        /*
+        The condition variable emulation code does not work reliably on Windows (lost signal).
+        So use a "hackish" way to signal/wait for the result.
+        Probaly better in the long term : use pthread-win32 (http://sourceware.org/pthreads-win32/)
+        // wake msg buffer thread 
+        fGuard.Signal()
+        // wait for it to be done  
         fGuard.Wait();
+        */
+
+        int count = 0;
+        while (fInit && ++count < 1000) {
+            /* wake msg buffer thread */
+            fGuard.Signal();
+            JackSleep(1000);
+        }
+               
         /* and we're done */
         fGuard.Unlock();
+        if (count == 1000) goto error;
         return 0;
-    } else {
-        jack_error("JackMessageBuffer::SetInitCallback : callback cannot be executed");
-        return -1;
     }
+    
+error:
+    jack_error("JackMessageBuffer::SetInitCallback : callback cannot be executed");
+    return -1;
 }
 
 };

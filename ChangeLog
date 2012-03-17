@@ -36,6 +36,22 @@ John Emmas
   Jackdmp changes log
 ---------------------------
 
+2012-03-15 Stephane Letz  <letz@grame.fr>
+
+	* POST_PACKED_STRUCTURE used for jack_latency_range_t type.
+
+2012-03-09 Stephane Letz  <letz@grame.fr>
+
+	* Remove JACK_32_64 flag, so POST_PACKED_STRUCTURE now always used.
+
+2012-02-10 Stephane Letz  <letz@grame.fr>
+
+	* Improve libjacknet master mode.
+
+2012-02-09 Stephane Letz  <letz@grame.fr>
+
+	* In control API, UNIX like sigset_t replaced by more abstract jackctl_sigmask_t * opaque struct.
+
 2012-02-01 Stephane Letz  <letz@grame.fr>
 
 	* Check server API callback from notification thread.

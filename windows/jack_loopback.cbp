@@ -16,8 +16,7 @@
 					<Add option="-Wall" />
 					<Add option="-DBUILD_DLL" />
 					<Add option="-DSERVER_SIDE" />
-                    <Add option="-DJACK_32_64" />
-					<Add directory="..\windows" />
+                			<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
 				</Compiler>
@@ -36,8 +35,7 @@
 					<Add option="-g" />
 					<Add option="-DBUILD_DLL" />
 					<Add option="-DSERVER_SIDE" />
-                    <Add option="-DJACK_32_64" />
-					<Add directory="..\windows" />
+              			<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
 				</Compiler>
@@ -57,8 +55,7 @@
 					<Add option="-DBUILD_DLL" />
 					<Add option="-DJACK_MONITOR" />
 					<Add option="-DSERVER_SIDE" />
-                    <Add option="-DJACK_32_64" />
-					<Add directory="..\windows" />
+             			<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
 				</Compiler>
@@ -75,11 +72,10 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
-                    <Add option="-m32" />
+                   			 <Add option="-m32" />
 					<Add option="-DBUILD_DLL" />
 					<Add option="-DSERVER_SIDE" />
-                    <Add option="-DJACK_32_64" />
-					<Add directory="..\windows" />
+                 			<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
 				</Compiler>
@@ -100,11 +96,10 @@
 				<Compiler>
 					<Add option="-Wall" />
 					<Add option="-g" />
-                    <Add option="-m32" />
+                			<Add option="-m32" />
 					<Add option="-DBUILD_DLL" />
 					<Add option="-DSERVER_SIDE" />
-                    <Add option="-DJACK_32_64" />
-					<Add directory="..\windows" />
+              				<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
 				</Compiler>
@@ -125,12 +120,11 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
-                    <Add option="-m32" />
+                 			<Add option="-m32" />
 					<Add option="-DBUILD_DLL" />
 					<Add option="-DJACK_MONITOR" />
 					<Add option="-DSERVER_SIDE" />
-                    <Add option="-DJACK_32_64" />
-					<Add directory="..\windows" />
+                			<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
 				</Compiler>

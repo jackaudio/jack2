@@ -25,6 +25,18 @@
 namespace Jack
 {
 
+    JackBasePosixMutex::JackBasePosixMutex(const char* name)
+        :fOwner(0)
+    {
+        int res = pthread_mutex_init(&fMutex, NULL);
+        ThrowIf(res != 0, JackException("JackBasePosixMutex: could not init the mutex"));
+    }
+
+    JackBasePosixMutex::~JackBasePosixMutex()
+    {
+        pthread_mutex_destroy(&fMutex);
+    }
+
     bool JackBasePosixMutex::Lock()
     {
         pthread_t current_thread = pthread_self();
@@ -77,6 +89,25 @@ namespace Jack
             jack_error("JackBasePosixMutex::Unlock mutex not locked by thread = %d owner %d", pthread_self(), fOwner);
             return false;
         }
+    }
+
+    JackPosixMutex::JackPosixMutex(const char* name)
+    {
+        // Use recursive mutex
+        pthread_mutexattr_t mutex_attr;
+        int res;
+        res = pthread_mutexattr_init(&mutex_attr);
+        ThrowIf(res != 0, JackException("JackBasePosixMutex: could not init the mutex attribute"));
+        res = pthread_mutexattr_settype(&mutex_attr, PTHREAD_MUTEX_RECURSIVE);
+        ThrowIf(res != 0, JackException("JackBasePosixMutex: could not settype the mutex"));
+        res = pthread_mutex_init(&fMutex, &mutex_attr);
+        ThrowIf(res != 0, JackException("JackBasePosixMutex: could not init the mutex"));
+        pthread_mutexattr_destroy(&mutex_attr);
+    }
+
+    JackPosixMutex::~JackPosixMutex()
+    {
+        pthread_mutex_destroy(&fMutex);
     }
 
     bool JackPosixMutex::Lock()

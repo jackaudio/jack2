@@ -214,8 +214,6 @@ def configure(conf):
             conf.define('USE_LIBDBUS_AUTOLAUNCH', 1)
     if conf.env['BUILD_WITH_PROFILE'] == True:
         conf.define('JACK_MONITOR', 1)
-    if conf.env['BUILD_WITH_32_64'] == True:
-        conf.define('JACK_32_64', 1)
     conf.write_config_header('config.h')
 
     svnrev = None

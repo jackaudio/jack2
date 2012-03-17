@@ -33,14 +33,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
         than use the natural alignment of the processor and/or
         compiler.
         */
-        #if (__GNUC__< 4)  /* Does not seem to work with GCC 3.XX serie */
-            #define POST_PACKED_STRUCTURE
-        #elif defined(JACK_32_64)
-            #define POST_PACKED_STRUCTURE __attribute__((__packed__))
-        #else
-            #define POST_PACKED_STRUCTURE
-        #endif
+        #define POST_PACKED_STRUCTURE __attribute__((__packed__))
     #endif
+    
     #define MEM_ALIGN(x,y) x __attribute__((aligned(y)))
     #define LIB_EXPORT __attribute__((visibility("default")))
     #ifdef SERVER_SIDE
@@ -52,6 +47,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
     #else
         #define SERVER_EXPORT __attribute__((visibility("hidden")))
     #endif
+    
 #else
     #define MEM_ALIGN(x,y) x
     #define LIB_EXPORT

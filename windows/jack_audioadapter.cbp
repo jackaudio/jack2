@@ -17,7 +17,6 @@
 					<Add option="-DBUILD_DLL" />
 					<Add option="-D__SMP__" />
 					<Add option="-DSERVER_SIDE" />
-					<Add option="-DJACK_32_64" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
@@ -43,7 +42,6 @@
 					<Add option="-DBUILD_DLL" />
 					<Add option="-D__SMP__" />
 					<Add option="-DSERVER_SIDE" />
-					<Add option="-DJACK_32_64" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
@@ -53,6 +51,8 @@
 					<Add library="libjackserver64" />
 					<Add library="libportaudio_x86_64.a" />
 					<Add library="libsamplerate_x86_64.a" />
+					<Add library="winmm" />
+					<Add library="ole32" />
 					<Add directory="Debug64\bin" />
 				</Linker>
 			</Target>
@@ -68,7 +68,6 @@
 					<Add option="-D__SMP__" />
 					<Add option="-DJACK_MONITOR" />
 					<Add option="-DSERVER_SIDE" />
-					<Add option="-DJACK_32_64" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
@@ -78,6 +77,8 @@
 					<Add library="libjackserver64" />
 					<Add library="libportaudio_x86_64.a" />
 					<Add library="libsamplerate_x86_64.a" />
+					<Add library="winmm" />
+					<Add library="ole32" />
 					<Add directory="Release64\bin" />
 				</Linker>
 			</Target>
@@ -93,7 +94,6 @@
 					<Add option="-DBUILD_DLL" />
 					<Add option="-D__SMP__" />
 					<Add option="-DSERVER_SIDE" />
-					<Add option="-DJACK_32_64" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
@@ -124,7 +124,6 @@
 					<Add option="-DBUILD_DLL" />
 					<Add option="-D__SMP__" />
 					<Add option="-DSERVER_SIDE" />
-					<Add option="-DJACK_32_64" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
@@ -135,6 +134,8 @@
 					<Add library="libjackserver" />
 					<Add library="libportaudio_x86.a" />
 					<Add library="libsamplerate_x86.a" />
+					<Add library="winmm" />
+					<Add library="ole32" />
 					<Add directory="Debug\bin" />
 				</Linker>
 				<ExtraCommands>
@@ -154,7 +155,6 @@
 					<Add option="-D__SMP__" />
 					<Add option="-DJACK_MONITOR" />
 					<Add option="-DSERVER_SIDE" />
-					<Add option="-DJACK_32_64" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
@@ -165,6 +165,8 @@
 					<Add library="libjackserver" />
 					<Add library="libportaudio_x86.a" />
 					<Add library="libsamplerate_x86.a" />
+					<Add library="winmm" />
+					<Add library="ole32" />
 					<Add directory="Release\bin" />
 				</Linker>
 				<ExtraCommands>

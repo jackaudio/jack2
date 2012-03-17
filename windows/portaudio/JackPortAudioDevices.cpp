@@ -46,8 +46,7 @@ PortAudioDevices::PortAudioDevices()
 
 PortAudioDevices::~PortAudioDevices()
 {
-    // Desactivate for now: crash the server..
-    //Pa_Terminate();
+    Pa_Terminate();
 
     delete[] fDeviceInfo;
     delete[] fHostName;

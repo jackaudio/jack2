@@ -262,7 +262,7 @@ namespace Jack
 
     bool JackNetMasterInterface::Init()
     {
-        jack_log("JackNetMasterInterface::Init, ID %u", fParams.fID);
+        jack_log("JackNetMasterInterface::Init : ID %u", fParams.fID);
 
         session_params_t host_params;
         uint attempt = 0;
@@ -504,7 +504,7 @@ namespace Jack
         while (!fRxHeader.fIsLastPckt) {
             // how much data is queued on the rx buffer ?
             rx_bytes = Recv(fParams.fMtu, MSG_PEEK);
-
+         
             // error here, problem with recv, just skip the cycle (return -1)
             if (rx_bytes == SOCKET_ERROR) {
                 return rx_bytes;
@@ -528,7 +528,7 @@ namespace Jack
                 }
             }
         }
-
+   
         return rx_bytes;
     }
 

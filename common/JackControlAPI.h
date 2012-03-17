@@ -25,15 +25,6 @@
 #include "jslist.h"
 #include "JackCompilerDeps.h"
 
-#ifdef WIN32
-#ifdef __MINGW32__
-#include <sys/types.h>
-typedef _sigset_t	sigset_t;
-#else
-typedef HANDLE sigset_t;
-#endif
-#endif
-
 /** Parameter types, intentionally similar to jack_driver_param_type_t */
 typedef enum
 {
@@ -80,6 +71,9 @@ typedef struct jackctl_internal jackctl_internal_t;
 /** opaque type for parameter object */
 typedef struct jackctl_parameter jackctl_parameter_t;
 
+/** opaque type for sigmask object */
+typedef struct jackctl_sigmask jackctl_sigmask_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -87,13 +81,13 @@ extern "C" {
 } /* Adjust editor indent */
 #endif
 
-SERVER_EXPORT sigset_t
+SERVER_EXPORT jackctl_sigmask_t *
 jackctl_setup_signals(
     unsigned int flags);
 
 SERVER_EXPORT void
 jackctl_wait_signals(
-    sigset_t signals);
+    jackctl_sigmask_t * signals);
 
 SERVER_EXPORT jackctl_server_t *
 jackctl_server_create(

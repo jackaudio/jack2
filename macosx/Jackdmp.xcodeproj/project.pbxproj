@@ -878,6 +878,10 @@
 		4BA7BE240DC2350D00AA3457 /* Jackservermp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B35C4FC0D4731D1000DE7AE /* Jackservermp.framework */; };
 		4BA7BE270DC2352A00AA3457 /* Jackservermp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B35C4FC0D4731D1000DE7AE /* Jackservermp.framework */; };
 		4BA7FECA0D8E76650017FF73 /* control.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BA7FEC80D8E76650017FF73 /* control.c */; };
+		4BAA150314F04FB600402512 /* JackAC3Encoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BAA150114F04FB600402512 /* JackAC3Encoder.cpp */; };
+		4BAA150414F04FB600402512 /* JackAC3Encoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BAA150214F04FB600402512 /* JackAC3Encoder.h */; };
+		4BAA150514F04FB600402512 /* JackAC3Encoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BAA150114F04FB600402512 /* JackAC3Encoder.cpp */; };
+		4BAA150614F04FB600402512 /* JackAC3Encoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BAA150214F04FB600402512 /* JackAC3Encoder.h */; };
 		4BAB95B80B9E20B800A0C723 /* JackPortType.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BAB95B60B9E20B800A0C723 /* JackPortType.cpp */; };
 		4BAB95B90B9E20B800A0C723 /* JackPortType.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BAB95B70B9E20B800A0C723 /* JackPortType.h */; };
 		4BAB95BA0B9E20B800A0C723 /* JackPortType.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BAB95B60B9E20B800A0C723 /* JackPortType.cpp */; };
@@ -981,6 +985,8 @@
 		4BE5FED10E725C320020B576 /* JackCoreAudioAdapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE5FECF0E725C320020B576 /* JackCoreAudioAdapter.cpp */; };
 		4BE5FED20E725C320020B576 /* JackCoreAudioAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BE5FED00E725C320020B576 /* JackCoreAudioAdapter.h */; };
 		4BE6C6AD0A3E0A65005A203A /* test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE6C6AC0A3E0A65005A203A /* test.cpp */; };
+		4BF1007C15135D8200B88F80 /* JackPosixMutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B327BA614B4B50400976483 /* JackPosixMutex.cpp */; };
+		4BF1007D15135D8800B88F80 /* JackPosixMutex.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BB4214814D2C0A700A1CAE1 /* JackPosixMutex.h */; };
 		4BF2841A0F31B4BC00B05BE3 /* JackArgParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF284160F31B4BC00B05BE3 /* JackArgParser.cpp */; };
 		4BF2841B0F31B4BC00B05BE3 /* JackArgParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF284170F31B4BC00B05BE3 /* JackArgParser.h */; };
 		4BF3391A0F8B86DC0080FB5B /* JackCoreMidiDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF339140F8B86DC0080FB5B /* JackCoreMidiDriver.h */; };
@@ -1887,6 +1893,8 @@
 		4BA692D60CBE4CC600EAD520 /* ipunload.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = ipunload.c; path = "../example-clients/ipunload.c"; sourceTree = SOURCE_ROOT; };
 		4BA7FEC30D8E76270017FF73 /* jack_server_control */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_server_control; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BA7FEC80D8E76650017FF73 /* control.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = control.c; path = "../example-clients/control.c"; sourceTree = SOURCE_ROOT; };
+		4BAA150114F04FB600402512 /* JackAC3Encoder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackAC3Encoder.cpp; path = ../common/JackAC3Encoder.cpp; sourceTree = SOURCE_ROOT; };
+		4BAA150214F04FB600402512 /* JackAC3Encoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackAC3Encoder.h; path = ../common/JackAC3Encoder.h; sourceTree = SOURCE_ROOT; };
 		4BAB95B60B9E20B800A0C723 /* JackPortType.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackPortType.cpp; path = ../common/JackPortType.cpp; sourceTree = SOURCE_ROOT; };
 		4BAB95B70B9E20B800A0C723 /* JackPortType.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackPortType.h; path = ../common/JackPortType.h; sourceTree = SOURCE_ROOT; };
 		4BAB95EC0B9E21A500A0C723 /* JackAudioPort.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackAudioPort.cpp; path = ../common/JackAudioPort.cpp; sourceTree = SOURCE_ROOT; };
@@ -3238,8 +3246,8 @@
 				4B21794D13E2EEA60095B3E5 /* JackTimedDriver.cpp */,
 				4BF3390D0F8B86AF0080FB5B /* MIDI */,
 				4B19B3010E23629800DD4A82 /* Adapter */,
-				BA222AEA0DC88379001A17F4 /* Net */,
 				4BD56D8707968982006D44F9 /* Threaded */,
+				BA222AEA0DC88379001A17F4 /* Net */,
 				4BD56D8607968979006D44F9 /* Audio */,
 			);
 			name = Driver;
@@ -3353,6 +3361,8 @@
 		4BD56D8607968979006D44F9 /* Audio */ = {
 			isa = PBXGroup;
 			children = (
+				4BAA150114F04FB600402512 /* JackAC3Encoder.cpp */,
+				4BAA150214F04FB600402512 /* JackAC3Encoder.h */,
 				4BBB00CF0E72614F0018AB1B /* JackPortAudioDevices.cpp */,
 				4BBB00D00E72614F0018AB1B /* JackPortAudioDevices.h */,
 				4BBB00D10E72614F0018AB1B /* JackPortAudioDriver.cpp */,
@@ -3843,6 +3853,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4BA4ADB50E87AB2600F26C85 /* JackCoreAudioDriver.h in Headers */,
+				4BAA150614F04FB600402512 /* JackAC3Encoder.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4277,6 +4288,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4BE5FECE0E725C090020B576 /* JackCoreAudioDriver.h in Headers */,
+				4BAA150414F04FB600402512 /* JackAC3Encoder.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4300,6 +4312,7 @@
 				4B86934E1371DEBD00D2D11B /* JackLibSampleRateResampler.h in Headers */,
 				4B49D44E14865F22003390F8 /* net.h in Headers */,
 				4B49D44F14865F22003390F8 /* session.h in Headers */,
+				4BF1007D15135D8800B88F80 /* JackPosixMutex.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7381,6 +7394,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4BA4ADB40E87AB2500F26C85 /* JackCoreAudioDriver.cpp in Sources */,
+				4BAA150514F04FB600402512 /* JackAC3Encoder.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7791,6 +7805,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4BE5FECD0E725C090020B576 /* JackCoreAudioDriver.cpp in Sources */,
+				4BAA150314F04FB600402512 /* JackAC3Encoder.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7819,6 +7834,7 @@
 				4B86932C1371DD9B00D2D11B /* ringbuffer.c in Sources */,
 				4B86934D1371DEBA00D2D11B /* JackLibSampleRateResampler.cpp in Sources */,
 				4B327BD614B4B6E700976483 /* JackException.cpp in Sources */,
+				4BF1007C15135D8200B88F80 /* JackPosixMutex.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9117,10 +9133,8 @@
 				INSTALL_PATH = /usr/local/lib;
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DSERVER_SIDE",
-					"-DJACK_32_64",
 					"-DHAVE_CELT",
 					"-DHAVE_CELT_API_0_7",
 					"-DMACH_RPC_MACH_SEMA",
@@ -9168,13 +9182,11 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DSERVER_SIDE",
 					"-DHAVE_CELT",
 					"-DHAVE_CELT_API_0_7",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					libcelt.a,
@@ -9510,12 +9522,10 @@
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
 					"-D__SMP__",
-					"-DJACK_32_64",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DMACH_RPC_MACH_SEMA",
 					"-D__SMP__",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -9566,12 +9576,10 @@
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
 					"-D__SMP__",
-					"-DJACK_32_64",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DMACH_RPC_MACH_SEMA",
 					"-D__SMP__",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -9617,12 +9625,10 @@
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
 					"-D__SMP__",
-					"-DJACK_32_64",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DMACH_RPC_MACH_SEMA",
 					"-D__SMP__",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -9685,13 +9691,11 @@
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
-					"-DJACK_32_64",
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DMACH_RPC_MACH_SEMA",
 					"-D__SMP__",
-					"-DJACK_32_64",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2)",
 				);
@@ -9751,12 +9755,10 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
-					"-DJACK_32_64",
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2)",
@@ -9807,12 +9809,10 @@
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
-					"-DJACK_32_64",
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2)",
@@ -9872,7 +9872,6 @@
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OTHER_CFLAGS = (
 					"-DSERVER_SIDE",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"-DUSE_POSIX_SHM",
 				);
@@ -9880,7 +9879,6 @@
 					"-DHAVE_CELT_API_0_7",
 					"-DHAVE_CELT",
 					"-DSERVER_SIDE",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"-DMACH_RPC_MACH_SEMA",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
@@ -9942,7 +9940,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
 					"-DSERVER_SIDE",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"-DUSE_POSIX_SHM",
 				);
@@ -9950,7 +9947,6 @@
 					"-DHAVE_CELT_API_0_7",
 					"-DHAVE_CELT",
 					"-DSERVER_SIDE",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"-DMACH_RPC_MACH_SEMA",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
@@ -10003,12 +9999,10 @@
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OTHER_CFLAGS = (
 					"-D__SMP__",
-					"-DJACK_32_64",
 					"-DUSE_POSIX_SHM",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-D__SMP__",
-					"-DJACK_32_64",
 					"-DMACH_RPC_MACH_SEMA",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2)",
@@ -11791,13 +11785,13 @@
 				INSTALL_PATH = /usr/local/lib;
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
+					libaften_static.a,
+					libaften_pcm.a,
 					"-framework",
 					Jackservermp,
 					"-framework",
@@ -11844,13 +11838,13 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
+					libaften_pcm.a,
+					libaften_static.a,
 					"-framework",
 					Jackservermp,
 					"-framework",
@@ -11983,11 +11977,7 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
-				OTHER_CFLAGS = "-DJACK_32_64";
-				OTHER_CPLUSPLUSFLAGS = (
-					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
-				);
+				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
 					libportaudio.a,
 					"-framework",
@@ -12082,11 +12072,9 @@
 				INSTALL_PATH = /usr/local/lib;
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -12134,11 +12122,9 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -12264,7 +12250,6 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -12364,7 +12349,6 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = All;
@@ -13485,11 +13469,9 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -13587,14 +13569,12 @@
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
-					"-DJACK_32_64",
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-D__CLIENTDEBUG__",
 					"-DMACH_RPC_MACH_SEMA",
 					"-D__SMP__",
-					"-DJACK_32_64",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2)",
 				);
@@ -13654,13 +13634,11 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
-					"-DJACK_32_64",
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-D__CLIENTDEBUG__",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2)",
@@ -13711,12 +13689,10 @@
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
-					"-DJACK_32_64",
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2)",
@@ -16071,6 +16047,8 @@
 				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
+					libaften_static.a,
+					libaften_pcm.a,
 					"-framework",
 					Jackservermp,
 					"-framework",
@@ -16123,6 +16101,8 @@
 				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
+					libaften_static.a,
+					libaften_pcm.a,
 					"-framework",
 					Jackservermp,
 					"-framework",
@@ -16389,14 +16369,12 @@
 				);
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
-					"-DJACK_32_64",
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DHAVE_CELT_API_0_7",
 					"-DHAVE_CELT",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DJACK_LOCATION=\\\"/usr/local/bin\\\"";
@@ -16461,14 +16439,12 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
-					"-DJACK_32_64",
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DHAVE_CELT_API_0_7",
 					"-DHAVE_CELT",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
@@ -16517,12 +16493,10 @@
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
-					"-DJACK_32_64",
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2)",
@@ -16917,7 +16891,6 @@
 				OTHER_CFLAGS = (
 					"-DJACK_MONITOR",
 					"-DSERVER_SIDE",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"-DUSE_POSIX_SHM",
 				);
@@ -16926,7 +16899,6 @@
 					"-DHAVE_CELT",
 					"-DJACK_MONITOR",
 					"-DSERVER_SIDE",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"-DMACH_RPC_MACH_SEMA",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
@@ -16988,7 +16960,6 @@
 				OTHER_CFLAGS = (
 					"-DJACK_MONITOR",
 					"-DSERVER_SIDE",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"-DUSE_POSIX_SHM",
 				);
@@ -16997,7 +16968,6 @@
 					"-DHAVE_CELT",
 					"-DJACK_MONITOR",
 					"-DSERVER_SIDE",
-					"-DJACK_32_64",
 					"-D__SMP__",
 					"-DMACH_RPC_MACH_SEMA",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
@@ -17050,12 +17020,10 @@
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OTHER_CFLAGS = (
 					"-D__SMP__",
-					"-DJACK_32_64",
 					"-DUSE_POSIX_SHM",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-D__SMP__",
-					"-DJACK_32_64",
 					"-DMACH_RPC_MACH_SEMA",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2)",
@@ -17518,7 +17486,6 @@
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -17570,7 +17537,6 @@
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -17667,7 +17633,6 @@
 					"-DHAVE_CELT",
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -17717,7 +17682,6 @@
 					"-DHAVE_CELT",
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -17853,7 +17817,6 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DSERVER_SIDE",
 					"$(OTHER_CFLAGS)",
@@ -18007,7 +17970,6 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DSERVER_SIDE",
 					"$(OTHER_CFLAGS)",
@@ -18109,9 +18071,7 @@
 				INSTALL_PATH = /usr/local/lib;
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = (
-					"-DJACK_32_64",
 					"-DHAVE_CELT",
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
@@ -18167,9 +18127,7 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
-				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = (
-					"-DJACK_32_64",
 					"-DHAVE_CELT",
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
