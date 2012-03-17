@@ -129,7 +129,7 @@ def build(bld):
         prog.source = ['netsource.c', '../common/netjack_packet.c']
         prog.env.append_value("CFLAGS", "-DNO_JACK_ERROR")
         prog.use = ['CELT', 'SAMPLERATE']
-        prog.uselib_local = 'clientlib'
+        prog.use = ['clientlib']
         prog.target = 'jack_netsource'
 
     if bld.env['IS_LINUX'] and bld.env['BUILD_EXAMPLE_ALSA_IO']:
