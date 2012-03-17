@@ -203,7 +203,8 @@ def configure(conf):
     conf.define('CLIENT_NUM', Options.options.clients)
     conf.define('PORT_NUM_FOR_CLIENT', Options.options.application_ports)
 
-    conf.define('ADDON_DIR', os.path.normpath(os.path.join(conf.env['LIBDIR'], 'jack')))
+    conf.env['ADDON_DIR'] = os.path.normpath(os.path.join(conf.env['LIBDIR'], 'jack'))
+    conf.define('ADDON_DIR', conf.env['ADDON_DIR'])
     conf.define('JACK_LOCATION', os.path.normpath(os.path.join(conf.env['PREFIX'], 'bin')))
     conf.define('USE_POSIX_SHM', 1)
     conf.define('JACKMP', 1)
