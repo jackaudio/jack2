@@ -253,6 +253,31 @@ JackFFADODriver::ffado_driver_restart (ffado_driver_t *driver)
     return Start();
 }
 
+void
+JackFFADODriver::UpdateLatencies(void)
+{
+    jack_latency_range_t range;
+    ffado_driver_t* driver = (ffado_driver_t*)fDriver;
+
+    for (int i = 0; i < fCaptureChannels; i++) {
+        range.min = range.max = driver->period_size + driver->capture_frame_latency;
+        fGraphManager->GetPort(fCapturePortList[i])->SetLatencyRange(JackCaptureLatency, &range);
+    }
+
+    for (int i = 0; i < fPlaybackChannels; i++) {
+        // Add one buffer more latency if "async" mode is used...
+        range.min = range.max = (driver->period_size *
+			(driver->device_options.nb_buffers - 1)) +
+                         ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + driver->playback_frame_latency;
+        fGraphManager->GetPort(fPlaybackPortList[i])->SetLatencyRange(JackPlaybackLatency, &range);
+        // Monitor port
+        if (fWithMonitorPorts) {
+            range.min = range.max =driver->period_size;
+            fGraphManager->GetPort(fMonitorPortList[i])->SetLatencyRange(JackCaptureLatency, &range);
+        }
+    }
+}
+
 int
 JackFFADODriver::SetBufferSize (jack_nframes_t nframes)
 {

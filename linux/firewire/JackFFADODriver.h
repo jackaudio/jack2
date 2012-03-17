@@ -2,6 +2,7 @@
 Copyright (C) 2001 Paul Davis
 Copyright (C) 2004 Grame
 Copyright (C) 2007 Pieter Palmers
+Copyright (C) 2012 Adrian Knoth
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -59,6 +60,7 @@ class JackFFADODriver : public JackAudioDriver
 
         void jack_driver_init (jack_driver_t *driver);
         void jack_driver_nt_init (jack_driver_nt_t * driver);
+        void UpdateLatencies();
 
     public:
 
