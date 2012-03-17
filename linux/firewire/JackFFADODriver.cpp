@@ -427,7 +427,6 @@ int JackFFADODriver::Attach()
     jack_port_id_t port_index;
     char buf[REAL_JACK_PORT_NAME_SIZE];
     char portname[REAL_JACK_PORT_NAME_SIZE];
-    jack_latency_range_t range;
 
     ffado_driver_t* driver = (ffado_driver_t*)fDriver;
 
@@ -513,8 +512,6 @@ int JackFFADODriver::Attach()
             ffado_streaming_capture_stream_onoff(driver->dev, chn, 0);
 
             port = fGraphManager->GetPort(port_index);
-            range.min = range.max = driver->period_size + driver->capture_frame_latency;
-            port->SetLatencyRange(JackCaptureLatency, &range);
             // capture port aliases (jackd1 style port names)
             snprintf(buf, sizeof(buf), "%s:capture_%i", fClientControl.fName, (int) chn + 1);
             port->SetAlias(buf);
@@ -544,9 +541,6 @@ int JackFFADODriver::Attach()
             // setup the midi buffer
             driver->capture_channels[chn].midi_buffer = (uint32_t *)calloc(driver->period_size, sizeof(uint32_t));
 
-            port = fGraphManager->GetPort(port_index);
-            range.min = range.max = driver->period_size + driver->capture_frame_latency;
-            port->SetLatencyRange(JackCaptureLatency, &range);
             fCapturePortList[chn] = port_index;
             jack_log("JackFFADODriver::Attach fCapturePortList[i] %ld ", port_index);
             fCaptureChannels++;
@@ -590,8 +584,6 @@ int JackFFADODriver::Attach()
 
             port = fGraphManager->GetPort(port_index);
             // Add one buffer more latency if "async" mode is used...
-            range.min = range.max = (driver->period_size * (driver->device_options.nb_buffers - 1)) + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + driver->playback_frame_latency;
-            port->SetLatencyRange(JackPlaybackLatency, &range);
             // playback port aliases (jackd1 style port names)
             snprintf(buf, sizeof(buf), "%s:playback_%i", fClientControl.fName, (int) chn + 1);
             port->SetAlias(buf);
@@ -626,9 +618,6 @@ int JackFFADODriver::Attach()
 
             driver->playback_channels[chn].midi_buffer = (uint32_t *)calloc(driver->period_size, sizeof(uint32_t));
 
-            port = fGraphManager->GetPort(port_index);
-            range.min = range.max = (driver->period_size * (driver->device_options.nb_buffers - 1)) + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + driver->playback_frame_latency;
-            port->SetLatencyRange(JackPlaybackLatency, &range);
             fPlaybackPortList[chn] = port_index;
             jack_log("JackFFADODriver::Attach fPlaybackPortList[i] %ld ", port_index);
             fPlaybackChannels++;
@@ -636,6 +625,8 @@ int JackFFADODriver::Attach()
             printMessage ("Don't register playback port %s", portname);
         }
     }
+
+    UpdateLatencies();
 
     assert(fCaptureChannels < DRIVER_PORT_NUM);
     assert(fPlaybackChannels < DRIVER_PORT_NUM);
