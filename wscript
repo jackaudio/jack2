@@ -1,33 +1,35 @@
 #! /usr/bin/env python
 # encoding: utf-8
+from __future__ import print_function
 
 import os
 import Utils
 import Options
-import commands
+import subprocess
 g_maxlen = 40
 import shutil
 import Task
 import re
 import Logs
+import sys
 
 VERSION='1.9.9'
 APPNAME='jack'
 JACK_API_VERSION = '0.1.0'
 
 # these variables are mandatory ('/' are converted automatically)
-srcdir = '.'
-blddir = 'build'
+top = '.'
+out = 'build'
 
 def display_msg(msg, status = None, color = None):
     sr = msg
     global g_maxlen
     g_maxlen = max(g_maxlen, len(msg))
     if status:
-        print "%s :" % msg.ljust(g_maxlen),
-        Utils.pprint(color, status)
+        Logs.pprint('NORMAL', "%s :" % msg.ljust(g_maxlen), sep=' ')
+        Logs.pprint(color, status)
     else:
-        print "%s" % msg.ljust(g_maxlen)
+        print("%s" % msg.ljust(g_maxlen))
 
 def display_feature(msg, build):
     if build:
@@ -36,26 +38,26 @@ def display_feature(msg, build):
         display_msg(msg, "no", 'YELLOW')
 
 def create_svnversion_task(bld, header='svnversion.h', define=None):
-    import Constants, Build
-
     cmd = '../svnversion_regenerate.sh ${TGT}'
     if define:
         cmd += " " + define
-
-    cls = Task.simple_task_type('svnversion', cmd, color='BLUE', before='cc')
-    cls.runnable_status = lambda self: Constants.RUN_ME
 
     def post_run(self):
         sg = Utils.h_file(self.outputs[0].abspath(self.env))
         #print sg.encode('hex')
         Build.bld.node_sigs[self.env.variant()][self.outputs[0].id] = sg
-    cls.post_run = post_run
 
-    tsk = cls(bld.env.copy())
-    tsk.inputs = []
-    tsk.outputs = [bld.path.find_or_declare(header)]
+    bld(
+            rule = cmd,
+            name = 'svnversion',
+            runnable_status = Task.RUN_ME,
+            before = 'c',
+            color = 'BLUE',
+            post_run = post_run,
+            target = [bld.path.find_or_declare(header)]
+    )
 
-def set_options(opt):
+def options(opt):
     # options provided by the modules
     opt.tool_options('compiler_cxx')
     opt.tool_options('compiler_cc')
@@ -77,19 +79,19 @@ def set_options(opt):
     opt.sub_options('dbus')
 
 def configure(conf):
-    platform = Utils.detect_platform()
+    platform = sys.platform
     conf.env['IS_MACOSX'] = platform == 'darwin'
-    conf.env['IS_LINUX'] = platform == 'linux' or platform == 'posix'
+    conf.env['IS_LINUX'] = platform == 'linux' or platform == 'linux2' or platform == 'posix'
     conf.env['IS_SUN'] = platform == 'sunos'
 
     if conf.env['IS_LINUX']:
-        Utils.pprint('CYAN', "Linux detected")
+        Logs.pprint('CYAN', "Linux detected")
 
     if conf.env['IS_MACOSX']:
-        Utils.pprint('CYAN', "MacOS X detected")
+        Logs.pprint('CYAN', "MacOS X detected")
 
     if conf.env['IS_SUN']:
-        Utils.pprint('CYAN', "SunOS detected")
+        Logs.pprint('CYAN', "SunOS detected")
 
     if conf.env['IS_LINUX']:
         conf.check_tool('compiler_cxx')
@@ -135,25 +137,25 @@ def configure(conf):
 
     conf.sub_config('example-clients')
 
-    if conf.check_cfg(package='celt', atleast_version='0.11.0', args='--cflags --libs'):
+    if conf.check_cfg(package='celt', atleast_version='0.11.0', args='--cflags --libs', mandatory=False):
         conf.define('HAVE_CELT', 1)
         conf.define('HAVE_CELT_API_0_11', 1)
         conf.define('HAVE_CELT_API_0_8', 0)
         conf.define('HAVE_CELT_API_0_7', 0)
         conf.define('HAVE_CELT_API_0_5', 0)
-    elif conf.check_cfg(package='celt', atleast_version='0.8.0', args='--cflags --libs'):
+    elif conf.check_cfg(package='celt', atleast_version='0.8.0', args='--cflags --libs', mandatory=False):
         conf.define('HAVE_CELT', 1)
         conf.define('HAVE_CELT_API_0_11', 0)
         conf.define('HAVE_CELT_API_0_8', 1)
         conf.define('HAVE_CELT_API_0_7', 0)
         conf.define('HAVE_CELT_API_0_5', 0)
-    elif conf.check_cfg(package='celt', atleast_version='0.7.0', args='--cflags --libs'):
+    elif conf.check_cfg(package='celt', atleast_version='0.7.0', args='--cflags --libs', mandatory=False):
         conf.define('HAVE_CELT', 1)
         conf.define('HAVE_CELT_API_0_11', 0)
         conf.define('HAVE_CELT_API_0_8', 0)
         conf.define('HAVE_CELT_API_0_7', 1)
         conf.define('HAVE_CELT_API_0_5', 0)
-    elif conf.check_cfg(package='celt', atleast_version='0.5.0', args='--cflags --libs', required=True):
+    elif conf.check_cfg(package='celt', atleast_version='0.5.0', args='--cflags --libs', mandatory=False):
         conf.define('HAVE_CELT', 1)
         conf.define('HAVE_CELT_API_0_11', 0)
         conf.define('HAVE_CELT_API_0_8', 0)
@@ -201,7 +203,8 @@ def configure(conf):
     conf.define('CLIENT_NUM', Options.options.clients)
     conf.define('PORT_NUM_FOR_CLIENT', Options.options.application_ports)
 
-    conf.define('ADDON_DIR', os.path.normpath(os.path.join(conf.env['LIBDIR'], 'jack')))
+    conf.env['ADDON_DIR'] = os.path.normpath(os.path.join(conf.env['LIBDIR'], 'jack'))
+    conf.define('ADDON_DIR', conf.env['ADDON_DIR'])
     conf.define('JACK_LOCATION', os.path.normpath(os.path.join(conf.env['PREFIX'], 'bin')))
     conf.define('USE_POSIX_SHM', 1)
     conf.define('JACKMP', 1)
@@ -220,7 +223,7 @@ def configure(conf):
         if m != None:
             svnrev = m.group(1)
 
-    conf.env.append_unique('LINKFLAGS', '-lm -lstdc++')
+    conf.env.append_unique('LINKFLAGS', ['-lm', '-lstdc++'])
 
     if Options.options.mixed == True:
         env_variant2 = conf.env.copy()
@@ -236,17 +239,17 @@ def configure(conf):
             conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib32'
         conf.write_config_header('config.h')
 
-    print
+    print()
     display_msg("==================")
     version_msg = "JACK " + VERSION
     if svnrev:
         version_msg += " exported from r" + svnrev
     else:
         version_msg += " svn revision will checked and eventually updated during build"
-    print version_msg
+    print(version_msg)
 
-    print "Build with a maximum of %d JACK clients" % conf.env['CLIENT_NUM']
-    print "Build with a maximum of %d ports per application" % conf.env['PORT_NUM_FOR_CLIENT']
+    print("Build with a maximum of %d JACK clients" % Options.options.clients)
+    print("Build with a maximum of %d ports per application" % Options.options.application_ports)
  
     display_msg("Install prefix", conf.env['PREFIX'], 'CYAN')
     display_msg("Library directory", conf.env['LIBDIR'], 'CYAN')
@@ -263,8 +266,8 @@ def configure(conf):
     display_feature('Build D-Bus JACK (jackdbus)', conf.env['BUILD_JACKDBUS'])
 
     if conf.env['BUILD_JACKDBUS'] and conf.env['BUILD_JACKD']:
-        print Logs.colors.RED + 'WARNING !! mixing both jackd and jackdbus may cause issues:' + Logs.colors.NORMAL
-        print Logs.colors.RED + 'WARNING !! jackdbus does not use .jackdrc nor qjackctl settings' + Logs.colors.NORMAL
+        print(Logs.colors.RED + 'WARNING !! mixing both jackd and jackdbus may cause issues:' + Logs.colors.NORMAL)
+        print(Logs.colors.RED + 'WARNING !! jackdbus does not use .jackdrc nor qjackctl settings' + Logs.colors.NORMAL)
 
     if conf.env['IS_LINUX']:
         display_feature('Build with ALSA support', conf.env['BUILD_DRIVER_ALSA'] == True)
@@ -276,21 +279,21 @@ def configure(conf):
         #display_msg('Settings persistence', xxx)
 
         if conf.env['DBUS_SERVICES_DIR'] != conf.env['DBUS_SERVICES_DIR_REAL']:
-            print
-            print Logs.colors.RED + "WARNING: D-Bus session services directory as reported by pkg-config is"
-            print Logs.colors.RED + "WARNING:",
-            print Logs.colors.CYAN + conf.env['DBUS_SERVICES_DIR_REAL']
-            print Logs.colors.RED + 'WARNING: but service file will be installed in'
-            print Logs.colors.RED + "WARNING:",
-            print Logs.colors.CYAN + conf.env['DBUS_SERVICES_DIR']
-            print Logs.colors.RED + 'WARNING: You may need to adjust your D-Bus configuration after installing jackdbus'
-            print 'WARNING: You can override dbus service install directory'
-            print 'WARNING: with --enable-pkg-config-dbus-service-dir option to this script'
-            print Logs.colors.NORMAL,
-    print
+            print()
+            print(Logs.colors.RED + "WARNING: D-Bus session services directory as reported by pkg-config is")
+            print(Logs.colors.RED + "WARNING:", end=' ')
+            print(Logs.colors.CYAN + conf.env['DBUS_SERVICES_DIR_REAL'])
+            print(Logs.colors.RED + 'WARNING: but service file will be installed in')
+            print(Logs.colors.RED + "WARNING:", end=' ')
+            print(Logs.colors.CYAN + conf.env['DBUS_SERVICES_DIR'])
+            print(Logs.colors.RED + 'WARNING: You may need to adjust your D-Bus configuration after installing jackdbus')
+            print('WARNING: You can override dbus service install directory')
+            print('WARNING: with --enable-pkg-config-dbus-service-dir option to this script')
+            print(Logs.colors.NORMAL, end=' ')
+    print()
 
 def build(bld):
-    print ("make[1]: Entering directory `" + os.getcwd() + "/" + blddir + "'" )
+    print("make[1]: Entering directory `" + os.getcwd() + "/" + out + "'")
     if not os.access('svnversion.h', os.R_OK):
         create_svnversion_task(bld)
 
@@ -324,27 +327,27 @@ def build(bld):
         html_docs_install_dir = share_dir + '/reference/html/'
         if Options.commands['install']:
             if os.path.isdir(html_docs_install_dir):
-                Utils.pprint('CYAN', "Removing old doxygen documentation installation...")
+                Logs.pprint('CYAN', "Removing old doxygen documentation installation...")
                 shutil.rmtree(html_docs_install_dir)
-                Utils.pprint('CYAN', "Removing old doxygen documentation installation done.")
-            Utils.pprint('CYAN', "Installing doxygen documentation...")
+                Logs.pprint('CYAN', "Removing old doxygen documentation installation done.")
+            Logs.pprint('CYAN', "Installing doxygen documentation...")
             shutil.copytree(html_docs_source_dir, html_docs_install_dir)
-            Utils.pprint('CYAN', "Installing doxygen documentation done.")
+            Logs.pprint('CYAN', "Installing doxygen documentation done.")
         elif Options.commands['uninstall']:
-            Utils.pprint('CYAN', "Uninstalling doxygen documentation...")
+            Logs.pprint('CYAN', "Uninstalling doxygen documentation...")
             if os.path.isdir(share_dir):
                 shutil.rmtree(share_dir)
-            Utils.pprint('CYAN', "Uninstalling doxygen documentation done.")
+            Logs.pprint('CYAN', "Uninstalling doxygen documentation done.")
         elif Options.commands['clean']:
             if os.access(html_docs_source_dir, os.R_OK):
-                Utils.pprint('CYAN', "Removing doxygen generated documentation...")
+                Logs.pprint('CYAN', "Removing doxygen generated documentation...")
                 shutil.rmtree(html_docs_source_dir)
-                Utils.pprint('CYAN', "Removing doxygen generated documentation done.")
+                Logs.pprint('CYAN', "Removing doxygen generated documentation done.")
         elif Options.commands['build']:
             if not os.access(html_docs_source_dir, os.R_OK):
                 os.popen("doxygen").read()
             else:
-                Utils.pprint('CYAN', "doxygen documentation already built.")
+                Logs.pprint('CYAN', "doxygen documentation already built.")
 
 def dist_hook():
     os.remove('svnversion_regenerate.sh')
