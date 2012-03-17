@@ -24,10 +24,9 @@ def create_jack_driver_obj(bld, target, sources, uselib = None):
     driver.target = target
     driver.source = sources
     driver.install_path = '${ADDON_DIR}/'
-    driver.use = []#['serverlib']
+    driver.use = []
     if uselib:
         driver.use += uselib
-    #driver.uselib_local = 'serverlib'
     return driver
 
 def build(bld):
