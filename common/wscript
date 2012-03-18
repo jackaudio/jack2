@@ -329,4 +329,5 @@ def build(bld):
                 'SERVERLIB': serverlib.target,
                 'JACK_VERSION': bld.env['JACK_VERSION'],
                 }
+    obj.dct = obj.dict
     obj.install_path = '${LIBDIR}/pkgconfig/'
