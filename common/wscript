@@ -320,14 +320,11 @@ def build(bld):
     bld.install_files('${PREFIX}/include/jack', bld.path.ant_glob('jack/*.h'))
 
     # process jack.pc.in -> jack.pc
-    obj = bld.new_task_gen('subst_pc')
-    obj.source = '../jack.pc.in'
-    obj.target = 'jack.pc'
-    obj.dict = {'PREFIX': bld.env['PREFIX'],
-                'LIBDIR': bld.env['LIBDIR'],
-                'INCLUDEDIR': os.path.normpath(bld.env['PREFIX'] + '/include'),
-                'SERVERLIB': serverlib.target,
-                'JACK_VERSION': bld.env['JACK_VERSION'],
-                }
-    obj.dct = obj.dict
-    obj.install_path = '${LIBDIR}/pkgconfig/'
+    obj = bld(
+        features = 'subst_pc',
+        source = '../jack.pc.in',
+        target = 'jack.pc',
+        install_path = '${LIBDIR}/pkgconfig/',
+        INCLUDEDIR = os.path.normpath(bld.env['PREFIX'] + '/include'),
+        SERVERLIB = serverlib.target,
+        )
