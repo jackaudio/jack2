@@ -46,6 +46,13 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackCompilerDeps.h"
 #include "JackLockedEngine.h"
 
+// FFADO_API_VERSION was first defined with API_VERSION 9, so all previous
+// headers do not provide this define.
+#ifndef FFADO_API_VERSION
+extern "C" int ffado_streaming_set_period_size(ffado_device_t *dev,
+		unsigned int period) __attribute__((__weak__));
+#endif
+
 namespace Jack
 {
 
