@@ -163,7 +163,7 @@ void Collect(FrameTimeCollector* TheFrame)
 
 void Jack_Thread_Init_Callback(void *arg)
 {
-    Log("Init callback has been successfully called. (msg from callback)\n");
+    Log("Init callback has been successfully called from thread = %x. (msg from callback)\n", pthread_self());
     init_clbk = 1;
 }
 
