@@ -1285,6 +1285,55 @@ jack_nframes_t jack_frame_time (const jack_client_t *) JACK_OPTIONAL_WEAK_EXPORT
 jack_nframes_t jack_last_frame_time (const jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
+ * This function may only be used from the process callback.
+ * It provides the internal cycle timing information as used by
+ * most of the other time related functions. This allows the
+ * caller to map between frame counts and microseconds with full
+ * precision (i.e. without rounding frame times to integers),
+ * and also provides e.g. the microseconds time of the start of
+ * the current cycle directly (it has to be computed otherwise).
+ *
+ * If the return value is zero, the following information is
+ * provided in the variables pointed to by the arguments:
+ *
+ * current_frames: the frame time counter at the start of the
+ *                 current cycle, same as jack_last_frame_time().
+ * current_usecs:  the microseconds time at the start of the
+ *                 current cycle.
+ * next_usecs:     the microseconds time of the start of the next
+ *                 next cycle as computed by the DLL.
+ * period_usecs:   the current best estimate of the period time in
+ *                  microseconds.
+ *
+ * NOTES:
+ * 
+ * Because of the types used, all the returned values except period_usecs
+ * are unsigned. In computations mapping between frames and microseconds
+ * *signed* differences are required. The easiest way is to compute those
+ * separately and assign them to the appropriate signed variables,
+ * int32_t for frames and int64_t for usecs. See the implementation of
+ * jack_frames_to_time() and Jack_time_to_frames() for an example.
+ * 
+ * Unless there was an xrun, skipped cycles, or the current cycle is the
+ * first after freewheeling or starting Jack, the value of current_usecs
+ * will always be the value of next_usecs of the previous cycle.
+ *
+ * The value of period_usecs will in general NOT be exactly equal to
+ * the difference of next_usecs and current_usecs. This is because to
+ * ensure stability of the DLL and continuity of the mapping, a fraction
+ * of the loop error must be included in next_usecs. For an accurate
+ * mapping between frames and microseconds, the difference of next_usecs
+ * and current_usecs should be used, and not period_usecs.
+ *
+ * @return zero if OK, non-zero otherwise.
+ */
+int jack_get_cycle_times(const jack_client_t *client,
+                        jack_nframes_t *current_frames,
+                        jack_time_t    *current_usecs,
+                        jack_time_t    *next_usecs,
+                        float          *period_usecs) JACK_OPTIONAL_WEAK_EXPORT;
+                  
+/**
  * @return the estimated time in microseconds of the specified frame time
  */
 jack_time_t jack_frames_to_time(const jack_client_t *client, jack_nframes_t) JACK_OPTIONAL_WEAK_EXPORT;

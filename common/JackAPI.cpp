@@ -180,10 +180,15 @@ extern "C"
     LIB_EXPORT int jack_engine_takeover_timebase(jack_client_t *);
     LIB_EXPORT jack_nframes_t jack_frames_since_cycle_start(const jack_client_t *);
     LIB_EXPORT jack_time_t jack_get_time();
-    LIB_EXPORT jack_nframes_t jack_time_to_frames(const jack_client_t *client, jack_time_t time);
+    LIB_EXPORT jack_nframes_t jack_time_to_frames(const jack_client_t *client, jack_time_t usecs);
     LIB_EXPORT jack_time_t jack_frames_to_time(const jack_client_t *client, jack_nframes_t frames);
     LIB_EXPORT jack_nframes_t jack_frame_time(const jack_client_t *);
     LIB_EXPORT jack_nframes_t jack_last_frame_time(const jack_client_t *client);
+    LIB_EXPORT int jack_get_cycle_times(const jack_client_t *client,
+                                        jack_nframes_t *current_frames,
+                                        jack_time_t    *current_usecs,
+                                        jack_time_t    *next_usecs,
+                                        float          *period_usecs);
     LIB_EXPORT float jack_cpu_load(jack_client_t *client);
     LIB_EXPORT jack_native_thread_t jack_client_thread_id(jack_client_t *);
     LIB_EXPORT void jack_set_error_function(print_function);
@@ -1331,7 +1336,7 @@ LIB_EXPORT jack_time_t jack_frames_to_time(const jack_client_t* ext_client, jack
     }
 }
 
-LIB_EXPORT jack_nframes_t jack_time_to_frames(const jack_client_t* ext_client, jack_time_t time)
+LIB_EXPORT jack_nframes_t jack_time_to_frames(const jack_client_t* ext_client, jack_time_t usecs)
 {
     JackGlobals::CheckContext("jack_time_to_frames");
 
@@ -1344,7 +1349,7 @@ LIB_EXPORT jack_nframes_t jack_time_to_frames(const jack_client_t* ext_client, j
         JackEngineControl* control = GetEngineControl();
         if (control) {
             control->ReadFrameTime(&timer);
-            return timer.Time2Frames(time, control->fBufferSize);
+            return timer.Time2Frames(usecs, control->fBufferSize);
         } else {
             return 0;
         }
@@ -1364,6 +1369,24 @@ LIB_EXPORT jack_nframes_t jack_last_frame_time(const jack_client_t* ext_client)
 
     JackEngineControl* control = GetEngineControl();
     return (control) ? control->fFrameTimer.ReadCurrentState()->CurFrame() : 0;
+}
+
+LIB_EXPORT int jack_get_cycle_times(const jack_client_t *client,
+                                    jack_nframes_t *current_frames,
+                                    jack_time_t    *current_usecs,
+                                    jack_time_t    *next_usecs,
+                                    float          *period_usecs)
+{
+    JackGlobals::CheckContext("jack_get_cycle_times");
+
+    JackEngineControl* control = GetEngineControl();
+    if (control) {
+        JackTimer timer;
+        control->ReadFrameTime(&timer);
+        return timer.GetCycleTimes(current_frames, current_usecs, next_usecs, period_usecs);
+    } else {
+        return 1;
+    }
 }
 
 LIB_EXPORT float jack_cpu_load(jack_client_t* ext_client)

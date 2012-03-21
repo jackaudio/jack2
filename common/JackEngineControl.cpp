@@ -97,10 +97,11 @@ void JackEngineControl::ResetRollingUsecs()
 
 void JackEngineControl::NotifyXRun(jack_time_t callback_usecs, float delayed_usecs)
 {
-    ResetFrameTime(callback_usecs);
+    ResetFrameTime(callback_usecs);  // Is this still necessary? SL 03/21/2012
     fXrunDelayedUsecs = delayed_usecs;
-    if (delayed_usecs > fMaxDelayedUsecs)
+    if (delayed_usecs > fMaxDelayedUsecs) {
         fMaxDelayedUsecs = delayed_usecs;
+    }
 }
 
 } // end of namespace

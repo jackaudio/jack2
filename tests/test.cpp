@@ -444,7 +444,7 @@ static void* jack_thread(void *arg)
 	jack_nframes_t last_thread_time = jack_frame_time(client);
 
 	while (1) {
-		jack_nframes_t frames = jack_cycle_wait (client);
+		jack_nframes_t frames = jack_cycle_wait(client);
 		jack_nframes_t current_thread_time = jack_frame_time(client);
 		jack_nframes_t delta_time = current_thread_time - last_thread_time;
 		Log("jack_thread : delta_time = %ld\n", delta_time);
@@ -486,6 +486,36 @@ int process4(jack_nframes_t nframes, void *arg)
 	}
 
 	last_time = cur_time;
+	return 0;
+}
+
+int process5(jack_nframes_t nframes, void *arg)
+{
+	jack_client_t* client = (jack_client_t*) arg;
+    
+    static jack_nframes_t first_current_frames;
+    static jack_time_t first_current_usecs;
+    static jack_time_t first_next_usecs;
+    static float first_period_usecs;
+	static int res1 = jack_get_cycle_times(client, &first_current_frames, &first_current_usecs, &first_next_usecs, &first_period_usecs);
+	   
+    jack_nframes_t current_frames;
+    jack_time_t current_usecs;
+    jack_time_t next_usecs;
+    float period_usecs;
+
+    int res = jack_get_cycle_times(client, &current_frames, &current_usecs, &next_usecs, &period_usecs);
+    if (res != 0) {
+        printf("!!! ERROR !!! jack_get_cycle_times fails...\n");
+        return 0;
+    }
+    
+	Log("calling process5 callback : jack_get_cycle_times delta current_frames = %ld delta current_usecs = %ld delta next_usecs = %ld period_usecs = %f\n", 
+        current_frames - first_current_frames, current_usecs - first_current_usecs, next_usecs - first_next_usecs, period_usecs);
+ 
+    first_current_frames = current_frames;
+    first_current_usecs = current_usecs;
+    first_next_usecs = next_usecs;
 	return 0;
 }
 
@@ -1967,7 +1997,16 @@ int main (int argc, char *argv[])
 	jack_set_process_callback(client1, process4, client1);
 	jack_activate(client1);
 	jack_sleep(2 * 1000);
-
+    
+    /**
+     * Checking jack_get_cycle_times.
+    */
+    Log("Testing jack_get_cycle_times...\n");
+    jack_deactivate(client1);
+	jack_set_process_callback(client1, process5, client1);
+	jack_activate(client1);
+	jack_sleep(3 * 1000);
+    
 
 	/**
      * Checking alternate thread model
