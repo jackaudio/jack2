@@ -98,7 +98,7 @@ int JackTimer::GetCycleTimes(jack_nframes_t* current_frames, jack_time_t* curren
         *period_usecs = fPeriodUsecs;
         return 0;
     } else {
-        return 1;
+        return -1;
     }
 }
 

@@ -1385,7 +1385,7 @@ LIB_EXPORT int jack_get_cycle_times(const jack_client_t *client,
         control->ReadFrameTime(&timer);
         return timer.GetCycleTimes(current_frames, current_usecs, next_usecs, period_usecs);
     } else {
-        return 1;
+        return -1;
     }
 }
 
