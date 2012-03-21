@@ -8,10 +8,10 @@ You will also find two sets of files :
 - Code::Blocks (10.05) workspace and project files, in order to compile JACK with MingW
 
 The built binaries will be located in '/Release/bin' (or '/Debug/bin' if you build the Debug target). Once compiled, you'll find there everything you need :
-- the two 'libjackmp.dll' and 'libjackservermp.dll', client and server jack libraries.
-- the 'jackdmp.exe', main application : the JACK server
+- the two 'libjack.dll' and 'libjackserver.dll', client and server jack libraries.
+- the 'jackd.exe', main application : the JACK server
 - the 'jack_xxx.exe' utilities and examples
-- in the jackmp directory, you'll find the driver's DLL's ('jack_portaudio.dll', 'jack_dummy.dll', 'jack_winmme.dll',  and 'jack_net.dll' and 'jack_netone.dll') and some tools ('netmanager.dll', 'audioadapter.dll', 'netadapter.dll' for example)
+- in the jack directory, you'll find the driver's DLL's ('jack_portaudio.dll', 'jack_dummy.dll', 'jack_winmme.dll', 'jack_net.dll' and 'jack_netone.dll') and some tools ('netmanager.dll', 'audioadapter.dll', 'netadapter.dll' for example)
 
 In Code::Blocks all the projects are automatically built in a correct order (DLL's then apps) by doing 'build->build workspace'.
 In VC6, you'll have to build the projects one by one.
