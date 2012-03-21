@@ -16,7 +16,7 @@ def configure(conf):
 
 def create_jack_process_obj(bld, target, sources, uselib = None):
     process = bld(features = ['cxx', 'cxxshlib'])
-    process.env['shlib_PATTERN'] = '%s.so'
+    process.env['cxxshlib_PATTERN'] = '%s.so'
     process.defines  = ['HAVE_CONFIG_H','SERVER_SIDE']
     if bld.env['IS_MACOSX']:
         env_includes = ['../macosx', '../posix', '../macosx/coreaudio']
