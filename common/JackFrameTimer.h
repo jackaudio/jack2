@@ -93,7 +93,7 @@ class SERVER_EXPORT JackFrameTimer : public JackAtomicState<JackTimer>
         {}
 
         void InitFrameTime();
-        void ResetFrameTime(jack_nframes_t frames_rate, jack_time_t callback_usecs, jack_time_t period_usecs);
+        void ResetFrameTime(jack_time_t callback_usecs);
         void IncFrameTime(jack_nframes_t buffer_size, jack_time_t callback_usecs, jack_time_t period_usecs);
         void ReadFrameTime(JackTimer* timer);
 

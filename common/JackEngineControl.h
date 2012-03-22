@@ -162,7 +162,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
 
     void ResetFrameTime(jack_time_t callback_usecs)
     {
-        fFrameTimer.ResetFrameTime(fSampleRate, callback_usecs, fPeriodUsecs);
+        fFrameTimer.ResetFrameTime(callback_usecs);
     }
 
     void ReadFrameTime(JackTimer* timer)

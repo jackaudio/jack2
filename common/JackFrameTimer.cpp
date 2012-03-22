@@ -122,15 +122,12 @@ void JackFrameTimer::IncFrameTime(jack_nframes_t buffer_size, jack_time_t callba
     IncFrameTimeAux(buffer_size, callback_usecs, period_usecs);
 }
 
-void JackFrameTimer::ResetFrameTime(jack_nframes_t frames_rate, jack_time_t callback_usecs, jack_time_t period_usecs)
+void JackFrameTimer::ResetFrameTime(jack_time_t callback_usecs)
 {
     if (!fFirstWakeUp) { // ResetFrameTime may be called by a xrun/delayed wakeup on the first cycle
         JackTimer* timer = WriteNextStateStart();
-        jack_nframes_t period_size_guess = (jack_nframes_t)(frames_rate * ((timer->fNextWakeUp - timer->fCurrentWakeup) / 1000000.0));
-        timer->fFrames += ((callback_usecs - timer->fNextWakeUp) / period_size_guess) * period_size_guess;
         timer->fCurrentWakeup = callback_usecs;
         timer->fCurrentCallback = callback_usecs;
-        timer->fNextWakeUp = callback_usecs + period_usecs;
         WriteNextStateStop();
         TrySwitchState(); // always succeed since there is only one writer
     }
