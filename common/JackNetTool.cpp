@@ -18,6 +18,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "JackNetTool.h"
+#include "JackError.h"
 
 #ifdef __APPLE__
 
@@ -274,7 +275,7 @@ namespace Jack
                 *active_port_address = htonl(port_index);
                 active_port_address++;
                 active_ports++;
-                assert(active_ports < 256);
+                assert(active_ports < 256); 
             }
         }
 
@@ -306,7 +307,6 @@ namespace Jack
         // Count active ports
         int active_ports = 0;
         for (int port_index = 0; port_index < fNPorts; port_index++) {
-
             if (fPortBuffer[port_index]) {
                 active_ports++;
             }
@@ -627,7 +627,7 @@ namespace Jack
 
     int NetCeltAudioBuffer::RenderFromJackPorts()
     {
-        float buffer[fPeriodSize];
+        float buffer[BUFFER_SIZE_MAX];
 
         for (int port_index = 0; port_index < fNPorts; port_index++) {
             if (fPortBuffer[port_index]) {

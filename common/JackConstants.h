@@ -24,7 +24,7 @@
 #include "config.h"
 #endif
 
-#define VERSION "1.9.8"
+#define VERSION "1.9.9"
 
 #define BUFFER_SIZE_MAX 8192
 
@@ -71,7 +71,7 @@
 
 #define JACK_PROTOCOL_VERSION 8
 
-#define SOCKET_TIME_OUT 5               // in sec
+#define SOCKET_TIME_OUT 2               // in sec
 #define DRIVER_OPEN_TIMEOUT 5           // in sec
 #define FREEWHEEL_DRIVER_TIMEOUT 10     // in sec
 #define DRIVER_TIMEOUT_FACTOR    10

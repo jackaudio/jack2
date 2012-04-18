@@ -8,7 +8,7 @@
 		<Build>
 			<Target title="Win32 Release 64bits">
 				<Option output="Release64\bin\libjack64" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Release64" />
+				<Option object_output="Release64\libjack" />
 				<Option type="3" />
 				<Option compiler="mingw_64" />
 				<Option createDefFile="1" />
@@ -21,11 +21,9 @@
 					<Add option="-D_WINDOWS" />
 					<Add option="-D_MBCS" />
 					<Add option="-D_USRDLL" />
-					<Add option="-DLIBJACKMP_EXPORTS" />
 					<Add option="-DREGEX_MALLOC" />
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-D__SMP__" />
-					<Add option="-DJACK_32_64" />
 					<Add option="-DHAVE_CONFIG_H" />
 					<Add directory="." />
 					<Add directory="..\windows" />
@@ -52,7 +50,7 @@
 			</Target>
 			<Target title="Win32 Debug 64bits">
 				<Option output="Debug64\bin\libjack64" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Debug64" />
+				<Option object_output="Debug64\libjack" />
 				<Option type="3" />
 				<Option compiler="mingw_64" />
 				<Option createDefFile="1" />
@@ -65,11 +63,9 @@
 					<Add option="-D_CONSOLE" />
 					<Add option="-D_MBCS" />
 					<Add option="-D_USRDLL" />
-					<Add option="-DLIBJACKMP_EXPORTS" />
 					<Add option="-DREGEX_MALLOC" />
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-D__SMP__" />
-					<Add option="-DJACK_32_64" />
 					<Add option="-DHAVE_CONFIG_H" />
 					<Add directory="." />
 					<Add directory="..\windows" />
@@ -96,7 +92,7 @@
 			</Target>
 			<Target title="Win32 Profiling 64bits">
 				<Option output="Release64\bin\libjack64" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Release64" />
+				<Option object_output="Release64\libjack" />
 				<Option type="3" />
 				<Option compiler="mingw_64" />
 				<Option createDefFile="1" />
@@ -109,11 +105,9 @@
 					<Add option="-D_WINDOWS" />
 					<Add option="-D_MBCS" />
 					<Add option="-D_USRDLL" />
-					<Add option="-DLIBJACKMP_EXPORTS" />
 					<Add option="-DREGEX_MALLOC" />
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-D__SMP__" />
-					<Add option="-DJACK_32_64" />
 					<Add option="-DJACK_MONITOR" />
 					<Add option="-DHAVE_CONFIG_H" />
 					<Add directory="." />
@@ -141,7 +135,7 @@
 			</Target>
 			<Target title="Win32 Release 32bits">
 				<Option output="Release\bin\libjack" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Release" />
+				<Option object_output="Release\libjack" />
 				<Option type="3" />
 				<Option compiler="mingw_64" />
 				<Option createDefFile="1" />
@@ -155,11 +149,9 @@
 					<Add option="-D_WINDOWS" />
 					<Add option="-D_MBCS" />
 					<Add option="-D_USRDLL" />
-					<Add option="-DLIBJACKMP_EXPORTS" />
 					<Add option="-DREGEX_MALLOC" />
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-D__SMP__" />
-					<Add option="-DJACK_32_64" />
 					<Add option="-DHAVE_CONFIG_H" />
 					<Add directory="." />
 					<Add directory="..\windows" />
@@ -185,12 +177,12 @@
 					<Add library="psapi" />
 				</Linker>
 				<ExtraCommands>
-					<Add before="windres -F pe-i386 -O coff -o Release/libjack.res libjack.rc" />
+					<Add before="windres -F pe-i386 -O coff -o Release/libjack/libjack.res libjack.rc" />
 				</ExtraCommands>
 			</Target>
 			<Target title="Win32 Debug 32bits">
 				<Option output="Debug\bin\libjack" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Debug" />
+				<Option object_output="Debug\libjack" />
 				<Option type="3" />
 				<Option compiler="mingw_64" />
 				<Option createDefFile="1" />
@@ -204,11 +196,9 @@
 					<Add option="-D_CONSOLE" />
 					<Add option="-D_MBCS" />
 					<Add option="-D_USRDLL" />
-					<Add option="-DLIBJACKMP_EXPORTS" />
 					<Add option="-DREGEX_MALLOC" />
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-D__SMP__" />
-					<Add option="-DJACK_32_64" />
 					<Add option="-DHAVE_CONFIG_H" />
 					<Add directory="." />
 					<Add directory="..\windows" />
@@ -234,12 +224,12 @@
 					<Add library="psapi" />
 				</Linker>
 				<ExtraCommands>
-					<Add before="windres -F pe-i386 -O coff -o Debug/libjack.res libjack.rc" />
+					<Add before="windres -F pe-i386 -O coff -o Debug/libjack/libjack.res libjack.rc" />
 				</ExtraCommands>
 			</Target>
 			<Target title="Win32 Profiling 32bits">
 				<Option output="Release\bin\libjack" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Release" />
+				<Option object_output="Release\libjack" />
 				<Option type="3" />
 				<Option compiler="mingw_64" />
 				<Option createDefFile="1" />
@@ -253,11 +243,9 @@
 					<Add option="-D_WINDOWS" />
 					<Add option="-D_MBCS" />
 					<Add option="-D_USRDLL" />
-					<Add option="-DLIBJACKMP_EXPORTS" />
 					<Add option="-DREGEX_MALLOC" />
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-D__SMP__" />
-					<Add option="-DJACK_32_64" />
 					<Add option="-DJACK_MONITOR" />
 					<Add option="-DHAVE_CONFIG_H" />
 					<Add directory="." />
@@ -284,7 +272,7 @@
 					<Add library="psapi" />
 				</Linker>
 				<ExtraCommands>
-					<Add before="windres -F pe-i386 -O coff -o Release/libjack.res libjack.rc" />
+					<Add before="windres -F pe-i386 -O coff -o Release/libjack/libjack.res libjack.rc" />
 				</ExtraCommands>
 			</Target>
 		</Build>
@@ -304,18 +292,25 @@
 			<Add library="uuid" />
 			<Add library="odbc32" />
 			<Add library="odbccp32" />
+			<Add library="winmm" />
 		</Linker>
 		<Unit filename="..\common\JackAPI.cpp" />
 		<Unit filename="..\common\JackActivationCount.cpp" />
 		<Unit filename="..\common\JackAudioPort.cpp" />
 		<Unit filename="..\common\JackClient.cpp" />
 		<Unit filename="..\common\JackConnectionManager.cpp" />
+		<Unit filename="..\common\JackDebugClient.cpp">
+			<Option target="Win32 Debug 64bits" />
+			<Option target="Win32 Debug 32bits" />
+		</Unit>
 		<Unit filename="..\common\JackEngineControl.cpp" />
 		<Unit filename="..\common\JackEngineProfiling.cpp">
 			<Option target="Win32 Profiling" />
 		</Unit>
 		<Unit filename="..\common\JackError.cpp" />
+		<Unit filename="..\common\JackException.cpp" />
 		<Unit filename="..\common\JackFrameTimer.cpp" />
+		<Unit filename="..\common\JackGenericClientChannel.cpp" />
 		<Unit filename="..\common\JackGlobals.cpp" />
 		<Unit filename="..\common\JackGraphManager.cpp" />
 		<Unit filename="..\common\JackLibAPI.cpp" />
@@ -335,6 +330,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="JackMMCSS.cpp" />
+		<Unit filename="JackWinMutex.cpp" />
 		<Unit filename="JackWinNamedPipe.cpp" />
 		<Unit filename="JackWinNamedPipeClientChannel.cpp" />
 		<Unit filename="JackWinProcessSync.cpp" />

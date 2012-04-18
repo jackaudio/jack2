@@ -40,6 +40,7 @@
 	09/27/2007 SL : Add AUDO_CONNECT property in JackRouter.ini file.
 	10/10/2007 SL : Use ASIOSTInt32LSB instead of ASIOSTInt16LSB.
 	12/04/2011 SL : Compilation on Windows 64.
+	12/04/2011 SL : Dynamic port allocation. Correct JACK port naming.
  */
 
 //------------------------------------------------------------------------------------------
@@ -67,6 +68,13 @@ static const double twoRaisedTo32Reciprocal = 1. / twoRaisedTo32;
 #endif
 
 using namespace std;
+
+//#define JACK_LOG 1
+
+#ifdef JACK_LOG
+#include <fstream>
+static std::ofstream* fStream;
+#endif
 
 // class id.
 // {838FE50A-C1AB-4b77-B9B6-0A40788B53F3}
@@ -138,9 +146,7 @@ HRESULT _stdcall DllUnregisterServer()
 }
 
 // Globals
-
 list<pair<string, string> > JackRouter::fConnections;
-bool JackRouter::fFirstActivate = true;
 
 //------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------
@@ -157,32 +163,27 @@ JackRouter::JackRouter() : AsioDriver()
 #endif
 {
 	long i;
-
 	fSamplePosition = 0;
-	fActive = false;
-	fStarted = false;
+	fRunning = false;
 	fTimeInfoMode = false;
 	fTcRead = false;
 	fClient = NULL;
 	fAutoConnectIn = true;
 	fAutoConnectOut = true;
-
-	for (i = 0; i < kNumInputs; i++) {
-		fInputBuffers[i] = 0;
-		fInputPorts[i] = 0;
-		fInMap[i] = 0;
-	}
-	for (i = 0; i < kNumOutputs; i++) {
-		fOutputBuffers[i] = 0;
-		fOutputPorts[i] = 0;
-		fOutMap[i] = 0;
-	}
 	fCallbacks = 0;
 	fActiveInputs = fActiveOutputs = 0;
 	fToggle = 0;
 	fBufferSize = 512;
 	fSampleRate = 44100;
-	printf("Constructor\n");
+    fFloatSample = true;    // float by default
+	fFirstActivate = true;
+
+#ifdef JACK_LOG 
+	fStream = new ofstream(name_log, ios_base::ate);
+    *fStream << "======================" << std::endl;
+    *fStream << "JackRouter::JackRouter" <<  std::endl;
+    *fStream << "======================" << std::endl;
+#endif
 
 	// Use "jackrouter.ini" parameters if available
 	HMODULE handle = LoadLibrary(JACK_ROUTER);
@@ -206,21 +207,64 @@ JackRouter::JackRouter() : AsioDriver()
 
 		fAutoConnectIn = get_private_profile_int("AUTO_CONNECT", "input", 1, confPath.c_str());
 		fAutoConnectOut = get_private_profile_int("AUTO_CONNECT", "output", 1, confPath.c_str());
+        
+        fFloatSample = get_private_profile_int("IO", "float-sample", 0, confPath.c_str());
+        fAliasSystem = get_private_profile_int("AUTO_CONNECT", "alias", 0, confPath.c_str());
 
 		FreeLibrary(handle);
-
+ 
 	} else {
-		printf("LoadLibrary error\n");
+    #ifdef JACK_LOG 
+        *fStream << "JackRouter::JackRouter : loadLibrary error" <<  std::endl;
+    #endif
+	}
+    
+    if (!fFloatSample) {
+        fInputBuffers = (void**)new long*[kNumInputs];
+        fOutputBuffers = (void**)new long*[kNumOutputs];
+    } else {
+        fInputBuffers = (void**)new float*[kNumInputs];
+        fOutputBuffers = (void**)new float*[kNumOutputs];
+    }
+
+    fInMap = new long[kNumInputs];
+	fOutMap = new long[kNumOutputs];
+    
+    fInputPorts = new jack_port_t*[kNumInputs];
+    fOutputPorts = new jack_port_t*[kNumOutputs];
+ 
+	for (i = 0; i < kNumInputs; i++) {
+		fInputBuffers[i] = 0;
+		fInputPorts[i] = 0;
+		fInMap[i] = 0;
+	}
+	for (i = 0; i < kNumOutputs; i++) {
+		fOutputBuffers[i] = 0;
+		fOutputPorts[i] = 0;
+		fOutMap[i] = 0;
 	}
 }
 
 //------------------------------------------------------------------------------------------
 JackRouter::~JackRouter()
 {
-	stop ();
-	disposeBuffers ();
+#ifdef JACK_LOG 
+    *fStream << "=======================" << std::endl;
+    *fStream << "JackRouter::~JackRouter" <<  std::endl;
+    *fStream << "=======================" << std::endl;
+#endif
+	stop();
+	disposeBuffers();
 	jack_client_close(fClient);
-	printf("Destructor\n");
+	delete[] fInputBuffers;
+    delete[] fOutputBuffers;
+    delete[] fInputPorts;
+    delete[] fOutputPorts;
+    delete[] fInMap;
+    delete[] fOutMap;
+#ifdef JACK_LOG  
+    delete fStream;
+#endif
 }
 
 //------------------------------------------------------------------------------------------
@@ -276,13 +320,17 @@ static inline jack_default_audio_sample_t ClipFloat(jack_default_audio_sample_t 
 }
 
 //------------------------------------------------------------------------------------------
-void JackRouter::shutdown(void* arg)
+void JackRouter::connectCallback(jack_port_id_t a, jack_port_id_t b, int connect, void* arg)
+{
+    JackRouter* driver = (JackRouter*)arg;
+}
+
+//------------------------------------------------------------------------------------------
+void JackRouter::shutdownCallback(void* arg)
 {
 	JackRouter* driver = (JackRouter*)arg;
 	/*
-	//exit(1);
 	char errstr[128];
-
 	memset(errstr,0,128);
 	sprintf(errstr,"JACK server has quitted");
 	MessageBox(0,(LPCTSTR)errstr,(LPCTSTR)"JackRouter",MB_OK);
@@ -290,53 +338,58 @@ void JackRouter::shutdown(void* arg)
 }
 
 //------------------------------------------------------------------------------------------
-int JackRouter::process(jack_nframes_t nframes, void* arg)
+void JackRouter::processInputs()
+{
+    int pos = (fToggle) ? 0 : fBufferSize;
+    
+    for (int i = 0; i < fActiveInputs; i++) {
+        if (!fFloatSample) {
+            jack_default_audio_sample_t* buffer = (jack_default_audio_sample_t*)jack_port_get_buffer(fInputPorts[i], fBufferSize);
+            long* in = (long*)fInputBuffers[i] + pos;
+            for (int j = 0; j < fBufferSize; j++) {
+                in[j] = buffer[j] * jack_default_audio_sample_t(0x7fffffff);
+            }
+        } else {
+            memcpy((float*)fInputBuffers[i] + pos,
+                    jack_port_get_buffer(fInputPorts[i], fBufferSize),
+                    fBufferSize * sizeof(jack_default_audio_sample_t));
+        }
+    }
+}
+
+//------------------------------------------------------------------------------------------
+void JackRouter::processOutputs()
+{
+    int pos = (fToggle) ? 0 : fBufferSize;
+    
+    for (int i = 0; i < fActiveOutputs; i++) {
+        if (!fFloatSample) {
+            jack_default_audio_sample_t* buffer = (jack_default_audio_sample_t*)jack_port_get_buffer(fOutputPorts[i], fBufferSize);
+            long* out = (long*)fOutputBuffers[i] + pos;
+            jack_default_audio_sample_t gain = jack_default_audio_sample_t(1)/jack_default_audio_sample_t(0x7fffffff);
+            for (int j = 0; j < fBufferSize; j++) {
+                buffer[j] = out[j] * gain;
+            }
+        } else {
+            memcpy(jack_port_get_buffer(fOutputPorts[i], fBufferSize),
+                    (float*)fOutputBuffers[i] + pos,
+                    fBufferSize * sizeof(jack_default_audio_sample_t));
+        }
+    }
+}
+
+//------------------------------------------------------------------------------------------
+int JackRouter::processCallback(jack_nframes_t nframes, void* arg)
 {
 	JackRouter* driver = (JackRouter*)arg;
-	int i,j;
-	int pos = (driver->fToggle) ? 0 : driver->fBufferSize ;
-
-	for (i = 0; i < driver->fActiveInputs; i++) {
-
-#ifdef LONG_SAMPLE
-		jack_default_audio_sample_t* buffer = (jack_default_audio_sample_t*)jack_port_get_buffer(driver->fInputPorts[i], nframes);
-		long* in = driver->fInputBuffers[i] + pos;
-		for (j = 0; j < nframes; j++) {
-			in[j] = buffer[j] * jack_default_audio_sample_t(0x7fffffff);
-		}
-#else
-		memcpy(driver->fInputBuffers[i] + pos,
-				jack_port_get_buffer(driver->fInputPorts[i], nframes),
-				nframes * sizeof(jack_default_audio_sample_t));
-#endif
-
-	}
-
-	driver->bufferSwitch();
-
-	for (i = 0; i < driver->fActiveOutputs; i++) {
-
-#ifdef LONG_SAMPLE
-		jack_default_audio_sample_t* buffer = (jack_default_audio_sample_t*)jack_port_get_buffer(driver->fOutputPorts[i], nframes);
-		long* out = driver->fOutputBuffers[i] + pos;
-		jack_default_audio_sample_t gain = jack_default_audio_sample_t(1)/jack_default_audio_sample_t(0x7fffffff);
-		for (j = 0; j < nframes; j++) {
-			buffer[j] = out[j] * gain;
-		}
-#else
-		memcpy(jack_port_get_buffer(driver->fOutputPorts[i], nframes),
-				driver->fOutputBuffers[i] + pos,
-				nframes * sizeof(jack_default_audio_sample_t));
-#endif
-	}
-
+  	driver->bufferSwitch();
 	return 0;
 }
 
 //------------------------------------------------------------------------------------------
 void JackRouter::getDriverName(char *name)
 {
-	strcpy (name, "JackRouter");
+	strcpy(name, "JackRouter");
 }
 
 //------------------------------------------------------------------------------------------
@@ -355,10 +408,15 @@ void JackRouter::getErrorMessage(char *string)
 ASIOBool JackRouter::init(void* sysRef)
 {
 	char name[MAX_PATH];
+	char name_log[MAX_PATH];
 	sysRef = sysRef;
 
-	if (fActive)
+	if (fClient) {
+    #ifdef JACK_LOG 
+        *fStream << "JackRouter::init : JACK client still present..." <<  std::endl;
+    #endif
 		return true;
+	}
 
 	HANDLE win = (HANDLE)sysRef;
 	int	my_pid = _getpid();
@@ -367,22 +425,21 @@ ASIOBool JackRouter::init(void* sysRef)
 		_snprintf(name, sizeof(name) - 1, "JackRouter_%d", my_pid);
 	}
 
-	if (fClient) {
-		printf("Error: jack client still present...\n");
-		return true;
-	}
+	_snprintf(name_log, sizeof(name_log) - 1, "JackRouter_%s.log", name);
 
 	fClient = jack_client_open(name, JackNullOption, NULL);
 	if (fClient == NULL) {
-		strcpy (fErrorMessage, "Open error: is jack server running?");
-		printf("Open error: is jack server running?\n");
+		strcpy(fErrorMessage, "Open error: is JACK server running?");
+		printf("Open error: is JACK server running?\n");
 		return false;
 	}
 
 	fBufferSize = jack_get_buffer_size(fClient);
 	fSampleRate = jack_get_sample_rate(fClient);
-	jack_set_process_callback(fClient, process, this);
-	jack_on_shutdown(fClient, shutdown, this);
+    
+	jack_set_process_callback(fClient, processCallback, this);
+	jack_on_shutdown(fClient, shutdownCallback, this);
+    jack_set_port_connect_callback(fClient, connectCallback, this);
 
 	fInputLatency = fBufferSize;		// typically
 	fOutputLatency = fBufferSize * 2;
@@ -391,8 +448,9 @@ ASIOBool JackRouter::init(void* sysRef)
 	// Typically fBufferSize * 2; try to get 1 by offering direct buffer
 	// access, and using asioPostOutput for lower latency
 
-	printf("Init ASIO Jack\n");
-	fActive = true;
+#ifdef JACK_LOG 
+    *fStream << "JackRouter::init" <<  std::endl;
+#endif
 	return true;
 }
 
@@ -403,18 +461,21 @@ ASIOError JackRouter::start()
 		fSamplePosition = 0;
 		fTheSystemTime.lo = fTheSystemTime.hi = 0;
 		fToggle = 0;
-		fStarted = true;
-		printf("Start ASIO Jack\n");
+		
+    #ifdef JACK_LOG 
+        *fStream << "JackRouter::start" <<  std::endl;
+    #endif
 
 		if (jack_activate(fClient) == 0) {
 
 			if (fFirstActivate) {
-				AutoConnect();
+				autoConnect();
 				fFirstActivate = false;
 			} else {
-				RestoreConnections();
+				restoreConnections();
 			}
 
+			fRunning = true;
 			return ASE_OK;
 
 		} else {
@@ -428,10 +489,14 @@ ASIOError JackRouter::start()
 //------------------------------------------------------------------------------------------
 ASIOError JackRouter::stop()
 {
-	fStarted = false;
-	printf("Stop ASIO Jack\n");
-	SaveConnections();
-	jack_deactivate(fClient);
+#ifdef JACK_LOG 
+    *fStream << "JackRouter::stop" <<  std::endl;
+#endif
+	fRunning = false;
+	saveConnections();
+	if (jack_deactivate(fClient) == 0) {
+		fFirstActivate = true;
+	}
 	return ASE_OK;
 }
 
@@ -454,7 +519,7 @@ ASIOError JackRouter::getLatencies(long *_inputLatency, long *_outputLatency)
 //------------------------------------------------------------------------------------------
 ASIOError JackRouter::getBufferSize(long *minSize, long *maxSize, long *preferredSize, long *granularity)
 {
-	*minSize = *maxSize = *preferredSize = fBufferSize;		// allow this size only
+	*minSize = *maxSize = *preferredSize = fBufferSize;		// Allows this size only
 	*granularity = 0;
 	return ASE_OK;
 }
@@ -525,44 +590,90 @@ ASIOError JackRouter::getSamplePosition(ASIOSamples *sPos, ASIOTimeStamp *tStamp
 //------------------------------------------------------------------------------------------
 ASIOError JackRouter::getChannelInfo(ASIOChannelInfo *info)
 {
-	if (info->channel < 0 || (info->isInput ? info->channel >= kNumInputs : info->channel >= kNumOutputs))
+	if (info->channel < 0 || (info->isInput ? info->channel >= kNumInputs : info->channel >= kNumOutputs)) {
 		return ASE_InvalidParameter;
-#ifdef LONG_SAMPLE
-	info->type = ASIOSTInt32LSB;
-#else
-	info->type = ASIOSTFloat32LSB;
+    }
+    
+    if (!fFloatSample) {
+        info->type = ASIOSTInt32LSB;
+    } else {
+        info->type = ASIOSTFloat32LSB;
+    }
+
+#ifdef JACK_LOG    
+	*fStream << "==========================" << std::endl;
+    *fStream << "JackRouter::getChannelInfo" << std::endl;
+	*fStream << "==========================" << std::endl;
 #endif
 
 	info->channelGroup = 0;
 	info->isActive = ASIOFalse;
 	long i;
 	char buf[32];
+    const char** ports;
+
+	char* aliases[2];
+	aliases[0] = (char*)malloc(jack_port_name_size());
+	aliases[1] = (char*)malloc(jack_port_name_size());
+
+	if (!aliases[0] || !aliases[1]) {
+		return ASE_NoMemory;
+    }
 
 	if (info->isInput) {
 		for (i = 0; i < fActiveInputs; i++) {
 			if (fInMap[i] == info->channel) {
 				info->isActive = ASIOTrue;
-				//_snprintf(buf, sizeof(buf) - 1, "Jack::In%d ", info->channel);
-				//strcpy(info->name, buf);
-				//strcpy(info->name, jack_port_name(fInputPorts[i]));
 				break;
 			}
 		}
-		_snprintf(buf, sizeof(buf) - 1, "In%d ", info->channel);
-		strcpy(info->name, buf);
+		
+        // A alias on system is wanted
+        if (fAliasSystem && fAutoConnectIn && (ports = jack_get_ports(fClient, NULL, NULL, JackPortIsPhysical | JackPortIsOutput))) {
+            jack_port_t* port = jack_port_by_name(fClient, ports[info->channel]);
+            if (port) {	
+                if (jack_port_get_aliases(port, aliases) == 2) {
+                    strncpy(info->name, aliases[1], 32);
+                #ifdef JACK_LOG
+                    *fStream << "Input " << "fActiveInputs = " << i << " ASIO_channel = " << info->channel <<  std::endl;
+                #endif
+                    goto end;
+                }	
+            }
+        } 
+            
+        _snprintf(buf, sizeof(buf) - 1, "In%d", info->channel + 1);
+        strcpy(info->name, buf);
+         
 	} else {
 		for (i = 0; i < fActiveOutputs; i++) {
-			if (fOutMap[i] == info->channel) {  //NOT USED !!
+			if (fOutMap[i] == info->channel) {  
 				info->isActive = ASIOTrue;
-				//_snprintf(buf, sizeof(buf) - 1, "Jack::Out%d ", info->channel);
-				//strcpy(info->name, buf);
-				//strcpy(info->name, jack_port_name(fOutputPorts[i]));
 				break;
 			}
 		}
-		_snprintf(buf, sizeof(buf) - 1, "Out%d ", info->channel);
-		strcpy(info->name, buf);
-	}
+        
+        // A alias on system is wanted
+        if (fAliasSystem && fAutoConnectOut && (ports = jack_get_ports(fClient, NULL, NULL, JackPortIsPhysical | JackPortIsInput))) {
+            jack_port_t* port = jack_port_by_name(fClient, ports[info->channel]);
+            if (port) {	
+                if (jack_port_get_aliases(port, aliases) == 2) {
+                    strncpy(info->name, aliases[1], 32);
+                #ifdef JACK_LOG
+                    *fStream << "Output " << "fActiveOutputs = " << i << " ASIO_channel = " << info->channel <<  std::endl;
+                #endif    
+                    goto end;
+                }	
+            }
+        } 
+        _snprintf(buf, sizeof(buf) - 1, "Out%d", info->channel + 1);
+        strcpy(info->name, buf);
+    }
+    
+end:
+
+	free(aliases[0]);
+	free(aliases[1]);
 	return ASE_OK;
 }
 
@@ -577,29 +688,42 @@ ASIOError JackRouter::createBuffers(ASIOBufferInfo *bufferInfos, long numChannel
 	fActiveInputs = 0;
 	fActiveOutputs = 0;
 
+#ifdef JACK_LOG    
+	*fStream << "==========================" << std::endl;
+    *fStream << "JackRouter::createBuffers" << std::endl;
+	*fStream << "==========================" << std::endl;
+#endif
+
 	for (i = 0; i < numChannels; i++, info++) {
 		if (info->isInput) {
-			if (info->channelNum < 0 || info->channelNum >= kNumInputs)
+            
+			if (info->channelNum < 0 || info->channelNum >= kNumInputs) {
 				goto error;
+            }
 			fInMap[fActiveInputs] = info->channelNum;
-		#ifdef LONG_SAMPLE
-			fInputBuffers[fActiveInputs] = new long[fBufferSize * 2];	// double buffer
-		#else
-			fInputBuffers[fActiveInputs] = new jack_default_audio_sample_t[fBufferSize * 2];	// double buffer
-		#endif
+            
+            if (!fFloatSample) {
+                fInputBuffers[fActiveInputs] = new long[fBufferSize * 2];	// double buffer
+            } else {
+                fInputBuffers[fActiveInputs] = new jack_default_audio_sample_t[fBufferSize * 2];	// double buffer
+            }
+            
 			if (fInputBuffers[fActiveInputs]) {
 				info->buffers[0] = fInputBuffers[fActiveInputs];
-				info->buffers[1] = fInputBuffers[fActiveInputs] + fBufferSize;
+				info->buffers[1] = (fFloatSample) ? (void*)((float*)fInputBuffers[fActiveInputs] + fBufferSize) : (void*)((long*)fInputBuffers[fActiveInputs] + fBufferSize);
 			} else {
 				info->buffers[0] = info->buffers[1] = 0;
 				notEnoughMem = true;
 			}
-
-			_snprintf(buf, sizeof(buf) - 1, "in%d", fActiveInputs + 1);
+        #ifdef JACK_LOG
+            *fStream << "Input " << "fActiveInputs = " << i << " ASIO_channel = " << info->channelNum <<  std::endl;
+        #endif
+			_snprintf(buf, sizeof(buf) - 1, "in%d", info->channelNum + 1);
 			fInputPorts[fActiveInputs]
 				= jack_port_register(fClient, buf, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput,0);
-			if (fInputPorts[fActiveInputs] == NULL)
+			if (fInputPorts[fActiveInputs] == NULL) {
 				goto error;
+            }
 
 			fActiveInputs++;
 			if (fActiveInputs > kNumInputs) {
@@ -607,30 +731,35 @@ error:
 				disposeBuffers();
 				return ASE_InvalidParameter;
 			}
-		} else {	// output
-			if (info->channelNum < 0 || info->channelNum >= kNumOutputs)
+		} else {	
+        
+     		if (info->channelNum < 0 || info->channelNum >= kNumOutputs) {
 				goto error;
+            }
 			fOutMap[fActiveOutputs] = info->channelNum;
 
-		#ifdef LONG_SAMPLE
-			fOutputBuffers[fActiveOutputs] = new long[fBufferSize * 2];	// double buffer
-		#else
-			fOutputBuffers[fActiveOutputs] = new jack_default_audio_sample_t[fBufferSize * 2];	// double buffer
-		#endif
+            if (!fFloatSample) {
+                fOutputBuffers[fActiveOutputs] = new long[fBufferSize * 2];	// double buffer
+            } else {
+                fOutputBuffers[fActiveOutputs] = new jack_default_audio_sample_t[fBufferSize * 2];	// double buffer
+            }
 
 			if (fOutputBuffers[fActiveOutputs]) {
 				info->buffers[0] = fOutputBuffers[fActiveOutputs];
-				info->buffers[1] = fOutputBuffers[fActiveOutputs] + fBufferSize;
+				info->buffers[1] = (fFloatSample) ? (void*)((float*)fOutputBuffers[fActiveOutputs] + fBufferSize) : (void*)((long*)fOutputBuffers[fActiveOutputs] + fBufferSize);
 			} else {
 				info->buffers[0] = info->buffers[1] = 0;
 				notEnoughMem = true;
 			}
-
-			_snprintf(buf, sizeof(buf) - 1, "out%d", fActiveOutputs + 1);
+        #ifdef JACK_LOG
+            *fStream << "Input " << "fActiveOutputs = " << i << " ASIO_channel = " << info->channelNum <<  std::endl;
+		#endif	
+			_snprintf(buf, sizeof(buf) - 1, "out%d", info->channelNum + 1);
 			fOutputPorts[fActiveOutputs]
 				= jack_port_register(fClient, buf, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput,0);
-			if (fOutputPorts[fActiveOutputs] == NULL)
+			if (fOutputPorts[fActiveOutputs] == NULL) {
 				goto error;
+            }
 
 			fActiveOutputs++;
 			if (fActiveOutputs > kNumOutputs) {
@@ -654,7 +783,6 @@ error:
 		fAsioTime.timeInfo.samplePosition.hi = fAsioTime.timeInfo.samplePosition.lo = 0;
 		fAsioTime.timeInfo.sampleRate = fSampleRate;
 		fAsioTime.timeInfo.flags = kSystemTimeValid | kSamplePositionValid | kSampleRateValid;
-
 		fAsioTime.timeCode.speed = 1.;
 		fAsioTime.timeCode.timeCodeSamples.lo = fAsioTime.timeCode.timeCodeSamples.hi = 0;
 		fAsioTime.timeCode.flags = kTcValid | kTcRunning ;
@@ -662,6 +790,9 @@ error:
 		fTimeInfoMode = false;
 	}
 
+	if (fRunning) { 
+		autoConnect();
+	}
 	return ASE_OK;
 }
 
@@ -698,8 +829,8 @@ ASIOError JackRouter::controlPanel()
 ASIOError JackRouter::future(long selector, void* opt)	// !!! check properties
 {
 	ASIOTransportParameters* tp = (ASIOTransportParameters*)opt;
-	switch (selector)
-	{
+    
+	switch (selector) {
 		case kAsioEnableTimeCodeRead:	fTcRead = true;	return ASE_SUCCESS;
 		case kAsioDisableTimeCodeRead:	fTcRead = false; return ASE_SUCCESS;
 		case kAsioSetInputMonitor:		return ASE_SUCCESS;	// for testing!!!
@@ -707,6 +838,7 @@ ASIOError JackRouter::future(long selector, void* opt)	// !!! check properties
 		case kAsioCanTimeInfo:			return ASE_SUCCESS;
 		case kAsioCanTimeCode:			return ASE_SUCCESS;
 	}
+    
 	return ASE_NotPresent;
 }
 
@@ -717,13 +849,15 @@ ASIOError JackRouter::future(long selector, void* opt)	// !!! check properties
 //---------------------------------------------------------------------------------------------
 void JackRouter::bufferSwitch()
 {
-	if (fStarted && fCallbacks) {
+	if (fRunning && fCallbacks) {
 		getNanoSeconds(&fTheSystemTime);			// latch system time
+        processInputs();
+        processOutputs();
 		fSamplePosition += fBufferSize;
 		if (fTimeInfoMode) {
-			bufferSwitchX ();
+			bufferSwitchX();
 		} else {
-			fCallbacks->bufferSwitch (fToggle, ASIOFalse);
+			fCallbacks->bufferSwitch(fToggle, ASIOFalse);
 		}
 		fToggle = fToggle ? 0 : 1;
 	}
@@ -731,7 +865,7 @@ void JackRouter::bufferSwitch()
 
 //---------------------------------------------------------------------------------------------
 // asio2 buffer switch
-void JackRouter::bufferSwitchX ()
+void JackRouter::bufferSwitchX()
 {
 	getSamplePosition (&fAsioTime.timeInfo.samplePosition, &fAsioTime.timeInfo.systemTime);
 	long offset = fToggle ? fBufferSize : 0;
@@ -741,7 +875,7 @@ void JackRouter::bufferSwitchX ()
 		fAsioTime.timeCode.timeCodeSamples.lo = fAsioTime.timeInfo.samplePosition.lo + 600.0 * fSampleRate;
 		fAsioTime.timeCode.timeCodeSamples.hi = 0;
 	}
-	fCallbacks->bufferSwitchTimeInfo (&fAsioTime, fToggle, ASIOFalse);
+	fCallbacks->bufferSwitchTimeInfo(&fAsioTime, fToggle, ASIOFalse);
 	fAsioTime.timeInfo.flags &= ~(kSampleRateChanged | kClockSourceChanged);
 }
 
@@ -755,8 +889,9 @@ ASIOError JackRouter::outputReady()
 double AsioSamples2double(ASIOSamples* samples)
 {
 	double a = (double)(samples->lo);
-	if (samples->hi)
+	if (samples->hi) {
 		a += (double)(samples->hi) * twoRaisedTo32;
+    }
 	return a;
 }
 
@@ -769,7 +904,7 @@ void getNanoSeconds(ASIOTimeStamp* ts)
 }
 
 //------------------------------------------------------------------------
-void JackRouter::SaveConnections()
+void JackRouter::saveConnections()
 {
     const char** connections;
  	int i;
@@ -794,7 +929,7 @@ void JackRouter::SaveConnections()
 }
 
 //------------------------------------------------------------------------
-void JackRouter::RestoreConnections()
+void JackRouter::restoreConnections()
 {
     list<pair<string, string> >::const_iterator it;
 
@@ -806,38 +941,59 @@ void JackRouter::RestoreConnections()
     fConnections.clear();
 }
 
+
 //------------------------------------------------------------------------------------------
-void JackRouter::AutoConnect()
+void JackRouter::autoConnect()
 {
 	const char** ports;
 
+#ifdef JACK_LOG    
+	*fStream << "=======================" << std::endl;
+    *fStream << "JackRouter::autoConnect" << std::endl;
+	*fStream << "=======================" << std::endl;
+#endif
+
 	if ((ports = jack_get_ports(fClient, NULL, NULL, JackPortIsPhysical | JackPortIsOutput)) == NULL) {
-		printf("Cannot find any physical capture ports\n");
+    #ifdef JACK_LOG 
+        *fStream << "JackRouter::autoConnect : cannot find any physical capture ports" << std::endl;
+    #endif
 	} else {
 		if (fAutoConnectIn) {
-			for (int i = 0; i < fActiveInputs; i++) {
-				if (!ports[i]) {
-					printf("source port is null i = %ld\n", i);
+        	for (int i = 0; i < fActiveInputs; i++) {
+                long ASIO_channel = fInMap[i];
+                if (!ports[ASIO_channel]) {
+					printf("source port is null ASIO_channel = %ld\n", ASIO_channel);
 					break;
-				} else if (jack_connect(fClient, ports[i], jack_port_name(fInputPorts[i])) != 0) {
+				} else if (jack_connect(fClient, ports[ASIO_channel], jack_port_name(fInputPorts[i])) != 0) {
 					printf("Cannot connect input ports\n");
-				}
+				} else {
+                #ifdef JACK_LOG
+                    *fStream << "Input " << "fActiveInputs = " << i << " ASIO_channel = " << ASIO_channel <<  std::endl;
+                #endif
+                }
 			}
 		}
 		jack_free(ports);
 	}
 
 	if ((ports = jack_get_ports(fClient, NULL, NULL, JackPortIsPhysical | JackPortIsInput)) == NULL) {
-		printf("Cannot find any physical playback ports");
+    #ifdef JACK_LOG 
+        *fStream << "JackRouter::autoConnect : cannot find any physical playback ports" << std::endl;
+    #endif
 	} else {
 		if (fAutoConnectOut) {
 			for (int i = 0; i < fActiveOutputs; i++) {
-				if (!ports[i]){
-					printf("destination port is null i = %ld\n", i);
+                long ASIO_channel = fOutMap[i];
+				if (!ports[ASIO_channel]) {
+					printf("destination port is null ASIO_channel = %ld\n", ASIO_channel);
 					break;
-				} else if (jack_connect(fClient, jack_port_name(fOutputPorts[i]), ports[i]) != 0) {
+				} else if (jack_connect(fClient, jack_port_name(fOutputPorts[i]), ports[ASIO_channel]) != 0) {
 					printf("Cannot connect output ports\n");
-				}
+				} else {
+                #ifdef JACK_LOG
+                    *fStream << "Output " << "fActiveOutputs = " << i << " ASIO_channel = " << ASIO_channel <<  std::endl;
+                #endif
+                }
 			}
 		}
 		jack_free(ports);

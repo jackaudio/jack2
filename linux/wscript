@@ -2,46 +2,45 @@
 # encoding: utf-8
 
 def configure(conf):
-    conf.check_cfg(package='alsa', atleast_version='1.0.18', args='--cflags --libs')
+    conf.check_cfg(package='alsa', atleast_version='1.0.18', args='--cflags --libs', mandatory=False)
     conf.env['BUILD_DRIVER_ALSA'] = conf.is_defined('HAVE_ALSA')
 
-    conf. check_cfg(package='libfreebob', atleast_version='1.0.0', args='--cflags --libs')
+    conf. check_cfg(package='libfreebob', atleast_version='1.0.0', args='--cflags --libs', mandatory=False)
     conf.env['BUILD_DRIVER_FREEBOB'] = conf.is_defined('HAVE_LIBFREEBOB')
 
-    conf. check_cfg(package='libffado', atleast_version='1.999.17', args='--cflags --libs')
+    conf. check_cfg(package='libffado', atleast_version='1.999.17', args='--cflags --libs', mandatory=False)
     conf.env['BUILD_DRIVER_FFADO'] = conf.is_defined('HAVE_LIBFFADO')
 
     conf.define('HAVE_PPOLL', 1 )
 
 def create_jack_driver_obj(bld, target, sources, uselib = None):
-    driver = bld.new_task_gen('cxx', 'shlib')
-    driver.features.append('cc')
-    driver.env['shlib_PATTERN'] = 'jack_%s.so'
+    driver = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
+    driver.env['cxxshlib_PATTERN'] = 'jack_%s.so'
 
     #driver.defines = ['HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL']
     driver.defines = ['HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL', 'HAVE_TIMERFD']
 
-    driver.includes = ['.', '../linux', '../posix', '../common', '../common/jack', '../dbus']
+    driver.includes = ['.', '../linux', '../posix', '../common', '../common/jack', '../dbus', '../']
     driver.target = target
     driver.source = sources
     driver.install_path = '${ADDON_DIR}/'
+    driver.use = []
     if uselib:
-        driver.uselib = uselib
-    driver.uselib_local = 'serverlib'
+        driver.use += uselib
     return driver
 
 def build(bld):
     if bld.env['BUILD_JACKD'] == True:
-        jackd = bld.new_task_gen('cxx', 'program')
-        jackd.includes = ['../linux', '../posix', '../common/jack', '../common', '../dbus']
+        jackd = bld(features = ['cxx', 'cxxprogram'])
+        jackd.includes = ['../linux', '../posix', '../common/jack', '../common', '../dbus', '../']
         jackd.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
         jackd.source = ['../common/Jackdmp.cpp']
-	if bld.env['IS_LINUX'] and bld.env['BUILD_JACKDBUS']: 
+        jackd.use = ['serverlib']
+        if bld.env['IS_LINUX'] and bld.env['BUILD_JACKDBUS']: 
             jackd.source += ['../dbus/reserve.c', '../dbus/audio_reserve.c'] 
-            jackd.uselib = 'PTHREAD DL RT DBUS-1'
-	else:
-            jackd.uselib = 'PTHREAD DL RT'		
-        jackd.uselib_local = 'serverlib'
+            jackd.use += ['PTHREAD', 'DL', 'RT', 'DBUS-1']
+        else:
+            jackd.use += ['PTHREAD', 'DL', 'RT']
         jackd.target = 'jackd'
   	
     create_jack_driver_obj(bld, 'dummy', '../common/JackDummyDriver.cpp')
@@ -54,7 +53,7 @@ def build(bld):
                        '../common/memops.c',
                        'alsa/generic_hw.c',
                        'alsa/hdsp.c',
-		       'alsa/alsa_driver.c',
+                       'alsa/alsa_driver.c',
                        'alsa/hammerfall.c',
                        'alsa/ice1712.c'
                        ]
@@ -76,15 +75,15 @@ def build(bld):
                        ]
 
     if bld.env['BUILD_DRIVER_ALSA'] == True:
-        create_jack_driver_obj(bld, 'alsa', alsa_driver_src, "ALSA")
+        create_jack_driver_obj(bld, 'alsa', alsa_driver_src, ["ALSA"])
         create_jack_driver_obj(bld, 'alsarawmidi', alsarawmidi_driver_src,
-                               "ALSA")
+                               ["ALSA"])
 
     if bld.env['BUILD_DRIVER_FREEBOB'] == True:
-        create_jack_driver_obj(bld, 'freebob', 'freebob/JackFreebobDriver.cpp', "LIBFREEBOB")
+        create_jack_driver_obj(bld, 'freebob', 'freebob/JackFreebobDriver.cpp', ["LIBFREEBOB"])
 
     if bld.env['BUILD_DRIVER_FFADO'] == True:
-        create_jack_driver_obj(bld, 'firewire', ffado_driver_src, "LIBFFADO")
+        create_jack_driver_obj(bld, 'firewire', ffado_driver_src, ["LIBFFADO"])
 
     create_jack_driver_obj(bld, 'net', '../common/JackNetDriver.cpp')
 
@@ -92,5 +91,5 @@ def build(bld):
 
     create_jack_driver_obj(bld, 'netone', [ '../common/JackNetOneDriver.cpp',
                                             '../common/netjack.c',
-                                            '../common/netjack_packet.c' ], "SAMPLERATE CELT" )
+                                            '../common/netjack_packet.c' ], ["SAMPLERATE", "CELT"])
 

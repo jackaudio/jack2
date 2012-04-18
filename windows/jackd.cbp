@@ -21,6 +21,7 @@
 					<Add option="-DNDEBUG" />
 					<Add option="-D_WINDOWS" />
 					<Add option="-D_MBCS" />
+					<Add option="-D_POSIX" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -44,6 +45,7 @@
 					<Add option="-D_DEBUG" />
 					<Add option="-D_CONSOLE" />
 					<Add option="-D_MBCS" />
+					<Add option="-D_POSIX" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -69,6 +71,7 @@
 					<Add option="-D_WINDOWS" />
 					<Add option="-D_MBCS" />
 					<Add option="-DJACK_MONITOR" />
+					<Add option="-D_POSIX" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -95,6 +98,7 @@
 					<Add option="-DNDEBUG" />
 					<Add option="-D_WINDOWS" />
 					<Add option="-D_MBCS" />
+					<Add option="-D_POSIX" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -123,6 +127,7 @@
 					<Add option="-D_DEBUG" />
 					<Add option="-D_CONSOLE" />
 					<Add option="-D_MBCS" />
+					<Add option="-D_POSIX" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -153,6 +158,7 @@
 					<Add option="-D_WINDOWS" />
 					<Add option="-D_MBCS" />
 					<Add option="-DJACK_MONITOR" />
+					<Add option="-D_POSIX" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />

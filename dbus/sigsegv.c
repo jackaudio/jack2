@@ -33,7 +33,7 @@
 char * __cxa_demangle(const char * __mangled_name, char * __output_buffer, size_t * __length, int * __status);
 #endif
 
-#include "JackError.h"
+#include "jack/control.h"
 
 #if defined(REG_RIP)
 # define SIGSEGV_STACK_IA64
@@ -60,6 +60,7 @@ static void signal_segv(int signum, siginfo_t* info, void*ptr) {
     static const char *si_codes[3] = {"", "SEGV_MAPERR", "SEGV_ACCERR"};
 
     size_t i;
+    const char *si_code_str;
     ucontext_t *ucontext = (ucontext_t*)ptr;
 
 #if defined(SIGSEGV_STACK_X86) || defined(SIGSEGV_STACK_IA64)
@@ -94,9 +95,14 @@ static void signal_segv(int signum, siginfo_t* info, void*ptr) {
         jack_error("Unknown bad signal catched!");
     }
 
+    if (info->si_code >= 0 && info->si_code < 3) 
+        si_code_str = si_codes[info->si_code];
+    else
+        si_code_str = "unknown";
+
     jack_error("info.si_signo = %d", signum);
     jack_error("info.si_errno = %d", info->si_errno);
-    jack_error("info.si_code  = %d (%s)", info->si_code, si_codes[info->si_code]);
+    jack_error("info.si_code  = %d (%s)", info->si_code, si_code_str);
     jack_error("info.si_addr  = %p", info->si_addr);
 #if !defined(__alpha__) && !defined(__ia64__) && !defined(__FreeBSD_kernel__) && !defined(__arm__) && !defined(__hppa__) && !defined(__sh__)
     for(i = 0; i < NGREG; i++)

@@ -163,7 +163,11 @@ void Collect(FrameTimeCollector* TheFrame)
 
 void Jack_Thread_Init_Callback(void *arg)
 {
-    Log("Init callback has been successfully called. (msg from callback)\n");
+#ifdef WIN32
+    Log("Init callback has been successfully called from thread = %x. (msg from callback)\n", GetCurrentThread());
+#else
+    Log("Init callback has been successfully called from thread = %x. (msg from callback)\n", pthread_self());
+#endif
     init_clbk = 1;
 }
 
@@ -440,7 +444,7 @@ static void* jack_thread(void *arg)
 	jack_nframes_t last_thread_time = jack_frame_time(client);
 
 	while (1) {
-		jack_nframes_t frames = jack_cycle_wait (client);
+		jack_nframes_t frames = jack_cycle_wait(client);
 		jack_nframes_t current_thread_time = jack_frame_time(client);
 		jack_nframes_t delta_time = current_thread_time - last_thread_time;
 		Log("jack_thread : delta_time = %ld\n", delta_time);
@@ -477,11 +481,41 @@ int process4(jack_nframes_t nframes, void *arg)
 	jack_nframes_t delta_time = cur_time - last_time;
 
 	Log("calling process4 callback : jack_frame_time = %ld delta_time = %ld\n", cur_time, delta_time);
-	if (delta_time > 0  && (unsigned int)abs(delta_time - cur_buffer_size) > tolerance) {
-		printf("!!! ERROR !!! jack_frame_time seems to return incorrect values cur_buffer_size = %d, delta_time = %d\n", cur_buffer_size, delta_time);
+	if (delta_time > 0  && (jack_nframes_t)abs(delta_time - cur_buffer_size) > tolerance) {
+		printf("!!! ERROR !!! jack_frame_time seems to return incorrect values cur_buffer_size = %d, delta_time = %d tolerance %d\n", cur_buffer_size, delta_time, tolerance);
 	}
 
 	last_time = cur_time;
+	return 0;
+}
+
+int process5(jack_nframes_t nframes, void *arg)
+{
+	jack_client_t* client = (jack_client_t*) arg;
+    
+    static jack_nframes_t first_current_frames;
+    static jack_time_t first_current_usecs;
+    static jack_time_t first_next_usecs;
+    static float first_period_usecs;
+	static int res1 = jack_get_cycle_times(client, &first_current_frames, &first_current_usecs, &first_next_usecs, &first_period_usecs);
+	   
+    jack_nframes_t current_frames;
+    jack_time_t current_usecs;
+    jack_time_t next_usecs;
+    float period_usecs;
+
+    int res = jack_get_cycle_times(client, &current_frames, &current_usecs, &next_usecs, &period_usecs);
+    if (res != 0) {
+        printf("!!! ERROR !!! jack_get_cycle_times fails...\n");
+        return 0;
+    }
+    
+	Log("calling process5 callback : jack_get_cycle_times delta current_frames = %ld delta current_usecs = %ld delta next_usecs = %ld period_usecs = %f\n", 
+        current_frames - first_current_frames, current_usecs - first_current_usecs, next_usecs - first_next_usecs, period_usecs);
+ 
+    first_current_frames = current_frames;
+    first_current_usecs = current_usecs;
+    first_next_usecs = next_usecs;
 	return 0;
 }
 
@@ -553,6 +587,8 @@ int main (int argc, char *argv[])
 
     client_name1 = "jack_test";
     time_to_run = 1;
+    //verbose_mode = 1;
+    //RT = 1;
     while ((opt = getopt_long (argc, argv, options, long_options, &option_index)) != EOF) {
         switch (opt) {
             case 'k':
@@ -1201,8 +1237,8 @@ int main (int argc, char *argv[])
      * (as mentionned in the doc of jack_get_ports)
      *
      */
-    free(inports);
-    free(outports);
+    jack_free(inports);
+    jack_free(outports);
 
     /**
      * Try to "reactivate" the client whereas it's already activated...
@@ -1241,7 +1277,7 @@ int main (int argc, char *argv[])
         printf("!!! ERROR !!! %i ports have been created, and %i callback reg ports have been received !\n", j, port_callback_reg);
     }
 
-    free(inports); // free array of ports (as mentionned in the doc of jack_get_ports)
+    jack_free(inports); // free array of ports (as mentionned in the doc of jack_get_ports)
 
     /**
      *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -1405,7 +1441,7 @@ int main (int argc, char *argv[])
         connexions2 = jack_port_get_all_connections(client1, jack_port_by_name(client1, inports[0]));
     }
 
-    free (inports);
+    jack_free (inports);
     if (connexions1 == NULL) {
         Log("checking jack_port_get_connections() for external client... ok\n");
     } else {
@@ -1648,7 +1684,7 @@ int main (int argc, char *argv[])
     } else {
         Log("Checking renaming of an unregistered port... ok\n");
     }
-    free (inports);
+    jack_free (inports);
 
 
     /**
@@ -1664,6 +1700,7 @@ int main (int argc, char *argv[])
     Log("Checking about latency functions...\n");
     t_error = 0;
     jack_recompute_total_latencies(client1);
+    Log("jack_recompute_total_latencies...\n");
     if ((jack_port_get_latency (output_port1) != 0) ||
             (jack_port_get_total_latency(client1, output_port1) != 0) ) {
         t_error = 1;
@@ -1753,8 +1790,8 @@ int main (int argc, char *argv[])
 
 	jack_sleep(1000);
 
-    free(inports);
-    free(outports);
+    jack_free(inports);
+    jack_free(outports);
 
     /**
      * Checking transport API.
@@ -1960,7 +1997,16 @@ int main (int argc, char *argv[])
 	jack_set_process_callback(client1, process4, client1);
 	jack_activate(client1);
 	jack_sleep(2 * 1000);
-
+    
+    /**
+     * Checking jack_get_cycle_times.
+    */
+    Log("Testing jack_get_cycle_times...\n");
+    jack_deactivate(client1);
+	jack_set_process_callback(client1, process5, client1);
+	jack_activate(client1);
+	jack_sleep(3 * 1000);
+    
 
 	/**
      * Checking alternate thread model

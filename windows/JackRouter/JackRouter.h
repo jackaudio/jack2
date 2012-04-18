@@ -46,8 +46,6 @@ static int	kNumOutputs = 4;
 #include "combase.h"
 #include "iasiodrv.h"
 
-#define MAX_PORTS 32
-#define LONG_SAMPLE 1
 #define PATH_SEP "\\"
 
 #include <list>
@@ -86,8 +84,9 @@ public:
 	~JackRouter();
 #endif
 
-	static int process(jack_nframes_t nframes, void* arg);
-	static void shutdown(void* arg);
+	static int processCallback(jack_nframes_t nframes, void* arg);
+    static void connectCallback(jack_port_id_t a, jack_port_id_t b, int connect, void* arg);
+	static void shutdownCallback(void* arg);
 
 	ASIOBool init(void* sysRef);
 	void getDriverName(char *name);		// max 32 bytes incl. terminating zero
@@ -122,7 +121,6 @@ public:
 	void bufferSwitch();
 	long getMilliSeconds() {return fMilliSeconds;}
 
-	static bool fFirstActivate;
 	static std::list<std::pair<std::string, std::string> > fConnections;  // Connections list
 
 private:
@@ -134,15 +132,11 @@ private:
 	ASIOTime fAsioTime;
 	ASIOTimeStamp fTheSystemTime;
 
-#ifdef LONG_SAMPLE
-	long* fInputBuffers[MAX_PORTS * 2];
-	long* fOutputBuffers[MAX_PORTS * 2];
-#else
-	float* fInputBuffers[MAX_PORTS * 2];
-	float* fOutputBuffers[MAX_PORTS * 2];
-#endif
-	long fInMap[MAX_PORTS];
-	long fOutMap[MAX_PORTS];
+	void** fInputBuffers;
+	void** fOutputBuffers;
+
+	long* fInMap;
+	long* fOutMap;
 
 	long fInputLatency;
 	long fOutputLatency;
@@ -150,7 +144,10 @@ private:
 	long fActiveOutputs;
 	long fToggle;
 	long fMilliSeconds;
-	bool fActive, fStarted;
+	bool fRunning;
+	bool fFirstActivate;
+    bool fFloatSample;
+    bool fAliasSystem;
 	bool fTimeInfoMode, fTcRead;
 	char fErrorMessage[128];
 
@@ -159,14 +156,17 @@ private:
 
 	// Jack part
 	jack_client_t* fClient;
-	jack_port_t* fInputPorts[MAX_PORTS];
-	jack_port_t* fOutputPorts[MAX_PORTS];
+	jack_port_t** fInputPorts;
+	jack_port_t** fOutputPorts;
 	long fBufferSize;
 	ASIOSampleRate fSampleRate;
 
-	void AutoConnect();
-	void SaveConnections();
-    void RestoreConnections();
+	void autoConnect();
+	void saveConnections();
+    void restoreConnections();
+    
+    void processInputs();
+    void processOutputs();
 
 };
 

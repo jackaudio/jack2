@@ -21,16 +21,18 @@
 #ifndef __JackWinMutex__
 #define __JackWinMutex__
 
-#include "JackError.h"
+#include "JackCompilerDeps.h"
 #include "JackException.h"
 #include <windows.h>
+#include <stdio.h>
 
 namespace Jack
 {
+
 /*!
 \brief Mutex abstraction.
 */
-class JackBaseWinMutex
+class SERVER_EXPORT JackBaseWinMutex
 {
 
     protected:
@@ -43,8 +45,8 @@ class JackBaseWinMutex
         JackBaseWinMutex():fOwner(0)
         {
             // In recursive mode by default
-            fMutex = (HANDLE)CreateMutex(0, FALSE, 0);
-            ThrowIf(fMutex == 0, JackException("JackWinMutex: could not init the mutex"));
+            fMutex = CreateMutex(NULL, FALSE, NULL);
+            ThrowIf((fMutex == 0), JackException("JackBaseWinMutex: could not init the mutex"));
         }
 
         virtual ~JackBaseWinMutex()
@@ -52,60 +54,13 @@ class JackBaseWinMutex
             CloseHandle(fMutex);
         }
 
-        bool Lock()
-        {
-            if (fOwner != GetCurrentThreadId()) {
-                DWORD res = WaitForSingleObject(fMutex, INFINITE);
-                if (res == WAIT_OBJECT_0) {
-                    fOwner = GetCurrentThreadId();
-                    return true;
-                } else {
-                    jack_log("JackWinMutex::Lock res = %d", res);
-                    return false;
-                }
-            } else {
-                jack_error("JackWinMutex::Lock mutex already locked by thread = %d", GetCurrentThreadId());
-                return false;
-            }
-        }
-
-        bool Trylock()
-        {
-            if (fOwner != GetCurrentThreadId()) {
-                DWORD res = WaitForSingleObject(fMutex, 0);
-                if (res == WAIT_OBJECT_0) {
-                    fOwner = GetCurrentThreadId();
-                    return true;
-                } else {
-                    jack_log("JackWinMutex::Trylock res = %d", res);
-                    return false;
-                }
-            } else {
-                jack_error("JackWinMutex::Trylock mutex already locked by thread = %d", GetCurrentThreadId());
-                return false;
-            }
-        }
-
-        bool Unlock()
-        {
-            if (fOwner == GetCurrentThreadId()) {
-                fOwner = 0;
-                int res = ReleaseMutex(fMutex);
-                if (res != 0) {
-                    return true;
-                } else {
-                    jack_log("JackWinMutex::Unlock res = %d", res);
-                    return false;
-                }
-            } else {
-                jack_error("JackWinMutex::Unlock mutex not locked by thread = %d", GetCurrentThreadId());
-                return false;
-            }
-        }
+        bool Lock();
+        bool Trylock();
+        bool Unlock();
 
 };
 
-class JackWinMutex
+class SERVER_EXPORT JackWinMutex
 {
 
     protected:
@@ -114,10 +69,18 @@ class JackWinMutex
 
     public:
 
-        JackWinMutex()
+        JackWinMutex(const char* name = NULL)
         {
             // In recursive mode by default
-            fMutex = (HANDLE)CreateMutex(0, FALSE, 0);
+            if (name) {
+                char buffer[MAX_PATH];
+                snprintf(buffer, sizeof(buffer), "%s_%s", "JackWinMutex", name);
+                fMutex = CreateMutex(NULL, FALSE, buffer);
+            } else {
+                fMutex = CreateMutex(NULL, FALSE, NULL);
+            }
+
+            ThrowIf((fMutex == 0), JackException("JackWinMutex: could not init the mutex"));
         }
 
         virtual ~JackWinMutex()
@@ -125,20 +88,34 @@ class JackWinMutex
             CloseHandle(fMutex);
         }
 
-        bool Lock()
+        bool Lock();
+        bool Trylock();
+        bool Unlock();
+
+};
+
+class SERVER_EXPORT JackWinCriticalSection
+{
+
+    protected:
+
+        CRITICAL_SECTION fSection;
+
+    public:
+
+        JackWinCriticalSection(const char* name = NULL)
         {
-            return (WAIT_OBJECT_0 == WaitForSingleObject(fMutex, INFINITE));
+            InitializeCriticalSection(&fSection);
         }
 
-        bool Trylock()
+        virtual ~JackWinCriticalSection()
         {
-            return (WAIT_OBJECT_0 == WaitForSingleObject(fMutex, 0));
+            DeleteCriticalSection(&fSection);
         }
 
-        bool Unlock()
-        {
-            return(ReleaseMutex(fMutex) != 0);
-        }
+        bool Lock();
+        bool Trylock();
+        bool Unlock();
 
 };
 
@@ -146,3 +123,4 @@ class JackWinMutex
 } // namespace
 
 #endif
+

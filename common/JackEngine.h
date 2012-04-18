@@ -26,6 +26,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackMutex.h"
 #include "JackTransportEngine.h"
 #include "JackPlatformPlug.h"
+#include "JackRequest.h"
+#include "JackChannel.h"
 #include <map>
 
 namespace Jack
@@ -55,15 +57,15 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         jack_time_t fLastSwitchUsecs;
 
         int fSessionPendingReplies;
-        JackChannelTransaction* fSessionTransaction;
+        detail::JackChannelTransactionInterface* fSessionTransaction;
         JackSessionNotifyResult* fSessionResult;
         std::map<int,std::string> fReservationMap;
         int fMaxUUID;
 
-        int ClientCloseAux(int refnum, JackClientInterface* client, bool wait);
+        int ClientCloseAux(int refnum, bool wait);
         void CheckXRun(jack_time_t callback_usecs);
 
-        int NotifyAddClient(JackClientInterface* new_client, const char* name, int refnum);
+        int NotifyAddClient(JackClientInterface* new_client, const char* new_name, int refnum);
         void NotifyRemoveClient(const char* name, int refnum);
 
         void ProcessNext(jack_time_t callback_usecs);
@@ -75,6 +77,8 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         int AllocateRefnum();
         void ReleaseRefnum(int ref);
 
+        int ClientNotify(JackClientInterface* client, int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2);
+        
         void NotifyClient(int refnum, int event, int sync, const char*  message, int value1, int value2);
         void NotifyClients(int event, int sync, const char*  message,  int value1, int value2);
 
@@ -100,6 +104,8 @@ class SERVER_EXPORT JackEngine : public JackLockAble
 
         int Open();
         int Close();
+        
+        void ShutDown();
 
         // Client management
         int ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status);
@@ -148,13 +154,13 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         void NotifyQuit();
 
         // Session management
-        void SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket, JackSessionNotifyResult** result);
-        void SessionReply(int refnum);
+        void SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, detail::JackChannelTransactionInterface *socket, JackSessionNotifyResult** result);
+        int SessionReply(int refnum);
 
-        void GetUUIDForClientName(const char *client_name, char *uuid_res, int *result);
-        void GetClientNameForUUID(const char *uuid, char *name_res, int *result);
-        void ReserveClientName(const char *name, const char *uuid, int *result);
-        void ClientHasSessionCallback(const char *name, int *result);
+        int GetUUIDForClientName(const char *client_name, char *uuid_res);
+        int GetClientNameForUUID(const char *uuid, char *name_res);
+        int ReserveClientName(const char *name, const char *uuid);
+        int ClientHasSessionCallback(const char *name);
 };
 
 

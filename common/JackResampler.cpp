@@ -18,6 +18,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "JackResampler.h"
+#include "JackError.h"
 #include <stdio.h>
 
 namespace Jack

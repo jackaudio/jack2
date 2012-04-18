@@ -29,9 +29,10 @@
 #ifndef JACKCTL_H__2EEDAD78_DF4C_4B26_83B7_4FF1A446A47E__INCLUDED
 #define JACKCTL_H__2EEDAD78_DF4C_4B26_83B7_4FF1A446A47E__INCLUDED
 
+#include <types.h>
 #include <jack/jslist.h>
 #include <jack/systemdeps.h>
-#if !defined (__sun__)
+#if !defined(sun) && !defined(__sun__)
 #include <stdbool.h>
 #endif
 
@@ -81,6 +82,9 @@ typedef struct jackctl_internal jackctl_internal_t;
 /** opaque type for parameter object */
 typedef struct jackctl_parameter jackctl_parameter_t;
 
+/** opaque type for sigmask object */
+typedef struct jackctl_sigmask jackctl_sigmask_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -102,7 +106,7 @@ extern "C" {
  *
  * @return the configurated signal set.
  */
-sigset_t
+jackctl_sigmask_t *
 jackctl_setup_signals(
     unsigned int flags);
 
@@ -113,7 +117,7 @@ jackctl_setup_signals(
  */
 void
 jackctl_wait_signals(
-    sigset_t signals);
+    jackctl_sigmask_t * signals);
 
 /**
  * Call this function to create server object.
@@ -329,6 +333,21 @@ jackctl_driver_get_type(
 const JSList *
 jackctl_driver_get_parameters(
 	jackctl_driver_t * driver);
+
+/**
+ * Call this function to parse parameters for a driver.
+ *
+ * @param driver driver object handle
+ * @param argc parameter list len
+ * @param argv parameter list, as an array of char*
+ *
+ * @return success status: true - success, false - fail
+ */
+int
+jackctl_driver_params_parse(
+    jackctl_driver_t * driver,
+    int argc,
+    char* argv[]);
 
 /**
  * Call this function to get name of internal client.

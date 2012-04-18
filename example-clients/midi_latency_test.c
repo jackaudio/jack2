@@ -214,7 +214,7 @@ get_semaphore_error(void)
     if (! FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, error,
                         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                         semaphore_error_msg, 1024, NULL)) {
-        snprintf(semaphore_error_msg, 1023, "Unknown OS error code '%d'",
+        snprintf(semaphore_error_msg, 1023, "Unknown OS error code '%ld'",
                 error);
     }
     return semaphore_error_msg;

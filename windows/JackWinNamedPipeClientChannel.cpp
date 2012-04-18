@@ -27,25 +27,15 @@
 namespace Jack
 {
 
-JackWinNamedPipeClientChannel::JackWinNamedPipeClientChannel():fThread(this)
+JackWinNamedPipeClientChannel::JackWinNamedPipeClientChannel()
+    :JackGenericClientChannel(),fThread(this)
 {
-    fClient = NULL;
+     fRequest = new JackWinNamedPipeClient();
 }
 
 JackWinNamedPipeClientChannel::~JackWinNamedPipeClientChannel()
-{}
-
-int JackWinNamedPipeClientChannel::ServerCheck(const char* server_name)
 {
-    jack_log("JackWinNamedPipeClientChannel::ServerCheck = %s", server_name);
-
-    // Connect to server
-    if (fRequestPipe.Connect(jack_server_dir, server_name, 0) < 0) {
-        jack_error("Cannot connect to server pipe");
-        return -1;
-    } else {
-        return 0;
-    }
+    delete fRequest;
 }
 
 int JackWinNamedPipeClientChannel::Open(const char* server_name, const char* name, int uuid, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
@@ -54,14 +44,14 @@ int JackWinNamedPipeClientChannel::Open(const char* server_name, const char* nam
     jack_log("JackWinNamedPipeClientChannel::Open name = %s", name);
 
     /*
-    16/08/07: was called before doing "fRequestPipe.Connect" .... still necessary?
+    16/08/07: was called before doing "fRequest->Connect" .... still necessary?
     if (fNotificationListenPipe.Bind(jack_client_dir, name, 0) < 0) {
         jack_error("Cannot bind pipe");
         goto error;
     }
     */
 
-    if (fRequestPipe.Connect(jack_server_dir, server_name, 0) < 0) {
+    if (fRequest->Connect(jack_server_dir, server_name, 0) < 0) {
         jack_error("Cannot connect to server pipe");
         goto error;
     }
@@ -86,14 +76,14 @@ int JackWinNamedPipeClientChannel::Open(const char* server_name, const char* nam
     return 0;
 
 error:
-    fRequestPipe.Close();
+    fRequest->Close();
     fNotificationListenPipe.Close();
     return -1;
 }
 
 void JackWinNamedPipeClientChannel::Close()
 {
-    fRequestPipe.Close();
+    fRequest->Close();
     fNotificationListenPipe.Close();
     // Here the thread will correctly stop when the pipe are closed
     fThread.Stop();
@@ -119,241 +109,14 @@ void JackWinNamedPipeClientChannel::Stop()
     fThread.Kill();  // Unsafe on WIN32... TODO : solve WIN32 thread Kill issue
 }
 
-void JackWinNamedPipeClientChannel::ServerSyncCall(JackRequest* req, JackResult* res, int* result)
-{
-    if (req->Write(&fRequestPipe) < 0) {
-        jack_error("Could not write request type = %ld", req->fType);
-        *result = -1;
-        return ;
-    }
-
-    if (res->Read(&fRequestPipe) < 0) {
-        jack_error("Could not read result type = %ld", req->fType);
-        *result = -1;
-        return ;
-    }
-
-    *result = res->fResult;
-}
-
-void JackWinNamedPipeClientChannel::ServerAsyncCall(JackRequest* req, JackResult* res, int* result)
-{
-    if (req->Write(&fRequestPipe) < 0) {
-        jack_error("Could not write request type = %ld", req->fType);
-        *result = -1;
-    } else {
-        *result = 0;
-    }
-}
-
-void JackWinNamedPipeClientChannel::ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status, int* result, int open)
-{
-    JackClientCheckRequest req(name, protocol, options, uuid, open);
-    JackClientCheckResult res;
-    ServerSyncCall(&req, &res, result);
-    *status = res.fStatus;
-    strcpy(name_res, res.fName);
-}
-
-void JackWinNamedPipeClientChannel::ClientOpen(const char* name, int pid, int uuid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
-{
-    JackClientOpenRequest req(name, pid, uuid);
-    JackClientOpenResult res;
-    ServerSyncCall(&req, &res, result);
-    *shared_engine = res.fSharedEngine;
-    *shared_client = res.fSharedClient;
-    *shared_graph = res.fSharedGraph;
-}
-
-void JackWinNamedPipeClientChannel::ClientClose(int refnum, int* result)
-{
-    JackClientCloseRequest req(refnum);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackWinNamedPipeClientChannel::ClientActivate(int refnum, int is_real_time, int* result)
-{
-    JackActivateRequest req(refnum, is_real_time);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackWinNamedPipeClientChannel::ClientDeactivate(int refnum, int* result)
-{
-    JackDeactivateRequest req(refnum);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackWinNamedPipeClientChannel::PortRegister(int refnum, const char* name, const char* type, unsigned int flags, unsigned int buffer_size, jack_port_id_t* port_index, int* result)
-{
-    JackPortRegisterRequest req(refnum, name, type, flags, buffer_size);
-    JackPortRegisterResult res;
-    ServerSyncCall(&req, &res, result);
-    *port_index = res.fPortIndex;
-}
-
-void JackWinNamedPipeClientChannel::PortUnRegister(int refnum, jack_port_id_t port_index, int* result)
-{
-    JackPortUnRegisterRequest req(refnum, port_index);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackWinNamedPipeClientChannel::PortConnect(int refnum, const char* src, const char* dst, int* result)
-{
-    JackPortConnectNameRequest req(refnum, src, dst);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackWinNamedPipeClientChannel::PortDisconnect(int refnum, const char* src, const char* dst, int* result)
-{
-    JackPortDisconnectNameRequest req(refnum, src, dst);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackWinNamedPipeClientChannel::PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst, int* result)
-{
-    JackPortConnectRequest req(refnum, src, dst);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackWinNamedPipeClientChannel::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t dst, int* result)
-{
-    JackPortDisconnectRequest req(refnum, src, dst);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackWinNamedPipeClientChannel::PortRename(int refnum, jack_port_id_t port, const char* name, int* result)
-{
-    JackPortRenameRequest req(refnum, port, name);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackWinNamedPipeClientChannel::SetBufferSize(jack_nframes_t buffer_size, int* result)
-{
-    JackSetBufferSizeRequest req(buffer_size);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackWinNamedPipeClientChannel::SetFreewheel(int onoff, int* result)
-{
-    JackSetFreeWheelRequest req(onoff);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackWinNamedPipeClientChannel::ComputeTotalLatencies(int* result)
-{
-    JackComputeTotalLatenciesRequest req;
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackWinNamedPipeClientChannel::SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char* path, jack_session_command_t** result)
-{
-    JackSessionNotifyRequest req(refnum, path, type, target);
-    JackSessionNotifyResult res;
-    int intresult;
-    ServerSyncCall(&req, &res, &intresult);
-    *result = res.GetCommands();
-}
-
-void JackWinNamedPipeClientChannel::SessionReply(int refnum, int* result)
-{
-    JackSessionReplyRequest req(refnum);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackWinNamedPipeClientChannel::GetUUIDForClientName(int refnum, const char* client_name, char* uuid_res, int* result)
-{
-    JackGetUUIDRequest req(client_name);
-    JackUUIDResult res;
-    ServerSyncCall(&req, &res, result);
-    strncpy(uuid_res, res.fUUID, JACK_UUID_SIZE);
-}
-
-void JackWinNamedPipeClientChannel::GetClientNameForUUID(int refnum, const char* uuid, char* name_res, int* result)
-{
-    JackGetClientNameRequest req(uuid);
-    JackClientNameResult res;
-    ServerSyncCall(&req, &res, result);
-    strncpy(name_res, res.fName, JACK_CLIENT_NAME_SIZE);
-}
-
-void JackWinNamedPipeClientChannel::ClientHasSessionCallback(const char* client_name, int* result)
-{
-    JackClientHasSessionCallbackRequest req(client_name);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackWinNamedPipeClientChannel::ReserveClientName(int refnum, const char* client_name, const char* uuid, int* result)
-{
-    JackReserveNameRequest req(refnum, client_name, uuid);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackWinNamedPipeClientChannel::ReleaseTimebase(int refnum, int* result)
-{
-    JackReleaseTimebaseRequest req(refnum);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackWinNamedPipeClientChannel::SetTimebaseCallback(int refnum, int conditional, int* result)
-{
-    JackSetTimebaseCallbackRequest req(refnum, conditional);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackWinNamedPipeClientChannel::GetInternalClientName(int refnum, int int_ref, char* name_res, int* result)
-{
-    JackGetInternalClientNameRequest req(refnum, int_ref);
-    JackGetInternalClientNameResult res;
-    ServerSyncCall(&req, &res, result);
-    strcpy(name_res, res.fName);
-}
-
-void JackWinNamedPipeClientChannel::InternalClientHandle(int refnum, const char* client_name, int* status, int* int_ref, int* result)
-{
-    JackInternalClientHandleRequest req(refnum, client_name);
-    JackInternalClientHandleResult res;
-    ServerSyncCall(&req, &res, result);
-    *int_ref = res.fIntRefNum;
-    *status = res.fStatus;
-}
-
-void JackWinNamedPipeClientChannel::InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int uuid, int* result)
-{
-    JackInternalClientLoadRequest req(refnum, client_name, so_name, objet_data, options, uuid);
-    JackInternalClientLoadResult res;
-    ServerSyncCall(&req, &res, result);
-    *int_ref = res.fIntRefNum;
-    *status = res.fStatus;
-}
-
-void JackWinNamedPipeClientChannel::InternalClientUnload(int refnum, int int_ref, int* status, int* result)
-{
-    JackInternalClientUnloadRequest req(refnum, int_ref);
-    JackInternalClientUnloadResult res;
-    ServerSyncCall(&req, &res, result);
-    *status = res.fStatus;
-}
-
 bool JackWinNamedPipeClientChannel::Init()
 {
     jack_log("JackWinNamedPipeClientChannel::Init");
+    
+    // Setup context
+    if (!jack_tls_set(JackGlobals::fNotificationThread, this)) {
+        jack_error("Failed to set thread notification key");
+    }
 
     if (!fNotificationListenPipe.Accept()) {
         jack_error("JackWinNamedPipeClientChannel: cannot establish notification pipe");
@@ -386,7 +149,7 @@ bool JackWinNamedPipeClientChannel::Execute()
 error:
     // Close the pipes, server wont be able to create them otherwise.
     fNotificationListenPipe.Close();
-    fRequestPipe.Close();
+    fRequest->Close();
     fClient->ShutDown();
     return false;
 }

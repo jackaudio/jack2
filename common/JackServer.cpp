@@ -78,7 +78,9 @@ JackServer::~JackServer()
 int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
 {
     // TODO: move that in reworked JackServerGlobals::Init()
-    JackMessageBuffer::Create();
+    if (!JackMessageBuffer::Create()) {
+        jack_error("Cannot create message buffer");
+    }
 
      if ((fAudioDriver = fDriverInfo->Open(driver_desc, fEngine, GetSynchroTable(), driver_params)) == NULL) {
         jack_error("Cannot initialize driver");
@@ -140,6 +142,7 @@ int JackServer::Close()
     fEngine->Close();
     // TODO: move that in reworked JackServerGlobals::Destroy()
     JackMessageBuffer::Destroy();
+    EndTime();
     return 0;
 }
 
@@ -188,6 +191,8 @@ int JackServer::Stop()
 {
     jack_log("JackServer::Stop");
     fChannel.Stop();
+    
+    fEngine->ShutDown();
 
     if (fFreewheel) {
         return fThreadedFreewheelDriver->Stop();

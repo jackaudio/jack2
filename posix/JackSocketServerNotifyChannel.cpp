@@ -54,18 +54,14 @@ void JackSocketServerNotifyChannel::Notify(int refnum, int notify, int value)
 {
     JackClientNotificationRequest req(refnum, notify, value);
     if (req.Write(&fRequestSocket) < 0) {
-        jack_error("Could not write request ref = %d notify = %d", refnum, notify);
+        jack_error("Could not write notification ref = %d notify = %d", refnum, notify);
     }
 }
 
 void JackSocketServerNotifyChannel::NotifyQuit()
 {
-    JackClientNotificationRequest req(-1, kQUIT, 0);
-    if (req.Write(&fRequestSocket) < 0) {
-        jack_error("Could not write request ref = %d notify = %d", -1, kQUIT);
-    }
+    Notify(-1, kQUIT, 0);
 }
-
 
 } // end of namespace
 

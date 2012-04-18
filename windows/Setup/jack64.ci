@@ -1,7 +1,7 @@
 <*project
       version = 4 civer = "Free v4.14.5" winver = "2.8/6.1.7600" > 
    <output> .</>
-   <exename> Jack_v1.9.8_64_setup.exe</>
+   <exename> Jack_v1.9.9_64_setup.exe</>
    <digitsign> </>
    <appname> Jack</>
    <password> </>
@@ -78,18 +78,16 @@
 <_><src>..\Release64\bin\jack_unload.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\jack_midi_latency_test.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\jackd.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release64\bin\libsamplerate_x86_64.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release64\bin\portaudio_x86_64.dll</><dest>win</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release64\bin\jack\jack_net.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release64\bin\jack\jack_netone.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release64\bin\jack\jack_net.dll</><dest>win</><custom>jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release64\bin\jack\jack_netone.dll</><dest>win</><custom>jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\jack_netsource.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release64\bin\jack\jack_dummy.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release64\bin\jack\jack_loopback.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release64\bin\jack\jack_winmme.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release64\bin\jack\jack_portaudio.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release64\bin\jack\netmanager.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release64\bin\jack\audioadapter.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release64\bin\jack\netadapter.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release64\bin\jack\jack_dummy.dll</><dest>win</><custom>jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release64\bin\jack\jack_loopback.dll</><dest>win</><custom>jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release64\bin\jack\jack_winmme.dll</><dest>win</><custom>jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release64\bin\jack\jack_portaudio.dll</><dest>win</><custom>jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release64\bin\jack\netmanager.dll</><dest>win</><custom>jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release64\bin\jack\audioadapter.dll</><dest>win</><custom>jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release64\bin\jack\netadapter.dll</><dest>win</><custom>jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\jack_midi_dump.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\control.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\intclient.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
@@ -97,11 +95,12 @@
 <_><src>..\..\common\jack\jslist.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\midiport.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\ringbuffer.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\session.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\statistics.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\systemdeps.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
 <_><src>..\..\common\jack\thread.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\transport.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\types.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\..\common\jack\systemdeps.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
 <_><src>..\..\common\jack\weakjack.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
 <_><src>..\..\common\jack\weakmacros.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
 <_><src>.\src\32bits\JackRouter.dll</><dest>inst</><custom>32bits</><ifexist>overnewer</><recurs>0</></>
@@ -112,12 +111,12 @@
 <_><src>.\src\64bits\JackRouter.ini</><dest>inst</><custom>64bits</><ifexist>overnewer</><recurs>0</></>
 <_><src>.\src\64bits\msvcr100.dll</><dest>inst</><custom>64bits</><ifexist>overnewer</><recurs>0</></>
 <_><src>.\src\64bits\msvcp100.dll</><dest>inst</><custom>64bits</><ifexist>overnewer</><recurs>0</></>
-<_><src>.\src\64bits\portaudio_x86_64.lib</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\mingwm10.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\qjackctl.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\QtCore4.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\QtGui4.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\QtXml4.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>.\qjackctl\libgcc_s_dw2-1.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\src\COPYING</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\src\README</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 

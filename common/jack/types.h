@@ -259,6 +259,7 @@ typedef void (*JackLatencyCallback)(jack_latency_callback_mode_t mode, void *arg
 /**
  * the new latency API operates on Ranges.
  */
+PRE_PACKED_STRUCTURE
 struct _jack_latency_range
 {
     /**
@@ -269,7 +270,7 @@ struct _jack_latency_range
      * maximum latency
      */
     jack_nframes_t max;
-};
+} POST_PACKED_STRUCTURE;
 
 typedef struct _jack_latency_range jack_latency_range_t;
 
@@ -548,7 +549,8 @@ typedef enum {
 #define JACK_POSITION_MASK (JackPositionBBT|JackPositionTimecode)
 #define EXTENDED_TIME_INFO
 
-typedef struct {
+PRE_PACKED_STRUCTURE
+struct _jack_position {
 
     /* these four cannot be set from clients: the server sets them */
     jack_unique_t       unique_1;       /**< unique ID */
@@ -614,7 +616,9 @@ typedef struct {
     /* When (unique_1 == unique_2) the contents are consistent. */
     jack_unique_t       unique_2;       /**< unique ID */
 
-} jack_position_t;
+} POST_PACKED_STRUCTURE;
+
+typedef struct _jack_position jack_position_t;
 
 /**
     * Prototype for the @a sync_callback defined by slow-sync clients.

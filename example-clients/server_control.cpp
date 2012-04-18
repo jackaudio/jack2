@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
     const JSList * drivers;
     const JSList * internals;
     const JSList * node_ptr;
-    sigset_t signals;
+    jackctl_sigmask_t * sigmask;
     int opt, option_index;
     const char* driver_name = "dummy";
     const char* client_name = "audioadapter";
@@ -234,8 +234,8 @@ int main(int argc, char *argv[])
 
     */
 
-    signals = jackctl_setup_signals(0);
-    jackctl_wait_signals(signals);
+    sigmask = jackctl_setup_signals(0);
+    jackctl_wait_signals(sigmask);
     jackctl_server_stop(server);
     jackctl_server_close(server);
     jackctl_server_destroy(server);

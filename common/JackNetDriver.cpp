@@ -16,6 +16,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "JackCompilerDeps.h"
+#include "driver_interface.h"
 #include "JackNetDriver.h"
 #include "JackEngineControl.h"
 #include "JackLockedEngine.h"
@@ -509,7 +511,7 @@ namespace Jack
         DecodeSyncPacket();
 
 #ifdef JACK_MONITOR
-        fNetTimeMon->Add((float(GetMicroSeconds() - fRcvSyncUst) / float(fEngineControl->fPeriodUsecs) * 100.f);
+        fNetTimeMon->Add(float(GetMicroSeconds() - fRcvSyncUst) / float(fEngineControl->fPeriodUsecs) * 100.f);
 #endif
         //audio, midi or sync if driver is late
         int res = DataRecv();
@@ -524,7 +526,7 @@ namespace Jack
         JackDriver::CycleTakeBeginTime();
 
 #ifdef JACK_MONITOR
-        fNetTimeMon->Add((float(GetMicroSeconds() - fRcvSyncUst) / float(fEngineControl->fPeriodUsecs) * 100.f);
+        fNetTimeMon->Add(float(GetMicroSeconds() - fRcvSyncUst) / float(fEngineControl->fPeriodUsecs) * 100.f);
 #endif
 
         return 0;
@@ -555,7 +557,7 @@ namespace Jack
         }
 
 #ifdef JACK_MONITOR
-        fNetTimeMon->AddLast((float(GetMicroSeconds() - fRcvSyncUst) / float(fEngineControl->fPeriodUsecs) * 100.f);
+        fNetTimeMon->AddLast(float(GetMicroSeconds() - fRcvSyncUst) / float(fEngineControl->fPeriodUsecs) * 100.f);
 #endif
 
         //sync
@@ -588,6 +590,7 @@ namespace Jack
     extern "C"
     {
 #endif
+
         SERVER_EXPORT jack_driver_desc_t* driver_get_descriptor()
         {
             jack_driver_desc_t * desc;
@@ -620,8 +623,11 @@ namespace Jack
             strcpy(value.str, "'hostname'");
             jack_driver_descriptor_add_parameter(desc, &filler, "client-name", 'n', JackDriverParamString, &value, NULL, "Name of the jack client", NULL);
 
+/*  
+Deactivated for now..
             value.ui = 0U;
             jack_driver_descriptor_add_parameter(desc, &filler, "transport-sync", 't', JackDriverParamUInt, &value, NULL, "Sync transport with master's", NULL);
+*/
 
             value.ui = 5U;
             jack_driver_descriptor_add_parameter(desc, &filler, "latency", 'l', JackDriverParamUInt, &value, NULL, "Network latency", NULL);
@@ -696,9 +702,12 @@ namespace Jack
                     case 'n' :
                         strncpy(net_name, param->value.str, JACK_CLIENT_NAME_SIZE);
                         break;
+                    /*
+                    Deactivated for now..
                     case 't' :
                         transport_sync = param->value.ui;
                         break;
+                    */
                     case 'l' :
                         network_latency = param->value.ui;
                         if (network_latency > NETWORK_MAX_LATENCY) {

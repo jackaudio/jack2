@@ -44,12 +44,6 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
         virtual ~JackInternalClientChannel()
         {}
 
-        // Open the Server/Client connection
-        virtual int Open(const char* name, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
-        {
-            return 0;
-        }
-
         void ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status, int* result, int open)
         {
             *result = fEngine->ClientCheck(name, uuid, name_res, protocol, options, status);
@@ -148,8 +142,7 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
         {
             JackSessionNotifyResult* res;
             fEngine->SessionNotify(refnum, target, type, path, NULL, &res);
-            if (res == NULL)
-            {
+            if (res == NULL) {
                 *result = NULL;
                 return;
             }
@@ -160,28 +153,27 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
 
         void SessionReply(int refnum, int* result)
         {
-            fEngine->SessionReply(refnum);
-            *result = 0;
+            *result = fEngine->SessionReply(refnum);
         }
 
         void GetUUIDForClientName(int refnum, const char* client_name, char* uuid_res, int* result)
         {
-            fEngine->GetUUIDForClientName(client_name, uuid_res, result);
+            *result = fEngine->GetUUIDForClientName(client_name, uuid_res);
         }
 
         void GetClientNameForUUID(int refnum, const char* uuid, char* name_res, int* result)
         {
-            fEngine->GetClientNameForUUID(uuid, name_res, result);
+            *result = fEngine->GetClientNameForUUID(uuid, name_res);
         }
 
         void ReserveClientName(int refnum, const char* client_name, const char *uuid, int* result)
         {
-            fEngine->ReserveClientName(client_name, uuid, result);
+            *result = fEngine->ReserveClientName(client_name, uuid);
         }
 
         void ClientHasSessionCallback(const char* client_name, int* result)
         {
-            fEngine->ClientHasSessionCallback(client_name, result);
+            *result = fEngine->ClientHasSessionCallback(client_name);
         }
 
 

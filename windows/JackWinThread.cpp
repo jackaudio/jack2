@@ -32,7 +32,7 @@ DWORD WINAPI JackWinThread::ThreadHandler(void* arg)
     JackRunnableInterface* runnable = obj->fRunnable;
 
     // Signal creation thread when started with StartSync
-    jack_log("ThreadHandler: start");
+    jack_log("JackWinThread::ThreadHandler : start");
     obj->fStatus = kIniting;
 
     // Call Init method
@@ -50,7 +50,7 @@ DWORD WINAPI JackWinThread::ThreadHandler(void* arg)
     }
 
     SetEvent(obj->fEvent);
-    jack_log("ThreadHandler: exit");
+    jack_log("JackWinThread::ThreadHandler : exit");
     return 0;
 }
 
@@ -109,14 +109,14 @@ int JackWinThread::StartImp(jack_native_thread_t* thread, int priority, int real
 
     if (realtime) {
 
-        jack_log("Create RT thread");
+        jack_log("JackWinThread::StartImp : create RT thread");
         if (!SetThreadPriority(*thread, THREAD_PRIORITY_TIME_CRITICAL)) {
             jack_error("Cannot set priority class = %d", GetLastError());
             return -1;
         }
 
     } else {
-        jack_log("Create non RT thread");
+        jack_log("JackWinThread::StartImp : create non RT thread");
     }
 
     return 0;

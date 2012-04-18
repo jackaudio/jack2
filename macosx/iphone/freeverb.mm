@@ -66,8 +66,8 @@ struct Meta : map<const char*, const char*>
 #define max(x,y) (((x)>(y)) ? (x) : (y))
 #define min(x,y) (((x)<(y)) ? (x) : (y))
 
-inline int		lsr (int x, int n)			{ return int(((unsigned int)x) >> n); }
-inline int 		int2pow2 (int x)	{ int r=0; while ((1<<r)<x) r++; return r; }
+inline int		lsr (int x, int n)	{ return int(((unsigned int)x) >> n); }
+inline int 		int2pow2 (int x)	{ int r = 0; while ((1<<r)<x) r++; return r; }
 
 
 /******************************************************************************
@@ -579,11 +579,7 @@ class mydsp : public dsp {
 	}
 };
 
-
-
-
 mydsp	DSP;
-
 
 /******************************************************************************
 *******************************************************************************

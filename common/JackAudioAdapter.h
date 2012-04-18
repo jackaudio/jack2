@@ -42,6 +42,9 @@ namespace Jack
             jack_port_t** fCapturePortList;
             jack_port_t** fPlaybackPortList;
 
+            jack_default_audio_sample_t** fInputBufferList;
+            jack_default_audio_sample_t** fOutputBufferList;
+
             jack_client_t* fClient;
             JackAudioAdapterInterface* fAudioAdapter;
             bool fAutoConnect;
@@ -49,6 +52,7 @@ namespace Jack
             void FreePorts();
             void ConnectPorts();
             void Reset();
+            int ProcessAux(jack_nframes_t frames);
 
         public:
 

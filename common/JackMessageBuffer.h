@@ -57,7 +57,7 @@ class JackMessageBuffer : public JackRunnableInterface
 
     private:
 
-        JackThreadInitCallback fInit;
+        volatile JackThreadInitCallback fInit;
         void* fInitArg;
         JackMessage fBuffers[MB_BUFFERS];
         JackThread fThread;
@@ -69,8 +69,8 @@ class JackMessageBuffer : public JackRunnableInterface
 
         void Flush();
 
-        void Start();
-        void Stop();
+        bool Start();
+        bool Stop();
 
     public:
 
@@ -80,11 +80,11 @@ class JackMessageBuffer : public JackRunnableInterface
         // JackRunnableInterface interface
         bool Execute();
 
-	    void static Create();
-	    void static Destroy();
+	    bool static Create();
+	    bool static Destroy();
 
         void AddMessage(int level, const char *message);
-        void SetInitCallback(JackThreadInitCallback callback, void *arg);
+        int SetInitCallback(JackThreadInitCallback callback, void *arg);
 
 	    static JackMessageBuffer* fInstance;
 };

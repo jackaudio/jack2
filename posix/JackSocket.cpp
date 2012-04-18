@@ -36,7 +36,7 @@ static void BuildName(const char* client_name, char* res, const char* dir, int w
     sprintf(res, "%s/jack_%s_%d_%d", dir, ext_client_name, JackTools::GetUID(), which);
 }
 
-JackClientSocket::JackClientSocket(int socket): fSocket(socket),fTimeOut(0)
+JackClientSocket::JackClientSocket(int socket): JackClientRequestInterface(), fSocket(socket),fTimeOut(0)
 {}
 
 #if defined(__sun__) || defined(sun)
@@ -120,7 +120,7 @@ int JackClientSocket::Connect(const char* dir, const char* name, int which) // A
 
     addr.sun_family = AF_UNIX;
     BuildName(name, addr.sun_path, dir, which);
-    jack_log("Connect: addr.sun_path %s", addr.sun_path);
+    jack_log("JackClientSocket::Connect : addr.sun_path %s", addr.sun_path);
 
     if (connect(fSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
         jack_error("Cannot connect to server socket err = %s", strerror(errno));
@@ -186,7 +186,8 @@ int JackClientSocket::Read(void* data, int len)
             return 0;  // For a non blocking socket, a read failure is not considered as an error
         } else if (res != 0) {
             jack_error("Cannot read socket fd = %d err = %s", fSocket, strerror(errno));
-            return 0;
+            //return 0;
+            return -1;
         } else {
             jack_error("Cannot read socket fd = %d err = %s", fSocket, strerror(errno));
             return -1;
@@ -231,7 +232,8 @@ int JackClientSocket::Write(void* data, int len)
             return 0;  // For a non blocking socket, a write failure is not considered as an error
         } else if (res != 0) {
             jack_error("Cannot write socket fd = %ld err = %s", fSocket, strerror(errno));
-            return 0;
+            //return 0;
+            return -1;
         } else {
             jack_error("Cannot write socket fd = %ld err = %s", fSocket, strerror(errno));
             return -1;
@@ -254,7 +256,7 @@ int JackServerSocket::Bind(const char* dir, const char* name, int which) // A re
     BuildName(name, fName, dir, which);
     strncpy(addr.sun_path, fName, sizeof(addr.sun_path) - 1);
 
-    jack_log("Bind: addr.sun_path %s", addr.sun_path);
+    jack_log("JackServerSocket::Bind : addr.sun_path %s", addr.sun_path);
     unlink(fName); // Security...
 
     if (bind(fSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {

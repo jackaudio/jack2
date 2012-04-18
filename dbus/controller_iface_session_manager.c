@@ -30,7 +30,7 @@
 #include "jackdbus.h"
 #include "controller_internal.h"
 #include "jack/session.h"
-#include "common/JackError.h"
+#include "jack/control.h"
 
 #define JACK_DBUS_IFACE_NAME "org.jackaudio.SessionManager"
 

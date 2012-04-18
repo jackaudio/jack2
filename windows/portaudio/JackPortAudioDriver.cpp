@@ -44,7 +44,7 @@ int JackPortAudioDriver::Render(const void* inputBuffer, void* outputBuffer,
     driver->fInputBuffer = (jack_default_audio_sample_t**)inputBuffer;
     driver->fOutputBuffer = (jack_default_audio_sample_t**)outputBuffer;
 
-    MMCSSAcquireRealTime(GetCurrentThread());
+    //MMCSSAcquireRealTime(GetCurrentThread());
 
     if (statusFlags) {
         if (statusFlags & paOutputUnderflow)
@@ -90,6 +90,8 @@ PaError JackPortAudioDriver::OpenStream(jack_nframes_t buffer_size)
 {
     PaStreamParameters inputParameters;
     PaStreamParameters outputParameters;
+
+    jack_log("JackPortAudioDriver::OpenStream buffer_size = %d", buffer_size);
 
     // Update parameters
     inputParameters.device = fInputDevice;
@@ -248,6 +250,39 @@ int JackPortAudioDriver::Close()
     return res;
 }
 
+int JackPortAudioDriver::Attach()
+{
+    if (JackAudioDriver::Attach() == 0) {
+
+        const char* alias;
+
+        if (fInputDevice != paNoDevice && fPaDevices->GetHostFromDevice(fInputDevice) == "ASIO") {
+            for (int i = 0; i < fCaptureChannels; i++) {
+                PaError err = PaAsio_GetInputChannelName(fInputDevice, i, &alias);
+                if (err == paNoError) {
+                    JackPort* port = fGraphManager->GetPort(fCapturePortList[i]);
+                    port->SetAlias(alias);
+                }
+            }
+        }
+
+        if (fOutputDevice != paNoDevice && fPaDevices->GetHostFromDevice(fOutputDevice) == "ASIO") {
+            for (int i = 0; i < fPlaybackChannels; i++) {
+                PaError err = PaAsio_GetInputChannelName(fOutputDevice, i, &alias);
+                if (err == paNoError) {
+                    JackPort* port = fGraphManager->GetPort(fPlaybackPortList[i]);
+                    port->SetAlias(alias);
+                }
+            }
+        }
+
+        return 0;
+
+    } else {
+        return -1;
+    }
+}
+
 int JackPortAudioDriver::Start()
 {
     jack_log("JackPortAudioDriver::Start");
@@ -313,10 +348,8 @@ extern "C"
         jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamUInt, &value, NULL, "Maximum number of input channels", NULL);
         jack_driver_descriptor_add_parameter(desc, &filler, "outchannels", 'o', JackDriverParamUInt, &value, NULL, "Maximum number of output channels", NULL);
 
-        strcpy(value.str, "will take default PortAudio input device");
         jack_driver_descriptor_add_parameter(desc, &filler, "capture", 'C', JackDriverParamString, &value, NULL, "Provide capture ports. Optionally set PortAudio device name", NULL);
 
-        strcpy(value.str, "will take default PortAudio output device");
         jack_driver_descriptor_add_parameter(desc, &filler, "playback", 'P', JackDriverParamString, &value, NULL, "Provide playback ports. Optionally set PortAudio device name", NULL);
 
         value.i = 0;
@@ -331,7 +364,6 @@ extern "C"
         value.ui = 512U;
         jack_driver_descriptor_add_parameter(desc, &filler, "period", 'p', JackDriverParamUInt, &value, NULL, "Frames per period", NULL);
 
-        strcpy(value.str, "will take default PortAudio device name");
         jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, NULL, "PortAudio device name", NULL);
 
         value.ui = 0;
@@ -425,7 +457,8 @@ extern "C"
 
             case 'l':
                 pa_devices->DisplayDevicesNames();
-                break;
+                // Stops the server in this case
+                return NULL;
             }
         }
 

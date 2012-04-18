@@ -37,7 +37,7 @@
 					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
-					<Add directory="Debug\bin64" />
+					<Add directory="Debug64\bin" />
                     <Add library="libjack64" />
 				</Linker>
 			</Target>

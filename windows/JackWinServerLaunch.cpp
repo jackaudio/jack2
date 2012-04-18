@@ -38,7 +38,6 @@ static char*
 find_path_to_jackdrc(char *path_to_jackdrc)
 {
     char user_jackdrc[1024];
-    char *ptr = NULL;
     char *ret = NULL;
 
 	user_jackdrc[0] = user_jackdrc[1] = 0; // Initialise
@@ -103,7 +102,6 @@ static int start_server_aux(const char* server_name)
     char   buffer    [MAX_PATH];
     char   filename  [MAX_PATH];
     char   curr_wd   [MAX_PATH];
-    char   temp_wd   [MAX_PATH];
 
 	curr_wd[0] = '\0';
 	if (find_path_to_jackdrc(filename))
@@ -121,13 +119,13 @@ static int start_server_aux(const char* server_name)
 
 		fgets(filename, MAX_PATH, fp);
 		_strlwr(filename);
-		if (p = strstr(filename, ".exe")) {
+		if ((p = strstr(filename, ".exe"))) {
 			p += 4;
 			*p = '\0';
 			pos = (size_t)(p - filename);
 			fseek(fp, 0, SEEK_SET);
 
-			if (command = (char*)malloc(pos+1))
+			if ((command = (char*)malloc(pos+1)))
 				ret = fread(command, 1, pos, fp);
 
 			if (ret && !ferror(fp)) {
@@ -286,8 +284,11 @@ static int server_connect(const char* server_name)
 	JackClientChannel channel;
 	int res = channel.ServerCheck(server_name);
 	channel.Close();
+	/*
 	JackSleep(2000); // Added by JE - 02-01-2009 (gives
 	                 // the channel some time to close)
+	                 */
+    JackSleep(500);
 	return res;
 }
 

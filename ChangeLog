@@ -36,6 +36,88 @@ John Emmas
   Jackdmp changes log
 ---------------------------
 
+2012-03-15 Stephane Letz  <letz@grame.fr>
+
+	* POST_PACKED_STRUCTURE used for jack_latency_range_t type.
+
+2012-03-09 Stephane Letz  <letz@grame.fr>
+
+	* Remove JACK_32_64 flag, so POST_PACKED_STRUCTURE now always used.
+
+2012-02-10 Stephane Letz  <letz@grame.fr>
+
+	* Improve libjacknet master mode.
+
+2012-02-09 Stephane Letz  <letz@grame.fr>
+
+	* In control API, UNIX like sigset_t replaced by more abstract jackctl_sigmask_t * opaque struct.
+
+2012-02-01 Stephane Letz  <letz@grame.fr>
+
+	* Check server API callback from notification thread.
+	* Use a time-out in notification channel write function.
+	* Fix lock management in JackEngine.
+
+2012-01-29 Stephane Letz  <letz@grame.fr>
+
+	* A bit more robust JackMessageBuffer implementation (in progress).
+
+2012-01-27 Stephane Letz  <letz@grame.fr>
+
+	* Rename JackProcessSync in JackPosixProcessSync.
+
+2012-01-26 Stephane Letz  <letz@grame.fr>
+
+	* Add EndTime function (especially for Windows).
+
+2012-01-25 Stephane Letz  <letz@grame.fr>
+
+	* Fix NetJack2 initialisation bug.
+
+2012-01-24 Stephane Letz  <letz@grame.fr>
+
+	* Improve ShutDown in NetManager.
+	* Correct ShutDown in JackInternalClient and JackLibClient.
+
+2012-01-20 Stephane Letz  <letz@grame.fr>
+
+	* Experimental system port alias use in WIndows JackRouter.
+
+2012-01-19 Stephane Letz  <letz@grame.fr>
+
+	* Implement shutdown for in server clients.
+	* Better time-out management in NetJack2.
+
+2012-01-13 Stephane Letz  <letz@grame.fr>
+
+	* More robust server/client protocol.
+
+2012-01-11 Stephane Letz  <letz@grame.fr>
+
+	* Factorize code the server/client request in JackRequestDecoder class.
+
+2012-01-06 Stephane Letz  <letz@grame.fr>
+
+	* Cleanup drivers and internals loading code.
+	* jackctl_driver_params_parse API moved in public control.h.
+	* More general drivers/internals loading model on Windows.
+
+2012-01-06 Stephane Letz  <letz@grame.fr>
+
+	* Fix for compilation on Solaris.
+
+2012-01-04 Stephane Letz  <letz@grame.fr>
+
+	* Fix library symbols export issue.
+
+2012-01-02 Stephane Letz  <letz@grame.fr>
+
+	* Adrian Knoth fix in midiseq.c.
+
+2011-12-20 Stephane Letz  <letz@grame.fr>
+
+	* Version 1.9.9 started. 
+
 2011-11-25 Stephane Letz  <letz@grame.fr>
 
 	* More robust dynamic port management in JACK/CoreMidi bridge.

@@ -47,10 +47,6 @@ extern "C"
 
 using namespace Jack;
 
-static jack_client_t * jack_client_open_aux (const char *client_name,
-            jack_options_t options,
-            jack_status_t *status, va_list ap);
-
 jack_client_t* jack_client_new_aux(const char* client_name, jack_options_t options, jack_status_t* status)
 {
     jack_varargs_t va;          /* variable arguments */
@@ -155,9 +151,8 @@ jack_client_t* jack_client_open_aux(const char* client_name, jack_options_t opti
 
 SERVER_EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options_t options, jack_status_t* status, ...)
 {
-#ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_client_open");
-#endif
+
     try {
         assert(JackGlobals::fOpenMutex);
         JackGlobals::fOpenMutex->Lock();
@@ -178,9 +173,8 @@ SERVER_EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_
 
 SERVER_EXPORT int jack_client_close(jack_client_t* ext_client)
 {
-#ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_client_close");
-#endif
+
     assert(JackGlobals::fOpenMutex);
     JackGlobals::fOpenMutex->Lock();
     int res = -1;

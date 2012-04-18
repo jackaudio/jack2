@@ -24,53 +24,15 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "driver_interface.h"
 #include "JackControlAPI.h"
 #include "JackPlatformPlug.h"
-#include "JackDriver.h"
-#include "JackSystemDeps.h"
-
-typedef jack_driver_desc_t* (*JackDriverDescFunction) ();
-typedef Jack::JackDriverClientInterface* (*driverInitialize) (Jack::JackLockedEngine*, Jack::JackSynchro*, const JSList*);
-
-class SERVER_EXPORT JackDriverInfo
-{
-
-    private:
-
-        driverInitialize fInitialize;
-        DRIVER_HANDLE fHandle;
-        Jack::JackDriverClientInterface* fBackend;
-
-    public:
-
-        JackDriverInfo():fInitialize(NULL),fHandle(NULL),fBackend(NULL)
-        {}
-        ~JackDriverInfo();
-
-        Jack::JackDriverClientInterface* Open(jack_driver_desc_t* driver_desc, Jack::JackLockedEngine*, Jack::JackSynchro*, const JSList*);
-
-        Jack::JackDriverClientInterface* GetBackend()
-        {
-            return fBackend;
-        }
-
-};
 
 jack_driver_desc_t* jack_find_driver_descriptor(JSList* drivers, const char* name);
-
 JSList* jack_drivers_load(JSList* drivers);
 JSList* jack_internals_load(JSList* internals);
+void jack_free_driver_params(JSList * param_ptr);
+void jack_print_driver_options(jack_driver_desc_t* desc, FILE* file);
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-SERVER_EXPORT int jackctl_parse_driver_params(jackctl_driver * driver_ptr, int argc, char* argv[]);
-SERVER_EXPORT void jack_free_driver_params(JSList * param_ptr);
-SERVER_EXPORT void jack_print_driver_options(jack_driver_desc_t* desc, FILE* file);
-
-#ifdef __cplusplus
-}
-#endif
+// External control.h API
+extern "C" SERVER_EXPORT int jackctl_driver_params_parse(jackctl_driver * driver, int argc, char* argv[]);
 
 #endif
 

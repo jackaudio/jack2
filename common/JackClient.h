@@ -27,6 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackSynchro.h"
 #include "JackPlatformPlug.h"
 #include "JackChannel.h"
+#include "JackRequest.h"
 #include "varargs.h"
 #include <list>
 
@@ -86,7 +87,7 @@ class SERVER_EXPORT JackClient : public JackClientInterface, public JackRunnable
         void* fThreadFunArg;
         void* fSessionArg;
         void* fLatencyArg;
-        char fServerName[64];
+        char fServerName[JACK_SERVER_CONTROL_NAME_SIZE];
 
         JackThread fThread;    /*! Thread to execute the Process function */
         detail::JackClientChannelInterface* fChannel;

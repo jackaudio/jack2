@@ -55,7 +55,7 @@ JackWinMMEPort::GetOSErrorString(LPTSTR text)
     if (! FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, error,
                         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), text,
                         MAXERRORLENGTH, NULL)) {
-        snprintf(text, MAXERRORLENGTH, "Unknown OS error code '%d'", error);
+        snprintf(text, MAXERRORLENGTH, "Unknown OS error code '%ld'", error);
     }
 }
 

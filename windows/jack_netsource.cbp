@@ -8,12 +8,13 @@
 		<Build>
 			<Target title="Win32 Release 64bits">
 				<Option output="Release64\bin\jack_netsource" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Release64\" />
+				<Option object_output="Release64\netsource" />
 				<Option type="1" />
 				<Option compiler="mingw_64" />
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
+					<Add option="-DNO_JACK_ERROR" />
 					<Add directory="..\example-clients" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -27,12 +28,13 @@
 			</Target>
 			<Target title="Win32 Debug 64bits">
 				<Option output="Debug64\bin\jack_netsource" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Debug64\" />
+				<Option object_output="Debug64\netsource" />
 				<Option type="1" />
 				<Option compiler="mingw_64" />
 				<Compiler>
 					<Add option="-Wall" />
 					<Add option="-g" />
+					<Add option="-DNO_JACK_ERROR" />
 					<Add directory="..\example-clients" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -46,13 +48,14 @@
 			</Target>
 			<Target title="Win32 Profiling 64bits">
 				<Option output="Release64\bin\jack_netsource" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Release64\" />
+				<Option object_output="Release64\netsource" />
 				<Option type="1" />
 				<Option compiler="mingw_64" />
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-DJACK_MONITOR" />
+					<Add option="-DNO_JACK_ERROR" />
 					<Add directory="..\example-clients" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -66,13 +69,14 @@
 			</Target>
 			<Target title="Win32 Release 32bits">
 				<Option output="Release\bin\jack_netsource" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Release\" />
+				<Option object_output="Release\netsource" />
 				<Option type="1" />
 				<Option compiler="mingw_64" />
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-m32" />
+					<Add option="-DNO_JACK_ERROR" />
 					<Add directory="..\example-clients" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -87,13 +91,14 @@
 			</Target>
 			<Target title="Win32 Debug 32bits">
 				<Option output="Debug\bin\jack_netsource" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Debug\" />
+				<Option object_output="Debug\netsource" />
 				<Option type="1" />
 				<Option compiler="mingw_64" />
 				<Compiler>
 					<Add option="-Wall" />
 					<Add option="-g" />
 					<Add option="-m32" />
+					<Add option="-DNO_JACK_ERROR" />
 					<Add directory="..\example-clients" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -108,7 +113,7 @@
 			</Target>
 			<Target title="Win32 Profiling 32bits">
 				<Option output="Release\bin\jack_netsource" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Release\" />
+				<Option object_output="Release\netsource" />
 				<Option type="1" />
 				<Option compiler="mingw_64" />
 				<Compiler>
@@ -116,6 +121,7 @@
 					<Add option="-Wall" />
 					<Add option="-m32" />
 					<Add option="-DJACK_MONITOR" />
+					<Add option="-DNO_JACK_ERROR" />
 					<Add directory="..\example-clients" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />

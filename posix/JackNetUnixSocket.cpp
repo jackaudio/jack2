@@ -18,6 +18,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "JackNetUnixSocket.h"
+#include "JackError.h"
+
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -331,10 +333,6 @@ namespace Jack
     int JackNetUnixSocket::SetTimeOut(int us)
     {
         jack_log("JackNetUnixSocket::SetTimeout %d usecs", us);
-
-        //negative timeout, or exceding 10s, return
-        if ((us < 0) ||(us > 10000000))
-            return SOCKET_ERROR;
         struct timeval timeout;
 
         //less than 1sec
@@ -343,10 +341,10 @@ namespace Jack
             timeout.tv_usec = us;
         } else {
         //more than 1sec
-            float sec = static_cast<float>(us) / 1000000.f;
-            timeout.tv_sec =(int) sec;
-            float usec = (sec - static_cast<float>(timeout.tv_sec)) * 1000000;
-            timeout.tv_usec =(int) usec;
+            float sec = float(us) / 1000000.f;
+            timeout.tv_sec = (int)sec;
+            float usec = (sec - float(timeout.tv_sec)) * 1000000;
+            timeout.tv_usec =(int)usec;
         }
         return SetOption(SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
     }

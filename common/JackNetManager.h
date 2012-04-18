@@ -39,14 +39,15 @@ namespace Jack
             friend class JackNetMasterManager;
 
         private:
-
+      
             static int SetProcess(jack_nframes_t nframes, void* arg);
             static int SetBufferSize(jack_nframes_t nframes, void* arg);
             static void SetTimebaseCallback(jack_transport_state_t state, jack_nframes_t nframes, jack_position_t* pos, int new_pos, void* arg);
+            static void SetConnectCallback(jack_port_id_t a, jack_port_id_t b, int connect, void* arg);
 
             //jack client
-            jack_client_t* fJackClient;
-            const char* fClientName;
+            jack_client_t* fClient;
+            const char* fName;
 
             //jack ports
             jack_port_t** fAudioCapturePorts;
@@ -74,6 +75,7 @@ namespace Jack
             int Process();
             void TimebaseCallback(jack_position_t* pos);
             void ConnectPorts();
+            void ConnectCallback(jack_port_id_t a, jack_port_id_t b, int connect);
 
         public:
 
@@ -96,14 +98,15 @@ namespace Jack
 
         private:
 
+            static void SetShutDown(void* arg);
             static int SetSyncCallback(jack_transport_state_t state, jack_position_t* pos, void* arg);
             static void* NetManagerThread(void* arg);
 
-            jack_client_t* fManagerClient;
-            const char* fManagerName;
+            jack_client_t* fClient;
+            const char* fName;
             char fMulticastIP[32];
             JackNetSocket fSocket;
-            jack_native_thread_t fManagerThread;
+            jack_native_thread_t fThread;
             master_list_t fMasterList;
             uint32_t fGlobalID;
             bool fRunning;
@@ -115,6 +118,7 @@ namespace Jack
             int KillMaster(session_params_t* params);
             int SyncCallback(jack_transport_state_t state, jack_position_t* pos);
             int CountIO(int flags);
+            void ShutDown();
 
         public:
 

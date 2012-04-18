@@ -344,7 +344,7 @@ void JackGraphManager::RecalculateLatency(jack_port_id_t port_index, jack_latenc
         next_index = GetCurrentIndex();
     } while (cur_index != next_index); // Until a coherent state has been read
 
-    jack_log("JackGraphManager::RecalculateLatency port_index = %ld", port_index);
+    //jack_log("JackGraphManager::RecalculateLatency port_index = %ld", port_index);
 }
 
 // Server

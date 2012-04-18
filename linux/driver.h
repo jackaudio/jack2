@@ -231,8 +231,6 @@ typedef struct _jack_driver
 }
 jack_driver_t;
 
-typedef jack_driver_desc_t * (*JackDriverDescFunction) ();
-
 void jack_driver_init (jack_driver_t *);
 void jack_driver_release (jack_driver_t *);
 
