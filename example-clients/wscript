@@ -149,7 +149,7 @@ def build(bld):
 
     for example_lib, example_lib_source in list(example_libs.items()):
         lib = bld(features = 'c cshlib')
-        lib.env['shlib_PATTERN'] = '%s.so'
+        lib.env['cshlib_PATTERN'] = '%s.so'
         lib.includes = os_incdir + ['../common/jack', '../common']
         lib.target = example_lib
         lib.source = example_lib_source
