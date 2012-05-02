@@ -87,6 +87,7 @@ def build(bld):
             prog.env.append_value("LINKFLAGS", "")
         if bld.env['IS_LINUX']:
             prog.use += ['RT']
+            prog.env.append_value("LINKFLAGS", "-lm")
         if bld.env['IS_SUN']:
             prog.env.append_value("LINKFLAGS", "-lm")
 
