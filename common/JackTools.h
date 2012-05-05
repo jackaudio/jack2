@@ -123,7 +123,7 @@ namespace Jack
 		    for ( uint32_t cnt = 0; cnt < fMeasureCnt; cnt++ )
 		    {
 			    fMeasureTable[cnt] = new T[fMeasurePoints];
-			    fill_n ( fMeasureTable[cnt], fMeasurePoints, 0 );
+			    std::fill_n ( fMeasureTable[cnt], fMeasurePoints, 0 );
 		    }
 	    }
 
