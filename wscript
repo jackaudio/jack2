@@ -79,10 +79,15 @@ def options(opt):
     opt.sub_options('dbus')
 
 def configure(conf):
+    conf.load('compiler_cxx')
+    conf.load('compiler_cc')
     platform = sys.platform
     conf.env['IS_MACOSX'] = platform == 'darwin'
     conf.env['IS_LINUX'] = platform == 'linux' or platform == 'linux2' or platform == 'posix'
     conf.env['IS_SUN'] = platform == 'sunos'
+    # GNU/kFreeBSD and GNU/Hurd are treated as Linux
+    if platform.startswith('gnu0') or platform.startswith('gnukfreebsd'):
+        conf.env['IS_LINUX'] = True
 
     if conf.env['IS_LINUX']:
         Logs.pprint('CYAN', "Linux detected")
@@ -186,12 +191,12 @@ def configure(conf):
         conf.env['BUILD_JACKD'] = True
 
     if Options.options.libdir:
-        conf.env['LIBDIR'] = conf.env['PREFIX'] + Options.options.libdir
+        conf.env['LIBDIR'] = Options.options.libdir
     else:
         conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib'
 
     if Options.options.mandir:
-        conf.env['MANDIR'] = conf.env['PREFIX'] + Options.options.mandir
+        conf.env['MANDIR'] = Options.options.mandir
     else:
         conf.env['MANDIR'] = conf.env['PREFIX'] + '/share/man/man1'
 
@@ -234,7 +239,7 @@ def configure(conf):
         conf.env.append_unique('CCFLAGS', '-m32')
         conf.env.append_unique('LINKFLAGS', '-m32')
         if Options.options.libdir32:
-            conf.env['LIBDIR'] = conf.env['PREFIX'] + Options.options.libdir32
+            conf.env['LIBDIR'] = Options.options.libdir32
         else:
             conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib32'
         conf.write_config_header('config.h')

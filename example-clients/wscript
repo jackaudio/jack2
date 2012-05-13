@@ -87,6 +87,7 @@ def build(bld):
             prog.env.append_value("LINKFLAGS", "")
         if bld.env['IS_LINUX']:
             prog.use += ['RT']
+            prog.env.append_value("LINKFLAGS", "-lm")
         if bld.env['IS_SUN']:
             prog.env.append_value("LINKFLAGS", "-lm")
 
@@ -149,7 +150,7 @@ def build(bld):
 
     for example_lib, example_lib_source in list(example_libs.items()):
         lib = bld(features = 'c cshlib')
-        lib.env['shlib_PATTERN'] = '%s.so'
+        lib.env['cshlib_PATTERN'] = '%s.so'
         lib.includes = os_incdir + ['../common/jack', '../common']
         lib.target = example_lib
         lib.source = example_lib_source
