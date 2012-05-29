@@ -177,7 +177,9 @@ int setup_sigsegv() {
 
     memset(&action, 0, sizeof(action));
     action.sa_sigaction = signal_segv;
+#ifdef SA_SIGINFO
     action.sa_flags = SA_SIGINFO;
+#endif
     if(sigaction(SIGSEGV, &action, NULL) < 0) {
         jack_error("sigaction failed. errno is %d (%s)", errno, strerror(errno));
         return 0;
