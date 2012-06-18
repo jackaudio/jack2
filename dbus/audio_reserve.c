@@ -26,7 +26,7 @@
 
 #include "reserve.h"
 #include "audio_reserve.h"
-#include "JackError.h"
+#include "jack/control.h"
 
 #define DEVICE_MAX 2
 

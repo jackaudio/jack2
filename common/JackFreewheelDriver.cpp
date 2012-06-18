@@ -37,7 +37,8 @@ int JackFreewheelDriver::Process()
 
    if (fEngine->Process(fBeginDateUst, fEndDateUst)) {
 
-        if (ResumeRefNum()) {      // Signal all clients
+        // Resume connected clients in the graph
+        if (ResumeRefNum()) {
             jack_error("JackFreewheelDriver::Process: ResumeRefNum error");
             res = -1;
         }
@@ -61,6 +62,7 @@ int JackFreewheelDriver::Process()
 
 int JackFreewheelDriver::ProcessReadSync()
 {
+    // Resume connected clients in the graph
     if (ResumeRefNum() < 0) {      // Signal all clients
         jack_error("JackFreewheelDriver::ProcessReadSync: ResumeRefNum error");
         return -1;
@@ -80,6 +82,7 @@ int JackFreewheelDriver::ProcessWriteSync()
 
 int JackFreewheelDriver::ProcessReadAsync()
 {
+    // Resume connected clients in the graph
     if (ResumeRefNum() < 0) {      // Signal all clients
         jack_error("JackFreewheelDriver::ProcessReadAsync: ResumeRefNum error");
         return -1;

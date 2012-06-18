@@ -18,6 +18,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackNetInterface.h"
 #include "JackException.h"
+#include "JackError.h"
+
 #include <assert.h>
 
 using namespace std;
@@ -52,6 +54,7 @@ namespace Jack
 
     void JackNetInterface::Initialize()
     {
+        fSetTimeOut = false;
         fTxBuffer = NULL;
         fRxBuffer = NULL;
         fNetAudioCaptureBuffer = NULL;
@@ -196,6 +199,7 @@ namespace Jack
         fRxHeader.fCycle = rx_head->fCycle;
         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
         buffer->RenderFromNetwork(rx_head->fSubCycle, rx_bytes - HEADER_SIZE);
+        
         // Last midi packet is received, so finish rendering...
         if (++recvd_midi_pckt == rx_head->fNumPacket) {
             buffer->RenderToJackPorts();
@@ -211,6 +215,7 @@ namespace Jack
         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
         fRxHeader.fActivePorts = rx_head->fActivePorts;
         rx_bytes = buffer->RenderFromNetwork(rx_head->fCycle, rx_head->fSubCycle, fRxHeader.fActivePorts);
+        
         // Last audio packet is received, so finish rendering...
         if (fRxHeader.fIsLastPckt) {
             buffer->RenderToJackPorts();
@@ -220,7 +225,6 @@ namespace Jack
 
     int JackNetInterface::FinishRecv(NetAudioBuffer* buffer)
     {
-        // TODO : finish midi and audio rendering ?
         buffer->RenderToJackPorts();
         return NET_PACKET_ERROR;
     }
@@ -242,12 +246,23 @@ namespace Jack
         }
         return NULL;
     }
+    
+    void JackNetInterface::SetRcvTimeOut()
+    {
+        if (!fSetTimeOut) {
+            if (fSocket.SetTimeOut(PACKET_TIMEOUT) == SOCKET_ERROR) {
+                jack_error("Can't set rx timeout : %s", StrError(NET_ERROR_CODE));
+                return;
+            }
+            fSetTimeOut = true;
+        }
+    }
 
     // JackNetMasterInterface ************************************************************************************
 
     bool JackNetMasterInterface::Init()
     {
-        jack_log("JackNetMasterInterface::Init, ID %u", fParams.fID);
+        jack_log("JackNetMasterInterface::Init : ID %u", fParams.fID);
 
         session_params_t host_params;
         uint attempt = 0;
@@ -260,8 +275,9 @@ namespace Jack
         }
 
         // timeout on receive (for init)
-        if (fSocket.SetTimeOut(MASTER_INIT_TIMEOUT) < 0)
-            jack_error("Can't set timeout : %s", StrError(NET_ERROR_CODE));
+        if (fSocket.SetTimeOut(MASTER_INIT_TIMEOUT) < 0) {
+            jack_error("Can't set init timeout : %s", StrError(NET_ERROR_CODE));
+        }
 
         // connect
         if (fSocket.Connect() == SOCKET_ERROR) {
@@ -291,19 +307,13 @@ namespace Jack
             SessionParamsNToH(&net_params, &host_params);
         }
         while ((GetPacketType(&host_params) != START_MASTER) && (++attempt < SLAVE_SETUP_RETRY));
+        
         if (attempt == SLAVE_SETUP_RETRY) {
             jack_error("Slave doesn't respond, exiting");
             return false;
         }
 
         return true;
-    }
-
-    int JackNetMasterInterface::SetRxTimeout()
-    {
-        jack_log("JackNetMasterInterface::SetRxTimeout");
-        float time = 3 * 1000000.f * (static_cast<float>(fParams.fPeriodSize) / static_cast<float>(fParams.fSampleRate));
-        return fSocket.SetTimeOut(static_cast<int>(time));
     }
 
     bool JackNetMasterInterface::SetParams()
@@ -345,14 +355,6 @@ namespace Jack
             jack_error("NetAudioBuffer allocation error...");
             return false;
         }
-
-        // set the new timeout for the socket
-        /*
-        if (SetRxTimeout() == SOCKET_ERROR) {
-            jack_error("Can't set rx timeout : %s", StrError(NET_ERROR_CODE));
-            goto error;
-        }
-        */
 
         // set the new rx buffer size
         if (SetNetBufferSize() == SOCKET_ERROR) {
@@ -418,19 +420,6 @@ namespace Jack
         int rx_bytes;
 
         if (((rx_bytes = fSocket.Recv(fRxBuffer, size, flags)) == SOCKET_ERROR) && fRunning) {
-
-            /*
-            net_error_t error = fSocket.GetError();
-            // no data isn't really a network error, so just return 0 available read bytes
-            if (error == NET_NO_DATA) {
-                return 0;
-            } else if (error == NET_CONN_ERROR) {
-                FatalRecvError();
-            } else {
-                jack_error("Error in master receive : %s", StrError(NET_ERROR_CODE));
-            }
-            */
-
             FatalRecvError();
         }
 
@@ -446,14 +435,6 @@ namespace Jack
         PacketHeaderHToN(header, header);
 
         if (((tx_bytes = fSocket.Send(fTxBuffer, size, flags)) == SOCKET_ERROR) && fRunning) {
-            /*
-            net_error_t error = fSocket.GetError();
-            if (error == NET_CONN_ERROR) {
-                FatalSendError();
-            } else {
-                jack_error("Error in master send : %s", StrError(NET_ERROR_CODE));
-            }
-            */
             FatalSendError();
         }
         return tx_bytes;
@@ -466,6 +447,8 @@ namespace Jack
 
     int JackNetMasterInterface::SyncSend()
     {
+        SetRcvTimeOut();
+        
         fTxHeader.fCycle++;
         fTxHeader.fSubCycle = 0;
         fTxHeader.fDataType = 's';
@@ -489,17 +472,6 @@ namespace Jack
     {
         int rx_bytes = 0;
         packet_header_t* rx_head = reinterpret_cast<packet_header_t*>(fRxBuffer);
-
-        /*
-        int rx_bytes = Recv(fParams.fMtu, MSG_PEEK);
-
-        if ((rx_bytes == 0) || (rx_bytes == SOCKET_ERROR)) {
-            // 0 bytes considered an error (lost connection)
-            return SOCKET_ERROR;
-        }
-
-        fCurrentCycleOffset = fTxHeader.fCycle - rx_head->fCycle;
-        */
 
         // receive sync (launch the cycle)
         do {
@@ -532,7 +504,7 @@ namespace Jack
         while (!fRxHeader.fIsLastPckt) {
             // how much data is queued on the rx buffer ?
             rx_bytes = Recv(fParams.fMtu, MSG_PEEK);
-
+         
             // error here, problem with recv, just skip the cycle (return -1)
             if (rx_bytes == SOCKET_ERROR) {
                 return rx_bytes;
@@ -556,7 +528,7 @@ namespace Jack
                 }
             }
         }
-
+   
         return rx_bytes;
     }
 
@@ -607,6 +579,17 @@ namespace Jack
 // JackNetSlaveInterface ************************************************************************************************
 
     uint JackNetSlaveInterface::fSlaveCounter = 0;
+
+    void JackNetSlaveInterface::InitAPI()
+    {
+        // open Socket API with the first slave
+        if (fSlaveCounter++ == 0) {
+            if (SocketAPIInit() < 0) {
+                jack_error("Can't init Socket API, exiting...");
+                throw std::bad_alloc();
+            }
+        }
+    }
 
     bool JackNetSlaveInterface::Init()
     {
@@ -674,8 +657,9 @@ namespace Jack
             // then tell the master we are ready
             jack_info("Initializing connection with %s...", fParams.fMasterNetName);
             status = SendStartToMaster();
-            if (status == NET_ERROR)
+            if (status == NET_ERROR) {
                 return false;
+            }
         }
         while (status != NET_ROLLING);
 
@@ -705,13 +689,15 @@ namespace Jack
             }
         }
 
-        // timeout on receive
-        if (fSocket.SetTimeOut(SLAVE_INIT_TIMEOUT) == SOCKET_ERROR)
-            jack_error("Can't set timeout : %s", StrError(NET_ERROR_CODE));
+        // timeout on receive (for init)
+        if (fSocket.SetTimeOut(SLAVE_INIT_TIMEOUT) == SOCKET_ERROR) {
+            jack_error("Can't set init timeout : %s", StrError(NET_ERROR_CODE));
+        }
 
         // disable local loop
-        if (fSocket.SetLocalLoop() == SOCKET_ERROR)
+        if (fSocket.SetLocalLoop() == SOCKET_ERROR) {
             jack_error("Can't disable multicast loop : %s", StrError(NET_ERROR_CODE));
+        }
 
         // send 'AVAILABLE' until 'SLAVE_SETUP' received
         jack_info("Waiting for a master...");
@@ -720,8 +706,9 @@ namespace Jack
             session_params_t net_params;
             memset(&net_params, 0, sizeof(session_params_t));
             SessionParamsHToN(&fParams, &net_params);
-            if (fSocket.SendTo(&net_params, sizeof(session_params_t), 0, fMulticastIP) == SOCKET_ERROR)
+            if (fSocket.SendTo(&net_params, sizeof(session_params_t), 0, fMulticastIP) == SOCKET_ERROR) {
                 jack_error("Error in data send : %s", StrError(NET_ERROR_CODE));
+            }
 
             // filter incoming packets : don't exit while no error is detected
             memset(&net_params, 0, sizeof(session_params_t));
@@ -833,20 +820,9 @@ namespace Jack
     int JackNetSlaveInterface::Recv(size_t size, int flags)
     {
         int rx_bytes = fSocket.Recv(fRxBuffer, size, flags);
+        
         // handle errors
         if (rx_bytes == SOCKET_ERROR) {
-            /*
-            net_error_t error = fSocket.GetError();
-            // no data isn't really an error in realtime processing, so just return 0
-            if (error == NET_NO_DATA) {
-                jack_error("No data, is the master still running ?");
-            // if a network error occurs, this exception will restart the driver
-            } else if (error == NET_CONN_ERROR) {
-                FatalRecvError();
-            } else {
-                jack_error("Fatal error in slave receive : %s", StrError(NET_ERROR_CODE));
-            }
-            */
             FatalRecvError();
         }
 
@@ -863,17 +839,9 @@ namespace Jack
 
         // handle errors
         if (tx_bytes == SOCKET_ERROR) {
-            /*
-            net_error_t error = fSocket.GetError();
-            // if a network error occurs, this exception will restart the driver
-            if (error == NET_CONN_ERROR) {
-                FatalSendError();
-            } else {
-                jack_error("Fatal error in slave send : %s", StrError(NET_ERROR_CODE));
-            }
-            */
             FatalSendError();
         }
+        
         return tx_bytes;
     }
 
@@ -881,7 +849,7 @@ namespace Jack
     {
         int rx_bytes = 0;
         packet_header_t* rx_head = reinterpret_cast<packet_header_t*>(fRxBuffer);
-
+     
         // receive sync (launch the cycle)
         do {
             rx_bytes = Recv(fParams.fMtu, 0);
@@ -893,6 +861,8 @@ namespace Jack
         while ((strcmp(rx_head->fPacketType, "header") != 0) && (rx_head->fDataType != 's'));
 
         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
+        
+        SetRcvTimeOut();
         return rx_bytes;
     }
 

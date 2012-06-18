@@ -859,7 +859,7 @@ SERVER_EXPORT jack_driver_desc_t* driver_get_descriptor()
     return desc;
 }
 
-EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)
+SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)
 {
     int bits = OSS_DRIVER_DEF_BITS;
     jack_nframes_t srate = OSS_DRIVER_DEF_FS;

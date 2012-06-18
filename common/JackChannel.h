@@ -35,6 +35,54 @@ class JackGraphManager;
 namespace detail
 {
 
+class JackChannelTransactionInterface
+{
+
+    public:
+
+        JackChannelTransactionInterface()
+        {}
+        virtual ~JackChannelTransactionInterface()
+        {}
+
+        virtual int Read(void* data, int len) = 0;
+        virtual int Write(void* data, int len) = 0;
+
+};
+
+class JackRequestInterface
+{
+
+    public:
+
+        JackRequestInterface()
+        {}
+        virtual ~JackRequestInterface()
+        {}
+
+        virtual int Connect(const char* dir, const char* name, int which) = 0;
+        virtual int Close() = 0;
+
+};
+
+class JackClientRequestInterface : public JackChannelTransactionInterface, public JackRequestInterface
+{
+
+    public:
+
+        JackClientRequestInterface()
+        {}
+        virtual ~JackClientRequestInterface()
+        {}
+        
+        virtual int Read(void* data, int len) { return -1; }
+        virtual int Write(void* data, int len) { return -1; }
+        
+        virtual int Connect(const char* dir, const char* name, int which) { return -1; }
+        virtual int Close() { return -1; }
+
+};
+
 /*!
 \brief Inter process channel for server/client bidirectionnal communication : request and (receiving) notifications.
 */

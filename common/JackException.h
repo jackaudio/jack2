@@ -20,10 +20,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackException__
 #define __JackException__
 
+#include "JackCompilerDeps.h"
+
 #include <stdexcept>
 #include <iostream>
 #include <string>
-#include "JackError.h"
 
 namespace Jack
 {
@@ -55,14 +56,9 @@ class SERVER_EXPORT JackException : public std::runtime_error {
             return what();
         }
 
-        void PrintMessage()
-        {
-            std::string str = what();
-            if (str != "") {
-                jack_info(str.c_str());
-            }
-        }
-};
+        void PrintMessage();
+
+ };
 
 /*!
  \brief Exception thrown by JackEngine in temporary mode.

@@ -47,7 +47,7 @@ $Id: net_driver.c,v 1.17 2006/04/16 20:16:10 torbenh Exp $
 #include <netinet/in.h>
 #endif
 
-#ifdef __linux__
+#if defined(HAVE_CONFIG_H)
 #include "config.h"
 #endif
 

@@ -46,25 +46,20 @@ int JackAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
     // Update engine and graph manager state
     fEngineControl->fBufferSize = buffer_size;
     fGraphManager->SetBufferSize(buffer_size);
-    fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize);	// in microsec
-    if (!fEngineControl->fTimeOut) {
-        fEngineControl->fTimeOutUsecs = jack_time_t(2.f * fEngineControl->fPeriodUsecs);
-    }
-
+    
+    fEngineControl->UpdateTimeOut();
     UpdateLatencies();
 
-    // Redirect on slaves drivers...
+    // Redirected on slaves drivers...
     return JackDriver::SetBufferSize(buffer_size);
 }
 
 int JackAudioDriver::SetSampleRate(jack_nframes_t sample_rate)
 {
     fEngineControl->fSampleRate = sample_rate;
-    fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize);	// in microsec
-    if (!fEngineControl->fTimeOut) {
-        fEngineControl->fTimeOutUsecs = jack_time_t(2.f * fEngineControl->fPeriodUsecs);
-    }
+    fEngineControl->UpdateTimeOut();
 
+    // Redirected on slaves drivers...
     return JackDriver::SetSampleRate(sample_rate);
 }
 

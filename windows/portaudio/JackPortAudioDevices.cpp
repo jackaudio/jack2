@@ -46,8 +46,7 @@ PortAudioDevices::PortAudioDevices()
 
 PortAudioDevices::~PortAudioDevices()
 {
-    // Desactivate for now: crash the server..
-    //Pa_Terminate();
+    Pa_Terminate();
 
     delete[] fDeviceInfo;
     delete[] fHostName;
@@ -106,10 +105,12 @@ PaDeviceInfo* PortAudioDevices::GetDeviceFromFullName (string fullname, PaDevice
         return NULL;
     }
     //first get host and device names from fullname
-    string::size_type separator = fullname.find ("::", 0);
-    if (separator == 0) {
+    string::size_type separator = fullname.find("::", 0);
+
+    if (separator == string::npos) {
         return NULL;
     }
+
     char* hostname = (char*)malloc(separator + 9);
     fill_n (hostname, separator + 9, 0);
     fullname.copy (hostname, separator);
@@ -168,7 +169,7 @@ void PortAudioDevices::PrintSupportedStandardSampleRates(const PaStreamParameter
 
 int PortAudioDevices::GetInputDeviceFromName(const char* devicename, PaDeviceIndex& id, int& max_input)
 {
-    string fullname = string (devicename);
+    string fullname = string(devicename);
     PaDeviceInfo* device = GetDeviceFromFullName (fullname, id, true);
     if (device) {
         max_input = device->maxInputChannels;
@@ -187,7 +188,7 @@ int PortAudioDevices::GetInputDeviceFromName(const char* devicename, PaDeviceInd
 
 int PortAudioDevices::GetOutputDeviceFromName(const char* devicename, PaDeviceIndex& id, int& max_output)
 {
-    string fullname = string (devicename);
+    string fullname = string(devicename);
     PaDeviceInfo* device = GetDeviceFromFullName (fullname, id, false);
     if (device) {
         max_output = device->maxOutputChannels;
@@ -228,7 +229,7 @@ void PortAudioDevices::DisplayDevicesNames()
         }
 
         /* print device info fields */
-        jack_info ("Name                        = %s", GetFullName (id).c_str());
+        jack_info ("Name                        = %s", GetFullName(id).c_str());
         jack_info ("Max inputs                  = %d", fDeviceInfo[id]->maxInputChannels);
         jack_info ("Max outputs                 = %d", fDeviceInfo[id]->maxOutputChannels);
 
@@ -237,7 +238,7 @@ void PortAudioDevices::DisplayDevicesNames()
         if (Pa_GetHostApiInfo(fDeviceInfo[id]->hostApi)->type == paASIO) {
             long minLatency, maxLatency, preferredLatency, granularity;
 
-            PaAsio_GetAvailableLatencyValues (id, &minLatency, &maxLatency, &preferredLatency, &granularity);
+            PaAsio_GetAvailableBufferSizes (id, &minLatency, &maxLatency, &preferredLatency, &granularity);
 
             jack_info ("ASIO minimum buffer size    = %ld", minLatency);
             jack_info ("ASIO maximum buffer size    = %ld", maxLatency);
@@ -269,7 +270,7 @@ void PortAudioDevices::DisplayDevicesNames()
     jack_info("**************************** End of list ****************************");
 }
 
-bool PortAudioDevices::IsDuplex (PaDeviceIndex id)
+bool PortAudioDevices::IsDuplex(PaDeviceIndex id)
 {
     //does the device has in and out facilities
     if (fDeviceInfo[id]->maxInputChannels && fDeviceInfo[id]->maxOutputChannels) {
@@ -277,7 +278,7 @@ bool PortAudioDevices::IsDuplex (PaDeviceIndex id)
     }
     //else is another complementary device ? (search in devices with the same name)
     for (PaDeviceIndex i = 0; i < fNumDevice; i++) {
-        if ((i != id) && (GetDeviceName (i) == GetDeviceName (id))) {
+        if ((i != id) && (GetDeviceName(i) == GetDeviceName(id))) {
             if ((fDeviceInfo[i]->maxInputChannels && fDeviceInfo[id]->maxOutputChannels)
                     || (fDeviceInfo[i]->maxOutputChannels && fDeviceInfo[id]->maxInputChannels)) {
                 return true;

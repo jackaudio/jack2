@@ -26,6 +26,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackLibSampleRateResampler.h"
 #endif
 #include "JackTime.h"
+#include "JackError.h"
 #include <stdio.h>
 
 namespace Jack
@@ -316,5 +317,76 @@ namespace Jack
 
         return res;
     }
+
+    int JackAudioAdapterInterface::SetHostBufferSize(jack_nframes_t buffer_size)
+    {
+        fHostBufferSize = buffer_size;
+        if (fAdaptative) {
+            AdaptRingBufferSize();
+        }
+        return 0;
+    }
+
+    int JackAudioAdapterInterface::SetAdaptedBufferSize(jack_nframes_t buffer_size)
+    {
+        fAdaptedBufferSize = buffer_size;
+        if (fAdaptative) {
+            AdaptRingBufferSize();
+        }
+        return 0;
+    }
+
+    int JackAudioAdapterInterface::SetBufferSize(jack_nframes_t buffer_size)
+    {
+        SetHostBufferSize(buffer_size);
+        SetAdaptedBufferSize(buffer_size);
+        return 0;
+    }
+
+    int JackAudioAdapterInterface::SetHostSampleRate(jack_nframes_t sample_rate)
+    {
+        fHostSampleRate = sample_rate;
+        fPIControler.Init(double(fHostSampleRate) / double(fAdaptedSampleRate));
+        return 0;
+    }
+
+    int JackAudioAdapterInterface::SetAdaptedSampleRate(jack_nframes_t sample_rate)
+    {
+        fAdaptedSampleRate = sample_rate;
+        fPIControler.Init(double(fHostSampleRate) / double(fAdaptedSampleRate));
+        return 0;
+    }
+
+    int JackAudioAdapterInterface::SetSampleRate(jack_nframes_t sample_rate)
+    {
+        SetHostSampleRate(sample_rate);
+        SetAdaptedSampleRate(sample_rate);
+        return 0;
+    }
+
+    void JackAudioAdapterInterface::SetInputs(int inputs)
+    {
+        jack_log("JackAudioAdapterInterface::SetInputs %d", inputs);
+        fCaptureChannels = inputs;
+    }
+
+    void JackAudioAdapterInterface::SetOutputs(int outputs)
+    {
+        jack_log("JackAudioAdapterInterface::SetOutputs %d", outputs);
+        fPlaybackChannels = outputs;
+    }
+
+    int JackAudioAdapterInterface::GetInputs()
+    {
+        //jack_log("JackAudioAdapterInterface::GetInputs %d", fCaptureChannels);
+        return fCaptureChannels;
+    }
+
+    int JackAudioAdapterInterface::GetOutputs()
+    {
+        //jack_log ("JackAudioAdapterInterface::GetOutputs %d", fPlaybackChannels);
+        return fPlaybackChannels;
+    }
+
 
 } // namespace

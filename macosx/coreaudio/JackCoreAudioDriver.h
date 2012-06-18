@@ -50,10 +50,14 @@ typedef	UInt8	CAAudioHardwareDeviceSectionID;
 \todo hardware monitoring
 */
 
+class JackAC3Encoder;
+
 class JackCoreAudioDriver : public JackAudioDriver
 {
 
     private:
+    
+        JackAC3Encoder* fAC3Encoder;
 
         AudioUnit fAUHAL;
 
@@ -75,8 +79,8 @@ class JackCoreAudioDriver : public JackAudioDriver
         float fIOUsage;
         float fComputationGrain;
         bool fClockDriftCompensate;
+        bool fDigitalPlayback;
    
-    
         static OSStatus Render(void *inRefCon,
                                AudioUnitRenderActionFlags *ioActionFlags,
                                const AudioTimeStamp *inTimeStamp,
@@ -122,7 +126,8 @@ class JackCoreAudioDriver : public JackAudioDriver
                          const char* playback_driver_uid,
                          char* capture_driver_name,
                          char* playback_driver_name,
-                         jack_nframes_t samplerate);
+                         jack_nframes_t samplerate,
+                         bool ac3_encoding);
 
         int SetupChannels(bool capturing,
                           bool playing,
@@ -158,6 +163,8 @@ class JackCoreAudioDriver : public JackAudioDriver
         bool TakeHog();
 
         void UpdateLatencies();
+        
+        bool IsDigitalDevice(AudioDeviceID device);
 
     public:
 
@@ -180,7 +187,10 @@ class JackCoreAudioDriver : public JackAudioDriver
                  int async_output_latency,
                  int computation_grain,
                  bool hogged,
-                 bool clock_drift);
+                 bool clock_drift,
+                 bool ac3_encoding,
+                 int ac3_bitrate, 
+                 bool ac3_lfe);
         int Close();
 
         int Attach();

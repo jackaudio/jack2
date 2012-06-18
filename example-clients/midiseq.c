@@ -102,7 +102,7 @@ int main(int narg, char **args)
 	loop_index = 0;
 	num_notes = (narg - 3)/3;
 	note_frqs = malloc(num_notes*sizeof(unsigned char));
-	note_starts = malloc(num_notes*sizeof(unsigned char));
+	note_starts = malloc(num_notes*sizeof(jack_nframes_t));
 	note_lengths = malloc(num_notes*sizeof(jack_nframes_t));
 	loop_nsamp = atoi(args[2]);
 	for(i=0; i<num_notes; i++)

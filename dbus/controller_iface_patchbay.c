@@ -782,7 +782,7 @@ jack_controller_patchbay_disconnect(
     ret = jack_disconnect(controller_ptr->client, port1_name, port2_name);
     if (ret != 0)
     {
-        jack_dbus_error(dbus_call_ptr, JACK_DBUS_ERROR_GENERIC, "jack_connect() failed with %d", ret);
+        jack_dbus_error(dbus_call_ptr, JACK_DBUS_ERROR_GENERIC, "jack_disconnect() failed with %d", ret);
         return false;
     }
 

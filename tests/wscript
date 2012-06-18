@@ -14,9 +14,8 @@ test_programs = {
     }
 
 def build(bld):
-    for test_program, test_program_sources in test_programs.items():
-        prog = bld.new_task_gen('cxx', 'program')
-        prog.features.append('cc')
+    for test_program, test_program_sources in list(test_programs.items()):
+        prog = bld(features = 'cxx cxxprogram')
         if bld.env['IS_MACOSX']:
 	        prog.includes = ['..','../macosx', '../posix', '../common/jack', '../common']
         if bld.env['IS_LINUX']:
@@ -29,6 +28,5 @@ def build(bld):
         if bld.env['IS_MACOSX']:
             prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
             #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc -arch x86_64")
-	    prog.env.append_value("LINKFLAGS", "")
-        prog.uselib_local = 'clientlib'
+        prog.use = 'clientlib'
         prog.target = test_program

@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -23,23 +23,26 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <unistd.h>
 #include <time.h>
 
-SERVER_EXPORT void JackSleep(long usec) 
+SERVER_EXPORT void JackSleep(long usec)
 {
     usleep(usec);
 }
 
 SERVER_EXPORT void InitTime()
 {}
-	
-SERVER_EXPORT jack_time_t GetMicroSeconds(void) 
+
+SERVER_EXPORT void EndTime()
+{}
+
+SERVER_EXPORT jack_time_t GetMicroSeconds(void)
 {
     return (jack_time_t)(gethrtime() / 1000);
 }
 
-SERVER_EXPORT void SetClockSource(jack_timer_type_t source)
+void SetClockSource(jack_timer_type_t source)
 {}
 
-SERVER_EXPORT const char* ClockSourceName(jack_timer_type_t source)
+const char* ClockSourceName(jack_timer_type_t source)
 {
     return "";
 }

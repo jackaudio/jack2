@@ -30,10 +30,12 @@ extern "C"
 #endif
 
     SERVER_EXPORT void InitTime();
+    SERVER_EXPORT void EndTime();
     SERVER_EXPORT jack_time_t GetMicroSeconds(void);
     SERVER_EXPORT void JackSleep(long usec);
-    SERVER_EXPORT void SetClockSource(jack_timer_type_t source);
-    SERVER_EXPORT const char* ClockSourceName(jack_timer_type_t source);
+
+    void SetClockSource(jack_timer_type_t source);
+    const char* ClockSourceName(jack_timer_type_t source);
 
 #ifdef __cplusplus
 }

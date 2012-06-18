@@ -22,7 +22,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "ringbuffer.h"
 #include "types.h"
-#include "JackError.h"
 
 namespace Jack
 {

@@ -40,7 +40,8 @@ class JackLockAble
 
         JackMutex fMutex;
 
-        JackLockAble()
+        JackLockAble(const char* name = NULL)
+            :fMutex(name)
         {}
         ~JackLockAble()
         {}

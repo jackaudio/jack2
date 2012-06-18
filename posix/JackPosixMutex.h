@@ -22,8 +22,9 @@
 #ifndef __JackPosixMutex__
 #define __JackPosixMutex__
 
-#include "JackError.h"
 #include "JackException.h"
+#include "JackCompilerDeps.h"
+
 #include <pthread.h>
 #include <stdio.h>
 #include <assert.h>
@@ -34,7 +35,7 @@ namespace Jack
 \brief Mutex abstraction.
 */
 
-class JackBasePosixMutex
+class SERVER_EXPORT JackBasePosixMutex
 {
 
     protected:
@@ -44,74 +45,16 @@ class JackBasePosixMutex
 
     public:
 
-        JackBasePosixMutex():fOwner(0)
-        {
-            int res = pthread_mutex_init(&fMutex, NULL);
-            ThrowIf(res != 0, JackException("JackBasePosixMutex: could not init the mutex"));
-        }
+        JackBasePosixMutex(const char* name = NULL);
+        virtual ~JackBasePosixMutex();
 
-        virtual ~JackBasePosixMutex()
-        {
-            pthread_mutex_destroy(&fMutex);
-        }
-
-        bool Lock()
-        {
-            pthread_t current_thread = pthread_self();
-
-            if (!pthread_equal(current_thread, fOwner)) {
-                int res = pthread_mutex_lock(&fMutex);
-                if (res == 0) {
-                    fOwner = current_thread;
-                    return true;
-                } else {
-                    jack_error("JackBasePosixMutex::Lock res = %d", res);
-                    return false;
-                }
-            } else {
-                jack_error("JackBasePosixMutex::Lock mutex already locked by thread = %d", current_thread);
-                return false;
-            }
-        }
-
-        bool Trylock()
-        {
-            pthread_t current_thread = pthread_self();
-
-            if (!pthread_equal(current_thread, fOwner)) {
-                int res = pthread_mutex_trylock(&fMutex);
-                if (res == 0) {
-                    fOwner = current_thread;
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                jack_error("JackBasePosixMutex::Trylock mutex already locked by thread = %d", current_thread);
-                return false;
-            }
-        }
-
-        bool Unlock()
-        {
-            if (pthread_equal(pthread_self(), fOwner)) {
-                fOwner = 0;
-                int res = pthread_mutex_unlock(&fMutex);
-                if (res == 0) {
-                    return true;
-                } else {
-                    jack_error("JackBasePosixMutex::Unlock res = %d", res);
-                    return false;
-                }
-            } else {
-                jack_error("JackBasePosixMutex::Unlock mutex not locked by thread = %d owner %d", pthread_self(), fOwner);
-                return false;
-            }
-        }
+        bool Lock();
+        bool Trylock();
+        bool Unlock();
 
 };
 
-class JackPosixMutex
+class SERVER_EXPORT JackPosixMutex
 {
     protected:
 
@@ -119,50 +62,13 @@ class JackPosixMutex
 
     public:
 
-        JackPosixMutex()
-        {
-            // Use recursive mutex
-            pthread_mutexattr_t mutex_attr;
-            int res;
-            res = pthread_mutexattr_init(&mutex_attr);
-            ThrowIf(res != 0, JackException("JackBasePosixMutex: could not init the mutex attribute"));
-            res = pthread_mutexattr_settype(&mutex_attr, PTHREAD_MUTEX_RECURSIVE);
-            ThrowIf(res != 0, JackException("JackBasePosixMutex: could not settype the mutex"));
-            res = pthread_mutex_init(&fMutex, &mutex_attr);
-            ThrowIf(res != 0, JackException("JackBasePosixMutex: could not init the mutex"));
-            pthread_mutexattr_destroy(&mutex_attr);
-        }
+        JackPosixMutex(const char* name = NULL);
+        virtual ~JackPosixMutex();
 
-        virtual ~JackPosixMutex()
-        {
-            pthread_mutex_destroy(&fMutex);
-        }
-
-        bool Lock()
-        {
-            int res = pthread_mutex_lock(&fMutex);
-            if (res != 0) {
-                jack_log("JackPosixMutex::Lock res = %d", res);
-            }
-            return (res == 0);
-        }
-
-        bool Trylock()
-        {
-            return (pthread_mutex_trylock(&fMutex) == 0);
-        }
-
-        bool Unlock()
-        {
-            int res = pthread_mutex_unlock(&fMutex);
-            if (res != 0) {
-                jack_log("JackPosixMutex::Unlock res = %d", res);
-            }
-            return (res == 0);
-        }
-
+        bool Lock();
+        bool Trylock();
+        bool Unlock();
 };
-
 
 } // namespace
 

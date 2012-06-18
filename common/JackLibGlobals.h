@@ -50,7 +50,7 @@ class JackClient;
 \brief Global library static structure: singleton kind of pattern.
 */
 
-struct LIB_EXPORT JackLibGlobals
+struct JackLibGlobals
 {
     JackShmReadWritePtr<JackGraphManager> fGraphManager;	/*! Shared memory Port manager */
     JackShmReadWritePtr<JackEngineControl> fEngineControl;	/*! Shared engine control */  // transport engine has to be writable
@@ -63,7 +63,9 @@ struct LIB_EXPORT JackLibGlobals
     JackLibGlobals()
     {
         jack_log("JackLibGlobals");
-        JackMessageBuffer::Create();
+        if (!JackMessageBuffer::Create()) {
+            jack_error("Cannot create message buffer");
+        }
         fGraphManager = -1;
         fEngineControl = -1;
 
@@ -127,6 +129,7 @@ struct LIB_EXPORT JackLibGlobals
     {
         if (--fClientCount == 0 && fGlobals) {
             jack_log("JackLibGlobals Destroy %x", fGlobals);
+            EndTime();
             delete fGlobals;
             fGlobals = NULL;
         }

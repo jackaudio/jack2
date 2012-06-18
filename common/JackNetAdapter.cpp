@@ -260,6 +260,7 @@ namespace Jack
                 }
             return false;
         } catch (JackNetException& e) {
+            // Otherwise just restart...
             e.PrintMessage();
             jack_info("NetAdapter is restarted");
             Reset();
@@ -413,7 +414,7 @@ extern "C"
 
         value.i = 2;
         jack_driver_descriptor_add_parameter(desc, &filler, "input-ports", 'C', JackDriverParamInt, &value, NULL, "Number of audio input ports", NULL);
-        jack_driver_descriptor_add_parameter(desc, &filler, "output-ports", 'C', JackDriverParamInt, &value, NULL, "Number of audio output ports", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "output-ports", 'P', JackDriverParamInt, &value, NULL, "Number of audio output ports", NULL);
 
     #if HAVE_CELT
         value.i = -1;

@@ -11,8 +11,8 @@
 //
 LANGUAGE LANG_FRENCH, SUBLANG_DEFAULT
 1 VERSIONINFO
-    FILEVERSION     1,9,8,0
-    PRODUCTVERSION  1,9,8,0
+    FILEVERSION     1,9,9,3
+    PRODUCTVERSION  1,9,9,3
     FILEOS          VOS_UNKNOWN
     FILETYPE        VFT_DLL
 BEGIN
@@ -23,14 +23,14 @@ BEGIN
             VALUE "Comments", "\0"
             VALUE "CompanyName", "Grame\0"
             VALUE "FileDescription", "Jackmp Net Manager for Windows\0"
-            VALUE "FileVersion", "1, 9, 8, 0\0"
+            VALUE "FileVersion", "1, 9, 9, 3\0"
             VALUE "InternalName", "netmanager\0"
-            VALUE "LegalCopyright", "Copyright Grame © 2006-2011\0"
+            VALUE "LegalCopyright", "Copyright Grame © 2006-2012\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "netmanager.dll\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "netmanager\0"
-            VALUE "ProductVersion", "1, 9, 8, 0\0"
+            VALUE "ProductVersion", "1, 9, 9, 3\0"
             VALUE "SpecialBuild", "\0"
         END
     END

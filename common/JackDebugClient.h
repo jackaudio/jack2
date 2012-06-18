@@ -46,7 +46,7 @@ PortFollower;
 \brief A "decorator" debug client to validate API use.
 */
 
-class LIB_EXPORT JackDebugClient : public JackClient
+class JackDebugClient : public JackClient
 {
     protected:
 
@@ -83,6 +83,7 @@ class LIB_EXPORT JackDebugClient : public JackClient
         // Context
         int SetBufferSize(jack_nframes_t buffer_size);
         int SetFreeWheel(int onoff);
+        int ComputeTotalLatencies();
         void ShutDown();
         jack_native_thread_t GetThreadID();
 
@@ -95,6 +96,7 @@ class LIB_EXPORT JackDebugClient : public JackClient
         int PortDisconnect(jack_port_id_t src);
 
         int PortIsMine(jack_port_id_t port_index);
+        int PortRename(jack_port_id_t port_index, const char* name);
 
         // Transport
         int ReleaseTimebase();
@@ -129,6 +131,9 @@ class LIB_EXPORT JackDebugClient : public JackClient
         int InternalClientHandle(const char* client_name, jack_status_t* status);
         int InternalClientLoad(const char* client_name, jack_options_t options, jack_status_t* status, jack_varargs_t* va);
         void InternalClientUnload(int ref, jack_status_t* status);
+        
+        // RT Thread
+        int SetProcessThread(JackThreadCallback fun, void *arg);
 
         // Session API
         jack_session_command_t* SessionNotify(const char* target, jack_session_event_type_t type, const char* path);

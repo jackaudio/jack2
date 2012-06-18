@@ -154,75 +154,16 @@ namespace Jack
             return 0;
         }
 
-        virtual int SetHostBufferSize(jack_nframes_t buffer_size)
-        {
-            fHostBufferSize = buffer_size;
-            if (fAdaptative) {
-                AdaptRingBufferSize();
-            }
-            return 0;
-        }
-
-        virtual int SetAdaptedBufferSize(jack_nframes_t buffer_size)
-        {
-            fAdaptedBufferSize = buffer_size;
-            if (fAdaptative) {
-                AdaptRingBufferSize();
-            }
-            return 0;
-        }
-
-        virtual int SetBufferSize(jack_nframes_t buffer_size)
-        {
-            SetHostBufferSize(buffer_size);
-            SetAdaptedBufferSize(buffer_size);
-            return 0;
-        }
-
-        virtual int SetHostSampleRate(jack_nframes_t sample_rate)
-        {
-            fHostSampleRate = sample_rate;
-            fPIControler.Init(double(fHostSampleRate) / double(fAdaptedSampleRate));
-            return 0;
-        }
-
-        virtual int SetAdaptedSampleRate(jack_nframes_t sample_rate)
-        {
-            fAdaptedSampleRate = sample_rate;
-            fPIControler.Init(double(fHostSampleRate) / double(fAdaptedSampleRate));
-            return 0;
-        }
-
-        virtual int SetSampleRate(jack_nframes_t sample_rate)
-        {
-            SetHostSampleRate(sample_rate);
-            SetAdaptedSampleRate(sample_rate);
-            return 0;
-        }
-
-        void SetInputs(int inputs)
-        {
-            jack_log("JackAudioAdapterInterface::SetInputs %d", inputs);
-            fCaptureChannels = inputs;
-        }
-
-        void SetOutputs(int outputs)
-        {
-            jack_log("JackAudioAdapterInterface::SetOutputs %d", outputs);
-            fPlaybackChannels = outputs;
-        }
-
-        int GetInputs()
-        {
-            //jack_log("JackAudioAdapterInterface::GetInputs %d", fCaptureChannels);
-            return fCaptureChannels;
-        }
-
-        int GetOutputs()
-        {
-            //jack_log ("JackAudioAdapterInterface::GetOutputs %d", fPlaybackChannels);
-            return fPlaybackChannels;
-        }
+        virtual int SetHostBufferSize(jack_nframes_t buffer_size);
+        virtual int SetAdaptedBufferSize(jack_nframes_t buffer_size);
+        virtual int SetBufferSize(jack_nframes_t buffer_size);
+        virtual int SetHostSampleRate(jack_nframes_t sample_rate);
+        virtual int SetAdaptedSampleRate(jack_nframes_t sample_rate);
+        virtual int SetSampleRate(jack_nframes_t sample_rate);
+        void SetInputs(int inputs);
+        void SetOutputs(int outputs);
+        int GetInputs();
+        int GetOutputs();
 
         virtual int GetInputLatency(int port_index) { return 0; }
         virtual int GetOutputLatency(int port_index) { return 0; }

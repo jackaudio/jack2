@@ -22,6 +22,7 @@
 #include "JackMessageBuffer.h"
 #include "JackGlobals.h"
 #include "JackError.h"
+#include "JackTime.h"
 
 namespace Jack
 {
@@ -29,19 +30,32 @@ namespace Jack
 JackMessageBuffer* JackMessageBuffer::fInstance = NULL;
 
 JackMessageBuffer::JackMessageBuffer()
-    :fInit(NULL),fInitArg(NULL),fThread(this),fInBuffer(0),fOutBuffer(0),fOverruns(0),fRunning(false)
+    :fInit(NULL),
+    fInitArg(NULL),
+    fThread(this),
+    fGuard(),
+    fInBuffer(0),
+    fOutBuffer(0),
+    fOverruns(0),
+    fRunning(false)
 {}
 
 JackMessageBuffer::~JackMessageBuffer()
 {}
 
-void JackMessageBuffer::Start()
+bool JackMessageBuffer::Start()
 {
+    // Before StartSync()...
     fRunning = true;
-    fThread.StartSync();
+    if (fThread.StartSync() == 0) {
+        return true;
+    } else {
+        fRunning = false;
+        return false;
+    }
 }
 
-void JackMessageBuffer::Stop()
+bool JackMessageBuffer::Stop()
 {
     if (fOverruns > 0) {
         jack_error("WARNING: %d message buffer overruns!", fOverruns);
@@ -59,6 +73,7 @@ void JackMessageBuffer::Stop()
     }
 
     Flush();
+    return true;
 }
 
 void JackMessageBuffer::Flush()
@@ -96,7 +111,7 @@ bool JackMessageBuffer::Execute()
                 /* and we're done */
                 fGuard.Signal();
             }
-
+            
             /* releasing the mutex reduces contention */
             fGuard.Unlock();
             Flush();
@@ -110,20 +125,30 @@ bool JackMessageBuffer::Execute()
     return false;
 }
 
-void JackMessageBuffer::Create()
+bool JackMessageBuffer::Create()
 {
     if (fInstance == NULL) {
         fInstance = new JackMessageBuffer();
-        fInstance->Start();
+        if (!fInstance->Start()) {
+            jack_error("JackMessageBuffer::Create cannot start thread");
+            delete fInstance;
+            fInstance = NULL;
+            return false;
+        }
     }
+
+    return true;
 }
 
-void JackMessageBuffer::Destroy()
+bool JackMessageBuffer::Destroy()
 {
     if (fInstance != NULL) {
         fInstance->Stop();
         delete fInstance;
         fInstance = NULL;
+        return true;
+    } else {
+        return false;
     }
 }
 
@@ -137,21 +162,42 @@ void JackMessageBufferAdd(int level, const char *message)
     }
 }
 
-void JackMessageBuffer::SetInitCallback(JackThreadInitCallback callback, void *arg)
+int JackMessageBuffer::SetInitCallback(JackThreadInitCallback callback, void *arg)
 {
-    if (fGuard.Lock()) {
+    if (fInstance && callback && fRunning && fGuard.Lock()) {
         /* set up the callback */
         fInitArg = arg;
         fInit = callback;
-        /* wake msg buffer thread */
+        
+    #ifndef WIN32
+        // wake msg buffer thread 
         fGuard.Signal();
-        /* wait for it to be done */
+        // wait for it to be done  
         fGuard.Wait();
-        /* and we're done */
+        // and we're done 
         fGuard.Unlock();
-    } else {
-        jack_error("JackMessageBuffer::SetInitCallback lock cannot be taken");
+    #else
+        /*
+        The condition variable emulation code does not work reliably on Windows (lost signal).
+        So use a "hackish" way to signal/wait for the result.
+        Probaly better in the long term : use pthread-win32 (http://sourceware.org/pthreads-win32/`
+        */
+        fGuard.Unlock();
+        int count = 0;
+        while (fInit && ++count < 1000) {
+            /* wake msg buffer thread */
+            fGuard.Signal();
+            JackSleep(1000);
+        }
+        if (count == 1000) goto error;
+    #endif
+    
+        return 0;
     }
+    
+error:
+    jack_error("JackMessageBuffer::SetInitCallback : callback cannot be executed");
+    return -1;
 }
 
 };

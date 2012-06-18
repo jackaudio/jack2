@@ -21,34 +21,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackRequest.h"
 #include "JackClient.h"
 #include "JackGlobals.h"
+#include "JackError.h"
 
 namespace Jack
 {
 
-JackSocketClientChannel::JackSocketClientChannel():
-    fThread(this)
+JackSocketClientChannel::JackSocketClientChannel()
+    :JackGenericClientChannel(), fThread(this)
 {
+    fRequest = new JackClientSocket();
     fNotificationSocket = NULL;
-    fClient = NULL;
 }
 
 JackSocketClientChannel::~JackSocketClientChannel()
 {
+    delete fRequest;
     delete fNotificationSocket;
-}
-
-int JackSocketClientChannel::ServerCheck(const char* server_name)
-{
-    jack_log("JackSocketClientChannel::ServerCheck = %s", server_name);
-
-    // Connect to server
-    if (fRequestSocket.Connect(jack_server_dir, server_name, 0) < 0) {
-        jack_error("Cannot connect to server socket");
-        fRequestSocket.Close();
-        return -1;
-    } else {
-        return 0;
-    }
 }
 
 int JackSocketClientChannel::Open(const char* server_name, const char* name, int uuid, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
@@ -56,7 +44,7 @@ int JackSocketClientChannel::Open(const char* server_name, const char* name, int
     int result = 0;
     jack_log("JackSocketClientChannel::Open name = %s", name);
 
-    if (fRequestSocket.Connect(jack_server_dir, server_name, 0) < 0) {
+    if (fRequest->Connect(jack_server_dir, server_name, 0) < 0) {
         jack_error("Cannot connect to server socket");
         goto error;
     }
@@ -82,14 +70,14 @@ int JackSocketClientChannel::Open(const char* server_name, const char* name, int
     return 0;
 
 error:
-    fRequestSocket.Close();
+    fRequest->Close();
     fNotificationListenSocket.Close();
     return -1;
 }
 
 void JackSocketClientChannel::Close()
 {
-    fRequestSocket.Close();
+    fRequest->Close();
     fNotificationListenSocket.Close();
     if (fNotificationSocket)
         fNotificationSocket->Close();
@@ -115,244 +103,18 @@ void JackSocketClientChannel::Stop()
     fThread.Kill();
 }
 
-void JackSocketClientChannel::ServerSyncCall(JackRequest* req, JackResult* res, int* result)
-{
-    if (req->Write(&fRequestSocket) < 0) {
-        jack_error("Could not write request type = %ld", req->fType);
-        *result = -1;
-        return;
-    }
-
-    if (res->Read(&fRequestSocket) < 0) {
-        jack_error("Could not read result type = %ld", req->fType);
-        *result = -1;
-        return;
-    }
-
-    *result = res->fResult;
-}
-
-void JackSocketClientChannel::ServerAsyncCall(JackRequest* req, JackResult* res, int* result)
-{
-    if (req->Write(&fRequestSocket) < 0) {
-        jack_error("Could not write request type = %ld", req->fType);
-        *result = -1;
-    } else {
-        *result = 0;
-    }
-}
-
-void JackSocketClientChannel::ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status, int* result, int open)
-{
-    JackClientCheckRequest req(name, protocol, options, uuid, open);
-    JackClientCheckResult res;
-    ServerSyncCall(&req, &res, result);
-    *status = res.fStatus;
-    strcpy(name_res, res.fName);
-}
-
-void JackSocketClientChannel::ClientOpen(const char* name, int pid, int uuid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
-{
-    JackClientOpenRequest req(name, pid, uuid);
-    JackClientOpenResult res;
-    ServerSyncCall(&req, &res, result);
-    *shared_engine = res.fSharedEngine;
-    *shared_client = res.fSharedClient;
-    *shared_graph = res.fSharedGraph;
-}
-
-void JackSocketClientChannel::ClientClose(int refnum, int* result)
-{
-    JackClientCloseRequest req(refnum);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackSocketClientChannel::ClientActivate(int refnum, int is_real_time, int* result)
-{
-    JackActivateRequest req(refnum, is_real_time);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackSocketClientChannel::ClientDeactivate(int refnum, int* result)
-{
-    JackDeactivateRequest req(refnum);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackSocketClientChannel::PortRegister(int refnum, const char* name, const char* type, unsigned int flags, unsigned int buffer_size, jack_port_id_t* port_index, int* result)
-{
-    JackPortRegisterRequest req(refnum, name, type, flags, buffer_size);
-    JackPortRegisterResult res;
-    ServerSyncCall(&req, &res, result);
-    *port_index = res.fPortIndex;
-}
-
-void JackSocketClientChannel::PortUnRegister(int refnum, jack_port_id_t port_index, int* result)
-{
-    JackPortUnRegisterRequest req(refnum, port_index);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackSocketClientChannel::PortConnect(int refnum, const char* src, const char* dst, int* result)
-{
-    JackPortConnectNameRequest req(refnum, src, dst);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackSocketClientChannel::PortDisconnect(int refnum, const char* src, const char* dst, int* result)
-{
-    JackPortDisconnectNameRequest req(refnum, src, dst);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackSocketClientChannel::PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst, int* result)
-{
-    JackPortConnectRequest req(refnum, src, dst);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackSocketClientChannel::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t dst, int* result)
-{
-    JackPortDisconnectRequest req(refnum, src, dst);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackSocketClientChannel::PortRename(int refnum, jack_port_id_t port, const char* name, int* result)
-{
-    JackPortRenameRequest req(refnum, port, name);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackSocketClientChannel::SetBufferSize(jack_nframes_t buffer_size, int* result)
-{
-    JackSetBufferSizeRequest req(buffer_size);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackSocketClientChannel::SetFreewheel(int onoff, int* result)
-{
-    JackSetFreeWheelRequest req(onoff);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackSocketClientChannel::ComputeTotalLatencies(int* result)
-{
-    JackComputeTotalLatenciesRequest req;
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackSocketClientChannel::SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char* path, jack_session_command_t** result)
-{
-    JackSessionNotifyRequest req(refnum, path, type, target);
-    JackSessionNotifyResult res;
-    int intresult;
-    ServerSyncCall(&req, &res, &intresult);
-    *result = res.GetCommands();
-}
-
-void JackSocketClientChannel::SessionReply(int refnum, int* result)
-{
-    JackSessionReplyRequest req(refnum);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackSocketClientChannel::GetUUIDForClientName(int refnum, const char* client_name, char* uuid_res, int* result)
-{
-    JackGetUUIDRequest req(client_name);
-    JackUUIDResult res;
-    ServerSyncCall(&req, &res, result);
-    strncpy(uuid_res, res.fUUID, JACK_UUID_SIZE);
-}
-
-void JackSocketClientChannel::GetClientNameForUUID(int refnum, const char* uuid, char* name_res, int* result)
-{
-    JackGetClientNameRequest req(uuid);
-    JackClientNameResult res;
-    ServerSyncCall(&req, &res, result);
-    strncpy(name_res, res.fName, JACK_CLIENT_NAME_SIZE);
-}
-
-void JackSocketClientChannel::ClientHasSessionCallback(const char* client_name, int* result)
-{
-    JackClientHasSessionCallbackRequest req(client_name);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackSocketClientChannel::ReserveClientName(int refnum, const char* client_name, const char* uuid, int* result)
-{
-    JackReserveNameRequest req(refnum, client_name, uuid);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackSocketClientChannel::ReleaseTimebase(int refnum, int* result)
-{
-    JackReleaseTimebaseRequest req(refnum);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackSocketClientChannel::SetTimebaseCallback(int refnum, int conditional, int* result)
-{
-    JackSetTimebaseCallbackRequest req(refnum, conditional);
-    JackResult res;
-    ServerSyncCall(&req, &res, result);
-}
-
-void JackSocketClientChannel::GetInternalClientName(int refnum, int int_ref, char* name_res, int* result)
-{
-    JackGetInternalClientNameRequest req(refnum, int_ref);
-    JackGetInternalClientNameResult res;
-    ServerSyncCall(&req, &res, result);
-    strcpy(name_res, res.fName);
-}
-
-void JackSocketClientChannel::InternalClientHandle(int refnum, const char* client_name, int* status, int* int_ref, int* result)
-{
-    JackInternalClientHandleRequest req(refnum, client_name);
-    JackInternalClientHandleResult res;
-    ServerSyncCall(&req, &res, result);
-    *int_ref = res.fIntRefNum;
-    *status = res.fStatus;
-}
-
-void JackSocketClientChannel::InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int uuid, int* result)
-{
-    JackInternalClientLoadRequest req(refnum, client_name, so_name, objet_data, options, uuid);
-    JackInternalClientLoadResult res;
-    ServerSyncCall(&req, &res, result);
-    *int_ref = res.fIntRefNum;
-    *status = res.fStatus;
-}
-
-void JackSocketClientChannel::InternalClientUnload(int refnum, int int_ref, int* status, int* result)
-{
-    JackInternalClientUnloadRequest req(refnum, int_ref);
-    JackInternalClientUnloadResult res;
-    ServerSyncCall(&req, &res, result);
-    *status = res.fStatus;
-}
-
 bool JackSocketClientChannel::Init()
 {
     jack_log("JackSocketClientChannel::Init");
     fNotificationSocket = fNotificationListenSocket.Accept();
+    
     // No more needed
     fNotificationListenSocket.Close();
+    
+    // Setup context
+    if (!jack_tls_set(JackGlobals::fNotificationThread, this)) {
+        jack_error("Failed to set thread notification key");
+    }
 
     if (!fNotificationSocket) {
         jack_error("JackSocketClientChannel: cannot establish notication socket");

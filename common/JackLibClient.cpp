@@ -55,6 +55,20 @@ JackSynchro* GetSynchroTable()
 // Client management
 //-------------------
 
+/*
+ShutDown is called:
+- from the RT thread when Execute method fails
+- possibly from a "closed" notification channel
+(Not needed since the synch object used (Sema of Fifo will fails when server quits... see ShutDown))
+*/
+
+void JackLibClient::ShutDown()
+{
+    jack_log("JackLibClient::ShutDown");
+    JackGlobals::fServerRunning = false;
+    JackClient::ShutDown();
+}
+
 JackLibClient::JackLibClient(JackSynchro* table): JackClient(table)
 {
     jack_log("JackLibClient::JackLibClient table = %x", table);

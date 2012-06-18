@@ -22,6 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackALSARawMidiInputPort.h"
 #include "JackMidiUtil.h"
+#include "JackError.h"
 
 using Jack::JackALSARawMidiInputPort;
 

@@ -35,20 +35,22 @@ namespace Jack
 int JackAudioAdapter::Process(jack_nframes_t frames, void* arg)
 {
     JackAudioAdapter* adapter = static_cast<JackAudioAdapter*>(arg);
-    jack_default_audio_sample_t* inputBuffer[adapter->fAudioAdapter->GetInputs()];
-    jack_default_audio_sample_t* outputBuffer[adapter->fAudioAdapter->GetOutputs()];
+    return adapter->ProcessAux(frames);
+}
 
+int JackAudioAdapter::ProcessAux(jack_nframes_t frames)
+{
     // Always clear output
-    for (int i = 0; i < adapter->fAudioAdapter->GetInputs(); i++) {
-        inputBuffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(adapter->fCapturePortList[i], frames);
-        memset(inputBuffer[i], 0, frames * sizeof(jack_default_audio_sample_t));
+    for (int i = 0; i < fAudioAdapter->GetInputs(); i++) {
+        fInputBufferList[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(fCapturePortList[i], frames);
+        memset(fInputBufferList[i], 0, frames * sizeof(jack_default_audio_sample_t));
     }
 
-    for (int i = 0; i < adapter->fAudioAdapter->GetOutputs(); i++) {
-        outputBuffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(adapter->fPlaybackPortList[i], frames);
+    for (int i = 0; i < fAudioAdapter->GetOutputs(); i++) {
+        fOutputBufferList[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(fPlaybackPortList[i], frames);
     }
 
-    adapter->fAudioAdapter->PullAndPush(inputBuffer, outputBuffer, frames);
+    fAudioAdapter->PullAndPush(fInputBufferList, fOutputBufferList, frames);
     return 0;
 }
 
@@ -126,6 +128,9 @@ void JackAudioAdapter::FreePorts()
 
     delete[] fCapturePortList;
     delete[] fPlaybackPortList;
+
+    delete[] fInputBufferList;
+    delete[] fOutputBufferList;
 }
 
 void JackAudioAdapter::ConnectPorts()
@@ -163,6 +168,9 @@ int JackAudioAdapter::Open()
     //jack ports
     fCapturePortList = new jack_port_t*[fAudioAdapter->GetInputs()];
     fPlaybackPortList = new jack_port_t*[fAudioAdapter->GetOutputs()];
+
+    fInputBufferList = new jack_default_audio_sample_t*[fAudioAdapter->GetInputs()];
+    fOutputBufferList = new jack_default_audio_sample_t*[fAudioAdapter->GetOutputs()];
 
     for (int i = 0; i < fAudioAdapter->GetInputs(); i++) {
         snprintf(name, sizeof(name), "capture_%d", i + 1);

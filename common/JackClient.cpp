@@ -88,6 +88,19 @@ JackClient::JackClient(JackSynchro* table):fThread(this)
 JackClient::~JackClient()
 {}
 
+void JackClient::ShutDown()
+{
+    jack_log("JackClient::ShutDown");
+ 
+    if (fInfoShutdown) {
+        fInfoShutdown(JackFailure, "JACK server has been closed", fInfoShutdownArg);
+        fInfoShutdown = NULL;
+    } else if (fShutdown) {
+        fShutdown(fShutdownArg);
+        fShutdown = NULL;
+    }
+}
+
 int JackClient::Close()
 {
     jack_log("JackClient::Close ref = %ld", GetClientControl()->fRefNum);
@@ -346,15 +359,18 @@ int JackClient::HandleLatencyCallback(int status)
                 if (port->GetFlags() & JackPortIsOutput) {
 					jack_latency_range_t other_latency;
 					port->GetLatencyRange(mode, &other_latency);
-					if (other_latency.max > latency.max)
+					if (other_latency.max > latency.max) {
 						latency.max = other_latency.max;
-					if (other_latency.min < latency.min)
+                    }
+					if (other_latency.min < latency.min) {
 						latency.min = other_latency.min;
+                    }
 				}
 			}
 
-			if (latency.min == UINT32_MAX)
+			if (latency.min == UINT32_MAX) {
 				latency.min = 0;
+            }
 
 			/* now set the found latency on all input ports
 			 */
@@ -373,15 +389,18 @@ int JackClient::HandleLatencyCallback(int status)
 				if (port->GetFlags() & JackPortIsInput) {
 					jack_latency_range_t other_latency;
                     port->GetLatencyRange(mode, &other_latency);
-					if (other_latency.max > latency.max)
+					if (other_latency.max > latency.max) {
 						latency.max = other_latency.max;
-					if (other_latency.min < latency.min)
+                    }
+					if (other_latency.min < latency.min) {
 						latency.min = other_latency.min;
+                    }
 				}
 			}
 
-			if (latency.min == UINT32_MAX)
+			if (latency.min == UINT32_MAX) {
 				latency.min = 0;
+            }
 
 			/* now set the found latency on all output ports
 			 */
@@ -409,13 +428,15 @@ connected to the client may not be activated.
 int JackClient::Activate()
 {
     jack_log("JackClient::Activate");
-    if (IsActive())
+    if (IsActive()) {
         return 0;
+    }
 
     // RT thread is started only when needed...
     if (IsRealTime()) {
-        if (StartThread() < 0)
+        if (StartThread() < 0) {
             return -1;
+        }
     }
 
     /*
@@ -440,8 +461,9 @@ int JackClient::Activate()
 int JackClient::Deactivate()
 {
     jack_log("JackClient::Deactivate");
-    if (!IsActive())
+    if (!IsActive()) {
         return 0;
+    }
 
     GetClientControl()->fActive = false;
 
@@ -455,8 +477,9 @@ int JackClient::Deactivate()
     jack_log("JackClient::Deactivate res = %ld", result);
 
     // RT thread is stopped only when needed...
-    if (IsRealTime())
+    if (IsRealTime()) {
         fThread.Kill();
+    }
     return result;
 }
 
@@ -493,11 +516,13 @@ bool JackClient::Init()
     InitAux();
 
     // Setup context
-    if (!jack_tls_set(JackGlobals::fRealTime, this))
-        jack_error("failed to set thread realtime key");
+    if (!jack_tls_set(JackGlobals::fRealTimeThread, this)) {
+        jack_error("Failed to set thread realtime key");
+    }
 
-    if (GetEngineControl()->fRealTime)
+    if (GetEngineControl()->fRealTime) {
         set_threaded_log_function();
+    }
 
     // Setup RT
     if (GetEngineControl()->fRealTime) {
@@ -560,19 +585,22 @@ inline void JackClient::ExecuteThread()
 
 inline jack_nframes_t JackClient::CycleWaitAux()
 {
-    if (!WaitSync())
+    if (!WaitSync()) {
         Error();   // Terminates the thread
+    }
     CallSyncCallbackAux();
     return GetEngineControl()->fBufferSize;
 }
 
 inline void JackClient::CycleSignalAux(int status)
 {
-    if (status == 0)
+    if (status == 0) {
         CallTimebaseCallbackAux();
+    }
     SignalSync();
-    if (status != 0)
+    if (status != 0) {
         End();     // Terminates the thread
+    }
 }
 
 jack_nframes_t JackClient::CycleWait()
@@ -747,27 +775,6 @@ int JackClient::ComputeTotalLatencies()
     return result;
 }
 
-/*
-ShutDown is called:
-- from the RT thread when Execute method fails
-- possibly from a "closed" notification channel
-(Not needed since the synch object used (Sema of Fifo will fails when server quits... see ShutDown))
-*/
-
-void JackClient::ShutDown()
-{
-    jack_log("JackClient::ShutDown");
-    JackGlobals::fServerRunning = false;
-
-    if (fInfoShutdown) {
-        fInfoShutdown(JackFailure, "JACK server has been closed", fInfoShutdownArg);
-        fInfoShutdown = NULL;
-    } else if (fShutdown) {
-        fShutdown(fShutdownArg);
-        fShutdown = NULL;
-    }
-}
-
 //----------------------
 // Transport management
 //----------------------
@@ -780,8 +787,9 @@ inline int JackClient::ActivateAux()
         jack_log("JackClient::ActivateAux");
 
         // RT thread is started
-        if (StartThread() < 0)
+        if (StartThread() < 0) {
             return -1;
+        }
 
         int result = -1;
         GetClientControl()->fCallback[kRealTimeCallback] = IsRealTime();
@@ -1001,8 +1009,7 @@ int JackClient::SetInitCallback(JackThreadInitCallback callback, void *arg)
         fInitArg = arg;
         fInit = callback;
         /* make sure that the message buffer thread is initialized too */
-        JackMessageBuffer::fInstance->SetInitCallback(callback, arg);
-        return 0;
+        return JackMessageBuffer::fInstance->SetInitCallback(callback, arg);
     }
 }
 
@@ -1042,8 +1049,9 @@ int JackClient::SetSampleRateCallback(JackSampleRateCallback callback, void *arg
         fSampleRateArg = arg;
         fSampleRate = callback;
         // Now invoke it
-        if (callback)
+        if (callback) {
             callback(GetEngineControl()->fSampleRate, arg);
+        }
         return 0;
     }
 }
@@ -1122,7 +1130,7 @@ int JackClient::SetProcessThread(JackThreadCallback fun, void *arg)
         jack_error("You cannot set callbacks on an active client");
         return -1;
     } else if (fProcess) {
-        jack_error ("A process callback has already been setup, both models cannot be used at the same time!");
+        jack_error("A process callback has already been setup, both models cannot be used at the same time!");
         return -1;
     } else {
         fThreadFun = fun;

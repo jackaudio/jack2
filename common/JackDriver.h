@@ -176,7 +176,7 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         void CycleTakeEndTime();
 
         void SetupDriverSync(int ref, bool freewheel);
-
+     
         void NotifyXRun(jack_time_t callback_usecs, float delayed_usecs);   // XRun notification sent by the driver
         void NotifyBufferSize(jack_nframes_t buffer_size);                  // BufferSize notification sent by the driver
         void NotifySampleRate(jack_nframes_t sample_rate);                  // SampleRate notification sent by the driver

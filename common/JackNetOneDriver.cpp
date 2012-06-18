@@ -56,7 +56,7 @@ JackNetOneDriver::JackNetOneDriver(const char* name, const char* alias, JackLock
 
 #ifdef WIN32
     WSADATA wsa;
-    int rc = WSAStartup(MAKEWORD(2, 0), &wsa);
+    WSAStartup(MAKEWORD(2, 0), &wsa);
 #endif
 
     netjack_init(& (this->netj),
@@ -753,6 +753,7 @@ JackNetOneDriver::render_jack_ports_to_payload (int bitdepth, JSList *playback_p
 extern "C"
 {
 #endif
+
     SERVER_EXPORT jack_driver_desc_t* driver_get_descriptor ()
     {
         jack_driver_desc_t * desc;

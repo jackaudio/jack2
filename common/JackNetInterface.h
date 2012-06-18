@@ -21,6 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackNetInterface__
 
 #include "JackNetTool.h"
+#include <limits.h>
 
 namespace Jack
 {
@@ -31,9 +32,10 @@ namespace Jack
 
 #define SLAVE_SETUP_RETRY   5
 
-#define MANAGER_INIT_TIMEOUT    2000000      // in usec
-#define MASTER_INIT_TIMEOUT     1000000      // in usec
-#define SLAVE_INIT_TIMEOUT      1000000      // in usec
+#define MANAGER_INIT_TIMEOUT    2000000         // in usec
+#define MASTER_INIT_TIMEOUT     1000000 * 10    // in usec
+#define SLAVE_INIT_TIMEOUT      1000000 * 10    // in usec
+#define PACKET_TIMEOUT          500000          // in usec
 
 #define NETWORK_MAX_LATENCY     20
 
@@ -45,6 +47,8 @@ namespace Jack
     {
 
         protected:
+        
+            bool fSetTimeOut;
 
             void Initialize();
 
@@ -106,6 +110,8 @@ namespace Jack
             int AudioRecv(packet_header_t* rx_head, NetAudioBuffer* buffer);
 
             int FinishRecv(NetAudioBuffer* buffer);
+            
+            void SetRcvTimeOut();
 
             NetAudioBuffer* AudioBufferFactory(int nports, char* buffer);
 
@@ -129,13 +135,10 @@ namespace Jack
         protected:
 
             bool fRunning;
-
             int fCurrentCycleOffset;
             int fMaxCycleOffset;
-            int fLastfCycleOffset;
-
+       
             bool Init();
-            int SetRxTimeout();
             bool SetParams();
 
             void Exit();
@@ -160,10 +163,10 @@ namespace Jack
 
         public:
 
-            JackNetMasterInterface() : JackNetInterface(), fRunning(false), fCurrentCycleOffset(0), fMaxCycleOffset(0), fLastfCycleOffset(0)
+            JackNetMasterInterface() : JackNetInterface(), fRunning(false), fCurrentCycleOffset(0), fMaxCycleOffset(0)
             {}
             JackNetMasterInterface(session_params_t& params, JackNetSocket& socket, const char* multicast_ip)
-                    : JackNetInterface(params, socket, multicast_ip)
+                    : JackNetInterface(params, socket, multicast_ip), fRunning(false), fCurrentCycleOffset(0), fMaxCycleOffset(0)
             {}
 
             virtual~JackNetMasterInterface()
@@ -206,16 +209,7 @@ namespace Jack
             void FatalRecvError();
             void FatalSendError();
 
-            void InitAPI()
-            {
-                // open Socket API with the first slave
-                if (fSlaveCounter++ == 0) {
-                    if (SocketAPIInit() < 0) {
-                        jack_error("Can't init Socket API, exiting...");
-                        throw std::bad_alloc();
-                    }
-                }
-            }
+            void InitAPI();
 
         public:
 

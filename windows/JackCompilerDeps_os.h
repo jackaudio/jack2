@@ -21,9 +21,19 @@
 #ifndef __JackCompilerDeps_WIN32__
 #define __JackCompilerDeps_WIN32__
 
-#if __GNUC__
-    #define PRE_PACKED_STRUCTURE
+#define	LIB_EXPORT __declspec(dllexport)
 
+#ifdef SERVER_SIDE
+    #define	SERVER_EXPORT __declspec(dllexport)
+#else
+    #define	SERVER_EXPORT
+#endif
+
+#if __GNUC__
+
+    #define MEM_ALIGN(x,y) x __attribute__((aligned(y)))
+    
+    #define PRE_PACKED_STRUCTURE
     #ifndef POST_PACKED_STRUCTURE
         /* POST_PACKED_STRUCTURE needs to be a macro which
         expands into a compiler directive. The directive must
@@ -32,53 +42,36 @@
         than use the natural alignment of the processor and/or
         compiler.
         */
-        #if (__GNUC__< 4)  /* Does not seem to work with GCC 3.XX serie */
-            #define POST_PACKED_STRUCTURE
-        #elif defined(JACK_32_64)
-            #define POST_PACKED_STRUCTURE __attribute__((__packed__))
-        #else
-            #define POST_PACKED_STRUCTURE
-        #endif
+        #define POST_PACKED_STRUCTURE __attribute__((__packed__))
     #endif
-	#define MEM_ALIGN(x,y) x __attribute__((aligned(y)))
-	#define	LIB_EXPORT __declspec(dllexport)
-    #ifdef SERVER_SIDE
-        #define	SERVER_EXPORT __declspec(dllexport)
-    #else
-        #define	SERVER_EXPORT
-    #endif
+	
 #else
-    #define MEM_ALIGN(x,y) x
-    #define	LIB_EXPORT __declspec(dllexport)
-    #ifdef SERVER_SIDE
-        #define	SERVER_EXPORT __declspec(dllexport)
-    #else
-        #define	SERVER_EXPORT
-    #endif
 
+    #define MEM_ALIGN(x,y) x
+ 
     #ifdef _MSC_VER
-       #if defined(JACK_32_64)
-            #define PRE_PACKED_STRUCTURE1 __pragma(pack(push,1))
-            #define PRE_PACKED_STRUCTURE    PRE_PACKED_STRUCTURE1
-            /* PRE_PACKED_STRUCTURE needs to be a macro which
-            expands into a compiler directive. The directive must
-            tell the compiler to arrange the following structure
-            declaration so that it is packed on byte-boundaries rather
-            than use the natural alignment of the processor and/or
-            compiler.
-            */
-            #define POST_PACKED_STRUCTURE ;__pragma(pack(pop))
-            /* and POST_PACKED_STRUCTURE needs to be a macro which
-            restores the packing to its previous setting */
-       #else
-            #define PRE_PACKED_STRUCTURE
-            #define POST_PACKED_STRUCTURE
-        #endif
+        #define PRE_PACKED_STRUCTURE1 __pragma(pack(push,1))
+        #define PRE_PACKED_STRUCTURE    PRE_PACKED_STRUCTURE1
+        /* PRE_PACKED_STRUCTURE needs to be a macro which
+        expands into a compiler directive. The directive must
+        tell the compiler to arrange the following structure
+        declaration so that it is packed on byte-boundaries rather
+        than use the natural alignment of the processor and/or
+        compiler.
+        */
+        #define POST_PACKED_STRUCTURE ;__pragma(pack(pop))
+        /* and POST_PACKED_STRUCTURE needs to be a macro which
+        restores the packing to its previous setting */
     #else
         /* Other Windows compilers to go here */
         #define PRE_PACKED_STRUCTURE
         #define POST_PACKED_STRUCTURE
     #endif
+    
+#endif
+
+#if defined(_MSC_VER) /* Added by JE - 31-01-2012 */
+#define snprintf _snprintf
 #endif
 
 #endif

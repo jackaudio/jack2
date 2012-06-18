@@ -28,26 +28,26 @@
 namespace Jack
 {
 
-int JackWinNamedPipe::Read(void* data, int len)
+int JackWinNamedPipeAux::ReadAux(void* data, int len)
 {
     DWORD read;
     BOOL res = ReadFile(fNamedPipe, data, len, &read, NULL);
     if (res && read == (DWORD)len) {
         return 0;
     } else {
-        jack_error("Cannot read named pipe name = %s err = %ld", fName, GetLastError());
+        jack_log("Cannot read named pipe name = %s err = %ld", fName, GetLastError());
         return -1;
     }
 }
 
-int JackWinNamedPipe::Write(void* data, int len)
+int JackWinNamedPipeAux::WriteAux(void* data, int len)
 {
     DWORD written;
     BOOL res = WriteFile(fNamedPipe, data, len, &written, NULL);
     if (res && written == (DWORD)len) {
         return 0;
     } else {
-        jack_error("Cannot write named pipe name = %s err = %ld", fName, GetLastError());
+        jack_log("Cannot write named pipe name = %s err = %ld", fName, GetLastError());
         return -1;
     }
 }
@@ -81,7 +81,7 @@ int JackWinNamedPipeClient::ConnectAux()
 
 int JackWinNamedPipeClient::ConnectAux()
 {
-    jack_log("Connect: fName %s", fName);
+    jack_log("JackWinNamedPipeClient::ConnectAux : fName %s", fName);
 
     while (true) {
 
@@ -99,15 +99,15 @@ int JackWinNamedPipeClient::ConnectAux()
             return 0;
         }
 
-        // Exit if an error other than ERROR_PIPE_BUSY occurs.
-        if (GetLastError() != ERROR_PIPE_BUSY) {
+        // Exit if an error other than ERROR_PIPE_BUSY or ERROR_FILE_NOT_FOUND occurs.
+        if ((GetLastError() != ERROR_PIPE_BUSY) && (GetLastError() != ERROR_FILE_NOT_FOUND)) {
             jack_error("Cannot connect to named pipe = %s err = %ld", fName, GetLastError());
             return -1;
         }
 
         // All pipe instances are busy, so wait for 2 seconds.
         if (!WaitNamedPipe(fName, 2000)) {
-            jack_error("Cannot connect to named pipe = %s err = %ld", fName, GetLastError());
+            jack_error("Cannot connect to named pipe after wait = %s err = %ld", fName, GetLastError());
             return -1;
         }
     }
@@ -137,9 +137,31 @@ int JackWinNamedPipeClient::Close()
 }
 
 void JackWinNamedPipeClient::SetReadTimeOut(long sec)
-{}
+{
+    /*
+    COMMTIMEOUTS timeout;
+    if (GetCommTimeouts(fNamedPipe, &timeout)) {
+        jack_info("JackWinNamedPipeClient::SetReadTimeOut ReadIntervalTimeout = %d", timeout.ReadIntervalTimeout);
+        jack_info("JackWinNamedPipeClient::SetReadTimeOut ReadTotalTimeoutMultiplier = %d", timeout.ReadTotalTimeoutMultiplier);
+        jack_info("JackWinNamedPipeClient::SetReadTimeOut ReadTotalTimeoutConstant = %d", timeout.ReadTotalTimeoutConstant);
+    } else {
+        jack_error("JackWinNamedPipeClient::SetReadTimeOut err %d", GetLastError());
+    }
+    */
+}
 
 void JackWinNamedPipeClient::SetWriteTimeOut(long sec)
+{
+    /*
+    COMMTIMEOUTS timeout;
+    if (GetCommTimeouts(fNamedPipe, &timeout)) {
+        jack_info("JackWinNamedPipeClient::SetWriteTimeOut WriteTotalTimeoutMultiplier = %d", timeout.WriteTotalTimeoutMultiplier);
+        jack_info("JackWinNamedPipeClient::SetWriteTimeOut WriteTotalTimeoutConstant = %d", timeout.WriteTotalTimeoutConstant);
+    }
+    */
+}
+
+void JackWinNamedPipeClient::SetNonBlocking(bool onoff)
 {}
 
 JackWinAsyncNamedPipeClient::JackWinAsyncNamedPipeClient()
@@ -254,7 +276,7 @@ int JackWinAsyncNamedPipeClient::Write(void* data, int len)
 // Server side
 int JackWinNamedPipeServer::BindAux()
 {
-    jack_log("Bind: fName %s", fName);
+    jack_log("JackWinNamedPipeServer::BindAux : fName %s", fName);
 
     if ((fNamedPipe = CreateNamedPipe(fName,
                                       PIPE_ACCESS_DUPLEX,       // read/write access
@@ -290,9 +312,9 @@ bool JackWinNamedPipeServer::Accept()
     if (ConnectNamedPipe(fNamedPipe, NULL)) {
         return true;
     } else {
-        jack_error("Cannot bind server pipe name = %s err = %ld", fName, GetLastError());
+        jack_error("Cannot connect server pipe name = %s err = %ld", fName, GetLastError());
         if (GetLastError() == ERROR_PIPE_CONNECTED) {
-            jack_error("pipe already connnected = %s ", fName);
+            jack_error("Pipe already connnected = %s", fName);
             return true;
         } else {
             return false;
@@ -316,7 +338,6 @@ JackWinNamedPipeClient* JackWinNamedPipeServer::AcceptClient()
             default:
                 jack_error("Cannot connect server pipe name = %s  err = %ld", fName, GetLastError());
                 return NULL;
-                break;
         }
     }
 }
@@ -339,7 +360,7 @@ int JackWinNamedPipeServer::Close()
 
 int JackWinAsyncNamedPipeServer::BindAux()
 {
-    jack_log("Bind: fName %s", fName);
+    jack_log("JackWinAsyncNamedPipeServer::BindAux : fName %s", fName);
 
     if ((fNamedPipe = CreateNamedPipe(fName,
                                       PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,  // read/write access

@@ -23,10 +23,12 @@
 
 #include <windows.h>
 
+#include "JackChannel.h"
+
 namespace Jack
 {
 
-class JackWinNamedPipe
+class JackWinNamedPipeAux
 {
 
     protected:
@@ -34,35 +36,59 @@ class JackWinNamedPipe
         HANDLE fNamedPipe;
         char fName[256];
 
+        int ReadAux(void* data, int len);
+        int WriteAux(void* data, int len);
+
     public:
 
-        JackWinNamedPipe(): fNamedPipe(INVALID_HANDLE_VALUE)
+        JackWinNamedPipeAux(): fNamedPipe(INVALID_HANDLE_VALUE)
         {}
-        JackWinNamedPipe(HANDLE pipe): fNamedPipe(pipe)
+        JackWinNamedPipeAux(HANDLE pipe): fNamedPipe(pipe)
+        {}
+        virtual ~JackWinNamedPipeAux()
+        {}
+
+};
+
+
+class JackWinNamedPipe : public JackWinNamedPipeAux, public detail::JackChannelTransactionInterface
+{
+
+    public:
+
+        JackWinNamedPipe():JackWinNamedPipeAux()
+        {}
+        JackWinNamedPipe(HANDLE pipe):JackWinNamedPipeAux(pipe)
         {}
         virtual ~JackWinNamedPipe()
         {}
 
-        virtual int Read(void* data, int len);
-        virtual int Write(void* data, int len);
+        virtual int Read(void* data, int len)
+        {
+            return ReadAux(data, len);
+        }
+        virtual int Write(void* data, int len)
+        {
+            return WriteAux(data, len);
+        }
 };
 
 /*!
 \brief Client named pipe.
 */
 
-class JackWinNamedPipeClient : public JackWinNamedPipe
+class JackWinNamedPipeClient : public JackWinNamedPipeAux, public detail::JackClientRequestInterface
 {
 
-    private:
+    protected:
 
         int ConnectAux();
 
     public:
 
-        JackWinNamedPipeClient(): JackWinNamedPipe()
+        JackWinNamedPipeClient():JackWinNamedPipeAux()
         {}
-        JackWinNamedPipeClient(HANDLE pipe, const char* name): JackWinNamedPipe(pipe)
+        JackWinNamedPipeClient(HANDLE pipe, const char* name):JackWinNamedPipeAux(pipe)
         {
             strcpy(fName, name);
         }
@@ -73,8 +99,20 @@ class JackWinNamedPipeClient : public JackWinNamedPipe
         virtual int Connect(const char* dir, int which);
         virtual int Connect(const char* dir, const char* name, int which);
         virtual int Close();
+
+        virtual int Read(void* data, int len)
+        {
+            return ReadAux(data, len);
+        }
+        virtual int Write(void* data, int len)
+        {
+            return WriteAux(data, len);
+        }
+
         virtual void SetReadTimeOut(long sec);
         virtual void SetWriteTimeOut(long sec);
+        
+        virtual void SetNonBlocking(bool onoff);
 };
 
 class JackWinAsyncNamedPipeClient : public JackWinNamedPipeClient

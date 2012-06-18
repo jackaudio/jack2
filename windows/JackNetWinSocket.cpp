@@ -17,7 +17,7 @@
 
  */
 
-
+#include "JackError.h"
 #include "JackNetWinSocket.h"
 
 namespace Jack
@@ -296,12 +296,8 @@ namespace Jack
     int JackNetWinSocket::SetTimeOut(int usec)
     {
         jack_log("JackNetWinSocket::SetTimeout %d usec", usec);
-
-        //negative timeout, or exceeding 10s, return
-        if (( usec < 0) || (usec > 10000000))
-            return SOCKET_ERROR;
-        int time = usec / 1000;
-        return SetOption(SOL_SOCKET, SO_RCVTIMEO, &time, sizeof(time));
+        int millisec = usec / 1000;
+        return SetOption(SOL_SOCKET, SO_RCVTIMEO, &millisec, sizeof(millisec));
     }
 
     //local loop*********************************************************************************************************

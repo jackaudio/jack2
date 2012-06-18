@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <signal.h>
 
 #ifdef WIN32
 #include <process.h>
@@ -36,11 +37,7 @@ namespace Jack {
 
     void JackTools::KillServer()
     {
-#ifdef WIN32
-        exit(1);
-#else
-        kill(GetPID(), SIGINT);
-#endif
+        raise(SIGINT);
     }
 
     void JackTools::ThrowJackNetException()
@@ -293,6 +290,7 @@ void BuildClientPath(char* path_to_so, int path_len, const char* so_name)
 }
 
 #endif
+
 
 }  // end of namespace
 
