@@ -523,6 +523,7 @@ namespace Jack
                             fCardInputs, fCardOutputs,
                             fFrequency, fBuffering,
                             snd_pcm_format_name ( ( _snd_pcm_format ) fSampleFormat ) );
+                snd_ctl_close(ctl_handle);
             }
 
             /**
@@ -551,7 +552,7 @@ namespace Jack
                     printHWParams ( fInputParams );
                 if ( fSoftOutputs > 0 )
                     printHWParams ( fOutputParams );
-
+                snd_ctl_close(ctl_handle);
                 return 0;
             }
 
