@@ -322,7 +322,7 @@ def main():
                 param = sys.argv[index]
                 index += 1
 
-                print "--- internal param reset \"%s\"" % (param
+                print "--- internal param reset \"%s\"" % param
 
                 configure_iface.ResetParameterValue(['internals', internal_name, param])
             elif arg == 'iload':
