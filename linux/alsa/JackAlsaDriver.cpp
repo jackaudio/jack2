@@ -859,10 +859,12 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
                 break;
 
             case 'd':
-                playback_pcm_name = strdup (param->value.str);
-                capture_pcm_name = strdup (param->value.str);
-                jack_log("playback device %s", playback_pcm_name);
-                jack_log("capture device %s", capture_pcm_name);
+                if (strcmp (param->value.str, "none") != 0) {
+                    playback_pcm_name = strdup (param->value.str);
+                    capture_pcm_name = strdup (param->value.str);
+                    jack_log("playback device %s", playback_pcm_name);
+                    jack_log("capture device %s", capture_pcm_name);
+                }
                 break;
 
             case 'H':
