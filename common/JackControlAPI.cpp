@@ -288,15 +288,16 @@ jackctl_destroy_param_list(
 
 /* for drivers and internals are configured through jack_driver_param_t JSList */
 /* this function creates such list from a jackctl_parameter list */
-static JSList *
+static
+bool
 jackctl_create_param_list(
-    const JSList * paramlist)
+    const JSList * paramlist,
+    JSList ** retparamlist)
 {
     jackctl_parameter * param_ptr;
     jack_driver_param_t * retparam_ptr;
-    JSList * retparamlist;
 
-    retparamlist = NULL;
+    *retparamlist = NULL;
     while (paramlist != NULL)
     {
         param_ptr = (jackctl_parameter *)paramlist->data;
@@ -335,19 +336,19 @@ jackctl_create_param_list(
                 goto free;
             }
 
-            retparamlist = jack_slist_append(retparamlist, retparam_ptr);
+            *retparamlist = jack_slist_append(*retparamlist, retparam_ptr);
         }
 
         paramlist = paramlist->next;
     }
 
-    return retparamlist;
+    return true;
 
 free:
     free(retparam_ptr);
 destroy:
-    jackctl_destroy_param_list(retparamlist);
-    return NULL;
+    jackctl_destroy_param_list(*retparamlist);
+    return false;
 }
 
 static int
@@ -1008,8 +1009,7 @@ jackctl_server_open(
             goto fail_unregister;
         }
 
-        paramlist = jackctl_create_param_list(driver_ptr->parameters);
-        if (paramlist == NULL) goto fail_delete;
+        if (!jackctl_create_param_list(driver_ptr->parameters, &paramlist)) goto fail_delete;
         rc = server_ptr->engine->Open(driver_ptr->desc_ptr, paramlist);
         jackctl_destroy_param_list(paramlist);
         if (rc < 0)
@@ -1287,8 +1287,8 @@ SERVER_EXPORT bool jackctl_server_load_internal(
 
     int status;
     if (server_ptr->engine != NULL) {
-        JSList * paramlist = jackctl_create_param_list(internal->parameters);
-        if (paramlist == NULL) return false;
+        JSList * paramlist;
+        if (!jackctl_create_param_list(internal->parameters, &paramlist)) return false;
         server_ptr->engine->InternalClientLoad2(internal->desc_ptr->name, internal->desc_ptr->name, paramlist, JackNullOption, &internal->refnum, -1, &status);
         jackctl_destroy_param_list(paramlist);
         return (internal->refnum > 0);
@@ -1321,8 +1321,8 @@ SERVER_EXPORT bool jackctl_server_add_slave(jackctl_server * server_ptr, jackctl
             jack_error("Cannot add a slave in a running server");
             return false;
         } else {
-            JSList * paramlist = jackctl_create_param_list(driver_ptr->parameters);
-            if (paramlist == NULL) return false;
+            JSList * paramlist;
+            if (!jackctl_create_param_list(driver_ptr->parameters, &paramlist)) return false;
             JackDriverInfo* info = server_ptr->engine->AddSlave(driver_ptr->desc_ptr, paramlist);
             jackctl_destroy_param_list(paramlist);
             if (info) {
@@ -1363,8 +1363,8 @@ SERVER_EXPORT bool jackctl_server_remove_slave(jackctl_server * server_ptr, jack
 SERVER_EXPORT bool jackctl_server_switch_master(jackctl_server * server_ptr, jackctl_driver * driver_ptr)
 {
     if (server_ptr && server_ptr->engine) {
-        JSList * paramlist = jackctl_create_param_list(driver_ptr->parameters);
-        if (paramlist == NULL) return false;
+        JSList * paramlist;
+        if (!jackctl_create_param_list(driver_ptr->parameters, &paramlist)) return false;
         jackctl_destroy_param_list(paramlist);
         bool ret = (server_ptr->engine->SwitchMaster(driver_ptr->desc_ptr, paramlist) == 0);
         jackctl_destroy_param_list(paramlist);
