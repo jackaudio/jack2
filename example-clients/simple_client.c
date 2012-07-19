@@ -191,7 +191,7 @@ main (int argc, char *argv[])
 		fprintf (stderr, "cannot connect output ports\n");
 	}
 
-	free (ports);
+	jack_free (ports);
     
     /* install a signal handler to properly quits jack client */
 #ifdef WIN32
