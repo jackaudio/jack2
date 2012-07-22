@@ -24,18 +24,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #if __GNUC__
 
-    #define PRE_PACKED_STRUCTURE
-
-    #ifndef POST_PACKED_STRUCTURE
-        /* POST_PACKED_STRUCTURE needs to be a macro which
-        expands into a compiler directive. The directive must
-        tell the compiler to arrange the preceding structure
-        declaration so that it is packed on byte-boundaries rather
-        than use the natural alignment of the processor and/or
-        compiler.
-        */
-        #define POST_PACKED_STRUCTURE __attribute__((__packed__))
-    #endif
     #define MEM_ALIGN(x,y) x __attribute__((aligned(y)))
     #define LIB_EXPORT __attribute__((visibility("default")))
     #ifdef SERVER_SIDE
@@ -47,7 +35,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
     #define MEM_ALIGN(x,y) x
     #define LIB_EXPORT
     #define SERVER_EXPORT
-    /* Add other things here for non-gcc platforms for PRE and POST_PACKED_STRUCTURE */
+    /* Add other things here for non-gcc platforms */
 #endif
 
 #endif
