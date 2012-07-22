@@ -27,7 +27,6 @@ typedef ULONGLONG UInt64;
 typedef UInt64 uint64_t;
 typedef unsigned short uint16_t;
 typedef DWORD jack_tls_key;
-typedef HANDLE jack_native_thread_t;
 
 #endif
 
