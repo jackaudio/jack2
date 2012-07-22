@@ -34,7 +34,7 @@ namespace Jack
 \brief Client control possibly in shared memory.
 */
 
-PRE_PACKED_STRUCTURE
+/* Note: This class must be kept 32/64 clean! */
 struct JackClientControl : public JackShmMemAble
 {
     char fName[JACK_CLIENT_NAME_SIZE + 1];
@@ -88,7 +88,7 @@ struct JackClientControl : public JackShmMemAble
         fSessionID = uuid;
     }
 
-} POST_PACKED_STRUCTURE;
+};
 
 } // end of namespace
 

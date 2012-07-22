@@ -32,7 +32,7 @@ namespace Jack
 \brief A structure used for time management.
 */
 
-PRE_PACKED_STRUCTURE
+/* Note: This class must be kept 32/64 clean! */
 class SERVER_EXPORT JackTimer
 {
 
@@ -69,13 +69,13 @@ class SERVER_EXPORT JackTimer
             return fCurrentWakeup;
         }
 
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief A class using the JackAtomicState to manage jack time.
 */
 
-PRE_PACKED_STRUCTURE
+/* Note: This class must be kept 32/64 clean! */
 class SERVER_EXPORT JackFrameTimer : public JackAtomicState<JackTimer>
 {
 
@@ -97,7 +97,7 @@ class SERVER_EXPORT JackFrameTimer : public JackAtomicState<JackTimer>
         void IncFrameTime(jack_nframes_t buffer_size, jack_time_t callback_usecs, jack_time_t period_usecs);
         void ReadFrameTime(JackTimer* timer);
 
-} POST_PACKED_STRUCTURE;
+};
 
 
 } // end of namespace

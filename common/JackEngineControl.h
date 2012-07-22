@@ -47,7 +47,7 @@ typedef JACK_ALIGNED_TYPE(UInt64) jack_UInt64;
 \brief Engine control in shared memory.
 */
 
-PRE_PACKED_STRUCTURE
+/* Note: This class must be kept 32/64 clean! */
 struct SERVER_EXPORT JackEngineControl : public JackShmMem
 {
     // Shared state
@@ -183,7 +183,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
     void CalcCPULoad(JackClientInterface** table, JackGraphManager* manager, jack_time_t cur_cycle_begin, jack_time_t prev_cycle_end);
     void ResetRollingUsecs();
 
-} POST_PACKED_STRUCTURE;
+};
 
 } // end of namespace
 

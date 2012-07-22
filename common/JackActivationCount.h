@@ -33,7 +33,7 @@ struct JackClientControl;
 \brief Client activation counter.
 */
 
-PRE_PACKED_STRUCTURE
+/* Note: This class must be kept 32/64 clean! */
 class JackActivationCount
 {
 
@@ -74,7 +74,7 @@ class JackActivationCount
             return fValue;
         }
 
-}  POST_PACKED_STRUCTURE;
+};
 
 } // end of namespace
 

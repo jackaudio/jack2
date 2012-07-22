@@ -149,7 +149,7 @@ extern "C"
      * attached to the address space.
      */
 
-    PRE_PACKED_STRUCTURE
+    /* Note: This class must be kept 32/64 clean! */
     struct _jack_shm_info {
         jack_shm_registry_index_t index;       /* offset into the registry */
         uint32_t size;
@@ -157,7 +157,7 @@ extern "C"
             void *attached_at;  /* address where attached */
             char ptr_size[8];
         } ptr;  /* a "pointer" that has the same 8 bytes size when compling in 32 or 64 bits */
-    } POST_PACKED_STRUCTURE;
+    };
     
     typedef struct _jack_shm_info jack_shm_info_t;
     
