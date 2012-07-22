@@ -23,6 +23,14 @@
 
 #include <jack/systemdeps.h>
 
+/* To facilitate direct sharing between 32-bit and 64-bit code, declare
+ * fully-aligned typedefs for types which would otherwise have differing
+ * alignment between the two.
+ */
+typedef JACK_ALIGNED_TYPE(double)   jack_double;
+typedef JACK_ALIGNED_TYPE(int64_t)  jack_int64_t;
+typedef JACK_ALIGNED_TYPE(uint64_t) jack_uint64_t;
+
 typedef int32_t jack_shmsize_t;
 
 /**
@@ -39,7 +47,7 @@ typedef uint32_t        jack_nframes_t;
  * Type used to represent the value of free running
  * monotonic clock with units of microseconds.
  */
-typedef uint64_t jack_time_t;
+typedef jack_uint64_t jack_time_t;
 
 /**
  *  Maximum size of @a load_init string passed to an internal client
@@ -530,7 +538,7 @@ typedef enum {
 
 } jack_transport_state_t;
 
-typedef uint64_t jack_unique_t;         /**< Unique ID (opaque) */
+typedef jack_uint64_t jack_unique_t;    /**< Unique ID (opaque) */
 
 /**
  * Optional struct jack_position_t fields.
@@ -564,16 +572,16 @@ struct _jack_position {
     int32_t             bar;            /**< current bar */
     int32_t             beat;           /**< current beat-within-bar */
     int32_t             tick;           /**< current tick-within-beat */
-    double              bar_start_tick;
+    jack_double         bar_start_tick;
 
     float               beats_per_bar;  /**< time signature "numerator" */
     float               beat_type;      /**< time signature "denominator" */
-    double              ticks_per_beat;
-    double              beats_per_minute;
+    jack_double         ticks_per_beat;
+    jack_double         beats_per_minute;
 
     /* JackPositionTimecode fields:     (EXPERIMENTAL: could change) */
-    double              frame_time;     /**< current time in seconds */
-    double              next_time;      /**< next sequential frame_time
+    jack_double         frame_time;     /**< current time in seconds */
+    jack_double         next_time;      /**< next sequential frame_time
                          (unless repositioned) */
 
     /* JackBBTFrameOffset fields: */

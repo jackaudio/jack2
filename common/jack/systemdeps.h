@@ -34,6 +34,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
         #define PRE_PACKED_STRUCTURE
         #define POST_PACKED_STRUCTURE __attribute__((__packed__))
 
+        #define JACK_ALIGN(N) __attribute__((__aligned__(N)))
+
+        /* A utility for declaring a type which is aligned to its size. */
+        #define JACK_ALIGNED_TYPE(T) JACK_ALIGN(sizeof(T)) T
+
     #else
     
         #ifdef _MSC_VER
@@ -49,9 +54,18 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
             #define POST_PACKED_STRUCTURE ;__pragma(pack(pop))
             /* and POST_PACKED_STRUCTURE needs to be a macro which
             restores the packing to its previous setting */
+
+            #define JACK_ALIGN(N) __declspec(align(N))
+
+            /* A utility for declaring a type which is aligned to its size. */
+            #define JACK_ALIGNED_TYPE(T) JACK_ALIGN(sizeof(T)) T
+
         #else
             #define PRE_PACKED_STRUCTURE
             #define POST_PACKED_STRUCTURE
+
+            #define JACK_ALIGN(N)
+            #define JACK_ALIGNED_TYPE(T) T
         #endif
 
     #endif
