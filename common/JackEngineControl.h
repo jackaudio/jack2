@@ -41,6 +41,8 @@ class JackGraphManager;
 #define JACK_ENGINE_ROLLING_COUNT 32
 #define JACK_ENGINE_ROLLING_INTERVAL 1024
 
+typedef JACK_ALIGNED_TYPE(UInt64) jack_UInt64;
+
 /*!
 \brief Engine control in shared memory.
 */
@@ -81,9 +83,9 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
     float fCPULoad;
 
     // For OSX thread
-    UInt64 fPeriod;
-    UInt64 fComputation;
-    UInt64 fConstraint;
+    jack_UInt64 fPeriod;
+    jack_UInt64 fComputation;
+    jack_UInt64 fConstraint;
 
     // Timer
     JackFrameTimer fFrameTimer;
