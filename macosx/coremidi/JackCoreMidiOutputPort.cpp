@@ -81,7 +81,11 @@ JackCoreMidiOutputPort::Execute()
         packet = MIDIPacketListAdd(packet_list, PACKET_BUFFER_SIZE, packet,
                                    timestamp, size, data);
         if (packet) {
-            while (GetMicroSeconds() < send_time) {
+            do {
+                if (GetMicroSeconds() >= send_time) {
+                    event = 0;
+                    break;
+                }
                 event = GetCoreMidiEvent(false);
                 if (! event) {
                     break;
@@ -90,10 +94,7 @@ JackCoreMidiOutputPort::Execute()
                                            packet,
                                            GetTimeStampFromFrames(event->time),
                                            event->size, event->buffer);
-                if (! packet) {
-                    break;
-                }
-            }
+            } while (packet);
             SendPacketList(packet_list);
         } else {
 
