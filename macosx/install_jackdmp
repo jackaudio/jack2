@@ -5,9 +5,9 @@
 [ -d JackRouter.plugin ] && sudo cp -r JackRouter.plugin /Library/Audio/Plug-Ins/HAL/
 
 # Copy libraries and exe
-sudo cp -r Jackmp.framework /Library/Frameworks/  
-sudo cp -r Jackservermp.framework /Library/Frameworks/  
-sudo cp -r Jacknet.framework /Library/Frameworks/   
+sudo cp -r Jackmp.framework /System/Library/Frameworks/  
+sudo cp -r Jackservermp.framework /System/Library/Frameworks/  
+sudo cp -r Jacknet.framework /System/Library/Frameworks/   
 sudo install -d /usr/local/bin 
 sudo cp jackdmp /usr/local/bin  
 [ -f jack_load ] && sudo cp jack_load /usr/local/bin 
@@ -35,10 +35,12 @@ cd /usr/local/lib && [ -f libjack.dylib ] && sudo rm libjack.dylib
 cd /usr/local/lib && [ -f libjacknet.dylib ] && sudo rm libjacknet.dylib
 cd /usr/local/lib && [ -f libjacknet.0.dylib ] && sudo rm libjacknet.0.dylib
 cd /usr/local/bin && [ -f jackd ] && sudo rm jackd
-cd /usr/local/lib && sudo ln -s /Library/Frameworks/Jackmp.framework/Jackmp libjack.dylib
-cd /usr/local/lib && sudo ln -s /Library/Frameworks/Jackmp.framework/Jackmp libjack.0.dylib
-cd /usr/local/lib && sudo ln -s /Library/Frameworks/Jacknet.framework/Jacknet libjacknet.dylib
-cd /usr/local/lib && sudo ln -s /Library/Frameworks/Jacknet.framework/Jacknet libjacknet.0.dylib
+cd /usr/local/lib && sudo ln -s /System/Library/Frameworks/Jackmp.framework/Jackmp libjack.dylib
+cd /usr/local/lib && sudo ln -s /System/Library/Frameworks/Jackmp.framework/Jackmp libjack.0.dylib
+cd /usr/local/lib && sudo ln -s /System/Library/Frameworks/Jackservermp.framework/Jackservermp libjackserver.dylib
+cd /usr/local/lib && sudo ln -s /System/Library/Frameworks/Jackservermp.framework/Jackservermp libjackserver.0.dylib
+cd /usr/local/lib && sudo ln -s /System/Library/Frameworks/Jacknet.framework/Jacknet libjacknet.dylib
+cd /usr/local/lib && sudo ln -s /System/Library/Frameworks/Jacknet.framework/Jacknet libjacknet.0.dylib
 cd /usr/local/bin && sudo ln -s jackdmp jackd
 
 

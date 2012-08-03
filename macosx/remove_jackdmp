@@ -3,9 +3,9 @@ sudo rm -r "/usr/local/lib/jackmp"
 sudo rm "/usr/local/bin/jackdmp"
 sudo rm -r "/usr/local/lib/jackd"
 sudo rm "/usr/local/lib/libjackmp.dylib"
-sudo rm -r "/Library/Frameworks/Jackmp.framework"
-sudo rm -r "/Library/Frameworks/Jackservermp.framework"
-sudo rm -r "/Library/Frameworks/Jacknet.framework"
+sudo rm -r "/System/Library/Frameworks/Jackmp.framework"
+sudo rm -r "/System/Library/Frameworks/Jackservermp.framework"
+sudo rm -r "/System/Library/Frameworks/Jacknet.framework"
 sudo rm -r "/Library/Audio/Plug-Ins/HAL/JackRouter.plugin"
 
 # Tries to restore jack
