@@ -50,6 +50,10 @@ namespace Jack
 #endif
 }
 
+/* __JackPlatformAdapter__ */
+#include "JackCoreAudioAdapter.h"
+namespace Jack { typedef JackCoreAudioAdapter JackPlatformAdapter; }
+
 /* __JackPlatformMutex__ */
 #include "JackPosixMutex.h"
 namespace Jack { typedef JackPosixMutex JackMutex; }

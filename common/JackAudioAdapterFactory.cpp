@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008 Grame
+Copyright (C) 2008-2012 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,26 +18,12 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "JackAudioAdapter.h"
+#include "JackPlatformPlug.h"
 #include "JackArgParser.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-
-#ifdef __linux__
-#include "JackAlsaAdapter.h"
-#endif
-
-#ifdef __APPLE__
-#include "JackCoreAudioAdapter.h"
-#endif
-
-#ifdef WIN32
-#include "JackPortAudioAdapter.h"
-#endif
-
-#if defined(__sun__) || defined(sun)
-#include "JackOSSAdapter.h"
-#endif
 
 #ifdef __cplusplus
 extern "C"
@@ -56,22 +42,7 @@ extern "C"
 
         try {
 
-    #ifdef __linux__
-            adapter = new Jack::JackAudioAdapter(jack_client, new Jack::JackAlsaAdapter(buffer_size, sample_rate, params));
-    #endif
-
-    #ifdef WIN32
-            adapter = new Jack::JackAudioAdapter(jack_client, new Jack::JackPortAudioAdapter(buffer_size, sample_rate, params));
-    #endif
-
-    #ifdef __APPLE__
-            adapter = new Jack::JackAudioAdapter(jack_client, new Jack::JackCoreAudioAdapter(buffer_size, sample_rate, params));
-    #endif
-
-    #if defined(__sun__) || defined(sun)
-            adapter = new Jack::JackAudioAdapter(jack_client, new Jack::JackOSSAdapter(buffer_size, sample_rate, params));
-    #endif
-
+            adapter = new Jack::JackAudioAdapter(jack_client, new Jack::JackPlatformAdapter(buffer_size, sample_rate, params));
             assert(adapter);
 
             if (adapter->Open() == 0) {
@@ -82,6 +53,7 @@ extern "C"
             }
 
         } catch (...) {
+            jack_info("audioadapter allocation error");
             return 1;
         }
     }

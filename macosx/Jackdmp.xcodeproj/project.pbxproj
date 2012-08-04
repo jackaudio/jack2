@@ -8737,6 +8737,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				HEADER_SEARCH_PATHS = (
+					../macosx,
 					/opt/local/include,
 					.,
 					../posix,
@@ -8787,6 +8788,7 @@
 				GCC_MODEL_TUNING = G4;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				HEADER_SEARCH_PATHS = (
+					../macosx,
 					/opt/local/include,
 					.,
 					../posix,
@@ -17908,6 +17910,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				HEADER_SEARCH_PATHS = (
+					../macosx,
 					/opt/local/include,
 					.,
 					../posix,
@@ -17960,6 +17963,7 @@
 				GCC_MODEL_TUNING = G4;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				HEADER_SEARCH_PATHS = (
+					../macosx,
 					/opt/local/include,
 					.,
 					../posix,

@@ -463,7 +463,7 @@ extern "C"
             }
 
         } catch (...) {
-            jack_info("NetAdapter allocation error");
+            jack_info("netadapter allocation error");
             return 1;
         }
     }

@@ -29,18 +29,26 @@ sudo cp  jack_loopback.so  /usr/local/lib/jackmp
 [ -f audioadapter.so ] && sudo cp  audioadapter.so /usr/local/lib/jackmp
 
 # Create links to jackmp ressources
-cd /usr/local/lib && [ -f libjack.0.dylib ] && sudo mv -f libjack.0.dylib tmp_libjack.0.dylib 
-cd /usr/local/lib && [ -f jackd ] && sudo mv -f jackd tmp_jackd 
+cd /usr/local/bin && [ -f jackd ] && sudo rm jackd
+
+cd /usr/local/lib && [ -f libjack.0.dylib ] && sudo rm libjack.0.dylib
 cd /usr/local/lib && [ -f libjack.dylib ] && sudo rm libjack.dylib
+
+cd /usr/local/lib && [ -f libjackserver.0.dylib ] && sudo rm libjackserver.0.dylib
+cd /usr/local/lib && [ -f libjackserver.dylib ] && sudo rm libjackserver.dylib
+
 cd /usr/local/lib && [ -f libjacknet.dylib ] && sudo rm libjacknet.dylib
 cd /usr/local/lib && [ -f libjacknet.0.dylib ] && sudo rm libjacknet.0.dylib
-cd /usr/local/bin && [ -f jackd ] && sudo rm jackd
+
 cd /usr/local/lib && sudo ln -s /System/Library/Frameworks/Jackmp.framework/Jackmp libjack.dylib
 cd /usr/local/lib && sudo ln -s /System/Library/Frameworks/Jackmp.framework/Jackmp libjack.0.dylib
+
 cd /usr/local/lib && sudo ln -s /System/Library/Frameworks/Jackservermp.framework/Jackservermp libjackserver.dylib
 cd /usr/local/lib && sudo ln -s /System/Library/Frameworks/Jackservermp.framework/Jackservermp libjackserver.0.dylib
+
 cd /usr/local/lib && sudo ln -s /System/Library/Frameworks/Jacknet.framework/Jacknet libjacknet.dylib
 cd /usr/local/lib && sudo ln -s /System/Library/Frameworks/Jacknet.framework/Jacknet libjacknet.0.dylib
+
 cd /usr/local/bin && sudo ln -s jackdmp jackd
 
 

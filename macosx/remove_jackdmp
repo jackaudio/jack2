@@ -9,8 +9,4 @@ sudo rm -r "/System/Library/Frameworks/Jacknet.framework"
 sudo rm -r "/Library/Audio/Plug-Ins/HAL/JackRouter.plugin"
 
 # Tries to restore jack
-cd /usr/local/lib && sudo rm -r libjack.0.dylib
-cd /usr/local/lib && [ -f tmp_libjack.0.dylib ] && sudo  mv -f tmp_libjack.0.dylib libjack.0.dylib
-cd /usr/local/lib && ln -s libjack.0.dylib libjack.dylib
-cd /usr/local/bin && [ -f tmp_jackd ] && sudo  mv -f tmp_jackd jackd
 
