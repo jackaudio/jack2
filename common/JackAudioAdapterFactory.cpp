@@ -25,6 +25,26 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <stdlib.h>
 #include <assert.h>
 
+#ifdef __APPLE__
+#include "JackCoreAudioAdapter.h"
+#define JackPlatformAdapter JackCoreAudioAdapter
+#endif
+
+#ifdef __linux__
+#include "JackAlsaAdapter.h"
+#define JackPlatformAdapter JackAlsaAdapter
+#endif
+
+#if defined(__sun__) || defined(sun)
+#include "JackOSSAdapter.h"
+#define JackPlatformAdapter JackOSSAdapter
+#endif
+
+#ifdef WIN32
+#include "JackPortAudioAdapter.h"
+#define JackPlatformAdapter JackPortAudioAdapter
+#endif
+
 #ifdef __cplusplus
 extern "C"
 {

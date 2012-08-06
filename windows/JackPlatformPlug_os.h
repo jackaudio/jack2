@@ -47,10 +47,6 @@ namespace Jack
 	class JackNetWinSocket;
 }
 
-/* __JackPlatformAdapter__ */
-#include "JackPortAudioAdapter.h"
-namespace Jack { typedef JackPortAudioAdapter JackPlatformAdapter; }
-
 /* __JackPlatformMutex__ */
 #include "JackWinMutex.h"
 namespace Jack {typedef JackWinMutex JackMutex; }

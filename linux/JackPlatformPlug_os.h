@@ -40,10 +40,6 @@ namespace Jack
     class JackNetUnixSocket;
 }
 
-/* __JackPlatformAdapter__ */
-#include "JackAlsaAdapter.h"
-namespace Jack { typedef JackAlsaAdapter JackPlatformAdapter; }
-
 /* __JackPlatformMutex__ */
 #include "JackPosixMutex.h"
 namespace Jack {typedef JackPosixMutex JackMutex; }
