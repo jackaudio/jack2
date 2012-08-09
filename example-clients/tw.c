@@ -231,7 +231,7 @@ main (int argc, char *argv[])
 		fprintf (stderr, "cannot connect input ports\n");
 	}
 
-	free (ports);
+	jack_free (ports);
 
 	ports = jack_get_ports (client, NULL, NULL,
 				JackPortIsPhysical|JackPortIsInput);
@@ -244,7 +244,7 @@ main (int argc, char *argv[])
 		fprintf (stderr, "cannot connect output ports\n");
 	}
 
-	free (ports);
+	jack_free (ports);
 
     /* install a signal handler to properly quits jack client */
     signal(SIGQUIT, signal_handler);

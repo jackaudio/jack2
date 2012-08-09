@@ -40,7 +40,7 @@ extern "C"
  *
  * @return NULL if unsuccessful, otherwise pointer to the internal
  * client name obtained from the heap via malloc().  The caller should
- * free() this storage when no longer needed.
+ * jack_free() this storage when no longer needed.
  */
 char *jack_get_internal_client_name (jack_client_t *client,
                                      jack_intclient_t intclient);

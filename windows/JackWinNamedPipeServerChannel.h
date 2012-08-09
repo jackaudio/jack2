@@ -17,16 +17,13 @@
 
  */
 
-
 #ifndef __JackWinNamedPipeServerChannel__
 #define __JackWinNamedPipeServerChannel__
 
 #include "JackWinNamedPipe.h"
 #include "JackPlatformPlug.h"
 #include "JackConstants.h"
-
 #include "JackRequestDecoder.h"
-
 #include <list>
 
 namespace Jack

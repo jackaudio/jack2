@@ -46,7 +46,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
 {
     JackRequest::RequestType type = (JackRequest::RequestType)type_aux;
 
-   // Read data
+    // Read data
     switch (type) {
 
         case JackRequest::kClientCheck: {

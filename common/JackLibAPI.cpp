@@ -166,7 +166,7 @@ static jack_client_t* jack_client_open_aux(const char* client_name, jack_options
 
 LIB_EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options_t options, jack_status_t* status, ...)
 {
-        JackGlobals::CheckContext("jack_client_open");
+    JackGlobals::CheckContext("jack_client_open");
 
     try {
         assert(JackGlobals::fOpenMutex);
