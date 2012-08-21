@@ -1616,14 +1616,29 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
     }
 
     // AUHAL
-    ComponentDescription cd = {kAudioUnitType_Output, kAudioUnitSubType_HALOutput, kAudioUnitManufacturer_Apple, 0, 0};
-    Component HALOutput = FindNextComponent(NULL, &cd);
-
-    err1 = OpenAComponent(HALOutput, &fAUHAL);
-    if (err1 != noErr) {
-        jack_error("Error calling OpenAComponent");
-        printError(err1);
-        goto error;
+    SInt32 major;
+    SInt32 minor;
+    Gestalt(gestaltSystemVersionMajor, &major);
+    Gestalt(gestaltSystemVersionMinor, &minor);
+    
+    if (major == 10 && minor >= 6) { 
+        AudioComponentDescription cd = {kAudioUnitType_Output, kAudioUnitSubType_HALOutput, kAudioUnitManufacturer_Apple, 0, 0};
+        AudioComponent HALOutput = AudioComponentFindNext(NULL, &cd);
+        err1 = AudioComponentInstanceNew(HALOutput, &fAUHAL);
+        if (err1 != noErr) {
+            jack_error("Error calling AudioComponentInstanceNew");
+            printError(err1);
+            goto error;
+        }
+    } else {
+        ComponentDescription cd = {kAudioUnitType_Output, kAudioUnitSubType_HALOutput, kAudioUnitManufacturer_Apple, 0, 0};
+        Component HALOutput = FindNextComponent(NULL, &cd);
+        err1 = OpenAComponent(HALOutput, &fAUHAL);
+        if (err1 != noErr) {
+            jack_error("Error calling OpenAComponent");
+            printError(err1);
+            goto error;
+        }
     }
 
     err1 = AudioUnitInitialize(fAUHAL);
