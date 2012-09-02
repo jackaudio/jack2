@@ -266,7 +266,7 @@ def main():
                 print "--- engine param reset \"%s\"" % param
 
                 type_char, name, short_descr, long_descr = configure_iface.GetParameterInfo(['engine', param])
-                configure_iface.SetParameterValue(['engine', param], python_type_to_jackdbus_type(value, type_char))
+                configure_iface.ResetParameterValue(['engine', param])
             elif arg == 'il':
                 print "--- internals list"
                 is_leaf, internals = configure_iface.ReadContainer(['internals'])
