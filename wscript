@@ -173,6 +173,13 @@ def configure(conf):
         conf.define('HAVE_CELT_API_0_7', 0)
         conf.define('HAVE_CELT_API_0_5', 0)
 
+    conf.env['WITH_OPUS'] = False
+    if conf.check_cfg(package='opus', atleast_version='0.9.0' , args='--cflags --libs', mandatory=False):
+        if conf.check_cc(header_name='opus/opus_custom.h', mandatory=False):
+            conf.define('HAVE_OPUS', 1)
+            conf.env['WITH_OPUS'] = True
+
+
     conf.env['LIB_PTHREAD'] = ['pthread']
     conf.env['LIB_DL'] = ['dl']
     conf.env['LIB_RT'] = ['rt']
@@ -264,6 +271,7 @@ def configure(conf):
     display_msg('C++ compiler flags', repr(conf.env['CXXFLAGS']))
     display_msg('Linker flags', repr(conf.env['LINKFLAGS']))
     display_feature('Build doxygen documentation', conf.env['BUILD_DOXYGEN_DOCS'])
+    display_feature('Build Opus netjack2', conf.env['WITH_OPUS'])
     display_feature('Build with engine profiling', conf.env['BUILD_WITH_PROFILE'])
     display_feature('Build with 32/64 bits mixed mode', conf.env['BUILD_WITH_32_64'])
 

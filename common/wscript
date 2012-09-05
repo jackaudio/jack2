@@ -68,7 +68,7 @@ def build(bld):
         ]
 
     includes = ['.', './jack', '..']
-    uselib = ["PTHREAD", "CELT"]
+    uselib = ["PTHREAD", "CELT", "OPUS"]
 
     if bld.env['IS_LINUX']:
         common_libsources += [
@@ -193,7 +193,7 @@ def build(bld):
         netlib.includes = includes
         netlib.name         = 'netlib'
         netlib.target       = 'jacknet'
-        netlib.use = ['SAMPLERATE', 'CELT', 'PTHREAD' , 'RT']
+        netlib.use = ['SAMPLERATE', 'CELT', 'OPUS', 'PTHREAD' , 'RT']
         netlib.install_path = '${LIBDIR}'
         netlib.source = [
             'JackNetAPI.cpp',

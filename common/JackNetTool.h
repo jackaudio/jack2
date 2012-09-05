@@ -62,6 +62,7 @@ namespace Jack
         JackFloatEncoder = 0,
         JackIntEncoder = 1,
         JackCeltEncoder = 2,
+        JackOpusEncoder = 3,
     };
 
 //session params ******************************************************************************
@@ -386,6 +387,50 @@ namespace Jack
 
             NetCeltAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer, int kbps);
             virtual ~NetCeltAudioBuffer();
+
+            // needed size in bytes for an entire cycle
+            size_t GetCycleSize();
+
+             // cycle duration in sec
+            float GetCycleDuration();
+            int GetNumPackets(int active_ports);
+
+            //jack<->buffer
+            int RenderFromJackPorts();
+            void RenderToJackPorts();
+
+            //network<->buffer
+            int RenderFromNetwork(int cycle, int sub_cycle, uint32_t port_num);
+            int RenderToNetwork(int sub_cycle, uint32_t  port_num);
+    };
+
+#endif
+
+#if HAVE_OPUS
+
+#include <opus/opus.h>
+#include <opus/opus_custom.h>
+
+    class SERVER_EXPORT NetOpusAudioBuffer : public NetAudioBuffer
+    {
+        private:
+
+            OpusCustomMode** fOpusMode;
+            OpusCustomEncoder** fOpusEncoder;
+            OpusCustomDecoder** fOpusDecoder;
+
+            int fCompressedSizeByte;
+            int fNumPackets;
+
+            size_t fLastSubPeriodBytesSize;
+
+            unsigned char** fCompressedBuffer;
+            void FreeOpus();
+
+        public:
+
+            NetOpusAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer, int kbps);
+            virtual ~NetOpusAudioBuffer();
 
             // needed size in bytes for an entire cycle
             size_t GetCycleSize();
