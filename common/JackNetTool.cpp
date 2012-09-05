@@ -840,6 +840,7 @@ namespace Jack
     SERVER_EXPORT void SessionParamsHToN(session_params_t* src_params, session_params_t* dst_params)
     {
         memcpy(dst_params, src_params, sizeof(session_params_t));
+        dst_params->fProtocolVersion = htonl(src_params->fProtocolVersion);
         dst_params->fPacketID = htonl(src_params->fPacketID);
         dst_params->fMtu = htonl(src_params->fMtu);
         dst_params->fID = htonl(src_params->fID);
@@ -859,6 +860,7 @@ namespace Jack
     SERVER_EXPORT void SessionParamsNToH(session_params_t* src_params, session_params_t* dst_params)
     {
         memcpy(dst_params, src_params, sizeof(session_params_t));
+        dst_params->fProtocolVersion = ntohl(src_params->fProtocolVersion);
         dst_params->fPacketID = ntohl(src_params->fPacketID);
         dst_params->fMtu = ntohl(src_params->fMtu);
         dst_params->fID = ntohl(src_params->fID);
@@ -967,6 +969,8 @@ namespace Jack
     SERVER_EXPORT void PacketHeaderHToN(packet_header_t* src_header, packet_header_t* dst_header)
     {
         memcpy(dst_header, src_header, sizeof(packet_header_t));
+        dst_header->fDataType = htonl(src_header->fDataType);
+        dst_header->fDataStream = htonl(src_header->fDataStream);
         dst_header->fID = htonl(src_header->fID);
         dst_header->fNumPacket = htonl(src_header->fNumPacket);
         dst_header->fPacketSize = htonl(src_header->fPacketSize);
@@ -979,6 +983,8 @@ namespace Jack
     SERVER_EXPORT void PacketHeaderNToH(packet_header_t* src_header, packet_header_t* dst_header)
     {
         memcpy(dst_header, src_header, sizeof(packet_header_t));
+        dst_header->fDataType = ntohl(src_header->fDataType);
+        dst_header->fDataStream = ntohl(src_header->fDataStream);
         dst_header->fID = ntohl(src_header->fID);
         dst_header->fNumPacket = ntohl(src_header->fNumPacket);
         dst_header->fPacketSize = ntohl(src_header->fPacketSize);

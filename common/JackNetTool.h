@@ -38,8 +38,8 @@ using namespace std;
 #endif
 #endif
 
-#define MASTER_PROTOCOL 5
-#define SLAVE_PROTOCOL 5
+#define MASTER_PROTOCOL 6
+#define SLAVE_PROTOCOL 6
 
 #define NET_PACKET_ERROR -2
 
@@ -83,11 +83,12 @@ namespace Jack
     are kept in LITTLE_ENDIAN format (to avoid 2 conversions in the more common LITTLE_ENDIAN <==> LITTLE_ENDIAN connection case).
     */
 
+    PRE_PACKED_STRUCTURE
     struct _session_params
     {
-        char fPacketType[7];                //packet type ('param')
-        char fProtocolVersion;              //version
-        uint32_t fPacketID;                 //indicates the packet type
+        char fPacketType[8];                //packet type ('param')
+        uint32_t fProtocolVersion;          //version
+        int32_t fPacketID;                 //indicates the packet type
         char fName[JACK_CLIENT_NAME_SIZE];  //slave's name
         char fMasterNetName[256];           //master hostname (network)
         char fSlaveNetName[256];            //slave hostname (network)
@@ -104,7 +105,7 @@ namespace Jack
         uint32_t fKBps;                     //KB per second for CELT encoder
         uint32_t fSlaveSyncMode;            //is the slave in sync mode ?
         uint32_t fNetworkLatency;           //network latency
-    };
+    } POST_PACKED_STRUCTURE;
 
 //net status **********************************************************************************
 
@@ -165,11 +166,12 @@ namespace Jack
 
     */
 
+    PRE_PACKED_STRUCTURE
     struct _packet_header
     {
-        char fPacketType[7];        //packet type ('headr')
-        char fDataType;             //a for audio, m for midi and s for sync
-        char fDataStream;           //s for send, r for return
+        char fPacketType[8];        //packet type ('headr')
+        uint32_t fDataType;         //a for audio, m for midi and s for sync
+        uint32_t fDataStream;       //s for send, r for return
         uint32_t fID;               //unique ID of the slave
         uint32_t fNumPacket;        //number of data packets of the cycle
         uint32_t fPacketSize;       //packet size in bytes
@@ -177,7 +179,7 @@ namespace Jack
         uint32_t fCycle;            //process cycle counter
         uint32_t fSubCycle;         //midi/audio subcycle counter
         uint32_t fIsLastPckt;       //is it the last packet of a given cycle ('y' or 'n')
-    };
+    } POST_PACKED_STRUCTURE;
 
 //net timebase master
 
@@ -202,13 +204,14 @@ namespace Jack
     \Brief This structure contains transport data to be sent over the network
     */
 
+    PRE_PACKED_STRUCTURE
     struct _net_transport_data
     {
         uint32_t fNewState;             //is it a state change
         uint32_t fTimebaseMaster;       //is there a new timebase master
         int32_t fState;                 //current cycle state
         jack_position_t fPosition;      //current cycle position
-    };
+    } POST_PACKED_STRUCTURE;
 
  //midi data ***********************************************************************************
 
