@@ -823,7 +823,7 @@ extern "C"
         desc = jack_driver_descriptor_construct("netmanager", JackDriverNone, "netjack multi-cast master component", &filler);
 
         strcpy(value.str, DEFAULT_MULTICAST_IP);
-        jack_driver_descriptor_add_parameter(desc, &filler, "multicast-ip", 'a', JackDriverParamString, &value, NULL, "Multicast Address", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "multicast-ip", 'a', JackDriverParamString, &value, NULL, "Multicast address", NULL);
 
         value.i = DEFAULT_PORT;
         jack_driver_descriptor_add_parameter(desc, &filler, "udp-net-port", 'p', JackDriverParamInt, &value, NULL, "UDP port", NULL);
