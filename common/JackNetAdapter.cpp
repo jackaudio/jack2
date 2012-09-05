@@ -102,6 +102,14 @@ namespace Jack
                     }
                     break;
             #endif
+            #if HAVE_OPUS
+                case 'O':
+                    if (param->value.i > 0) {
+                        fParams.fSampleEncoder = JackOpusEncoder;
+                        fParams.fKBps = param->value.i;
+                    }
+                    break;
+            #endif
                 case 'l' :
                     fParams.fNetworkLatency = param->value.i;
                     if (fParams.fNetworkLatency > NETWORK_MAX_LATENCY) {
@@ -419,6 +427,11 @@ extern "C"
     #if HAVE_CELT
         value.i = -1;
         jack_driver_descriptor_add_parameter(desc, &filler, "celt", 'c', JackDriverParamInt, &value, NULL, "Set CELT encoding and number of kBits per channel", NULL);
+    #endif
+
+    #if HAVE_OPUS
+        value.i = -1;
+        jack_driver_descriptor_add_parameter(desc, &filler, "opus", 'O', JackDriverParamInt, &value, NULL, "Set Opus encoding and number of kBits per channel", NULL);
     #endif
 
         strcpy(value.str, "'hostname'");
