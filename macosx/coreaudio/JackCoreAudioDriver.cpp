@@ -258,17 +258,21 @@ static CFStringRef GetDeviceName(AudioDeviceID id)
     return (err == noErr) ? UIname : NULL;
 }
 
-static void ParseChannelList(const string& list, vector<int>& result)
+static void ParseChannelList(const string& list, vector<int>& result, int max_chan)
 {
     stringstream ss(list);
     string token;
-	int chan;
-
+    int chan;
+  
     while (ss >> token) {
         istringstream ins;
         ins.str(token);
         ins >> chan;
-        result.push_back(chan);
+        if (chan < 0 || chan >= max_chan) {
+            jack_error("Ignore incorrect channel mapping value = %d", chan);
+        } else {
+            result.push_back(chan);
+        }
     }
 }
 
@@ -2027,19 +2031,7 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
 
     vector<int> parsed_chan_in_list;
     vector<int> parsed_chan_out_list;
-
-    ParseChannelList(chan_in_list, parsed_chan_in_list);
-    if (parsed_chan_in_list.size() > 0) {
-        jack_info("Explicit input channel list size = %d", parsed_chan_in_list.size());
-        inchannels = parsed_chan_in_list.size();
-    }
-
-    ParseChannelList(chan_out_list, parsed_chan_out_list);
-    if (parsed_chan_out_list.size() > 0) {
-        jack_info("Explicit output channel list size = %d", parsed_chan_out_list.size());
-        outchannels = parsed_chan_out_list.size();
-    }
-
+   
     // Starting with 10.6 systems, the HAL notification thread is created internally
     if (major == 10 && minor >= 6) {
         CFRunLoopRef theRunLoop = NULL;
@@ -2070,6 +2062,18 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
     if (SetupChannels(capturing, playing, inchannels, outchannels, in_nChannels, out_nChannels, !ac3_encoding) < 0) {
         goto error;
     }
+    
+    ParseChannelList(chan_in_list, parsed_chan_in_list, in_nChannels);
+    if (parsed_chan_in_list.size() > 0) {
+        jack_info("Explicit input channel list size = %d", parsed_chan_in_list.size());
+        inchannels = parsed_chan_in_list.size();
+    }
+
+    ParseChannelList(chan_out_list, parsed_chan_out_list, out_nChannels);
+    if (parsed_chan_out_list.size() > 0) {
+        jack_info("Explicit output channel list size = %d", parsed_chan_out_list.size());
+        outchannels = parsed_chan_out_list.size();
+    }  
 
     if (SetupBufferSize(buffer_size) < 0) {
         goto error;
@@ -2470,8 +2474,8 @@ extern "C"
         jack_driver_descriptor_add_parameter(desc, &filler, "out-channels", 'o', JackDriverParamInt, &value, NULL, "Maximum number of output channels", "Maximum number of output channels. If -1, max possible number of output channels will be used");
 
         value.str[0] = 0;
-        jack_driver_descriptor_add_parameter(desc, &filler, "input-list", 'n', JackDriverParamString, &value, NULL, "Input channel list", "List of input channel number to be opened");
-        jack_driver_descriptor_add_parameter(desc, &filler, "output-list", 'N', JackDriverParamString, &value, NULL, "Output channel list", "List of output channel number to be opened");
+        jack_driver_descriptor_add_parameter(desc, &filler, "input-list", 'n', JackDriverParamString, &value, NULL, "Input channel list for channel mapping", "List of input channel number to be opened (syntax like : \"0 3 2\")");
+        jack_driver_descriptor_add_parameter(desc, &filler, "output-list", 'N', JackDriverParamString, &value, NULL, "Output channel list for channel mapping", "List of output channel number to be opened (syntax like : \"0 3 2\")");
 
         value.str[0] = 0;
         jack_driver_descriptor_add_parameter(desc, &filler, "capture", 'C', JackDriverParamString, &value, NULL, "Input CoreAudio device name", NULL);
@@ -2665,7 +2669,7 @@ extern "C"
             printf("Input channel list and in channels are both specified, input channel list will take over...\n");
         }
 
-         if (strcmp(chan_out_list, "") != 0 && chan_out >= 0) {
+        if (strcmp(chan_out_list, "") != 0 && chan_out >= 0) {
             printf("Output channel list and out channels are both specified, output channel list will take over...\n");
         }
 
