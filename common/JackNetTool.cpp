@@ -709,6 +709,210 @@ namespace Jack
 
 #endif
 
+#if HAVE_OPUS
+
+    NetOpusAudioBuffer::NetOpusAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer, int kbps)
+        :NetAudioBuffer(params, nports, net_buffer)
+    {
+        fOpusMode = new OpusCustomMode *[fNPorts];
+        fOpusEncoder = new OpusCustomEncoder *[fNPorts];
+        fOpusDecoder = new OpusCustomDecoder *[fNPorts];
+
+        memset(fOpusMode, 0, fNPorts * sizeof(OpusCustomMode*));
+        memset(fOpusEncoder, 0, fNPorts * sizeof(OpusCustomEncoder*));
+        memset(fOpusDecoder, 0, fNPorts * sizeof(OpusCustomDecoder*));
+
+        int error = OPUS_OK;
+
+        for (int i = 0; i < fNPorts; i++)  {
+            /* Allocate en/decoders */
+            fOpusMode[i] = opus_custom_mode_create(
+            params->fSampleRate, params->fPeriodSize, &error);
+            if (error != OPUS_OK) {
+                goto error;
+            }
+
+            fOpusEncoder[i] = opus_custom_encoder_create(fOpusMode[i], 1,&error);
+            if (error != OPUS_OK) {
+                goto error;
+            }
+
+            fOpusDecoder[i] = opus_custom_decoder_create(fOpusMode[i], 1, &error);
+            if (error != OPUS_OK) {
+                goto error;
+            }
+
+            opus_custom_encoder_ctl(fOpusEncoder[i], OPUS_SET_BITRATE(kbps*1024)); // bits per second
+            opus_custom_encoder_ctl(fOpusEncoder[i], OPUS_SET_COMPLEXITY(10));
+            opus_custom_encoder_ctl(fOpusEncoder[i], OPUS_SET_SIGNAL(OPUS_SIGNAL_MUSIC));
+            opus_custom_encoder_ctl(fOpusEncoder[i], OPUS_SET_SIGNAL(OPUS_APPLICATION_RESTRICTED_LOWDELAY));
+
+            /* initilize decoders */
+            error = opus_custom_encoder_init(fOpusEncoder[i], fOpusMode[i], 1);
+            error = opus_custom_decoder_init(fOpusDecoder[i], fOpusMode[i], 1);
+        }
+
+        {
+            fPeriodSize = params->fPeriodSize;
+            fCompressedSizeByte = (kbps * params->fPeriodSize * 1024) / (params->fSampleRate * 8);
+            jack_log("NetOpusAudioBuffer fCompressedSizeByte %d", fCompressedSizeByte);
+
+            fCompressedBuffer = new unsigned char* [fNPorts];
+            for (int port_index = 0; port_index < fNPorts; port_index++) {
+                fCompressedBuffer[port_index] = new unsigned char[fCompressedSizeByte];
+                memset(fCompressedBuffer[port_index], 0, fCompressedSizeByte * sizeof(char));
+            }
+
+            int res1 = (fNPorts * fCompressedSizeByte) % PACKET_AVAILABLE_SIZE(params);
+            int res2 = (fNPorts * fCompressedSizeByte) / PACKET_AVAILABLE_SIZE(params);
+
+            fNumPackets = (res1) ? (res2 + 1) : res2;
+
+            jack_log("NetOpusAudioBuffer res1 = %d res2 = %d", res1, res2);
+
+            fSubPeriodBytesSize = fCompressedSizeByte / fNumPackets;
+            fLastSubPeriodBytesSize = fSubPeriodBytesSize + fCompressedSizeByte % fNumPackets;
+
+            jack_log("NetOpusAudioBuffer fNumPackets = %d fSubPeriodBytesSize = %d, fLastSubPeriodBytesSize = %d", fNumPackets, fSubPeriodBytesSize, fLastSubPeriodBytesSize);
+
+            fCycleDuration = float(fSubPeriodBytesSize / sizeof(sample_t)) / float(params->fSampleRate);
+            fCycleBytesSize = params->fMtu * fNumPackets;
+
+            fLastSubCycle = -1;
+            return;
+        }
+
+    error:
+
+        FreeOpus();
+        throw std::bad_alloc();
+    }
+
+    NetOpusAudioBuffer::~NetOpusAudioBuffer()
+    {
+        FreeOpus();
+
+        for (int port_index = 0; port_index < fNPorts; port_index++) {
+            delete [] fCompressedBuffer[port_index];
+        }
+
+        delete [] fCompressedBuffer;
+    }
+
+    void NetOpusAudioBuffer::FreeOpus()
+    {
+        for (int i = 0; i < fNPorts; i++)  {
+            if (fOpusEncoder[i]) {
+                opus_custom_encoder_destroy(fOpusEncoder[i]);
+                fOpusEncoder[i]=0;
+            }
+            if (fOpusDecoder[i]) {
+                opus_custom_decoder_destroy(fOpusDecoder[i]);
+                fOpusDecoder[i]=0;
+            }
+            if (fOpusMode[i]) {
+                opus_custom_mode_destroy(fOpusMode[i]);
+                fOpusMode[i]=0;
+            }
+        }
+
+        delete [] fOpusEncoder;
+        delete [] fOpusDecoder;
+        delete [] fOpusMode;
+    }
+
+    size_t NetOpusAudioBuffer::GetCycleSize()
+    {
+        return fCycleBytesSize;
+    }
+
+    float NetOpusAudioBuffer::GetCycleDuration()
+    {
+        return fCycleDuration;
+    }
+
+    int NetOpusAudioBuffer::GetNumPackets(int active_ports)
+    {
+        return fNumPackets;
+    }
+
+    int NetOpusAudioBuffer::RenderFromJackPorts()
+    {
+        float buffer[BUFFER_SIZE_MAX];
+
+        for (int port_index = 0; port_index < fNPorts; port_index++) {
+            if (fPortBuffer[port_index]) {
+                memcpy(buffer, fPortBuffer[port_index], fPeriodSize * sizeof(sample_t));
+            } else {
+                memset(buffer, 0, fPeriodSize * sizeof(sample_t));
+            }
+            int res = opus_custom_encode_float(fOpusEncoder[port_index], buffer, fPeriodSize, fCompressedBuffer[port_index], fCompressedSizeByte);
+            if (res != fCompressedSizeByte) {
+                jack_error("opus_encode_float error fCompressedSizeByte = %d res = %d", fCompressedSizeByte, res);
+            }
+        }
+
+        // All ports active
+        return fNPorts;
+    }
+
+    void NetOpusAudioBuffer::RenderToJackPorts()
+    {
+        for (int port_index = 0; port_index < fNPorts; port_index++) {
+            if (fPortBuffer[port_index]) {
+                int res = opus_custom_decode_float(fOpusDecoder[port_index], fCompressedBuffer[port_index], fCompressedSizeByte, fPortBuffer[port_index], fPeriodSize);
+                if (res != OPUS_OK) {
+                    jack_error("opus_decode_float error fCompressedSizeByte = %d res = %d", fCompressedSizeByte, res);
+                }
+            }
+        }
+
+        NextCycle();
+    }
+
+    //network<->buffer
+    int NetOpusAudioBuffer::RenderFromNetwork(int cycle, int sub_cycle, uint32_t port_num)
+    {
+        // Cleanup all JACK ports at the beginning of the cycle
+        if (sub_cycle == 0) {
+            Cleanup();
+        }
+
+        if (port_num > 0)  {
+            // Last packet of the cycle
+            if (sub_cycle == fNumPackets - 1) {
+                for (int port_index = 0; port_index < fNPorts; port_index++) {
+                    memcpy(fCompressedBuffer[port_index] + sub_cycle * fSubPeriodBytesSize, fNetBuffer + port_index * fLastSubPeriodBytesSize, fLastSubPeriodBytesSize);
+                }
+            } else {
+                for (int port_index = 0; port_index < fNPorts; port_index++) {
+                    memcpy(fCompressedBuffer[port_index] + sub_cycle * fSubPeriodBytesSize, fNetBuffer + port_index * fSubPeriodBytesSize, fSubPeriodBytesSize);
+                }
+            }
+        }
+
+        return CheckPacket(cycle, sub_cycle);
+    }
+
+    int NetOpusAudioBuffer::RenderToNetwork(int sub_cycle, uint32_t port_num)
+    {
+        // Last packet of the cycle
+        if (sub_cycle == fNumPackets - 1) {
+            for (int port_index = 0; port_index < fNPorts; port_index++) {
+                memcpy(fNetBuffer + port_index * fLastSubPeriodBytesSize, fCompressedBuffer[port_index] + sub_cycle * fSubPeriodBytesSize, fLastSubPeriodBytesSize);
+            }
+            return fNPorts * fLastSubPeriodBytesSize;
+        } else {
+            for (int port_index = 0; port_index < fNPorts; port_index++) {
+                memcpy(fNetBuffer + port_index * fSubPeriodBytesSize, fCompressedBuffer[port_index] + sub_cycle * fSubPeriodBytesSize, fSubPeriodBytesSize);
+            }
+            return fNPorts * fSubPeriodBytesSize;
+        }
+    }
+
+#endif
+
+
     NetIntAudioBuffer::NetIntAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer)
         : NetAudioBuffer(params, nports, net_buffer)
     {
@@ -891,6 +1095,9 @@ namespace Jack
             case JackCeltEncoder:
                 strcpy(encoder, "CELT");
                 break;
+            case JackOpusEncoder:
+                strcpy(encoder, "OPUS");
+                break;
         }
 
         jack_info("**************** Network parameters ****************");
@@ -915,6 +1122,10 @@ namespace Jack
                 break;
             case (JackCeltEncoder):
                 jack_info("SampleEncoder : %s", "CELT");
+                jack_info("kBits : %d", params->fKBps);
+                break;
+            case (JackOpusEncoder):
+                jack_info("SampleEncoder : %s", "OPUS");
                 jack_info("kBits : %d", params->fKBps);
                 break;
         };
