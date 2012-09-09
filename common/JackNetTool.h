@@ -419,7 +419,8 @@ namespace Jack
             OpusCustomEncoder** fOpusEncoder;
             OpusCustomDecoder** fOpusDecoder;
 
-            int fCompressedSizeByte;
+            size_t *fCompressedSizesByte;
+            int fCompressedMaxSizeByte;
             int fNumPackets;
 
             size_t fLastSubPeriodBytesSize;
