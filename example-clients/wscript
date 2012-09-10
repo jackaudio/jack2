@@ -126,13 +126,12 @@ def build(bld):
 
     if bld.env['IS_LINUX'] or bld.env['IS_MACOSX']:
         prog = bld(features = 'c cprogram')
-        prog.includes = os_incdir + ['../common/jack', '../common']
+        prog.includes = os_incdir + ['.', '..', '../common/jack', '../common']
         prog.source = ['netsource.c', '../common/netjack_packet.c']
         prog.env.append_value("CFLAGS", "-DNO_JACK_ERROR")
         prog.use = ['CELT', 'SAMPLERATE', 'OPUS', 'clientlib']
         prog.target = 'jack_netsource'
         prog.defines = ['HAVE_CONFIG_H']
-        prog.includes = os_incdir + ['.', '..', '../common/jack', '../common']
 
     if bld.env['IS_LINUX'] and bld.env['BUILD_EXAMPLE_ALSA_IO']:
         prog = bld(features = 'c cprogram')
