@@ -1111,7 +1111,7 @@ SERVER_EXPORT bool jackctl_parameter_has_enum_constraint(jackctl_parameter *para
 SERVER_EXPORT uint32_t jackctl_parameter_get_enum_constraints_count(jackctl_parameter *parameter_ptr)
 {
     if (!parameter_ptr) {
-        return NULL;
+        return 0;
     }
 
     if (!jackctl_parameter_has_enum_constraint(parameter_ptr))

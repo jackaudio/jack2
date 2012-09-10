@@ -223,8 +223,6 @@ int main(int argc, char** argv)
     char* master_driver_name = NULL;
     char** master_driver_args = NULL;
     int master_driver_nargs = 1;
-    int do_mlock = 1;
-    int do_unlock = 0;
     int loopback = 0;
     bool show_version = false;
     jackctl_sigmask_t * sigmask;
@@ -301,14 +299,6 @@ int main(int argc, char** argv)
                     value.ui = atoi(optarg);
                     jackctl_parameter_set_value(param, &value);
                 }
-                break;
-
-            case 'm':
-                do_mlock = 0;
-                break;
-
-            case 'u':
-                do_unlock = 1;
                 break;
 
             case 'v':

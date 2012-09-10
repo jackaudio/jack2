@@ -1388,56 +1388,56 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid,
 }
 
 /*
-Return the max possible input channels in in_nChannels and output channels in out_nChannels.
+Return the max possible input channels in in_maxChannels and output channels in out_maxChannels.
 */
-int JackCoreAudioDriver::SetupChannels(bool capturing, bool playing, int& inchannels, int& outchannels, int& in_nChannels, int& out_nChannels, bool strict)
+int JackCoreAudioDriver::SetupChannels(bool capturing, bool playing, int& inchannels, int& outchannels, int& in_maxChannels, int& out_maxChannels, bool strict)
 {
     OSStatus err = noErr;
 
     if (capturing) {
-        err = GetTotalChannels(fDeviceID, in_nChannels, true);
+        err = GetTotalChannels(fDeviceID, in_maxChannels, true);
         if (err != noErr) {
             jack_error("SetupChannels : cannot get input channel number");
             printError(err);
             return -1;
         } else {
-            jack_log("JackCoreAudioDriver::SetupChannels : max input channels : %d", in_nChannels);
+            jack_log("JackCoreAudioDriver::SetupChannels : max input channels : %d", in_maxChannels);
         }
     }
 
     if (playing) {
-        err = GetTotalChannels(fDeviceID, out_nChannels, false);
+        err = GetTotalChannels(fDeviceID, out_maxChannels, false);
         if (err != noErr) {
             jack_error("Cannot get output channel number");
             printError(err);
             return -1;
         } else {
-            jack_log("JackCoreAudioDriver::SetupChannels : max output channels : %d", out_nChannels);
+            jack_log("JackCoreAudioDriver::SetupChannels : max output channels : %d", out_maxChannels);
         }
     }
 
-    if (inchannels > in_nChannels) {
-        jack_error("This device hasn't required input channels inchannels = %d in_nChannels = %d", inchannels, in_nChannels);
+    if (inchannels > in_maxChannels) {
+        jack_error("This device hasn't required input channels inchannels = %d in_maxChannels = %d", inchannels, in_maxChannels);
         if (strict) {
             return -1;
         }
     }
 
-    if (outchannels > out_nChannels) {
-        jack_error("This device hasn't required output channels outchannels = %d out_nChannels = %d", outchannels, out_nChannels);
+    if (outchannels > out_maxChannels) {
+        jack_error("This device hasn't required output channels outchannels = %d out_maxChannels = %d", outchannels, out_maxChannels);
         if (strict) {
             return -1;
         }
     }
 
     if (inchannels == -1) {
-        jack_log("JackCoreAudioDriver::SetupChannels : setup max in channels = %d", in_nChannels);
-        inchannels = in_nChannels;
+        jack_log("JackCoreAudioDriver::SetupChannels : setup max in channels = %d", in_maxChannels);
+        inchannels = in_maxChannels;
     }
 
     if (outchannels == -1) {
-        jack_log("JackCoreAudioDriver::SetupChannels : setup max out channels = %d", out_nChannels);
-        outchannels = out_nChannels;
+        jack_log("JackCoreAudioDriver::SetupChannels : setup max out channels = %d", out_maxChannels);
+        outchannels = out_maxChannels;
     }
 
     return 0;
@@ -1598,8 +1598,8 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
                                    bool playing,
                                    int inchannels,
                                    int outchannels,
-                                   int in_nChannels,
-                                   int out_nChannels,
+                                   int in_maxChannels,
+                                   int out_maxChannels,
                                    const vector<int>& chan_in_list,
                                    const vector<int>& chan_out_list,
                                    jack_nframes_t buffer_size,
@@ -1611,8 +1611,8 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
     AudioDeviceID currAudioDeviceID;
     UInt32 size;
 
-    jack_log("JackCoreAudioDriver::OpenAUHAL : capturing = %d playing = %d inchannels = %d outchannels = %d in_nChannels = %d out_nChannels = %d chan_in_list = %d chan_out_list = %d",
-        capturing, playing, inchannels, outchannels, in_nChannels, out_nChannels, chan_in_list.size(), chan_out_list.size());
+    jack_log("JackCoreAudioDriver::OpenAUHAL : capturing = %d playing = %d inchannels = %d outchannels = %d in_maxChannels = %d out_maxChannels = %d chan_in_list = %d chan_out_list = %d",
+        capturing, playing, inchannels, outchannels, in_maxChannels, out_maxChannels, chan_in_list.size(), chan_out_list.size());
 
     if (inchannels == 0 && outchannels == 0) {
         jack_error("No input and output channels...");
@@ -1721,16 +1721,16 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
     }
 
     // Setup input channel map
-    if (capturing && inchannels > 0 && inchannels <= in_nChannels) {
-        SInt32 chanArr[in_nChannels];
-        for (int i = 0; i < in_nChannels; i++) {
+    if (capturing && inchannels > 0 && inchannels <= in_maxChannels) {
+        SInt32 chanArr[in_maxChannels];
+        for (int i = 0; i < in_maxChannels; i++) {
             chanArr[i] = -1;
         }
         // Explicit mapping
         if (chan_in_list.size() > 0) {
             for (uint i = 0; i < chan_in_list.size(); i++) {
                 int chan = chan_in_list[i];
-                if (chan < out_nChannels) {
+                if (chan < out_maxChannels) {
                     // The wanted JACK input index for the 'chan' channel value
                     chanArr[chan] = i;
                     jack_info("Input channel = %d ==> JACK input port = %d", chan, i);
@@ -1746,7 +1746,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
             }
         }
 
-        AudioUnitSetProperty(fAUHAL, kAudioOutputUnitProperty_ChannelMap , kAudioUnitScope_Input, 1, chanArr, sizeof(SInt32) * in_nChannels);
+        AudioUnitSetProperty(fAUHAL, kAudioOutputUnitProperty_ChannelMap , kAudioUnitScope_Input, 1, chanArr, sizeof(SInt32) * in_maxChannels);
         if (err1 != noErr) {
             jack_error("Error calling AudioUnitSetProperty - kAudioOutputUnitProperty_ChannelMap for input");
             printError(err1);
@@ -1755,16 +1755,16 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
     }
 
     // Setup output channel map
-    if (playing && outchannels > 0 && outchannels <= out_nChannels) {
-        SInt32 chanArr[out_nChannels];
-        for (int i = 0;	i < out_nChannels; i++) {
+    if (playing && outchannels > 0 && outchannels <= out_maxChannels) {
+        SInt32 chanArr[out_maxChannels];
+        for (int i = 0;	i < out_maxChannels; i++) {
             chanArr[i] = -1;
         }
         // Explicit mapping
         if (chan_out_list.size() > 0) {
             for (uint i = 0; i < chan_out_list.size(); i++) {
                 int chan = chan_out_list[i];
-                if (chan < out_nChannels) {
+                if (chan < out_maxChannels) {
                     // The wanted JACK output index for the 'chan' channel value
                     chanArr[chan] = i;
                     jack_info("JACK output port = %d ==> output channel = %d", i, chan);
@@ -1780,7 +1780,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
             }
         }
 
-        err1 = AudioUnitSetProperty(fAUHAL, kAudioOutputUnitProperty_ChannelMap, kAudioUnitScope_Output, 0, chanArr, sizeof(SInt32) * out_nChannels);
+        err1 = AudioUnitSetProperty(fAUHAL, kAudioOutputUnitProperty_ChannelMap, kAudioUnitScope_Output, 0, chanArr, sizeof(SInt32) * out_maxChannels);
         if (err1 != noErr) {
             jack_error("Error calling AudioUnitSetProperty - kAudioOutputUnitProperty_ChannelMap for output");
             printError(err1);
@@ -2012,8 +2012,8 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
                               int ac3_bitrate,
                               bool ac3_lfe)
 {
-    int in_nChannels = 0;
-    int out_nChannels = 0;
+    int in_maxChannels = 0;
+    int out_maxChannels = 0;
     char capture_driver_name[256];
     char playback_driver_name[256];
 
@@ -2059,17 +2059,17 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
         goto error;
     }
 
-    if (SetupChannels(capturing, playing, inchannels, outchannels, in_nChannels, out_nChannels, !ac3_encoding) < 0) {
+    if (SetupChannels(capturing, playing, inchannels, outchannels, in_maxChannels, out_maxChannels, !ac3_encoding) < 0) {
         goto error;
     }
     
-    ParseChannelList(chan_in_list, parsed_chan_in_list, in_nChannels);
+    ParseChannelList(chan_in_list, parsed_chan_in_list, in_maxChannels);
     if (parsed_chan_in_list.size() > 0) {
         jack_info("Explicit input channel list size = %d", parsed_chan_in_list.size());
         inchannels = parsed_chan_in_list.size();
     }
 
-    ParseChannelList(chan_out_list, parsed_chan_out_list, out_nChannels);
+    ParseChannelList(chan_out_list, parsed_chan_out_list, out_maxChannels);
     if (parsed_chan_out_list.size() > 0) {
         jack_info("Explicit output channel list size = %d", parsed_chan_out_list.size());
         outchannels = parsed_chan_out_list.size();
@@ -2115,7 +2115,7 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
         }
         
         // Force real output channel number to 2
-        outchannels = out_nChannels = 2;
+        outchannels = out_maxChannels = 2;
         
     } else {
         fPlaybackChannels = outchannels;
@@ -2124,7 +2124,7 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
     // Core driver may have changed the in/out values
     fCaptureChannels = inchannels;
 
-    if (OpenAUHAL(capturing, playing, inchannels, outchannels, in_nChannels, out_nChannels, parsed_chan_in_list, parsed_chan_out_list, buffer_size, sample_rate) < 0) {
+    if (OpenAUHAL(capturing, playing, inchannels, outchannels, in_maxChannels, out_maxChannels, parsed_chan_in_list, parsed_chan_out_list, buffer_size, sample_rate) < 0) {
         goto error;
     }
 

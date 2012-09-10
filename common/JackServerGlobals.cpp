@@ -100,9 +100,7 @@ bool JackServerGlobals::Init()
     int client_timeout = 0; /* msecs; if zero, use period size. */
     int realtime_priority = 10;
     int verbose_aux = 0;
-    int do_mlock = 1;
     unsigned int port_max = 128;
-    int do_unlock = 0;
     int temporary = 0;
 
     int opt = 0;
@@ -231,14 +229,6 @@ bool JackServerGlobals::Init()
 
                 case 'p':
                     port_max = (unsigned int)atol(optarg);
-                    break;
-
-                case 'm':
-                    do_mlock = 0;
-                    break;
-
-                case 'u':
-                    do_unlock = 1;
                     break;
 
                 case 'v':
