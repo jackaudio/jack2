@@ -710,7 +710,7 @@ namespace Jack
 #endif
 
 #if HAVE_OPUS
-#define CDO (sizeof(size_t)) ///< compressed data offset (first 4 bytes are length)
+#define CDO (sizeof(short)) ///< compressed data offset (first 2 bytes are length)
 
     NetOpusAudioBuffer::NetOpusAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer, int kbps)
         :NetAudioBuffer(params, nports, net_buffer)
@@ -718,7 +718,7 @@ namespace Jack
         fOpusMode = new OpusCustomMode *[fNPorts];
         fOpusEncoder = new OpusCustomEncoder *[fNPorts];
         fOpusDecoder = new OpusCustomDecoder *[fNPorts];
-        fCompressedSizesByte = new size_t [fNPorts];
+        fCompressedSizesByte = new unsigned short [fNPorts];
 
         memset(fOpusMode, 0, fNPorts * sizeof(OpusCustomMode*));
         memset(fOpusEncoder, 0, fNPorts * sizeof(OpusCustomEncoder*));
@@ -854,7 +854,12 @@ namespace Jack
             } else {
                 memset(buffer, 0, fPeriodSize * sizeof(sample_t));
             }
-            fCompressedSizesByte[port_index] = opus_custom_encode_float(fOpusEncoder[port_index], buffer, fPeriodSize, fCompressedBuffer[port_index], fCompressedMaxSizeByte);
+            int res = opus_custom_encode_float(fOpusEncoder[port_index], buffer, fPeriodSize, fCompressedBuffer[port_index], fCompressedMaxSizeByte);
+						if (res <0 || res >= 65535) {
+							fCompressedSizesByte[port_index] = 0;
+						} else {
+							fCompressedSizesByte[port_index] = res;
+						}
         }
 
         // All ports active
@@ -866,7 +871,7 @@ namespace Jack
         for (int port_index = 0; port_index < fNPorts; port_index++) {
             if (fPortBuffer[port_index]) {
                 int res = opus_custom_decode_float(fOpusDecoder[port_index], fCompressedBuffer[port_index], fCompressedSizesByte[port_index], fPortBuffer[port_index], fPeriodSize);
-                if (res != fPeriodSize) {
+                if (res < 0 || res != fPeriodSize) {
                     jack_error("opus_decode_float error fCompressedSizeByte = %d res = %d", fCompressedSizesByte[port_index], res);
                 }
             }
@@ -887,7 +892,7 @@ namespace Jack
             if (sub_cycle == 0) {
                 for (int port_index = 0; port_index < fNPorts; port_index++) {
                     size_t len = *((size_t*)(fNetBuffer + port_index * fSubPeriodBytesSize));
-                    fCompressedSizesByte[port_index] = ntohl(len);
+                    fCompressedSizesByte[port_index] = ntohs(len);
                     memcpy(fCompressedBuffer[port_index] + sub_cycle * fSubPeriodBytesSize, fNetBuffer + CDO + port_index * fSubPeriodBytesSize, fSubPeriodBytesSize - CDO);
                 }
             } else if (sub_cycle == fNumPackets - 1) {
@@ -908,7 +913,7 @@ namespace Jack
     {
         if (sub_cycle == 0) {
             for (int port_index = 0; port_index < fNPorts; port_index++) {
-                size_t len = htonl(fCompressedSizesByte[port_index]);
+                unsigned short len = htons(fCompressedSizesByte[port_index]);
                 memcpy(fNetBuffer + port_index * fSubPeriodBytesSize, &len, CDO);
                 memcpy(fNetBuffer + port_index * fSubPeriodBytesSize + CDO, fCompressedBuffer[port_index], fSubPeriodBytesSize - CDO);
             }

@@ -776,6 +776,7 @@ JackNetOneDriver::render_jack_ports_to_payload_celt (JSList *playback_ports, JSL
 #endif
 
 #if HAVE_OPUS
+#define CDO (sizeof(short)) ///< compressed data offset (first 2 bytes are length)
 // render functions for Opus.
 void
 JackNetOneDriver::render_payload_to_jack_ports_opus (void *packet_payload, jack_nframes_t net_period_down, JSList *capture_ports, JSList *capture_srcs, jack_nframes_t nframes)
@@ -801,10 +802,9 @@ JackNetOneDriver::render_payload_to_jack_ports_opus (void *packet_payload, jack_
             if( !packet_payload )
                 memset(buf, 0, nframes * sizeof(float));
             else {
-#define CDO (sizeof(size_t)) ///< compressed data offset (first 4 bytes are length)
-                size_t len;
-                memcpy(&len, packet_bufX, sizeof(size_t));
-                len = ntohl(len);
+                unsigned short len;
+                memcpy(&len, packet_bufX, CDO);
+                len = ntohs(len);
                 opus_custom_decode_float( decoder, packet_bufX + CDO, len, buf, nframes );
             }
 
@@ -849,8 +849,8 @@ JackNetOneDriver::render_jack_ports_to_payload_opus (JSList *playback_ports, JSL
             memcpy(floatbuf, buf, nframes * sizeof(jack_default_audio_sample_t));
             OpusCustomEncoder *encoder = (OpusCustomEncoder*) src_node->data;
             encoded_bytes = opus_custom_encode_float( encoder, floatbuf, nframes, packet_bufX + CDO, net_period_up - CDO );
-            size_t len = htonl(encoded_bytes);
-            memcpy(packet_bufX, &len, sizeof(size_t));
+            unsigned short len = htons(encoded_bytes);
+            memcpy(packet_bufX, &len, CDO);
             src_node = jack_slist_next( src_node );
         } else if (strncmp(portname, JACK_DEFAULT_MIDI_TYPE, jack_port_type_size()) == 0) {
             // encode midi events from port to packet
