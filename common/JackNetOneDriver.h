@@ -46,6 +46,12 @@ class JackNetOneDriver : public JackWaiterDriver
         void
         render_jack_ports_to_payload_celt(JSList *playback_ports, JSList *playback_srcs, jack_nframes_t nframes, void *packet_payload, jack_nframes_t net_period_up);
 #endif
+#if HAVE_OPUS
+        void
+        render_payload_to_jack_ports_opus(void *packet_payload, jack_nframes_t net_period_down, JSList *capture_ports, JSList *capture_srcs, jack_nframes_t nframes);
+        void
+        render_jack_ports_to_payload_opus(JSList *playback_ports, JSList *playback_srcs, jack_nframes_t nframes, void *packet_payload, jack_nframes_t net_period_up);
+#endif
         void
         render_payload_to_jack_ports(int bitdepth, void *packet_payload, jack_nframes_t net_period_down, JSList *capture_ports, JSList *capture_srcs, jack_nframes_t nframes, int dont_htonl_floats);
         void

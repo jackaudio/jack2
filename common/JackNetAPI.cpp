@@ -37,7 +37,7 @@ extern "C"
         JackFloatEncoder = 0,
         JackIntEncoder = 1,
         JackCeltEncoder = 2,
-        JackMaxEncoder = 3
+        JackOpusEncoder = 3
     };
 
     typedef struct {
@@ -551,6 +551,11 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
             return -1;
         }
         
+        if ((fParams.fSampleEncoder == JackOpusEncoder) && (fParams.fKBps == 0)) {
+            jack_error("Opus encoder with 0 for kps...");
+            return -1;
+        }
+
         // Check latency
         if (fParams.fNetworkLatency > NETWORK_MAX_LATENCY) {
             jack_error("Error : network latency is limited to %d", NETWORK_MAX_LATENCY);
