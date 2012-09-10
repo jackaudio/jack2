@@ -368,6 +368,11 @@ void netjack_attach( netjack_driver_state_t *netj )
         netj->codec_latency = 2 * lookahead;
 #endif
     }
+    if( netj->bitdepth == OPUS_MODE ) {
+#if HAVE_OPUS
+        netj->opus_mode = opus_custom_mode_create(netj->sample_rate, netj->period_size, NULL);
+#endif
+    }
 
     if (netj->handle_transport_sync)
         jack_set_sync_callback(netj->client, (JackSyncCallback) net_driver_sync_cb, NULL);
@@ -397,6 +402,12 @@ void netjack_attach( netjack_driver_state_t *netj )
 #else
             netj->capture_srcs = jack_slist_append(netj->capture_srcs, celt_decoder_create( netj->celt_mode ) );
 #endif
+#endif
+        } else if( netj->bitdepth == OPUS_MODE ) {
+#if HAVE_OPUS
+            OpusCustomDecoder *decoder = opus_custom_decoder_create( netj->opus_mode, 1, NULL );
+            opus_custom_decoder_init(decoder, netj->opus_mode, 1);
+            netj->capture_srcs = jack_slist_append(netj->capture_srcs, decoder );
 #endif
         } else {
 #if HAVE_SAMPLERATE
@@ -449,6 +460,20 @@ void netjack_attach( netjack_driver_state_t *netj )
             netj->playback_srcs = jack_slist_append(netj->playback_srcs, celt_encoder_create( celt_mode ) );
 #endif
 #endif
+        } else if( netj->bitdepth == OPUS_MODE ) {
+#if HAVE_OPUS
+            const int kbps = netj->resample_factor;
+						jack_log( "OPUS %dkbps\n", kbps);
+
+            OpusCustomMode *opus_mode = opus_custom_mode_create( netj->sample_rate, netj->period_size, NULL ); // XXX free me in the end
+            OpusCustomEncoder *oe = opus_custom_encoder_create( opus_mode, 1, NULL );
+            opus_custom_encoder_ctl(oe, OPUS_SET_BITRATE(kbps*1024)); // bits per second
+            opus_custom_encoder_ctl(oe, OPUS_SET_COMPLEXITY(10));
+            opus_custom_encoder_ctl(oe, OPUS_SET_SIGNAL(OPUS_SIGNAL_MUSIC));
+            opus_custom_encoder_ctl(oe, OPUS_SET_SIGNAL(OPUS_APPLICATION_RESTRICTED_LOWDELAY));
+            opus_custom_encoder_init(oe, opus_mode, 1);
+            netj->playback_srcs = jack_slist_append(netj->playback_srcs, oe );
+#endif
         } else {
 #if HAVE_SAMPLERATE
             netj->playback_srcs = jack_slist_append(netj->playback_srcs, src_new(SRC_LINEAR, 1, NULL));
@@ -493,6 +518,12 @@ void netjack_detach( netjack_driver_state_t *netj )
             celt_decoder_destroy(decoder);
         } else
 #endif
+#if HAVE_OPUS
+        if ( netj->bitdepth == OPUS_MODE ) {
+            OpusCustomDecoder * decoder = node->data;
+            opus_custom_decoder_destroy(decoder);
+        } else
+#endif
         {
 #if HAVE_SAMPLERATE
             SRC_STATE * src = node->data;
@@ -517,6 +548,12 @@ void netjack_detach( netjack_driver_state_t *netj )
             celt_encoder_destroy(encoder);
         } else
 #endif
+#if HAVE_OPUS
+        if ( netj->bitdepth == OPUS_MODE ) {
+            OpusCustomEncoder * encoder = node->data;
+            opus_custom_encoder_destroy(encoder);
+        } else
+#endif
         {
 #if HAVE_SAMPLERATE
             SRC_STATE * src = node->data;
@@ -530,6 +567,10 @@ void netjack_detach( netjack_driver_state_t *netj )
 #if HAVE_CELT
     if( netj->bitdepth == CELT_MODE )
         celt_mode_destroy(netj->celt_mode);
+#endif
+#if HAVE_OPUS
+    if( netj->bitdepth == OPUS_MODE )
+        opus_custom_mode_destroy(netj->opus_mode);
 #endif
 }
 
@@ -588,7 +629,7 @@ netjack_driver_state_t *netjack_init (netjack_driver_state_t *netj,
     netj->client = client;
 
 
-    if ((bitdepth != 0) && (bitdepth != 8) && (bitdepth != 16) && (bitdepth != CELT_MODE)) {
+    if ((bitdepth != 0) && (bitdepth != 8) && (bitdepth != 16) && (bitdepth != CELT_MODE) && (bitdepth != OPUS_MODE)) {
         jack_info ("Invalid bitdepth: %d (8, 16 or 0 for float) !!!", bitdepth);
         return NULL;
     }
@@ -755,6 +796,11 @@ netjack_startup( netjack_driver_state_t *netj )
 
         netj->net_period_down = netj->resample_factor;
         netj->net_period_up = netj->resample_factor_up;
+    } else if( netj->bitdepth == OPUS_MODE ) {
+        // Opus mode.
+        // TODO: this is a hack. But i dont want to change the packet header, either
+        netj->net_period_down = (netj->resample_factor * netj->period_size * 1024 / netj->sample_rate / 8) & (~1);
+        netj->net_period_up = (netj->resample_factor_up * netj->period_size * 1024 / netj->sample_rate / 8) & (~1);
     } else {
         netj->net_period_down = (float) netj->period_size / (float) netj->resample_factor;
         netj->net_period_up = (float) netj->period_size / (float) netj->resample_factor_up;

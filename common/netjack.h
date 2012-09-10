@@ -32,6 +32,11 @@
 #include <celt/celt.h>
 #endif
 
+#if HAVE_OPUS
+#include <opus/opus.h>
+#include <opus/opus_custom.h>
+#endif
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -111,6 +116,9 @@ extern "C"
         struct _packet_cache * packcache;
 #if HAVE_CELT
         CELTMode	   *celt_mode;
+#endif
+#if HAVE_OPUS
+        OpusCustomMode* opus_mode;
 #endif
     };
 
