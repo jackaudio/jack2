@@ -62,6 +62,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <celt/celt.h>
 #endif
 
+#if HAVE_OPUS
+#include <opus/opus.h>
+#include <opus/opus_custom.h>
+#endif
+
 #include <math.h>
 
 JSList *capture_ports = NULL;
@@ -148,6 +153,16 @@ alloc_ports (int n_capture_audio, int n_playback_audio, int n_capture_midi, int 
             capture_srcs = jack_slist_append(capture_srcs, celt_decoder_create( celt_mode ) );
 #endif
 #endif
+        } else if (bitdepth == 999) {
+#if HAVE_OPUS
+            int err;
+            OpusCustomMode *opus_mode = opus_custom_mode_create(jack_get_sample_rate( client ), jack_get_buffer_size(client), &err);
+            if (err != OPUS_OK) { printf("OPUS MODE FAILED\n"); }
+            OpusCustomDecoder *decoder = opus_custom_decoder_create(opus_mode, 1, &err);
+            if (err != OPUS_OK) { printf("OPUS DECODER FAILED\n"); }
+            opus_custom_decoder_init(decoder, opus_mode, 1);
+            capture_srcs = jack_slist_append(capture_srcs, decoder);
+#endif
         } else {
 #if HAVE_SAMPLERATE
             capture_srcs = jack_slist_append (capture_srcs, src_new (SRC_LINEAR, 1, NULL));
@@ -189,6 +204,22 @@ alloc_ports (int n_capture_audio, int n_playback_audio, int n_capture_midi, int 
             CELTMode *celt_mode = celt_mode_create( jack_get_sample_rate (client), 1, jack_get_buffer_size(client), NULL );
             playback_srcs = jack_slist_append(playback_srcs, celt_encoder_create( celt_mode ) );
 #endif
+#endif
+        } else if( bitdepth == 999 ) {
+#if HAVE_OPUS
+            const int kbps = factor;
+            printf("new opus encoder %d kbps\n", kbps);
+            int err;
+            OpusCustomMode *opus_mode = opus_custom_mode_create(jack_get_sample_rate (client), jack_get_buffer_size(client), &err ); // XXX free me
+            if (err != OPUS_OK) { printf("OPUS MODE FAILED\n"); }
+            OpusCustomEncoder *oe = opus_custom_encoder_create( opus_mode, 1, &err );
+            if (err != OPUS_OK) { printf("OPUS ENCODER FAILED\n"); }
+            opus_custom_encoder_ctl(oe, OPUS_SET_BITRATE(kbps*1024)); // bits per second
+            opus_custom_encoder_ctl(oe, OPUS_SET_COMPLEXITY(10));
+            opus_custom_encoder_ctl(oe, OPUS_SET_SIGNAL(OPUS_SIGNAL_MUSIC));
+            opus_custom_encoder_ctl(oe, OPUS_SET_SIGNAL(OPUS_APPLICATION_RESTRICTED_LOWDELAY));
+            opus_custom_encoder_init(oe, opus_mode, 1);
+            playback_srcs = jack_slist_append(playback_srcs, oe);
 #endif
         } else {
 #if HAVE_SAMPLERATE
@@ -269,7 +300,7 @@ process (jack_nframes_t nframes, void *arg)
     uint32_t *rx_packet_ptr;
     jack_time_t packet_recv_timestamp;
 
-    if( bitdepth == 1000 )
+    if( bitdepth == 1000 || bitdepth == 999)
         net_period = (factor * jack_get_buffer_size(client) * 1024 / jack_get_sample_rate(client) / 8) & (~1) ;
     else
         net_period = (float) nframes / (float) factor;
@@ -519,6 +550,7 @@ printUsage ()
              "  -B <bind port> - reply port, for use in NAT environments\n"
              "  -b <bitdepth> - Set transport to use 16bit or 8bit\n"
              "  -c <kbits> - Use CELT encoding with <kbits> kbits per channel\n"
+             "  -P <kbits> - Use Opus encoding with <kbits> kbits per channel\n"
              "  -m <mtu> - Assume this mtu for the link\n"
              "  -R <N> - Redundancy: send out packets N times.\n"
              "  -e - skip host-to-network endianness conversion\n"
@@ -564,7 +596,7 @@ main (int argc, char *argv[])
     sprintf(client_name, "netjack");
     sprintf(peer_ip, "localhost");
 
-    while ((c = getopt (argc, argv, ":h:H:o:i:O:I:n:p:r:B:b:c:m:R:e:N:s:")) != -1) {
+    while ((c = getopt (argc, argv, ":h:H:o:i:O:I:n:p:r:B:b:c:m:R:e:N:s:P:")) != -1) {
         switch (c) {
             case 'h':
                 printUsage();
@@ -612,6 +644,15 @@ main (int argc, char *argv[])
                 factor = atoi (optarg);
 #else
                 printf( "not built with celt support\n" );
+                exit(10);
+#endif
+                break;
+            case 'P':
+#if HAVE_OPUS
+                bitdepth = 999;
+                factor = atoi (optarg);
+#else
+                printf( "not built with opus support\n" );
                 exit(10);
 #endif
                 break;
@@ -689,7 +730,7 @@ main (int argc, char *argv[])
 
     alloc_ports (capture_channels_audio, playback_channels_audio, capture_channels_midi, playback_channels_midi);
 
-    if( bitdepth == 1000 )
+    if( bitdepth == 1000 || bitdepth == 999)
         net_period = (factor * jack_get_buffer_size(client) * 1024 / jack_get_sample_rate(client) / 8) & (~1) ;
     else
         net_period = ceilf((float) jack_get_buffer_size (client) / (float) factor);
