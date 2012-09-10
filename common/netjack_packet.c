@@ -72,6 +72,11 @@
 #include <celt/celt.h>
 #endif
 
+#if HAVE_OPUS
+#include <opus/opus.h>
+#include <opus/opus_custom.h>
+#endif
+
 #include "netjack_packet.h"
 #include "JackError.h"
 
@@ -128,6 +133,8 @@ int get_sample_size (int bitdepth)
     //JN: why? is this for buffer sizes before or after encoding?
     //JN: if the former, why not int16_t, if the latter, shouldn't it depend on -c N?
     if( bitdepth == CELT_MODE )
+        return sizeof( unsigned char );
+    if( bitdepth == OPUS_MODE )
         return sizeof( unsigned char );
     return sizeof (int32_t);
 }
@@ -1347,6 +1354,91 @@ render_jack_ports_to_payload_celt (JSList *playback_ports, JSList *playback_srcs
 }
 
 #endif
+
+#if HAVE_OPUS
+// render functions for Opus.
+void
+render_payload_to_jack_ports_opus (void *packet_payload, jack_nframes_t net_period_down, JSList *capture_ports, JSList *capture_srcs, jack_nframes_t nframes)
+{
+    int chn = 0;
+    JSList *node = capture_ports;
+    JSList *src_node = capture_srcs;
+
+    unsigned char *packet_bufX = (unsigned char *)packet_payload;
+
+    while (node != NULL) {
+        jack_port_t *port = (jack_port_t *) node->data;
+        jack_default_audio_sample_t* buf = jack_port_get_buffer (port, nframes);
+
+        const char *porttype = jack_port_type (port);
+
+        if (jack_port_is_audio (porttype)) {
+            // audio port, decode opus data.
+            OpusCustomDecoder *decoder = (OpusCustomDecoder*) src_node->data;
+            if( !packet_payload )
+                memset(buf, 0, nframes * sizeof(float));
+            else {
+#define CDO (sizeof(size_t)) ///< compressed data offset (first 4 bytes are length)
+                size_t len;
+                memcpy(&len, packet_bufX, sizeof(size_t));
+                len = ntohl(len);
+                opus_custom_decode_float( decoder, packet_bufX + CDO, len, buf, nframes );
+            }
+
+            src_node = jack_slist_next (src_node);
+        } else if (jack_port_is_midi (porttype)) {
+            // midi port, decode midi events
+            // convert the data buffer to a standard format (uint32_t based)
+            unsigned int buffer_size_uint32 = net_period_down / 2;
+            uint32_t * buffer_uint32 = (uint32_t*) packet_bufX;
+            if( packet_payload )
+                decode_midi_buffer (buffer_uint32, buffer_size_uint32, buf);
+        }
+        packet_bufX = (packet_bufX + net_period_down);
+        node = jack_slist_next (node);
+        chn++;
+    }
+}
+
+void
+render_jack_ports_to_payload_opus (JSList *playback_ports, JSList *playback_srcs, jack_nframes_t nframes, void *packet_payload, jack_nframes_t net_period_up)
+{
+    int chn = 0;
+    JSList *node = playback_ports;
+    JSList *src_node = playback_srcs;
+
+    unsigned char *packet_bufX = (unsigned char *)packet_payload;
+
+    while (node != NULL) {
+        jack_port_t *port = (jack_port_t *) node->data;
+        jack_default_audio_sample_t* buf = jack_port_get_buffer (port, nframes);
+        const char *porttype = jack_port_type (port);
+
+        if (jack_port_is_audio (porttype)) {
+            // audio port, encode opus data.
+
+            int encoded_bytes;
+            float *floatbuf = alloca (sizeof(float) * nframes );
+            memcpy( floatbuf, buf, nframes * sizeof(float) );
+            OpusCustomEncoder *encoder = (OpusCustomEncoder*) src_node->data;
+            encoded_bytes = opus_custom_encode_float( encoder, floatbuf, nframes, packet_bufX + CDO, net_period_up - CDO );
+            size_t len = htonl(encoded_bytes);
+            memcpy(packet_bufX, &len, sizeof(size_t));
+            src_node = jack_slist_next( src_node );
+        } else if (jack_port_is_midi (porttype)) {
+            // encode midi events from port to packet
+            // convert the data buffer to a standard format (uint32_t based)
+            unsigned int buffer_size_uint32 = net_period_up / 2;
+            uint32_t * buffer_uint32 = (uint32_t*) packet_bufX;
+            encode_midi_buffer (buffer_uint32, buffer_size_uint32, buf);
+        }
+        packet_bufX = (packet_bufX + net_period_up);
+        node = jack_slist_next (node);
+        chn++;
+    }
+}
+#endif
+
 /* Wrapper functions with bitdepth argument... */
 void
 render_payload_to_jack_ports (int bitdepth, void *packet_payload, jack_nframes_t net_period_down, JSList *capture_ports, JSList *capture_srcs, jack_nframes_t nframes, int dont_htonl_floats)
@@ -1358,6 +1450,10 @@ render_payload_to_jack_ports (int bitdepth, void *packet_payload, jack_nframes_t
 #if HAVE_CELT
     else if (bitdepth == CELT_MODE)
         render_payload_to_jack_ports_celt (packet_payload, net_period_down, capture_ports, capture_srcs, nframes);
+#endif
+#if HAVE_OPUS
+    else if (bitdepth == OPUS_MODE)
+        render_payload_to_jack_ports_opus (packet_payload, net_period_down, capture_ports, capture_srcs, nframes);
 #endif
     else
         render_payload_to_jack_ports_float (packet_payload, net_period_down, capture_ports, capture_srcs, nframes, dont_htonl_floats);
@@ -1373,6 +1469,10 @@ render_jack_ports_to_payload (int bitdepth, JSList *playback_ports, JSList *play
 #if HAVE_CELT
     else if (bitdepth == CELT_MODE)
         render_jack_ports_to_payload_celt (playback_ports, playback_srcs, nframes, packet_payload, net_period_up);
+#endif
+#if HAVE_OPUS
+    else if (bitdepth == OPUS_MODE)
+        render_jack_ports_to_payload_opus (playback_ports, playback_srcs, nframes, packet_payload, net_period_up);
 #endif
     else
         render_jack_ports_to_payload_float (playback_ports, playback_srcs, nframes, packet_payload, net_period_up, dont_htonl_floats);
