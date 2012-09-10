@@ -1365,7 +1365,6 @@ SERVER_EXPORT bool jackctl_server_switch_master(jackctl_server * server_ptr, jac
     if (server_ptr && server_ptr->engine) {
         JSList * paramlist;
         if (!jackctl_create_param_list(driver_ptr->parameters, &paramlist)) return false;
-        jackctl_destroy_param_list(paramlist);
         bool ret = (server_ptr->engine->SwitchMaster(driver_ptr->desc_ptr, paramlist) == 0);
         jackctl_destroy_param_list(paramlist);
         return ret;
