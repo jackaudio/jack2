@@ -183,6 +183,8 @@ def configure(conf):
     conf.env['LIB_PTHREAD'] = ['pthread']
     conf.env['LIB_DL'] = ['dl']
     conf.env['LIB_RT'] = ['rt']
+    conf.env['LIB_M'] = ['m']
+    conf.env['LIB_STDC++'] = ['stdc++']
     conf.env['JACK_API_VERSION'] = JACK_API_VERSION
     conf.env['JACK_VERSION'] = VERSION
 
@@ -234,8 +236,6 @@ def configure(conf):
         m = re.match(r'^#define SVN_VERSION "([^"]*)"$', data)
         if m != None:
             svnrev = m.group(1)
-
-    conf.env.append_unique('LINKFLAGS', ['-lm', '-lstdc++'])
 
     if Options.options.mixed == True:
         env_variant2 = conf.env.copy()

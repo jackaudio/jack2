@@ -86,10 +86,9 @@ def build(bld):
             #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc -arch x86_64")
             prog.env.append_value("LINKFLAGS", "")
         if bld.env['IS_LINUX']:
-            prog.use += ['RT']
-            prog.env.append_value("LINKFLAGS", "-lm")
+            prog.use += ['RT', 'M']
         if bld.env['IS_SUN']:
-            prog.env.append_value("LINKFLAGS", "-lm")
+            prog.use += ['M']
 
         prog.target = example_program
    
