@@ -579,6 +579,7 @@ enum_alsa_devices()
         if (snd_ctl_open(&handle, card_id, 0) >= 0 &&
             snd_ctl_card_info(handle, info) >= 0)
         {
+            snprintf(card_id, sizeof(card_id), "hw:%s", snd_ctl_card_info_get_id(info));
             fill_device(&constraint_ptr, &array_size, card_id, snd_ctl_card_info_get_name(info));
 
             device_no = -1;
