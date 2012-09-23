@@ -156,7 +156,6 @@ int JackNetOneDriver::AllocPorts()
 #if HAVE_OPUS
             OpusCustomMode *opus_mode = opus_custom_mode_create(netj.sample_rate, netj.period_size, NULL); // XXX free me in the end
             OpusCustomDecoder *decoder = opus_custom_decoder_create( opus_mode, 1, NULL );
-            opus_custom_decoder_init(decoder, opus_mode, 1);
             netj.capture_srcs = jack_slist_append(netj.capture_srcs, decoder);
 #endif
         } else {
@@ -217,7 +216,6 @@ int JackNetOneDriver::AllocPorts()
             opus_custom_encoder_ctl(oe, OPUS_SET_COMPLEXITY(10));
             opus_custom_encoder_ctl(oe, OPUS_SET_SIGNAL(OPUS_SIGNAL_MUSIC));
             opus_custom_encoder_ctl(oe, OPUS_SET_SIGNAL(OPUS_APPLICATION_RESTRICTED_LOWDELAY));
-            opus_custom_encoder_init(oe, opus_mode, 1);
             netj.playback_srcs = jack_slist_append(netj.playback_srcs, oe);
 #endif
         } else {
