@@ -406,7 +406,6 @@ void netjack_attach( netjack_driver_state_t *netj )
         } else if( netj->bitdepth == OPUS_MODE ) {
 #if HAVE_OPUS
             OpusCustomDecoder *decoder = opus_custom_decoder_create( netj->opus_mode, 1, NULL );
-            opus_custom_decoder_init(decoder, netj->opus_mode, 1);
             netj->capture_srcs = jack_slist_append(netj->capture_srcs, decoder );
 #endif
         } else {
@@ -471,7 +470,6 @@ void netjack_attach( netjack_driver_state_t *netj )
             opus_custom_encoder_ctl(oe, OPUS_SET_COMPLEXITY(10));
             opus_custom_encoder_ctl(oe, OPUS_SET_SIGNAL(OPUS_SIGNAL_MUSIC));
             opus_custom_encoder_ctl(oe, OPUS_SET_SIGNAL(OPUS_APPLICATION_RESTRICTED_LOWDELAY));
-            opus_custom_encoder_init(oe, opus_mode, 1);
             netj->playback_srcs = jack_slist_append(netj->playback_srcs, oe );
 #endif
         } else {
