@@ -749,10 +749,6 @@ namespace Jack
             opus_custom_encoder_ctl(fOpusEncoder[i], OPUS_SET_COMPLEXITY(10));
             opus_custom_encoder_ctl(fOpusEncoder[i], OPUS_SET_SIGNAL(OPUS_SIGNAL_MUSIC));
             opus_custom_encoder_ctl(fOpusEncoder[i], OPUS_SET_SIGNAL(OPUS_APPLICATION_RESTRICTED_LOWDELAY));
-
-            /* initilize decoders */
-            error = opus_custom_encoder_init(fOpusEncoder[i], fOpusMode[i], 1);
-            error = opus_custom_decoder_init(fOpusDecoder[i], fOpusMode[i], 1);
         }
 
         {
