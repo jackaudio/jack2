@@ -128,7 +128,7 @@ def build(bld):
         prog.includes = os_incdir + ['.', '..', '../common/jack', '../common']
         prog.source = ['netsource.c', '../common/netjack_packet.c']
         prog.env.append_value("CFLAGS", "-DNO_JACK_ERROR")
-        prog.use = ['CELT', 'SAMPLERATE', 'OPUS', 'clientlib']
+        prog.use = ['CELT', 'SAMPLERATE', 'OPUS', 'M', 'clientlib']
         prog.target = 'jack_netsource'
         prog.defines = ['HAVE_CONFIG_H']
 
