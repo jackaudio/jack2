@@ -779,9 +779,9 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
         "  s - shaped\n"
         "  t - triangular");
 
-    value.i = 0;
-    jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamInt, &value, NULL, "Number of capture channels (defaults to hardware max)", NULL);
-    jack_driver_descriptor_add_parameter(desc, &filler, "outchannels", 'o', JackDriverParamInt, &value, NULL, "Number of playback channels (defaults to hardware max)", NULL);
+    value.ui = 0;
+    jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamUInt, &value, NULL, "Number of capture channels (defaults to hardware max)", NULL);
+    jack_driver_descriptor_add_parameter(desc, &filler, "outchannels", 'o', JackDriverParamUInt, &value, NULL, "Number of playback channels (defaults to hardware max)", NULL);
 
     value.i = FALSE;
     jack_driver_descriptor_add_parameter(desc, &filler, "shorts", 'S', JackDriverParamBool, &value, NULL, "Try 16-bit samples before 32-bit", NULL);
@@ -892,8 +892,9 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
 
             case 'n':
                 user_nperiods = param->value.ui;
-                if (user_nperiods < 2)	/* enforce minimum value */
+                if (user_nperiods < 2) {    /* enforce minimum value */
                     user_nperiods = 2;
+                }
                 break;
 
             case 's':
@@ -977,8 +978,9 @@ void SetTime(jack_time_t time)
 int Restart()
 {
     int res;
-    if ((res = g_alsa_driver->Stop()) == 0)
+    if ((res = g_alsa_driver->Stop()) == 0) {
         res = g_alsa_driver->Start();
+    }
     return res;
 }
 
