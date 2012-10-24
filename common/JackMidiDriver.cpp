@@ -136,9 +136,7 @@ int JackMidiDriver::SetBufferSize(jack_nframes_t buffer_size)
 int JackMidiDriver::ProcessReadSync()
 {
     int res = 0;
-    
-    jack_log("JackMidiDriver::ProcessReadSync");
-
+ 
     // Read input buffers for the current cycle
     if (Read() < 0) {
         jack_error("JackMidiDriver::ProcessReadSync: read error");
@@ -156,9 +154,7 @@ int JackMidiDriver::ProcessReadSync()
 int JackMidiDriver::ProcessWriteSync()
 {
     int res = 0;
-    
-    jack_log("JackMidiDriver::ProcessWriteSync");
-
+ 
     if (SuspendRefNum() < 0) {
         jack_error("JackMidiDriver::ProcessWriteSync: SuspendRefNum error");
         res = -1;
@@ -176,9 +172,7 @@ int JackMidiDriver::ProcessWriteSync()
 int JackMidiDriver::ProcessReadAsync()
 {
     int res = 0;
-    
-    jack_log("JackMidiDriver::ProcessReadAsync");
-
+ 
     // Read input buffers for the current cycle
     if (Read() < 0) {
         jack_error("JackMidiDriver::ProcessReadAsync: read error");
@@ -201,7 +195,6 @@ int JackMidiDriver::ProcessReadAsync()
 
 int JackMidiDriver::ProcessWriteAsync()
 {
-    jack_log("JackMidiDriver::ProcessWriteAsync");
     return 0;
 }
 

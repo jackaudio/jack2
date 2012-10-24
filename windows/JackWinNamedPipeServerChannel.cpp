@@ -208,7 +208,7 @@ bool JackWinNamedPipeServerChannel::Init()
 
 bool JackWinNamedPipeServerChannel::ClientListen()
 {
-     if (fRequestListenPipe.Bind(jack_server_dir, fServerName, 0) < 0) {
+    if (fRequestListenPipe.Bind(jack_server_dir, fServerName, 0) < 0) {
         jack_error("JackWinNamedPipeServerChannel::ClientListen : cannot create result listen pipe");
         return false;
     } else {
