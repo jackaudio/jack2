@@ -327,8 +327,8 @@ class SERVER_EXPORT JackLockedEngine
 
         void NotifyQuit()
         {
+            // No lock needed
             TRY_CALL
-            JackLock lock(&fEngine);
             return fEngine.NotifyQuit();
             CATCH_EXCEPTION
         }
