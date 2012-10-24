@@ -97,7 +97,7 @@ int JackSocketServerChannel::Start()
 
 void JackSocketServerChannel::Stop()
 {
-    fThread.Kill();
+    fThread.Stop();
 }
 
 void JackSocketServerChannel::ClientCreate()
