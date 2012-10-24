@@ -31,10 +31,88 @@ David Garcia Garzon
 Valerio Pilo
 Chris Caudle
 John Emmas
+Robin Gareus
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
+
+2012-09-22 Robin Gareus <robin@gareus.org>
+
+	* netjack/opus: don't re-init en/decoders.
+
+2012-09-18 Nedko Arnaudov  <nedko@arnaudov.name>
+
+	* Use string ids in the alsa device list.
+
+2012-09-10 Nedko Arnaudov  <nedko@arnaudov.name>
+
+	* controlapi: fix double free on master switch.
+
+2012-09-10 Robin Gareus <robin@gareus.org>
+
+	* netjack1/netone opus support.
+	* netjack1/2 Opus: use only 2bytes for encoded-length.
+	* wscript: add header defines and libs for example-clients/netsource.
+	* fix duplicate prog.includes.
+
+2012-09-05 Stephane Letz  <letz@grame.fr>
+
+	* More robust channel mapping handling in JackCoreAudioDriver.
+
+2012-09-05 Robin Gareus <robin@gareus.org>
+
+	* Add opus support to NetJack2.
+
+2012-08-21 Nedko Arnaudov  <nedko@arnaudov.name>
+
+	* jack_control: fix epr command.
+
+2012-08-21 Stephane Letz  <letz@grame.fr>
+
+	* Update JackCoreAudioDriver and JackCoreAudioAdapter with more recent API.
+
+2012-08-03 Stephane Letz  <letz@grame.fr>
+
+	* Change framework installation hierarchy for OSX Mountain Lion.
+
+2012-08-02 Stephane Letz  <letz@grame.fr>
+
+	* Devin Anderson patch for Jack/CoreMIDI duplicated messages.
+
+2012-07-24 Stephane Letz  <letz@grame.fr>
+
+	* Fix in ALSA adapter.
+
+2012-05-26 Nedko Arnaudov  <nedko@arnaudov.name>
+
+	* Fix alsa driver parameter order.
+	* Control API: Enforce driver/internal parameter order.
+
+2012-05-24 Nedko Arnaudov  <nedko@arnaudov.name>
+
+	* Extend jack_control to have parameter reset commands.
+
+2012-03-24 Adrian Knoth  <adi@drcomp.erfurt.thur.de>
+
+	* Align buffers to 32 byte boundaries to allow AVX processing.
+
+2012-03-21 Stephane Letz  <letz@grame.fr>
+
+	* New jack_get_cycle_times() implementation from Fons Adriennsen.
+
+2012-03-17 Nedko Arnaudov  <nedko@arnaudov.name>
+
+	* Update waf.
+
+2012-03-17 Adrian Knoth  <adi@drcomp.erfurt.thur.de>
+
+	* [firewire] Introduce UpdateLatencies() in FFADO backend.
+	* [firewire] Allow FFADO backend to change the buffer size.
+
+2012-03-16 Stephane Letz  <letz@grame.fr>
+
+	* Rework JackMessageBuffer.
 
 2012-03-15 Stephane Letz  <letz@grame.fr>
 
@@ -81,7 +159,7 @@ John Emmas
 
 2012-01-20 Stephane Letz  <letz@grame.fr>
 
-	* Experimental system port alias use in WIndows JackRouter.
+	* Experimental system port alias use in Windows JackRouter.
 
 2012-01-19 Stephane Letz  <letz@grame.fr>
 
