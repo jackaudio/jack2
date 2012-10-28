@@ -228,7 +228,7 @@ def configure(conf):
             conf.define('USE_LIBDBUS_AUTOLAUNCH', 1)
     if conf.env['BUILD_WITH_PROFILE'] == True:
         conf.define('JACK_MONITOR', 1)
-    conf.write_config_header('config.h')
+    conf.write_config_header('config.h', remove=False)
 
     svnrev = None
     if os.access('svnversion.h', os.R_OK):
