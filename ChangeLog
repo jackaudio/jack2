@@ -37,6 +37,10 @@ Robin Gareus
   Jackdmp changes log
 ---------------------------
 
+2012-10-20 Stephane Letz  <letz@grame.fr>
+
+	* Correct JackEngine::NotifyGraphReorder : graph-order callback now notified after port latencies update.
+
 2012-09-22 Robin Gareus <robin@gareus.org>
 
 	* netjack/opus: don't re-init en/decoders.

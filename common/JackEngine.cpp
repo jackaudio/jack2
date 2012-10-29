@@ -366,8 +366,8 @@ void JackEngine::NotifyXRun(int refnum)
 
 void JackEngine::NotifyGraphReorder()
 {
-    NotifyClients(kGraphOrderCallback, false, "", 0, 0);
     ComputeTotalLatencies();
+    NotifyClients(kGraphOrderCallback, false, "", 0, 0);
 }
 
 void JackEngine::NotifyBufferSize(jack_nframes_t buffer_size)
