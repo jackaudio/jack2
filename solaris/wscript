@@ -6,7 +6,7 @@ def create_jack_driver_obj(bld, target, sources, uselib = None):
     driver.features.append('cc')
     driver.env['shlib_PATTERN'] = 'jack_%s.so'
     #driver.env.append_unique('CXXFLAGS', '-march=i686 -msse3 -ffast-math')
-    #driver.env.append_unique('CCFLAGS', '-march=i686  -msse3  -ffast-math')
+    #driver.env.append_unique('CFLAGS', '-march=i686  -msse3  -ffast-math')
     driver.defines = 'HAVE_CONFIG_H'
     driver.includes = ['.', '..','../posix', '../common', '../common/jack']
     driver.target = target

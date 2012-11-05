@@ -136,14 +136,14 @@ def build(bld):
         prog = bld(features = 'c cprogram')
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = ['alsa_in.c', '../common/memops.c']
-        prog.env.append_value("CCFLAGS", "-DNO_JACK_ERROR")
+        prog.env.append_value("CFLAGS", "-DNO_JACK_ERROR")
         prog.use = ['clientlib', 'ALSA', 'SAMPLERATE']
         prog.target = 'alsa_in'
 
         prog = bld(features = 'c cprogram')
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = ['alsa_out.c', '../common/memops.c']
-        prog.env.append_value("CCFLAGS", "-DNO_JACK_ERROR")
+        prog.env.append_value("CFLAGS", "-DNO_JACK_ERROR")
         prog.use = ['clientlib', 'ALSA', 'SAMPLERATE']
         prog.target = 'alsa_out'
 

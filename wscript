@@ -116,7 +116,7 @@ def configure(conf):
     #   conf.check_tool('compiler_cc')
  
     conf.env.append_unique('CXXFLAGS', '-Wall')
-    conf.env.append_unique('CCFLAGS', '-Wall')
+    conf.env.append_unique('CFLAGS', '-Wall')
 
     conf.sub_config('common')
     if conf.env['IS_LINUX']:
@@ -211,7 +211,7 @@ def configure(conf):
 
     if conf.env['BUILD_DEBUG']:
         conf.env.append_unique('CXXFLAGS', '-g')
-        conf.env.append_unique('CCFLAGS', '-g')
+        conf.env.append_unique('CFLAGS', '-g')
         conf.env.append_unique('LINKFLAGS', '-g')
 
     conf.define('CLIENT_NUM', Options.options.clients)
@@ -243,7 +243,7 @@ def configure(conf):
         env_variant2.set_variant('lib32')
         conf.setenv('lib32')
         conf.env.append_unique('CXXFLAGS', '-m32')
-        conf.env.append_unique('CCFLAGS', '-m32')
+        conf.env.append_unique('CFLAGS', '-m32')
         conf.env.append_unique('LINKFLAGS', '-m32')
         if Options.options.libdir32:
             conf.env['LIBDIR'] = Options.options.libdir32
@@ -267,7 +267,7 @@ def configure(conf):
     display_msg("Library directory", conf.env['LIBDIR'], 'CYAN')
     display_msg("Drivers directory", conf.env['ADDON_DIR'], 'CYAN')
     display_feature('Build debuggable binaries', conf.env['BUILD_DEBUG'])
-    display_msg('C compiler flags', repr(conf.env['CCFLAGS']))
+    display_msg('C compiler flags', repr(conf.env['CFLAGS']))
     display_msg('C++ compiler flags', repr(conf.env['CXXFLAGS']))
     display_msg('Linker flags', repr(conf.env['LINKFLAGS']))
     display_feature('Build doxygen documentation', conf.env['BUILD_DOXYGEN_DOCS'])
