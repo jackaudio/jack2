@@ -50,7 +50,7 @@ def configure(conf):
     #if conf.is_defined('HAVE_READLINE'):
     #    conf.env['LIB_READLINE'] = ['readline']
 
-    conf.env['BUILD_EXAMPLE_CLIENT_TRANSPORT'] = bool(conf.env['LIB_READLINE']) and bool(conf.env['LIB_NCURSES'])
+    conf.env['BUILD_EXAMPLE_CLIENT_TRANSPORT'] = bool(conf.env['LIB_READLINE'])
 
     conf.env['BUILD_EXAMPLE_CLIENT_REC'] = conf.is_defined('HAVE_SNDFILE')
 
@@ -102,9 +102,9 @@ def build(bld):
             #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc -arch x86_64")
             prog.env.append_value("LINKFLAGS", "")
         if bld.env['IS_LINUX']:
-            prog.use += ['RT', 'READLINE', 'NCURSES']
+            prog.use += ['RT', 'READLINE']
         if bld.env['IS_MACOSX']:
-            prog.use += ['READLINE', 'NCURSES']
+            prog.use += ['READLINE']
         prog.target = 'jack_transport'
 
     if bld.env['BUILD_EXAMPLE_CLIENT_REC']:
