@@ -1513,7 +1513,6 @@ error:
     // Remove BS change notification
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDevicePropertyBufferFrameSize, BSNotificationCallback);
     return -1;
-
 }
 
 int JackCoreAudioDriver::SetupSampleRate(jack_nframes_t sample_rate)

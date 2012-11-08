@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2003-2008 Fons Adriaensen <fons@kokkinizita.net>
-
+    
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -24,135 +24,145 @@
 #include <unistd.h>
 #include <jack/jack.h>
 
-class Freq
+struct Freq
 {
-public:
-
     int   p;
     int   f;
-    float a;
     float xa;
     float ya;
-    float xf;
-    float yf;
+    float x1;
+    float y1;
+    float x2;
+    float y2;
 };
 
-class MTDM
+
+struct MTDM
 {
-public:
-
-    MTDM (void);
-    int process (size_t len, float *inp, float *out);
-    int resolve (void);
-    void invert (void) { _inv ^= 1; }
-    int    inv (void) { return _inv; }
-    double del (void) { return _del; }
-    double err (void) { return _err; }
-
-
     double  _del;
     double  _err;
+    float   _wlp;
     int     _cnt;
     int     _inv;
-    Freq    _freq [5];
+
+    struct Freq _freq [13];
 };
 
-MTDM::MTDM (void) : _cnt (0), _inv (0)
+
+struct MTDM * mtdm_new (double fsamp)
 {
     int   i;
-    Freq  *F;
+    struct Freq  *F;
 
-    _freq [0].f = 4096;
-    _freq [1].f =  512;
-    _freq [2].f = 1088;
-    _freq [3].f = 1544;
-    _freq [4].f = 2049;
+    struct MTDM *retval = (MTDM *)malloc( sizeof(struct MTDM) );
 
-    _freq [0].a = 0.2f;
-    _freq [1].a = 0.1f;
-    _freq [2].a = 0.1f;
-    _freq [3].a = 0.1f;
-    _freq [4].a = 0.1f;
+    if (retval==NULL)
+	    return NULL;
 
-    for (i = 0, F = _freq; i < 5; i++, F++)
-    {
+    retval->_cnt = 0;
+    retval->_inv = 0;
+
+    retval->_freq [0].f  = 4096;
+    retval->_freq [1].f  = 2048;
+    retval->_freq [2].f  = 3072;
+    retval->_freq [3].f  = 2560;
+    retval->_freq [4].f  = 2304;
+    retval->_freq [5].f  = 2176; 
+    retval->_freq [6].f  = 1088;
+    retval->_freq [7].f  = 1312;
+    retval->_freq [8].f  = 1552;
+    retval->_freq [9].f  = 1800;
+    retval->_freq [10].f = 3332;
+    retval->_freq [11].f = 3586;
+    retval->_freq [12].f = 3841;
+    retval->_wlp = 200.0f / fsamp;
+    for (i = 0, F = retval->_freq; i < 13; i++, F++) {
         F->p = 128;
         F->xa = F->ya = 0.0f;
-        F->xf = F->yf = 0.0f;
+        F->x1 = F->y1 = 0.0f;
+        F->x2 = F->y2 = 0.0f;
     }
+
+    return retval;
 }
 
-int MTDM::process (size_t len, float *ip, float *op)
+int mtdm_process (struct MTDM *self, size_t len, float *ip, float *op)
 {
     int    i;
     float  vip, vop, a, c, s;
-    Freq   *F;
+    struct Freq   *F;
 
     while (len--)
     {
         vop = 0.0f;
         vip = *ip++;
-        for (i = 0, F = _freq; i < 5; i++, F++)
+        for (i = 0, F = self->_freq; i < 13; i++, F++)
         {
-            a = 2 * (float) M_PI * (F->p & 65535) / 65536.0;
+            a = 2 * (float) M_PI * (F->p & 65535) / 65536.0; 
             F->p += F->f;
-            c =  cosf (a);
-            s = -sinf (a);
-            vop += F->a * s;
+            c =  cosf (a); 
+            s = -sinf (a); 
+            vop += (i ? 0.01f : 0.20f) * s;
             F->xa += s * vip;
             F->ya += c * vip;
-        }
+        } 
         *op++ = vop;
-        if (++_cnt == 16)
+        if (++self->_cnt == 16)
         {
-            for (i = 0, F = _freq; i < 5; i++, F++)
+            for (i = 0, F = self->_freq; i < 13; i++, F++)
             {
-                F->xf += 1e-3f * (F->xa - F->xf + 1e-20);
-                F->yf += 1e-3f * (F->ya - F->yf + 1e-20);
+                F->x1 += self->_wlp * (F->xa - F->x1 + 1e-20);
+                F->y1 += self->_wlp * (F->ya - F->y1 + 1e-20);
+                F->x2 += self->_wlp * (F->x1 - F->x2 + 1e-20);
+                F->y2 += self->_wlp * (F->y1 - F->y2 + 1e-20);
                 F->xa = F->ya = 0.0f;
             }
-            _cnt = 0;
+            self->_cnt = 0;
         }
     }
 
     return 0;
 }
 
-int MTDM::resolve (void)
+int mtdm_resolve (struct MTDM *self)
 {
     int     i, k, m;
     double  d, e, f0, p;
-    Freq    *F = _freq;
+    struct Freq *F = self->_freq;
 
-    if (hypot (F->xf, F->yf) < 0.01) return -1;
-    d = atan2 (F->yf, F->xf) / (2 * M_PI);
-    if (_inv) d += 0.5f;
-    if (d > 0.5f) d -= 1.0f;
-    f0 = _freq [0].f;
+    if (hypot (F->x2, F->y2) < 0.001) return -1;
+    d = atan2 (F->y2, F->x2) / (2 * M_PI);
+    if (self->_inv) d += 0.5;
+    if (d > 0.5) d -= 1.0;
+    f0 = self->_freq [0].f;
     m = 1;
-    _err = 0.0;
-    for (i = 0; i < 4; i++)
+    self->_err = 0.0;
+    for (i = 0; i < 12; i++)
     {
         F++;
-        p = atan2 (F->yf, F->xf) / (2 * M_PI) - d * F->f / f0;
-        if (_inv) p += 0.5f;
+        p = atan2 (F->y2, F->x2) / (2 * M_PI) - d * F->f / f0;
+        if (self->_inv) p += 0.5;
         p -= floor (p);
-        p *= 8;
+        p *= 2;
         k = (int)(floor (p + 0.5));
         e = fabs (p - k);
-        if (e > _err) _err = e;
-        if (e > 0.4) return 1;
-        d += m * (k & 7);
-        m *= 8;
-    }
-    _del = 16 * d;
+        if (e > self->_err) self->_err = e;
+        if (e > 0.4) return 1; 
+        d += m * (k & 1);
+        m *= 2;
+    }  
+    self->_del = 16 * d;
 
     return 0;
 }
 
+void mtdm_invert (struct MTDM *self)
+{
+	self->_inv ^= 1;
+}
 // --------------------------------------------------------------------------------
 
-static MTDM            mtdm;
+static struct MTDM    *mtdm;
 static jack_client_t  *jack_handle;
 static jack_port_t    *jack_capt;
 static jack_port_t    *jack_play;
@@ -191,7 +201,7 @@ int jack_callback (jack_nframes_t nframes, void *arg)
 
     ip = (float *)(jack_port_get_buffer (jack_capt, nframes));
     op = (float *)(jack_port_get_buffer (jack_play, nframes));
-    mtdm.process (nframes, ip, op);
+    mtdm_process (mtdm, nframes, ip, op);
     return 0;
 }
 
@@ -206,6 +216,8 @@ int main (int ac, char *av [])
         fprintf (stderr, "Can't connect to Jack, is the server running ?\n");
         exit (1);
     }
+
+    mtdm = mtdm_new(jack_get_sample_rate(jack_handle));
 
     jack_set_process_callback (jack_handle, jack_callback, 0);
 
@@ -225,28 +237,28 @@ int main (int ac, char *av [])
 
     while (1)
     {
-
-    #ifdef WIN32
-        Sleep (250);
-    #else
-        usleep (250000);
- 	#endif
-        if (mtdm.resolve() < 0) printf ("Signal below threshold...\n");
-        else
+ 
+    #ifdef WIN32 
+        Sleep (250); 
+    #else 
+        usleep (250000); 
+ 	#endif        
+        if (mtdm_resolve (mtdm) < 0) printf ("Signal below threshold...\n");
+        else 
         {
             jack_nframes_t systemic_latency;
-            if (mtdm.err () > 0.3)
-            {
-                mtdm.invert ();
-                mtdm.resolve ();
-            }
-            systemic_latency = (jack_nframes_t) floor (mtdm._del - (capture_latency.max + playback_latency.max));
 
-            printf("%10.3lf frames %10.3lf ms total roundtrip latency\n\textra loopback latency: %u frames\n\tuse %u for the backend arguments -I and -O"
-                    , mtdm._del, mtdm._del * t,
+            if (mtdm->_err > 0.3) 
+            {
+                mtdm_invert ( mtdm );
+                mtdm_resolve ( mtdm );
+            }
+            systemic_latency = (jack_nframes_t) floor (mtdm->_del - (capture_latency.max + playback_latency.max));
+
+            printf ("%10.3lf frames %10.3lf ms total roundtrip latency\n\textra loopback latency: %u frames\n\tuse %u for the backend arguments -I and -O", mtdm->_del, mtdm->_del * t, 
                     systemic_latency, systemic_latency/2);
-            if (mtdm._err > 0.2) printf (" ??");
-            if (mtdm._inv) printf (" Inv");
+            if (mtdm->_err > 0.2) printf (" ??");
+                if (mtdm->_inv) printf (" Inv");
             printf ("\n");
         }
     }
