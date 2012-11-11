@@ -37,7 +37,7 @@ PortAudioDevices::PortAudioDevices()
         }
         fHostName = new string[fNumHostApi];
         for (id = 0; id < fNumHostApi; id++) {
-            fHostName[id] = string (Pa_GetHostApiInfo(id)->name);
+            fHostName[id] = string(Pa_GetHostApiInfo(id)->name);
         }
     } else {
 		jack_error("JackPortAudioDriver::Pa_Initialize error = %s", Pa_GetErrorText(err));
@@ -97,7 +97,7 @@ string PortAudioDevices::GetFullName(std::string hostname, std::string devicenam
     return (hostname + "::" + devicename);
 }
 
-PaDeviceInfo* PortAudioDevices::GetDeviceFromFullName (string fullname, PaDeviceIndex& id, bool isInput)
+PaDeviceInfo* PortAudioDevices::GetDeviceFromFullName(string fullname, PaDeviceIndex& id, bool isInput)
 {
     PaDeviceInfo* ret = NULL;
     //no driver to find
@@ -112,14 +112,14 @@ PaDeviceInfo* PortAudioDevices::GetDeviceFromFullName (string fullname, PaDevice
     }
 
     char* hostname = (char*)malloc(separator + 9);
-    fill_n (hostname, separator + 9, 0);
-    fullname.copy (hostname, separator);
+    fill_n(hostname, separator + 9, 0);
+    fullname.copy(hostname, separator);
 
     //we need the entire hostname, replace shortcuts
-    if (strcmp (hostname, "DirectSound") == 0) {
-        strcpy (hostname, "Windows DirectSound");
+    if (strcmp(hostname, "DirectSound") == 0) {
+        strcpy(hostname, "Windows DirectSound");
     }
-    string devicename = fullname.substr (separator + 2);
+    string devicename = fullname.substr(separator + 2);
     //then find the corresponding device
     for (PaDeviceIndex dev_id = 0; dev_id < fNumDevice; dev_id++) {
         bool flag = (isInput) ? (fDeviceInfo[dev_id]->maxInputChannels > 0) : (fDeviceInfo[dev_id]->maxOutputChannels > 0);
@@ -170,7 +170,7 @@ void PortAudioDevices::PrintSupportedStandardSampleRates(const PaStreamParameter
 int PortAudioDevices::GetInputDeviceFromName(const char* devicename, PaDeviceIndex& id, int& max_input)
 {
     string fullname = string(devicename);
-    PaDeviceInfo* device = GetDeviceFromFullName (fullname, id, true);
+    PaDeviceInfo* device = GetDeviceFromFullName(fullname, id, true);
     if (device) {
         max_input = device->maxInputChannels;
     } else {
@@ -189,7 +189,7 @@ int PortAudioDevices::GetInputDeviceFromName(const char* devicename, PaDeviceInd
 int PortAudioDevices::GetOutputDeviceFromName(const char* devicename, PaDeviceIndex& id, int& max_output)
 {
     string fullname = string(devicename);
-    PaDeviceInfo* device = GetDeviceFromFullName (fullname, id, false);
+    PaDeviceInfo* device = GetDeviceFromFullName(fullname, id, false);
     if (device) {
         max_output = device->maxOutputChannels;
     } else {
@@ -205,54 +205,80 @@ int PortAudioDevices::GetOutputDeviceFromName(const char* devicename, PaDeviceIn
     return id;
 }
 
+int PortAudioDevices::GetPreferredBufferSize(PaDeviceIndex id)
+{
+#ifdef WIN32
+    /* ASIO specific latency information */
+    if (Pa_GetHostApiInfo(fDeviceInfo[id]->hostApi)->type == paASIO) {
+        long minLatency, maxLatency, preferredLatency, granularity;
+
+        PaAsio_GetAvailableBufferSizes(id, &minLatency, &maxLatency, &preferredLatency, &granularity);
+
+        jack_info("ASIO minimum buffer size    = %ld", minLatency);
+        jack_info("ASIO maximum buffer size    = %ld", maxLatency);
+        jack_info("ASIO preferred buffer size  = %ld", preferredLatency);
+
+        if (granularity == -1) {
+            jack_info("ASIO buffer granularity     = power of 2");
+        } else {
+            jack_info("ASIO buffer granularity     = %ld", granularity);
+        }
+        
+        return preferredLatency;
+    } else 
+#endif   
+    {
+        return 512; // Non ASIO driver, returns generic value
+    }
+}
+
 void PortAudioDevices::DisplayDevicesNames()
 {
     PaDeviceIndex id;
     PaStreamParameters inputParameters, outputParameters;
-    jack_info ("********************** Devices list, %d detected **********************", fNumDevice);
+    jack_info("********************** Devices list, %d detected **********************", fNumDevice);
 
     for (id = 0; id < fNumDevice; id++) {
-        jack_info ("-------- device #%d ------------------------------------------------", id);
+        jack_info("-------- device #%d ------------------------------------------------", id);
 
         if (id == Pa_GetDefaultInputDevice()) {
             jack_info("[ Default Input ]");
-        } else if (id == Pa_GetHostApiInfo (fDeviceInfo[id]->hostApi)->defaultInputDevice) {
-            const PaHostApiInfo *host_info = Pa_GetHostApiInfo (fDeviceInfo[id]->hostApi);
+        } else if (id == Pa_GetHostApiInfo(fDeviceInfo[id]->hostApi)->defaultInputDevice) {
+            const PaHostApiInfo *host_info = Pa_GetHostApiInfo(fDeviceInfo[id]->hostApi);
             jack_info("[ Default %s Input ]", host_info->name);
         }
 
         if (id == Pa_GetDefaultOutputDevice()) {
-            jack_info ("[ Default Output ]");
-        } else if (id == Pa_GetHostApiInfo (fDeviceInfo[id]->hostApi)->defaultOutputDevice) {
-            const PaHostApiInfo *host_info = Pa_GetHostApiInfo (fDeviceInfo[id]->hostApi);
+            jack_info("[ Default Output ]");
+        } else if (id == Pa_GetHostApiInfo(fDeviceInfo[id]->hostApi)->defaultOutputDevice) {
+            const PaHostApiInfo *host_info = Pa_GetHostApiInfo(fDeviceInfo[id]->hostApi);
             jack_info("[ Default %s Output ]", host_info->name);
         }
 
         /* print device info fields */
-        jack_info ("Name                        = %s", GetFullName(id).c_str());
-        jack_info ("Max inputs                  = %d", fDeviceInfo[id]->maxInputChannels);
-        jack_info ("Max outputs                 = %d", fDeviceInfo[id]->maxOutputChannels);
-
-#ifdef WIN32
+        jack_info("Name                        = %s", GetFullName(id).c_str());
+        jack_info("Max inputs                  = %d", fDeviceInfo[id]->maxInputChannels);
+        jack_info("Max outputs                 = %d", fDeviceInfo[id]->maxOutputChannels);
+        
+    #ifdef WIN32
         /* ASIO specific latency information */
         if (Pa_GetHostApiInfo(fDeviceInfo[id]->hostApi)->type == paASIO) {
             long minLatency, maxLatency, preferredLatency, granularity;
 
-            PaAsio_GetAvailableBufferSizes (id, &minLatency, &maxLatency, &preferredLatency, &granularity);
+            PaAsio_GetAvailableBufferSizes(id, &minLatency, &maxLatency, &preferredLatency, &granularity);
 
-            jack_info ("ASIO minimum buffer size    = %ld", minLatency);
-            jack_info ("ASIO maximum buffer size    = %ld", maxLatency);
-            jack_info ("ASIO preferred buffer size  = %ld", preferredLatency);
+            jack_info("ASIO minimum buffer size    = %ld", minLatency);
+            jack_info("ASIO maximum buffer size    = %ld", maxLatency);
+            jack_info("ASIO preferred buffer size  = %ld", preferredLatency);
 
             if (granularity == -1) {
-                jack_info ("ASIO buffer granularity     = power of 2");
+                jack_info("ASIO buffer granularity     = power of 2");
             } else {
-                jack_info ("ASIO buffer granularity     = %ld", granularity);
+                jack_info("ASIO buffer granularity     = %ld", granularity);
             }
         }
-#endif
-
-        jack_info ("Default sample rate         = %8.2f", fDeviceInfo[id]->defaultSampleRate);
+    #endif 
+        jack_info("Default sample rate         = %8.2f", fDeviceInfo[id]->defaultSampleRate);
 
         /* poll for standard sample rates */
         inputParameters.device = id;
