@@ -39,7 +39,7 @@ Robin Gareus
 
 2012-11-21 Stephane Letz  <letz@grame.fr>
 
-	* Correct JackEngine::NotifyGraphReorder : graph-order callback now notified after port latencies update.
+	* Correct JackPortAudioDriver::Open : special case for ASIO drivers.
 
 2012-10-20 Stephane Letz  <letz@grame.fr>
 
