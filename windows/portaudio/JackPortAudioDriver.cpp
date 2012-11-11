@@ -186,6 +186,7 @@ int JackPortAudioDriver::Open(jack_nframes_t buffer_size,
     // If ASIO, request for preferred size (assuming fInputDevice and fOutputDevice are the same)
     if (buffer_size == -1) { 
         buffer_size = fPaDevices->GetPreferredBufferSize(fInputDevice);
+        jack_log("JackPortAudioDriver::Open preferred buffer_size = %d", buffer_size);
     }
   
     // Generic JackAudioDriver Open

@@ -13,7 +13,7 @@ import re
 import Logs
 import sys
 
-VERSION='1.9.9'
+VERSION='1.9.9.5'
 APPNAME='jack'
 JACK_API_VERSION = '0.1.0'
 

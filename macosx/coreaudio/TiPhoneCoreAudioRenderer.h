@@ -105,8 +105,9 @@ class TiPhoneCoreAudioRenderer
         
         void PerformAudioCallback(int frames)
         {
-            if (fAudioCallback)
+            if (fAudioCallback) {
                 fAudioCallback(frames, fInChannel, fOutChannel, fCallbackArg);
+            }
         }
 
 };
