@@ -315,3 +315,11 @@ bool PortAudioDevices::IsDuplex(PaDeviceIndex id)
     return false;
 }
 
+bool PortAudioDevices::IsASIO(PaDeviceIndex id)
+{
+ #ifdef WIN32
+    return (Pa_GetHostApiInfo(fDeviceInfo[id]->hostApi)->type == paASIO);
+ #else
+    return false;
+ #endif
+}

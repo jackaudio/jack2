@@ -98,15 +98,15 @@ PaError JackPortAudioDriver::OpenStream(jack_nframes_t buffer_size)
     inputParameters.channelCount = fCaptureChannels;
     inputParameters.sampleFormat = paFloat32 | paNonInterleaved;		// 32 bit floating point output
     inputParameters.suggestedLatency = (fInputDevice != paNoDevice)		// TODO: check how to setup this on ASIO
-                                       ? Pa_GetDeviceInfo(inputParameters.device)->defaultLowInputLatency
+                                       ? (fPaDevices->IsASIO(fInputDevice) ? 0 : Pa_GetDeviceInfo(inputParameters.device)->defaultLowInputLatency)
                                        : 0;
     inputParameters.hostApiSpecificStreamInfo = NULL;
 
     outputParameters.device = fOutputDevice;
     outputParameters.channelCount = fPlaybackChannels;
-    outputParameters.sampleFormat = paFloat32 | paNonInterleaved;		// 32 bit floating point output
-    outputParameters.suggestedLatency = (fOutputDevice != paNoDevice)	// TODO: check how to setup this on ASIO
-                                        ? Pa_GetDeviceInfo(outputParameters.device)->defaultLowOutputLatency
+    outputParameters.sampleFormat = paFloat32 | paNonInterleaved;       // 32 bit floating point output
+    outputParameters.suggestedLatency = (fOutputDevice != paNoDevice)   // TODO: check how to setup this on ASIO
+                                        ? (fPaDevices->IsASIO(fOutputDevice) ? 0 : Pa_GetDeviceInfo(outputParameters.device)->defaultLowOutputLatency)
                                         : 0;
     outputParameters.hostApiSpecificStreamInfo = NULL;
 
