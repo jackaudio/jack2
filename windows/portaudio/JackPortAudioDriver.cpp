@@ -184,7 +184,7 @@ int JackPortAudioDriver::Open(jack_nframes_t buffer_size,
     }
     
     // If ASIO, request for preferred size (assuming fInputDevice and fOutputDevice are the same)
-    if (buffer_size == -1) { 
+    if (buffer_size == 0) { 
         buffer_size = fPaDevices->GetPreferredBufferSize(fInputDevice);
         jack_log("JackPortAudioDriver::Open preferred buffer_size = %d", buffer_size);
     }
@@ -368,7 +368,7 @@ extern "C"
         jack_driver_descriptor_add_parameter(desc, &filler, "rate", 'r', JackDriverParamUInt, &value, NULL, "Sample rate", NULL);
 
         value.ui = 512U;
-        jack_driver_descriptor_add_parameter(desc, &filler, "period", 'p', JackDriverParamUInt, &value, NULL, "Frames per period", "Frames per period. If -1 and ASIO drver, will take preferred value");
+        jack_driver_descriptor_add_parameter(desc, &filler, "period", 'p', JackDriverParamUInt, &value, NULL, "Frames per period", "Frames per period. If 0 and ASIO driver, will take preferred value");
 
         jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, NULL, "PortAudio device name", NULL);
 
