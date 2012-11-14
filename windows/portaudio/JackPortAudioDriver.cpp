@@ -98,7 +98,7 @@ PaError JackPortAudioDriver::OpenStream(jack_nframes_t buffer_size)
     inputParameters.channelCount = fCaptureChannels;
     inputParameters.sampleFormat = paFloat32 | paNonInterleaved;		// 32 bit floating point output
     inputParameters.suggestedLatency = (fInputDevice != paNoDevice)		// TODO: check how to setup this on ASIO
-                                       ? (fPaDevices->IsASIO(fInputDevice) ? 0 : Pa_GetDeviceInfo(inputParameters.device)->defaultLowInputLatency)
+                                       ? ((fPaDevices->GetHostFromDevice(fInputDevice) == "ASIO") ? 0 : Pa_GetDeviceInfo(inputParameters.device)->defaultLowInputLatency)
                                        : 0;
     inputParameters.hostApiSpecificStreamInfo = NULL;
 
@@ -106,7 +106,7 @@ PaError JackPortAudioDriver::OpenStream(jack_nframes_t buffer_size)
     outputParameters.channelCount = fPlaybackChannels;
     outputParameters.sampleFormat = paFloat32 | paNonInterleaved;       // 32 bit floating point output
     outputParameters.suggestedLatency = (fOutputDevice != paNoDevice)   // TODO: check how to setup this on ASIO
-                                        ? (fPaDevices->IsASIO(fOutputDevice) ? 0 : Pa_GetDeviceInfo(outputParameters.device)->defaultLowOutputLatency)
+                                        ? ((fPaDevices->GetHostFromDevice(fOutputDevice) == "ASIO") ? 0 : Pa_GetDeviceInfo(outputParameters.device)->defaultLowOutputLatency)
                                         : 0;
     outputParameters.hostApiSpecificStreamInfo = NULL;
 
@@ -263,8 +263,7 @@ int JackPortAudioDriver::Attach()
 
         if (fInputDevice != paNoDevice && fPaDevices->GetHostFromDevice(fInputDevice) == "ASIO") {
             for (int i = 0; i < fCaptureChannels; i++) {
-                PaError err = PaAsio_GetInputChannelName(fInputDevice, i, &alias);
-                if (err == paNoError) {
+                if (PaAsio_GetInputChannelName(fInputDevice, i, &alias) == paNoError) {
                     JackPort* port = fGraphManager->GetPort(fCapturePortList[i]);
                     port->SetAlias(alias);
                 }
@@ -273,8 +272,7 @@ int JackPortAudioDriver::Attach()
 
         if (fOutputDevice != paNoDevice && fPaDevices->GetHostFromDevice(fOutputDevice) == "ASIO") {
             for (int i = 0; i < fPlaybackChannels; i++) {
-                PaError err = PaAsio_GetInputChannelName(fOutputDevice, i, &alias);
-                if (err == paNoError) {
+                if (PaAsio_GetOutputChannelName(fOutputDevice, i, &alias) == paNoError) {
                     JackPort* port = fGraphManager->GetPort(fPlaybackPortList[i]);
                     port->SetAlias(alias);
                 }

@@ -58,7 +58,6 @@ class PortAudioDevices
         int GetPreferredBufferSize(PaDeviceIndex id);
         void DisplayDevicesNames();
         bool IsDuplex(PaDeviceIndex id);
-        bool IsASIO(PaDeviceIndex id);
 
 };
 
