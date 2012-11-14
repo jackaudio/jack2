@@ -65,7 +65,7 @@ def build(bld):
         os_incdir = ['../solaris', '../posix']
     for example_program, example_program_source in list(example_programs.items()):
         if example_program == 'jack_server_control':
-            use = ['serverlib']
+            use = ['serverlib', 'STDC++']
         elif example_program == 'jack_net_slave':
             if not bld.env['BUILD_NETLIB']:
                 continue
