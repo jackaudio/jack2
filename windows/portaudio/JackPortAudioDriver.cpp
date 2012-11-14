@@ -250,10 +250,9 @@ error:
 int JackPortAudioDriver::Close()
 {
     // Generic audio driver close
-    int res = JackAudioDriver::Close();
     jack_log("JackPortAudioDriver::Close");
-    Pa_CloseStream(fStream);
-    return res;
+    int res = JackAudioDriver::Close();
+    return (Pa_CloseStream(fStream) != paNoError) ? -1 : res;
 }
 
 int JackPortAudioDriver::Attach()
@@ -293,8 +292,7 @@ int JackPortAudioDriver::Start()
 {
     jack_log("JackPortAudioDriver::Start");
     if (JackAudioDriver::Start() >= 0) {
-        PaError err = Pa_StartStream(fStream);
-        if (err == paNoError) {
+        if (Pa_StartStream(fStream) == paNoError) {
             return 0;
         }
         JackAudioDriver::Stop();
@@ -305,8 +303,7 @@ int JackPortAudioDriver::Start()
 int JackPortAudioDriver::Stop()
 {
     jack_log("JackPortAudioDriver::Stop");
-    PaError err = Pa_StopStream(fStream);
-    int res = (err == paNoError) ? 0 : -1;
+    int res = (Pa_StopStream(fStream) == paNoError) ? 0 : -1;
     if (JackAudioDriver::Stop() < 0) {
         res = -1;
     }
