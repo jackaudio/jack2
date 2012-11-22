@@ -1617,32 +1617,27 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
         jack_error("No input and output channels...");
         return -1;
     }
-
-    // AUHAL
-    SInt32 major;
-    SInt32 minor;
-    Gestalt(gestaltSystemVersionMajor, &major);
-    Gestalt(gestaltSystemVersionMinor, &minor);
     
-    if (major == 10 && minor >= 6) { 
-        AudioComponentDescription cd = {kAudioUnitType_Output, kAudioUnitSubType_HALOutput, kAudioUnitManufacturer_Apple, 0, 0};
-        AudioComponent HALOutput = AudioComponentFindNext(NULL, &cd);
-        err1 = AudioComponentInstanceNew(HALOutput, &fAUHAL);
-        if (err1 != noErr) {
-            jack_error("Error calling AudioComponentInstanceNew");
-            printError(err1);
-            goto error;
-        }
-    } else {
-        ComponentDescription cd = {kAudioUnitType_Output, kAudioUnitSubType_HALOutput, kAudioUnitManufacturer_Apple, 0, 0};
-        Component HALOutput = FindNextComponent(NULL, &cd);
-        err1 = OpenAComponent(HALOutput, &fAUHAL);
-        if (err1 != noErr) {
-            jack_error("Error calling OpenAComponent");
-            printError(err1);
-            goto error;
-        }
+    // AUHAL
+#ifdef MAC_OS_X_VERSION_10_5
+    ComponentDescription cd = {kAudioUnitType_Output, kAudioUnitSubType_HALOutput, kAudioUnitManufacturer_Apple, 0, 0};
+    Component HALOutput = FindNextComponent(NULL, &cd);
+    err1 = OpenAComponent(HALOutput, &fAUHAL);
+    if (err1 != noErr) {
+        jack_error("Error calling OpenAComponent");
+        printError(err1);
+        goto error;
     }
+#else 
+    AudioComponentDescription cd = {kAudioUnitType_Output, kAudioUnitSubType_HALOutput, kAudioUnitManufacturer_Apple, 0, 0};
+    AudioComponent HALOutput = AudioComponentFindNext(NULL, &cd);
+    err1 = AudioComponentInstanceNew(HALOutput, &fAUHAL);
+    if (err1 != noErr) {
+        jack_error("Error calling AudioComponentInstanceNew");
+        printError(err1);
+        goto error;
+    }
+#endif
 
     err1 = AudioUnitInitialize(fAUHAL);
     if (err1 != noErr) {
