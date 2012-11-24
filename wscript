@@ -76,6 +76,7 @@ def options(opt):
     opt.add_option('--firewire', action='store_true', default=False, help='Enable FireWire driver (FFADO)')
     opt.add_option('--freebob', action='store_true', default=False, help='Enable FreeBob driver')
     opt.add_option('--alsa', action='store_true', default=False, help='Enable ALSA driver')
+    opt.add_option('--autostart', type='string', default="default", help='Autostart method. Possible values: "default", "classic", "dbus", "none"')
     opt.sub_options('dbus')
 
 def configure(conf):
@@ -214,6 +215,27 @@ def configure(conf):
         conf.env.append_unique('CFLAGS', '-g')
         conf.env.append_unique('LINKFLAGS', '-g')
 
+    if not Options.options.autostart in ["default", "classic", "dbus", "none"]:
+        conf.fatal("Invalid autostart value \"" + Options.options.autostart + "\"")
+
+    if Options.options.autostart == "default":
+        if conf.env['BUILD_JACKDBUS'] == True and conf.env['BUILD_JACKD'] == False:
+            conf.env['AUTOSTART_METHOD'] = "dbus"
+        else:
+            conf.env['AUTOSTART_METHOD'] = "classic"
+    else:
+        conf.env['AUTOSTART_METHOD'] = Options.options.autostart
+
+    if conf.env['AUTOSTART_METHOD'] == "dbus" and not conf.env['BUILD_JACKDBUS']:
+        conf.fatal("D-Bus autostart mode was specified but jackdbus will not be built")
+    if conf.env['AUTOSTART_METHOD'] == "classic" and not conf.env['BUILD_JACKD']:
+        conf.fatal("Classic autostart mode was specified but jackd will not be built")
+
+    if conf.env['AUTOSTART_METHOD'] == "dbus":
+        conf.define('USE_LIBDBUS_AUTOLAUNCH', 1)
+    elif conf.env['AUTOSTART_METHOD'] == "classic":
+        conf.define('USE_CLASSIC_AUTOLAUNCH', 1)
+
     conf.define('CLIENT_NUM', Options.options.clients)
     conf.define('PORT_NUM_FOR_CLIENT', Options.options.application_ports)
 
@@ -224,8 +246,6 @@ def configure(conf):
     conf.define('JACKMP', 1)
     if conf.env['BUILD_JACKDBUS'] == True:
         conf.define('JACK_DBUS', 1)
-        if conf.env['BUILD_JACKD'] == False:
-            conf.define('USE_LIBDBUS_AUTOLAUNCH', 1)
     if conf.env['BUILD_WITH_PROFILE'] == True:
         conf.define('JACK_MONITOR', 1)
     conf.write_config_header('config.h', remove=False)
@@ -277,6 +297,7 @@ def configure(conf):
 
     display_feature('Build standard JACK (jackd)', conf.env['BUILD_JACKD'])
     display_feature('Build D-Bus JACK (jackdbus)', conf.env['BUILD_JACKDBUS'])
+    display_msg('Autostart method', conf.env['AUTOSTART_METHOD'])
 
     if conf.env['BUILD_JACKDBUS'] and conf.env['BUILD_JACKD']:
         print(Logs.colors.RED + 'WARNING !! mixing both jackd and jackdbus may cause issues:' + Logs.colors.NORMAL)

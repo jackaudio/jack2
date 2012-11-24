@@ -226,7 +226,7 @@ def build(bld):
     clientlib.defines = 'HAVE_CONFIG_H'
     clientlib.use = uselib
     clientlib.install_path = '${LIBDIR}'
-    if bld.env['BUILD_JACKDBUS'] == True and bld.env['BUILD_JACKD'] == False:
+    if bld.env['AUTOSTART_METHOD'] == "dbus":
         clientlib.use.append('DBUS-1')
     clientlib.includes = includes
     clientlib.name         = 'clientlib'
