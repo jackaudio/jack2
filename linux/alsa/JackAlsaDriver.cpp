@@ -278,16 +278,22 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
         int playback_card = card_to_num(playback_driver_name);
         char audio_name[32];
 
-        snprintf(audio_name, sizeof(audio_name), "Audio%d", capture_card);
-        if (!JackServerGlobals::on_device_acquire(audio_name)) {
-            jack_error("Audio device %s cannot be acquired...", capture_driver_name);
-            return -1;
+        if (capture_card >= 0) {
+            snprintf(audio_name, sizeof(audio_name), "Audio%d", capture_card);
+            if (!JackServerGlobals::on_device_acquire(audio_name)) {
+                jack_error("Audio device %s cannot be acquired...", capture_driver_name);
+                return -1;
+            }
         }
 
-        if (playback_card != capture_card) {
+        if (playback_card >= 0 && playback_card != capture_card) {
             snprintf(audio_name, sizeof(audio_name), "Audio%d", playback_card);
             if (!JackServerGlobals::on_device_acquire(audio_name)) {
                 jack_error("Audio device %s cannot be acquired...", playback_driver_name);
+                if (capture_card >= 0) {
+                    snprintf(audio_name, sizeof(audio_name), "Audio%d", capture_card);
+                    JackServerGlobals::on_device_release(audio_name);
+                }
                 return -1;
             }
         }
