@@ -31,7 +31,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/time.h>
-#include <regex.h>
 #include <string.h>
 
 #include "JackAlsaDriver.h"
@@ -172,30 +171,31 @@ int JackAlsaDriver::Detach()
     return JackAudioDriver::Detach();
 }
 
-static char* get_control_device_name(const char * device_name)
+extern "C" char* get_control_device_name(const char * device_name)
 {
     char * ctl_name;
-    regex_t expression;
+    const char * comma;
 
-    regcomp(&expression, "(plug)?hw:[0-9](,[0-9])?", REG_ICASE | REG_EXTENDED);
+    /* the user wants a hw or plughw device, the ctl name
+     * should be hw:x where x is the card identification.
+     * We skip the subdevice suffix that starts with comma */
 
-    if (!regexec(&expression, device_name, 0, NULL, 0)) {
-        /* the user wants a hw or plughw device, the ctl name
-         * should be hw:x where x is the card number */
-
-        char tmp[5];
-        strncpy(tmp, strstr(device_name, "hw"), 4);
-        tmp[4] = '\0';
-        jack_info("control device %s",tmp);
-        ctl_name = strdup(tmp);
-    } else {
-        ctl_name = strdup(device_name);
+    if (strncasecmp(device_name, "plughw:", 7) == 0) {
+        /* skip the "plug" prefix" */
+        device_name += 4;
     }
 
-    regfree(&expression);
-
-    if (ctl_name == NULL) {
-        jack_error("strdup(\"%s\") failed.", ctl_name);
+    comma = strchr(device_name, ',');
+    if (comma == NULL) {
+        ctl_name = strdup(device_name);
+        if (ctl_name == NULL) {
+            jack_error("strdup(\"%s\") failed.", device_name);
+        }
+    } else {
+        ctl_name = strndup(device_name, comma - device_name);
+        if (ctl_name == NULL) {
+            jack_error("strndup(\"%s\", %u) failed.", device_name, (unsigned int)(comma - device_name));
+        }
     }
 
     return ctl_name;
