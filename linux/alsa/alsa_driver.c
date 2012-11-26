@@ -32,7 +32,6 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/time.h>
-#include <regex.h>
 #include <string.h>
 
 #include "alsa_driver.h"
@@ -137,30 +136,18 @@ alsa_driver_check_capabilities (alsa_driver_t *driver)
 	return 0;
 }
 
+char* get_control_device_name(const char * device_name);
+
 static int
 alsa_driver_check_card_type (alsa_driver_t *driver)
 {
 	int err;
 	snd_ctl_card_info_t *card_info;
 	char * ctl_name;
-	regex_t expression;
 
 	snd_ctl_card_info_alloca (&card_info);
 
-	regcomp(&expression,"(plug)?hw:[0-9](,[0-9])?",REG_ICASE|REG_EXTENDED);
-
-       	if (!regexec(&expression,driver->alsa_name_playback,0,NULL,0)) {
-		/* the user wants a hw or plughw device, the ctl name
-		 * should be hw:x where x is the card number */
-
-		char tmp[5];
-		strncpy(tmp,strcasestr(driver->alsa_name_playback,"hw"),4);
-		tmp[4]='\0';
-		jack_info("control device %s",tmp);
-		ctl_name = strdup(tmp);
-	} else {
-		ctl_name = strdup(driver->alsa_name_playback);
-	}
+	ctl_name = get_control_device_name(driver->alsa_name_playback);
 
 	// XXX: I don't know the "right" way to do this. Which to use
 	// driver->alsa_name_playback or driver->alsa_name_capture.
@@ -175,7 +162,6 @@ alsa_driver_check_card_type (alsa_driver_t *driver)
 
 	driver->alsa_driver = strdup(snd_ctl_card_info_get_driver (card_info));
 
-	regfree(&expression);
 	free(ctl_name);
 
 	return alsa_driver_check_capabilities (driver);

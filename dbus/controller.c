@@ -377,6 +377,8 @@ on_device_acquire(const char * device_name)
     int ret;
     DBusError error;
 
+    dbus_error_init(&error);
+
     ret = rd_acquire(
         &g_reserved_device[g_device_count].reserved_device,
         g_connection,
@@ -388,6 +390,7 @@ on_device_acquire(const char * device_name)
     if (ret  < 0)
     {
         jack_error("Failed to acquire device name : %s error : %s", device_name, (error.message ? error.message : strerror(-ret)));
+        dbus_error_free(&error);
         return false;
     }
 
