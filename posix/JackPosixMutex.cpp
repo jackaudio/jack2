@@ -51,7 +51,6 @@ namespace Jack
                 return false;
             }
         } else {
-            jack_error("JackBasePosixMutex::Lock mutex already locked by thread = %d", current_thread);
             return false;
         }
     }
@@ -69,7 +68,6 @@ namespace Jack
                 return false;
             }
         } else {
-            jack_error("JackBasePosixMutex::Trylock mutex already locked by thread = %d", current_thread);
             return false;
         }
     }
@@ -86,7 +84,6 @@ namespace Jack
                 return false;
             }
         } else {
-            jack_error("JackBasePosixMutex::Unlock mutex not locked by thread = %d owner %d", pthread_self(), fOwner);
             return false;
         }
     }
