@@ -13,7 +13,7 @@ import re
 import Logs
 import sys
 
-VERSION='1.9.9'
+VERSION='1.9.9.5'
 APPNAME='jack'
 JACK_API_VERSION = '0.1.0'
 
@@ -76,6 +76,7 @@ def options(opt):
     opt.add_option('--firewire', action='store_true', default=False, help='Enable FireWire driver (FFADO)')
     opt.add_option('--freebob', action='store_true', default=False, help='Enable FreeBob driver')
     opt.add_option('--alsa', action='store_true', default=False, help='Enable ALSA driver')
+    opt.add_option('--autostart', type='string', default="default", help='Autostart method. Possible values: "default", "classic", "dbus", "none"')
     opt.sub_options('dbus')
 
 def configure(conf):
@@ -116,7 +117,7 @@ def configure(conf):
     #   conf.check_tool('compiler_cc')
  
     conf.env.append_unique('CXXFLAGS', '-Wall')
-    conf.env.append_unique('CCFLAGS', '-Wall')
+    conf.env.append_unique('CFLAGS', '-Wall')
 
     conf.sub_config('common')
     if conf.env['IS_LINUX']:
@@ -173,9 +174,18 @@ def configure(conf):
         conf.define('HAVE_CELT_API_0_7', 0)
         conf.define('HAVE_CELT_API_0_5', 0)
 
+    conf.env['WITH_OPUS'] = False
+    if conf.check_cfg(package='opus', atleast_version='0.9.0' , args='--cflags --libs', mandatory=False):
+        if conf.check_cc(header_name='opus/opus_custom.h', mandatory=False):
+            conf.define('HAVE_OPUS', 1)
+            conf.env['WITH_OPUS'] = True
+
+
     conf.env['LIB_PTHREAD'] = ['pthread']
     conf.env['LIB_DL'] = ['dl']
     conf.env['LIB_RT'] = ['rt']
+    conf.env['LIB_M'] = ['m']
+    conf.env['LIB_STDC++'] = ['stdc++']
     conf.env['JACK_API_VERSION'] = JACK_API_VERSION
     conf.env['JACK_VERSION'] = VERSION
 
@@ -202,8 +212,29 @@ def configure(conf):
 
     if conf.env['BUILD_DEBUG']:
         conf.env.append_unique('CXXFLAGS', '-g')
-        conf.env.append_unique('CCFLAGS', '-g')
+        conf.env.append_unique('CFLAGS', '-g')
         conf.env.append_unique('LINKFLAGS', '-g')
+
+    if not Options.options.autostart in ["default", "classic", "dbus", "none"]:
+        conf.fatal("Invalid autostart value \"" + Options.options.autostart + "\"")
+
+    if Options.options.autostart == "default":
+        if conf.env['BUILD_JACKDBUS'] == True and conf.env['BUILD_JACKD'] == False:
+            conf.env['AUTOSTART_METHOD'] = "dbus"
+        else:
+            conf.env['AUTOSTART_METHOD'] = "classic"
+    else:
+        conf.env['AUTOSTART_METHOD'] = Options.options.autostart
+
+    if conf.env['AUTOSTART_METHOD'] == "dbus" and not conf.env['BUILD_JACKDBUS']:
+        conf.fatal("D-Bus autostart mode was specified but jackdbus will not be built")
+    if conf.env['AUTOSTART_METHOD'] == "classic" and not conf.env['BUILD_JACKD']:
+        conf.fatal("Classic autostart mode was specified but jackd will not be built")
+
+    if conf.env['AUTOSTART_METHOD'] == "dbus":
+        conf.define('USE_LIBDBUS_AUTOLAUNCH', 1)
+    elif conf.env['AUTOSTART_METHOD'] == "classic":
+        conf.define('USE_CLASSIC_AUTOLAUNCH', 1)
 
     conf.define('CLIENT_NUM', Options.options.clients)
     conf.define('PORT_NUM_FOR_CLIENT', Options.options.application_ports)
@@ -215,11 +246,9 @@ def configure(conf):
     conf.define('JACKMP', 1)
     if conf.env['BUILD_JACKDBUS'] == True:
         conf.define('JACK_DBUS', 1)
-        if conf.env['BUILD_JACKD'] == False:
-            conf.define('USE_LIBDBUS_AUTOLAUNCH', 1)
     if conf.env['BUILD_WITH_PROFILE'] == True:
         conf.define('JACK_MONITOR', 1)
-    conf.write_config_header('config.h')
+    conf.write_config_header('config.h', remove=False)
 
     svnrev = None
     if os.access('svnversion.h', os.R_OK):
@@ -228,15 +257,13 @@ def configure(conf):
         if m != None:
             svnrev = m.group(1)
 
-    conf.env.append_unique('LINKFLAGS', ['-lm', '-lstdc++'])
-
     if Options.options.mixed == True:
         env_variant2 = conf.env.copy()
         conf.set_env_name('lib32', env_variant2)
         env_variant2.set_variant('lib32')
         conf.setenv('lib32')
         conf.env.append_unique('CXXFLAGS', '-m32')
-        conf.env.append_unique('CCFLAGS', '-m32')
+        conf.env.append_unique('CFLAGS', '-m32')
         conf.env.append_unique('LINKFLAGS', '-m32')
         if Options.options.libdir32:
             conf.env['LIBDIR'] = Options.options.libdir32
@@ -260,15 +287,17 @@ def configure(conf):
     display_msg("Library directory", conf.env['LIBDIR'], 'CYAN')
     display_msg("Drivers directory", conf.env['ADDON_DIR'], 'CYAN')
     display_feature('Build debuggable binaries', conf.env['BUILD_DEBUG'])
-    display_msg('C compiler flags', repr(conf.env['CCFLAGS']))
+    display_msg('C compiler flags', repr(conf.env['CFLAGS']))
     display_msg('C++ compiler flags', repr(conf.env['CXXFLAGS']))
     display_msg('Linker flags', repr(conf.env['LINKFLAGS']))
     display_feature('Build doxygen documentation', conf.env['BUILD_DOXYGEN_DOCS'])
+    display_feature('Build Opus netjack2', conf.env['WITH_OPUS'])
     display_feature('Build with engine profiling', conf.env['BUILD_WITH_PROFILE'])
     display_feature('Build with 32/64 bits mixed mode', conf.env['BUILD_WITH_32_64'])
 
     display_feature('Build standard JACK (jackd)', conf.env['BUILD_JACKD'])
     display_feature('Build D-Bus JACK (jackdbus)', conf.env['BUILD_JACKDBUS'])
+    display_msg('Autostart method', conf.env['AUTOSTART_METHOD'])
 
     if conf.env['BUILD_JACKDBUS'] and conf.env['BUILD_JACKD']:
         print(Logs.colors.RED + 'WARNING !! mixing both jackd and jackdbus may cause issues:' + Logs.colors.NORMAL)

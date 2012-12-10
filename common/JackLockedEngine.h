@@ -41,7 +41,7 @@ catch (...) {
 */
 
 #define CATCH_EXCEPTION_RETURN                      \
-    } catch(std::bad_alloc& e) {                    \
+    } catch (std::bad_alloc& e) {                    \
         jack_error("Memory allocation error...");   \
         return -1;                                  \
     } catch (...) {                                 \
@@ -50,10 +50,10 @@ catch (...) {
     }                                               \
 
 #define CATCH_CLOSE_EXCEPTION_RETURN                      \
-    } catch(std::bad_alloc& e) {                    \
+    } catch (std::bad_alloc& e) {                    \
         jack_error("Memory allocation error...");   \
         return -1;                                  \
-    } catch(JackTemporaryException& e) {                       \
+    } catch (JackTemporaryException& e) {                       \
         jack_error("JackTemporaryException : now quits...");   \
         JackTools::KillServer();                     \
         return 0;                                   \
@@ -63,7 +63,7 @@ catch (...) {
     }
 
 #define CATCH_EXCEPTION                      \
-    } catch(std::bad_alloc& e) {                    \
+    } catch (std::bad_alloc& e) {                    \
         jack_error("Memory allocation error...");   \
     } catch (...) {                                 \
         jack_error("Unknown error...");             \
@@ -327,8 +327,8 @@ class SERVER_EXPORT JackLockedEngine
 
         void NotifyQuit()
         {
+            // No lock needed
             TRY_CALL
-            JackLock lock(&fEngine);
             return fEngine.NotifyQuit();
             CATCH_EXCEPTION
         }

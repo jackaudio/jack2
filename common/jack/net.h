@@ -40,6 +40,7 @@ enum JackNetEncoder {
     JackFloatEncoder = 0,   // samples are transmitted as float
     JackIntEncoder = 1,     // samples are transmitted as 16 bits integer
     JackCeltEncoder = 2,    // samples are transmitted using CELT codec (http://www.celt-codec.org/)
+    JackOpusEncoder = 3,    // samples are transmitted using OPUS codec (http://www.opus-codec.org/)
 };
 
 typedef struct {

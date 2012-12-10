@@ -69,7 +69,7 @@ namespace Jack
 
             JackNetDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
                         const char* ip, int port, int mtu, int midi_input_ports, int midi_output_ports,
-                        char* net_name, uint transport_sync, int network_latency, int celt_encoding);
+                        char* net_name, uint transport_sync, int network_latency, int celt_encoding, int opus_encoding);
             virtual ~JackNetDriver();
 
             int Close();

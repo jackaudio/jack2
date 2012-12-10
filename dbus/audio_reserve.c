@@ -76,6 +76,8 @@ SERVER_EXPORT bool audio_acquire(const char * device_name)
 
     assert(gReserveCount < DEVICE_MAX);
 
+    dbus_error_init(&error);
+
     if ((ret= rd_acquire(
                  &gReservedDevice[gReserveCount].reserved_device,
                  gConnection,
@@ -86,6 +88,7 @@ SERVER_EXPORT bool audio_acquire(const char * device_name)
                  &error)) < 0) {
 
         jack_error("Failed to acquire device name : %s error : %s", device_name, (error.message ? error.message : strerror(-ret)));
+        dbus_error_free(&error);
         return false;
     }
 

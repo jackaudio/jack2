@@ -38,9 +38,9 @@ def build(bld):
         jackd.use = ['serverlib']
         if bld.env['IS_LINUX'] and bld.env['BUILD_JACKDBUS']: 
             jackd.source += ['../dbus/reserve.c', '../dbus/audio_reserve.c'] 
-            jackd.use += ['PTHREAD', 'DL', 'RT', 'DBUS-1']
+            jackd.use += ['PTHREAD', 'DL', 'RT', 'M', 'STDC++', 'DBUS-1']
         else:
-            jackd.use += ['PTHREAD', 'DL', 'RT']
+            jackd.use += ['PTHREAD', 'DL', 'RT', 'M', 'STDC++']
         jackd.target = 'jackd'
   	
     create_jack_driver_obj(bld, 'dummy', '../common/JackDummyDriver.cpp')

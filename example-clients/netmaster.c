@@ -73,7 +73,7 @@ main (int argc, char *argv[])
 		{0, 0, 0, 0}
 	};
 
-	while ((opt = getopt_long (argc, argv, options, long_options, &option_index)) != EOF) {
+	while ((opt = getopt_long (argc, argv, options, long_options, &option_index)) != -1) {
 
 		switch (opt) {
 

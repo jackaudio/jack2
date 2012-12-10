@@ -27,7 +27,7 @@ static int Jack_Graph_Order_Callback(void *arg)
         for (i = 0;  ports[i]; ++i) {
             printf("name: %s\n", ports[i]);
         }
-        free(ports);
+        jack_free(ports);
     }
 
     ports = jack_get_ports(client, NULL, NULL, JackPortIsPhysical|JackPortIsInput);
@@ -35,7 +35,7 @@ static int Jack_Graph_Order_Callback(void *arg)
         for (i = 0;  ports[i]; ++i) {
             printf("name: %s\n", ports[i]);
         }
-        free(ports);
+        jack_free(ports);
     }
 
     return 0;

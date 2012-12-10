@@ -153,9 +153,10 @@ int main(int argc, char *argv[])
 	struct option long_options[] = {
 		{"driver", 1, 0, 'd'},
 		{"client", 1, 0, 'c'},
+        {0, 0, 0, 0}
 	};
 
- 	while ((opt = getopt_long (argc, argv, options, long_options, &option_index)) != EOF) {
+ 	while ((opt = getopt_long (argc, argv, options, long_options, &option_index)) != -1) {
 		switch (opt) {
 			case 'd':
 				driver_name = optarg;

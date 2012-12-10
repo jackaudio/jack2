@@ -8737,6 +8737,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				HEADER_SEARCH_PATHS = (
+					../macosx,
 					/opt/local/include,
 					.,
 					../posix,
@@ -8787,6 +8788,7 @@
 				GCC_MODEL_TUNING = G4;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				HEADER_SEARCH_PATHS = (
+					../macosx,
 					/opt/local/include,
 					.,
 					../posix,
@@ -9750,7 +9752,7 @@
 					../common/jack,
 				);
 				INFOPLIST_FILE = "Jack-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
@@ -9935,7 +9937,7 @@
 					../common/jack,
 				);
 				INFOPLIST_FILE = "Jack-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
@@ -13629,7 +13631,7 @@
 					../common/jack,
 				);
 				INFOPLIST_FILE = "Jack-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
@@ -14461,7 +14463,7 @@
 					../common/jack,
 				);
 				INFOPLIST_FILE = "Jack-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
@@ -14640,7 +14642,7 @@
 					../common/jack,
 				);
 				INFOPLIST_FILE = "Jack-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
@@ -16431,7 +16433,7 @@
 					../common/jack,
 				);
 				INFOPLIST_FILE = "Jack-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					/opt/local/lib,
 					/usr/lib/gcc/darwin/3.3,
@@ -16954,7 +16956,7 @@
 					../common/jack,
 				);
 				INFOPLIST_FILE = "Jack-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
@@ -17908,6 +17910,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				HEADER_SEARCH_PATHS = (
+					../macosx,
 					/opt/local/include,
 					.,
 					../posix,
@@ -17960,6 +17963,7 @@
 				GCC_MODEL_TUNING = G4;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				HEADER_SEARCH_PATHS = (
+					../macosx,
 					/opt/local/include,
 					.,
 					../posix,

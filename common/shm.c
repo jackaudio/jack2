@@ -5,6 +5,7 @@
  *	- common (interface-independent) code
  *	- POSIX implementation
  *	- System V implementation
+ *  - Windows implementation
  *
  * The implementation used is determined by whether USE_POSIX_SHM was
  * set in the ./configure step.
@@ -12,7 +13,8 @@
 
 /*
  Copyright (C) 2001-2003 Paul Davis
-
+ Copyright (C) 2005-2012 Grame
+ 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as published by
  the Free Software Foundation; either version 2.1 of the License, or
@@ -1167,7 +1169,7 @@ jack_access_registry (jack_shm_info_t *ri)
 		}
 	}
 
-	if ((ri->attached_at = shmat (registry_id, 0, 0)) < 0) {
+	if ((ri->ptr.attached_at = shmat (registry_id, 0, 0)) < 0) {
 		jack_error ("Cannot attach shm registry segment (%s)",
 			    strerror (errno));
 		return EINVAL;
@@ -1175,7 +1177,7 @@ jack_access_registry (jack_shm_info_t *ri)
 
 	/* set up global pointers */
 	ri->index = JACK_SHM_REGISTRY_INDEX;
-	jack_shm_header = ri->attached_at;
+	jack_shm_header = ri->ptr.attached_at;
 	jack_shm_registry = (jack_shm_registry_t *) (jack_shm_header + 1);
 	return 0;
 }
@@ -1199,7 +1201,7 @@ jack_create_registry (jack_shm_info_t *ri)
 		return errno;
 	}
 
-	if ((ri->attached_at = shmat (registry_id, 0, 0)) < 0) {
+	if ((ri->ptr.attached_at = shmat (registry_id, 0, 0)) < 0) {
 		jack_error ("Cannot attach shm registry segment (%s)",
 			    strerror (errno));
 		return EINVAL;
@@ -1207,7 +1209,7 @@ jack_create_registry (jack_shm_info_t *ri)
 
 	/* set up global pointers */
 	ri->index = JACK_SHM_REGISTRY_INDEX;
-	jack_shm_header = ri->attached_at;
+	jack_shm_header = ri->ptr.attached_at;
 	jack_shm_registry = (jack_shm_registry_t *) (jack_shm_header + 1);
 
 	/* initialize registry contents */
@@ -1226,8 +1228,8 @@ void
 jack_release_shm (jack_shm_info_t* si)
 {
 	/* registry may or may not be locked */
-	if (si->attached_at != MAP_FAILED) {
-		shmdt (si->attached_at);
+	if (si->ptr.attached_at != MAP_FAILED) {
+		shmdt (si->ptr.attached_at);
 	}
 }
 
@@ -1261,7 +1263,7 @@ jack_shmalloc (const char* name_not_used, jack_shmsize_t size,
 			registry->id = shmid;
 			registry->allocator = getpid();
 			si->index = registry->index;
-			si->attached_at = MAP_FAILED; /* not attached */
+			si->ptr.attached_at = MAP_FAILED; /* not attached */
 			rc = 0;
 
 		} else {
@@ -1277,7 +1279,19 @@ jack_shmalloc (const char* name_not_used, jack_shmsize_t size,
 int
 jack_attach_shm (jack_shm_info_t* si)
 {
-	if ((si->attached_at = shmat (jack_shm_registry[si->index].id, 0, 0)) < 0) {
+	if ((si->ptr.attached_at = shmat (jack_shm_registry[si->index].id, 0, 0)) < 0) {
+		jack_error ("Cannot attach shm segment (%s)",
+			    strerror (errno));
+		jack_release_shm_info (si->index);
+		return -1;
+	}
+	return 0;
+}
+
+int
+jack_attach_shm_read (jack_shm_info_t* si)
+{
+	if ((si->ptr.attached_at = shmat (jack_shm_registry[si->index].id, 0, SHM_RDONLY)) < 0) {
 		jack_error ("Cannot attach shm segment (%s)",
 			    strerror (errno));
 		jack_release_shm_info (si->index);

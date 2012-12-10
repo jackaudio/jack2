@@ -67,7 +67,7 @@ def build(bld):
         ]
     obj.use = ['serverlib']
     if bld.env['IS_LINUX']:
-        obj.use += ['PTHREAD', 'DL', 'RT', 'DBUS-1', 'EXPAT']
+        obj.use += ['PTHREAD', 'DL', 'RT', 'DBUS-1', 'EXPAT', 'STDC++']
     if bld.env['IS_MACOSX']:
         obj.use += ['PTHREAD', 'DL', 'DBUS-1', 'EXPAT']
     obj.target = 'jackdbus'

@@ -130,6 +130,8 @@ namespace Jack
             snd_pcm_access_t fSampleAccess;
 
             //channels
+            const char*  fCaptureName;
+            const char*  fPlaybackName;
             unsigned int fCardInputs;
             unsigned int fCardOutputs;
 
@@ -182,6 +184,8 @@ namespace Jack
                 fInputParams    = 0;
                 fOutputParams   = 0;
                 fPeriod = 2;
+                fCaptureName    = NULL;
+                fPlaybackName   = NULL;
 
                 fInputCardBuffer = 0;
                 fOutputCardBuffer = 0;
@@ -200,6 +204,8 @@ namespace Jack
             {
                 fInputCardBuffer = 0;
                 fOutputCardBuffer = 0;
+                fCaptureName    = NULL;
+                fPlaybackName   = NULL;
 
                 for ( int i = 0; i < 256; i++ )
                 {
@@ -216,8 +222,8 @@ namespace Jack
             int open()
             {
                 //open input/output streams
-                check_error ( snd_pcm_open ( &fInputDevice,  fCardName, SND_PCM_STREAM_CAPTURE, 0 ) );
-                check_error ( snd_pcm_open ( &fOutputDevice, fCardName, SND_PCM_STREAM_PLAYBACK, 0 ) );
+                check_error ( snd_pcm_open ( &fInputDevice,  (fCaptureName == NULL) ? fCardName : fCaptureName, SND_PCM_STREAM_CAPTURE, 0 ) );
+                check_error ( snd_pcm_open ( &fOutputDevice, (fPlaybackName == NULL) ? fCardName : fPlaybackName, SND_PCM_STREAM_PLAYBACK, 0 ) );
 
                 //get hardware input parameters
                 check_error ( snd_pcm_hw_params_malloc ( &fInputParams ) );
@@ -523,6 +529,7 @@ namespace Jack
                             fCardInputs, fCardOutputs,
                             fFrequency, fBuffering,
                             snd_pcm_format_name ( ( _snd_pcm_format ) fSampleFormat ) );
+                snd_ctl_close(ctl_handle);
             }
 
             /**
@@ -551,7 +558,7 @@ namespace Jack
                     printHWParams ( fInputParams );
                 if ( fSoftOutputs > 0 )
                     printHWParams ( fOutputParams );
-
+                snd_ctl_close(ctl_handle);
                 return 0;
             }
 

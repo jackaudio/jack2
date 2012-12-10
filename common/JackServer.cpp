@@ -134,7 +134,6 @@ fail_close1:
 int JackServer::Close()
 {
     jack_log("JackServer::Close");
-    fEngine->NotifyQuit();
     fChannel.Close();
     fAudioDriver->Detach();
     fAudioDriver->Close();
@@ -190,6 +189,7 @@ int JackServer::Start()
 int JackServer::Stop()
 {
     jack_log("JackServer::Stop");
+    fEngine->NotifyQuit();
     fChannel.Stop();
     
     fEngine->ShutDown();

@@ -73,7 +73,7 @@ static int start_server_dbus(const char* server_name)
     return 0;
 }
 
-#else
+#elif defined(USE_CLASSIC_AUTOLAUNCH)
 
 /* Exec the JACK server in this process.  Does not return. */
 static void start_server_classic_aux(const char* server_name)
@@ -199,8 +199,11 @@ static int start_server(const char* server_name, jack_options_t options)
 
 #if defined(USE_LIBDBUS_AUTOLAUNCH)
     return start_server_dbus(server_name);
-#else
+#elif defined(USE_CLASSIC_AUTOLAUNCH)
     return start_server_classic(server_name);
+#else
+    fprintf(stderr, "Automatic start of JACK server is disabled at configure time\n");
+    return 1;
 #endif
 }
 

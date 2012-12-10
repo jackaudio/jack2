@@ -31,6 +31,11 @@
 #include <stdint.h>
 
 #include "reserve.h"
+#include "jack/control.h"
+
+#define RESERVE_ERROR_NO_MEMORY            "org.freedesktop.ReserveDevice1.Error.NoMemory"
+#define RESERVE_ERROR_PROTOCOL_VIOLATION   "org.freedesktop.ReserveDevice1.Error.Protocol"
+#define RESERVE_ERROR_RELEASE_DENIED       "org.freedesktop.ReserveDevice1.Error.ReleaseDenied"
 
 struct rd_device {
 	int ref;
@@ -371,34 +376,51 @@ int rd_acquire(
 	dbus_bool_t good;
     vtable.message_function = object_handler;
 
-	if (!error)
+	if (!error) {
 		error = &_error;
+		dbus_error_init(error);
+	}
 
-	dbus_error_init(error);
+	if (!_d) {
+		assert(0);
+		r = -EINVAL;
+		goto fail;
+	}
 
-	if (!_d)
-		return -EINVAL;
+	if (!connection) {
+		assert(0);
+		r = -EINVAL;
+		goto fail;
+	}
 
-	if (!connection)
-		return -EINVAL;
+	if (!device_name) {
+		assert(0);
+		r = -EINVAL;
+		goto fail;
+	}
 
-	if (!device_name)
-		return -EINVAL;
+	if (!request_cb && priority != INT32_MAX) {
+		assert(0);
+		r = -EINVAL;
+		goto fail;
+	}
 
-	if (!request_cb && priority != INT32_MAX)
-		return -EINVAL;
-
-	if (!(d = (rd_device *)calloc(sizeof(rd_device), 1)))
-		return -ENOMEM;
+	if (!(d = (rd_device *)calloc(sizeof(rd_device), 1))) {
+		dbus_set_error(error, RESERVE_ERROR_NO_MEMORY, "Cannot allocate memory for rd_device struct");
+		r = -ENOMEM;
+		goto fail;
+	}
 
 	d->ref = 1;
 
 	if (!(d->device_name = strdup(device_name))) {
+		dbus_set_error(error, RESERVE_ERROR_NO_MEMORY, "Cannot duplicate device name string");
 		r = -ENOMEM;
 		goto fail;
 	}
 
 	if (!(d->application_name = strdup(application_name))) {
+		dbus_set_error(error, RESERVE_ERROR_NO_MEMORY, "Cannot duplicate application name string");
 		r = -ENOMEM;
 		goto fail;
 	}
@@ -408,12 +430,14 @@ int rd_acquire(
 	d->request_cb = request_cb;
 
 	if (!(d->service_name = (char*)malloc(sizeof(SERVICE_PREFIX) + strlen(device_name)))) {
+		dbus_set_error(error, RESERVE_ERROR_NO_MEMORY, "Cannot allocate memory for service name string");
 		r = -ENOMEM;
 		goto fail;
 	}
 	sprintf(d->service_name, SERVICE_PREFIX "%s", d->device_name);
 
 	if (!(d->object_path = (char*)malloc(sizeof(OBJECT_PREFIX) + strlen(device_name)))) {
+		dbus_set_error(error, RESERVE_ERROR_NO_MEMORY, "Cannot allocate memory for object path string");
 		r = -ENOMEM;
 		goto fail;
 	}
@@ -425,20 +449,28 @@ int rd_acquire(
 		     DBUS_NAME_FLAG_DO_NOT_QUEUE|
 		     (priority < INT32_MAX ? DBUS_NAME_FLAG_ALLOW_REPLACEMENT : 0),
 		     error)) < 0) {
+		jack_error("dbus_bus_request_name() failed. (1)");
 		r = -EIO;
 		goto fail;
 	}
 
-	if (k == DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER || k == DBUS_REQUEST_NAME_REPLY_ALREADY_OWNER)
+	switch (k) {
+	case DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER:
+	case DBUS_REQUEST_NAME_REPLY_ALREADY_OWNER:
 		goto success;
-
-	if (k != DBUS_REQUEST_NAME_REPLY_EXISTS) {
+	case DBUS_REQUEST_NAME_REPLY_EXISTS:
+		break;
+	case DBUS_REQUEST_NAME_REPLY_IN_QUEUE : /* DBUS_NAME_FLAG_DO_NOT_QUEUE was specified */
+	default:								/* unknown reply returned */
+		jack_error("request name reply with unexpected value %d.", k);
+		assert(0);
 		r = -EIO;
 		goto fail;
 	}
 
 	if (priority <= INT32_MIN) {
 		r = -EBUSY;
+		dbus_set_error(error, RESERVE_ERROR_RELEASE_DENIED, "Device reservation request with priority %"PRIi32" denied for \"%s\"", priority, device_name);
 		goto fail;
 	}
 
@@ -447,6 +479,7 @@ int rd_acquire(
 		      d->object_path,
 		      "org.freedesktop.ReserveDevice1",
 		      "RequestRelease"))) {
+		dbus_set_error(error, RESERVE_ERROR_NO_MEMORY, "Cannot allocate memory for RequestRelease method call");
 		r = -ENOMEM;
 		goto fail;
 	}
@@ -455,6 +488,7 @@ int rd_acquire(
 		    m,
 		    DBUS_TYPE_INT32, &d->priority,
 		    DBUS_TYPE_INVALID)) {
+		dbus_set_error(error, RESERVE_ERROR_NO_MEMORY, "Cannot append args for RequestRelease method call");
 		r = -ENOMEM;
 		goto fail;
 	}
@@ -469,10 +503,12 @@ int rd_acquire(
 		    dbus_error_has_name(error, DBUS_ERROR_UNKNOWN_METHOD) ||
 		    dbus_error_has_name(error, DBUS_ERROR_NO_REPLY)) {
 			/* This must be treated as denied. */
+			jack_info("Device reservation request with priority %"PRIi32" denied for \"%s\": %s (%s)", priority, device_name, error->name, error->message);
 			r = -EBUSY;
 			goto fail;
 		}
 
+		jack_error("dbus_connection_send_with_reply_and_block(RequestRelease) failed.");
 		r = -EIO;
 		goto fail;
 	}
@@ -482,11 +518,13 @@ int rd_acquire(
 		    error,
 		    DBUS_TYPE_BOOLEAN, &good,
 		    DBUS_TYPE_INVALID)) {
+		jack_error("RequestRelease() reply is invalid.");
 		r = -EIO;
 		goto fail;
 	}
 
 	if (!good) {
+        dbus_set_error(error, RESERVE_ERROR_RELEASE_DENIED, "Device reservation request with priority %"PRIi32" denied for \"%s\" via RequestRelease()", priority, device_name);
 		r = -EBUSY;
 		goto fail;
 	}
@@ -498,11 +536,14 @@ int rd_acquire(
 		     (priority < INT32_MAX ? DBUS_NAME_FLAG_ALLOW_REPLACEMENT : 0)|
 		     DBUS_NAME_FLAG_REPLACE_EXISTING,
 		     error)) < 0) {
+		jack_error("dbus_bus_request_name() failed. (2)");
 		r = -EIO;
 		goto fail;
 	}
 
 	if (k != DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER) {
+        /* this is racy, another contender may have acquired the device */
+		dbus_set_error(error, RESERVE_ERROR_PROTOCOL_VIOLATION, "request name reply is not DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER but %d.", k);
 		r = -EIO;
 		goto fail;
 	}
@@ -510,11 +551,13 @@ int rd_acquire(
 success:
 	d->owning = 1;
 
-	if (!(dbus_connection_register_object_path(
+	if (!(dbus_connection_try_register_object_path(
 		      d->connection,
 		      d->object_path,
 		      &vtable,
-		      d))) {
+		      d,
+		      error))) {
+		jack_error("cannot register object path \"%s\": %s", d->object_path, error->message);
 		r = -ENOMEM;
 		goto fail;
 	}
@@ -526,6 +569,7 @@ success:
 		    filter_handler,
 		    d,
 		    NULL)) {
+		dbus_set_error(error, RESERVE_ERROR_NO_MEMORY, "Cannot add filter");
 		r = -ENOMEM;
 		goto fail;
 	}

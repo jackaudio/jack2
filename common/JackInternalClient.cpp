@@ -27,10 +27,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackServer.h"
 #include "JackEngineControl.h"
 #include "JackClientControl.h"
-
 #include "JackInternalClientChannel.h"
-#include "JackGenericClientChannel.h"
-
 #include "JackTools.h"
 #include <assert.h>
 

@@ -98,15 +98,15 @@ PaError JackPortAudioDriver::OpenStream(jack_nframes_t buffer_size)
     inputParameters.channelCount = fCaptureChannels;
     inputParameters.sampleFormat = paFloat32 | paNonInterleaved;		// 32 bit floating point output
     inputParameters.suggestedLatency = (fInputDevice != paNoDevice)		// TODO: check how to setup this on ASIO
-                                       ? Pa_GetDeviceInfo(inputParameters.device)->defaultLowInputLatency
+                                       ? ((fPaDevices->GetHostFromDevice(fInputDevice) == "ASIO") ? 0 : Pa_GetDeviceInfo(inputParameters.device)->defaultLowInputLatency)
                                        : 0;
     inputParameters.hostApiSpecificStreamInfo = NULL;
 
     outputParameters.device = fOutputDevice;
     outputParameters.channelCount = fPlaybackChannels;
-    outputParameters.sampleFormat = paFloat32 | paNonInterleaved;		// 32 bit floating point output
-    outputParameters.suggestedLatency = (fOutputDevice != paNoDevice)	// TODO: check how to setup this on ASIO
-                                        ? Pa_GetDeviceInfo(outputParameters.device)->defaultLowOutputLatency
+    outputParameters.sampleFormat = paFloat32 | paNonInterleaved;       // 32 bit floating point output
+    outputParameters.suggestedLatency = (fOutputDevice != paNoDevice)   // TODO: check how to setup this on ASIO
+                                        ? ((fPaDevices->GetHostFromDevice(fOutputDevice) == "ASIO") ? 0 : Pa_GetDeviceInfo(outputParameters.device)->defaultLowOutputLatency)
                                         : 0;
     outputParameters.hostApiSpecificStreamInfo = NULL;
 
@@ -167,17 +167,11 @@ int JackPortAudioDriver::Open(jack_nframes_t buffer_size,
 
     fCaptureLatency = capture_latency;
     fPlaybackLatency = playback_latency;
-
+    
     jack_log("JackPortAudioDriver::Open nframes = %ld in = %ld out = %ld capture name = %s playback name = %s samplerate = %ld",
              buffer_size, inchannels, outchannels, capture_driver_uid, playback_driver_uid, samplerate);
 
-    // Generic JackAudioDriver Open
-    if (JackAudioDriver::Open(buffer_size, samplerate, capturing, playing, inchannels, outchannels, monitor,
-        capture_driver_uid, playback_driver_uid, capture_latency, playback_latency) != 0) {
-        return -1;
-    }
-
-    //get devices
+    // Get devices
     if (capturing) {
         if (fPaDevices->GetInputDeviceFromName(capture_driver_uid, fInputDevice, in_max) < 0) {
             goto error;
@@ -188,10 +182,22 @@ int JackPortAudioDriver::Open(jack_nframes_t buffer_size,
             goto error;
         }
     }
+    
+    // If ASIO, request for preferred size (assuming fInputDevice and fOutputDevice are the same)
+    if (buffer_size == 0) { 
+        buffer_size = fPaDevices->GetPreferredBufferSize(fInputDevice);
+        jack_log("JackPortAudioDriver::Open preferred buffer_size = %d", buffer_size);
+    }
+  
+    // Generic JackAudioDriver Open
+    if (JackAudioDriver::Open(buffer_size, samplerate, capturing, playing, inchannels, outchannels, monitor,
+        capture_driver_uid, playback_driver_uid, capture_latency, playback_latency) != 0) {
+        return -1;
+    }
 
     jack_log("JackPortAudioDriver::Open fInputDevice = %d, fOutputDevice %d", fInputDevice, fOutputDevice);
 
-    //default channels number required
+    // Default channels number required
     if (inchannels == 0) {
         jack_log("JackPortAudioDriver::Open setup max in channels = %ld", in_max);
         inchannels = in_max;
@@ -201,7 +207,7 @@ int JackPortAudioDriver::Open(jack_nframes_t buffer_size,
         outchannels = out_max;
     }
 
-    //too many channels required, take max available
+    // Too many channels required, take max available
     if (inchannels > in_max) {
         jack_error("This device has only %d available input channels.", in_max);
         inchannels = in_max;
@@ -244,10 +250,9 @@ error:
 int JackPortAudioDriver::Close()
 {
     // Generic audio driver close
-    int res = JackAudioDriver::Close();
     jack_log("JackPortAudioDriver::Close");
-    Pa_CloseStream(fStream);
-    return res;
+    int res = JackAudioDriver::Close();
+    return (Pa_CloseStream(fStream) != paNoError) ? -1 : res;
 }
 
 int JackPortAudioDriver::Attach()
@@ -258,8 +263,7 @@ int JackPortAudioDriver::Attach()
 
         if (fInputDevice != paNoDevice && fPaDevices->GetHostFromDevice(fInputDevice) == "ASIO") {
             for (int i = 0; i < fCaptureChannels; i++) {
-                PaError err = PaAsio_GetInputChannelName(fInputDevice, i, &alias);
-                if (err == paNoError) {
+                if (PaAsio_GetInputChannelName(fInputDevice, i, &alias) == paNoError) {
                     JackPort* port = fGraphManager->GetPort(fCapturePortList[i]);
                     port->SetAlias(alias);
                 }
@@ -268,8 +272,7 @@ int JackPortAudioDriver::Attach()
 
         if (fOutputDevice != paNoDevice && fPaDevices->GetHostFromDevice(fOutputDevice) == "ASIO") {
             for (int i = 0; i < fPlaybackChannels; i++) {
-                PaError err = PaAsio_GetInputChannelName(fOutputDevice, i, &alias);
-                if (err == paNoError) {
+                if (PaAsio_GetOutputChannelName(fOutputDevice, i, &alias) == paNoError) {
                     JackPort* port = fGraphManager->GetPort(fPlaybackPortList[i]);
                     port->SetAlias(alias);
                 }
@@ -287,8 +290,7 @@ int JackPortAudioDriver::Start()
 {
     jack_log("JackPortAudioDriver::Start");
     if (JackAudioDriver::Start() >= 0) {
-        PaError err = Pa_StartStream(fStream);
-        if (err == paNoError) {
+        if (Pa_StartStream(fStream) == paNoError) {
             return 0;
         }
         JackAudioDriver::Stop();
@@ -299,8 +301,7 @@ int JackPortAudioDriver::Start()
 int JackPortAudioDriver::Stop()
 {
     jack_log("JackPortAudioDriver::Stop");
-    PaError err = Pa_StopStream(fStream);
-    int res = (err == paNoError) ? 0 : -1;
+    int res = (Pa_StopStream(fStream) == paNoError) ? 0 : -1;
     if (JackAudioDriver::Stop() < 0) {
         res = -1;
     }
@@ -362,7 +363,7 @@ extern "C"
         jack_driver_descriptor_add_parameter(desc, &filler, "rate", 'r', JackDriverParamUInt, &value, NULL, "Sample rate", NULL);
 
         value.ui = 512U;
-        jack_driver_descriptor_add_parameter(desc, &filler, "period", 'p', JackDriverParamUInt, &value, NULL, "Frames per period", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "period", 'p', JackDriverParamUInt, &value, NULL, "Frames per period", "Frames per period. If 0 and ASIO driver, will take preferred value");
 
         jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, NULL, "PortAudio device name", NULL);
 

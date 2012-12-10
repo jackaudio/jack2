@@ -116,17 +116,20 @@ def main():
         print "    dp                         - get parameters of currently selected driver"
         print "    dpd <param>                - get long description for driver parameter"
         print "    dps <param> <value>        - set driver parameter"
+        print "    dpr <param>                - reset driver parameter to its default value"
         print "    asd <driver>               - add slave driver"
         print "    rsd <driver>               - remove slave driver"
         print "    il                         - get list of available internals"
         print "    ip <name>                  - get parameters of given internal"
         print "    ipd <name> <param>         - get long description for internal parameter"
         print "    ips <name> <param> <value> - set internal parameter"
+        print "    ipr <name> <param>         - reset internal parameter to its default value"
         print "    iload <name>               - load internal"
         print "    iunload <name>             - unload internal"
         print "    ep                         - get engine parameters"
         print "    epd <param>                - get long description for engine parameter"
         print "    eps <param> <value>        - set engine parameter"
+        print "    epr <param>                - reset engine parameter to its default value"
         sys.exit(0)
     
     bus = dbus.SessionBus()
@@ -213,6 +216,16 @@ def main():
 
                 type_char, name, short_descr, long_descr = configure_iface.GetParameterInfo(['driver', param])
                 configure_iface.SetParameterValue(['driver', param], python_type_to_jackdbus_type(value, type_char))
+            elif arg == 'dpr':
+                if index >= len(sys.argv):
+                    print "driver parameter reset command requires parameter name argument"
+                    sys.exit()
+
+                param = sys.argv[index]
+                index += 1
+
+                print "--- driver param reset \"%s\"" % param
+                configure_iface.ResetParameterValue(['driver', param])
             elif arg == 'ep':
                 print "--- get engine parameters (type:isset:default:value)"
                 get_parameters(configure_iface, ['engine'])
@@ -242,6 +255,18 @@ def main():
 
                 type_char, name, short_descr, long_descr = configure_iface.GetParameterInfo(['engine', param])
                 configure_iface.SetParameterValue(['engine', param], python_type_to_jackdbus_type(value, type_char))
+            elif arg == 'epr':
+                if index >= len(sys.argv):
+                    print "engine parameter reset command requires parameter name"
+                    sys.exit()
+
+                param = sys.argv[index]
+                index += 1
+
+                print "--- engine param reset \"%s\"" % param
+
+                type_char, name, short_descr, long_descr = configure_iface.GetParameterInfo(['engine', param])
+                configure_iface.ResetParameterValue(['engine', param])
             elif arg == 'il':
                 print "--- internals list"
                 is_leaf, internals = configure_iface.ReadContainer(['internals'])
@@ -273,7 +298,7 @@ def main():
                 print long_descr
             elif arg == 'ips':
                 if index + 2 >= len(sys.argv):
-                    print "get internal parameter long description command requires internal, parameter name and value arguments"
+                    print "internal parameter set command requires internal, parameter name and value arguments"
                     sys.exit()
 
                 internal_name = sys.argv[index]
@@ -287,6 +312,19 @@ def main():
 
                 type_char, name, short_descr, long_descr = configure_iface.GetParameterInfo(['internals', internal_name, param])
                 configure_iface.SetParameterValue(['internals', internal_name, param], python_type_to_jackdbus_type(value, type_char))
+            elif arg == 'ipr':
+                if index + 1 >= len(sys.argv):
+                    print "reset internal parameter command requires internal and parameter name arguments"
+                    sys.exit()
+
+                internal_name = sys.argv[index]
+                index += 1
+                param = sys.argv[index]
+                index += 1
+
+                print "--- internal param reset \"%s\"" % param
+
+                configure_iface.ResetParameterValue(['internals', internal_name, param])
             elif arg == 'iload':
                 print "--- load internal"
 

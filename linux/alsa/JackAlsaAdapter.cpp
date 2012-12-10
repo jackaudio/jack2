@@ -54,8 +54,14 @@ namespace Jack
                     fPlaybackChannels = param->value.ui;
                     break;
                 case 'C':
+                    if (strncmp(param->value.str,"none",4) != 0) {
+                        fAudioInterface.fCaptureName = strdup ( param->value.str );
+                    }
                     break;
                 case 'P':
+                    if  (strncmp(param->value.str,"none",4) != 0) {
+                        fAudioInterface.fPlaybackName = strdup ( param->value.str );
+                    }
                     break;
                 case 'D':
                     break;

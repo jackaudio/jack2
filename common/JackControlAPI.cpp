@@ -113,7 +113,6 @@ struct jackctl_driver
 {
     jack_driver_desc_t * desc_ptr;
     JSList * parameters;
-    JSList * set_parameters;
     JSList * infos;
 };
 
@@ -121,7 +120,6 @@ struct jackctl_internal
 {
     jack_driver_desc_t * desc_ptr;
     JSList * parameters;
-    JSList * set_parameters;
     int refnum;
 };
 
@@ -139,7 +137,6 @@ struct jackctl_parameter
     union jackctl_parameter_value default_value;
     struct jackctl_driver * driver_ptr;
     char id;
-    jack_driver_param_t * driver_parameter_ptr;
     jack_driver_param_constraint_desc_t * constraint_ptr;
 };
 
@@ -187,7 +184,6 @@ jackctl_add_parameter(
     *value_ptr = *default_value_ptr = value;
 
     parameter_ptr->driver_ptr = NULL;
-    parameter_ptr->driver_parameter_ptr = NULL;
     parameter_ptr->id = 0;
     parameter_ptr->constraint_ptr = constraint_ptr;
 
@@ -212,14 +208,6 @@ jackctl_free_driver_parameters(
         free(driver_ptr->parameters->data);
         free(driver_ptr->parameters);
         driver_ptr->parameters = next_node_ptr;
-    }
-
-    while (driver_ptr->set_parameters)
-    {
-        next_node_ptr = driver_ptr->set_parameters->next;
-        free(driver_ptr->set_parameters->data);
-        free(driver_ptr->set_parameters);
-        driver_ptr->set_parameters = next_node_ptr;
     }
 }
 
@@ -295,6 +283,87 @@ fail:
     return false;
 }
 
+/* destroy jack_driver_param_desc_t list created by jackctl_create_param_list() */
+static void
+jackctl_destroy_param_list(
+    JSList * params)
+{
+    JSList * next;
+
+    while (params)
+    {
+        next = params->next;
+        free(params->data);
+        free(params);
+        params = next;
+    }
+}
+
+/* for drivers and internals are configured through jack_driver_param_t JSList */
+/* this function creates such list from a jackctl_parameter list */
+static
+bool
+jackctl_create_param_list(
+    const JSList * paramlist,
+    JSList ** retparamlist)
+{
+    jackctl_parameter * param_ptr;
+    jack_driver_param_t * retparam_ptr;
+
+    *retparamlist = NULL;
+    while (paramlist != NULL)
+    {
+        param_ptr = (jackctl_parameter *)paramlist->data;
+        if (param_ptr->is_set)
+        {
+            /* jack_info("setting driver parameter %p ...", parameter_ptr); */
+            retparam_ptr = (jack_driver_param_t *)malloc(sizeof(jack_driver_param_t));
+            if (retparam_ptr == NULL)
+            {
+                jack_error ("Allocation of jack_driver_param_t structure failed");
+                goto destroy;
+            }
+
+            retparam_ptr->character = param_ptr->id;
+
+            switch (param_ptr->type)
+            {
+            case JackParamInt:
+                retparam_ptr->value.i = param_ptr->value_ptr->i;
+                break;
+            case JackParamUInt:
+                retparam_ptr->value.ui = param_ptr->value_ptr->ui;
+                break;
+            case JackParamChar:
+                retparam_ptr->value.c = param_ptr->value_ptr->c;
+                break;
+            case JackParamString:
+                strcpy(retparam_ptr->value.str, param_ptr->value_ptr->str);
+                break;
+            case JackParamBool:
+                retparam_ptr->value.i = param_ptr->value_ptr->b;
+                break;
+            default:
+                jack_error("Unknown parameter type %i", (int)param_ptr->type);
+                assert(0);
+                goto free;
+            }
+
+            *retparamlist = jack_slist_append(*retparamlist, retparam_ptr);
+        }
+
+        paramlist = paramlist->next;
+    }
+
+    return true;
+
+free:
+    free(retparam_ptr);
+destroy:
+    jackctl_destroy_param_list(*retparamlist);
+    return false;
+}
+
 static int
 jackctl_drivers_load(
     struct jackctl_server * server_ptr)
@@ -321,7 +390,6 @@ jackctl_drivers_load(
 
         driver_ptr->desc_ptr = (jack_driver_desc_t *)descriptor_node_ptr->data;
         driver_ptr->parameters = NULL;
-        driver_ptr->set_parameters = NULL;
         driver_ptr->infos = NULL;
 
         if (!jackctl_add_driver_parameters(driver_ptr))
@@ -391,7 +459,6 @@ jackctl_internals_load(
 
         internal_ptr->desc_ptr = (jack_driver_desc_t *)descriptor_node_ptr->data;
         internal_ptr->parameters = NULL;
-        internal_ptr->set_parameters = NULL;
         internal_ptr->refnum = -1;
 
         if (!jackctl_add_driver_parameters((struct jackctl_driver *)internal_ptr))
@@ -934,6 +1001,7 @@ jackctl_server_open(
     jackctl_driver *driver_ptr)
 {
     JackSelfConnectMode self_connect_mode;
+    JSList * paramlist = NULL;
 
     try {
 
@@ -1011,7 +1079,9 @@ jackctl_server_open(
             goto fail_unregister;
         }
 
-        rc = server_ptr->engine->Open(driver_ptr->desc_ptr, driver_ptr->set_parameters);
+        if (!jackctl_create_param_list(driver_ptr->parameters, &paramlist)) goto fail_delete;
+        rc = server_ptr->engine->Open(driver_ptr->desc_ptr, paramlist);
+        jackctl_destroy_param_list(paramlist);
         if (rc < 0)
         {
             jack_error("JackServer::Open failed with %d", rc);
@@ -1022,6 +1092,7 @@ jackctl_server_open(
 
     } catch (std::exception e) {
         jack_error("jackctl_server_open error...");
+        jackctl_destroy_param_list(paramlist);
     }
 
 fail_delete:
@@ -1110,7 +1181,7 @@ SERVER_EXPORT bool jackctl_parameter_has_enum_constraint(jackctl_parameter *para
 SERVER_EXPORT uint32_t jackctl_parameter_get_enum_constraints_count(jackctl_parameter *parameter_ptr)
 {
     if (!parameter_ptr) {
-        return NULL;
+        return 0;
     }
 
     if (!jackctl_parameter_has_enum_constraint(parameter_ptr))
@@ -1242,57 +1313,6 @@ SERVER_EXPORT bool jackctl_parameter_set_value(jackctl_parameter *parameter_ptr,
         return NULL;
     }
 
-    bool new_driver_parameter;
-
-    /* for driver parameters, set the parameter by adding jack_driver_param_t in the set_parameters list */
-    if (parameter_ptr->driver_ptr != NULL)
-    {
-/*      jack_info("setting driver parameter %p ...", parameter_ptr); */
-        new_driver_parameter = parameter_ptr->driver_parameter_ptr == NULL;
-        if (new_driver_parameter)
-        {
-/*          jack_info("new driver parameter..."); */
-            parameter_ptr->driver_parameter_ptr = (jack_driver_param_t *)malloc(sizeof(jack_driver_param_t));
-            if (parameter_ptr->driver_parameter_ptr == NULL)
-            {
-                jack_error ("Allocation of jack_driver_param_t structure failed");
-                return false;
-            }
-
-           parameter_ptr->driver_parameter_ptr->character = parameter_ptr->id;
-           parameter_ptr->driver_ptr->set_parameters = jack_slist_append(parameter_ptr->driver_ptr->set_parameters, parameter_ptr->driver_parameter_ptr);
-        }
-
-        switch (parameter_ptr->type)
-        {
-        case JackParamInt:
-            parameter_ptr->driver_parameter_ptr->value.i = value_ptr->i;
-            break;
-        case JackParamUInt:
-            parameter_ptr->driver_parameter_ptr->value.ui = value_ptr->ui;
-            break;
-        case JackParamChar:
-            parameter_ptr->driver_parameter_ptr->value.c = value_ptr->c;
-            break;
-        case JackParamString:
-            strcpy(parameter_ptr->driver_parameter_ptr->value.str, value_ptr->str);
-            break;
-        case JackParamBool:
-            parameter_ptr->driver_parameter_ptr->value.i = value_ptr->b;
-            break;
-        default:
-            jack_error("Unknown parameter type %i", (int)parameter_ptr->type);
-            assert(0);
-
-            if (new_driver_parameter)
-            {
-                parameter_ptr->driver_ptr->set_parameters = jack_slist_remove(parameter_ptr->driver_ptr->set_parameters, parameter_ptr->driver_parameter_ptr);
-            }
-
-            return false;
-        }
-    }
-
     parameter_ptr->is_set = true;
     *parameter_ptr->value_ptr = *value_ptr;
 
@@ -1337,7 +1357,10 @@ SERVER_EXPORT bool jackctl_server_load_internal(
 
     int status;
     if (server_ptr->engine != NULL) {
-        server_ptr->engine->InternalClientLoad2(internal->desc_ptr->name, internal->desc_ptr->name, internal->set_parameters, JackNullOption, &internal->refnum, -1, &status);
+        JSList * paramlist;
+        if (!jackctl_create_param_list(internal->parameters, &paramlist)) return false;
+        server_ptr->engine->InternalClientLoad2(internal->desc_ptr->name, internal->desc_ptr->name, paramlist, JackNullOption, &internal->refnum, -1, &status);
+        jackctl_destroy_param_list(paramlist);
         return (internal->refnum > 0);
     } else {
         return false;
@@ -1368,7 +1391,10 @@ SERVER_EXPORT bool jackctl_server_add_slave(jackctl_server * server_ptr, jackctl
             jack_error("Cannot add a slave in a running server");
             return false;
         } else {
-            JackDriverInfo* info = server_ptr->engine->AddSlave(driver_ptr->desc_ptr, driver_ptr->set_parameters);
+            JSList * paramlist;
+            if (!jackctl_create_param_list(driver_ptr->parameters, &paramlist)) return false;
+            JackDriverInfo* info = server_ptr->engine->AddSlave(driver_ptr->desc_ptr, paramlist);
+            jackctl_destroy_param_list(paramlist);
             if (info) {
                 driver_ptr->infos = jack_slist_append(driver_ptr->infos, info);
                 return true;
@@ -1407,7 +1433,11 @@ SERVER_EXPORT bool jackctl_server_remove_slave(jackctl_server * server_ptr, jack
 SERVER_EXPORT bool jackctl_server_switch_master(jackctl_server * server_ptr, jackctl_driver * driver_ptr)
 {
     if (server_ptr && server_ptr->engine) {
-        return (server_ptr->engine->SwitchMaster(driver_ptr->desc_ptr, driver_ptr->set_parameters) == 0);
+        JSList * paramlist;
+        if (!jackctl_create_param_list(driver_ptr->parameters, &paramlist)) return false;
+        bool ret = (server_ptr->engine->SwitchMaster(driver_ptr->desc_ptr, paramlist) == 0);
+        jackctl_destroy_param_list(paramlist);
+        return ret;
     } else {
         return false;
     }

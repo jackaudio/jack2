@@ -39,15 +39,13 @@ class JackAlsaDriver : public JackAudioDriver
     private:
 
         jack_driver_t* fDriver;
-        int fReservedCaptureDevice;
-        int fReservedPlaybackDevice;
 
         void UpdateLatencies();
 
     public:
 
         JackAlsaDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
-		: JackAudioDriver(name, alias, engine, table),fDriver(NULL),fReservedCaptureDevice(-1),fReservedPlaybackDevice(-1)
+		: JackAudioDriver(name, alias, engine, table),fDriver(NULL)
         {}
         virtual ~JackAlsaDriver()
         {}

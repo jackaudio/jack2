@@ -39,6 +39,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <celt/celt.h>
 #endif
 
+#if HAVE_OPUS
+#include <opus/opus.h>
+#include <opus/opus_custom.h>
+#endif
+
 #define MIN(x,y) ((x)<(y) ? (x) : (y))
 
 using namespace std;
@@ -147,6 +152,12 @@ int JackNetOneDriver::AllocPorts()
             celt_mode_info(celt_mode, CELT_GET_LOOKAHEAD, &lookahead);
             netj.codec_latency = 2 * lookahead;
 #endif
+        } else if (netj.bitdepth == OPUS_MODE) {
+#if HAVE_OPUS
+            OpusCustomMode *opus_mode = opus_custom_mode_create(netj.sample_rate, netj.period_size, NULL); // XXX free me in the end
+            OpusCustomDecoder *decoder = opus_custom_decoder_create( opus_mode, 1, NULL );
+            netj.capture_srcs = jack_slist_append(netj.capture_srcs, decoder);
+#endif
         } else {
 #if HAVE_SAMPLERATE
             netj.capture_srcs = jack_slist_append(netj.capture_srcs, (void *)src_new(SRC_LINEAR, 1, NULL));
@@ -191,6 +202,21 @@ int JackNetOneDriver::AllocPorts()
             CELTMode *celt_mode = celt_mode_create(netj.sample_rate, 1, netj.period_size, NULL);
             netj.playback_srcs = jack_slist_append(netj.playback_srcs, celt_encoder_create(celt_mode));
 #endif
+#endif
+        } else if (netj.bitdepth == OPUS_MODE) {
+#if HAVE_OPUS
+            const int kbps = netj.resample_factor;
+            jack_error("NEW ONE OPUS ENCODER 128  <> %d!!", kbps);
+            int err;
+            OpusCustomMode *opus_mode = opus_custom_mode_create( netj.sample_rate, netj.period_size, &err ); // XXX free me in the end
+            if (err != OPUS_OK) { jack_error("opus mode failed"); }
+            OpusCustomEncoder *oe = opus_custom_encoder_create( opus_mode, 1, &err );
+            if (err != OPUS_OK) { jack_error("opus mode failed"); }
+            opus_custom_encoder_ctl(oe, OPUS_SET_BITRATE(kbps*1024)); // bits per second
+            opus_custom_encoder_ctl(oe, OPUS_SET_COMPLEXITY(10));
+            opus_custom_encoder_ctl(oe, OPUS_SET_SIGNAL(OPUS_SIGNAL_MUSIC));
+            opus_custom_encoder_ctl(oe, OPUS_SET_SIGNAL(OPUS_APPLICATION_RESTRICTED_LOWDELAY));
+            netj.playback_srcs = jack_slist_append(netj.playback_srcs, oe);
 #endif
         } else {
 #if HAVE_SAMPLERATE
@@ -448,6 +474,28 @@ JackNetOneDriver::FreePorts ()
             node = jack_slist_remove_link(node, this_node);
             jack_slist_free_1(this_node);
             celt_decoder_destroy(dec);
+        }
+        netj.capture_srcs = NULL;
+#endif
+    } else if (netj.bitdepth == OPUS_MODE) {
+#if HAVE_OPUS
+        node = netj.playback_srcs;
+        while (node != NULL) {
+            JSList *this_node = node;
+            OpusCustomEncoder *enc = (OpusCustomEncoder *) node->data;
+            node = jack_slist_remove_link(node, this_node);
+            jack_slist_free_1(this_node);
+            opus_custom_encoder_destroy(enc);
+        }
+        netj.playback_srcs = NULL;
+
+        node = netj.capture_srcs;
+        while (node != NULL) {
+            JSList *this_node = node;
+            OpusCustomDecoder *dec = (OpusCustomDecoder *) node->data;
+            node = jack_slist_remove_link(node, this_node);
+            jack_slist_free_1(this_node);
+            opus_custom_decoder_destroy(dec);
         }
         netj.capture_srcs = NULL;
 #endif
@@ -724,6 +772,98 @@ JackNetOneDriver::render_jack_ports_to_payload_celt (JSList *playback_ports, JSL
 }
 
 #endif
+
+#if HAVE_OPUS
+#define CDO (sizeof(short)) ///< compressed data offset (first 2 bytes are length)
+// render functions for Opus.
+void
+JackNetOneDriver::render_payload_to_jack_ports_opus (void *packet_payload, jack_nframes_t net_period_down, JSList *capture_ports, JSList *capture_srcs, jack_nframes_t nframes)
+{
+    int chn = 0;
+    JSList *node = capture_ports;
+    JSList *src_node = capture_srcs;
+
+    unsigned char *packet_bufX = (unsigned char *)packet_payload;
+
+    while (node != NULL) {
+        jack_port_id_t port_index = (jack_port_id_t) (intptr_t)node->data;
+        JackPort *port = fGraphManager->GetPort(port_index);
+
+        jack_default_audio_sample_t* buf =
+            (jack_default_audio_sample_t*)fGraphManager->GetBuffer(port_index, fEngineControl->fBufferSize);
+
+        const char *portname = port->GetType();
+
+        if (strncmp(portname, JACK_DEFAULT_AUDIO_TYPE, jack_port_type_size()) == 0) {
+            // audio port, decode opus data.
+            OpusCustomDecoder *decoder = (OpusCustomDecoder*) src_node->data;
+            if( !packet_payload )
+                memset(buf, 0, nframes * sizeof(float));
+            else {
+                unsigned short len;
+                memcpy(&len, packet_bufX, CDO);
+                len = ntohs(len);
+                opus_custom_decode_float( decoder, packet_bufX + CDO, len, buf, nframes );
+            }
+
+            src_node = jack_slist_next (src_node);
+        } else if (strncmp(portname, JACK_DEFAULT_MIDI_TYPE, jack_port_type_size()) == 0) {
+            // midi port, decode midi events
+            // convert the data buffer to a standard format (uint32_t based)
+            unsigned int buffer_size_uint32 = net_period_down / 2;
+            uint32_t * buffer_uint32 = (uint32_t*) packet_bufX;
+            if( packet_payload )
+                decode_midi_buffer (buffer_uint32, buffer_size_uint32, buf);
+        }
+        packet_bufX = (packet_bufX + net_period_down);
+        node = jack_slist_next (node);
+        chn++;
+    }
+}
+
+void
+JackNetOneDriver::render_jack_ports_to_payload_opus (JSList *playback_ports, JSList *playback_srcs, jack_nframes_t nframes, void *packet_payload, jack_nframes_t net_period_up)
+{
+    int chn = 0;
+    JSList *node = playback_ports;
+    JSList *src_node = playback_srcs;
+
+    unsigned char *packet_bufX = (unsigned char *)packet_payload;
+
+    while (node != NULL) {
+        jack_port_id_t port_index = (jack_port_id_t) (intptr_t) node->data;
+        JackPort *port = fGraphManager->GetPort(port_index);
+
+        jack_default_audio_sample_t* buf =
+            (jack_default_audio_sample_t*)fGraphManager->GetBuffer(port_index, fEngineControl->fBufferSize);
+
+        const char *portname = port->GetType();
+
+        if (strncmp (portname, JACK_DEFAULT_AUDIO_TYPE, jack_port_type_size()) == 0) {
+            // audio port, encode opus data.
+
+            int encoded_bytes;
+            jack_default_audio_sample_t *floatbuf = (jack_default_audio_sample_t *)alloca (sizeof(jack_default_audio_sample_t) * nframes);
+            memcpy(floatbuf, buf, nframes * sizeof(jack_default_audio_sample_t));
+            OpusCustomEncoder *encoder = (OpusCustomEncoder*) src_node->data;
+            encoded_bytes = opus_custom_encode_float( encoder, floatbuf, nframes, packet_bufX + CDO, net_period_up - CDO );
+            unsigned short len = htons(encoded_bytes);
+            memcpy(packet_bufX, &len, CDO);
+            src_node = jack_slist_next( src_node );
+        } else if (strncmp(portname, JACK_DEFAULT_MIDI_TYPE, jack_port_type_size()) == 0) {
+            // encode midi events from port to packet
+            // convert the data buffer to a standard format (uint32_t based)
+            unsigned int buffer_size_uint32 = net_period_up / 2;
+            uint32_t * buffer_uint32 = (uint32_t*) packet_bufX;
+            encode_midi_buffer (buffer_uint32, buffer_size_uint32, buf);
+        }
+        packet_bufX = (packet_bufX + net_period_up);
+        node = jack_slist_next (node);
+        chn++;
+    }
+}
+#endif
+
 /* Wrapper functions with bitdepth argument... */
 void
 JackNetOneDriver::render_payload_to_jack_ports (int bitdepth, void *packet_payload, jack_nframes_t net_period_down, JSList *capture_ports, JSList *capture_srcs, jack_nframes_t nframes, int dont_htonl_floats)
@@ -731,6 +871,11 @@ JackNetOneDriver::render_payload_to_jack_ports (int bitdepth, void *packet_paylo
 #if HAVE_CELT
     if (bitdepth == CELT_MODE)
         render_payload_to_jack_ports_celt (packet_payload, net_period_down, capture_ports, capture_srcs, nframes);
+    else
+#endif
+#if HAVE_OPUS
+    if (bitdepth == OPUS_MODE)
+        render_payload_to_jack_ports_opus (packet_payload, net_period_down, capture_ports, capture_srcs, nframes);
     else
 #endif
         render_payload_to_jack_ports_float (packet_payload, net_period_down, capture_ports, capture_srcs, nframes, dont_htonl_floats);
@@ -742,6 +887,11 @@ JackNetOneDriver::render_jack_ports_to_payload (int bitdepth, JSList *playback_p
 #if HAVE_CELT
     if (bitdepth == CELT_MODE)
         render_jack_ports_to_payload_celt (playback_ports, playback_srcs, nframes, packet_payload, net_period_up);
+    else
+#endif
+#if HAVE_OPUS
+    if (bitdepth == OPUS_MODE)
+        render_jack_ports_to_payload_opus (playback_ports, playback_srcs, nframes, packet_payload, net_period_up);
     else
 #endif
         render_jack_ports_to_payload_float (playback_ports, playback_srcs, nframes, packet_payload, net_period_up, dont_htonl_floats);
@@ -791,6 +941,10 @@ extern "C"
 #if HAVE_CELT
         value.ui = 0U;
         jack_driver_descriptor_add_parameter(desc, &filler, "celt", 'c', JackDriverParamUInt, &value, NULL, "Set CELT encoding and number of kbits per channel", NULL);
+#endif
+#if HAVE_OPUS
+        value.ui = 0U;
+        jack_driver_descriptor_add_parameter(desc, &filler, "opus", 'P', JackDriverParamUInt, &value, NULL, "Set Opus encoding and number of kbits per channel", NULL);
 #endif
         value.ui = 0U;
         jack_driver_descriptor_add_parameter(desc, &filler, "bit-depth", 'b', JackDriverParamUInt, &value, NULL, "Sample bit-depth (0 for float, 8 for 8bit and 16 for 16bit)", NULL);
@@ -900,6 +1054,17 @@ extern "C"
                     resample_factor = param->value.ui;
 #else
                     jack_error("not built with celt support");
+                    return NULL;
+#endif
+                    break;
+
+                case 'P':
+#if HAVE_OPUS
+                    bitdepth = OPUS_MODE;
+                    resample_factor = param->value.ui;
+                    jack_error("OPUS: %d\n", resample_factor);
+#else
+                    jack_error("not built with Opus support");
                     return NULL;
 #endif
                     break;

@@ -162,7 +162,7 @@ SERVER_EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_
         va_end(ap);
         JackGlobals::fOpenMutex->Unlock();
         return res;
-    } catch(std::bad_alloc& e) {
+    } catch (std::bad_alloc& e) {
         jack_error("Memory allocation error...");
         return NULL;
     } catch (...) {

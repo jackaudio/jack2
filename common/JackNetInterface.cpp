@@ -243,6 +243,10 @@ namespace Jack
             case JackCeltEncoder:
                 return new NetCeltAudioBuffer(&fParams, nports, buffer, fParams.fKBps);
             #endif
+            #if HAVE_OPUS
+            case JackOpusEncoder:
+                return new NetOpusAudioBuffer(&fParams, nports, buffer, fParams.fKBps);
+            #endif
         }
         return NULL;
     }

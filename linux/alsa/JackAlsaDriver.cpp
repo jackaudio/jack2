@@ -31,7 +31,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/time.h>
-#include <regex.h>
 #include <string.h>
 
 #include "JackAlsaDriver.h"
@@ -172,30 +171,31 @@ int JackAlsaDriver::Detach()
     return JackAudioDriver::Detach();
 }
 
-static char* get_control_device_name(const char * device_name)
+extern "C" char* get_control_device_name(const char * device_name)
 {
     char * ctl_name;
-    regex_t expression;
+    const char * comma;
 
-    regcomp(&expression, "(plug)?hw:[0-9](,[0-9])?", REG_ICASE | REG_EXTENDED);
+    /* the user wants a hw or plughw device, the ctl name
+     * should be hw:x where x is the card identification.
+     * We skip the subdevice suffix that starts with comma */
 
-    if (!regexec(&expression, device_name, 0, NULL, 0)) {
-        /* the user wants a hw or plughw device, the ctl name
-         * should be hw:x where x is the card number */
-
-        char tmp[5];
-        strncpy(tmp, strstr(device_name, "hw"), 4);
-        tmp[4] = '\0';
-        jack_info("control device %s",tmp);
-        ctl_name = strdup(tmp);
-    } else {
-        ctl_name = strdup(device_name);
+    if (strncasecmp(device_name, "plughw:", 7) == 0) {
+        /* skip the "plug" prefix" */
+        device_name += 4;
     }
 
-    regfree(&expression);
-
-    if (ctl_name == NULL) {
-        jack_error("strdup(\"%s\") failed.", ctl_name);
+    comma = strchr(device_name, ',');
+    if (comma == NULL) {
+        ctl_name = strdup(device_name);
+        if (ctl_name == NULL) {
+            jack_error("strdup(\"%s\") failed.", device_name);
+        }
+    } else {
+        ctl_name = strndup(device_name, comma - device_name);
+        if (ctl_name == NULL) {
+            jack_error("strndup(\"%s\", %u) failed.", device_name, (unsigned int)(comma - device_name));
+        }
     }
 
     return ctl_name;
@@ -278,16 +278,22 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
         int playback_card = card_to_num(playback_driver_name);
         char audio_name[32];
 
-        snprintf(audio_name, sizeof(audio_name), "Audio%d", capture_card);
-        if (!JackServerGlobals::on_device_acquire(audio_name)) {
-            jack_error("Audio device %s cannot be acquired...", capture_driver_name);
-            return -1;
+        if (capture_card >= 0) {
+            snprintf(audio_name, sizeof(audio_name), "Audio%d", capture_card);
+            if (!JackServerGlobals::on_device_acquire(audio_name)) {
+                jack_error("Audio device %s cannot be acquired...", capture_driver_name);
+                return -1;
+            }
         }
 
-        if (playback_card != capture_card) {
+        if (playback_card >= 0 && playback_card != capture_card) {
             snprintf(audio_name, sizeof(audio_name), "Audio%d", playback_card);
             if (!JackServerGlobals::on_device_acquire(audio_name)) {
                 jack_error("Audio device %s cannot be acquired...", playback_driver_name);
+                if (capture_card >= 0) {
+                    snprintf(audio_name, sizeof(audio_name), "Audio%d", capture_card);
+                    JackServerGlobals::on_device_release(audio_name);
+                }
                 return -1;
             }
         }
@@ -579,6 +585,7 @@ enum_alsa_devices()
         if (snd_ctl_open(&handle, card_id, 0) >= 0 &&
             snd_ctl_card_info(handle, info) >= 0)
         {
+            snprintf(card_id, sizeof(card_id), "hw:%s", snd_ctl_card_info_get_id(info));
             fill_device(&constraint_ptr, &array_size, card_id, snd_ctl_card_info_get_name(info));
 
             device_no = -1;
@@ -731,12 +738,12 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
 
     desc = jack_driver_descriptor_construct("alsa", JackDriverMaster, "Linux ALSA API based audio backend", &filler);
 
+    strcpy(value.str, "hw:0");
+    jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, enum_alsa_devices(), "ALSA device name", NULL);
+
     strcpy(value.str, "none");
     jack_driver_descriptor_add_parameter(desc, &filler, "capture", 'C', JackDriverParamString, &value, NULL, "Provide capture ports.  Optionally set device", NULL);
     jack_driver_descriptor_add_parameter(desc, &filler, "playback", 'P', JackDriverParamString, &value, NULL, "Provide playback ports.  Optionally set device", NULL);
-
-    strcpy(value.str, "hw:0");
-    jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, enum_alsa_devices(), "ALSA device name", NULL);
 
     value.ui = 48000U;
     jack_driver_descriptor_add_parameter(desc, &filler, "rate", 'r', JackDriverParamUInt, &value, NULL, "Sample rate", NULL);
@@ -778,9 +785,9 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
         "  s - shaped\n"
         "  t - triangular");
 
-    value.i = 0;
-    jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamInt, &value, NULL, "Number of capture channels (defaults to hardware max)", NULL);
-    jack_driver_descriptor_add_parameter(desc, &filler, "outchannels", 'o', JackDriverParamInt, &value, NULL, "Number of playback channels (defaults to hardware max)", NULL);
+    value.ui = 0;
+    jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamUInt, &value, NULL, "Number of capture channels (defaults to hardware max)", NULL);
+    jack_driver_descriptor_add_parameter(desc, &filler, "outchannels", 'o', JackDriverParamUInt, &value, NULL, "Number of playback channels (defaults to hardware max)", NULL);
 
     value.i = FALSE;
     jack_driver_descriptor_add_parameter(desc, &filler, "shorts", 'S', JackDriverParamBool, &value, NULL, "Try 16-bit samples before 32-bit", NULL);
@@ -859,10 +866,12 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
                 break;
 
             case 'd':
-                playback_pcm_name = strdup (param->value.str);
-                capture_pcm_name = strdup (param->value.str);
-                jack_log("playback device %s", playback_pcm_name);
-                jack_log("capture device %s", capture_pcm_name);
+                if (strcmp (param->value.str, "none") != 0) {
+                    playback_pcm_name = strdup (param->value.str);
+                    capture_pcm_name = strdup (param->value.str);
+                    jack_log("playback device %s", playback_pcm_name);
+                    jack_log("capture device %s", capture_pcm_name);
+                }
                 break;
 
             case 'H':
@@ -889,8 +898,9 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
 
             case 'n':
                 user_nperiods = param->value.ui;
-                if (user_nperiods < 2)	/* enforce minimum value */
+                if (user_nperiods < 2) {    /* enforce minimum value */
                     user_nperiods = 2;
+                }
                 break;
 
             case 's':
@@ -974,8 +984,9 @@ void SetTime(jack_time_t time)
 int Restart()
 {
     int res;
-    if ((res = g_alsa_driver->Stop()) == 0)
+    if ((res = g_alsa_driver->Stop()) == 0) {
         res = g_alsa_driver->Start();
+    }
     return res;
 }
 

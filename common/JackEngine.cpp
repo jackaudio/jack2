@@ -205,6 +205,22 @@ Client that finish *after* the callback date are considered late even if their o
 correctly mixed in the time window: callbackUsecs <==> Read <==> Write.
 */
 
+static const char* State2String(jack_client_state_t state)
+{
+    switch (state) {
+        case NotTriggered:
+            return "NotTriggered";
+        case Triggered:
+            return "Triggered";
+        case Running:
+            return "Running";
+        case Finished:
+            return "Finished";
+        default:
+            return "";
+    }
+}
+
 void JackEngine::CheckXRun(jack_time_t callback_usecs)  // REVOIR les conditions de fin
 {
     for (int i = fEngineControl->fDriverNum; i < CLIENT_NUM; i++) {
@@ -215,7 +231,7 @@ void JackEngine::CheckXRun(jack_time_t callback_usecs)  // REVOIR les conditions
             jack_time_t finished_date = timing->fFinishedAt;
 
             if (status != NotTriggered && status != Finished) {
-                jack_error("JackEngine::XRun: client = %s was not run: state = %ld", client->GetClientControl()->fName, status);
+                jack_error("JackEngine::XRun: client = %s was not finished, state = %s", client->GetClientControl()->fName, State2String(status));
                 fChannel.Notify(ALL_CLIENTS, kXRunCallback, 0);  // Notify all clients
             }
 
@@ -352,8 +368,8 @@ void JackEngine::NotifyXRun(int refnum)
 
 void JackEngine::NotifyGraphReorder()
 {
-    NotifyClients(kGraphOrderCallback, false, "", 0, 0);
     ComputeTotalLatencies();
+    NotifyClients(kGraphOrderCallback, false, "", 0, 0);
 }
 
 void JackEngine::NotifyBufferSize(jack_nframes_t buffer_size)

@@ -58,7 +58,7 @@ class SERVER_EXPORT JackPort
 
         bool fInUse;
         jack_port_id_t fTied;   // Locally tied source port
-        jack_default_audio_sample_t fBuffer[BUFFER_SIZE_MAX + 4];
+        jack_default_audio_sample_t fBuffer[BUFFER_SIZE_MAX + 8];
 
         bool IsUsed() const
         {
@@ -108,7 +108,7 @@ class SERVER_EXPORT JackPort
         // Since we are in shared memory, the resulting pointer cannot be cached, so align it here...
         jack_default_audio_sample_t* GetBuffer()
         {
-            return (jack_default_audio_sample_t*)((uintptr_t)fBuffer & ~15L) + 4;
+            return (jack_default_audio_sample_t*)((uintptr_t)fBuffer & ~31L) + 8;
         }
 
         int GetRefNum() const;
