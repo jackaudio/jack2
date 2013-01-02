@@ -84,7 +84,6 @@ namespace Jack
     are kept in LITTLE_ENDIAN format (to avoid 2 conversions in the more common LITTLE_ENDIAN <==> LITTLE_ENDIAN connection case).
     */
 
-    PRE_PACKED_STRUCTURE
     struct _session_params
     {
         char fPacketType[8];                //packet type ('param')
@@ -106,7 +105,7 @@ namespace Jack
         uint32_t fKBps;                     //KB per second for CELT encoder
         uint32_t fSlaveSyncMode;            //is the slave in sync mode ?
         uint32_t fNetworkLatency;           //network latency
-    } POST_PACKED_STRUCTURE;
+    };
 
 //net status **********************************************************************************
 
@@ -167,7 +166,6 @@ namespace Jack
 
     */
 
-    PRE_PACKED_STRUCTURE
     struct _packet_header
     {
         char fPacketType[8];        //packet type ('headr')
@@ -180,7 +178,7 @@ namespace Jack
         uint32_t fCycle;            //process cycle counter
         uint32_t fSubCycle;         //midi/audio subcycle counter
         uint32_t fIsLastPckt;       //is it the last packet of a given cycle ('y' or 'n')
-    } POST_PACKED_STRUCTURE;
+    };
 
 //net timebase master
 
@@ -205,14 +203,13 @@ namespace Jack
     \Brief This structure contains transport data to be sent over the network
     */
 
-    PRE_PACKED_STRUCTURE
     struct _net_transport_data
     {
         uint32_t fNewState;             //is it a state change
         uint32_t fTimebaseMaster;       //is there a new timebase master
         int32_t fState;                 //current cycle state
         jack_position_t fPosition;      //current cycle position
-    } POST_PACKED_STRUCTURE;
+    };
 
  //midi data ***********************************************************************************
 
