@@ -13943,7 +13943,7 @@
 					"-DMACH_RPC_MACH_SEMA",
 				);
 				OTHER_LDFLAGS = (
-					/usr/local/lib/libsamplerate.a,
+					/opt/local/lib/libsamplerate.a,
 					"-framework",
 					Jackservermp,
 					"-framework",
