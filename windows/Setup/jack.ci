@@ -80,7 +80,7 @@
 <_><src>..\Release\bin\jack\audioadapter.dll</><dest>sys</><custom>jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jack\netadapter.dll</><dest>sys</><custom>jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jack_midi_dump.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\portaudio_x86.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>.\src\32bits\portaudio_x86.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\control.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\intclient.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\jack.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
@@ -95,7 +95,7 @@
 <_><src>..\..\common\jack\types.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\weakjack.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
 <_><src>..\..\common\jack\weakmacros.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
-<_><src>.\src\32bits\JackRouter.dll</><dest>inst</><custom>32bits</><ifexist>overnewer</><recurs>0</></>
+<_><src>.\src\32bits\portaudio_x86.dll\JackRouter.dll</><dest>inst</><custom>32bits</><ifexist>overnewer</><recurs>0</></>
 <_><src>.\src\32bits\JackRouter.ini</><dest>inst</><custom>32bits</><ifexist>overnewer</><recurs>0</></>
 <_><src>.\src\32bits\msvcr100.dll</><dest>inst</><custom>32bits</><ifexist>overnewer</><recurs>0</></>
 <_><src>.\src\32bits\msvcp100.dll</><dest>inst</><custom>32bits</><ifexist>overnewer</><recurs>0</></>
