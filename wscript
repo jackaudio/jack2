@@ -179,6 +179,8 @@ def configure(conf):
         if conf.check_cc(header_name='opus/opus_custom.h', mandatory=False):
             conf.define('HAVE_OPUS', 1)
             conf.env['WITH_OPUS'] = True
+        else:
+            conf.define('HAVE_OPUS', 0)
 
 
     conf.env['LIB_PTHREAD'] = ['pthread']
