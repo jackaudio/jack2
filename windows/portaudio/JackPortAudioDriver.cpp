@@ -164,6 +164,10 @@ int JackPortAudioDriver::Open(jack_nframes_t buffer_size,
     int in_max = 0;
     int out_max = 0;
     PaError err = paNoError;
+    
+    if (!fPaDevices) {
+        fPaDevices = new PortAudioDevices();
+    }
 
     fCaptureLatency = capture_latency;
     fPlaybackLatency = playback_latency;
@@ -251,8 +255,11 @@ int JackPortAudioDriver::Close()
 {
     // Generic audio driver close
     jack_log("JackPortAudioDriver::Close");
-    int res = JackAudioDriver::Close();
-    return (Pa_CloseStream(fStream) != paNoError) ? -1 : res;
+    JackAudioDriver::Close();
+    PaError err = Pa_CloseStream(fStream);
+    delete fPaDevices;
+    fPaDevices = NULL;
+    return (err != paNoError) ? -1 : 0;
 }
 
 int JackPortAudioDriver::Attach()
@@ -312,19 +319,27 @@ int JackPortAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
     PaError err;
 
-    if ((err = Pa_CloseStream(fStream)) != paNoError) {
+    if (fStream && (err = Pa_CloseStream(fStream)) != paNoError) {
         jack_error("Pa_CloseStream error = %s", Pa_GetErrorText(err));
-        return -1;
+        goto error;
     }
-
+    
+    // It seems that some ASIO drivers (like ASIO4All needs this to restart correctly);
+    delete fPaDevices;
+    fPaDevices = new PortAudioDevices();
+  
     err = OpenStream(buffer_size);
     if (err != paNoError) {
         jack_error("Pa_OpenStream error %d = %s", err, Pa_GetErrorText(err));
-        return -1;
+        goto error;
     } else {
         JackAudioDriver::SetBufferSize(buffer_size); // Generic change, never fails
         return 0;
     }
+    
+error:
+    fStream = NULL;
+    return -1;
 }
 
 } // end of namespace

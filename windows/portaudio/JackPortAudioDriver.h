@@ -56,10 +56,8 @@ class JackPortAudioDriver : public JackMMCSS, public JackAudioDriver
 
         JackPortAudioDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table, PortAudioDevices* pa_devices)
                 : JackMMCSS(), JackAudioDriver(name, alias, engine, table), fStream(NULL), fInputBuffer(NULL), fOutputBuffer(NULL),
-                fInputDevice(paNoDevice), fOutputDevice(paNoDevice)
-        {
-            fPaDevices = pa_devices;
-        }
+                fInputDevice(paNoDevice), fOutputDevice(paNoDevice), fPaDevices(pa_devices);
+        {}
 
         virtual ~JackPortAudioDriver()
         {
