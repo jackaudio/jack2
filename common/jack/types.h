@@ -23,6 +23,14 @@
 
 #include <jack/systemdeps.h>
 
+/* To facilitate direct sharing between 32-bit and 64-bit code, declare
+ * fully-aligned typedefs for types which would otherwise have differing
+ * alignment between the two.
+ */
+typedef JACK_ALIGNED_TYPE(double)   jack_double;
+typedef JACK_ALIGNED_TYPE(int64_t)  jack_int64_t;
+typedef JACK_ALIGNED_TYPE(uint64_t) jack_uint64_t;
+
 typedef int32_t jack_shmsize_t;
 
 /**
@@ -39,7 +47,7 @@ typedef uint32_t        jack_nframes_t;
  * Type used to represent the value of free running
  * monotonic clock with units of microseconds.
  */
-typedef uint64_t jack_time_t;
+typedef jack_uint64_t jack_time_t;
 
 /**
  *  Maximum size of @a load_init string passed to an internal client
@@ -259,7 +267,7 @@ typedef void (*JackLatencyCallback)(jack_latency_callback_mode_t mode, void *arg
 /**
  * the new latency API operates on Ranges.
  */
-PRE_PACKED_STRUCTURE
+/* Note: This class must be kept 32/64 clean! */
 struct _jack_latency_range
 {
     /**
@@ -270,7 +278,7 @@ struct _jack_latency_range
      * maximum latency
      */
     jack_nframes_t max;
-} POST_PACKED_STRUCTURE;
+};
 
 typedef struct _jack_latency_range jack_latency_range_t;
 
@@ -530,7 +538,7 @@ typedef enum {
 
 } jack_transport_state_t;
 
-typedef uint64_t jack_unique_t;         /**< Unique ID (opaque) */
+typedef jack_uint64_t jack_unique_t;    /**< Unique ID (opaque) */
 
 /**
  * Optional struct jack_position_t fields.
@@ -549,7 +557,7 @@ typedef enum {
 #define JACK_POSITION_MASK (JackPositionBBT|JackPositionTimecode)
 #define EXTENDED_TIME_INFO
 
-PRE_PACKED_STRUCTURE
+/* Note: This class must be kept 32/64 clean! */
 struct _jack_position {
 
     /* these four cannot be set from clients: the server sets them */
@@ -564,16 +572,16 @@ struct _jack_position {
     int32_t             bar;            /**< current bar */
     int32_t             beat;           /**< current beat-within-bar */
     int32_t             tick;           /**< current tick-within-beat */
-    double              bar_start_tick;
+    jack_double         bar_start_tick;
 
     float               beats_per_bar;  /**< time signature "numerator" */
     float               beat_type;      /**< time signature "denominator" */
-    double              ticks_per_beat;
-    double              beats_per_minute;
+    jack_double         ticks_per_beat;
+    jack_double         beats_per_minute;
 
     /* JackPositionTimecode fields:     (EXPERIMENTAL: could change) */
-    double              frame_time;     /**< current time in seconds */
-    double              next_time;      /**< next sequential frame_time
+    jack_double         frame_time;     /**< current time in seconds */
+    jack_double         next_time;      /**< next sequential frame_time
                          (unless repositioned) */
 
     /* JackBBTFrameOffset fields: */
@@ -616,7 +624,7 @@ struct _jack_position {
     /* When (unique_1 == unique_2) the contents are consistent. */
     jack_unique_t       unique_2;       /**< unique ID */
 
-} POST_PACKED_STRUCTURE;
+};
 
 typedef struct _jack_position jack_position_t;
 

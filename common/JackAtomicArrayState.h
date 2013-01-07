@@ -30,7 +30,7 @@ namespace Jack
 /*!
 \brief Counter for CAS
 */
-PRE_PACKED_STRUCTURE
+/* Note: This class must be kept 32/64 clean! */
 struct AtomicArrayCounter
 {
     union {
@@ -68,7 +68,7 @@ struct AtomicArrayCounter
         return *this;
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 #define Counter1(e) (e).info.fLongVal
 #define GetIndex1(e, state) ((e).info.scounter.fByteVal[state])
@@ -109,7 +109,7 @@ Requirement:
 
 // CHECK livelock
 
-PRE_PACKED_STRUCTURE
+/* Note: This class must be kept 32/64 clean! */
 template <class T>
 class JackAtomicArrayState
 {
@@ -249,7 +249,7 @@ class JackAtomicArrayState
             WriteNextStateStopAux(state);
         }
 
-} POST_PACKED_STRUCTURE;
+};
 
 } // end of namespace
 

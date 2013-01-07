@@ -37,7 +37,7 @@ namespace Jack
 \brief Timing stucture for a client.
 */
 
-PRE_PACKED_STRUCTURE
+/* Note: This class must be kept 32/64 clean! */
 struct JackTimingMeasureClient
 {
     int fRefNum;
@@ -54,13 +54,13 @@ struct JackTimingMeasureClient
         fStatus((jack_client_state_t)0)
     {}
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief Timing interval in the global table for a given client
 */
 
-PRE_PACKED_STRUCTURE
+/* Note: This class must be kept 32/64 clean! */
 struct JackTimingClientInterval
 {
     int fRefNum;
@@ -74,13 +74,13 @@ struct JackTimingClientInterval
          fEndInterval(-1)
     {}
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief Timing stucture for a table of clients.
 */
 
-PRE_PACKED_STRUCTURE
+/* Note: This class must be kept 32/64 clean! */
 struct JackTimingMeasure
 {
     unsigned int fAudioCycle;
@@ -96,7 +96,7 @@ struct JackTimingMeasure
         fPrevCycleEnd(0)
     {}
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief Client timing monitoring.
@@ -105,7 +105,7 @@ struct JackTimingMeasure
 class JackClientInterface;
 class JackGraphManager;
 
-PRE_PACKED_STRUCTURE
+/* Note: This class must be kept 32/64 clean! */
 class SERVER_EXPORT JackEngineProfiling
 {
 
@@ -132,7 +132,7 @@ class SERVER_EXPORT JackEngineProfiling
                     
         JackTimingMeasure* GetCurMeasure();
 
-} POST_PACKED_STRUCTURE;
+};
 
 } // end of namespace
 

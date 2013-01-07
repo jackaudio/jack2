@@ -89,7 +89,7 @@ We have:
 
 class JackClientInterface;
 
-PRE_PACKED_STRUCTURE
+/* Note: This class must be kept 32/64 clean! */
 class SERVER_EXPORT JackTransportEngine : public JackAtomicArrayState<jack_position_t>
 {
 
@@ -194,7 +194,7 @@ class SERVER_EXPORT JackTransportEngine : public JackAtomicArrayState<jack_posit
             fNetworkSync = sync;
         }
 
-} POST_PACKED_STRUCTURE;
+};
 
 } // end of namespace
 

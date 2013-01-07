@@ -36,7 +36,7 @@ struct JackClientControl;
 \brief Utility class.
 */
 
-PRE_PACKED_STRUCTURE
+/* Note: This class must be kept 32/64 clean! */
 template <int SIZE>
 class JackFixedArray
 {
@@ -117,13 +117,13 @@ class JackFixedArray
             return fCounter;
         }
 
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief Utility class.
 */
 
-PRE_PACKED_STRUCTURE
+/* Note: This class must be kept 32/64 clean! */
 template <int SIZE>
 class JackFixedArray1 : public JackFixedArray<SIZE>
 {
@@ -154,13 +154,13 @@ class JackFixedArray1 : public JackFixedArray<SIZE>
             }
         }
 
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief Utility class.
 */
 
-PRE_PACKED_STRUCTURE
+/* Note: This class must be kept 32/64 clean! */
 template <int SIZE>
 class JackFixedMatrix
 {
@@ -250,13 +250,13 @@ class JackFixedMatrix
         }
 
 
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief Utility class.
 */
 
-PRE_PACKED_STRUCTURE
+/* Note: This class must be kept 32/64 clean! */
 template <int SIZE>
 class JackLoopFeedback
 {
@@ -364,13 +364,13 @@ class JackLoopFeedback
             return -1;
         }
 
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief For client timing measurements.
 */
 
-PRE_PACKED_STRUCTURE
+/* Note: This class must be kept 32/64 clean! */
 struct JackClientTiming
 {
     jack_time_t fSignaledAt;
@@ -393,7 +393,7 @@ struct JackClientTiming
         fStatus = NotTriggered;
     }
 
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief Connection manager.
@@ -407,7 +407,7 @@ struct JackClientTiming
 </UL>
 */
 
-PRE_PACKED_STRUCTURE
+/* Note: This class must be kept 32/64 clean! */
 class SERVER_EXPORT JackConnectionManager
 {
 
@@ -487,7 +487,7 @@ class SERVER_EXPORT JackConnectionManager
         int SuspendRefNum(JackClientControl* control, JackSynchro* table, JackClientTiming* timing, long time_out_usec);
         void TopologicalSort(std::vector<jack_int_t>& sorted);
 
-} POST_PACKED_STRUCTURE;
+};
 
 } // end of namespace
 
