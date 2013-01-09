@@ -64,9 +64,9 @@ static inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void* ad
         "# CAS \n\t"
         LOCK "cmpxchg %2, (%1) \n\t"
         "sete %0               \n\t"
-    : "=a" (ret)
-                : "c" (addr), "d" (newvalue), "a" (value)
-            );
+        : "=a" (ret)
+        : "c" (addr), "d" (newvalue), "a" (value)
+        );
     return ret;
 }
 

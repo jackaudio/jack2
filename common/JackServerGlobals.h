@@ -39,7 +39,6 @@ struct SERVER_EXPORT JackServerGlobals
 {
     static JackServer* fInstance;
     static unsigned int fUserCount;
-    static int fRTNotificationSocket;  // For debugging purpose
     static std::map<std::string, JackDriverInfo*> fSlavesList;
     static std::map<std::string, int> fInternalsList;
 

@@ -31,7 +31,6 @@ namespace Jack
 
 JackServer* JackServerGlobals::fInstance;
 unsigned int JackServerGlobals::fUserCount;
-int JackServerGlobals::fRTNotificationSocket;
 std::map<std::string, JackDriverInfo*> JackServerGlobals::fSlavesList;
 std::map<std::string, int> JackServerGlobals::fInternalsList;
 

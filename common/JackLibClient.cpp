@@ -84,6 +84,7 @@ JackLibClient::~JackLibClient()
 int JackLibClient::Open(const char* server_name, const char* name, int uuid, jack_options_t options, jack_status_t* status)
 {
     int shared_engine, shared_client, shared_graph, result;
+    bool res;
     jack_log("JackLibClient::Open name = %s", name);
 
     strncpy(fServerName, server_name, sizeof(fServerName));
@@ -122,7 +123,11 @@ int JackLibClient::Open(const char* server_name, const char* name, int uuid, jac
     SetupDriverSync(false);
 
     // Connect shared synchro : the synchro must be usable in I/O mode when several clients live in the same process
-    if (!fSynchroTable[GetClientControl()->fRefNum].Connect(name_res, fServerName)) {
+    assert(JackGlobals::fSynchroMutex);
+    JackGlobals::fSynchroMutex->Lock();
+    res = fSynchroTable[GetClientControl()->fRefNum].Connect(name_res, fServerName);
+    JackGlobals::fSynchroMutex->Unlock();
+    if (!res) {
         jack_error("Cannot ConnectSemaphore %s client", name_res);
         goto error;
     }
@@ -145,6 +150,8 @@ error:
 int JackLibClient::ClientNotifyImp(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2)
 {
     int res = 0;
+    assert(JackGlobals::fSynchroMutex);
+    JackGlobals::fSynchroMutex->Lock();
 
     // Done all time
     switch (notify) {
@@ -157,11 +164,13 @@ int JackLibClient::ClientNotifyImp(int refnum, const char* name, int notify, int
 
         case kRemoveClient:
             jack_log("JackClient::RemoveClient name = %s, ref = %ld ", name, refnum);
-            if (GetClientControl() && strcmp(GetClientControl()->fName, name) != 0)
+            if (GetClientControl() && strcmp(GetClientControl()->fName, name) != 0) {
                 res = fSynchroTable[refnum].Disconnect() ? 0 : -1;
+            }
             break;
     }
 
+    JackGlobals::fSynchroMutex->Unlock();
     return res;
 }
 

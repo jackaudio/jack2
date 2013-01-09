@@ -117,7 +117,10 @@ int JackClient::Close()
     }
 
     fChannel->Close();
+    assert(JackGlobals::fSynchroMutex);
+    JackGlobals::fSynchroMutex->Lock();
     fSynchroTable[GetClientControl()->fRefNum].Disconnect();
+    JackGlobals::fSynchroMutex->Unlock();
     JackGlobals::fClientTable[GetClientControl()->fRefNum] = NULL;
     return result;
 }

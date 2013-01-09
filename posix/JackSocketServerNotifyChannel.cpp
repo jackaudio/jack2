@@ -34,7 +34,6 @@ int JackSocketServerNotifyChannel::Open(const char* server_name)
         return -1;
     } else {
         fRequestSocket.SetNonBlocking(true);
-        JackServerGlobals::fRTNotificationSocket = fRequestSocket.GetFd();
         return 0;
     }
 }
