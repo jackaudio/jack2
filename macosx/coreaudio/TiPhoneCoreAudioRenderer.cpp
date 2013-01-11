@@ -378,8 +378,15 @@ error:
 
 int TiPhoneCoreAudioRenderer::Close()
 {
- 	AudioUnitUninitialize(fAUHAL);
+    AudioUnitUninitialize(fAUHAL);
     AudioComponentInstanceDispose(fAUHAL);
+    if (fCAInputData) {
+         // Free buffers and list
+        for (int i = 0; i < fDevNumInChans; i++) {
+            free(fCAInputData->mBuffers[i].mData);
+        }
+        free(fCAInputData);
+    }
     return NO_ERR;
 }
 
