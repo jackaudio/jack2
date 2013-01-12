@@ -88,13 +88,82 @@ static void copyright(FILE* file)
 {
     fprintf(file, "jackdmp " VERSION "\n"
             "Copyright 2001-2005 Paul Davis and others.\n"
-            "Copyright 2004-2012 Grame.\n"
+            "Copyright 2004-2013 Grame.\n"
             "jackdmp comes with ABSOLUTELY NO WARRANTY\n"
             "This is free software, and you are welcome to redistribute it\n"
             "under certain conditions; see the file COPYING for details\n");
 }
 
-static void usage(FILE* file)
+static jackctl_driver_t * jackctl_server_get_driver(jackctl_server_t *server, const char *driver_name)
+{
+    const JSList * node_ptr = jackctl_server_get_drivers_list(server);
+
+    while (node_ptr) {
+        if (strcmp(jackctl_driver_get_name((jackctl_driver_t *)node_ptr->data), driver_name) == 0) {
+            return (jackctl_driver_t *)node_ptr->data;
+        }
+        node_ptr = jack_slist_next(node_ptr);
+    }
+
+    return NULL;
+}
+
+static void print_server_drivers(jackctl_server_t *server, FILE* file)
+{
+    const JSList * node_ptr = jackctl_server_get_drivers_list(server);
+
+    fprintf(file, "Available backends:\n");
+    
+    while (node_ptr) {
+        jackctl_driver_t* driver = (jackctl_driver_t *)node_ptr->data;
+        fprintf(file, "      %s (%s)\n", jackctl_driver_get_name(driver), (jackctl_driver_get_type(driver) == JackMaster) ? "master" : "slave");
+        node_ptr = jack_slist_next(node_ptr);
+    }
+    fprintf(file, "\n");
+}
+
+static jackctl_internal_t * jackctl_server_get_internal(jackctl_server_t *server, const char *internal_name)
+{
+    const JSList * node_ptr = jackctl_server_get_internals_list(server);
+
+    while (node_ptr) {
+        if (strcmp(jackctl_internal_get_name((jackctl_internal_t *)node_ptr->data), internal_name) == 0) {
+            return (jackctl_internal_t *)node_ptr->data;
+        }
+        node_ptr = jack_slist_next(node_ptr);
+    }
+
+    return NULL;
+}
+
+static void print_server_internals(jackctl_server_t *server, FILE* file)
+{
+    const JSList * node_ptr = jackctl_server_get_internals_list(server);
+
+    fprintf(file, "Available internals:\n");
+    
+    while (node_ptr) {
+        jackctl_internal_t* internal = (jackctl_internal_t *)node_ptr->data;
+        fprintf(file, "      %s\n", jackctl_internal_get_name(internal));
+        node_ptr = jack_slist_next(node_ptr);
+    }
+    fprintf(file, "\n");
+}
+
+static jackctl_parameter_t * jackctl_get_parameter(const JSList * parameters_list, const char * parameter_name)
+{
+    while (parameters_list) {
+        if (strcmp(jackctl_parameter_get_name((jackctl_parameter_t *)parameters_list->data), parameter_name) == 0) {
+            return (jackctl_parameter_t *)parameters_list->data;
+        }
+        parameters_list = jack_slist_next(parameters_list);
+    }
+
+    return NULL;
+}
+
+
+static void usage(FILE* file, jackctl_server_t *server)
 {
     fprintf(file, "\n"
             "usage: jackdmp [ --no-realtime OR -r ]\n"
@@ -116,61 +185,13 @@ static void usage(FILE* file)
             "               [ --temporary OR -T ]\n"
             "               [ --version OR -V ]\n"
             "         -d master-backend-name [ ... master-backend args ... ]\n"
-#ifdef __APPLE__
-            "               Available master backends may include: coreaudio, dummy, net or netone.\n\n"
-#endif
-#ifdef WIN32
-            "               Available master backends may include: portaudio, dummy, net or netone.\n\n"
-#endif
-#ifdef __linux__
-            "               Available master backends may include: alsa, dummy, freebob, firewire, net or netone.\n\n"
-#endif
-#if defined(__sun__) || defined(sun)
-            "               Available master backends may include: boomer, oss, dummy or net.\n\n"
-#endif
             "       jackdmp -d master-backend-name --help\n"
             "             to display options for each master backend\n\n");
-}
-
-// To put in the control.h interface ??
-static jackctl_driver_t * jackctl_server_get_driver(jackctl_server_t *server, const char *driver_name)
-{
-    const JSList * node_ptr = jackctl_server_get_drivers_list(server);
-
-    while (node_ptr) {
-        if (strcmp(jackctl_driver_get_name((jackctl_driver_t *)node_ptr->data), driver_name) == 0) {
-            return (jackctl_driver_t *)node_ptr->data;
-        }
-        node_ptr = jack_slist_next(node_ptr);
+    
+    if (server) {
+        print_server_drivers(server, file);
+        print_server_internals(server, file);
     }
-
-    return NULL;
-}
-
-static jackctl_internal_t * jackctl_server_get_internal(jackctl_server_t *server, const char *internal_name)
-{
-    const JSList * node_ptr = jackctl_server_get_internals_list(server);
-
-    while (node_ptr) {
-        if (strcmp(jackctl_internal_get_name((jackctl_internal_t *)node_ptr->data), internal_name) == 0) {
-            return (jackctl_internal_t *)node_ptr->data;
-        }
-        node_ptr = jack_slist_next(node_ptr);
-    }
-
-    return NULL;
-}
-
-static jackctl_parameter_t * jackctl_get_parameter(const JSList * parameters_list, const char * parameter_name)
-{
-    while (parameters_list) {
-        if (strcmp(jackctl_parameter_get_name((jackctl_parameter_t *)parameters_list->data), parameter_name) == 0) {
-            return (jackctl_parameter_t *)parameters_list->data;
-        }
-        parameters_list = jack_slist_next(parameters_list);
-    }
-
-    return NULL;
 }
 
 // Prototype to be found in libjackserver
@@ -270,7 +291,7 @@ int main(int argc, char** argv)
                         value.ui = JACK_TIMER_SYSTEM_CLOCK;
                         jackctl_parameter_set_value(param, &value);
                     } else {
-                        usage(stdout);
+                        usage(stdout, NULL);
                         goto destroy_server;
                     }
                 }
@@ -379,7 +400,7 @@ int main(int argc, char** argv)
                 /*fallthru*/
 
             case 'h':
-                usage(stdout);
+                usage(stdout, server_ctl);
                 goto destroy_server;
         }
     }
@@ -400,7 +421,7 @@ int main(int argc, char** argv)
     }
 
     if (!master_driver_name) {
-        usage(stderr);
+        usage(stderr, NULL);
         goto destroy_server;
     }
 
@@ -524,15 +545,17 @@ int main(int argc, char** argv)
     // Slave drivers
     for (it = slaves_list.begin(); it != slaves_list.end(); it++) {
         jackctl_driver_t * slave_driver_ctl = jackctl_server_get_driver(server_ctl, *it);
-        if (slave_driver_ctl)
+        if (slave_driver_ctl) {
             jackctl_server_remove_slave(server_ctl, slave_driver_ctl);
+        }
     }
 
     // Internal clients
     for (it = internals_list.begin(); it != internals_list.end(); it++) {
         jackctl_internal_t * internal_driver_ctl = jackctl_server_get_internal(server_ctl, *it);
-        if (internal_driver_ctl)
+        if (internal_driver_ctl) {
             jackctl_server_unload_internal(server_ctl, internal_driver_ctl);
+        }
     }
     jackctl_server_close(server_ctl);
 
