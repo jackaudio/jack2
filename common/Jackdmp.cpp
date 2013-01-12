@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2001 Paul Davis
-Copyright (C) 2004-2008 Grame
+Copyright (C) 2004-2013 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "types.h"
 #include "jack.h"
 #include "control.h"
-
 #include "JackConstants.h"
 #include "JackPlatformPlug.h"
 
@@ -41,7 +40,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 /*
-This is a simple port of the old jackdmp.cpp file to use the new Jack 2.0 control API. Available options for the server
+This is a simple port of the old jackdmp.cpp file to use the new jack2 control API. Available options for the server
 are "hard-coded" in the source. A much better approach would be to use the control API to:
 - dynamically retrieve available server parameters and then prepare to parse them
 - get available drivers and their possible parameters, then prepare to parse them.
@@ -108,20 +107,6 @@ static jackctl_driver_t * jackctl_server_get_driver(jackctl_server_t *server, co
     return NULL;
 }
 
-static void print_server_drivers(jackctl_server_t *server, FILE* file)
-{
-    const JSList * node_ptr = jackctl_server_get_drivers_list(server);
-
-    fprintf(file, "Available backends:\n");
-    
-    while (node_ptr) {
-        jackctl_driver_t* driver = (jackctl_driver_t *)node_ptr->data;
-        fprintf(file, "      %s (%s)\n", jackctl_driver_get_name(driver), (jackctl_driver_get_type(driver) == JackMaster) ? "master" : "slave");
-        node_ptr = jack_slist_next(node_ptr);
-    }
-    fprintf(file, "\n");
-}
-
 static jackctl_internal_t * jackctl_server_get_internal(jackctl_server_t *server, const char *internal_name)
 {
     const JSList * node_ptr = jackctl_server_get_internals_list(server);
@@ -134,6 +119,32 @@ static jackctl_internal_t * jackctl_server_get_internal(jackctl_server_t *server
     }
 
     return NULL;
+}
+
+static jackctl_parameter_t * jackctl_get_parameter(const JSList * parameters_list, const char * parameter_name)
+{
+    while (parameters_list) {
+        if (strcmp(jackctl_parameter_get_name((jackctl_parameter_t *)parameters_list->data), parameter_name) == 0) {
+            return (jackctl_parameter_t *)parameters_list->data;
+        }
+        parameters_list = jack_slist_next(parameters_list);
+    }
+
+    return NULL;
+}
+
+static void print_server_drivers(jackctl_server_t *server, FILE* file)
+{
+    const JSList * node_ptr = jackctl_server_get_drivers_list(server);
+
+    fprintf(file, "Available backends:\n");
+    
+    while (node_ptr) {
+        jackctl_driver_t* driver = (jackctl_driver_t *)node_ptr->data;
+        fprintf(file, "      %s (%s)\n", jackctl_driver_get_name(driver), (jackctl_driver_get_type(driver) == JackMaster) ? "master" : "slave");
+        node_ptr = jack_slist_next(node_ptr);
+    }
+    fprintf(file, "\n");
 }
 
 static void print_server_internals(jackctl_server_t *server, FILE* file)
@@ -150,23 +161,10 @@ static void print_server_internals(jackctl_server_t *server, FILE* file)
     fprintf(file, "\n");
 }
 
-static jackctl_parameter_t * jackctl_get_parameter(const JSList * parameters_list, const char * parameter_name)
-{
-    while (parameters_list) {
-        if (strcmp(jackctl_parameter_get_name((jackctl_parameter_t *)parameters_list->data), parameter_name) == 0) {
-            return (jackctl_parameter_t *)parameters_list->data;
-        }
-        parameters_list = jack_slist_next(parameters_list);
-    }
-
-    return NULL;
-}
-
-
 static void usage(FILE* file, jackctl_server_t *server)
 {
     fprintf(file, "\n"
-            "usage: jackdmp [ --no-realtime OR -r ]\n"
+            "Usage: jackdmp [ --no-realtime OR -r ]\n"
             "               [ --realtime OR -R [ --realtime-priority OR -P priority ] ]\n"
             "      (the two previous arguments are mutually exclusive. The default is --realtime)\n"
             "               [ --name OR -n server-name ]\n"
