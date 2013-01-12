@@ -30,9 +30,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
-void JackFifo::BuildName(const char* client_name, const char* server_name, char* res)
+void JackFifo::BuildName(const char* client_name, const char* server_name, char* res, int size)
 {
-    char ext_client_name[JACK_CLIENT_NAME_SIZE + 1];
+    char ext_client_name[SYNC_MAX_NAME_SIZE + 1];
     JackTools::RewriteName(client_name, ext_client_name);
     sprintf(res, "%s/jack_fifo.%d_%s_%s", jack_client_dir, JackTools::GetUID(), server_name, ext_client_name);
 }
@@ -126,7 +126,7 @@ bool JackFifo::TimedWait(long usec)
 bool JackFifo::Allocate(const char* name, const char* server_name, int value)
 {
     struct stat statbuf;
-    BuildName(name, server_name, fName);
+    BuildName(name, server_name, fName, sizeof(fName));
     jack_log("JackFifo::Allocate name = %s", fName);
 
     if (stat(fName, &statbuf) < 0) {
@@ -159,7 +159,7 @@ bool JackFifo::Allocate(const char* name, const char* server_name, int value)
 // Client side
 bool JackFifo::ConnectAux(const char* name, const char* server_name, int access)
 {
-    BuildName(name, server_name, fName);
+    BuildName(name, server_name, fName, sizeof(fName));
     jack_log("JackFifo::ConnectAux name = %s", fName);
 
     // Temporary...

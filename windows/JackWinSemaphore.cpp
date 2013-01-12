@@ -28,7 +28,7 @@ namespace Jack
 
 void JackWinSemaphore::BuildName(const char* client_name, const char* server_name, char* res, int size)
 {
-    char ext_client_name[JACK_CLIENT_NAME_SIZE + 1];
+    char ext_client_name[SYNC_MAX_NAME_SIZE + 1];
     JackTools::RewriteName(client_name, ext_client_name);
     _snprintf(res, size, "jack_pipe.%s_%s", server_name, ext_client_name);
 }
