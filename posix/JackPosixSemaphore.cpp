@@ -94,8 +94,9 @@ bool JackPosixSemaphore::Wait()
 
     while ((res = sem_wait(fSemaphore) < 0)) {
         jack_error("JackPosixSemaphore::Wait name = %s err = %s", fName, strerror(errno));
-        if (errno != EINTR)
+        if (errno != EINTR) {
             break;
+        }
     }
     return (res == 0);
 }
@@ -122,8 +123,9 @@ bool JackPosixSemaphore::TimedWait(long usec)
         jack_error("JackPosixSemaphore::TimedWait err = %s", strerror(errno));
         jack_log("JackPosixSemaphore::TimedWait now : %ld %ld ", now.tv_sec, now.tv_usec);
         jack_log("JackPosixSemaphore::TimedWait next : %ld %ld ", time.tv_sec, time.tv_nsec/1000);
-        if (errno != EINTR)
+        if (errno != EINTR) {
             break;
+        }
     }
     return (res == 0);
 }

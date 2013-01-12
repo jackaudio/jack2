@@ -57,8 +57,6 @@ class JackGenericClientChannel : public detail::JackClientChannelInterface
 
         void ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status, int* result, int open);
         void ClientOpen(const char* name, int pid, int uuid, int* shared_engine, int* shared_client, int* shared_graph, int* result);
-        void ClientOpen(const char* name, int* ref, int uuid, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, int* result)
-        {}
         void ClientClose(int refnum, int* result);
 
         void ClientActivate(int refnum, int is_real_time, int* result);

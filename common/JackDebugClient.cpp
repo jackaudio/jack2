@@ -417,7 +417,7 @@ jack_nframes_t JackDebugClient::GetCurrentTransportFrame()
     return fClient->GetCurrentTransportFrame();
 }
 
-int JackDebugClient::TransportReposition(jack_position_t* pos)
+int JackDebugClient::TransportReposition(const jack_position_t* pos)
 {
     CheckClient("TransportReposition");
     return fClient->TransportReposition(pos);

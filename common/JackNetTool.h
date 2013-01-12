@@ -324,9 +324,6 @@ namespace Jack
             virtual int RenderFromNetwork(int cycle, int sub_cycle, uint32_t port_num) = 0;
             virtual int RenderToNetwork(int sub_cycle, uint32_t port_num) = 0;
 
-            virtual void RenderFromNetwork(char* net_buffer, int active_port, int sub_cycle, size_t copy_size) {}
-            virtual void RenderToNetwork(char* net_buffer, int active_port, int sub_cycle, size_t copy_size) {}
-
             virtual int ActivePortsToNetwork(char* net_buffer);
             virtual void ActivePortsFromNetwork(char* net_buffer, uint32_t port_num);
 
@@ -340,6 +337,10 @@ namespace Jack
             int fPacketSize;
 
             void UpdateParams(int active_ports);
+        
+        
+            void RenderFromNetwork(char* net_buffer, int active_port, int sub_cycle);
+            void RenderToNetwork(char* net_buffer, int active_port, int sub_cycle);
 
         public:
 
@@ -356,9 +357,6 @@ namespace Jack
             //jack<->buffer
             int RenderFromNetwork(int cycle, int sub_cycle, uint32_t port_num);
             int RenderToNetwork(int sub_cycle, uint32_t port_num);
-
-            void RenderFromNetwork(char* net_buffer, int active_port, int sub_cycle);
-            void RenderToNetwork(char* net_buffer, int active_port, int sub_cycle);
 
     };
 

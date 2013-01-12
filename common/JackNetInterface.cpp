@@ -632,7 +632,7 @@ namespace Jack
     bool JackNetSlaveInterface::InitConnection(int time_out_sec)
     {
         jack_log("JackNetSlaveInterface::InitConnection()");
-        uint try_count = (time_out_sec > 0) ? ((1000000 * time_out_sec) / SLAVE_INIT_TIMEOUT) : LONG_MAX;
+        uint try_count = (time_out_sec > 0) ? ((1000000 * time_out_sec) / SLAVE_INIT_TIMEOUT) : UINT_MAX;
 
         // set the parameters to send
         strcpy(fParams.fPacketType, "params");

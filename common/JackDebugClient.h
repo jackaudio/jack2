@@ -106,7 +106,7 @@ class JackDebugClient : public JackClient
         void TransportLocate(jack_nframes_t frame);
         jack_transport_state_t TransportQuery(jack_position_t* pos);
         jack_nframes_t GetCurrentTransportFrame();
-        int TransportReposition(jack_position_t* pos);
+        int TransportReposition(const jack_position_t* pos);
         void TransportStart();
         void TransportStop();
 
