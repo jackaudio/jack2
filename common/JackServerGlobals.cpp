@@ -304,8 +304,9 @@ bool JackServerGlobals::Init()
         }
 
 #ifndef WIN32
-        if (server_name == NULL)
+        if (server_name == NULL) {
             server_name = (char*)JackTools::DefaultServerName();
+        }
 #endif
 
         rc = jack_register_server(server_name, false);
@@ -327,8 +328,9 @@ bool JackServerGlobals::Init()
         jack_cleanup_shm();
         JackTools::CleanupFiles(server_name);
 
-        if (!realtime && client_timeout == 0)
+        if (!realtime && client_timeout == 0) {
             client_timeout = 500; /* 0.5 sec; usable when non realtime. */
+        }
 
         for (i = 0; i < argc; i++) {
             free(argv[i]);
@@ -376,14 +378,16 @@ bool JackServerGlobals::Init()
         }
     }
 
-    if (master_driver_params)
+    if (master_driver_params) {
         jack_free_driver_params(master_driver_params);
+    }
     return true;
 
 error:
     jack_log("JackServerGlobals Init error");
-    if (master_driver_params)
+    if (master_driver_params) {
         jack_free_driver_params(master_driver_params);
+    }
     Destroy();
     return false;
 }

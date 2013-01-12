@@ -728,7 +728,7 @@ SERVER_EXPORT jackctl_server_t * jackctl_server_create(
     server_ptr->parameters = NULL;
     server_ptr->engine = NULL;
 
-    strcpy(value.str, JACK_DEFAULT_SERVER_NAME);
+    strcpy(value.str, JackTools::DefaultServerName());
     if (jackctl_add_parameter(
             &server_ptr->parameters,
             "name",

@@ -64,9 +64,6 @@
 
 #define JACK_DEFAULT_SERVER_NAME "default"
 
-#define jack_server_entry "jackdmp_entry"
-#define jack_client_entry "jack_client"
-
 #define ALL_CLIENTS -1 // for notification
 
 #define JACK_PROTOCOL_VERSION 8

@@ -165,7 +165,7 @@ int JackServer::InternalClientLoadAux(JackLoadableInternalClient* client, const 
     *status = 0;
 
     // Client object is internally kept in JackEngine
-    if ((client->Init(so_name) < 0) || (client->Open(JACK_DEFAULT_SERVER_NAME, client_name,  uuid, (jack_options_t)options, (jack_status_t*)status) < 0)) {
+    if ((client->Init(so_name) < 0) || (client->Open(JackTools::DefaultServerName(), client_name,  uuid, (jack_options_t)options, (jack_status_t*)status) < 0)) {
         delete client;
         int my_status1 = *status | JackFailure;
         *status = (jack_status_t)my_status1;

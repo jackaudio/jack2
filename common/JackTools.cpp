@@ -79,8 +79,9 @@ namespace Jack {
     const char* JackTools::DefaultServerName()
     {
         const char* server_name;
-        if ((server_name = getenv("JACK_DEFAULT_SERVER")) == NULL)
+        if ((server_name = getenv("JACK_DEFAULT_SERVER")) == NULL) {
             server_name = JACK_DEFAULT_SERVER_NAME;
+        }
         return server_name;
     }
 
