@@ -433,8 +433,7 @@ static int _process (jack_nframes_t nframes)
 	jack_default_audio_sample_t *in, *out;
 	in = (jack_default_audio_sample_t *)jack_port_get_buffer (input_port1, nframes);
 	out = (jack_default_audio_sample_t *)jack_port_get_buffer (output_port1, nframes);
-	memcpy (out, in,
-		sizeof (jack_default_audio_sample_t) * nframes);
+	memcpy (out, in, sizeof (jack_default_audio_sample_t) * nframes);
 	return 0;
 }
 
@@ -745,6 +744,24 @@ int main (int argc, char *argv[])
     } else {
         printf("!!! ERROR !!! Jackd server automatic renaming feature does not work!\n");
     }
+    
+    /**
+     * try to register a client with maximum possible client name size
+     *
+     */
+    char client_name3[jack_client_name_size()];
+    for (int i = 0; i < jack_client_name_size() - 1; i++) {
+        client_name3[i] = 'A';
+    }
+    client_name3[jack_client_name_size()] = 0;
+    Log("trying to register a new jackd client wwith maximum possible client name size...\n", client_name3);
+    client2 = jack_client_open(client_name3, jack_options, &status, server_name);
+    if (client2 != NULL) {
+        Log ("valid : a client with maximum possible client name size can be opened\n");
+		jack_client_close(client2);
+    } else {
+        printf("!!! ERROR !!! opening a client with maximum possible client name size does not work!\n");
+    }
 
     /**
      * testing client name...
@@ -753,27 +770,31 @@ int main (int argc, char *argv[])
      */
     Log("Testing name...");
     client_name2 = jack_get_client_name(client1);
-    if (strcmp(client_name1, client_name2) == 0)
+    if (strcmp(client_name1, client_name2) == 0) {
         Log(" ok\n");
-    else
+    } else {
         printf("\n!!! ERROR !!! name returned different from the one given : %s\n", client_name2);
+    }
 
     /**
      * Test RT mode...
      * verify if the real time mode returned by jack match the optional argument defined when launching jack_test*/
-    if (jack_is_realtime(client1) == RT)
+    if (jack_is_realtime(client1) == RT) {
         Log("Jackd is in realtime mode (RT = %i).\n", RT);
-    else
+    } else {
         printf("!!! ERROR !!! Jackd is in a non-expected realtime mode (RT = %i).\n", RT);
+    }
 
     /**
      * Register all callbacks...
      *
      */
-    if (jack_set_thread_init_callback(client1, Jack_Thread_Init_Callback, 0) != 0)
+    if (jack_set_thread_init_callback(client1, Jack_Thread_Init_Callback, 0) != 0) {
         printf("!!! ERROR !!! while calling jack_set_thread_init_callback()...\n");
-    if (jack_set_freewheel_callback(client1, Jack_Freewheel_Callback, 0) != 0 )
+    }
+    if (jack_set_freewheel_callback(client1, Jack_Freewheel_Callback, 0) != 0 ) {
         printf("\n!!! ERROR !!! while calling jack_set_freewheel_callback()...\n");
+    }
 
 
     if (jack_set_process_callback(client1, process1, 0) != 0) {
@@ -782,8 +803,9 @@ int main (int argc, char *argv[])
 
     jack_on_shutdown(client1, jack_shutdown, 0);
 
-    if (jack_on_info_shutdown)
+    if (jack_on_info_shutdown) {
         jack_on_info_shutdown(client1, jack_info_shutdown, 0);
+    }
 
     if (jack_set_buffer_size_callback(client1, Jack_Update_Buffer_Size, 0) != 0) {
         printf("Error when calling buffer_size_callback !\n");
@@ -910,6 +932,27 @@ int main (int argc, char *argv[])
     } else {
         printf("error : port_set_name function can't be tested...\n");
     }
+    
+    /**
+     * Verify if a port can be registered with maximum port name size
+     *
+     */
+    int port_size_max = jack_port_name_size() - strlen(client_name1) - 1;  // Port is of shape: "client_name:port_name"
+    char port_name3[port_size_max];
+    for (int i = 0; i < port_size_max - 1; i++) {
+        port_name3[i] = 'A';
+    }
+    port_name3[port_size_max] = 0;
+    jack_port_t * test_max_port = jack_port_register(client1, port_name3,
+                                      JACK_DEFAULT_AUDIO_TYPE,
+                                      JackPortIsOutput, 0);
+   
+    if (test_max_port != NULL) {
+        Log ("valid : a port with maximum possible port name size can be registered\n");
+		jack_port_unregister(client1, test_max_port);
+    } else {
+        printf("!!! ERROR !!! registering a port with maximum possible port name size does not work!\n");
+    }
 
     port_callback_reg = 0;	// number of port registration received by the callback
 
@@ -929,8 +972,9 @@ int main (int argc, char *argv[])
     jack_port_set_name (output_port1, "renamed-port#");
     jack_sleep(1 * 1000);
 
-    if (port_rename_clbk == 0)
+    if (port_rename_clbk == 0) {
         printf("!!! ERROR !!! Jack_Port_Rename_Callback was not called !!.\n");
+    }
 
 
     /**
@@ -950,8 +994,9 @@ int main (int argc, char *argv[])
      * Test if init callback initThread have been called.
      *
      */
-    if (init_clbk == 0)
+    if (init_clbk == 0) {
         printf("!!! ERROR !!! Jack_Thread_Init_Callback was not called !!.\n");
+    }
 
     jack_sleep(10 * 1000); // test see the clock in the graph at the begining...
 
@@ -978,14 +1023,15 @@ int main (int argc, char *argv[])
         printf("\n!!! ERROR !!! RT mode is always activated while freewheel mode is applied !\n");
         t_error = 1;
     }
-    if (activated == 0)
+    if (activated == 0) {
         printf("!!! ERROR !!! Freewheel mode doesn't activate audio callback !!\n");
+    }
 
     jack_set_freewheel(client1, 0);
     jack_sleep(7 * 1000);
 
-	if (jack_is_realtime(client1) == 1) {}
-    else {
+	if (jack_is_realtime(client1) == 1) {
+    } else {
         printf("\n!!! ERROR !!! freewheel mode fail to reactivate RT mode when exiting !\n");
         t_error = 1;
     }
@@ -1814,8 +1860,9 @@ int main (int argc, char *argv[])
             jack_transport_stop(client1);
             Log("Transport state : %i\n", ts);
         }
-        if (jack_set_sync_callback(client2, Jack_Sync_Callback, 0) != 0)
+        if (jack_set_sync_callback(client2, Jack_Sync_Callback, 0) != 0) {
             printf("error while calling set_sync_callback...\n");
+        }
 
         Log("starting transport...\n");
 
@@ -1880,8 +1927,9 @@ int main (int argc, char *argv[])
             ts = jack_transport_query(client2, &pos);
         }
 
-        if (sync_called == 0)
+        if (sync_called == 0) {
             Log("!!! ERROR !!! starting a slow-sync client does not work correctly\n");
+        }
 
         Log("Sync callback have been called %i times.\n", sync_called);
         display_transport_state();
@@ -2006,7 +2054,6 @@ int main (int argc, char *argv[])
 	jack_set_process_callback(client1, process5, client1);
 	jack_activate(client1);
 	jack_sleep(3 * 1000);
-    
 
 	/**
      * Checking alternate thread model
