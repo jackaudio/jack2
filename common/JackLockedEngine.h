@@ -164,6 +164,13 @@ class SERVER_EXPORT JackLockedEngine
             return (fEngine.CheckClient(refnum)) ? fEngine.ClientDeactivate(refnum) : -1;
             CATCH_EXCEPTION_RETURN
         }
+        void ClientKill(int refnum)
+        {
+            TRY_CALL
+            JackLock lock(&fEngine);
+            fEngine.ClientKill(refnum);
+            CATCH_EXCEPTION
+        }
 
         // Internal client management
         int GetInternalClientName(int int_ref, char* name_res)

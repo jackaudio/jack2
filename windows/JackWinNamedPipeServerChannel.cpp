@@ -136,7 +136,7 @@ void JackClientPipeThread::ClientKill()
     } else if (fRefNum == 0) {  // Correspond to a still not opened client.
         jack_log("Kill a not opened client %x", this);
     } else {
-        fServer->ClientKill(fRefNum);
+        fServer->GetEngine()->ClientKill(fRefNum);
     }
 
     Close();

@@ -324,7 +324,7 @@ int JackPortAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
         goto error;
     }
     
-    // It seems that some ASIO drivers (like ASIO4All needs this to restart correctly);
+    // It seems that some ASIO drivers (like ASIO4All) needs this to restart correctly;
     delete fPaDevices;
     fPaDevices = new PortAudioDevices();
   

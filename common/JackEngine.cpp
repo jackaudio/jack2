@@ -107,7 +107,6 @@ void JackEngine::ShutDown()
     }
 }
 
-
 void JackEngine::NotifyQuit()
 {
     fChannel.NotifyQuit();
@@ -128,9 +127,9 @@ int JackEngine::AllocateRefnum()
     return -1;
 }
 
-void JackEngine::ReleaseRefnum(int ref)
+void JackEngine::ReleaseRefnum(int refnum)
 {
-    fClientTable[ref] = NULL;
+    fClientTable[refnum] = NULL;
 
     if (fEngineControl->fTemporary) {
         int i;
@@ -140,7 +139,7 @@ void JackEngine::ReleaseRefnum(int ref)
             }
         }
         if (i == CLIENT_NUM) {
-            // last client and temporay case: quit the server
+            // Last client and temporay case: quit the server
             jack_log("JackEngine::ReleaseRefnum server quit");
             fEngineControl->fTemporary = false;
             throw JackTemporaryException();
@@ -155,10 +154,10 @@ void JackEngine::ReleaseRefnum(int ref)
 void JackEngine::ProcessNext(jack_time_t cur_cycle_begin)
 {
     fLastSwitchUsecs = cur_cycle_begin;
-    if (fGraphManager->RunNextGraph())  { // True if the graph actually switched to a new state
+    if (fGraphManager->RunNextGraph())  {   // True if the graph actually switched to a new state
         fChannel.Notify(ALL_CLIENTS, kGraphOrderCallback, 0);
     }
-    fSignal.Signal();                   // Signal for threads waiting for next cycle
+    fSignal.Signal();                       // Signal for threads waiting for next cycle
 }
 
 void JackEngine::ProcessCurrent(jack_time_t cur_cycle_begin)
@@ -839,6 +838,17 @@ int JackEngine::ClientDeactivate(int refnum)
         return -1;
     } else {
         return 0;
+    }
+}
+
+void JackEngine::ClientKill(int refnum)
+{
+    jack_log("JackEngine::ClientKill ref = %ld", refnum);
+    if (ClientDeactivate(refnum) < 0) {
+        jack_error("JackServer::ClientKill ref = %ld cannot be removed from the graph !!", refnum);
+    }
+    if (ClientExternalClose(refnum) < 0) {
+        jack_error("JackServer::ClientKill ref = %ld cannot be closed", refnum);
     }
 }
 

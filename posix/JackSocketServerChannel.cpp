@@ -170,13 +170,13 @@ void JackSocketServerChannel::ClientKill(int fd)
     int refnum = elem.first;
     assert(socket);
     
+    jack_log("JackSocketServerChannel::ClientKill ref = %d fd = %d", refnum, fd);
     if (refnum == -1) {  // Should never happen... correspond to a client that started the socket but never opened...
         jack_log("Client was not opened : probably correspond to server_check");
     } else {
-        fServer->ClientKill(refnum);
+        fServer->GetEngine()->ClientKill(refnum);
     }
-
-    jack_log("JackSocketServerChannel::ClientKill ref = %d fd = %d", refnum, fd);
+   
     fSocketTable.erase(fd);
     socket->Close();
     delete socket;

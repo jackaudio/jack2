@@ -53,8 +53,7 @@ JackServer::JackServer(bool sync, bool temporary, int timeout, bool rt, int prio
     // regular freewheel driver because the freewheel driver needs to run in
     // threaded mode when freewheel mode is active and needs to run as a slave
     // when freewheel mode isn't active.
-    JackFreewheelDriver *freewheelDriver =
-        new JackFreewheelDriver(fEngine, GetSynchroTable());
+    JackFreewheelDriver* freewheelDriver = new JackFreewheelDriver(fEngine, GetSynchroTable());
     fThreadedFreewheelDriver = new JackThreadedDriver(freewheelDriver);
 
     fFreewheelDriver = freewheelDriver;
@@ -296,17 +295,6 @@ void JackServer::Notify(int refnum, int notify, int value)
         case kXRunCallback:
             fEngine->NotifyXRun(refnum);
             break;
-    }
-}
-
-void JackServer::ClientKill(int refnum)
-{
-    jack_log("JackServer::ClientKill ref = %ld", refnum);
-    if (fEngine->ClientDeactivate(refnum) < 0) {
-        jack_error("JackServer::ClientKill ref = %ld cannot be removed from the graph !!", refnum);
-    }
-    if (fEngine->ClientExternalClose(refnum) < 0) {
-        jack_error("JackServer::ClientKill ref = %ld cannot be closed", refnum);
     }
 }
 
