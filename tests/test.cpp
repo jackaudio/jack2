@@ -754,7 +754,7 @@ int main (int argc, char *argv[])
         client_name3[i] = 'A';
     }
     client_name3[jack_client_name_size()] = 0;
-    Log("trying to register a new jackd client wwith maximum possible client name size...\n", client_name3);
+    Log("trying to register a new jackd client with maximum possible client name size...\n", client_name3);
     client2 = jack_client_open(client_name3, jack_options, &status, server_name);
     if (client2 != NULL) {
         Log ("valid : a client with maximum possible client name size can be opened\n");
@@ -848,7 +848,7 @@ int main (int argc, char *argv[])
     sprintf (filename, "framefile-%i.dat", cur_buffer_size);
     file = fopen(filename, "w");
     if (file == NULL) {
-        fprintf(stderr, "Erreur dans l'ouverture du fichier log framefile.dat");
+        fprintf(stderr, "Error when opening framefile.dat log file");
         exit(-1);
     }
 
@@ -937,7 +937,7 @@ int main (int argc, char *argv[])
      * Verify if a port can be registered with maximum port name size
      *
      */
-    int port_size_max = jack_port_name_size() - strlen(client_name1) - 1;  // Port is of shape: "client_name:port_name"
+    int port_size_max = jack_port_name_size() - strlen(client_name1) - 2;  // Port is of shape: "client_name:port_name"
     char port_name3[port_size_max];
     for (int i = 0; i < port_size_max - 1; i++) {
         port_name3[i] = 'A';
@@ -2112,8 +2112,8 @@ int main (int argc, char *argv[])
     sprintf (filename, "framegraph-%i.gnu", cur_buffer_size);
     file = fopen(filename, "w");
     if (file == NULL) {
-        fprintf(stderr, "Erreur dans l'ouverture du fichier");
-        exit( -1);
+        fprintf(stderr, "Error while opening file");
+        exit(-1);
     }
     fprintf(file, "reset\n");
     fprintf(file, "set terminal png transparent nocrop enhanced\n");
