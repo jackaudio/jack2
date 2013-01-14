@@ -39,7 +39,7 @@
 
 #define SYNC_MAX_NAME_SIZE 256
 
-#define REAL_JACK_PORT_NAME_SIZE JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE
+#define REAL_JACK_PORT_NAME_SIZE JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE   // full name like "client_name:short_port_name"
 
 #ifndef PORT_NUM
 #define PORT_NUM 2048

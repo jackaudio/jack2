@@ -670,15 +670,15 @@ inline void JackClient::Error()
 int JackClient::PortRegister(const char* port_name, const char* port_type, unsigned long flags, unsigned long buffer_size)
 {
     // Check if port name is empty
-    string port_name_str = string(port_name);
-    if (port_name_str.size() == 0) {
+    string port_short_name_str = string(port_name);
+    if (port_short_name_str.size() == 0) {
         jack_error("port_name is empty");
         return 0; // Means failure here...
     }
 
     // Check port name length
-    string name = string(GetClientControl()->fName) + string(":") + port_name_str;
-    if (name.size() >= REAL_JACK_PORT_NAME_SIZE) {
+    string port_full_name_str = string(GetClientControl()->fName) + string(":") + port_short_name_str;
+    if (port_full_name_str.size() >= REAL_JACK_PORT_NAME_SIZE) {
         jack_error("\"%s:%s\" is too long to be used as a JACK port name.\n"
                    "Please use %lu characters or less",
                    GetClientControl()->fName,
@@ -689,10 +689,10 @@ int JackClient::PortRegister(const char* port_name, const char* port_type, unsig
 
     int result = -1;
     jack_port_id_t port_index = NO_PORT;
-    fChannel->PortRegister(GetClientControl()->fRefNum, name.c_str(), port_type, flags, buffer_size, &port_index, &result);
+    fChannel->PortRegister(GetClientControl()->fRefNum, port_full_name_str.c_str(), port_type, flags, buffer_size, &port_index, &result);
 
     if (result == 0) {
-        jack_log("JackClient::PortRegister ref = %ld name = %s type = %s port_index = %ld", GetClientControl()->fRefNum, name.c_str(), port_type, port_index);
+        jack_log("JackClient::PortRegister ref = %ld name = %s type = %s port_index = %ld", GetClientControl()->fRefNum, port_full_name_str.c_str(), port_type, port_index);
         fPortList.push_back(port_index);
         return port_index;
     } else {
@@ -719,6 +719,14 @@ int JackClient::PortUnRegister(jack_port_id_t port_index)
 int JackClient::PortConnect(const char* src, const char* dst)
 {
     jack_log("JackClient::Connect src = %s dst = %s", src, dst);
+    if (strlen(src) >= REAL_JACK_PORT_NAME_SIZE) {
+        jack_error("\"%s\" is too long to be used as a JACK port name.\n", src);
+        return -1; 
+    }
+    if (strlen(dst) >= REAL_JACK_PORT_NAME_SIZE) {
+        jack_error("\"%s\" is too long to be used as a JACK port name.\n", src);
+        return -1; 
+    }
     int result = -1;
     fChannel->PortConnect(GetClientControl()->fRefNum, src, dst, &result);
     return result;
@@ -727,6 +735,14 @@ int JackClient::PortConnect(const char* src, const char* dst)
 int JackClient::PortDisconnect(const char* src, const char* dst)
 {
     jack_log("JackClient::Disconnect src = %s dst = %s", src, dst);
+    if (strlen(src) >= REAL_JACK_PORT_NAME_SIZE) {
+        jack_error("\"%s\" is too long to be used as a JACK port name.\n", src);
+        return -1; 
+    }
+    if (strlen(dst) >= REAL_JACK_PORT_NAME_SIZE) {
+        jack_error("\"%s\" is too long to be used as a JACK port name.\n", src);
+        return -1; 
+    }
     int result = -1;
     fChannel->PortDisconnect(GetClientControl()->fRefNum, src, dst, &result);
     return result;

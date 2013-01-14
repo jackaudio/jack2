@@ -408,7 +408,7 @@ struct JackPortRegisterRequest : public JackRequest
 {
 
     int fRefNum;
-    char fName[JACK_PORT_NAME_SIZE + 1];
+    char fName[JACK_PORT_NAME_SIZE + 1];   // port short name
     char fPortType[JACK_PORT_TYPE_SIZE + 1];
     unsigned int fFlags;
     unsigned int fBufferSize;
@@ -517,8 +517,8 @@ struct JackPortConnectNameRequest : public JackRequest
 {
 
     int fRefNum;
-    char fSrc[JACK_PORT_NAME_SIZE + 1];
-    char fDst[JACK_PORT_NAME_SIZE + 1];
+    char fSrc[REAL_JACK_PORT_NAME_SIZE + 1];    // port full name
+    char fDst[REAL_JACK_PORT_NAME_SIZE + 1];    // port full name
 
     JackPortConnectNameRequest()
     {}
@@ -559,8 +559,8 @@ struct JackPortDisconnectNameRequest : public JackRequest
 {
 
     int fRefNum;
-    char fSrc[JACK_PORT_NAME_SIZE + 1];
-    char fDst[JACK_PORT_NAME_SIZE + 1];
+    char fSrc[REAL_JACK_PORT_NAME_SIZE + 1];    // port full name
+    char fDst[REAL_JACK_PORT_NAME_SIZE + 1];    // port full name
 
     JackPortDisconnectNameRequest()
     {}
@@ -678,7 +678,7 @@ struct JackPortRenameRequest : public JackRequest
 
     int fRefNum;
     jack_port_id_t fPort;
-    char fName[JACK_PORT_NAME_SIZE + 1];
+    char fName[JACK_PORT_NAME_SIZE + 1];   // port short name
 
     JackPortRenameRequest()
     {}
@@ -1194,7 +1194,7 @@ struct JackClientNotificationRequest : public JackRequest
 struct JackSessionCommand
 {
     char fUUID[JACK_UUID_SIZE];
-    char fClientName[JACK_CLIENT_NAME_SIZE+1];
+    char fClientName[JACK_CLIENT_NAME_SIZE + 1];
     char fCommand[JACK_SESSION_COMMAND_SIZE];
     jack_session_flags_t fFlags;
 

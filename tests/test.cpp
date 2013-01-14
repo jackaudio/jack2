@@ -750,10 +750,12 @@ int main (int argc, char *argv[])
      *
      */
     char client_name3[jack_client_name_size()];
+    // "jack_client_name_size" - 1 effective characters
     for (int i = 0; i < jack_client_name_size() - 1; i++) {
         client_name3[i] = 'A';
     }
-    client_name3[jack_client_name_size()] = 0;
+    // And last one is the terminating '0'
+    client_name3[jack_client_name_size()] = 0; 
     Log("trying to register a new jackd client with maximum possible client name size...\n", client_name3);
     client2 = jack_client_open(client_name3, jack_options, &status, server_name);
     if (client2 != NULL) {
@@ -934,15 +936,17 @@ int main (int argc, char *argv[])
     }
     
     /**
-     * Verify if a port can be registered with maximum port name size
+     * Verify if a port can be registered with maximum port name size (that is "short name")
      *
      */
-    int port_size_max = jack_port_name_size() - strlen(client_name1) - 2;  // Port is of shape: "client_name:port_name"
-    char port_name3[port_size_max];
-    for (int i = 0; i < port_size_max - 1; i++) {
+    int short_port_size_max = jack_port_name_size() - jack_client_name_size() - 1;  // Port is of shape: "client_name:port_name"
+    char port_name3[short_port_size_max];
+    // "short_port_size_max" - 1 effective characters
+    for (int i = 0; i < short_port_size_max - 1; i++) {
         port_name3[i] = 'A';
     }
-    port_name3[port_size_max] = 0;
+    // And last one is the terminating '0'
+    port_name3[short_port_size_max] = 0;
     jack_port_t * test_max_port = jack_port_register(client1, port_name3,
                                       JACK_DEFAULT_AUDIO_TYPE,
                                       JackPortIsOutput, 0);
