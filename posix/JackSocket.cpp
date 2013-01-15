@@ -253,8 +253,10 @@ int JackServerSocket::Bind(const char* dir, const char* name, int which) // A re
     }
 
     addr.sun_family = AF_UNIX;
-    BuildName(name, addr.sun_path, dir, which, sizeof(addr.sun_path));
- 
+    // Socket name has to be kept in fName to be "unlinked".
+    BuildName(name, fName, dir, which, sizeof(addr.sun_path));
+    strncpy(addr.sun_path, fName, sizeof(addr.sun_path) - 1);
+   
     jack_log("JackServerSocket::Bind : addr.sun_path %s", addr.sun_path);
     unlink(fName); // Security...
 
