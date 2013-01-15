@@ -194,7 +194,7 @@ void JackTransportEngine::CycleEnd(JackClientInterface** table, jack_nframes_t f
                 fTransportState = JackTransportStopped;
                 MakeAllStopping(table);
             } else if (fPendingPos) {
-                jack_log("transport starting ==> starting frame = %d"), ReadCurrentState()->frame;
+                jack_log("transport starting ==> starting frame = %d", ReadCurrentState()->frame);
                 fTransportState = JackTransportStarting;
                 MakeAllStartingLocating(table);
                 SyncTimeout(frame_rate, buffer_size);
