@@ -29,11 +29,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
-static void BuildName(const char* client_name, char* res, const char* dir, int which)
+static void BuildName(const char* client_name, char* res, const char* dir, int which, int size)
 {
-    char ext_client_name[JACK_CLIENT_NAME_SIZE + 1];
+    char ext_client_name[SYNC_MAX_NAME_SIZE + 1];
     JackTools::RewriteName(client_name, ext_client_name);
-    sprintf(res, "%s/jack_%s_%d_%d", dir, ext_client_name, JackTools::GetUID(), which);
+    snprintf(res, size, "%s/jack_%s_%d_%d", dir, ext_client_name, JackTools::GetUID(), which);
 }
 
 JackClientSocket::JackClientSocket(int socket): JackClientRequestInterface(), fSocket(socket),fTimeOut(0)
@@ -119,7 +119,7 @@ int JackClientSocket::Connect(const char* dir, const char* name, int which) // A
     }
 
     addr.sun_family = AF_UNIX;
-    BuildName(name, addr.sun_path, dir, which);
+    BuildName(name, addr.sun_path, dir, which, sizeof(addr.sun_path));
     jack_log("JackClientSocket::Connect : addr.sun_path %s", addr.sun_path);
 
     if (connect(fSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
@@ -253,9 +253,8 @@ int JackServerSocket::Bind(const char* dir, const char* name, int which) // A re
     }
 
     addr.sun_family = AF_UNIX;
-    BuildName(name, fName, dir, which);
-    strncpy(addr.sun_path, fName, sizeof(addr.sun_path) - 1);
-
+    BuildName(name, addr.sun_path, dir, which, sizeof(addr.sun_path));
+ 
     jack_log("JackServerSocket::Bind : addr.sun_path %s", addr.sun_path);
     unlink(fName); // Security...
 

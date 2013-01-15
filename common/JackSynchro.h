@@ -40,9 +40,6 @@ class JackSynchro
         char fName[SYNC_MAX_NAME_SIZE];
         bool fFlush; // If true, signal are "flushed" : used for drivers that do no consume the signal
 
-        void BuildName(const char* name, const char* server_name, char* res)
-        {}
-
     public:
 
         JackSynchro(): fFlush(false)
