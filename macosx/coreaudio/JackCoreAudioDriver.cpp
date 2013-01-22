@@ -327,6 +327,8 @@ int JackCoreAudioDriver::Read()
 
 int JackCoreAudioDriver::Write()
 {
+    int size = sizeof(jack_default_audio_sample_t) * fEngineControl->fBufferSize;
+    
     if (fAC3Encoder) {
     
         // AC3 encoding and SPDIF write
@@ -336,7 +338,7 @@ int JackCoreAudioDriver::Write()
             AC3_inputs[i] = GetOutputBuffer(i);
             // If not connected, clear the buffer
             if (fGraphManager->GetConnectionsNum(fPlaybackPortList[i]) == 0) {
-                memset(AC3_inputs[i], 0, sizeof(jack_default_audio_sample_t) * fEngineControl->fBufferSize);
+                memset(AC3_inputs[i], 0, size);
             }
         }
         AC3_outputs[0] = (jack_default_audio_sample_t*)fDriverOutputData->mBuffers[0].mData;
@@ -349,14 +351,13 @@ int JackCoreAudioDriver::Write()
         for (int i = 0; i < fPlaybackChannels; i++) {
             if (fGraphManager->GetConnectionsNum(fPlaybackPortList[i]) > 0) {
                 jack_default_audio_sample_t* buffer = GetOutputBuffer(i);
-                int size = sizeof(jack_default_audio_sample_t) * fEngineControl->fBufferSize;
                 memcpy((jack_default_audio_sample_t*)fDriverOutputData->mBuffers[i].mData, buffer, size);
                 // Monitor ports
                 if (fWithMonitorPorts && fGraphManager->GetConnectionsNum(fMonitorPortList[i]) > 0) {
                     memcpy(GetMonitorBuffer(i), buffer, size);
                 }
             } else {
-                memset((jack_default_audio_sample_t*)fDriverOutputData->mBuffers[i].mData, 0, sizeof(jack_default_audio_sample_t) * fEngineControl->fBufferSize);
+                memset((jack_default_audio_sample_t*)fDriverOutputData->mBuffers[i].mData, 0, size);
             }
         }
     }

@@ -41,46 +41,44 @@ static void AudioBufferInit(void* buffer, size_t buffer_size, jack_nframes_t)
 static inline void MixAudioBuffer(jack_default_audio_sample_t* mixbuffer, jack_default_audio_sample_t* buffer, jack_nframes_t frames)
 {
 #ifdef __APPLE__
-    // It seems that a vector mult only operation does not exist...
-    jack_default_audio_sample_t gain = jack_default_audio_sample_t(1.0);
-    vDSP_vsma(buffer, 1, &gain, mixbuffer, 1, mixbuffer, 1, frames);
+    vDSP_vadd(buffer, 1, mixbuffer, 1, mixbuffer, 1, frames);
 #else
     jack_nframes_t frames_group = frames / 4;
     frames = frames % 4;
 
     while (frames_group > 0) {
-#if defined (__SSE__) && !defined (__sun__)
+    #if defined (__SSE__) && !defined (__sun__)
         __m128 vec = _mm_add_ps(_mm_load_ps(mixbuffer), _mm_load_ps(buffer));
         _mm_store_ps(mixbuffer, vec);
 
         mixbuffer += 4;
         buffer += 4;
         frames_group--;
-#else
-    register jack_default_audio_sample_t mixFloat1 = *mixbuffer;
-    register jack_default_audio_sample_t sourceFloat1 = *buffer;
-    register jack_default_audio_sample_t mixFloat2 = *(mixbuffer + 1);
-    register jack_default_audio_sample_t sourceFloat2 = *(buffer + 1);
-    register jack_default_audio_sample_t mixFloat3 = *(mixbuffer + 2);
-    register jack_default_audio_sample_t sourceFloat3 = *(buffer + 2);
-    register jack_default_audio_sample_t mixFloat4 = *(mixbuffer + 3);
-    register jack_default_audio_sample_t sourceFloat4 = *(buffer + 3);
+    #else
+        register jack_default_audio_sample_t mixFloat1 = *mixbuffer;
+        register jack_default_audio_sample_t sourceFloat1 = *buffer;
+        register jack_default_audio_sample_t mixFloat2 = *(mixbuffer + 1);
+        register jack_default_audio_sample_t sourceFloat2 = *(buffer + 1);
+        register jack_default_audio_sample_t mixFloat3 = *(mixbuffer + 2);
+        register jack_default_audio_sample_t sourceFloat3 = *(buffer + 2);
+        register jack_default_audio_sample_t mixFloat4 = *(mixbuffer + 3);
+        register jack_default_audio_sample_t sourceFloat4 = *(buffer + 3);
 
-    buffer += 4;
-    frames_group--;
+        buffer += 4;
+        frames_group--;
 
-    mixFloat1 += sourceFloat1;
-    mixFloat2 += sourceFloat2;
-    mixFloat3 += sourceFloat3;
-    mixFloat4 += sourceFloat4;
+        mixFloat1 += sourceFloat1;
+        mixFloat2 += sourceFloat2;
+        mixFloat3 += sourceFloat3;
+        mixFloat4 += sourceFloat4;
 
-    *mixbuffer = mixFloat1;
-    *(mixbuffer + 1) = mixFloat2;
-    *(mixbuffer + 2) = mixFloat3;
-    *(mixbuffer + 3) = mixFloat4;
+        *mixbuffer = mixFloat1;
+        *(mixbuffer + 1) = mixFloat2;
+        *(mixbuffer + 2) = mixFloat3;
+        *(mixbuffer + 3) = mixFloat4;
 
-    mixbuffer += 4;
-#endif
+        mixbuffer += 4;
+    #endif
     }
 
     while (frames > 0) {
@@ -104,11 +102,10 @@ static void AudioBufferMixdown(void* mixbuffer, void** src_buffers, int src_coun
     jack_nframes_t frames_group = nframes / 4;
     jack_nframes_t remaining_frames = nframes % 4;
 
-    jack_default_audio_sample_t * source = static_cast<jack_default_audio_sample_t*>(src_buffers[0]);
-    jack_default_audio_sample_t * target = static_cast<jack_default_audio_sample_t*>(mixbuffer);
+    jack_default_audio_sample_t* source = static_cast<jack_default_audio_sample_t*>(src_buffers[0]);
+    jack_default_audio_sample_t* target = static_cast<jack_default_audio_sample_t*>(mixbuffer);
 
-    while (frames_group > 0)
-    {
+    while (frames_group > 0) {
         __m128 vec = _mm_load_ps(source);
         _mm_store_ps(target, vec);
         source += 4;
@@ -116,8 +113,9 @@ static void AudioBufferMixdown(void* mixbuffer, void** src_buffers, int src_coun
         --frames_group;
     }
 
-    for (jack_nframes_t i = 0; i != remaining_frames; ++i)
+    for (jack_nframes_t i = 0; i != remaining_frames; ++i) {
         target[i] = source[i];
+    }
 
 #else
     memcpy(mixbuffer, src_buffers[0], nframes * sizeof(jack_default_audio_sample_t));

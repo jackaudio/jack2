@@ -98,7 +98,7 @@ process_audio (jack_nframes_t nframes)
     jack_nframes_t cur_time = jack_frame_time(client);
     jack_time_t cur_micro_time = jack_get_time();
 
-    printf("jack_frame_timed %lld  micro %lld delta %d\n", cur_time, (cur_micro_time - last_micro_time), cur_time - last_time);
+    printf("jack_frame_time %lld micro %lld delta %d\n", cur_time, (cur_micro_time - last_micro_time), cur_time - last_time);
     last_time = cur_time;
     last_micro_time = cur_micro_time;
     */
