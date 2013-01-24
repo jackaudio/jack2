@@ -46,8 +46,9 @@ namespace Jack
 
         JackFilter()
         {
-            for (int i = 0; i < MAX_SIZE; i++)
+            for (int i = 0; i < MAX_SIZE; i++) {
                 fTable[i] = 0;
+            }
         }
 
         void AddValue(jack_time_t val)
@@ -59,8 +60,9 @@ namespace Jack
         jack_time_t GetVal()
         {
             jack_time_t mean = 0;
-            for (int i = 0; i < MAX_SIZE; i++)
+            for (int i = 0; i < MAX_SIZE; i++) {
                 mean += fTable[i];
+            }
             return mean / MAX_SIZE;
         }
 

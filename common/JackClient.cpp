@@ -149,8 +149,9 @@ void JackClient::SetupDriverSync(bool freewheel)
         }
     } else {
         jack_log("JackClient::SetupDriverSync driver sem in normal mode");
-        for (int i = 0; i < GetEngineControl()->fDriverNum; i++)
+        for (int i = 0; i < GetEngineControl()->fDriverNum; i++) {
             fSynchroTable[i].SetFlush(false);
+        }
     }
 }
 
@@ -339,7 +340,7 @@ int JackClient::HandleLatencyCallback(int status)
     list<jack_port_id_t>::iterator it;
 
 	for (it = fPortList.begin(); it != fPortList.end(); it++) {
-	   JackPort* port = GetGraphManager()->GetPort(*it);
+        JackPort* port = GetGraphManager()->GetPort(*it);
         if ((port->GetFlags() & JackPortIsOutput) && (mode == JackPlaybackLatency)) {
             GetGraphManager()->RecalculateLatency(*it, mode);
 		}

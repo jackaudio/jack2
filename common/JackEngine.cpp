@@ -271,10 +271,7 @@ int JackEngine::ComputeTotalLatencies()
 
 int JackEngine::ClientNotify(JackClientInterface* client, int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2)
 {   
-    if (!client) {
-        return 0;
-    }
-    
+    // Check if notification is needed
     if (!client->GetClientControl()->fCallback[notify]) {
         jack_log("JackEngine::ClientNotify: no callback for notification = %ld", notify);
         return 0;
@@ -342,7 +339,10 @@ void JackEngine::NotifyRemoveClient(const char* name, int refnum)
 {
     // Notify existing clients (including the one beeing suppressed) of the removed client
     for (int i = 0; i < CLIENT_NUM; i++) {
-        ClientNotify(fClientTable[i], refnum, name, kRemoveClient, false, "", 0, 0);
+        JackClientInterface* client = fClientTable[refnum];
+        if (client) {
+            ClientNotify(fClientTable[i], refnum, name, kRemoveClient, false, "", 0, 0);
+        }
     }
 }
 
@@ -425,6 +425,7 @@ void JackEngine::NotifyActivate(int refnum)
 int JackEngine::GetInternalClientName(int refnum, char* name_res)
 {
     JackClientInterface* client = fClientTable[refnum];
+    assert(client);
     strncpy(name_res, client->GetClientControl()->fName, JACK_CLIENT_NAME_SIZE);
     return 0;
 }
@@ -712,6 +713,7 @@ int JackEngine::ClientExternalClose(int refnum)
 {
     jack_log("JackEngine::ClientExternalClose ref = %ld", refnum);
     JackClientInterface* client = fClientTable[refnum];
+    assert(client);
     int res = ClientCloseAux(refnum, true);
     client->Close();
     delete client;
@@ -887,6 +889,7 @@ int JackEngine::PortUnRegister(int refnum, jack_port_id_t port_index)
 {
     jack_log("JackEngine::PortUnRegister ref = %ld port_index = %ld", refnum, port_index);
     JackClientInterface* client = fClientTable[refnum];
+    assert(client);
 
     // Disconnect port ==> notification is sent
     PortDisconnect(refnum, port_index, ALL_PORTS);
@@ -1080,6 +1083,7 @@ void JackEngine::SessionNotify(int refnum, const char *target, jack_session_even
 int JackEngine::SessionReply(int refnum)
 {
     JackClientInterface* client = fClientTable[refnum];
+    assert(client);
     char uuid_buf[JACK_UUID_SIZE];
     snprintf(uuid_buf, sizeof(uuid_buf), "%d", client->GetClientControl()->fSessionID);
     fSessionResult->fCommandList.push_back(JackSessionCommand(uuid_buf,

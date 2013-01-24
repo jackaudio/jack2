@@ -47,7 +47,7 @@ enum NotificationType {
     kQUIT = 16,
     kSessionCallback = 17,
     kLatencyCallback = 18,
-    kMaxNotification
+    kMaxNotification = 64  // To keep some room in JackClientControl fCallback table
 };
 
 } // end of namespace

@@ -69,8 +69,9 @@ bool JackConnectionManager::IsLoopPathAux(int ref1, int ref2) const
             return true;
         } else {
             for (int i = 0; i < CLIENT_NUM && output[i] != EMPTY; i++) { // Otherwise recurse for all ref1 outputs
-                if (IsLoopPathAux(output[i], ref2))
+                if (IsLoopPathAux(output[i], ref2)) {
                     return true; // Stop when a path is found
+                }
             }
             return false;
         }
@@ -304,8 +305,9 @@ void JackConnectionManager::TopologicalSort(std::vector<jack_int_t>& sorted)
                 tmp.ClearItem(refnum, dst);
                 jack_int_t output_ref2[CLIENT_NUM];
                 tmp.GetOutputTable1(dst, output_ref2);
-                if (HasNoConnection(output_ref2))
+                if (HasNoConnection(output_ref2)) {
                     level.insert(dst);
+                }
             }
         }
     }
@@ -380,8 +382,9 @@ bool JackConnectionManager::IsDirectConnection(int ref1, int ref2) const
 int JackConnectionManager::GetInputRefNum(jack_port_id_t port_index) const
 {
     for (int i = 0; i < CLIENT_NUM; i++) {
-        if (fInputPort[i].CheckItem(port_index))
+        if (fInputPort[i].CheckItem(port_index)) {
             return i;
+        }
     }
 
     return -1;
@@ -393,8 +396,9 @@ int JackConnectionManager::GetInputRefNum(jack_port_id_t port_index) const
 int JackConnectionManager::GetOutputRefNum(jack_port_id_t port_index) const
 {
     for (int i = 0; i < CLIENT_NUM; i++) {
-        if (fOutputPort[i].CheckItem(port_index))
+        if (fOutputPort[i].CheckItem(port_index)) {
             return i;
+        }
     }
 
     return -1;
@@ -422,8 +426,9 @@ bool JackConnectionManager::IncFeedbackConnection(jack_port_id_t port_src, jack_
     jack_log("JackConnectionManager::IncFeedbackConnection ref1 = %ld ref2 = %ld", ref1, ref2);
     assert(ref1 >= 0 && ref2 >= 0);
 
-    if (ref1 != ref2)
+    if (ref1 != ref2) {
         DirectConnect(ref2, ref1);
+    }
 
     return fLoopFeedback.IncConnection(ref1, ref2); // Add the feedback connection
 }
@@ -437,8 +442,9 @@ bool JackConnectionManager::DecFeedbackConnection(jack_port_id_t port_src, jack_
     jack_log("JackConnectionManager::DecFeedbackConnection ref1 = %ld ref2 = %ld", ref1, ref2);
     assert(ref1 >= 0 && ref2 >= 0);
 
-    if (ref1 != ref2)
+    if (ref1 != ref2) {
         DirectDisconnect(ref2, ref1);
+    }
 
     return fLoopFeedback.DecConnection(ref1, ref2); // Remove the feedback connection
 }

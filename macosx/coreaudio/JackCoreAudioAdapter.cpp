@@ -167,11 +167,11 @@ OSStatus JackCoreAudioAdapter::AudioHardwareNotificationCallback(AudioHardwarePr
 
     switch (inPropertyID) {
 
-            case kAudioHardwarePropertyDevices: {
-                jack_log("JackCoreAudioAdapter::AudioHardwareNotificationCallback kAudioHardwarePropertyDevices");
-                DisplayDeviceNames();
-                break;
-            }
+        case kAudioHardwarePropertyDevices: {
+            jack_log("JackCoreAudioAdapter::AudioHardwareNotificationCallback kAudioHardwarePropertyDevices");
+            DisplayDeviceNames();
+            break;
+        }
     }
 
     return noErr;

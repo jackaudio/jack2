@@ -68,8 +68,9 @@ struct JackClientControl : public JackShmMemAble
     void Init(const char* name, int pid, int refnum, int uuid)
     {
         strcpy(fName, name);
-        for (int i = 0; i < kMaxNotification; i++)
+        for (int i = 0; i < kMaxNotification; i++) {
             fCallback[i] = false;
+        }
         // Always activated
         fCallback[kAddClient] = true;
         fCallback[kRemoveClient] = true;
