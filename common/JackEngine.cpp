@@ -843,12 +843,16 @@ int JackEngine::ClientDeactivate(int refnum)
 
 void JackEngine::ClientKill(int refnum)
 {
-    jack_log("JackEngine::ClientKill ref = %ld", refnum);
-    if (ClientDeactivate(refnum) < 0) {
-        jack_error("JackServer::ClientKill ref = %ld cannot be removed from the graph !!", refnum);
-    }
-    if (ClientExternalClose(refnum) < 0) {
-        jack_error("JackServer::ClientKill ref = %ld cannot be closed", refnum);
+    if (fClientTable[refnum]) {
+        jack_log("JackEngine::ClientKill ref = %ld", refnum);
+        if (ClientDeactivate(refnum) < 0) {
+            jack_error("JackEngine::ClientKill ref = %ld cannot be removed from the graph !!", refnum);
+        }
+        if (ClientExternalClose(refnum) < 0) {
+            jack_error("JackEngine::ClientKill ref = %ld cannot be closed", refnum);
+        }
+    } else {
+        jack_log("JackEngine::ClientKill ref = %ld probably already killed...", refnum);
     }
 }
 

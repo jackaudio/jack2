@@ -1202,7 +1202,7 @@ int main (int argc, char *argv[])
         } else {
             // Connect created input to PHY output
             a = 0;
-            while (outports[a] != NULL) {
+            while (outports && outports[a] != NULL) {
                 if (jack_connect(client1, outports[a], jack_port_name(input_port1))) {
                     printf ("error : cannot connect input PHY port to client port %s\n", jack_port_name(input_port1));
                 } else {
@@ -1211,7 +1211,7 @@ int main (int argc, char *argv[])
                 a++;
             }
             // Try one time to "overconnect" 2 ports (the latest created)...
-            if (test_link == 0) {
+            if (test_link == 0 && outports && ((a - 1) > 0) && outports[a - 1]) {
                 if (jack_connect(client1, outports[a - 1], jack_port_name(input_port1)) == EEXIST) {
                     // cannot over-connect input PHY port to client port. ok.
                     test_link = 1;
@@ -1230,7 +1230,7 @@ int main (int argc, char *argv[])
         } else {
             // Connect created input to PHY output
             a = 0;
-            while (inports[a] != NULL) {
+            while (inports && inports[a] != NULL) {
                 if (jack_connect(client1, jack_port_name(output_port1), inports[a])) {
                     printf ("error : cannot connect input PHY port %s to client port %s\n", inports[a], jack_port_name(output_port1));
                 } else {
@@ -1239,7 +1239,7 @@ int main (int argc, char *argv[])
                 a++;
             }
             // Try one time to "overconnect" 2 ports (the latest created)...
-            if (test_link == 0) {
+            if (test_link == 0 && inports && ((a - 1) > 0) && inports[a - 1]) {
                 if (jack_connect(client1, jack_port_name(output_port1), inports[a - 1]) == EEXIST) {
                     // cannot over-connect output PHY port to client port. ok.
                     test_link = 1;
@@ -1485,8 +1485,7 @@ int main (int argc, char *argv[])
     t_error = 0;
     inports = jack_get_ports(client1, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
     connexions1 = NULL;
-    assert(inports != NULL);
-    if (inports[0] != NULL) {
+    if (inports && inports[0] != NULL) {
         connexions1 = jack_port_get_connections (jack_port_by_name(client1, inports[0]));
         connexions2 = jack_port_get_all_connections(client1, jack_port_by_name(client1, inports[0]));
     }
@@ -1729,7 +1728,7 @@ int main (int argc, char *argv[])
         Log("Checking renaming of an unregistered port... ok\n");
     }
     inports = jack_get_ports(client1, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
-    if (jack_port_set_name(jack_port_by_name(client1, inports[0]), "new_name") == 0 ) {
+    if (inports && jack_port_set_name(jack_port_by_name(client1, inports[0]), "new_name") == 0 ) {
         printf("!!! WARNING !!! A PHYSICAL port can be renamed successfully !\n");
     } else {
         Log("Checking renaming of an unregistered port... ok\n");
@@ -1759,7 +1758,7 @@ int main (int argc, char *argv[])
 
     inports = jack_get_ports(client1, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
     outports = jack_get_ports(client1, NULL, NULL, JackPortIsPhysical | JackPortIsOutput);
-    if (inports[0] != NULL) {
+    if (inports && outports && inports[0] != NULL &&  outports[0] != NULL) {
         output_ext_latency = jack_port_get_latency (jack_port_by_name(client1, inports[0]));  // from client to out driver (which has "inputs" ports..)
 		input_ext_latency = jack_port_get_latency (jack_port_by_name(client1, outports[0]));  // from in driver (which has "output" ports..) to client
         if (output_ext_latency != jack_port_get_total_latency(client1, jack_port_by_name(client1, inports[0]))) {
