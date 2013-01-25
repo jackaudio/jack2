@@ -94,19 +94,6 @@ int JackEngine::Close()
     return 0;
 }
 
-void JackEngine::ShutDown()
-{
-    jack_log("JackEngine::ShutDown");
-  
-    // Shutdown remaining clients (RT is stopped)
-    for (int i = fEngineControl->fDriverNum; i < CLIENT_NUM; i++) {
-        if (JackLoadableInternalClient* loadable_client = dynamic_cast<JackLoadableInternalClient*>(fClientTable[i])) {
-            jack_log("JackEngine::ShutDown loadable client = %s", loadable_client->GetClientControl()->fName);
-            loadable_client->ShutDown();
-        } 
-    }
-}
-
 void JackEngine::NotifyQuit()
 {
     fChannel.NotifyQuit();

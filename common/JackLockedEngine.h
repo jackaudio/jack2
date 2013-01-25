@@ -103,15 +103,7 @@ class SERVER_EXPORT JackLockedEngine
             return fEngine.Close();
             CATCH_EXCEPTION_RETURN
         }
-        
-        void ShutDown()
-        {
-            // No lock needed
-            TRY_CALL
-            fEngine.ShutDown();
-            CATCH_EXCEPTION
-        }
-
+ 
         // Client management
         int ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status)
         {

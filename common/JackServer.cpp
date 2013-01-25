@@ -86,7 +86,7 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
         goto fail_close1;
     }
 
-    if (fChannel.Open(fEngineControl->fServerName, this) < 0) {
+    if (fRequestChannel.Open(fEngineControl->fServerName, this) < 0) {
         jack_error("Server channel open error");
         goto fail_close2;
     }
@@ -120,7 +120,7 @@ fail_close4:
     fEngine->Close();
 
 fail_close3:
-    fChannel.Close();
+    fRequestChannel.Close();
 
 fail_close2:
     fAudioDriver->Close();
@@ -133,7 +133,7 @@ fail_close1:
 int JackServer::Close()
 {
     jack_log("JackServer::Close");
-    fChannel.Close();
+    fRequestChannel.Close();
     fAudioDriver->Detach();
     fAudioDriver->Close();
     fFreewheelDriver->Close();
@@ -182,16 +182,17 @@ int JackServer::Start()
     if (fAudioDriver->Start() < 0) {
         return -1;
     }
-    return fChannel.Start();
+    return fRequestChannel.Start();
 }
 
 int JackServer::Stop()
 {
     jack_log("JackServer::Stop");
-    fEngine->NotifyQuit();
-    fChannel.Stop();
     
-    fEngine->ShutDown();
+    fEngine->NotifyQuit();
+    fRequestChannel.Stop();
+    
+    fEngine->NotifyFailure(JackFailure, "JACK server has been closed");
 
     if (fFreewheel) {
         return fThreadedFreewheelDriver->Stop();

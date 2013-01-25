@@ -55,7 +55,7 @@ class SERVER_EXPORT JackServer
         JackLockedEngine* fEngine;
         JackEngineControl* fEngineControl;
         JackGraphManager* fGraphManager;
-        JackServerChannel fChannel;
+        JackServerChannel fRequestChannel;
         JackConnectionManager fConnectionState;
         JackSynchro fSynchroTable[CLIENT_NUM];
         bool fFreewheel;
