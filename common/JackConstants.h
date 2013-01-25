@@ -75,6 +75,8 @@
 #define FREEWHEEL_DRIVER_TIMEOUT 10     // in sec
 #define DRIVER_TIMEOUT_FACTOR    10
 
+#define JACK_SERVER_FAILURE "JACK server has been closed"
+
 
 #define NO_PORT   0xFFFE
 

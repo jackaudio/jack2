@@ -160,17 +160,13 @@ int JackServer::Start()
 int JackServer::Stop()
 {
     jack_log("JackServer::Stop");
+    int res = (fFreewheel) ? fThreadedFreewheelDriver->Stop() : fAudioDriver->Stop();
     
     fEngine->NotifyQuit();
     fRequestChannel.Stop();
+    fEngine->NotifyFailure(JackFailure, JACK_SERVER_FAILURE);
     
-    fEngine->NotifyFailure(JackFailure, "JACK server has been closed");
-
-    if (fFreewheel) {
-        return fThreadedFreewheelDriver->Stop();
-    } else {
-        return fAudioDriver->Stop();
-    }
+    return res;
 }
 
 bool JackServer::IsRunning()

@@ -62,11 +62,11 @@ ShutDown is called:
 (Not needed since the synch object used (Sema of Fifo will fails when server quits... see ShutDown))
 */
 
-void JackLibClient::ShutDown()
+void JackLibClient::ShutDown(const char* message)
 {
     jack_log("JackLibClient::ShutDown");
     JackGlobals::fServerRunning = false;
-    JackClient::ShutDown();
+    JackClient::ShutDown(message);
 }
 
 JackLibClient::JackLibClient(JackSynchro* table): JackClient(table)

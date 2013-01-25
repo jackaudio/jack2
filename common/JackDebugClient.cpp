@@ -363,10 +363,10 @@ ShutDown is called:
 (Not needed since the synch object used (Sema of Fifo will fails when server quits... see ShutDown))
 */
 
-void JackDebugClient::ShutDown()
+void JackDebugClient::ShutDown(const char* message)
 {
     CheckClient("ShutDown");
-    fClient->ShutDown();
+    fClient->ShutDown(message);
 }
 
 //---------------------

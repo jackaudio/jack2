@@ -146,7 +146,7 @@ bool JackSocketClientChannel::Execute()
 
 error:
     fNotificationSocket->Close();
-    fClient->ShutDown();
+    fClient->ShutDown(JACK_SERVER_FAILURE);
     return false;
 }
 
