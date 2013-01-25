@@ -67,19 +67,23 @@ class SERVER_EXPORT JackServer
         JackServer(bool sync, bool temporary, int timeout, bool rt, int priority, int port_max, bool verbose, jack_timer_type_t clock, const char* server_name);
         ~JackServer();
 
+        // Server control
         int Open(jack_driver_desc_t* driver_desc, JSList* driver_params);
         int Close();
 
         int Start();
         int Stop();
+        
         bool IsRunning();
 
         // RT thread
         void Notify(int refnum, int notify, int value);
 
-        // Command thread : API
+        // From request thread : API 
         int SetBufferSize(jack_nframes_t buffer_size);
         int SetFreewheel(bool onoff);
+        
+        // Internals clients
         int InternalClientLoad1(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int uuid, int* status);
         int InternalClientLoad2(const char* client_name, const char* so_name, const JSList * parameters, int options, int* int_ref, int uuid, int* status);
    

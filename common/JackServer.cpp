@@ -37,6 +37,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
+//----------------
+// Server control 
+//----------------
+
 JackServer::JackServer(bool sync, bool temporary, int timeout, bool rt, int priority, int port_max, bool verbose, jack_timer_type_t clock, const char* server_name)
 {
     if (rt) {
@@ -144,6 +148,42 @@ int JackServer::Close()
     return 0;
 }
 
+int JackServer::Start()
+{
+    jack_log("JackServer::Start");
+    if (fAudioDriver->Start() < 0) {
+        return -1;
+    }
+    return fRequestChannel.Start();
+}
+
+int JackServer::Stop()
+{
+    jack_log("JackServer::Stop");
+    
+    fEngine->NotifyQuit();
+    fRequestChannel.Stop();
+    
+    fEngine->NotifyFailure(JackFailure, "JACK server has been closed");
+
+    if (fFreewheel) {
+        return fThreadedFreewheelDriver->Stop();
+    } else {
+        return fAudioDriver->Stop();
+    }
+}
+
+bool JackServer::IsRunning()
+{
+    jack_log("JackServer::IsRunning");
+    assert(fAudioDriver);
+    return fAudioDriver->IsRunning();
+}
+
+//------------------
+// Internal clients 
+//------------------
+
 int JackServer::InternalClientLoad1(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int uuid, int* status)
 {
     JackLoadableInternalClient* client = new JackLoadableInternalClient1(JackServerGlobals::fInstance, GetSynchroTable(), objet_data);
@@ -176,37 +216,9 @@ int JackServer::InternalClientLoadAux(JackLoadableInternalClient* client, const 
     }
  }
 
-int JackServer::Start()
-{
-    jack_log("JackServer::Start");
-    if (fAudioDriver->Start() < 0) {
-        return -1;
-    }
-    return fRequestChannel.Start();
-}
-
-int JackServer::Stop()
-{
-    jack_log("JackServer::Stop");
-    
-    fEngine->NotifyQuit();
-    fRequestChannel.Stop();
-    
-    fEngine->NotifyFailure(JackFailure, "JACK server has been closed");
-
-    if (fFreewheel) {
-        return fThreadedFreewheelDriver->Stop();
-    } else {
-        return fAudioDriver->Stop();
-    }
-}
-
-bool JackServer::IsRunning()
-{
-    jack_log("JackServer::IsRunning");
-    assert(fAudioDriver);
-    return fAudioDriver->IsRunning();
-}
+//---------------------------
+// From request thread : API 
+//---------------------------
 
 int JackServer::SetBufferSize(jack_nframes_t buffer_size)
 {
@@ -284,7 +296,10 @@ int JackServer::SetFreewheel(bool onoff)
     }
 }
 
+//---------------------------
 // Coming from the RT thread
+//---------------------------
+
 void JackServer::Notify(int refnum, int notify, int value)
 {
     switch (notify) {
@@ -299,9 +314,9 @@ void JackServer::Notify(int refnum, int notify, int value)
     }
 }
 
-//----------------------
+//--------------------
 // Backend management
-//----------------------
+//--------------------
 
 JackDriverInfo* JackServer::AddSlave(jack_driver_desc_t* driver_desc, JSList* driver_params)
 {

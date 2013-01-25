@@ -279,7 +279,7 @@ int JackEngine::ClientNotify(JackClientInterface* client, int refnum, const char
     }
     
     if (ret < 0) {
-        jack_error("NotifyClient fails name = %s notification = %ld val1 = %ld val2 = %ld", name, notify, value1, value2);
+        jack_error("ClientNotify fails name = %s notification = %ld val1 = %ld val2 = %ld", name, notify, value1, value2);
     }
     return ret;
 }
