@@ -62,7 +62,13 @@ void JackGlobals::CheckContext(const char* name)
         JackGlobals::fStream = new std::ofstream(provstr, std::ios_base::ate);
         JackGlobals::fStream->is_open();
     }
+#ifdef PTHREAD_WIN32 /* Added by JE - 10-10-2011 */
+    (*fStream) << "JACK API call : " << name << ", calling thread : " << pthread_self().p << std::endl;
+#elif defined(WIN32) && !defined(__CYGWIN__)
+    (*fStream) << "JACK API call : " << name << ", calling thread : " << GetCurrentThread() << std::endl;
+#else
     (*fStream) << "JACK API call : " << name << ", calling thread : " << pthread_self() << std::endl;
+#endif
 }
 
 #else

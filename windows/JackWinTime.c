@@ -31,8 +31,9 @@ SERVER_EXPORT void JackSleep(long usec)
 
 SERVER_EXPORT void InitTime()
 {
-	QueryPerformanceFrequency(&_jack_freq);
     TIMECAPS caps;
+
+    QueryPerformanceFrequency(&_jack_freq);
     if (timeGetDevCaps(&caps, sizeof(TIMECAPS)) != TIMERR_NOERROR) {
         jack_error("InitTime : could not get timer device");
     } else {

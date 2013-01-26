@@ -17,6 +17,11 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
+#if !defined(WIN32) || defined(__CYGWIN__)
+
+#ifdef PTHREAD_WIN32        // Added by JE - 13-02-2010
+#include <ptw32/pthread.h>  // Makes sure we #include the ptw32 version for
+#endif                      // consistency - even though we won't need it !
 
 #include "JackConstants.h"
 #include "JackChannel.h"
@@ -242,3 +247,4 @@ int try_start_server(jack_varargs_t* va, jack_options_t options, jack_status_t* 
     return 0;
 }
 
+#endif  // !defined(WIN32) || defined(__CYGWIN__)

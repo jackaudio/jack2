@@ -40,7 +40,9 @@
 #endif
 
 #if defined(_MSC_VER) /* Added by JE - 31-01-2012 */
+#define vsnprintf _vsnprintf
 #define snprintf _snprintf
+#define strdup _strdup
 #endif
 
 #endif
