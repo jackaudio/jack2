@@ -93,7 +93,7 @@ static void start_server_classic_aux(const char* server_name)
     char** argv = 0;
     int i = 0;
     int good = 0;
-    int ret;
+    int res;
 
     snprintf(filename, 255, "%s/.jackdrc", getenv("HOME"));
     fp = fopen(filename, "r");
@@ -108,11 +108,11 @@ static void start_server_classic_aux(const char* server_name)
 
     if (fp) {
         arguments[0] = '\0';
-        ret = fscanf(fp, "%s", buffer);
+        res = fscanf(fp, "%s", buffer);
         while (ret != 0 && ret != EOF) {
             strcat(arguments, buffer);
             strcat(arguments, " ");
-            ret = fscanf(fp, "%s", buffer);
+            res = fscanf(fp, "%s", buffer);
         }
         if (strlen(arguments) > 0) {
             good = 1;

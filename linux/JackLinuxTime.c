@@ -140,7 +140,7 @@ static jack_time_t jack_get_mhz (void)
 	if (f == 0)
 	{
 		perror("can't open /proc/cpuinfo\n");
-		exit(1);
+		exit(1);    // TODO : should be remplaced by an exception
 	}
 
 	for (;;)
@@ -150,9 +150,8 @@ static jack_time_t jack_get_mhz (void)
 		char buf[1000];
 
 		if (fgets(buf, sizeof(buf), f) == NULL) {
-			jack_error ("FATAL: cannot locate cpu MHz in "
-				    "/proc/cpuinfo\n");
-			exit(1);
+			jack_error ("FATAL: cannot locate cpu MHz in /proc/cpuinfo\n");
+			exit(1);    // TODO : should be remplaced by an exception
 		}
 
 #if defined(__powerpc__)
@@ -225,42 +224,42 @@ SERVER_EXPORT void EndTime()
 
 void SetClockSource(jack_timer_type_t source)
 {
-        jack_log("Clock source : %s", ClockSourceName(source));
+    jack_log("Clock source : %s", ClockSourceName(source));
 
 	switch (source)
 	{
-	case JACK_TIMER_CYCLE_COUNTER:
-		_jack_get_microseconds = jack_get_microseconds_from_cycles;
-		break;
+        case JACK_TIMER_CYCLE_COUNTER:
+            _jack_get_microseconds = jack_get_microseconds_from_cycles;
+            break;
 
-	case JACK_TIMER_HPET:
-		if (jack_hpet_init () == 0) {
-			_jack_get_microseconds = jack_get_microseconds_from_hpet;
-		} else {
-			_jack_get_microseconds = jack_get_microseconds_from_system;
-		}
-		break;
+        case JACK_TIMER_HPET:
+            if (jack_hpet_init () == 0) {
+                _jack_get_microseconds = jack_get_microseconds_from_hpet;
+            } else {
+                _jack_get_microseconds = jack_get_microseconds_from_system;
+            }
+            break;
 
-	case JACK_TIMER_SYSTEM_CLOCK:
-	default:
-		_jack_get_microseconds = jack_get_microseconds_from_system;
-		break;
+        case JACK_TIMER_SYSTEM_CLOCK:
+            default:
+            _jack_get_microseconds = jack_get_microseconds_from_system;
+            break;
 	}
 }
 
 const char* ClockSourceName(jack_timer_type_t source)
 {
 	switch (source) {
-	case JACK_TIMER_CYCLE_COUNTER:
-		return "cycle counter";
-	case JACK_TIMER_HPET:
-		return "hpet";
-	case JACK_TIMER_SYSTEM_CLOCK:
-#ifdef HAVE_CLOCK_GETTIME
-		return "system clock via clock_gettime";
-#else
-		return "system clock via gettimeofday";
-#endif
+        case JACK_TIMER_CYCLE_COUNTER:
+            return "cycle counter";
+        case JACK_TIMER_HPET:
+            return "hpet";
+        case JACK_TIMER_SYSTEM_CLOCK:
+        #ifdef HAVE_CLOCK_GETTIME
+            return "system clock via clock_gettime";
+        #else
+            return "system clock via gettimeofday";
+        #endif
 	}
 
 	/* what is wrong with gcc ? */

@@ -975,6 +975,8 @@ void JackClient::OnShutdown(JackShutdownCallback callback, void *arg)
     if (IsActive()) {
         jack_error("You cannot set callbacks on an active client");
     } else {
+        // Shutdown callback will either be an old API version or the new version (with info) 
+        GetClientControl()->fCallback[kShutDownCallback] = (callback != NULL);
         fShutdownArg = arg;
         fShutdown = callback;
     }
@@ -985,6 +987,7 @@ void JackClient::OnInfoShutdown(JackInfoShutdownCallback callback, void *arg)
     if (IsActive()) {
         jack_error("You cannot set callbacks on an active client");
     } else {
+        // Shutdown callback will either be an old API version or the new version (with info)
         GetClientControl()->fCallback[kShutDownCallback] = (callback != NULL);
         fInfoShutdownArg = arg;
         fInfoShutdown = callback;

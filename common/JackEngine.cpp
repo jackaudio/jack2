@@ -264,24 +264,24 @@ int JackEngine::ClientNotify(JackClientInterface* client, int refnum, const char
         return 0;
     }
     
-    int ret;
+    int res1;
    
     // External client
     if (dynamic_cast<JackExternalClient*>(client)) {
-       ret = client->ClientNotify(refnum, name, notify, sync, message, value1, value2);
+       res1 = client->ClientNotify(refnum, name, notify, sync, message, value1, value2);
     // Important for internal client : unlock before calling the notification callbacks
     } else {
-        bool res = Unlock();
-        ret = client->ClientNotify(refnum, name, notify, sync, message, value1, value2);
-        if (res) {
+        bool res2 = Unlock();
+        res1 = client->ClientNotify(refnum, name, notify, sync, message, value1, value2);
+        if (res2) {
             Lock();
         }
     }
     
-    if (ret < 0) {
+    if (res1 < 0) {
         jack_error("ClientNotify fails name = %s notification = %ld val1 = %ld val2 = %ld", name, notify, value1, value2);
     }
-    return ret;
+    return res1;
 }
 
 void JackEngine::NotifyClient(int refnum, int event, int sync, const char* message, int value1, int value2)
@@ -958,22 +958,22 @@ int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t ds
         fGraphManager->GetConnections(src, connections);
 
         JackPort* port = fGraphManager->GetPort(src);
-        int ret = 0;
+        int res = 0;
         if (port->GetFlags() & JackPortIsOutput) {
             for (int i = 0; (i < CONNECTION_NUM_FOR_PORT) && (connections[i] != EMPTY); i++) {
                 if (PortDisconnect(refnum, src, connections[i]) != 0) {
-                    ret = -1;
+                    res = -1;
                 }
             }
         } else {
             for (int i = 0; (i < CONNECTION_NUM_FOR_PORT) && (connections[i] != EMPTY); i++) {
                 if (PortDisconnect(refnum, connections[i], src) != 0) {
-                    ret = -1;
+                    res = -1;
                 }
             }
         }
 
-        return ret;
+        return res;
     } else if (fGraphManager->CheckPorts(src, dst) < 0) {
         return -1;
     } else if (fGraphManager->Disconnect(src, dst) == 0) {

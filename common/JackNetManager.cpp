@@ -640,15 +640,15 @@ namespace Jack
     int JackNetMasterManager::SyncCallback(jack_transport_state_t state, jack_position_t* pos)
     {
         //check if each slave is ready to roll
-        int ret = 1;
+        int res = 1;
         master_list_it_t it;
         for (it = fMasterList.begin(); it != fMasterList.end(); it++) {
             if (!(*it)->IsSlaveReadyToRoll()) {
-                ret = 0;
+                res = 0;
             }
         }
-        jack_log("JackNetMasterManager::SyncCallback returns '%s'", (ret) ? "true" : "false");
-        return ret;
+        jack_log("JackNetMasterManager::SyncCallback returns '%s'", (res) ? "true" : "false");
+        return res;
     }
 
     void* JackNetMasterManager::NetManagerThread(void* arg)
