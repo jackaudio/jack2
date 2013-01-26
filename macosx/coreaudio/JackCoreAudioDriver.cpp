@@ -2334,8 +2334,7 @@ int JackCoreAudioDriver::Start()
         fState = false;
         int count = 0;
 
-        OSStatus err = AudioOutputUnitStart(fAUHAL);
-        if (err == noErr) {
+        if (AudioOutputUnitStart(fAUHAL) == noErr) {
 
             while (!fState && count++ < WAIT_COUNTER) {
                 usleep(100000);
@@ -2388,10 +2387,9 @@ int JackCoreAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
 bool JackCoreAudioDriver::TakeHogAux(AudioDeviceID deviceID, bool isInput)
 {
     pid_t hog_pid;
-    OSStatus err;
-
     UInt32 propSize = sizeof(hog_pid);
-    err = AudioDeviceGetProperty(deviceID, 0, isInput, kAudioDevicePropertyHogMode, &propSize, &hog_pid);
+    
+    OSStatus err = AudioDeviceGetProperty(deviceID, 0, isInput, kAudioDevicePropertyHogMode, &propSize, &hog_pid);
     if (err) {
         jack_error("Cannot read hog state...");
         printError(err);

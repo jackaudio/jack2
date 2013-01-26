@@ -326,9 +326,9 @@ void JackEngine::NotifyRemoveClient(const char* name, int refnum)
 {
     // Notify existing clients (including the one beeing suppressed) of the removed client
     for (int i = 0; i < CLIENT_NUM; i++) {
-        JackClientInterface* client = fClientTable[refnum];
+        JackClientInterface* client = fClientTable[i];
         if (client) {
-            ClientNotify(fClientTable[i], refnum, name, kRemoveClient, false, "", 0, 0);
+            ClientNotify(client, refnum, name, kRemoveClient, false, "", 0, 0);
         }
     }
 }
@@ -749,7 +749,7 @@ int JackEngine::ClientCloseAux(int refnum, bool wait)
     }
 
     // Notify running clients
-    NotifyRemoveClient(client->GetClientControl()->fName, client->GetClientControl()->fRefNum);
+    NotifyRemoveClient(client->GetClientControl()->fName, refnum);
 
     // Cleanup...
     fSynchroTable[refnum].Destroy();
