@@ -718,7 +718,6 @@ int main (int argc, char *argv[])
         }
     }
 
-
     /**
      * try to register another one with the same name...
      *
@@ -970,7 +969,7 @@ int main (int argc, char *argv[])
     }
 
     /**
-     * Test if portrename callback have been called.
+     * Test if port rename callback have been called.
      *
      */
     jack_port_set_name (output_port1, "renamed-port#");
@@ -980,13 +979,12 @@ int main (int argc, char *argv[])
         printf("!!! ERROR !!! Jack_Port_Rename_Callback was not called !!.\n");
     }
 
-
     /**
-     * Test if portregistration callback have been called.
+     * Test if port registration callback have been called.
      *
      */
 
-    jack_sleep(1 * 1000);
+    jack_sleep(1 * 1000); // To hope all port registration and reorder callback have been received...
 
     if (1 == port_callback_reg) {
         Log("%i ports have been successfully created, and %i callback reg ports have been received... ok\n", 1, port_callback_reg);
@@ -1319,6 +1317,8 @@ int main (int argc, char *argv[])
         }
         a++;
     }
+    
+    jack_sleep(1 * 1000); // To hope all port registration and reorder callback have been received...
 
     // Check port registration callback again
     if (j == port_callback_reg) {
@@ -1353,10 +1353,21 @@ int main (int argc, char *argv[])
         exit(1);
     }
 
-	// Check client registration callback
-	jack_sleep(1000);
-	if (client_register == 0)
-		printf("!!! ERROR !!! Client registration callback not called!\n");
+    // Check client registration callback after jack_client_new
+    jack_sleep(2000);
+    if (client_register == 0) {
+        printf("!!! ERROR !!! Client registration callback not called for an opened client !\n");
+    }
+        
+    // Check client registration callback after jack_client_close
+    jack_client_close(client2);
+    jack_sleep(2000);
+    if (client_register == 1) {
+        printf("!!! ERROR !!! Client registration callback not called for a closed client!\n");
+    }
+    
+    // Open client2 again...
+    client2 = jack_client_new(client_name2);
 
     /**
      * Register callback for this client.
@@ -1398,8 +1409,8 @@ int main (int argc, char *argv[])
     process2_activated = -1;
     process1_activated = -1;
     if (jack_activate(client2) < 0) {
-        printf ("Fatal error : cannot activate client2\n");
-        exit (1);
+        printf("Fatal error : cannot activate client2\n");
+        exit(1);
     }
 
     /**
