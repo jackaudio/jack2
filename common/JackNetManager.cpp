@@ -513,7 +513,7 @@ namespace Jack
             return res;
         } else if (res == NET_PACKET_ERROR) {
             // Well not a real XRun...
-            JackServerGlobals::fInstance->GetEngine()->NotifyXRun(GetMicroSeconds(), 0);
+            JackServerGlobals::fInstance->GetEngine()->NotifyClientXRun(ALL_CLIENTS);
         }
 
 #ifdef JACK_MONITOR

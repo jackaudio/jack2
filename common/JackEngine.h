@@ -142,9 +142,9 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         bool Process(jack_time_t cur_cycle_begin, jack_time_t prev_cycle_end);
 
         // Notifications
-        void NotifyXRun(jack_time_t callback_usecs, float delayed_usecs);
+        void NotifyDriverXRun();
+        void NotifyClientXRun(int refnum);
         void NotifyFailure(int code, const char* reason);
-        void NotifyXRun(int refnum);
         void NotifyGraphReorder();
         void NotifyBufferSize(jack_nframes_t buffer_size);
         void NotifySampleRate(jack_nframes_t sample_rate);

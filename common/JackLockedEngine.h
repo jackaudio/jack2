@@ -258,16 +258,18 @@ class SERVER_EXPORT JackLockedEngine
         }
 
         // Notifications
-        void NotifyXRun(jack_time_t cur_cycle_begin, float delayed_usecs)
+        void NotifyDriverXRun()
         {
-            // RT : no lock
-            fEngine.NotifyXRun(cur_cycle_begin, delayed_usecs);
+            // Coming from the driver in RT : no lock
+            fEngine.NotifyDriverXRun();
         }
 
-        void NotifyXRun(int refnum)
+        void NotifyClientXRun(int refnum)
         {
-            // RT : no lock
-            fEngine.NotifyXRun(refnum);
+            TRY_CALL
+            JackLock lock(&fEngine);
+            fEngine.NotifyClientXRun(refnum);
+            CATCH_EXCEPTION
         }
 
         void NotifyGraphReorder()

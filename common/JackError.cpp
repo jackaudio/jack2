@@ -59,12 +59,13 @@ void jack_log_function(int level, const char *message)
 
 static void jack_format_and_log(int level, const char *prefix, const char *fmt, va_list ap)
 {
-    char buffer[300];
+    char buffer[256];
     size_t len;
     jack_log_function_t log_function;
 
     if (prefix != NULL) {
         len = strlen(prefix);
+        assert(len < 256);
         memcpy(buffer, prefix, len);
     } else {
         len = 0;

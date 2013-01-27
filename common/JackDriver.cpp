@@ -265,7 +265,8 @@ JackClientControl* JackDriver::GetClientControl() const
 
 void JackDriver::NotifyXRun(jack_time_t cur_cycle_begin, float delayed_usecs)
 {
-    fEngine->NotifyXRun(cur_cycle_begin, delayed_usecs);
+    fEngineControl->NotifyXRun(cur_cycle_begin, delayed_usecs);
+    fEngine->NotifyDriverXRun();
 }
 
 void JackDriver::NotifyBufferSize(jack_nframes_t buffer_size)

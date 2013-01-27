@@ -305,7 +305,7 @@ void JackServer::Notify(int refnum, int notify, int value)
             break;
 
         case kXRunCallback:
-            fEngine->NotifyXRun(refnum);
+            fEngine->NotifyClientXRun(refnum);
             break;
     }
 }

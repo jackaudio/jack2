@@ -334,14 +334,13 @@ void JackEngine::NotifyRemoveClient(const char* name, int refnum)
 }
 
 // Coming from the driver
-void JackEngine::NotifyXRun(jack_time_t callback_usecs, float delayed_usecs)
+void JackEngine::NotifyDriverXRun()
 {
     // Use the audio thread => request thread communication channel
-    fEngineControl->NotifyXRun(callback_usecs, delayed_usecs);
     fChannel.Notify(ALL_CLIENTS, kXRunCallback, 0);
 }
 
-void JackEngine::NotifyXRun(int refnum)
+void JackEngine::NotifyClientXRun(int refnum)
 {
     if (refnum == ALL_CLIENTS) {
         NotifyClients(kXRunCallback, false, "", 0, 0);
