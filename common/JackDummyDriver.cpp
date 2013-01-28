@@ -100,11 +100,12 @@ extern "C"
         }
 
         if (wait_time > 0) {
-            buffer_size = lroundf((wait_time * sample_rate) / 1000000.0f);
-            if (buffer_size > BUFFER_SIZE_MAX) {
-                buffer_size = BUFFER_SIZE_MAX;
-                jack_error("Buffer size set to %d", BUFFER_SIZE_MAX);
-            }
+            buffer_size = lroundf((float(wait_time) * float(sample_rate)) / 1000000.0f);
+        }
+        
+        if (buffer_size > BUFFER_SIZE_MAX) {
+            buffer_size = BUFFER_SIZE_MAX;
+            jack_error("Buffer size set to %d", BUFFER_SIZE_MAX);
         }
 
         Jack::JackDriverClientInterface* driver = new Jack::JackThreadedDriver(new Jack::JackDummyDriver("system", "dummy_pcm", engine, table));
