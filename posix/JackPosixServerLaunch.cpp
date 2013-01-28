@@ -109,7 +109,7 @@ static void start_server_classic_aux(const char* server_name)
     if (fp) {
         arguments[0] = '\0';
         res = fscanf(fp, "%s", buffer);
-        while (ret != 0 && ret != EOF) {
+        while (res != 0 && res != EOF) {
             strcat(arguments, buffer);
             strcat(arguments, " ");
             res = fscanf(fp, "%s", buffer);
