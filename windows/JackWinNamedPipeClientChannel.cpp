@@ -38,7 +38,7 @@ JackWinNamedPipeClientChannel::~JackWinNamedPipeClientChannel()
     delete fRequest;
 }
 
-int JackWinNamedPipeClientChannel::Open(const char* server_name, const char* name, int uuid, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
+int JackWinNamedPipeClientChannel::Open(const char* server_name, const char* name, int uuid, char* name_res, JackClient* client, jack_options_t options, jack_status_t* status)
 {
     int result = 0;
     jack_log("JackWinNamedPipeClientChannel::Open name = %s", name);
@@ -50,11 +50,17 @@ int JackWinNamedPipeClientChannel::Open(const char* server_name, const char* nam
         goto error;
     }
     */
+    
+    // Before any server/client call
+    fClient = client;
 
     if (fRequest->Connect(jack_server_dir, server_name, 0) < 0) {
         jack_error("Cannot connect to server pipe");
         goto error;
     }
+    
+    // OK so server is there...
+    JackGlobals::fServerRunning = true;
 
     // Check name in server
     ClientCheck(name, uuid, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result, true);
@@ -72,7 +78,6 @@ int JackWinNamedPipeClientChannel::Open(const char* server_name, const char* nam
         goto error;
     }
 
-    fClient = obj;
     return 0;
 
 error:

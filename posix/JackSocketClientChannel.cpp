@@ -39,15 +39,21 @@ JackSocketClientChannel::~JackSocketClientChannel()
     delete fNotificationSocket;
 }
 
-int JackSocketClientChannel::Open(const char* server_name, const char* name, int uuid, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
+int JackSocketClientChannel::Open(const char* server_name, const char* name, int uuid, char* name_res, JackClient* client, jack_options_t options, jack_status_t* status)
 {
     int result = 0;
     jack_log("JackSocketClientChannel::Open name = %s", name);
+    
+    // Before any server/client call
+    fClient = client;
 
     if (fRequest->Connect(jack_server_dir, server_name, 0) < 0) {
         jack_error("Cannot connect to server socket");
         goto error;
     }
+    
+    // OK so server is there...
+    JackGlobals::fServerRunning = true;
 
     // Check name in server
     ClientCheck(name, uuid, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result, true);
@@ -65,8 +71,7 @@ int JackSocketClientChannel::Open(const char* server_name, const char* name, int
         jack_error("Cannot bind socket");
         goto error;
     }
-
-    fClient = obj;
+    
     return 0;
 
 error:
@@ -79,8 +84,9 @@ void JackSocketClientChannel::Close()
 {
     fRequest->Close();
     fNotificationListenSocket.Close();
-    if (fNotificationSocket)
+    if (fNotificationSocket) {
         fNotificationSocket->Close();
+    }
 }
 
 int JackSocketClientChannel::Start()

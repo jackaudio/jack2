@@ -53,6 +53,12 @@ void JackGenericClientChannel::ServerSyncCall(JackRequest* req, JackResult* res,
         return;
     }
     
+    if (!JackGlobals::fServerRunning) {
+        jack_error("Server is not running");
+        *result = -1;
+        return;
+    }
+    
     if (req->Write(fRequest) < 0) {
         jack_error("Could not write request type = %ld", req->fType);
         *result = -1;
@@ -73,6 +79,12 @@ void JackGenericClientChannel::ServerAsyncCall(JackRequest* req, JackResult* res
     // Check call context
     if (jack_tls_get(JackGlobals::fNotificationThread)) {
         jack_error("Cannot callback the server in notification thread!");
+        *result = -1;
+        return;
+    }
+    
+    if (!JackGlobals::fServerRunning) {
+        jack_error("Server is not running");
         *result = -1;
         return;
     }

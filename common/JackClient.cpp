@@ -109,15 +109,12 @@ int JackClient::Close()
     int result = 0;
 
     Deactivate();
-    fChannel->Stop();  // Channels is stopped first to avoid receiving notifications while closing
-
-    // Request close only if server is still running
-    if (JackGlobals::fServerRunning) {
-        fChannel->ClientClose(GetClientControl()->fRefNum, &result);
-    } else {
-        jack_log("JackClient::Close server is shutdown");
-    }
-
+    
+    // Channels is stopped first to avoid receiving notifications while closing
+    fChannel->Stop();  
+    // Then close client
+    fChannel->ClientClose(GetClientControl()->fRefNum, &result);
+  
     fChannel->Close();
     assert(JackGlobals::fSynchroMutex);
     JackGlobals::fSynchroMutex->Lock();

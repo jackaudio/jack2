@@ -86,7 +86,7 @@ int JackLibClient::Open(const char* server_name, const char* name, int uuid, jac
     int shared_engine, shared_client, shared_graph, result;
     bool res;
     jack_log("JackLibClient::Open name = %s", name);
-  
+    
     if (strlen(name) >= JACK_CLIENT_NAME_SIZE) {
         jack_error("\"%s\" is too long to be used as a JACK client name.\n"
                    "Please use %lu characters or less",
@@ -141,7 +141,6 @@ int JackLibClient::Open(const char* server_name, const char* name, int uuid, jac
     }
 
     JackGlobals::fClientTable[GetClientControl()->fRefNum] = this;
-    JackGlobals::fServerRunning = true;
     SetClockSource(GetEngineControl()->fClockSource);
     jack_log("JackLibClient::Open name = %s refnum = %ld", name_res, GetClientControl()->fRefNum);
     return 0;
