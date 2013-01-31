@@ -51,6 +51,7 @@ class JackPortAudioDriver : public JackMMCSS, public JackAudioDriver
 
         PaError OpenStream(jack_nframes_t buffer_size);
         void UpdateLatencies();
+        int Render(const void* inputBuffer, void* outputBuffer, PaStreamCallbackFlags statusFlags);
 
     public:
 

@@ -283,32 +283,36 @@ OSStatus JackCoreAudioDriver::Render(void* inRefCon,
                                      UInt32 inNumberFrames,
                                      AudioBufferList* ioData)
 {
-    JackCoreAudioDriver* driver = (JackCoreAudioDriver*)inRefCon;
-    driver->fActionFags = ioActionFlags;
-    driver->fCurrentTime = inTimeStamp;
-    driver->fDriverOutputData = ioData;
+    return static_cast<JackCoreAudioDriver*>(inRefCon)->Render(ioActionFlags, inTimeStamp, ioData);
+}
+
+OSStatus JackCoreAudioDriver::Render(AudioUnitRenderActionFlags* ioActionFlags, const AudioTimeStamp* inTimeStamp,  AudioBufferList* ioData)
+{
+    fActionFags = ioActionFlags;
+    fCurrentTime = inTimeStamp;
+    fDriverOutputData = ioData;
 
     // Setup threaded based log function et get RT thread parameters once...
     if (set_threaded_log_function()) {
 
         jack_log("JackCoreAudioDriver::Render : set_threaded_log_function");
-        JackMachThread::GetParams(pthread_self(), &driver->fEngineControl->fPeriod, &driver->fEngineControl->fComputation, &driver->fEngineControl->fConstraint);
+        JackMachThread::GetParams(pthread_self(), &fEngineControl->fPeriod, &fEngineControl->fComputation, &fEngineControl->fConstraint);
 
-        if (driver->fComputationGrain > 0) {
-            jack_log("JackCoreAudioDriver::Render : RT thread computation setup to %d percent of period", int(driver->fComputationGrain * 100));
-            driver->fEngineControl->fComputation = driver->fEngineControl->fPeriod * driver->fComputationGrain;
+        if (fComputationGrain > 0) {
+            jack_log("JackCoreAudioDriver::Render : RT thread computation setup to %d percent of period", int(fComputationGrain * 100));
+            fEngineControl->fComputation = fEngineControl->fPeriod * fComputationGrain;
         }
     }
 
     // Signal waiting start function...
-    driver->fState = true;
+    fState = true;
 
-    driver->CycleTakeBeginTime();
+    CycleTakeBeginTime();
 
-    if (driver->Process() < 0) {
+    if (Process() < 0) {
         jack_error("Process error, stopping driver");
-        driver->NotifyFailure(JackBackendError, "Process error, stopping driver");    // Message length limited to JACK_MESSAGE_SIZE
-        driver->Stop();
+        NotifyFailure(JackBackendError, "Process error, stopping driver");    // Message length limited to JACK_MESSAGE_SIZE
+        Stop();
         kill(JackTools::GetPID(), SIGINT);
         return kAudioHardwareUnsupportedOperationError;
     } else {

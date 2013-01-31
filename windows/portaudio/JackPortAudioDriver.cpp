@@ -40,11 +40,13 @@ int JackPortAudioDriver::Render(const void* inputBuffer, void* outputBuffer,
                                 PaStreamCallbackFlags statusFlags,
                                 void* userData)
 {
-    JackPortAudioDriver* driver = (JackPortAudioDriver*)userData;
-    driver->fInputBuffer = (jack_default_audio_sample_t**)inputBuffer;
-    driver->fOutputBuffer = (jack_default_audio_sample_t**)outputBuffer;
+    return static_cast<JackPortAudioDriver*>(userData)->Render(inputBuffer, outputBuffer, statusFlags);
+}
 
-    //MMCSSAcquireRealTime(GetCurrentThread());
+int JackPortAudioDriver::Render(const void* inputBuffer, void* outputBuffer, PaStreamCallbackFlags statusFlags)
+{
+    fInputBuffer = (jack_default_audio_sample_t**)inputBuffer;
+    fOutputBuffer = (jack_default_audio_sample_t**)outputBuffer;
 
     if (statusFlags) {
         if (statusFlags & paOutputUnderflow)
@@ -60,14 +62,14 @@ int JackPortAudioDriver::Render(const void* inputBuffer, void* outputBuffer,
 
         if (statusFlags != paPrimingOutput) {
             jack_time_t cur_time = GetMicroSeconds();
-            driver->NotifyXRun(cur_time, float(cur_time - driver->fBeginDateUst));   // Better this value than nothing...
+            NotifyXRun(cur_time, float(cur_time - fBeginDateUst));   // Better this value than nothing...
         }
     }
 
-    // Setup threadded based log function
+    // Setup threaded based log function
     set_threaded_log_function();
-    driver->CycleTakeBeginTime();
-    return (driver->Process() == 0) ? paContinue : paAbort;
+    CycleTakeBeginTime();
+    return (Process() == 0) ? paContinue : paAbort;
 }
 
 int JackPortAudioDriver::Read()

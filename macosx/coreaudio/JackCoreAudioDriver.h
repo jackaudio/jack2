@@ -165,6 +165,7 @@ class JackCoreAudioDriver : public JackAudioDriver
         void UpdateLatencies();
         
         bool IsDigitalDevice(AudioDeviceID device);
+        OSStatus Render(AudioUnitRenderActionFlags* ioActionFlags, const AudioTimeStamp* inTimeStamp,  AudioBufferList* ioData);
 
     public:
 

@@ -142,6 +142,11 @@ class JackCoreAudioAdapter : public JackAudioAdapterInterface
 
         int GetLatency(int port_index, bool input);
         OSStatus GetStreamLatencies(AudioDeviceID device, bool isInput, vector<int>& latencies);
+        
+        OSStatus Render(AudioUnitRenderActionFlags *ioActionFlags,
+                        const AudioTimeStamp *inTimeStamp,
+                        UInt32 inNumberFrames,
+                        AudioBufferList *ioData);
 
     public:
 

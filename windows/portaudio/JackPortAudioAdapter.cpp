@@ -30,8 +30,7 @@ namespace Jack
                                     PaStreamCallbackFlags statusFlags,
                                     void* userData)
     {
-        JackPortAudioAdapter* adapter = static_cast<JackPortAudioAdapter*>(userData);
-        adapter->PushAndPull((jack_default_audio_sample_t**)inputBuffer, (jack_default_audio_sample_t**)outputBuffer, framesPerBuffer);
+        static_cast<JackPortAudioAdapter*>(userData)->PushAndPull((jack_default_audio_sample_t**)inputBuffer, (jack_default_audio_sample_t**)outputBuffer, framesPerBuffer);
         return paContinue;
     }
 

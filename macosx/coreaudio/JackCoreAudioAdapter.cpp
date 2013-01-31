@@ -293,21 +293,28 @@ OSStatus JackCoreAudioAdapter::Render(void *inRefCon,
                                     UInt32 inNumberFrames,
                                     AudioBufferList *ioData)
 {
-    JackCoreAudioAdapter* adapter = static_cast<JackCoreAudioAdapter*>(inRefCon);
-    OSStatus err = AudioUnitRender(adapter->fAUHAL, ioActionFlags, inTimeStamp, 1, inNumberFrames, adapter->fInputData);
+    return static_cast<JackCoreAudioAdapter*>(inRefCon)->Render(ioActionFlags, inTimeStamp, inNumberFrames, ioData);
+}
+
+OSStatus JackCoreAudioAdapter::Render(AudioUnitRenderActionFlags *ioActionFlags,
+                                    const AudioTimeStamp *inTimeStamp,
+                                    UInt32 inNumberFrames,
+                                    AudioBufferList *ioData)
+{
+    OSStatus err = AudioUnitRender(fAUHAL, ioActionFlags, inTimeStamp, 1, inNumberFrames, fInputData);
 
     if (err == noErr) {
-        jack_default_audio_sample_t* inputBuffer[adapter->fCaptureChannels];
-        jack_default_audio_sample_t* outputBuffer[adapter->fPlaybackChannels];
+        jack_default_audio_sample_t* inputBuffer[fCaptureChannels];
+        jack_default_audio_sample_t* outputBuffer[fPlaybackChannels];
 
-        for (int i = 0; i < adapter->fCaptureChannels; i++) {
-            inputBuffer[i] = (jack_default_audio_sample_t*)adapter->fInputData->mBuffers[i].mData;
+        for (int i = 0; i < fCaptureChannels; i++) {
+            inputBuffer[i] = (jack_default_audio_sample_t*)fInputData->mBuffers[i].mData;
         }
-        for (int i = 0; i < adapter->fPlaybackChannels; i++) {
+        for (int i = 0; i < fPlaybackChannels; i++) {
             outputBuffer[i] = (jack_default_audio_sample_t*)ioData->mBuffers[i].mData;
         }
 
-        adapter->PushAndPull((jack_default_audio_sample_t**)inputBuffer, (jack_default_audio_sample_t**)outputBuffer, inNumberFrames);
+        PushAndPull((jack_default_audio_sample_t**)inputBuffer, (jack_default_audio_sample_t**)outputBuffer, inNumberFrames);
         return noErr;
     } else {
         return err;
