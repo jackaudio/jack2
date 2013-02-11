@@ -41,10 +41,12 @@ SERVER_EXPORT jack_shmsize_t JackMidiBuffer::MaxEventSize() const
 {
     assert (((jack_shmsize_t) - 1) < 0); // jack_shmsize_t should be signed
     jack_shmsize_t left = buffer_size - (sizeof(JackMidiBuffer) + sizeof(JackMidiEvent) * (event_count + 1) + write_pos);
-    if (left < 0)
+    if (left < 0) {
         return 0;
-    if (left <= JackMidiEvent::INLINE_SIZE_MAX)
+    }
+    if (left <= JackMidiEvent::INLINE_SIZE_MAX) {
         return JackMidiEvent::INLINE_SIZE_MAX;
+    }
     return left;
 }
 
@@ -60,8 +62,9 @@ SERVER_EXPORT jack_midi_data_t* JackMidiBuffer::ReserveEvent(jack_nframes_t time
     JackMidiEvent* event = &events[event_count++];
     event->time = time;
     event->size = size;
-    if (size <= JackMidiEvent::INLINE_SIZE_MAX)
+    if (size <= JackMidiEvent::INLINE_SIZE_MAX) {
         return event->data;
+    }
 
     write_pos += size;
     event->offset = buffer_size - write_pos;
@@ -128,8 +131,9 @@ static void MidiBufferMixdown(void* mixbuffer, void** src_buffers, int src_count
 
         // write the event
         jack_midi_data_t* dest = mix->ReserveEvent(next_event->time, next_event->size);
-        if (!dest)
+        if (!dest) {
             break;
+        }
         memcpy(dest, next_event->GetData(next_buf), next_event->size);
         next_buf->mix_index++;
     }

@@ -66,7 +66,6 @@ JackInternalClient::~JackInternalClient()
 int JackInternalClient::Open(const char* server_name, const char* name, int uuid, jack_options_t options, jack_status_t* status)
 {
     int result;
-    char name_res[JACK_CLIENT_NAME_SIZE + 1];
     jack_log("JackInternalClient::Open name = %s", name);
     
     if (strlen(name) >= JACK_CLIENT_NAME_SIZE) {
@@ -79,6 +78,8 @@ int JackInternalClient::Open(const char* server_name, const char* name, int uuid
 
     strncpy(fServerName, server_name, sizeof(fServerName));
 
+    // Open server/client direct channel
+    char name_res[JACK_CLIENT_NAME_SIZE + 1];
     fChannel->ClientCheck(name, uuid, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result, false);
     if (result < 0) {
         int status1 = *status;

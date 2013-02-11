@@ -36,8 +36,9 @@ bool JackPort::Allocate(int refnum, const char* port_name, const char* port_type
 {
     jack_port_type_id_t id = GetPortTypeId(port_type);
     assert(id >= 0 && id <= PORT_TYPES_MAX);
-    if (id == PORT_TYPES_MAX)
+    if (id == PORT_TYPES_MAX) {
         return false;
+    }
     fTypeId = id;
     fFlags = flags;
     fRefNum = refnum;
@@ -116,16 +117,18 @@ void JackPort::SetLatencyRange(jack_latency_callback_mode_t mode, jack_latency_r
 		/* hack to set latency up for
 		 * backend ports
 		 */
-		if ((fFlags & JackPortIsOutput) && (fFlags & JackPortIsPhysical))
+		if ((fFlags & JackPortIsOutput) && (fFlags & JackPortIsPhysical)) {
 			fLatency = (range->min + range->max) / 2;
+        }
 	} else {
         fPlaybackLatency = *range;
 
 		/* hack to set latency up for
 		 * backend ports
 		 */
-		if ((fFlags & JackPortIsInput) && (fFlags & JackPortIsPhysical))
+		if ((fFlags & JackPortIsInput) && (fFlags & JackPortIsPhysical)) {
 			fLatency = (range->min + range->max) / 2;
+        }
 	}
 }
 

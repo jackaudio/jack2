@@ -54,7 +54,7 @@ int JackLoopbackDriver::ProcessWriteSync()
 {
     // Suspend on connected clients in the graph
     if (SuspendRefNum() < 0) {
-        jack_error("JackLoopbackDriver::ProcessWriteSync SuspendRefNum error");
+        jack_error("JackLoopbackDriver::ProcessWriteSync - SuspendRefNum error");
         return -1;
     }
     return 0;

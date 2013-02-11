@@ -57,10 +57,11 @@ struct SERVER_EXPORT JackMidiEvent
 
     jack_midi_data_t* GetData(void* buffer)
     {
-        if (size <= INLINE_SIZE_MAX)
+        if (size <= INLINE_SIZE_MAX) {
             return data;
-        else
+        } else {
             return (jack_midi_data_t*)buffer + offset;
+        }
     }
 };
 

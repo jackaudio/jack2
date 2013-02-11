@@ -154,6 +154,9 @@ imposing the basic JACK system latency determined by the
 .br
 Number of capture channels.  Default is maximum supported by hardware.
 .TP
+\fB\-I \-\-input\-latency\fR
+Extra input latency (frames) (default: 0)
+.TP
 \fB\-n, \-\-nperiods \fIint\fR
 .br
 Specify the number of periods of playback latency.  In seconds, this
@@ -178,6 +181,9 @@ devices supported by FFADO (formerly Freebob) are configured with
 \fB\-o, \-\-outchannels \fIint\fR
 .br
 Number of playback channels.  Default is maximum supported by hardware.
+.TP
+\fB\-O \-\-output\-latency\fR
+Extra output latency (frames) (default: 0)
 .TP
 \fB\-P, \-\-playback\fR [ \fIname\fR ]
 Provide only playback ports, unless combined with \-D or \-C.  Optionally set 
@@ -381,6 +387,12 @@ Specify output device for playback (default: /dev/dsp)
 .TP
 \fB\-b, \-\-ignorehwbuf \fIboolean\fR
 Specify, whether to ignore hardware period size (default: false)
+.TP
+\fB\-I \-\-input\-latency\fR
+Extra input latency (frames) (default: 0)
+.TP
+\fB\-O \-\-output\-latency\fR
+Extra output latency (frames) (default: 0)
 .SS SUN BACKEND PARAMETERS
 .TP
 \fB\-r, \-\-rate \fIint\fR
@@ -425,8 +437,14 @@ Maximum number of channels (default: all available hardware channels)
 \fB\-i \-\-channelin\fR
 Maximum number of input channels (default: all available hardware channels)
 .TP
+\fB\-I \-\-input\-latency\fR
+Extra input latency (frames) (default: 0)
+.TP
 \fB\-o \-\-channelout\fR
 Maximum number of output channels (default: all available hardware channels)
+.TP
+\fB\-O \-\-output\-latency\fR
+Extra output latency (frames) (default: 0)
 .TP
 \fB\-C \-\-capture\fR
 Whether or not to capture (default: true)
