@@ -64,7 +64,7 @@ namespace Jack
             strcpy(multicast_ip, DEFAULT_MULTICAST_IP);
         }
 
-        const char* default_multicast_if = getenv("JACK_NETJACK_MULTICAST");
+        const char* default_multicast_if = getenv("JACK_NETJACK_INTERFACE");
         if (default_multicast_if) {
             strcpy(multicast_if, default_multicast_if);
         } else {
