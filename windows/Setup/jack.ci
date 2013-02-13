@@ -95,7 +95,7 @@
 <_><src>..\..\common\jack\types.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\weakjack.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
 <_><src>..\..\common\jack\weakmacros.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
-<_><src>.\src\32bits\portaudio_x86.dll\JackRouter.dll</><dest>inst</><custom>32bits</><ifexist>overnewer</><recurs>0</></>
+<_><src>.\src\32bits\JackRouter.dll</><dest>inst</><custom>32bits</><ifexist>overnewer</><recurs>0</></>
 <_><src>.\src\32bits\JackRouter.ini</><dest>inst</><custom>32bits</><ifexist>overnewer</><recurs>0</></>
 <_><src>.\src\32bits\msvcr100.dll</><dest>inst</><custom>32bits</><ifexist>overnewer</><recurs>0</></>
 <_><src>.\src\32bits\msvcp100.dll</><dest>inst</><custom>32bits</><ifexist>overnewer</><recurs>0</></>
