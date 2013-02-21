@@ -26,6 +26,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
+// Should be registered at IANA perhaps
+#define DEFAULT_MULTICAST_IP6 "FF05::139a"
 #define DEFAULT_MULTICAST_IP "225.3.19.154"
 #define DEFAULT_MULTICAST_IF "any"
 #define DEFAULT_PORT    19000

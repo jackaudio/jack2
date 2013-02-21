@@ -798,8 +798,8 @@ namespace Jack
             return;
         }
 
-        //socket
-        if (fSocket.NewSocket() == SOCKET_ERROR) {
+        //socket: we need to have socket probed first if we want to use multicast
+        if (fSocket.NewSocket(fMulticastIP) == SOCKET_ERROR) {
             jack_error("Can't create NetManager input socket : %s", StrError(NET_ERROR_CODE));
             return;
         }
@@ -858,7 +858,7 @@ namespace Jack
                         }
                         break;
                     default:
-			jack_log("JackNetMasterManager::Run: read: %d; type: %d; peer: %s",rx_bytes,host_params.fPacketID,host_params.fName);
+                        jack_log("JackNetMasterManager::Run: read: %d; type: %d; peer: %s",rx_bytes,host_params.fPacketID,host_params.fName);
                         break;
                 }
             }

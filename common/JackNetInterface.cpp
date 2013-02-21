@@ -57,7 +57,7 @@ namespace Jack
         fSetTimeOut = false;
         fTxBuffer = NULL;
         fRxBuffer = NULL;
-	fMulticastIF[0]=0;
+        fMulticastIF[0]=0;
         fNetAudioCaptureBuffer = NULL;
         fNetAudioPlaybackBuffer = NULL;
         fNetMidiCaptureBuffer = NULL;
