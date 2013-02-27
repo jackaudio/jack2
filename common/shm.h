@@ -38,6 +38,7 @@
 #include <sys/types.h>
 #include "types.h"
 #include "JackCompilerDeps.h"
+#include "JackConstants.h"
 
 #define TRUE 1
 #define FALSE 0
@@ -47,9 +48,8 @@ extern "C"
 {
 #endif
 
-#define MAX_SERVERS 8			/* maximum concurrent servers */
-#define MAX_SHM_ID 256			/* generally about 16 per server */
-#define JACK_SERVER_NAME_SIZE 256	/* maximum length of server name */
+#define MAX_SERVERS 8               /* maximum concurrent servers */
+#define MAX_SHM_ID 256              /* generally about 16 per server */
 #define JACK_SHM_MAGIC 0x4a41434b	/* shm magic number: "JACK" */
 #define JACK_SHM_NULL_INDEX -1		/* NULL SHM index */
 #define JACK_SHM_REGISTRY_INDEX -2	/* pseudo SHM index for registry */
@@ -62,7 +62,7 @@ extern "C"
 #ifdef USE_POSIX_SHM
 
 #ifndef NAME_MAX
-#define NAME_MAX            255
+#define NAME_MAX 255
 #endif
 
 #ifndef SHM_NAME_MAX
@@ -72,7 +72,7 @@ extern "C"
     typedef shm_name_t jack_shm_id_t;
 
 #elif WIN32  
-#define NAME_MAX            255
+#define NAME_MAX 255
 #ifndef SHM_NAME_MAX
 #define SHM_NAME_MAX NAME_MAX
 #endif
