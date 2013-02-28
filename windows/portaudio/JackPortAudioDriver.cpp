@@ -166,14 +166,14 @@ int JackPortAudioDriver::Open(jack_nframes_t buffer_size,
     int in_max = 0;
     int out_max = 0;
     PaError err = paNoError;
-    
+
     if (!fPaDevices) {
         fPaDevices = new PortAudioDevices();
     }
 
     fCaptureLatency = capture_latency;
     fPlaybackLatency = playback_latency;
-    
+
     jack_log("JackPortAudioDriver::Open nframes = %ld in = %ld out = %ld capture name = %s playback name = %s samplerate = %ld",
              buffer_size, inchannels, outchannels, capture_driver_uid, playback_driver_uid, samplerate);
 
@@ -188,13 +188,13 @@ int JackPortAudioDriver::Open(jack_nframes_t buffer_size,
             goto error;
         }
     }
-    
+
     // If ASIO, request for preferred size (assuming fInputDevice and fOutputDevice are the same)
-    if (buffer_size == 0) { 
+    if (buffer_size == 0) {
         buffer_size = fPaDevices->GetPreferredBufferSize(fInputDevice);
         jack_log("JackPortAudioDriver::Open preferred buffer_size = %d", buffer_size);
     }
-  
+
     // Generic JackAudioDriver Open
     if (JackAudioDriver::Open(buffer_size, samplerate, capturing, playing, inchannels, outchannels, monitor,
         capture_driver_uid, playback_driver_uid, capture_latency, playback_latency) != 0) {
@@ -303,7 +303,7 @@ int JackPortAudioDriver::Start()
         if ((err = Pa_StartStream(fStream)) == paNoError) {
             return 0;
         }
-        jack_error("Pa_StartStream error = %s", Pa_GetErrorText(err))
+        jack_error("Pa_StartStream error = %s", Pa_GetErrorText(err));
         JackAudioDriver::Stop();
     }
     return -1;
@@ -331,11 +331,11 @@ int JackPortAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
         jack_error("Pa_CloseStream error = %s", Pa_GetErrorText(err));
         goto error;
     }
-    
+
     // It seems that some ASIO drivers (like ASIO4All) needs this to restart correctly;
     delete fPaDevices;
     fPaDevices = new PortAudioDevices();
-  
+
     err = OpenStream(buffer_size);
     if (err != paNoError) {
         jack_error("Pa_OpenStream error = %s", Pa_GetErrorText(err));
@@ -344,7 +344,7 @@ int JackPortAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
         JackAudioDriver::SetBufferSize(buffer_size); // Generic change, never fails
         return 0;
     }
-    
+
 error:
     fStream = NULL;
     return -1;

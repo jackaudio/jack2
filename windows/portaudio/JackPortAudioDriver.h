@@ -36,12 +36,12 @@ class JackPortAudioDriver : public JackMMCSS, public JackAudioDriver
 
     private:
 
-        PortAudioDevices* fPaDevices;
         PaStream* fStream;
         jack_default_audio_sample_t** fInputBuffer;
         jack_default_audio_sample_t** fOutputBuffer;
         PaDeviceIndex fInputDevice;
         PaDeviceIndex fOutputDevice;
+        PortAudioDevices* fPaDevices;
 
         static int Render(const void* inputBuffer, void* outputBuffer,
                           unsigned long framesPerBuffer,
