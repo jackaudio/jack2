@@ -160,7 +160,17 @@ int JackServer::Start()
 int JackServer::Stop()
 {
     jack_log("JackServer::Stop");
-    int res = (fFreewheel) ? fThreadedFreewheelDriver->Stop() : fAudioDriver->Stop();
+    int res = -1;
+    
+    if (fFreewheel) {
+        if (fThreadedFreewheelDriver) {
+            res = fThreadedFreewheelDriver->Stop();
+        }
+    } else {
+        if (fAudioDriver) {
+            res = fAudioDriver->Stop();
+        }
+    }
     
     fEngine->NotifyQuit();
     fRequestChannel.Stop();
