@@ -229,7 +229,7 @@ int JackPortAudioDriver::Open(jack_nframes_t buffer_size,
 
     err = OpenStream(buffer_size);
     if (err != paNoError) {
-        jack_error("Pa_OpenStream error %d = %s", err, Pa_GetErrorText(err));
+        jack_error("Pa_OpenStream error = %s", Pa_GetErrorText(err));
         goto error;
     }
 
@@ -298,10 +298,12 @@ int JackPortAudioDriver::Attach()
 int JackPortAudioDriver::Start()
 {
     jack_log("JackPortAudioDriver::Start");
-    if (JackAudioDriver::Start() >= 0) {
-        if (Pa_StartStream(fStream) == paNoError) {
+    if (JackAudioDriver::Start() == 0) {
+        PaError err;
+        if ((err = Pa_StartStream(fStream)) == paNoError) {
             return 0;
         }
+        jack_error("Pa_StartStream error = %s", Pa_GetErrorText(err))
         JackAudioDriver::Stop();
     }
     return -1;
@@ -310,11 +312,15 @@ int JackPortAudioDriver::Start()
 int JackPortAudioDriver::Stop()
 {
     jack_log("JackPortAudioDriver::Stop");
-    int res = (Pa_StopStream(fStream) == paNoError) ? 0 : -1;
-    if (JackAudioDriver::Stop() < 0) {
-        res = -1;
+    PaError err;
+    if ((err = Pa_StopStream(fStream)) != paNoError) {
+        jack_error("Pa_StopStream error = %s", Pa_GetErrorText(err));
     }
-    return res;
+    if (JackAudioDriver::Stop() < 0) {
+        return -1;
+    } else {
+        return (err == paNoError) ? 0 : -1;
+    }
 }
 
 int JackPortAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
@@ -332,7 +338,7 @@ int JackPortAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
   
     err = OpenStream(buffer_size);
     if (err != paNoError) {
-        jack_error("Pa_OpenStream error %d = %s", err, Pa_GetErrorText(err));
+        jack_error("Pa_OpenStream error = %s", Pa_GetErrorText(err));
         goto error;
     } else {
         JackAudioDriver::SetBufferSize(buffer_size); // Generic change, never fails

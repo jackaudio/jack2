@@ -46,6 +46,7 @@ PortAudioDevices::PortAudioDevices()
 
 PortAudioDevices::~PortAudioDevices()
 {
+    jack_log("Terminate PortAudio...");
     Pa_Terminate();
 
     delete[] fDeviceInfo;

@@ -25,7 +25,7 @@ BEGIN
             VALUE "FileDescription", "Jackmp Dummy Driver for Windows\0"
             VALUE "FileVersion", "1, 9, 10\0"
             VALUE "InternalName", "jack_dummy\0"
-            VALUE "LegalCopyright", "Copyright Grame © 2006-2012\0"
+            VALUE "LegalCopyright", "Copyright Grame © 2006-2013\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "jack_dummy.dll\0"
             VALUE "PrivateBuild", "\0"
