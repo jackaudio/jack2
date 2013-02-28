@@ -259,6 +259,9 @@ int JackPortAudioDriver::Close()
     jack_log("JackPortAudioDriver::Close");
     JackAudioDriver::Close();
     PaError err = Pa_CloseStream(fStream);
+    if (err != paNoError) {
+        jack_error("Pa_CloseStream error = %s", Pa_GetErrorText(err));
+    }
     delete fPaDevices;
     fPaDevices = NULL;
     return (err != paNoError) ? -1 : 0;
