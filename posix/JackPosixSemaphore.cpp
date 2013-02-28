@@ -145,7 +145,7 @@ bool JackPosixSemaphore::Allocate(const char* name, const char* server_name, int
     BuildName(name, server_name, fName, sizeof(fName));
     jack_log("JackPosixSemaphore::Allocate name = %s val = %ld", fName, value);
 
-    if ((fSemaphore = sem_open(fName, O_CREAT, 0777, value)) == (sem_t*)SEM_FAILED) {
+    if ((fSemaphore = sem_open(fName, O_CREAT | O_RDWR, 0777, value)) == (sem_t*)SEM_FAILED) {
         jack_error("Allocate: can't check in named semaphore name = %s err = %s", fName, strerror(errno));
         return false;
     } else {
@@ -165,7 +165,7 @@ bool JackPosixSemaphore::ConnectInput(const char* name, const char* server_name)
         return true;
     }
 
-    if ((fSemaphore = sem_open(fName, O_CREAT)) == (sem_t*)SEM_FAILED) {
+    if ((fSemaphore = sem_open(fName, O_RDWR)) == (sem_t*)SEM_FAILED) {
         jack_error("Connect: can't connect named semaphore name = %s err = %s", fName, strerror(errno));
         return false;
     } else {
