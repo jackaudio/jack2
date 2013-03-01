@@ -39,6 +39,7 @@ JackCoreMidiInputPort::JackCoreMidiInputPort(double time_ratio,
     write_queue_ptr.release();
     thread_queue_ptr.release();
     jack_event = 0;
+    running_status_buf[0] = 0;
 }
 
 JackCoreMidiInputPort::~JackCoreMidiInputPort()
@@ -67,6 +68,8 @@ void
 JackCoreMidiInputPort::ProcessCoreMidi(const MIDIPacketList *packet_list)
 {
     set_threaded_log_function();
+
+    // TODO: maybe parsing should be done by JackMidiRawInputWriteQueue instead
 
     unsigned int packet_count = packet_list->numPackets;
     assert(packet_count);
@@ -116,8 +119,30 @@ JackCoreMidiInputPort::ProcessCoreMidi(const MIDIPacketList *packet_list)
                 goto buffer_sysex_bytes;
             }
         }
-        event.buffer = data;
-        event.size = size;
+
+        // regular status byte ?
+        if ((data[0] & 0x80) || !running_status_buf[0] ||
+            (size + 1) > sizeof(running_status_buf))
+        { // valid status byte (or invalid "running status") ...
+            event.buffer = data;
+            event.size = size;
+            // store status byte for eventual "running status" in next event
+            if (data[0] & 0x80) {
+                if (data[0] < 0xf0) {
+                    // "running status" is only allowed for channel messages
+                    running_status_buf[0] = data[0];
+                } else if (data[0] < 0xf8) {
+                    // "system common" messages (0xf0..0xf7) shall reset any running
+                    // status, however "realtime" messages (0xf8..0xff) shall be
+                    // ignored here
+                    running_status_buf[0] = 0;
+                }
+            }
+        } else { // "running status" mode ...
+            memcpy(&running_status_buf[1], data, size);
+            event.buffer = running_status_buf;
+            event.size = size + 1;
+        }
 
     send_event:
         event.time = GetFramesFromTimeStamp(packet->timeStamp);
@@ -174,6 +199,7 @@ JackCoreMidiInputPort::Start()
     // the engine.
     while (thread_queue->DequeueEvent());
     sysex_bytes_sent = 0;
+    running_status_buf[0] = 0;
     return true;
 }
 

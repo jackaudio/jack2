@@ -36,6 +36,7 @@ namespace Jack {
         jack_midi_event_t *jack_event;
         jack_midi_data_t *sysex_buffer;
         size_t sysex_bytes_sent;
+        jack_midi_data_t running_status_buf[3];
         JackMidiAsyncQueue *thread_queue;
         JackMidiBufferWriteQueue *write_queue;
 
