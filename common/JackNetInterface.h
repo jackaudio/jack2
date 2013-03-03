@@ -27,6 +27,7 @@ namespace Jack
 {
 
 #define DEFAULT_MULTICAST_IP "225.3.19.154"
+#define DEFAULT_MULTICAST_IF "any"
 #define DEFAULT_PORT    19000
 #define DEFAULT_MTU     1500
 #define MAX_MTU         9000
@@ -60,6 +61,7 @@ namespace Jack
             session_params_t fParams;
             JackNetSocket fSocket;
             char fMulticastIP[32];
+            char fMulticastIF[32];
 
             // headers
             packet_header_t fTxHeader;

@@ -64,6 +64,7 @@ namespace Jack
             //socket management
             int NewSocket();
             int Bind();
+	    int Bind(const char *if_name);
             int BindWith(const char* ip);
             int BindWith(int port);
             int Connect();
@@ -84,6 +85,8 @@ namespace Jack
             //utility
             int GetName(char* name);
             int JoinMCastGroup(const char* mcast_ip);
+            int JoinMCastGroup(const char* mcast_ip, const char* if_name);
+	    int BindMCastIface(const char *if_name, const int option, struct ip_mreq *mreq);
 
             //options management
             int SetOption(int level, int optname, const void* optval, socklen_t optlen);
