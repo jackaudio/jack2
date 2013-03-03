@@ -26,6 +26,25 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 using Jack::JackCoreMidiInputPort;
 
+/**
+ * Takes a MIDI status byte as argument and returns the expected size of the
+ * associated MIDI event. Returns -1 on invalid status bytes AND on variable
+ * size events (SysEx events).
+ */
+inline static int _expectedEventSize(const unsigned char& byte) {
+    if (byte < 0x80) return -1; // not a valid status byte
+    if (byte < 0xC0) return 3; // note on/off, note pressure, control change
+    if (byte < 0xE0) return 2; // program change, channel pressure
+    if (byte < 0xF0) return 3; // pitch wheel
+    if (byte == 0xF0) return -1; // sysex message (variable size)
+    if (byte == 0xF1) return 2; // time code per quarter frame
+    if (byte == 0xF2) return 3; // sys. common song position pointer
+    if (byte == 0xF3) return 2; // sys. common song select
+    if (byte == 0xF4) return -1; // sys. common undefined / reserved
+    if (byte == 0xF5) return -1; // sys. common undefined / reserved
+    return 1; // tune request, end of SysEx, system real-time events
+}
+
 JackCoreMidiInputPort::JackCoreMidiInputPort(double time_ratio,
                                              size_t max_bytes,
                                              size_t max_messages):
@@ -79,6 +98,12 @@ JackCoreMidiInputPort::ProcessCoreMidi(const MIDIPacketList *packet_list)
         size_t size = packet->length;
         assert(size);
         jack_midi_event_t event;
+        // In a MIDIPacket there can be more than one (non SysEx) MIDI event.
+        // However if the packet contains a SysEx event, it is guaranteed that
+        // there are no other events in the same MIDIPacket.
+        int k = 0; // index of the current MIDI event within current MIDIPacket
+        int eventSize = 0; // theoretical size of the current MIDI event
+        int chunkSize = 0; // actual size of the current MIDI event data consumed
 
         // XX: There might be dragons in my spaghetti.  This code is begging
         // for a rewrite.
@@ -108,41 +133,62 @@ JackCoreMidiInputPort::ProcessCoreMidi(const MIDIPacketList *packet_list)
                 event.buffer = sysex_buffer;
                 event.size = sysex_bytes_sent;
                 sysex_bytes_sent = 0;
+                k = size; // don't loop in a MIDIPacket if its a SysEx
                 goto send_event;
             }
             goto get_next_packet;
         }
 
     parse_event:
-        if (data[0] == 0xf0) {
+        if (data[k+0] == 0xf0) {
+            // Must actually never happen, since CoreMIDI guarantees a SysEx
+            // message to be alone in one MIDIPaket, but safety first. The SysEx
+            // buffer code is not written to handle this case, so skip packet.
+            if (k != 0) {
+                jack_error("JackCoreMidiInputPort::ProcessCoreMidi - Non "
+                           "isolated SysEx message in one packet, discarding.");
+                goto get_next_packet;
+            }
+
             if (data[size - 1] != 0xf7) {
                 goto buffer_sysex_bytes;
             }
         }
 
-        // regular status byte ?
-        if ((data[0] & 0x80) || !running_status_buf[0] ||
-            (size + 1) > sizeof(running_status_buf))
-        { // valid status byte (or invalid "running status") ...
-            event.buffer = data;
-            event.size = size;
-            // store status byte for eventual "running status" in next event
-            if (data[0] & 0x80) {
-                if (data[0] < 0xf0) {
-                    // "running status" is only allowed for channel messages
-                    running_status_buf[0] = data[0];
-                } else if (data[0] < 0xf8) {
-                    // "system common" messages (0xf0..0xf7) shall reset any running
-                    // status, however "realtime" messages (0xf8..0xff) shall be
-                    // ignored here
-                    running_status_buf[0] = 0;
-                }
+        // not a regular status byte ?
+        if (!(data[k+0] & 0x80) && running_status_buf[0]) { // "running status" mode ...
+            eventSize = _expectedEventSize(running_status_buf[0]);
+            chunkSize = (eventSize < 0) ? size - k : eventSize - 1;
+            if (chunkSize <= 0) goto get_next_packet;
+            if (chunkSize + 1 <= sizeof(running_status_buf)) {
+                memcpy(&running_status_buf[1], &data[k], chunkSize);
+                event.buffer = running_status_buf;
+                event.size = chunkSize + 1;
+                k += chunkSize;
+                goto send_event;
             }
-        } else { // "running status" mode ...
-            memcpy(&running_status_buf[1], data, size);
-            event.buffer = running_status_buf;
-            event.size = size + 1;
         }
+
+        // valid status byte (or invalid "running status") ...
+
+        eventSize = _expectedEventSize(data[k+0]);
+        if (eventSize < 0) eventSize = size - k;
+        if (eventSize <= 0) goto get_next_packet;
+        event.buffer = &data[k];
+        event.size = eventSize;
+        // store status byte for eventual "running status" in next event
+        if (data[k+0] & 0x80) {
+            if (data[k+0] < 0xf0) {
+                // "running status" is only allowed for channel messages
+                running_status_buf[0] = data[k+0];
+            } else if (data[k+0] < 0xf8) {
+                // "system common" messages (0xf0..0xf7) shall reset any running
+                // status, however "realtime" messages (0xf8..0xff) shall be
+                // ignored here
+                running_status_buf[0] = 0;
+            }
+        }
+        k += eventSize;
 
     send_event:
         event.time = GetFramesFromTimeStamp(packet->timeStamp);
@@ -159,6 +205,7 @@ JackCoreMidiInputPort::ProcessCoreMidi(const MIDIPacketList *packet_list)
         default:
             ;
         }
+        if (k < size) goto parse_event;
 
     get_next_packet:
         packet = MIDIPacketNext(packet);
