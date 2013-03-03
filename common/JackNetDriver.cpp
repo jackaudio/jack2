@@ -28,7 +28,7 @@ using namespace std;
 namespace Jack
 {
     JackNetDriver::JackNetDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
-                                const char* ip, int udp_port, int mtu, int midi_input_ports, int midi_output_ports,
+                                const char* ip, int udp_port, const char* mcif, int mtu, int midi_input_ports, int midi_output_ports,
                                 char* net_name, uint transport_sync, int network_latency, int celt_encoding, int opus_encoding)
             : JackWaiterDriver(name, alias, engine, table), JackNetSlaveInterface(ip, udp_port)
     {
@@ -38,6 +38,8 @@ namespace Jack
         if (strcmp(net_name, "") == 0) {
             GetHostName(net_name, JACK_CLIENT_NAME_SIZE);
         }
+	if(strcmp(mcif,DEFAULT_MULTICAST_IF))
+	    strcpy(fMulticastIF,mcif);
 
         fParams.fMtu = mtu;
         fParams.fSendMidiChannels = midi_input_ports;
@@ -605,6 +607,9 @@ namespace Jack
             strcpy(value.str, DEFAULT_MULTICAST_IP);
             jack_driver_descriptor_add_parameter(desc, &filler, "multicast-ip", 'a', JackDriverParamString, &value, NULL, "Multicast address, or explicit IP of the master", NULL);
 
+	    strcpy(value.str, DEFAULT_MULTICAST_IF);
+	    jack_driver_descriptor_add_parameter(desc, &filler, "multicast-if", 'f', JackDriverParamString, &value, NULL, "Multicast interface name, any or all", "Multicast interface to send probes from (any - kernel chosen (default), all - all available, if_name - explicit bind)");
+
             value.i = DEFAULT_PORT;
             jack_driver_descriptor_add_parameter(desc, &filler, "udp-net-port", 'p', JackDriverParamInt, &value, NULL, "UDP port", NULL);
 
@@ -644,7 +649,7 @@ Deactivated for now..
 
         SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)
         {
-            char multicast_ip[32];
+            char multicast_ip[32],multicast_if[32];
             char net_name[JACK_CLIENT_NAME_SIZE + 1];
             int udp_port;
             int mtu = DEFAULT_MTU;
@@ -676,6 +681,13 @@ Deactivated for now..
                 strcpy(multicast_ip, DEFAULT_MULTICAST_IP);
             }
 
+            const char* default_multicast_if = getenv("JACK_NETJACK_INTERFACE");
+            if (default_multicast_ip) {
+                strcpy(multicast_if, default_multicast_if);
+            } else {
+                strcpy(multicast_if, DEFAULT_MULTICAST_IF);
+            }
+
             for (node = params; node; node = jack_slist_next(node)) {
                 param = (const jack_driver_param_t*) node->data;
                 switch (param->character)
@@ -683,6 +695,10 @@ Deactivated for now..
                     case 'a' :
                         assert(strlen(param->value.str) < 32);
                         strcpy(multicast_ip, param->value.str);
+                        break;
+                    case 'f' :
+                        assert(strlen(param->value.str) < 32);
+                        strcpy(multicast_if, param->value.str);
                         break;
                     case 'p':
                         udp_port = param->value.ui;
@@ -734,7 +750,7 @@ Deactivated for now..
             try {
 
                 Jack::JackDriverClientInterface* driver = new Jack::JackWaitThreadedDriver(
-                        new Jack::JackNetDriver("system", "net_pcm", engine, table, multicast_ip, udp_port, mtu,
+                        new Jack::JackNetDriver("system", "net_pcm", engine, table, multicast_ip, udp_port, multicast_if, mtu,
                                                 midi_input_ports, midi_output_ports,
                                                 net_name, transport_sync,
                                                 network_latency, celt_encoding, opus_encoding));

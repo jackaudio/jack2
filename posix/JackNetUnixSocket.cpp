@@ -20,6 +20,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackNetUnixSocket.h"
 #include "JackError.h"
 
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <ifaddrs.h>
+#include <net/if.h>
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -139,6 +143,16 @@ namespace Jack
     {
         return bind(fSockfd, reinterpret_cast<socket_address_t*>(&fRecvAddr), sizeof(socket_address_t));
     }
+    int JackNetUnixSocket::Bind(const char *if_name)
+    {
+        struct ip_mreq multicast_req;
+	int ret = Bind();
+	if(!ret && strcmp(if_name,"any")) {
+	    multicast_req.imr_multiaddr.s_addr = fSendAddr.sin_addr.s_addr;
+	    ret = BindMCastIface(if_name, IP_MULTICAST_IF, &multicast_req);
+	}
+	return ret;
+    }
 
     int JackNetUnixSocket::BindWith(const char* ip)
     {
@@ -232,10 +246,52 @@ namespace Jack
 
     int JackNetUnixSocket::JoinMCastGroup(const char* ip)
     {
+	return JoinMCastGroup(ip,"any");
+    }
+    int JackNetUnixSocket::JoinMCastGroup(const char* ip, const char *if_name)
+    {
         struct ip_mreq multicast_req;
         inet_aton(ip, &multicast_req.imr_multiaddr);
-        multicast_req.imr_interface.s_addr = htonl(INADDR_ANY);
-        return SetOption(IPPROTO_IP, IP_ADD_MEMBERSHIP, &multicast_req, sizeof(multicast_req));
+	if(!strcmp(if_name,"any")) {
+	    multicast_req.imr_interface.s_addr = htonl(INADDR_ANY);
+	    return SetOption(IPPROTO_IP, IP_ADD_MEMBERSHIP, &multicast_req, sizeof(multicast_req));
+	} else {
+	    return BindMCastIface(if_name, IP_ADD_MEMBERSHIP, &multicast_req);
+	}
+    }
+    int JackNetUnixSocket::BindMCastIface(const char *if_name, const int option, struct ip_mreq *mreq)
+    {
+	struct ifaddrs *ifas, *ifa;
+	int specific = strcmp("all",if_name);
+	int ret=-1;
+	char *if_last="any";
+
+	if (getifaddrs(&ifas) == -1) {
+		jack_error("JackNetUnixSocket::BindMCastIface error in getifaddrs");
+		return -1;
+	}
+	for (ifa = ifas; ifa != NULL; ifa = ifa->ifa_next) {
+		if (ifa->ifa_addr == NULL)
+		    continue; // Address is mandatory
+		if(!ifa->ifa_name || !strcmp(if_last,ifa->ifa_name))
+		    continue; // Name as well, also skip already enabled interface
+		if(!(ifa->ifa_flags & IFF_MULTICAST) || !(ifa->ifa_flags & IFF_RUNNING))
+		    continue; // And non multicast or down interface
+		if(ifa->ifa_addr->sa_family != AF_INET)
+		    continue; // And for the moment we're dealing with IPv4 only
+		if(!specific || !strcmp(ifa->ifa_name,if_name)) {
+		    mreq->imr_interface.s_addr = ((struct sockaddr_in *)(ifa->ifa_addr))->sin_addr.s_addr;
+		    ret = SetOption(IPPROTO_IP, option, mreq, sizeof(struct ip_mreq));
+		    if(ret)
+			break;
+		    if_last = ifa->ifa_name;
+		    jack_log("JackNetUnixSocket::BindMCastIface attaching to %s", if_last);
+		}
+	}
+	freeifaddrs(ifas);
+	if(!strcmp(if_last,"any"))
+		jack_error("JackNetUnixSocket::BindMCastIface cannot find valid interface");
+	return ret;
     }
 
     //options************************************************************************************************************
@@ -409,6 +465,7 @@ namespace Jack
 
     int JackNetUnixSocket::CatchHost(void* buffer, size_t nbytes, int flags)
     {
+        jack_log("JackNetUnixSocket::CatchHost");
         socklen_t addr_len = sizeof(socket_address_t);
     #if defined(__sun__) || defined(sun)
         if (WaitRead() < 0)
