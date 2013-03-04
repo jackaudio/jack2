@@ -176,48 +176,37 @@ namespace Jack
     int JackNetMaster::AllocPorts()
     {
         int i;
-        char name[24];
-        jack_nframes_t port_latency = jack_get_buffer_size(fClient);
-        jack_latency_range_t range;
-
+        char name[32];
         jack_log("JackNetMaster::AllocPorts");
 
         //audio
         for (i = 0; i < fParams.fSendAudioChannels; i++) {
             snprintf(name, sizeof(name), "to_slave_%d", i+1);
-            if ((fAudioCapturePorts[i] = jack_port_register(fClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput | JackPortIsTerminal, 0)) == NULL)
+            if ((fAudioCapturePorts[i] = jack_port_register(fClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput | JackPortIsTerminal, 0)) == NULL) {
                 return -1;
-            //port latency
-            range.min = range.max = 0;
-            jack_port_set_latency_range(fAudioCapturePorts[i], JackCaptureLatency, &range);
+            }
         }
 
         for (i = 0; i < fParams.fReturnAudioChannels; i++) {
             snprintf(name, sizeof(name), "from_slave_%d", i+1);
-            if ((fAudioPlaybackPorts[i] = jack_port_register(fClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput | JackPortIsTerminal, 0)) == NULL)
+            if ((fAudioPlaybackPorts[i] = jack_port_register(fClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput | JackPortIsTerminal, 0)) == NULL) {
                 return -1;
-            //port latency
-            range.min = range.max = fParams.fNetworkLatency * port_latency + ((fParams.fSlaveSyncMode) ? 0 : port_latency);
-            jack_port_set_latency_range(fAudioPlaybackPorts[i], JackPlaybackLatency, &range);
+            }
         }
 
         //midi
         for (i = 0; i < fParams.fSendMidiChannels; i++) {
             snprintf(name, sizeof(name), "midi_to_slave_%d", i+1);
-            if ((fMidiCapturePorts[i] = jack_port_register(fClient, name, JACK_DEFAULT_MIDI_TYPE, JackPortIsInput | JackPortIsTerminal, 0)) == NULL)
+            if ((fMidiCapturePorts[i] = jack_port_register(fClient, name, JACK_DEFAULT_MIDI_TYPE, JackPortIsInput | JackPortIsTerminal, 0)) == NULL) {
                 return -1;
-            //port latency
-            range.min = range.max = 0;
-            jack_port_set_latency_range(fMidiCapturePorts[i], JackCaptureLatency, &range);
+            }
         }
 
         for (i = 0; i < fParams.fReturnMidiChannels; i++) {
             snprintf(name, sizeof(name), "midi_from_slave_%d", i+1);
-            if ((fMidiPlaybackPorts[i] = jack_port_register(fClient, name, JACK_DEFAULT_MIDI_TYPE,  JackPortIsOutput | JackPortIsTerminal, 0)) == NULL)
+            if ((fMidiPlaybackPorts[i] = jack_port_register(fClient, name, JACK_DEFAULT_MIDI_TYPE,  JackPortIsOutput | JackPortIsTerminal, 0)) == NULL) {
                 return -1;
-            //port latency
-            range.min = range.max = fParams.fNetworkLatency * port_latency + ((fParams.fSlaveSyncMode) ? 0 : port_latency);
-            jack_port_set_latency_range(fMidiPlaybackPorts[i], JackPlaybackLatency, &range);
+            }
         }
         return 0;
     }
