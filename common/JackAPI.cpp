@@ -1257,19 +1257,21 @@ LIB_EXPORT jack_port_t* jack_port_by_name(jack_client_t* ext_client, const char*
 
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
-        jack_error("jack_get_ports called with a NULL client");
-        return 0;
+        jack_error("jack_port_by_name called with a NULL client");
+        return NULL;
     }
 
     if (portname == NULL) {
         jack_error("jack_port_by_name called with a NULL port name");
         return NULL;
-    } else {
-        JackGraphManager* manager = GetGraphManager();
-        if (!manager)
-            return NULL;
+    }
+    
+    JackGraphManager* manager = GetGraphManager();
+    if (manager) {
         int res = manager->GetPort(portname); // returns a port index at least > 1
         return (res == NO_PORT) ? NULL : (jack_port_t*)((uintptr_t)res);
+    } else {
+        return NULL;
     }
 }
 
@@ -1399,7 +1401,7 @@ LIB_EXPORT float jack_cpu_load(jack_client_t* ext_client)
         return 0.0f;
     } else {
         JackEngineControl* control = GetEngineControl();
-        return (control ? control->fCPULoad :  0.0f);
+        return (control ? control->fCPULoad : 0.0f);
     }
 }
 

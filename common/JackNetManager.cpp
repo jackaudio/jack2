@@ -135,12 +135,16 @@ namespace Jack
             goto fail;
         }
         
+        if (jack_set_latency_callback(fClient, LatencyCallback, this) < 0) {
+            goto fail;
+        }
+        
         /*
         if (jack_set_port_connect_callback(fClient, SetConnectCallback, this) < 0) {
             goto fail;
         }
         */
-
+     
         if (AllocPorts() != 0) {
             jack_error("Can't allocate JACK ports");
             goto fail;
@@ -193,7 +197,7 @@ namespace Jack
             if ((fAudioPlaybackPorts[i] = jack_port_register(fClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput | JackPortIsTerminal, 0)) == NULL)
                 return -1;
             //port latency
-            range.min = range.max = fParams.fNetworkLatency * port_latency + (fParams.fSlaveSyncMode) ? 0 : port_latency;
+            range.min = range.max = fParams.fNetworkLatency * port_latency + ((fParams.fSlaveSyncMode) ? 0 : port_latency);
             jack_port_set_latency_range(fAudioPlaybackPorts[i], JackPlaybackLatency, &range);
         }
 
@@ -212,7 +216,7 @@ namespace Jack
             if ((fMidiPlaybackPorts[i] = jack_port_register(fClient, name, JACK_DEFAULT_MIDI_TYPE,  JackPortIsOutput | JackPortIsTerminal, 0)) == NULL)
                 return -1;
             //port latency
-            range.min = range.max = fParams.fNetworkLatency * port_latency + (fParams.fSlaveSyncMode) ? 0 : port_latency;
+            range.min = range.max = fParams.fNetworkLatency * port_latency + ((fParams.fSlaveSyncMode) ? 0 : port_latency);
             jack_port_set_latency_range(fMidiPlaybackPorts[i], JackPlaybackLatency, &range);
         }
         return 0;
@@ -220,14 +224,14 @@ namespace Jack
 
     void JackNetMaster::ConnectPorts()
     {
-        const char **ports;
+        const char** ports;
 
         ports = jack_get_ports(fClient, NULL, NULL, JackPortIsPhysical | JackPortIsOutput);
         if (ports != NULL) {
             for (int i = 0; i < fParams.fSendAudioChannels && ports[i]; i++) {
                 jack_connect(fClient, ports[i], jack_port_name(fAudioCapturePorts[i]));
             }
-            free(ports);
+            jack_free(ports);
         }
 
         ports = jack_get_ports(fClient, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
@@ -235,7 +239,7 @@ namespace Jack
             for (int i = 0; i < fParams.fReturnAudioChannels && ports[i]; i++) {
                 jack_connect(fClient, jack_port_name(fAudioPlaybackPorts[i]), ports[i]);
             }
-            free(ports);
+            jack_free(ports);
         }
     }
 
@@ -382,6 +386,28 @@ namespace Jack
             obj->Exit();
         }
         return 0;
+    }
+    
+    void JackNetMaster::LatencyCallback(jack_latency_callback_mode_t mode, void* arg)
+    {
+        JackNetMaster* obj = static_cast<JackNetMaster*>(arg);
+        jack_nframes_t port_latency = jack_get_buffer_size(obj->fClient);
+        jack_latency_range_t range;
+        int i;
+    
+        //audio
+        for (i = 0; i < obj->fParams.fReturnAudioChannels; i++) {
+            //port latency
+            range.min = range.max = obj->fParams.fNetworkLatency * port_latency + ((obj->fParams.fSlaveSyncMode) ? 0 : port_latency);
+            jack_port_set_latency_range(obj->fAudioPlaybackPorts[i], JackPlaybackLatency, &range);
+        }
+
+        //midi
+        for (i = 0; i < obj->fParams.fReturnMidiChannels; i++) {
+            //port latency
+            range.min = range.max = obj->fParams.fNetworkLatency * port_latency + ((obj->fParams.fSlaveSyncMode) ? 0 : port_latency);
+            jack_port_set_latency_range(obj->fMidiPlaybackPorts[i], JackPlaybackLatency, &range);
+        }
     }
 
 //process-----------------------------------------------------------------------------
@@ -595,7 +621,7 @@ namespace Jack
 
     int JackNetMasterManager::CountIO(int flags)
     {
-        const char **ports;
+        const char** ports;
         int count = 0;
         jack_port_t* port;
 
@@ -606,7 +632,7 @@ namespace Jack
                     && (strcmp(jack_port_type(port), JACK_DEFAULT_AUDIO_TYPE) == 0)) {
                 count++;
             }
-            free(ports);
+            jack_free(ports);
         }
         return count;
     }
