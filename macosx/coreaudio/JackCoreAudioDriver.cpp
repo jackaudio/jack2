@@ -1729,7 +1729,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
         if (chan_in_list.size() > 0) {
             for (uint i = 0; i < chan_in_list.size(); i++) {
                 int chan = chan_in_list[i];
-                if (chan < out_maxChannels) {
+                if (chan < in_maxChannels) {
                     // The wanted JACK input index for the 'chan' channel value
                     chanArr[chan] = i;
                     jack_info("Input channel = %d ==> JACK input port = %d", chan, i);
