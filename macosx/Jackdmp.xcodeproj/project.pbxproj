@@ -9696,6 +9696,7 @@
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
+					"-DUSE_CLASSIC_AUTOLAUNCH",
 					"-DMACH_RPC_MACH_SEMA",
 					"-D__SMP__",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
@@ -9760,6 +9761,7 @@
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
+					"-DUSE_CLASSIC_AUTOLAUNCH",
 					"-DMACH_RPC_MACH_SEMA",
 					"-D__SMP__",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
@@ -13574,6 +13576,7 @@
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
+					"-DUSE_CLASSIC_AUTOLAUNCH",
 					"-D__CLIENTDEBUG__",
 					"-DMACH_RPC_MACH_SEMA",
 					"-D__SMP__",
@@ -13639,6 +13642,7 @@
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
+					"-DUSE_CLASSIC_AUTOLAUNCH",
 					"-D__CLIENTDEBUG__",
 					"-DMACH_RPC_MACH_SEMA",
 					"-D__SMP__",
@@ -14409,6 +14413,7 @@
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
+					"-DUSE_CLASSIC_AUTOLAUNCH",
 					"-DMACH_RPC_MACH_SEMA",
 					"-D__SMP__",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
@@ -14471,6 +14476,7 @@
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
+					"-DUSE_CLASSIC_AUTOLAUNCH",
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
 					"-D__SMP__",
