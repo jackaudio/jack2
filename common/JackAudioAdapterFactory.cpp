@@ -62,7 +62,7 @@ extern "C"
 
         try {
 
-            adapter = new Jack::JackAudioAdapter(jack_client, new Jack::JackPlatformAdapter(buffer_size, sample_rate, params));
+            adapter = new Jack::JackAudioAdapter(jack_client, new Jack::JackPlatformAdapter(buffer_size, sample_rate, params), params);
             assert(adapter);
 
             if (adapter->Open() == 0) {

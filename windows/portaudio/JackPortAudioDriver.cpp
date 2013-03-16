@@ -382,7 +382,7 @@ extern "C"
         value.i = 0;
         jack_driver_descriptor_add_parameter(desc, &filler, "monitor", 'm', JackDriverParamBool, &value, NULL, "Provide monitor ports for the output", NULL);
 
-        value.i = TRUE;
+        value.i = true;
         jack_driver_descriptor_add_parameter(desc, &filler, "duplex", 'D', JackDriverParamBool, &value, NULL, "Provide both capture and playback ports", NULL);
 
         value.ui = 44100U;
@@ -397,7 +397,7 @@ extern "C"
         jack_driver_descriptor_add_parameter(desc, &filler, "input-latency", 'I', JackDriverParamUInt, &value, NULL, "Extra input latency", NULL);
         jack_driver_descriptor_add_parameter(desc, &filler, "output-latency", 'O', JackDriverParamUInt, &value, NULL, "Extra output latency", NULL);
 
-        value.i = TRUE;
+        value.i = true;
         jack_driver_descriptor_add_parameter(desc, &filler, "list-devices", 'l', JackDriverParamBool, &value, NULL, "Display available PortAudio devices", NULL);
 
         return desc;
@@ -456,7 +456,7 @@ extern "C"
                 break;
 
             case 'P':
-                playback = TRUE;
+                playback = true;
                 if (strcmp(param->value.str, "none") != 0) {
                     playback_pcm_name = param->value.str;
                 }

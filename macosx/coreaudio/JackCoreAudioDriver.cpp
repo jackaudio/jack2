@@ -2491,7 +2491,7 @@ extern "C"
         value.i  = 0;
         jack_driver_descriptor_add_parameter(desc, &filler, "AC3-LFE", 'f', JackDriverParamBool, &value, NULL, "AC3 LFE channel", NULL);
 #endif
-        value.i  = TRUE;
+        value.i  = true;
         jack_driver_descriptor_add_parameter(desc, &filler, "duplex", 'D', JackDriverParamBool, &value, NULL, "Provide both capture and playback ports", NULL);
 
         value.ui  = 44100U;
@@ -2507,10 +2507,10 @@ extern "C"
         jack_driver_descriptor_add_parameter(desc, &filler, "input-latency", 'I', JackDriverParamUInt, &value, NULL, "Extra input latency (frames)", NULL);
         jack_driver_descriptor_add_parameter(desc, &filler, "output-latency", 'O', JackDriverParamUInt, &value, NULL, "Extra output latency (frames)", NULL);
 
-        value.i  = FALSE;
+        value.i  = false;
         jack_driver_descriptor_add_parameter(desc, &filler, "list-devices", 'l', JackDriverParamBool, &value, NULL, "Display available CoreAudio devices", NULL);
 
-        value.i  = FALSE;
+        value.i  = false;
         jack_driver_descriptor_add_parameter(desc, &filler, "hog", 'H', JackDriverParamBool, &value, NULL, "Take exclusive access of the audio device", NULL);
 
         value.ui  = 100;
@@ -2519,7 +2519,7 @@ extern "C"
         value.ui  = 100;
         jack_driver_descriptor_add_parameter(desc, &filler, "grain", 'G', JackDriverParamUInt, &value, NULL, "Computation grain in RT thread (percent)", NULL);
 
-        value.i = FALSE;
+        value.i = false;
         jack_driver_descriptor_add_parameter(desc, &filler, "clock-drift", 's', JackDriverParamBool, &value, NULL, "Clock drift compensation", "Whether to compensate clock drift in dynamically created aggregate device");
 
         return desc;

@@ -568,8 +568,7 @@ namespace Jack
         for (node = params; node; node = jack_slist_next(node)) {
 
             param = (const jack_driver_param_t*) node->data;
-            switch (param->character)
-            {
+            switch (param->character) {
                 case 'a' :
                     if (strlen(param->value.str) < 32) {
                         strcpy(fMulticastIP, param->value.str);

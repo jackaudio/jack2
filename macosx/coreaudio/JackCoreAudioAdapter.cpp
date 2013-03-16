@@ -357,11 +357,7 @@ JackCoreAudioAdapter::JackCoreAudioAdapter(jack_nframes_t buffer_size, jack_nfra
         param = (const jack_driver_param_t*) node->data;
 
         switch (param->character) {
-
-            case 'c' :
-                fCaptureChannels = fPlaybackChannels = param->value.ui;
-                break;
-
+ 
             case 'i':
                 fCaptureChannels = param->value.ui;
                 break;
@@ -1714,7 +1710,6 @@ extern "C"
         desc = jack_driver_descriptor_construct("audioadapter", JackDriverNone, "netjack audio <==> net backend adapter", &filler);
 
         value.i = -1;
-        jack_driver_descriptor_add_parameter(desc, &filler, "channels", 'c', JackDriverParamInt, &value, NULL, "Maximum number of channels", "Maximum number of channels. If -1, max possible number of channels will be used");
         jack_driver_descriptor_add_parameter(desc, &filler, "in-channels", 'i', JackDriverParamInt, &value, NULL, "Maximum number of input channels", "Maximum number of input channels. If -1, max possible number of input channels will be used");
         jack_driver_descriptor_add_parameter(desc, &filler, "out-channels", 'o', JackDriverParamInt, &value, NULL, "Maximum number of output channels", "Maximum number of output channels. If -1, max possible number of output channels will be used");
 
@@ -1728,13 +1723,13 @@ extern "C"
         value.ui = 512U;
         jack_driver_descriptor_add_parameter(desc, &filler, "period", 'p', JackDriverParamUInt, &value, NULL, "Frames per period", NULL);
 
-        value.i = TRUE;
+        value.i = true;
         jack_driver_descriptor_add_parameter(desc, &filler, "duplex", 'D', JackDriverParamBool, &value, NULL, "Provide both capture and playback ports", NULL);
 
         value.str[0] = 0;
         jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, NULL, "CoreAudio device name", NULL);
 
-        value.i = TRUE;
+        value.i = true;
         jack_driver_descriptor_add_parameter(desc, &filler, "list-devices", 'l', JackDriverParamBool, &value, NULL, "Display available CoreAudio devices", NULL);
 
         value.ui = 0;
@@ -1743,8 +1738,11 @@ extern "C"
         value.ui = 32768;
         jack_driver_descriptor_add_parameter(desc, &filler, "ring-buffer", 'g', JackDriverParamInt, &value, NULL, "Fixed ringbuffer size", "Fixed ringbuffer size (if not set => automatic adaptative)");
 
-        value.i = FALSE;
+        value.i = false;
         jack_driver_descriptor_add_parameter(desc, &filler, "clock-drift", 's', JackDriverParamBool, &value, NULL, "Clock drift compensation", "Whether to compensate clock drift in dynamically created aggregate device");
+
+        value.i = false;
+        jack_driver_descriptor_add_parameter(desc, &filler, "auto-connect", 'c', JackDriverParamBool, &value, NULL, "Auto connect audioadapter to system ports", NULL);
 
         return desc;
     }
