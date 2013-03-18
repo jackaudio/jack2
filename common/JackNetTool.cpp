@@ -208,14 +208,22 @@ namespace Jack
         fNPorts = nports;
         fNetBuffer = net_buffer;
 
-        fPortBuffer = new sample_t* [fNPorts];
+        fPortBuffer = new sample_t*[fNPorts];
         fConnectedPorts = new bool[fNPorts];
+        
         for (int port_index = 0; port_index < fNPorts; port_index++) {
             fPortBuffer[port_index] = NULL;
             fConnectedPorts[port_index] = true;
         }
+        
+        fLastSubCycle = 0;
+        fPeriodSize = 0;
+        fSubPeriodSize = 0;
+        fSubPeriodBytesSize = 0;
+        fCycleDuration = 0.f;
+        fCycleBytesSize = 0;
     }
-
+ 
     NetAudioBuffer::~NetAudioBuffer()
     {
         delete [] fConnectedPorts;
@@ -285,19 +293,14 @@ namespace Jack
     void NetAudioBuffer::ActivePortsFromNetwork(char* net_buffer, uint32_t port_num)
     {
         int* active_port_address = (int*)net_buffer;
-
+  
         for (int port_index = 0; port_index < fNPorts; port_index++) {
             fConnectedPorts[port_index] = false;
         }
 
         for (uint port_index = 0; port_index < port_num; port_index++) {
-            // Use -1 when port is actually connected on other side
             int active_port = ntohl(*active_port_address);
-            if (active_port >= 0 && active_port < fNPorts) {
-                fConnectedPorts[active_port] = true;
-            } else {
-                jack_error("ActivePortsFromNetwork: incorrect port = %d", active_port);
-            }
+            fConnectedPorts[active_port] = true;
             active_port_address++;
         }
     }
@@ -371,7 +374,7 @@ namespace Jack
         UpdateParams(active_ports);
 
         /*
-        jack_log("GetNumPackets packet = %d  fPeriodSize = %d fSubPeriodSize = %d fSubPeriodBytesSize = %d",
+        jack_log("GetNumPackets packet = %d fPeriodSize = %d fSubPeriodSize = %d fSubPeriodBytesSize = %d",
             fPeriodSize / fSubPeriodSize, fPeriodSize, fSubPeriodSize, fSubPeriodBytesSize);
         */
         return fPeriodSize / fSubPeriodSize; // At least one packet
