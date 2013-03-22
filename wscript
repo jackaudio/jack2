@@ -84,7 +84,7 @@ def configure(conf):
     conf.load('compiler_cc')
     platform = sys.platform
     conf.env['IS_MACOSX'] = platform == 'darwin'
-    conf.env['IS_LINUX'] = platform == 'linux' or platform == 'linux2' or platform == 'posix'
+    conf.env['IS_LINUX'] = platform == 'linux' or platform == 'linux2' or platform == 'linux3' or platform == 'posix'
     conf.env['IS_SUN'] = platform == 'sunos'
     # GNU/kFreeBSD and GNU/Hurd are treated as Linux
     if platform.startswith('gnu0') or platform.startswith('gnukfreebsd'):
