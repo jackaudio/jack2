@@ -1010,7 +1010,7 @@ size_t jack_port_type_get_buffer_size (jack_client_t *client, const char *port_t
  * latency values associated with them, both measured in frames:
  *
  * <b>capture latency</b>: how long since the data read from
- *                  the buffer of a port arrived at at
+ *                  the buffer of a port arrived at
  *                  a port marked with JackPortIsTerminal.
  *                  The data will have come from the "outside
  *                  world" if the terminal port is also

@@ -61,7 +61,7 @@ namespace Jack {
         int CloseAux();
 
         void Restart();
-
+    
         JackThread fThread;    /*! Thread to execute the Process function */
 
     public:

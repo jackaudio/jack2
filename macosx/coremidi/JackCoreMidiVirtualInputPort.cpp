@@ -20,6 +20,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <sstream>
 #include <stdexcept>
 
+#include "JackError.h"
 #include "JackCoreMidiUtil.h"
 #include "JackCoreMidiVirtualInputPort.h"
 
@@ -63,6 +64,9 @@ JackCoreMidiVirtualInputPort(const char *alias_name, const char *client_name,
         throw std::runtime_error(GetMacOSErrorString(status));
     }
     Initialize(alias_name, client_name, driver_name, index, destination);
+    
+    // Keep in global list (that keeps growing during the whole session...)
+    endpoint_list.insert(endpoint);
 }
 
 JackCoreMidiVirtualInputPort::~JackCoreMidiVirtualInputPort()

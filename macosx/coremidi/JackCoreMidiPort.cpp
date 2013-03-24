@@ -25,6 +25,14 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 using Jack::JackCoreMidiPort;
 
+std::set<MIDIEndpointRef> JackCoreMidiPort::endpoint_list;
+
+bool JackCoreMidiPort::IsInternalPort(MIDIObjectRef port_aux)
+{
+    MIDIEndpointRef port = (MIDIEndpointRef)port_aux;
+    return std::find(endpoint_list.begin(), endpoint_list.end(), port) != endpoint_list.end();
+}
+
 JackCoreMidiPort::JackCoreMidiPort(double time_ratio)
 {
     initialized = false;

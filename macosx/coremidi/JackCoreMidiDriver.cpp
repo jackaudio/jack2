@@ -112,7 +112,6 @@ bool JackCoreMidiDriver::OpenAux()
 
     OSStatus status = MIDIClientCreate(name, HandleNotificationEvent, this,
                                        &client);
-
     CFRelease(name);
 
     if (status != noErr) {
@@ -245,7 +244,6 @@ bool JackCoreMidiDriver::OpenAux()
             }
         }
     }
-
 
     if (! (pi_count || po_count || in_channels || out_channels)) {
         jack_error("JackCoreMidiDriver::Open - no CoreMIDI inputs or outputs "
@@ -522,7 +520,6 @@ void
 JackCoreMidiDriver::Restart()
 {
     JackLock lock(this);
-
     SaveConnections();
     Stop();
     Detach();
@@ -538,16 +535,27 @@ JackCoreMidiDriver::HandleNotification(const MIDINotification *message)
 {
     switch (message->messageID) {
 
-        case kMIDIMsgSetupChanged:
-            Restart();
+        case kMIDIMsgObjectAdded: {
+            /*
+                We don't want to restart when our internal virtual in/out are created.
+            */
+            const MIDIObjectAddRemoveNotification* add_message = reinterpret_cast<const MIDIObjectAddRemoveNotification*>(message);
+            if (!JackCoreMidiPort::IsInternalPort(add_message->child)) {
+                Restart();
+            }
             break;
-
-        case kMIDIMsgObjectAdded:
+        }
+        
+        case kMIDIMsgObjectRemoved: {
+            /*
+                We don't want to restart when our internal virtual in/out are created.
+            */
+            const MIDIObjectAddRemoveNotification* remove_message = reinterpret_cast<const MIDIObjectAddRemoveNotification*>(message);
+            if (!JackCoreMidiPort::IsInternalPort(remove_message->child)) {
+                Restart();
+            }
             break;
-
-        case kMIDIMsgObjectRemoved:
-            break;
-
+        }
     }
 }
 
@@ -809,8 +817,8 @@ extern "C" {
     {
         const JSList * node;
         const jack_driver_param_t * param;
-        int virtual_in = 0;
-        int virtual_out = 0;
+        int virtual_in = 1;
+        int virtual_out = 1;
 
         for (node = params; node; node = jack_slist_next (node)) {
             param = (const jack_driver_param_t *) node->data;
