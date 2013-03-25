@@ -510,9 +510,28 @@ namespace Jack
         }
 
         //receive sync
+        /*
         int res = SyncRecv();
         if ((res == 0) || (res == SOCKET_ERROR)) {
             return res;
+        }
+        */
+        
+        int res = SyncRecv();
+        switch (res) {
+        
+            case 0:
+            case SOCKET_ERROR:
+                return res;
+                
+            case NET_PACKET_ERROR:
+                // Since sync packet is incorrect, don't decode it and continue with data
+                break;
+                
+            default:
+                //decode sync
+                DecodeSyncPacket();
+                break;
         }
 
 #ifdef JACK_MONITOR
@@ -520,15 +539,31 @@ namespace Jack
 #endif
 
         //decode sync
-        DecodeSyncPacket();
+        //DecodeSyncPacket();
 
         //receive data
+        /*
         res = DataRecv();
         if ((res == 0) || (res == SOCKET_ERROR)) {
             return res;
         } else if (res == NET_PACKET_ERROR) {
             // Well not a real XRun...
             JackServerGlobals::fInstance->GetEngine()->NotifyClientXRun(ALL_CLIENTS);
+        }
+        */
+        
+        //receive data
+        res = DataRecv();
+        switch (res) {
+        
+            case 0:
+            case SOCKET_ERROR:
+                return res;
+                
+            case NET_PACKET_ERROR:
+                // Well not a real XRun...
+                JackServerGlobals::fInstance->GetEngine()->NotifyClientXRun(ALL_CLIENTS);
+                break;
         }
 
 #ifdef JACK_MONITOR

@@ -351,11 +351,31 @@ namespace Jack
     {
         //don't return -1 in case of sync recv failure
         //we need the process to continue for network error detection
+        /*
         if (SyncRecv() == SOCKET_ERROR) {
             return 0;
         }
 
         DecodeSyncPacket();
+        */
+        
+        //don't return -1 in case of sync recv failure
+        //we need the process to continue for network error detection
+        switch (SyncRecv()) {
+        
+            case SOCKET_ERROR:
+                return 0;
+                
+            case NET_PACKET_ERROR:
+                // Since sync packet is incorrect, don't decode it and continue with data
+                break;
+                
+            default:
+                //decode sync
+                DecodeSyncPacket();
+                break;
+        }
+        
         return DataRecv();
     }
 

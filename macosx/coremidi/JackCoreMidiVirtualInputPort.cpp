@@ -59,6 +59,15 @@ JackCoreMidiVirtualInputPort(const char *alias_name, const char *client_name,
     MIDIEndpointRef destination;
     OSStatus status = MIDIDestinationCreate(client, name, HandleInputEvent,
                                             this, &destination);
+     
+    /*                                                                            
+    SInt32 value;                                        
+    status = MIDIObjectGetIntegerProperty(destination, kMIDIPropertyUniqueID, &value);
+    if (status == noErr) {
+        jack_info("kMIDIPropertyUniqueID %d", value);
+    }
+    */                                  
+                                            
     CFRelease(name);
     if (status != noErr) {
         throw std::runtime_error(GetMacOSErrorString(status));

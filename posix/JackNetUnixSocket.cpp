@@ -335,12 +335,12 @@ namespace Jack
         jack_log("JackNetUnixSocket::SetTimeout %d usecs", us);
         struct timeval timeout;
 
-        //less than 1sec
+        //less than 1 sec
         if (us < 1000000) {
             timeout.tv_sec = 0;
             timeout.tv_usec = us;
         } else {
-        //more than 1sec
+        //more than 1 sec
             float sec = float(us) / 1000000.f;
             timeout.tv_sec = (int)sec;
             float usec = (sec - float(timeout.tv_sec)) * 1000000;

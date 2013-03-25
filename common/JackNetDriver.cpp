@@ -507,10 +507,25 @@ namespace Jack
         fNetTimeMon->New();
 #endif
 
-        //receive sync (launch the cycle)
+        switch (SyncRecv()) {
+        
+            case SOCKET_ERROR:
+                return SOCKET_ERROR;
+                
+            case NET_PACKET_ERROR:
+                // Since sync packet is incorrect, don't decode it and continue with data
+                break;
+                
+            default:
+                //decode sync
+                DecodeSyncPacket();
+                break;
+        }
+        /*
         if (SyncRecv() == SOCKET_ERROR) {
             return SOCKET_ERROR;
         }
+        */
 
 #ifdef JACK_MONITOR
         // For timing
@@ -519,19 +534,30 @@ namespace Jack
 
         //decode sync
         //if there is an error, don't return -1, it will skip Write() and the network error probably won't be identified
-        DecodeSyncPacket();
+        //DecodeSyncPacket();
 
 #ifdef JACK_MONITOR
         fNetTimeMon->Add(float(GetMicroSeconds() - fRcvSyncUst) / float(fEngineControl->fPeriodUsecs) * 100.f);
 #endif
         //audio, midi or sync if driver is late
-        int res = DataRecv();
+        switch (DataRecv()) {
+        
+            case SOCKET_ERROR:
+                return SOCKET_ERROR;
+                
+            case NET_PACKET_ERROR:
+                jack_time_t cur_time = GetMicroSeconds();
+                NotifyXRun(cur_time, float(cur_time - fBeginDateUst));  // Better this value than nothing...
+                break;
+        }
+        /*
         if (res == SOCKET_ERROR) {
             return SOCKET_ERROR;
         } else if (res == NET_PACKET_ERROR) {
             jack_time_t cur_time = GetMicroSeconds();
             NotifyXRun(cur_time, float(cur_time - fBeginDateUst));  // Better this value than nothing...
         }
+        */
 
         //take the time at the beginning of the cycle
         JackDriver::CycleTakeBeginTime();
@@ -553,12 +579,9 @@ namespace Jack
         for (int audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++) {
         #ifdef OPTIMIZED_PROTOCOL
             // Port is connected on other side...
-            if (fNetAudioPlaybackBuffer->GetConnected(audio_port_index)) {
-                if (fGraphManager->GetConnectionsNum(fPlaybackPortList[audio_port_index]) > 0) {
-                    fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, GetOutputBuffer(audio_port_index));
-                } else {
-                    fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, NULL);
-                }
+            if (fNetAudioPlaybackBuffer->GetConnected(audio_port_index)
+                && (fGraphManager->GetConnectionsNum(fPlaybackPortList[audio_port_index]) > 0)) {
+                fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, GetOutputBuffer(audio_port_index));
             } else {
                 fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, NULL);
             }

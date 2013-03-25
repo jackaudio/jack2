@@ -44,6 +44,15 @@ JackCoreMidiVirtualOutputPort(const char *alias_name, const char *client_name,
     }
     MIDIEndpointRef source;
     OSStatus status = MIDISourceCreate(client, name, &source);
+    
+    /*
+    SInt32 value;                                        
+    status = MIDIObjectGetIntegerProperty(source, kMIDIPropertyUniqueID, &value);
+    if (status == noErr) {
+        jack_info("kMIDIPropertyUniqueID %d", value);
+    }
+    */   
+    
     CFRelease(name);
     if (status != noErr) {
         throw std::runtime_error(GetMacOSErrorString(status));

@@ -381,7 +381,7 @@ namespace Jack
         fRunning = false;
 
         // send a 'multicast euthanasia request' - new socket is required on macosx
-        jack_info("Exiting '%s'", fParams.fName);
+        jack_info("Exiting '%s'  %s", fParams.fName, fMulticastIP);
         SetPacketType(&fParams, KILL_MASTER);
         JackNetSocket mcast_socket(fMulticastIP, fSocket.GetPort());
 
@@ -488,8 +488,8 @@ namespace Jack
         while (strcmp(rx_head->fPacketType, "header") != 0);
         
         if (rx_head->fDataType != 's') {
-            jack_error("Wrong packet type : %c\n", rx_head->fDataType);
-            return -1;
+            jack_error("Wrong packet type : %c", rx_head->fDataType);
+            return NET_PACKET_ERROR;
         }
     
         fCurrentCycleOffset = fTxHeader.fCycle - rx_head->fCycle;
@@ -532,7 +532,7 @@ namespace Jack
                         break;
 
                     case 's':   // sync
-                        jack_info("NetMaster : overloaded, skipping receive from '%s'", fParams.fName);
+                        jack_info("NetMaster : missing last data packet from '%s'", fParams.fName);
                         return FinishRecv(fNetAudioPlaybackBuffer);
                 }
             }
@@ -866,7 +866,7 @@ namespace Jack
         // receive sync (launch the cycle)
         do {
             rx_bytes = Recv(fParams.fMtu, 0);
-            // connection issue, send will detect it, so don't skip the cycle (return 0)
+            // connection issue (return -1)
             if (rx_bytes == SOCKET_ERROR) {
                 return rx_bytes;
             }
@@ -874,8 +874,8 @@ namespace Jack
         while (strcmp(rx_head->fPacketType, "header") != 0);
         
         if (rx_head->fDataType != 's') {
-            jack_error("Wrong packet type : %c\n", rx_head->fDataType);
-            return -1;
+            jack_error("Wrong packet type : %c", rx_head->fDataType);
+            return NET_PACKET_ERROR;
         }
      
         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
@@ -894,7 +894,7 @@ namespace Jack
             // how much data is queued on the rx buffer ?
             rx_bytes = Recv(fParams.fMtu, MSG_PEEK);
 
-            // error here, problem with recv, just skip the cycle (return -1)
+            // error here, just skip the cycle (return -1)
             if (rx_bytes == SOCKET_ERROR) {
                 return rx_bytes;
             }
@@ -912,7 +912,7 @@ namespace Jack
                         break;
 
                     case 's':   // sync
-                        jack_info("NetSlave : overloaded, skipping receive");
+                        jack_info("NetSlave : missing last data packet");
                         return FinishRecv(fNetAudioCaptureBuffer);
                 }
             }
