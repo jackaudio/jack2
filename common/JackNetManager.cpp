@@ -510,13 +510,6 @@ namespace Jack
         }
 
         //receive sync
-        /*
-        int res = SyncRecv();
-        if ((res == 0) || (res == SOCKET_ERROR)) {
-            return res;
-        }
-        */
-        
         int res = SyncRecv();
         switch (res) {
         
@@ -526,7 +519,7 @@ namespace Jack
                 
             case NET_PACKET_ERROR:
                 // Since sync packet is incorrect, don't decode it and continue with data
-                break;
+                 break;
                 
             default:
                 //decode sync
@@ -537,21 +530,7 @@ namespace Jack
 #ifdef JACK_MONITOR
         fNetTimeMon->Add((((float)(GetMicroSeconds() - begin_time)) / (float) fPeriodUsecs) * 100.f);
 #endif
-
-        //decode sync
-        //DecodeSyncPacket();
-
-        //receive data
-        /*
-        res = DataRecv();
-        if ((res == 0) || (res == SOCKET_ERROR)) {
-            return res;
-        } else if (res == NET_PACKET_ERROR) {
-            // Well not a real XRun...
-            JackServerGlobals::fInstance->GetEngine()->NotifyClientXRun(ALL_CLIENTS);
-        }
-        */
-        
+      
         //receive data
         res = DataRecv();
         switch (res) {

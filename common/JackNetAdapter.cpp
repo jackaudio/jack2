@@ -349,18 +349,6 @@ namespace Jack
 //read/write operations---------------------------------------------------------------
     int JackNetAdapter::Read()
     {
-        //don't return -1 in case of sync recv failure
-        //we need the process to continue for network error detection
-        /*
-        if (SyncRecv() == SOCKET_ERROR) {
-            return 0;
-        }
-
-        DecodeSyncPacket();
-        */
-        
-        //don't return -1 in case of sync recv failure
-        //we need the process to continue for network error detection
         switch (SyncRecv()) {
         
             case SOCKET_ERROR:

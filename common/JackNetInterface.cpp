@@ -489,6 +489,8 @@ namespace Jack
         
         if (rx_head->fDataType != 's') {
             jack_error("Wrong packet type : %c", rx_head->fDataType);
+            // Not the last packet..
+            fRxHeader.fIsLastPckt = 0;
             return NET_PACKET_ERROR;
         }
     
@@ -509,10 +511,12 @@ namespace Jack
         int rx_bytes = 0;
         uint recvd_midi_pckt = 0;
         packet_header_t* rx_head = reinterpret_cast<packet_header_t*>(fRxBuffer);
-
+     
         while (!fRxHeader.fIsLastPckt) {
             // how much data is queued on the rx buffer ?
             rx_bytes = Recv(fParams.fMtu, MSG_PEEK);
+            
+            //jack_error("DataRecv : rx_bytes %d", rx_bytes);
          
             // error here, problem with recv, just skip the cycle (return -1)
             if (rx_bytes == SOCKET_ERROR) {
@@ -875,6 +879,8 @@ namespace Jack
         
         if (rx_head->fDataType != 's') {
             jack_error("Wrong packet type : %c", rx_head->fDataType);
+            // Not the last packet...
+            fRxHeader.fIsLastPckt = 0;
             return NET_PACKET_ERROR;
         }
      

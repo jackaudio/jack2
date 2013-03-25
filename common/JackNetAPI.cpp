@@ -415,17 +415,6 @@ struct JackNetExtMaster : public JackNetMasterInterface {
                 fNetMidiPlaybackBuffer->SetBuffer(midi_port_index, ((JackMidiBuffer**)midi_input_buffer)[midi_port_index]);
             }
          
-            /*
-            // TODO : use with netmaster/netdriver code
-            //receive sync
-            int res = SyncRecv();
-            if ((res == 0) || (res == SOCKET_ERROR)) {
-                return res;
-            }
-            
-            DecodeSyncPacket();
-            */
-            
             int res = SyncRecv();
             switch (res) {
             
@@ -773,18 +762,8 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
 
     int Read()
     {
-        // TODO : use with netmaster/netdriver code
         //receive sync (launch the cycle)
-        /*
-        if (SyncRecv() == SOCKET_ERROR) {
-            return SOCKET_ERROR;
-        }
-
-        DecodeSyncPacket();
-        return DataRecv();
-        */
-        
-         switch (SyncRecv()) {
+        switch (SyncRecv()) {
         
             case SOCKET_ERROR:
                 return SOCKET_ERROR;
@@ -795,7 +774,6 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
                 
             default:
                 //decode sync
-                //if there is an error, don't return -1, it will skip Write() and the network error probably won't be identified
                 DecodeSyncPacket();
                 break;
         }
