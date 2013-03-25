@@ -515,8 +515,6 @@ namespace Jack
         while (!fRxHeader.fIsLastPckt) {
             // how much data is queued on the rx buffer ?
             rx_bytes = Recv(fParams.fMtu, MSG_PEEK);
-            
-            //jack_error("DataRecv : rx_bytes %d", rx_bytes);
          
             // error here, problem with recv, just skip the cycle (return -1)
             if (rx_bytes == SOCKET_ERROR) {
