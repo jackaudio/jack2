@@ -241,6 +241,57 @@ fail:
     return i;
 }
 
+bool JackAlsaDriver::AcquireDevice(int device_no, char* reserved_device)
+{
+    assert(*reserved_device == '\0');
+    snprintf(reserved_device, MAX_RESERVED_DEVICE_NAME_SIZE, "Audio%d", device_no);
+
+    if (!JackServerGlobals::on_device_acquire(reserved_device)) {
+        *reserved_device = '\0';
+        return false;
+    }
+
+    return true;
+}
+
+void JackAlsaDriver::AcquireDevices(const char* capture, const char* playback)
+{
+    if (JackServerGlobals::on_device_acquire == NULL) {
+        assert(JackServerGlobals::on_device_release == NULL);
+        return;
+    }
+
+    int capture_card = card_to_num(capture);
+    int playback_card = card_to_num(playback);
+
+    if (capture_card >= 0)
+        if (!AcquireDevice(capture_card, fReservedCaptureDevice))
+            jack_error("Audio device %s cannot be acquired...", capture);
+
+    if (playback_card >= 0 && playback_card != capture_card)
+        if (!AcquireDevice(playback_card, fReservedPlaybackDevice))
+            jack_error("Audio device %s cannot be acquired...", playback);
+}
+
+void JackAlsaDriver::ReleaseDevice(char* reserved_device)
+{
+    if (*reserved_device == '\0') return;
+
+    JackServerGlobals::on_device_release(reserved_device);
+    *reserved_device = '\0';
+}
+
+void JackAlsaDriver::ReleaseDevices()
+{
+    if (JackServerGlobals::on_device_release == NULL) {
+        assert(JackServerGlobals::on_device_acquire == NULL);
+        return;
+    }
+
+    ReleaseDevice(fReservedCaptureDevice);
+    ReleaseDevice(fReservedPlaybackDevice);
+}
+
 int JackAlsaDriver::Open(jack_nframes_t nframes,
                          jack_nframes_t user_nperiods,
                          jack_nframes_t samplerate,
@@ -273,31 +324,7 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
     else if (strcmp(midi_driver_name, "raw") == 0)
         midi = alsa_rawmidi_new((jack_client_t*)this);
 
-    if (JackServerGlobals::on_device_acquire != NULL) {
-        int capture_card = card_to_num(capture_driver_name);
-        int playback_card = card_to_num(playback_driver_name);
-        char audio_name[32];
-
-        if (capture_card >= 0) {
-            snprintf(audio_name, sizeof(audio_name), "Audio%d", capture_card);
-            if (!JackServerGlobals::on_device_acquire(audio_name)) {
-                jack_error("Audio device %s cannot be acquired...", capture_driver_name);
-                return -1;
-            }
-        }
-
-        if (playback_card >= 0 && playback_card != capture_card) {
-            snprintf(audio_name, sizeof(audio_name), "Audio%d", playback_card);
-            if (!JackServerGlobals::on_device_acquire(audio_name)) {
-                jack_error("Audio device %s cannot be acquired...", playback_driver_name);
-                if (capture_card >= 0) {
-                    snprintf(audio_name, sizeof(audio_name), "Audio%d", capture_card);
-                    JackServerGlobals::on_device_release(audio_name);
-                }
-                return -1;
-            }
-        }
-    }
+    AcquireDevices(capture_driver_name, playback_driver_name);
 
     fDriver = alsa_driver_new ((char*)"alsa_pcm", (char*)playback_driver_name, (char*)capture_driver_name,
                                NULL,
@@ -335,21 +362,7 @@ int JackAlsaDriver::Close()
 
     alsa_driver_delete((alsa_driver_t*)fDriver);
 
-    if (JackServerGlobals::on_device_release != NULL)
-    {
-        char audio_name[32];
-        int capture_card = card_to_num(fCaptureDriverName);
-        if (capture_card >= 0) {
-            snprintf(audio_name, sizeof(audio_name), "Audio%d", capture_card);
-            JackServerGlobals::on_device_release(audio_name);
-        }
-
-        int playback_card = card_to_num(fPlaybackDriverName);
-        if (playback_card >= 0 && playback_card != capture_card) {
-            snprintf(audio_name, sizeof(audio_name), "Audio%d", playback_card);
-            JackServerGlobals::on_device_release(audio_name);
-        }
-    }
+    ReleaseDevices();
 
     return res;
 }

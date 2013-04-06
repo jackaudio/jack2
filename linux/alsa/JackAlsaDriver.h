@@ -29,6 +29,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
+#define MAX_RESERVED_DEVICE_NAME_SIZE 32
+
 /*!
 \brief The ALSA driver.
 */
@@ -39,14 +41,23 @@ class JackAlsaDriver : public JackAudioDriver
     private:
 
         jack_driver_t* fDriver;
+        char fReservedCaptureDevice[MAX_RESERVED_DEVICE_NAME_SIZE];
+        char fReservedPlaybackDevice[MAX_RESERVED_DEVICE_NAME_SIZE];
 
+        bool AcquireDevice(int device_no, char* reserved_device);
+        void ReleaseDevice(char* reserved_device);
+        void AcquireDevices(const char* capture, const char* playback);
+        void ReleaseDevices();
         void UpdateLatencies();
 
     public:
 
         JackAlsaDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
 		: JackAudioDriver(name, alias, engine, table),fDriver(NULL)
-        {}
+        {
+            *fReservedCaptureDevice = '\0';
+            *fReservedPlaybackDevice = '\0';
+        }
         virtual ~JackAlsaDriver()
         {}
 
