@@ -232,7 +232,10 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
             case kStartFreewheelCallback:
                 jack_log("JackClient::kStartFreewheel");
                 SetupDriverSync(true);
-                fThread.DropRealTime();     // Always done (JACK server in RT mode or not...)
+                // Drop RT only when the RT thread is actually running
+                if (fThread.GetStatus() == JackThread::kRunning) {
+                    fThread.DropRealTime();     
+                }
                 if (fFreewheel) {
                     fFreewheel(1, fFreewheelArg);
                 }
@@ -244,8 +247,9 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                 if (fFreewheel) {
                     fFreewheel(0, fFreewheelArg);
                 }
-                if (GetEngineControl()->fRealTime) {
-                    if (fThread.AcquireRealTime() < 0) {
+                // Acquire RT only when the RT thread is actually running
+                if (GetEngineControl()->fRealTime && fThread.GetStatus() == JackThread::kRunning) {
+                    if (fThread.AcquireRealTime(GetEngineControl()->fClientPriority) < 0) {
                         jack_error("JackClient::AcquireRealTime error");
                     }
                 }
