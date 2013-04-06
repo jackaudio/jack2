@@ -203,8 +203,8 @@ int main(int argc, char** argv)
     jackctl_driver_t * master_driver_ctl;
     jackctl_driver_t * loopback_driver_ctl = NULL;
     int replace_registry = 0;
-
     const char *options = "-d:X:I:P:uvshVrRL:STFl:t:mn:p:"
+        "a:"
 #ifdef __linux__
         "c:"
 #endif
@@ -234,6 +234,7 @@ int main(int argc, char** argv)
                                        { "version", 0, 0, 'V' },
                                        { "silent", 0, 0, 's' },
                                        { "sync", 0, 0, 'S' },
+                                       { "autoconnect", 1, 0, 'a' },
                                        { 0, 0, 0, 0 }
                                    };
 
@@ -295,6 +296,26 @@ int main(int argc, char** argv)
                 }
                 break;
         #endif
+
+            case 'a':
+                param = jackctl_get_parameter(server_parameters, "self-connect-mode");
+                if (param != NULL) {
+                    bool value_valid = false;
+                    for (uint32_t k=0; k<jackctl_parameter_get_enum_constraints_count( param ); k++ ) {
+                        value = jackctl_parameter_get_enum_constraint_value( param, k );
+                        if( value.c == optarg[0] )
+                            value_valid = true;
+                    }
+
+                    if( value_valid ) {
+                        value.c = optarg[0];
+                        jackctl_parameter_set_value(param, &value);
+                    } else {
+                        usage(stdout);
+                        goto destroy_server;
+                    }
+                }
+                break;
 
             case 'd':
                 master_driver_name = optarg;

@@ -60,7 +60,8 @@ struct SERVER_EXPORT JackServerGlobals
                      int priority,
                      int port_max,
                      int verbose,
-                    jack_timer_type_t clock);
+                     jack_timer_type_t clock,
+                     JackSelfConnectMode self_connect_mode);
     static void Stop();
     static void Delete();
 };

@@ -47,10 +47,11 @@ int JackServerGlobals::Start(const char* server_name,
                              int priority,
                              int port_max,
                              int verbose,
-                            jack_timer_type_t clock)
+                             jack_timer_type_t clock,
+                             JackSelfConnectMode self_connect_mode)
 {
     jack_log("Jackdmp: sync = %ld timeout = %ld rt = %ld priority = %ld verbose = %ld ", sync, time_out_ms, rt, priority, verbose);
-    new JackServer(sync, temporary, time_out_ms, rt, priority, port_max, verbose, clock, server_name);  // Will setup fInstance and fUserCount globals
+    new JackServer(sync, temporary, time_out_ms, rt, priority, port_max, verbose, clock, self_connect_mode, server_name);  // Will setup fInstance and fUserCount globals
     int res = fInstance->Open(driver_desc, driver_params);
     return (res < 0) ? res : fInstance->Start();
 }
@@ -336,7 +337,7 @@ bool JackServerGlobals::Init()
             free(argv[i]);
         }
 
-        int res = Start(server_name, driver_desc, master_driver_params, sync, temporary, client_timeout, realtime, realtime_priority, port_max, verbose_aux, clock_source);
+        int res = Start(server_name, driver_desc, master_driver_params, sync, temporary, client_timeout, realtime, realtime_priority, port_max, verbose_aux, clock_source, JACK_DEFAULT_SELF_CONNECT_MODE);
         if (res < 0) {
             jack_error("Cannot start server... exit");
             Delete();
