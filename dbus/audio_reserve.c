@@ -71,8 +71,11 @@ SERVER_EXPORT bool audio_acquire(const char * device_name)
     int ret;
 
     // Open DBus connection first time
-    if (gReserveCount == 0)
-       audio_reservation_init();
+    if (gReserveCount == 0) {
+        if (audio_reservation_init() != 0) {
+            return false;
+        }
+    }
 
     assert(gReserveCount < DEVICE_MAX);
 
