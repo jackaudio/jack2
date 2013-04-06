@@ -311,7 +311,7 @@ int main(int argc, char** argv)
                         value.c = optarg[0];
                         jackctl_parameter_set_value(param, &value);
                     } else {
-                        usage(stdout);
+                        usage(stdout, NULL);
                         goto destroy_server;
                     }
                 }
