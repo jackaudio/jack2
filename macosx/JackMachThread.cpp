@@ -160,12 +160,11 @@ int JackMachThread::GetParams(jack_native_thread_t thread, UInt64* period, UInt6
 
 int JackMachThread::Kill()
 {
-    // pthread_cancel still not yet implemented in Darwin (TO CHECK ON TIGER)
-    jack_log("JackMachThread::Kill");
-
     if (fThread != (jack_native_thread_t)NULL)  { // If thread has been started
+        jack_log("JackMachThread::Kill");
         mach_port_t machThread = pthread_mach_thread_np(fThread);
         int res = (thread_terminate(machThread) == KERN_SUCCESS) ? 0 : -1;
+        fStatus = kIdle;
         fThread = (jack_native_thread_t)NULL;
         return res;
     } else {
