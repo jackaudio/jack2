@@ -355,7 +355,7 @@ JackCoreMidiDriver::Attach()
     JackCoreMidiPort *port_obj;
     latency_range.max = latency;
     latency_range.min = latency;
-
+    
     // Physical inputs
     for (int i = 0; i < num_physical_inputs; i++) {
         port_obj = physical_input_ports[i];
@@ -520,14 +520,16 @@ void
 JackCoreMidiDriver::Restart()
 {
     JackLock lock(this);
-    SaveConnections();
+    // Use first alias
+    SaveConnections(1);
     Stop();
     Detach();
     CloseAux();
     OpenAux();
     Attach();
     Start();
-    RestoreConnections();
+    // Use first alias and partial port naming
+    RestoreConnections(1, false);
 }
 
 void

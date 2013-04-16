@@ -28,6 +28,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackEngineControl.h"
 #include "JackClientControl.h"
 #include "JackLockedEngine.h"
+#include "JackTime.h"
 #include <math.h>
 #include <assert.h>
 
@@ -471,27 +472,45 @@ bool JackDriver::Initialize()
     return true;
 }
 
-void JackDriver::SaveConnections()
+static string RemoveLast(const string& name)
+{
+    return name.substr(0, name.find_last_of(':')); // Remove end of name after last ":"
+}
+
+void JackDriver::SaveConnections(int alias)
 {
     const char** connections;
-    fConnections.clear();
     char alias1[REAL_JACK_PORT_NAME_SIZE];
     char alias2[REAL_JACK_PORT_NAME_SIZE];
+    char system_alias1[REAL_JACK_PORT_NAME_SIZE];
+    char system_alias2[REAL_JACK_PORT_NAME_SIZE];
     char* aliases[2];
+    char* system_aliases[2];
 
     aliases[0] = alias1;
     aliases[1] = alias2;
-
+    
+    system_aliases[0] = system_alias1;
+    system_aliases[1] = system_alias2;
+    
+    fConnections.clear();
+   
     for (int i = 0; i < fCaptureChannels; ++i) {
         if (fCapturePortList[i] && (connections = fGraphManager->GetConnections(fCapturePortList[i])) != 0) {
-            for (int j = 0; connections[j]; j++) {
-                /*
+            if (alias == 0) {
+                for (int j = 0; connections[j]; j++) {
+                    fConnections.push_back(make_pair(fGraphManager->GetPort(fCapturePortList[i])->GetName(), connections[j]));
+                    jack_info("Save connection: %s %s", fGraphManager->GetPort(fCapturePortList[i])->GetName(), connections[j]);
+                }
+            } else {
                 fGraphManager->GetPort(fCapturePortList[i])->GetAliases(aliases);
-                fConnections.push_back(make_pair(aliases[0], connections[j]));
-                jack_info("Save connection: %s %s", aliases[0], connections[j]);
-                */
-                fConnections.push_back(make_pair(string(fGraphManager->GetPort(fCapturePortList[i])->GetName()), string(connections[j])));
-                jack_info("Save connection: %s %s", fGraphManager->GetPort(fCapturePortList[i])->GetName(), connections[j]);
+                string sub_name = RemoveLast(aliases[alias-1]);
+                for (int j = 0; connections[j]; j++) {
+                    fGraphManager->GetPort(fGraphManager->GetPort(connections[j]))->GetAliases(system_aliases);
+                    string sub_system_name = RemoveLast(system_aliases[alias-1]);
+                    fConnections.push_back(make_pair(sub_name, sub_system_name));
+                    jack_info("Save connection: %s %s", sub_name.c_str(), sub_system_name.c_str());
+               }        
             }
             free(connections);
         }
@@ -499,28 +518,80 @@ void JackDriver::SaveConnections()
 
     for (int i = 0; i < fPlaybackChannels; ++i) {
         if (fPlaybackPortList[i] && (connections = fGraphManager->GetConnections(fPlaybackPortList[i])) != 0) {
-            for (int j = 0; connections[j]; j++) {
-                /*
+            if (alias == 0) {
+                for (int j = 0; connections[j]; j++) {
+                    fConnections.push_back(make_pair(fGraphManager->GetPort(fPlaybackPortList[i])->GetName(), connections[j]));
+                    jack_info("Save connection: %s %s", fGraphManager->GetPort(fPlaybackPortList[i])->GetName(), connections[j]);
+                }
+            } else {
                 fGraphManager->GetPort(fPlaybackPortList[i])->GetAliases(aliases);
-                fConnections.push_back(make_pair(connections[j], aliases[0]));
-                jack_info("Save connection: %s %s", connections[j], aliases[0]);
-                */
-                fConnections.push_back(make_pair(string(connections[j]), string(fGraphManager->GetPort(fPlaybackPortList[i])->GetName())));
-                jack_info("Save connection: %s %s", connections[j], fGraphManager->GetPort(fPlaybackPortList[i])->GetName());
+                string sub_name = RemoveLast(aliases[alias-1]);
+                for (int j = 0; connections[j]; j++) {
+                    fGraphManager->GetPort(fGraphManager->GetPort(connections[j]))->GetAliases(system_aliases);
+                    string sub_system_name = RemoveLast(system_aliases[alias-1]);
+                    fConnections.push_back(make_pair(sub_system_name, sub_name));
+                    jack_info("Save connection: %s %s", sub_system_name.c_str(), sub_name.c_str());
+               }        
             }
             free(connections);
         }
     }
 }
 
-void JackDriver::RestoreConnections()
+string JackDriver::MatchPortName(const char* name, const char** ports, int alias)
+{
+    char alias1[REAL_JACK_PORT_NAME_SIZE];
+    char alias2[REAL_JACK_PORT_NAME_SIZE];
+    char* aliases[2];
+  
+    aliases[0] = alias1;
+    aliases[1] = alias2;
+  
+    for (int i = 0; ports && ports[i]; ++i) {
+        fGraphManager->GetPort(fGraphManager->GetPort(ports[i]))->GetAliases(aliases);
+        if (string(aliases[alias-1]).find(name) != string::npos) {
+             return string(aliases[alias-1]);
+        }
+    } 
+    
+    return "";
+}
+
+void JackDriver::RestoreConnections(int alias, bool full_name)
 {
     list<pair<string, string> >::const_iterator it;
-
-    for (it = fConnections.begin(); it != fConnections.end(); it++) {
-        pair<string, string> connection = *it;
-        jack_info("Restore connection: %s %s", connection.first.c_str(), connection.second.c_str());
-        fEngine->PortConnect(fClientControl.fRefNum, connection.first.c_str(), connection.second.c_str());
+    
+    if (full_name) {
+        for (it = fConnections.begin(); it != fConnections.end(); it++) {
+            pair<string, string> connection = *it;
+            jack_info("Restore connection: %s %s", connection.first.c_str(), connection.second.c_str());
+            fEngine->PortConnect(fClientControl.fRefNum, connection.first.c_str(), connection.second.c_str());
+        }
+    } else {
+        const char** inputs = fGraphManager->GetPorts(NULL, NULL, JackPortIsInput);
+        const char** outputs = fGraphManager->GetPorts(NULL, NULL, JackPortIsOutput);
+        
+        for (it = fConnections.begin(); it != fConnections.end(); it++) {
+            pair<string, string> connection = *it;
+            string real_input = MatchPortName(connection.first.c_str(), outputs, alias);
+            string real_output = MatchPortName(connection.second.c_str(), inputs, alias);
+            if ((real_input != "") && (real_output != "")) {
+                jack_info("Restore connection: %s %s", real_input.c_str(), real_output.c_str());
+                fEngine->PortConnect(fClientControl.fRefNum, real_input.c_str(), real_output.c_str());
+            }
+        }
+        
+        // Wait for connection change
+        if (fGraphManager->IsPendingChange()) {
+            JackSleep(int(fEngineControl->fPeriodUsecs * 1.1f));
+        }
+        
+        if (inputs) {
+            free(inputs);
+        }
+        if (outputs) {
+            free(outputs);
+        }
     }
 }
 
@@ -533,6 +604,5 @@ int JackDriver::SuspendRefNum()
 {
     return fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable, DRIVER_TIMEOUT_FACTOR * fEngineControl->fTimeOutUsecs);
 }
-
 
 } // end of namespace

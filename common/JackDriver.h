@@ -182,8 +182,9 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         void NotifySampleRate(jack_nframes_t sample_rate);                  // SampleRate notification sent by the driver
         void NotifyFailure(int code, const char* reason);                   // Failure notification sent by the driver
 
-        virtual void SaveConnections();
-        virtual void RestoreConnections();
+        virtual void SaveConnections(int alias);
+        virtual void RestoreConnections(int alias, bool full_name = true);
+        std::string MatchPortName(const char* name, const char** ports, int alias);
 
         virtual int StartSlaves();
         virtual int StopSlaves();

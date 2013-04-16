@@ -110,7 +110,7 @@ namespace Jack
     bool JackNetDriver::Initialize()
     {
         jack_log("JackNetDriver::Initialize");
-        SaveConnections();
+        SaveConnections(0);
         FreePorts();
 
         // New loading, but existing socket, restart the driver
@@ -201,7 +201,7 @@ namespace Jack
         // Transport engine parametering
         fEngineControl->fTransport.SetNetworkSync(fParams.fTransportSync);
 
-        RestoreConnections();
+        RestoreConnections(0);
         return true;
     }
 
@@ -372,9 +372,9 @@ namespace Jack
         return 0;
     }
 
-    void JackNetDriver::SaveConnections()
+    void JackNetDriver::SaveConnections(int alias)
     {
-        JackDriver::SaveConnections();
+        JackDriver::SaveConnections(alias);
         const char** connections;
 
         for (int i = 0; i < fParams.fSendMidiChannels; ++i) {

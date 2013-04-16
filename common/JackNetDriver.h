@@ -63,7 +63,7 @@ namespace Jack
             JackMidiBuffer* GetMidiInputBuffer(int port_index);
             JackMidiBuffer* GetMidiOutputBuffer(int port_index);
 
-            void SaveConnections();
+            void SaveConnections(int alias);
             
             void UpdateLatencies();
 
