@@ -310,9 +310,14 @@ int jack_set_thread_init_callback (jack_client_t *client,
  * on.  It should be called before jack_client_activate().
  *
  * NOTE: if a client calls this AND jack_on_info_shutdown(), then
- * the event of a client thread shutdown, the callback
+ * in case of a client thread shutdown, the callback
  * passed to this function will not be called, and the one passed to
  * jack_on_info_shutdown() will.
+ *
+ * NOTE: application should typically signal another thread to correctly 
+ * finish cleanup, that is by calling "jack_client_close" 
+ * (since "jack_client_close" cannot be called directly in the context 
+ * of the thread that calls the shutdown callback).
  */
 void jack_on_shutdown (jack_client_t *client,
                        JackShutdownCallback shutdown_callback, void *arg) JACK_OPTIONAL_WEAK_EXPORT;
@@ -335,10 +340,14 @@ void jack_on_shutdown (jack_client_t *client,
  * to help more complex clients understand what is going
  * on.  It should be called before jack_client_activate().
  *
- * NOTE: if a client calls this AND jack_on_info_shutdown(), then
- * the event of a client thread shutdown, the callback
- * passed to this function will not be called, and the one passed to
- * jack_on_info_shutdown() will.
+ * NOTE: if a client calls this AND jack_on_shutdown(), then
+ * in case of a client thread shutdown, the callback passed to
+ * jack_on_info_shutdown() will be called.
+ *
+ * NOTE: application should typically signal another thread to correctly 
+ * finish cleanup, that is by calling "jack_client_close" 
+ * (since "jack_client_close" cannot be called directly in the context 
+ * of the thread that calls the shutdown callback).
  */
 void jack_on_info_shutdown (jack_client_t *client,
                             JackInfoShutdownCallback shutdown_callback, void *arg) JACK_WEAK_EXPORT;

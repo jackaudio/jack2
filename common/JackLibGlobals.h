@@ -108,7 +108,6 @@ struct JackLibGlobals
                     jack_error("Cleanup client ref = %d", i);
                     client->Close();
                     delete client;
-                    JackGlobals::fClientTable[i] = NULL;
                 }
             }
 
