@@ -774,7 +774,7 @@ namespace Jack
 
     JackNetMaster* JackNetMasterManager::InitMaster(session_params_t& params)
     {
-        jack_log("JackNetMasterManager::InitMaster, Slave : %s", params.fName);
+        jack_log("JackNetMasterManager::InitMaster slave : %s", params.fName);
 
         //check MASTER <<==> SLAVE network protocol coherency
         if (params.fProtocolVersion != MASTER_PROTOCOL) {

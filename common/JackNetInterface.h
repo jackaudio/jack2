@@ -188,7 +188,7 @@ namespace Jack
             bool InitConnection(int time_out_sec);
             bool InitRendering();
 
-            net_status_t SendAvailableToMaster(long count = LONG_MAX);  // long here (and not int...)
+            net_status_t SendAvailableToMaster(int count = INT_MAX); 
             net_status_t SendStartToMaster();
 
             bool SetParams();
