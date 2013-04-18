@@ -327,19 +327,21 @@ JackDriverInfo* JackServer::AddSlave(jack_driver_desc_t* driver_desc, JSList* dr
 {
     JackDriverInfo* info = new JackDriverInfo();
     JackDriverClientInterface* slave = info->Open(driver_desc, fEngine, GetSynchroTable(), driver_params);
-    if (slave == NULL) {
-        goto error;
+    if (!slave) {
+        goto error1;
     }
     if (slave->Attach() < 0) {
-        goto error;
+        goto error2;
     }
     
     slave->SetMaster(false);
     fAudioDriver->AddSlave(slave);
     return info;
 
-error:
+error2:
     slave->Close();
+    
+error1:
     delete info;
     return NULL;
 }
@@ -366,7 +368,7 @@ int JackServer::SwitchMaster(jack_driver_desc_t* driver_desc, JSList* driver_par
     JackDriverInfo* info = new JackDriverInfo();
     JackDriverClientInterface* master = info->Open(driver_desc, fEngine, GetSynchroTable(), driver_params);
 
-    if (master == NULL) {
+    if (!master) {
        goto error;
     }
 
