@@ -210,7 +210,7 @@ bool JackCoreMidiDriver::OpenAux()
                 virtual_input_ports[vi_count] =
                     new JackCoreMidiVirtualInputPort(fAliasName, client_name,
                                                      capture_driver_name,
-                                                     vi_count + pi_count, client,
+                                                     vi_count, vi_count + pi_count, client,
                                                      time_ratio);
             } catch (std::exception e) {
                 jack_error("JackCoreMidiDriver::Open - while creating virtual "
@@ -235,7 +235,7 @@ bool JackCoreMidiDriver::OpenAux()
                 virtual_output_ports[vo_count] =
                     new JackCoreMidiVirtualOutputPort(fAliasName, client_name,
                                                       playback_driver_name,
-                                                      vo_count + po_count, client,
+                                                      vo_count, vo_count + po_count, client,
                                                       time_ratio);
             } catch (std::exception e) {
                 jack_error("JackCoreMidiDriver::Open - while creating virtual "
@@ -595,7 +595,7 @@ JackCoreMidiDriver::Open(bool capturing_aux, bool playing_aux, int in_channels_a
         return -1;
     } else {
         JackSleep(10000);
-        jack_info("CoreMIDI driver is running...");
+        jack_info("CoreMIDI driver is opened...");
     }
 
     return 0;
@@ -819,8 +819,8 @@ extern "C" {
     {
         const JSList * node;
         const jack_driver_param_t * param;
-        int virtual_in = 1;
-        int virtual_out = 1;
+        int virtual_in = 2;
+        int virtual_out = 2;
 
         for (node = params; node; node = jack_slist_next (node)) {
             param = (const jack_driver_param_t *) node->data;

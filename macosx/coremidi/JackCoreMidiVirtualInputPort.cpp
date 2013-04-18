@@ -44,13 +44,15 @@ HandleInputEvent(const MIDIPacketList *packet_list, void *port,
 
 JackCoreMidiVirtualInputPort::
 JackCoreMidiVirtualInputPort(const char *alias_name, const char *client_name,
-                             const char *driver_name, int index,
+                             const char *driver_name, int base_index, int index,
                              MIDIClientRef client, double time_ratio,
                              size_t max_bytes, size_t max_messages):
     JackCoreMidiInputPort(time_ratio, max_bytes, max_messages)
 {
-    CFStringRef name = CFStringCreateWithCString(0, "virtual",
-                                                CFStringGetSystemEncoding());
+    std::stringstream stream;
+    stream << "virtual" << (base_index + 1);
+    CFStringRef name = CFStringCreateWithCString(0, stream.str().c_str(),
+                                               CFStringGetSystemEncoding());
     if (! name) {
         throw std::bad_alloc();
     }

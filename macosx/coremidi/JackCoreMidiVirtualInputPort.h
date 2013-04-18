@@ -36,7 +36,7 @@ namespace Jack {
 
         JackCoreMidiVirtualInputPort(const char *alias_name,
                                      const char *client_name,
-                                     const char *driver_name, int index,
+                                     const char *driver_name, int base_index, int index,
                                      MIDIClientRef client, double time_ratio,
                                      size_t max_bytes=4096,
                                      size_t max_messages=1024);

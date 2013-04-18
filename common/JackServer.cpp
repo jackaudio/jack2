@@ -328,13 +328,20 @@ JackDriverInfo* JackServer::AddSlave(jack_driver_desc_t* driver_desc, JSList* dr
     JackDriverInfo* info = new JackDriverInfo();
     JackDriverClientInterface* slave = info->Open(driver_desc, fEngine, GetSynchroTable(), driver_params);
     if (slave == NULL) {
-        delete info;
-        return NULL;
+        goto error;
     }
-    slave->Attach();
+    if (slave->Attach() < 0) {
+        goto error;
+    }
+    
     slave->SetMaster(false);
     fAudioDriver->AddSlave(slave);
     return info;
+
+error:
+    slave->Close();
+    delete info;
+    return NULL;
 }
 
 void JackServer::RemoveSlave(JackDriverInfo* info)
@@ -347,6 +354,9 @@ void JackServer::RemoveSlave(JackDriverInfo* info)
 
 int JackServer::SwitchMaster(jack_driver_desc_t* driver_desc, JSList* driver_params)
 {
+    std::list<JackDriverInterface*> slave_list;
+    std::list<JackDriverInterface*>::const_iterator it;
+    
     /// Remove current master
     fAudioDriver->Stop();
     fAudioDriver->Detach();
@@ -357,14 +367,12 @@ int JackServer::SwitchMaster(jack_driver_desc_t* driver_desc, JSList* driver_par
     JackDriverClientInterface* master = info->Open(driver_desc, fEngine, GetSynchroTable(), driver_params);
 
     if (master == NULL) {
-        delete info;
-        return -1;
+       goto error;
     }
 
     // Get slaves list
-    std::list<JackDriverInterface*> slave_list = fAudioDriver->GetSlaves();
-    std::list<JackDriverInterface*>::const_iterator it;
-
+    slave_list = fAudioDriver->GetSlaves();
+ 
     // Move slaves in new master
     for (it = slave_list.begin(); it != slave_list.end(); it++) {
         JackDriverInterface* slave = *it;
@@ -377,9 +385,16 @@ int JackServer::SwitchMaster(jack_driver_desc_t* driver_desc, JSList* driver_par
     // Activate master
     fAudioDriver = master;
     fDriverInfo = info;
-    fAudioDriver->Attach();
+    if (fAudioDriver->Attach() < 0) {
+        goto error;
+    }
+   
     fAudioDriver->SetMaster(true);
     return fAudioDriver->Start();
+
+error:
+    delete info;
+    return -1;
 }
 
 //----------------------
