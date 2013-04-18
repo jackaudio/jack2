@@ -380,7 +380,8 @@ namespace Jack
         for (int i = 0; i < fParams.fSendMidiChannels; ++i) {
             if (fCapturePortList[i] && (connections = fGraphManager->GetConnections(fMidiCapturePortList[i])) != 0) {
                 for (int j = 0; connections[j]; j++) {
-                    fConnections.push_back(make_pair(fGraphManager->GetPort(fMidiCapturePortList[i])->GetName(), connections[j]));
+                    JackPort* port_id = fGraphManager->GetPort(fGraphManager->GetPort(connections[j]));
+                    fConnections.push_back(make_pair(port_id->GetType(), make_pair(fGraphManager->GetPort(fMidiCapturePortList[i])->GetName(), connections[j])));
                 }
                 free(connections);
             }
@@ -389,7 +390,8 @@ namespace Jack
         for (int i = 0; i < fParams.fReturnMidiChannels; ++i) {
             if (fPlaybackPortList[i] && (connections = fGraphManager->GetConnections(fMidiPlaybackPortList[i])) != 0) {
                 for (int j = 0; connections[j]; j++) {
-                    fConnections.push_back(make_pair(connections[j], fGraphManager->GetPort(fMidiPlaybackPortList[i])->GetName()));
+                    JackPort* port_id = fGraphManager->GetPort(fGraphManager->GetPort(connections[j]));
+                    fConnections.push_back(make_pair(port_id->GetType(), make_pair(connections[j], fGraphManager->GetPort(fMidiPlaybackPortList[i])->GetName())));
                 }
                 free(connections);
             }

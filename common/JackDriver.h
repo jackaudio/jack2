@@ -169,7 +169,7 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         jack_port_id_t fPlaybackPortList[DRIVER_PORT_NUM];
         jack_port_id_t fMonitorPortList[DRIVER_PORT_NUM];
 
-        std::list<std::pair<std::string, std::string> > fConnections;		// Connections list
+        std::list<std::pair<std::string, std::pair<std::string, std::string> > > fConnections;		// Connections list
 
         void CycleIncTime();
         void CycleTakeBeginTime();
@@ -184,7 +184,7 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
 
         virtual void SaveConnections(int alias);
         virtual void RestoreConnections(int alias, bool full_name = true);
-        std::string MatchPortName(const char* name, const char** ports, int alias);
+        std::string MatchPortName(const char* name, const char** ports, int alias, const std::string& type);
 
         virtual int StartSlaves();
         virtual int StopSlaves();
