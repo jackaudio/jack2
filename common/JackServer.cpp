@@ -173,7 +173,7 @@ int JackServer::Stop()
     
     fEngine->NotifyQuit();
     fRequestChannel.Stop();
-    fEngine->NotifyFailure(JackFailure, JACK_SERVER_FAILURE);
+    fEngine->NotifyFailure(JackFailure | JackServerError, JACK_SERVER_FAILURE);
     
     return res;
 }
@@ -359,7 +359,7 @@ int JackServer::SwitchMaster(jack_driver_desc_t* driver_desc, JSList* driver_par
     std::list<JackDriverInterface*> slave_list;
     std::list<JackDriverInterface*>::const_iterator it;
     
-    /// Remove current master
+    // Remove current master
     fAudioDriver->Stop();
     fAudioDriver->Detach();
     fAudioDriver->Close();

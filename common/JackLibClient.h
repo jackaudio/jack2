@@ -45,7 +45,7 @@ class JackLibClient : public JackClient
         virtual ~JackLibClient();
 
         int Open(const char* server_name, const char* name, int uuid, jack_options_t options, jack_status_t* status);
-        void ShutDown(const char* message);
+        void ShutDown(jack_status_t code, const char* message);
 
         int ClientNotifyImp(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2);
 

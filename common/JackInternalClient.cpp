@@ -111,10 +111,10 @@ error:
     return -1;
 }
 
-void JackInternalClient::ShutDown(const char* message)
+void JackInternalClient::ShutDown(jack_status_t code, const char* message)
 {
     jack_log("JackInternalClient::ShutDown");
-    JackClient::ShutDown(message);
+    JackClient::ShutDown(code, message);
 }
 
 JackGraphManager* JackInternalClient::GetGraphManager() const

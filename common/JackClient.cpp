@@ -88,13 +88,13 @@ JackClient::JackClient(JackSynchro* table):fThread(this)
 JackClient::~JackClient()
 {}
 
-void JackClient::ShutDown(const char* message)
+void JackClient::ShutDown(jack_status_t code, const char* message)
 {
     jack_log("JackClient::ShutDown");
  
     // If "fInfoShutdown" callback, then call it
     if (fInfoShutdown) {
-        fInfoShutdown(JackFailure, message, fInfoShutdownArg);
+        fInfoShutdown(code, message, fInfoShutdownArg);
         fInfoShutdown = NULL;
     // Otherwise possibly call the normal "fShutdown"
     } else if (fShutdown) {
@@ -299,7 +299,7 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
 
             case kShutDownCallback:
                 jack_log("JackClient::kShutDownCallback");
-                ShutDown(message);
+                ShutDown(jack_status_t(value1), message);
                 break;
 
             case kSessionCallback:
@@ -660,7 +660,7 @@ inline void JackClient::Error()
     fThread.DropSelfRealTime();
     GetClientControl()->fActive = false;
     fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
-    ShutDown(JACK_SERVER_FAILURE);
+    ShutDown(jack_status_t(JackFailure | JackServerError), JACK_SERVER_FAILURE);
     fThread.Terminate();
 }
 

@@ -311,7 +311,7 @@ OSStatus JackCoreAudioDriver::Render(AudioUnitRenderActionFlags* ioActionFlags, 
 
     if (Process() < 0) {
         jack_error("Process error, stopping driver");
-        NotifyFailure(JackBackendError, "Process error, stopping driver");    // Message length limited to JACK_MESSAGE_SIZE
+        NotifyFailure(JackFailure | JackBackendError, "Process error, stopping driver");    // Message length limited to JACK_MESSAGE_SIZE
         Stop();
         kill(JackTools::GetPID(), SIGINT);
         return kAudioHardwareUnsupportedOperationError;
@@ -497,7 +497,7 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
 
         case kAudioDevicePropertyStreamConfiguration: {
             jack_error("Cannot handle kAudioDevicePropertyStreamConfiguration : server will quit...");
-            driver->NotifyFailure(JackBackendError, "Another application has changed the device configuration");   // Message length limited to JACK_MESSAGE_SIZE
+            driver->NotifyFailure(JackFailure | JackBackendError, "Another application has changed the device configuration");   // Message length limited to JACK_MESSAGE_SIZE
             driver->CloseAUHAL();
             kill(JackTools::GetPID(), SIGINT);
             return kAudioHardwareUnsupportedOperationError;
@@ -544,7 +544,7 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
                     return noErr;
 
                 } else {
-                    driver->NotifyFailure(JackBackendError, "Another application has changed the sample rate");    // Message length limited to JACK_MESSAGE_SIZE
+                    driver->NotifyFailure(JackFailure | JackBackendError, "Another application has changed the sample rate");    // Message length limited to JACK_MESSAGE_SIZE
                     driver->CloseAUHAL();
                     kill(JackTools::GetPID(), SIGINT);
                     return kAudioHardwareUnsupportedOperationError;
