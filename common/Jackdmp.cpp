@@ -199,7 +199,7 @@ int main(int argc, char** argv)
 {
     jackctl_server_t * server_ctl;
     const JSList * server_parameters;
-    const char* server_name = "default";
+    const char* server_name = JACK_DEFAULT_SERVER_NAME;
     jackctl_driver_t * master_driver_ctl;
     jackctl_driver_t * loopback_driver_ctl = NULL;
     int replace_registry = 0;

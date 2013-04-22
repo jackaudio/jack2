@@ -152,7 +152,7 @@ class JackShmReadWritePtr
 
         jack_shm_info_t fInfo;
 
-        void Init(int index, const char* server_name = "default")
+        void Init(int index, const char* server_name = JACK_DEFAULT_SERVER_NAME)
         {
             if (fInfo.index < 0 && index >= 0) {
                 jack_log("JackShmReadWritePtr::Init %ld %ld", index, fInfo.index);
@@ -234,7 +234,7 @@ class JackShmReadWritePtr1
 
         jack_shm_info_t fInfo;
 
-        void Init(int index, const char* server_name = "default")
+        void Init(int index, const char* server_name = JACK_DEFAULT_SERVER_NAME)
         {
             if (fInfo.index < 0 && index >= 0) {
                 jack_log("JackShmReadWritePtr1::Init %ld %ld", index, fInfo.index);
@@ -322,7 +322,7 @@ class JackShmReadPtr
 
         jack_shm_info_t fInfo;
 
-        void Init(int index, const char* server_name = "default")
+        void Init(int index, const char* server_name = JACK_DEFAULT_SERVER_NAME)
         {
             if (fInfo.index < 0 && index >= 0) {
                 jack_log("JackShmPtrRead::Init %ld %ld", index, fInfo.index);
