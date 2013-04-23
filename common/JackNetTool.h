@@ -43,7 +43,7 @@ using namespace std;
 
 #define NET_PACKET_ERROR -2
 
-#define OPTIMIZED_PROTOCOL
+#define OPTIMIZED_PROTOCOL 1
 
 #define HEADER_SIZE (sizeof(packet_header_t))
 #define PACKET_AVAILABLE_SIZE(params) ((params)->fMtu - sizeof(packet_header_t))
@@ -281,6 +281,7 @@ namespace Jack
 
             int fNPorts;
             int fLastSubCycle;
+            int fNumPackets;
 
             char* fNetBuffer;
             sample_t** fPortBuffer;
@@ -373,8 +374,7 @@ namespace Jack
             CELTDecoder** fCeltDecoder;
 
             int fCompressedSizeByte;
-            int fNumPackets;
-
+   
             size_t fLastSubPeriodBytesSize;
 
             unsigned char** fCompressedBuffer;
@@ -419,8 +419,7 @@ namespace Jack
 
             unsigned short *fCompressedSizesByte;
             int fCompressedMaxSizeByte;
-            int fNumPackets;
-
+   
             size_t fLastSubPeriodBytesSize;
 
             unsigned char** fCompressedBuffer;
@@ -454,8 +453,7 @@ namespace Jack
         private:
 
             int fCompressedSizeByte;
-            int fNumPackets;
-
+ 
             size_t fLastSubPeriodBytesSize;
 
             short** fIntBuffer;
