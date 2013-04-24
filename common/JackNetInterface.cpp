@@ -248,7 +248,8 @@ namespace Jack
                 return new NetOpusAudioBuffer(&fParams, nports, buffer, fParams.fKBps);
             #endif
         }
-        return NULL;
+        
+        throw std::bad_alloc();
     }
     
     void JackNetInterface::SetRcvTimeOut()
@@ -360,7 +361,7 @@ namespace Jack
             return false;
         }
 
-        // set the new rx buffer size
+        // set the new buffer size
         if (SetNetBufferSize() == SOCKET_ERROR) {
             jack_error("Can't set net buffer sizes : %s", StrError(NET_ERROR_CODE));
             goto error;

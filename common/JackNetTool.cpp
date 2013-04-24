@@ -860,7 +860,7 @@ namespace Jack
                 memset(buffer, 0, fPeriodSize * sizeof(sample_t));
             }
             int res = opus_custom_encode_float(fOpusEncoder[port_index], buffer, fPeriodSize, fCompressedBuffer[port_index], fCompressedMaxSizeByte);
-            if (res <0 || res >= 65535) {
+            if (res < 0 || res >= 65535) {
                 fCompressedSizesByte[port_index] = 0;
             } else {
                 fCompressedSizesByte[port_index] = res;
