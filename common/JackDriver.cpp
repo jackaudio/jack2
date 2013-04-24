@@ -505,23 +505,23 @@ void JackDriver::SaveConnections(int alias)
                 }
             } else {
                 int res1 = fGraphManager->GetPort(fCapturePortList[i])->GetAliases(aliases);
-                string sub_name;
+                string sub_system_name;
                 if (res1 >= alias) {
-                    sub_name = aliases[alias-1];
+                    sub_system_name = aliases[alias-1];
                 } else {
-                    sub_name = fGraphManager->GetPort(fCapturePortList[i])->GetName();
+                    sub_system_name = fGraphManager->GetPort(fCapturePortList[i])->GetName();
                 }
                 for (int j = 0; connections[j]; j++) {
                     JackPort* port_id = fGraphManager->GetPort(fGraphManager->GetPort(connections[j]));
                     int res2 = port_id->GetAliases(system_aliases);
-                    string sub_system_name;
+                    string sub_system;
                     if (res2 >= alias) {
-                        sub_system_name = system_aliases[alias-1];
+                        sub_system = system_aliases[alias-1];
                     } else {
-                        sub_system_name = connections[j];
+                        sub_system = connections[j];
                     }
-                    fConnections.push_back(make_pair(port_id->GetType(), make_pair(sub_name, sub_system_name)));
-                    jack_info("Save connection: %s %s", sub_name.c_str(), sub_system_name.c_str());
+                    fConnections.push_back(make_pair(port_id->GetType(), make_pair(sub_system_name, sub_system)));
+                    jack_info("Save connection: %s %s", sub_system_name.c_str(), sub_system.c_str());
                }        
             }
             free(connections);
@@ -533,28 +533,28 @@ void JackDriver::SaveConnections(int alias)
             if (alias == 0) {
                 for (int j = 0; connections[j]; j++) {
                     JackPort* port_id = fGraphManager->GetPort(fPlaybackPortList[i]);
-                    fConnections.push_back(make_pair(port_id->GetType(), make_pair(port_id->GetName(), connections[j])));
-                    jack_info("Save connection: %s %s", fGraphManager->GetPort(fPlaybackPortList[i])->GetName(), connections[j]);
+                    fConnections.push_back(make_pair(port_id->GetType(), make_pair(connections[j], port_id->GetName())));
+                    jack_info("Save connection: %s %s", connections[j], fGraphManager->GetPort(fPlaybackPortList[i])->GetName());
                 }
             } else {
                 int res1 = fGraphManager->GetPort(fPlaybackPortList[i])->GetAliases(aliases);
-                string sub_name;
+                string sub_system_name;
                 if (res1 >= alias) {
-                    sub_name = aliases[alias-1];
+                    sub_system_name = aliases[alias-1];
                 } else {
-                    sub_name = fGraphManager->GetPort(fPlaybackPortList[i])->GetName();
+                    sub_system_name = fGraphManager->GetPort(fPlaybackPortList[i])->GetName();
                 }
                 for (int j = 0; connections[j]; j++) {
                     JackPort* port_id = fGraphManager->GetPort(fGraphManager->GetPort(connections[j]));
                     int res2 = port_id->GetAliases(system_aliases);
-                    string sub_system_name;
+                    string sub_name;
                     if (res2 >= alias) {
-                        sub_system_name = system_aliases[alias-1];
+                        sub_name = system_aliases[alias-1];
                     } else {
-                        sub_system_name = connections[j];
+                        sub_name = connections[j];
                     }
-                    fConnections.push_back(make_pair(port_id->GetType(), make_pair(sub_system_name, sub_name)));
-                    jack_info("Save connection: %s %s", sub_system_name.c_str(), sub_name.c_str());
+                    fConnections.push_back(make_pair(port_id->GetType(), make_pair(sub_name, sub_system_name)));
+                    jack_info("Save connection: %s %s", sub_name.c_str(), sub_system_name.c_str());
                }        
             }
             free(connections);
