@@ -45,7 +45,7 @@ int JackFreewheelDriver::Process()
 
         // Special "SuspendRefNum" with longer timeout
         if (SuspendRefNum() < 0) { // Wait for all clients to finish for 10 sec
-            jack_error("JackFreewheelDriver::ProcessSync: SuspendRefNum error");
+            jack_error("JackFreewheelDriver::Process: SuspendRefNum error");
             /* We have a client time-out error, but still continue to process, until a better recovery strategy is chosen */
             return 0;
         }
@@ -74,7 +74,7 @@ int JackFreewheelDriver::ProcessWriteSync()
 {
     // Generic "SuspendRefNum" here
     if (JackDriver::SuspendRefNum() < 0) {
-        jack_error("JackFreewheelDriver::ProcessSync SuspendRefNum error");
+        jack_error("JackFreewheelDriver::ProcessSync: SuspendRefNum error");
         return -1;
     }
     return 0;

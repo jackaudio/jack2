@@ -279,7 +279,7 @@ int JackServer::SetFreewheel(bool onoff)
         } else {
             fFreewheel = false;
             fThreadedFreewheelDriver->Stop();
-            fGraphManager->Restore(&fConnectionState);   // Restore previous connection state
+            fGraphManager->Restore(&fConnectionState);   // Restore connection state
             fEngine->NotifyFreewheel(onoff);
             fFreewheelDriver->SetMaster(false);
             fAudioDriver->SetMaster(true);
@@ -290,6 +290,15 @@ int JackServer::SetFreewheel(bool onoff)
             fFreewheel = true;
             fAudioDriver->Stop();
             fGraphManager->Save(&fConnectionState);     // Save connection state
+            // Disconnect all slaves
+            std::list<JackDriverInterface*> slave_list = fAudioDriver->GetSlaves();
+            std::list<JackDriverInterface*>::const_iterator it;
+            for (it = slave_list.begin(); it != slave_list.end(); it++) {
+                JackDriver* slave = dynamic_cast<JackDriver*>(*it);
+                assert(slave);
+                fGraphManager->DisconnectAllPorts(slave->GetClientControl()->fRefNum);
+            }
+            // Disconnect master
             fGraphManager->DisconnectAllPorts(fAudioDriver->GetClientControl()->fRefNum);
             fEngine->NotifyFreewheel(onoff);
             fAudioDriver->SetMaster(false);
