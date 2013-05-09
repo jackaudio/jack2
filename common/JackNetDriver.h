@@ -45,8 +45,11 @@ namespace Jack
             int fLastTimebaseMaster;
             
             // The wanted value at creation time (may be different than the value actually returned by the master)
-            int fWantedCaptureChannels;   
-            int fWantedPlaybackChannels;  
+            int fWantedAudioCaptureChannels;   
+            int fWantedAudioPlaybackChannels;  
+            
+            int fWantedMIDICaptureChannels;
+            int fWantedMIDIPlaybackChannels;
 
             //monitoring
 	#ifdef JACK_MONITOR

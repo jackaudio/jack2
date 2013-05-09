@@ -42,6 +42,7 @@ namespace Jack
       
             static int SetProcess(jack_nframes_t nframes, void* arg);
             static int SetBufferSize(jack_nframes_t nframes, void* arg);
+            static int SetSampleRate(jack_nframes_t nframes, void* arg);
             static void SetTimebaseCallback(jack_transport_state_t state, jack_nframes_t nframes, jack_position_t* pos, int new_pos, void* arg);
             static void SetConnectCallback(jack_port_id_t a, jack_port_id_t b, int connect, void* arg);
             static void LatencyCallback(jack_latency_callback_mode_t mode, void* arg);
@@ -118,7 +119,7 @@ namespace Jack
             master_list_it_t FindMaster(uint32_t client_id);
             int KillMaster(session_params_t* params);
             int SyncCallback(jack_transport_state_t state, jack_position_t* pos);
-            int CountIO(int flags);
+            int CountIO(const char* type, int flags);
             void ShutDown();
 
         public:

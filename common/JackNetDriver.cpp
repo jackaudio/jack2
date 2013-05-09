@@ -40,8 +40,10 @@ namespace Jack
         }
 
         fParams.fMtu = mtu;
-        fParams.fSendMidiChannels = midi_input_ports;
-        fParams.fReturnMidiChannels = midi_output_ports;
+        
+        fWantedMIDICaptureChannels = midi_input_ports;
+        fWantedMIDIPlaybackChannels = midi_output_ports;
+        
         if (celt_encoding > 0) {
             fParams.fSampleEncoder = JackCeltEncoder;
             fParams.fKBps = celt_encoding;
@@ -62,8 +64,8 @@ namespace Jack
         fLastTimebaseMaster = -1;
         fMidiCapturePortList = NULL;
         fMidiPlaybackPortList = NULL;
-        fWantedCaptureChannels = -1;
-        fWantedPlaybackChannels = -1;
+        fWantedAudioCaptureChannels = -1;
+        fWantedAudioPlaybackChannels = -1;
 #ifdef JACK_MONITOR
         fNetTimeMon = NULL;
         fRcvSyncUst = 0;
@@ -94,8 +96,8 @@ namespace Jack
                          jack_nframes_t playback_latency)
     {
         // Keep initial wanted values
-        fWantedCaptureChannels = inchannels;
-        fWantedPlaybackChannels = outchannels;
+        fWantedAudioCaptureChannels = inchannels;
+        fWantedAudioPlaybackChannels = outchannels;
         return JackWaiterDriver::Open(buffer_size, samplerate, 
                                     capturing, playing, 
                                     inchannels, outchannels, 
@@ -145,8 +147,12 @@ namespace Jack
         }
 
         // Set the parameters to send
-        fParams.fSendAudioChannels = fWantedCaptureChannels;
-        fParams.fReturnAudioChannels = fWantedPlaybackChannels;
+        fParams.fSendAudioChannels = fWantedAudioCaptureChannels;
+        fParams.fReturnAudioChannels = fWantedAudioPlaybackChannels;
+        
+        fParams.fSendMidiChannels = fWantedMIDICaptureChannels;
+        fParams.fReturnMidiChannels = fWantedMIDIPlaybackChannels;
+        
         fParams.fSlaveSyncMode = fEngineControl->fSyncMode;
 
         // Display some additional infos
@@ -165,10 +171,12 @@ namespace Jack
             return false;
         }
 
-        // If -1 at connection time, in/out channels count is sent by the master
+        // If -1 at connection time for audio, in/out audio channels count is sent by the master
         fCaptureChannels = fParams.fSendAudioChannels;
         fPlaybackChannels = fParams.fReturnAudioChannels;
-
+        
+        // If -1 at connection time for MIDI, in/out MIDI channels count is sent by the master (in fParams struct)
+   
         // Allocate midi ports lists
         fMidiCapturePortList = new jack_port_id_t [fParams.fSendMidiChannels];
         fMidiPlaybackPortList = new jack_port_id_t [fParams.fReturnMidiChannels];
@@ -403,20 +411,22 @@ namespace Jack
         const char** connections;
 
         for (int i = 0; i < fParams.fSendMidiChannels; ++i) {
-            if (fCapturePortList[i] && (connections = fGraphManager->GetConnections(fMidiCapturePortList[i])) != 0) {
+            if (fMidiCapturePortList[i] && (connections = fGraphManager->GetConnections(fMidiCapturePortList[i])) != 0) {
                 for (int j = 0; connections[j]; j++) {
                     JackPort* port_id = fGraphManager->GetPort(fGraphManager->GetPort(connections[j]));
                     fConnections.push_back(make_pair(port_id->GetType(), make_pair(fGraphManager->GetPort(fMidiCapturePortList[i])->GetName(), connections[j])));
+                    jack_info("Save connection: %s %s", fGraphManager->GetPort(fMidiCapturePortList[i])->GetName(), connections[j]);
                 }
                 free(connections);
             }
         }
 
         for (int i = 0; i < fParams.fReturnMidiChannels; ++i) {
-            if (fPlaybackPortList[i] && (connections = fGraphManager->GetConnections(fMidiPlaybackPortList[i])) != 0) {
+            if (fMidiPlaybackPortList[i] && (connections = fGraphManager->GetConnections(fMidiPlaybackPortList[i])) != 0) {
                 for (int j = 0; connections[j]; j++) {
                     JackPort* port_id = fGraphManager->GetPort(fGraphManager->GetPort(connections[j]));
                     fConnections.push_back(make_pair(port_id->GetType(), make_pair(connections[j], fGraphManager->GetPort(fMidiPlaybackPortList[i])->GetName())));
+                    jack_info("Save connection: %s %s", connections[j], fGraphManager->GetPort(fMidiPlaybackPortList[i])->GetName());
                 }
                 free(connections);
             }
@@ -656,9 +666,9 @@ namespace Jack
             jack_driver_descriptor_add_parameter(desc, &filler, "input-ports", 'C', JackDriverParamInt, &value, NULL, "Number of audio input ports", "Number of audio input ports. If -1, audio physical input from the master");
             jack_driver_descriptor_add_parameter(desc, &filler, "output-ports", 'P', JackDriverParamInt, &value, NULL, "Number of audio output ports", "Number of audio output ports. If -1, audio physical output from the master");
 
-            value.i = 0;
-            jack_driver_descriptor_add_parameter(desc, &filler, "midi-in-ports", 'i', JackDriverParamInt, &value, NULL, "Number of midi input ports", NULL);
-            jack_driver_descriptor_add_parameter(desc, &filler, "midi-out-ports", 'o', JackDriverParamInt, &value, NULL, "Number of midi output ports", NULL);
+            value.i = -1;
+            jack_driver_descriptor_add_parameter(desc, &filler, "midi-in-ports", 'i', JackDriverParamInt, &value, NULL, "Number of midi input ports", "Number of MIDI input ports. If -1, MIDI physical input from the master");
+            jack_driver_descriptor_add_parameter(desc, &filler, "midi-out-ports", 'o', JackDriverParamInt, &value, NULL, "Number of midi output ports", "Number of MIDI output ports. If -1, MIDI physical output from the master");
 
 #if HAVE_CELT
             value.i = -1;
@@ -695,8 +705,8 @@ Deactivated for now..
             jack_nframes_t sample_rate = 48000;
             int audio_capture_ports = -1;
             int audio_playback_ports = -1;
-            int midi_input_ports = 0;
-            int midi_output_ports = 0;
+            int midi_input_ports = -1;
+            int midi_output_ports = -1;
             int celt_encoding = -1;
             int opus_encoding = -1;
             bool monitor = false;

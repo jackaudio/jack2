@@ -135,6 +135,10 @@ namespace Jack
             goto fail;
         }
         
+        if (jack_set_sample_rate_callback(fClient, SetSampleRate, this) < 0) {
+            goto fail;
+        }
+        
         if (jack_set_latency_callback(fClient, LatencyCallback, this) < 0) {
             goto fail;
         }
@@ -213,9 +217,7 @@ namespace Jack
 
     void JackNetMaster::ConnectPorts()
     {
-        const char** ports;
-
-        ports = jack_get_ports(fClient, NULL, NULL, JackPortIsPhysical | JackPortIsOutput);
+        const char** ports = jack_get_ports(fClient, NULL, JACK_DEFAULT_AUDIO_TYPE, JackPortIsPhysical | JackPortIsOutput);
         if (ports != NULL) {
             for (int i = 0; i < fParams.fSendAudioChannels && ports[i]; i++) {
                 jack_connect(fClient, ports[i], jack_port_name(fAudioCapturePorts[i]));
@@ -223,7 +225,7 @@ namespace Jack
             jack_free(ports);
         }
 
-        ports = jack_get_ports(fClient, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
+        ports = jack_get_ports(fClient, NULL, JACK_DEFAULT_AUDIO_TYPE, JackPortIsPhysical | JackPortIsInput);
         if (ports != NULL) {
             for (int i = 0; i < fParams.fReturnAudioChannels && ports[i]; i++) {
                 jack_connect(fClient, jack_port_name(fAudioPlaybackPorts[i]), ports[i]);
@@ -371,7 +373,17 @@ namespace Jack
     {
         JackNetMaster* obj = static_cast<JackNetMaster*>(arg);
         if (nframes != obj->fParams.fPeriodSize) {
-            jack_error("Cannot handle buffer size change, so JackNetMaster proxy will be removed...");
+            jack_error("Cannot currently handle buffer size change, so JackNetMaster proxy will be removed...");
+            obj->Exit();
+        }
+        return 0;
+    }
+    
+    int JackNetMaster::SetSampleRate(jack_nframes_t nframes, void* arg)
+    {
+        JackNetMaster* obj = static_cast<JackNetMaster*>(arg);
+        if (nframes != obj->fParams.fSampleRate) {
+            jack_error("Cannot currently handle sample rate change, so JackNetMaster proxy will be removed...");
             obj->Exit();
         }
         return 0;
@@ -621,19 +633,12 @@ namespace Jack
         ShutDown();
     }
 
-    int JackNetMasterManager::CountIO(int flags)
+    int JackNetMasterManager::CountIO(const char* type, int flags)
     {
-        const char** ports;
         int count = 0;
-        jack_port_t* port;
-
-        ports = jack_get_ports(fClient, NULL, NULL, flags);
+        const char** ports = jack_get_ports(fClient, NULL, type, flags);
         if (ports != NULL) {
-            while (ports[count]
-                    && (port = jack_port_by_name(fClient, ports[count]))
-                    && (strcmp(jack_port_type(port), JACK_DEFAULT_AUDIO_TYPE) == 0)) {
-                count++;
-            }
+            while (ports[count]) { count++; }
             jack_free(ports);
         }
         return count;
@@ -789,13 +794,23 @@ namespace Jack
         params.fPeriodSize = jack_get_buffer_size(fClient);
 
         if (params.fSendAudioChannels == -1) {
-            params.fSendAudioChannels = CountIO(JackPortIsPhysical | JackPortIsOutput);
-            jack_info("Takes physical %d inputs for client", params.fSendAudioChannels);
+            params.fSendAudioChannels = CountIO(JACK_DEFAULT_AUDIO_TYPE, JackPortIsPhysical | JackPortIsOutput);
+            jack_info("Takes physical %d audio input(s) for slave", params.fSendAudioChannels);
         }
 
         if (params.fReturnAudioChannels == -1) {
-            params.fReturnAudioChannels = CountIO(JackPortIsPhysical | JackPortIsInput);
-            jack_info("Takes physical %d outputs for client", params.fReturnAudioChannels);
+            params.fReturnAudioChannels = CountIO(JACK_DEFAULT_AUDIO_TYPE, JackPortIsPhysical | JackPortIsInput);
+            jack_info("Takes physical %d audio output(s) for slave", params.fReturnAudioChannels);
+        }
+        
+        if (params.fSendMidiChannels == -1) {
+            params.fSendMidiChannels = CountIO(JACK_DEFAULT_MIDI_TYPE, JackPortIsPhysical | JackPortIsOutput);
+            jack_info("Takes physical %d MIDI input(s) for slave", params.fSendMidiChannels);
+        }
+
+        if (params.fReturnMidiChannels == -1) {
+            params.fReturnMidiChannels = CountIO(JACK_DEFAULT_MIDI_TYPE, JackPortIsPhysical | JackPortIsInput);
+            jack_info("Takes physical %d MIDI output(s) for slave", params.fReturnMidiChannels);
         }
 
         //create a new master and add it to the list
