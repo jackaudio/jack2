@@ -62,6 +62,8 @@ namespace Jack
         fLastTimebaseMaster = -1;
         fMidiCapturePortList = NULL;
         fMidiPlaybackPortList = NULL;
+        fWantedCaptureChannels = -1;
+        fWantedPlaybackChannels = -1;
 #ifdef JACK_MONITOR
         fNetTimeMon = NULL;
         fRcvSyncUst = 0;
@@ -79,6 +81,29 @@ namespace Jack
 
 //open, close, attach and detach------------------------------------------------------
 
+    int JackNetDriver::Open(jack_nframes_t buffer_size,
+                         jack_nframes_t samplerate,
+                         bool capturing,
+                         bool playing,
+                         int inchannels,
+                         int outchannels,
+                         bool monitor,
+                         const char* capture_driver_name,
+                         const char* playback_driver_name,
+                         jack_nframes_t capture_latency,
+                         jack_nframes_t playback_latency)
+    {
+        // Keep initial wanted values
+        fWantedCaptureChannels = inchannels;
+        fWantedPlaybackChannels = outchannels;
+        return JackWaiterDriver::Open(buffer_size, samplerate, 
+                                    capturing, playing, 
+                                    inchannels, outchannels, 
+                                    monitor, 
+                                    capture_driver_name, playback_driver_name, 
+                                    capture_latency, playback_latency);
+    }
+                         
     int JackNetDriver::Close()
     {
 #ifdef JACK_MONITOR
@@ -120,8 +145,8 @@ namespace Jack
         }
 
         // Set the parameters to send
-        fParams.fSendAudioChannels = fCaptureChannels;
-        fParams.fReturnAudioChannels = fPlaybackChannels;
+        fParams.fSendAudioChannels = fWantedCaptureChannels;
+        fParams.fReturnAudioChannels = fWantedPlaybackChannels;
         fParams.fSlaveSyncMode = fEngineControl->fSyncMode;
 
         // Display some additional infos

@@ -43,6 +43,10 @@ namespace Jack
             //transport
             int fLastTransportState;
             int fLastTimebaseMaster;
+            
+            // The wanted value at creation time (may be different than the value actually returned by the master)
+            int fWantedCaptureChannels;   
+            int fWantedPlaybackChannels;  
 
             //monitoring
 	#ifdef JACK_MONITOR
@@ -74,6 +78,17 @@ namespace Jack
                         char* net_name, uint transport_sync, int network_latency, int celt_encoding, int opus_encoding);
             virtual ~JackNetDriver();
 
+            int Open(jack_nframes_t buffer_size,
+                         jack_nframes_t samplerate,
+                         bool capturing,
+                         bool playing,
+                         int inchannels,
+                         int outchannels,
+                         bool monitor,
+                         const char* capture_driver_name,
+                         const char* playback_driver_name,
+                         jack_nframes_t capture_latency,
+                         jack_nframes_t playback_latency);
             int Close();
 
             int Attach();
