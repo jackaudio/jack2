@@ -118,6 +118,7 @@ class SERVER_EXPORT JackClient : public JackClientInterface, public JackRunnable
         inline void CallTimebaseCallbackAux();
         inline int ActivateAux();
         inline void InitAux();
+        inline void SetupRealTime();
 
         int HandleLatencyCallback(int status);
 

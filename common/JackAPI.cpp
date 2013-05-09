@@ -1718,14 +1718,12 @@ LIB_EXPORT int jack_drop_real_time_scheduling(jack_native_thread_t thread)
 LIB_EXPORT int jack_client_stop_thread(jack_client_t* client, jack_native_thread_t thread)
 {
     JackGlobals::CheckContext("jack_client_stop_thread");
-
     return JackThread::StopImp(thread);
 }
 
 LIB_EXPORT int jack_client_kill_thread(jack_client_t* client, jack_native_thread_t thread)
 {
     JackGlobals::CheckContext("jack_client_kill_thread");
-
     return JackThread::KillImp(thread);
 }
 
@@ -1746,7 +1744,6 @@ LIB_EXPORT int jack_internal_client_new (const char* client_name,
                                      const char* load_init)
 {
     JackGlobals::CheckContext("jack_internal_client_new");
-
     jack_error("jack_internal_client_new: deprecated");
     return -1;
 }
@@ -1754,7 +1751,6 @@ LIB_EXPORT int jack_internal_client_new (const char* client_name,
 LIB_EXPORT void jack_internal_client_close (const char* client_name)
 {
     JackGlobals::CheckContext("jack_internal_client_close");
-
     jack_error("jack_internal_client_close: deprecated");
 }
 
@@ -1866,7 +1862,6 @@ LIB_EXPORT void jack_get_version(int *major_ptr,
 LIB_EXPORT const char* jack_get_version_string()
 {
     JackGlobals::CheckContext("jack_get_version_string");
-
     return VERSION;
 }
 

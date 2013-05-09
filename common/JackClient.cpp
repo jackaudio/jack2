@@ -524,23 +524,18 @@ bool JackClient::Init()
         jack_error("Failed to set thread realtime key");
     }
 
-    if (GetEngineControl()->fRealTime) {
-        set_threaded_log_function();
-    }
-
     // Setup RT
     if (GetEngineControl()->fRealTime) {
-        if (fThread.AcquireSelfRealTime(GetEngineControl()->fClientPriority) < 0) {
-            jack_error("JackClient::AcquireSelfRealTime error");
-        }
+        set_threaded_log_function();
+        SetupRealTime();
     }
 
     return true;
 }
 
-int JackClient::StartThread()
+void JackClient::SetupRealTime()
 {
-    jack_log("JackClient::StartThread : period = %ld computation = %ld constraint = %ld",
+    jack_log("JackClient::Init : period = %ld computation = %ld constraint = %ld",
              long(int64_t(GetEngineControl()->fPeriod) / 1000.0f),
              long(int64_t(GetEngineControl()->fComputation) / 1000.0f),
              long(int64_t(GetEngineControl()->fConstraint) / 1000.0f));
@@ -548,6 +543,13 @@ int JackClient::StartThread()
     // Will do "something" on OSX only...
     fThread.SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
 
+    if (fThread.AcquireSelfRealTime(GetEngineControl()->fClientPriority) < 0) {
+        jack_error("JackClient::AcquireSelfRealTime error");
+    }
+}
+
+int JackClient::StartThread()
+{
     if (fThread.StartSync() < 0) {
         jack_error("Start thread error");
         return -1;
