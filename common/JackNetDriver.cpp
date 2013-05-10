@@ -178,6 +178,9 @@ namespace Jack
         // If -1 at connection time for MIDI, in/out MIDI channels count is sent by the master (in fParams struct)
    
         // Allocate midi ports lists
+        delete[] fMidiCapturePortList;
+        delete[] fMidiPlaybackPortList;
+        
         fMidiCapturePortList = new jack_port_id_t [fParams.fSendMidiChannels];
         fMidiPlaybackPortList = new jack_port_id_t [fParams.fReturnMidiChannels];
 
@@ -410,25 +413,29 @@ namespace Jack
         JackDriver::SaveConnections(alias);
         const char** connections;
 
-        for (int i = 0; i < fParams.fSendMidiChannels; ++i) {
-            if (fMidiCapturePortList[i] && (connections = fGraphManager->GetConnections(fMidiCapturePortList[i])) != 0) {
-                for (int j = 0; connections[j]; j++) {
-                    JackPort* port_id = fGraphManager->GetPort(fGraphManager->GetPort(connections[j]));
-                    fConnections.push_back(make_pair(port_id->GetType(), make_pair(fGraphManager->GetPort(fMidiCapturePortList[i])->GetName(), connections[j])));
-                    jack_info("Save connection: %s %s", fGraphManager->GetPort(fMidiCapturePortList[i])->GetName(), connections[j]);
+        if (fMidiCapturePortList) {
+            for (int i = 0; i < fParams.fSendMidiChannels; ++i) {
+                if (fMidiCapturePortList[i] && (connections = fGraphManager->GetConnections(fMidiCapturePortList[i])) != 0) {
+                    for (int j = 0; connections[j]; j++) {
+                        JackPort* port_id = fGraphManager->GetPort(fGraphManager->GetPort(connections[j]));
+                        fConnections.push_back(make_pair(port_id->GetType(), make_pair(fGraphManager->GetPort(fMidiCapturePortList[i])->GetName(), connections[j])));
+                        jack_info("Save connection: %s %s", fGraphManager->GetPort(fMidiCapturePortList[i])->GetName(), connections[j]);
+                    }
+                    free(connections);
                 }
-                free(connections);
             }
         }
 
-        for (int i = 0; i < fParams.fReturnMidiChannels; ++i) {
-            if (fMidiPlaybackPortList[i] && (connections = fGraphManager->GetConnections(fMidiPlaybackPortList[i])) != 0) {
-                for (int j = 0; connections[j]; j++) {
-                    JackPort* port_id = fGraphManager->GetPort(fGraphManager->GetPort(connections[j]));
-                    fConnections.push_back(make_pair(port_id->GetType(), make_pair(connections[j], fGraphManager->GetPort(fMidiPlaybackPortList[i])->GetName())));
-                    jack_info("Save connection: %s %s", connections[j], fGraphManager->GetPort(fMidiPlaybackPortList[i])->GetName());
+        if (fMidiPlaybackPortList) {
+            for (int i = 0; i < fParams.fReturnMidiChannels; ++i) {
+                if (fMidiPlaybackPortList[i] && (connections = fGraphManager->GetConnections(fMidiPlaybackPortList[i])) != 0) {
+                    for (int j = 0; connections[j]; j++) {
+                        JackPort* port_id = fGraphManager->GetPort(fGraphManager->GetPort(connections[j]));
+                        fConnections.push_back(make_pair(port_id->GetType(), make_pair(connections[j], fGraphManager->GetPort(fMidiPlaybackPortList[i])->GetName())));
+                        jack_info("Save connection: %s %s", connections[j], fGraphManager->GetPort(fMidiPlaybackPortList[i])->GetName());
+                    }
+                    free(connections);
                 }
-                free(connections);
             }
         }
     }
