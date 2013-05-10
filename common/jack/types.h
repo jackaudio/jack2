@@ -514,6 +514,12 @@ enum JackPortFlags {
      */
     JackPortIsTerminal = 0x10,
 
+    /**
+     * if JackPortIsCV is set, then the audio port is used
+     * as control voltage audio signal.
+     */
+    JackPortIsCV = 0x100,
+
 };
 
 /**
