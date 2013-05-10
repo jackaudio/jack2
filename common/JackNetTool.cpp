@@ -738,13 +738,12 @@ namespace Jack
 
         for (int i = 0; i < fNPorts; i++)  {
             /* Allocate en/decoders */
-            fOpusMode[i] = opus_custom_mode_create(
-            params->fSampleRate, params->fPeriodSize, &error);
+            fOpusMode[i] = opus_custom_mode_create(params->fSampleRate, params->fPeriodSize, &error);
             if (error != OPUS_OK) {
                 goto error;
             }
 
-            fOpusEncoder[i] = opus_custom_encoder_create(fOpusMode[i], 1,&error);
+            fOpusEncoder[i] = opus_custom_encoder_create(fOpusMode[i], 1, &error);
             if (error != OPUS_OK) {
                 goto error;
             }

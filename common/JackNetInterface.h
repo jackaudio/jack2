@@ -156,8 +156,6 @@ namespace Jack
             int Send(size_t size, int flags);
             int Recv(size_t size, int flags);
 
-            bool IsSynched();
-
             void FatalRecvError();
             void FatalSendError();
 

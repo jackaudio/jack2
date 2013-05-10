@@ -454,22 +454,16 @@ struct JackNetExtMaster : public JackNetMasterInterface {
                 fNetMidiCaptureBuffer->SetBuffer(midi_port_index, ((JackMidiBuffer**)midi_output_buffer)[midi_port_index]);
             }
             
-            if (IsSynched()) {  // only send if connection is "synched"
-            
-                EncodeSyncPacket();
+            EncodeSyncPacket();
 
-                // send sync
-                if (SyncSend() == SOCKET_ERROR) {
-                    return SOCKET_ERROR;
-                }
+            // send sync
+            if (SyncSend() == SOCKET_ERROR) {
+                return SOCKET_ERROR;
+            }
 
-                //send data
-                if (DataSend() == SOCKET_ERROR) {
-                    return SOCKET_ERROR;
-                }
-                
-            } else {
-                jack_info("Connection is not synched, skip cycle...");
+            //send data
+            if (DataSend() == SOCKET_ERROR) {
+                return SOCKET_ERROR;
             }
             
             return 0;

@@ -445,11 +445,6 @@ namespace Jack
         return tx_bytes;
     }
 
-    bool JackNetMasterInterface::IsSynched()
-    {
-        return (fCurrentCycleOffset <= fMaxCycleOffset);
-    }
-
     int JackNetMasterInterface::SyncSend()
     {
         SetRcvTimeOut();

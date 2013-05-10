@@ -495,31 +495,25 @@ namespace Jack
         #endif
         }
 
-        if (IsSynched()) {  // only send if connection is "synched"
+        //encode the first packet
+        EncodeSyncPacket();
 
-            //encode the first packet
-            EncodeSyncPacket();
-
-            if (SyncSend() == SOCKET_ERROR) {
-                return SOCKET_ERROR;
-            }
-
-    #ifdef JACK_MONITOR
-            fNetTimeMon->Add((((float)(GetMicroSeconds() - begin_time)) / (float) fPeriodUsecs) * 100.f);
-    #endif
-
-            //send data
-            if (DataSend() == SOCKET_ERROR) {
-                return SOCKET_ERROR;
-            }
-
-    #ifdef JACK_MONITOR
-            fNetTimeMon->Add((((float)(GetMicroSeconds() - begin_time)) / (float) fPeriodUsecs) * 100.f);
-    #endif
-
-        } else {
-            jack_info("Connection is not synched, skip cycle...");
+        if (SyncSend() == SOCKET_ERROR) {
+            return SOCKET_ERROR;
         }
+
+#ifdef JACK_MONITOR
+        fNetTimeMon->Add((((float)(GetMicroSeconds() - begin_time)) / (float) fPeriodUsecs) * 100.f);
+#endif
+
+        //send data
+        if (DataSend() == SOCKET_ERROR) {
+            return SOCKET_ERROR;
+        }
+
+#ifdef JACK_MONITOR
+        fNetTimeMon->Add((((float)(GetMicroSeconds() - begin_time)) / (float) fPeriodUsecs) * 100.f);
+#endif
 
         //receive sync
         int res = SyncRecv();
