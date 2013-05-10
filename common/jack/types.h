@@ -451,6 +451,11 @@ typedef void (*JackInfoShutdownCallback)(jack_status_t code, const char* reason,
 #define JACK_DEFAULT_MIDI_TYPE "8 bit raw midi"
 
 /**
+ * Used to check if the current JACK version provides JackPortIsCV flag.
+ */
+#define JACK_HAS_PORT_IS_CV_FLAG 1
+
+/**
  * For convenience, use this typedef if you want to be able to change
  * between float and double. You may want to typedef sample_t to
  * jack_default_audio_sample_t in your application.
