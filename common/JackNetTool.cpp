@@ -680,7 +680,7 @@ namespace Jack
             Cleanup();
         }
 
-        if (port_num > 0)  {
+        if (port_num > 0) {
         
             int sub_period_bytes_size;
             
@@ -936,7 +936,6 @@ namespace Jack
     }
 
 #endif
-
 
     NetIntAudioBuffer::NetIntAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer)
         : NetAudioBuffer(params, nports, net_buffer)

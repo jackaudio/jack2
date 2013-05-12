@@ -38,8 +38,8 @@ using namespace std;
 #endif
 #endif
 
-#define MASTER_PROTOCOL 6
-#define SLAVE_PROTOCOL 6
+#define MASTER_PROTOCOL  6
+#define SLAVE_PROTOCOL   6
 
 #define NET_PACKET_ERROR -2
 

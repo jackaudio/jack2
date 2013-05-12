@@ -485,17 +485,24 @@ namespace Jack
         
         if (rx_head->fDataType != 's') {
             jack_error("Wrong packet type : %c", rx_head->fDataType);
-            // Not the last packet..
+            // not the last packet..
             fRxHeader.fIsLastPckt = 0;
             return NET_PACKET_ERROR;
         }
     
         fCurrentCycleOffset = fTxHeader.fCycle - rx_head->fCycle;
 
-        if (fCurrentCycleOffset < fMaxCycleOffset) {
+        if (fCurrentCycleOffset < fMaxCycleOffset && !fSynched) {
             jack_info("Synching with latency = %d", fCurrentCycleOffset);
             return 0;
         } else {
+            if (fCurrentCycleOffset == fMaxCycleOffset) {
+                // when the sync offset is reached 
+                fSynched = true;
+            } else if (abs(fCurrentCycleOffset - fMaxCycleOffset) >= NETWORK_RESYNCH_LATENCY) {
+                jack_info("Resync connection...");
+                fSynched = false;
+            }
             rx_bytes = Recv(rx_head->fPacketSize, 0);
             fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
             return rx_bytes;
@@ -732,7 +739,7 @@ namespace Jack
         }
         while (strcmp(host_params.fPacketType, fParams.fPacketType)  && (GetPacketType(&host_params) != SLAVE_SETUP)  && (--try_count > 0));
 
-        // Time out failure..
+        // time out failure..
         if (try_count == 0) {
             jack_error("Time out error in connect");
             return NET_CONNECT_ERROR;
@@ -873,7 +880,7 @@ namespace Jack
         
         if (rx_head->fDataType != 's') {
             jack_error("Wrong packet type : %c", rx_head->fDataType);
-            // Not the last packet...
+            // not the last packet...
             fRxHeader.fIsLastPckt = 0;
             return NET_PACKET_ERROR;
         }

@@ -524,7 +524,7 @@ namespace Jack
                 return res;
                 
             case NET_PACKET_ERROR:
-                // Since sync packet is incorrect, don't decode it and continue with data
+                 // Since sync packet is incorrect, don't decode it and continue with data
                  break;
                 
             default:

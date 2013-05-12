@@ -423,11 +423,11 @@ struct JackNetExtMaster : public JackNetMasterInterface {
                     return res;
                     
                 case NET_PACKET_ERROR:
-                    // Since sync packet is incorrect, don't decode it and continue with data
+                    // since sync packet is incorrect, don't decode it and continue with data
                     break;
                     
                 default:
-                    //decode sync
+                    // decode sync
                     DecodeSyncPacket();
                     break;
             }
@@ -731,7 +731,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
     bool Execute()
     {
         try  {
-            // Keep running even in case of error
+            // keep running even in case of error
             while (fThread.GetStatus() == JackThread::kRunning) {
                 if (Process() == SOCKET_ERROR) {
                     return false;
@@ -739,7 +739,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
             }
             return false;
         } catch (JackNetException& e) {
-            // Otherwise just restart...
+            // otherwise just restart...
             e.PrintMessage();
             jack_info("NetSlave is restarted");
             fThread.DropRealTime();
@@ -756,18 +756,18 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
 
     int Read()
     {
-        //receive sync (launch the cycle)
+        // receive sync (launch the cycle)
         switch (SyncRecv()) {
         
             case SOCKET_ERROR:
                 return SOCKET_ERROR;
                 
             case NET_PACKET_ERROR:
-                // Since sync packet is incorrect, don't decode it and continue with data
+                // since sync packet is incorrect, don't decode it and continue with data
                 break;
                 
             default:
-                //decode sync
+                // decode sync
                 DecodeSyncPacket();
                 break;
         }

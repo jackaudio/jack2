@@ -557,11 +557,11 @@ namespace Jack
                 return SOCKET_ERROR;
                 
             case NET_PACKET_ERROR:
-                // Since sync packet is incorrect, don't decode it and continue with data
+                // since sync packet is incorrect, don't decode it and continue with data
                 break;
                 
             default:
-                //decode sync
+                // decode sync
                 DecodeSyncPacket();
                 break;
         }
