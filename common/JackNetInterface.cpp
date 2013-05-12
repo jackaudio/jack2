@@ -499,9 +499,6 @@ namespace Jack
             if (fCurrentCycleOffset == fMaxCycleOffset) {
                 // when the sync offset is reached 
                 fSynched = true;
-            } else if (abs(fCurrentCycleOffset - fMaxCycleOffset) >= NETWORK_RESYNCH_LATENCY) {
-                jack_info("Resync connection...");
-                fSynched = false;
             }
             rx_bytes = Recv(rx_head->fPacketSize, 0);
             fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;

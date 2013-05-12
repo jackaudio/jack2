@@ -37,8 +37,7 @@ namespace Jack
 #define SLAVE_INIT_TIMEOUT      1000000 * 10  // in usec
 #define PACKET_TIMEOUT          500000        // in usec
 
-#define NETWORK_MAX_LATENCY      20  // maximun possile latency in network master/slave loop
-#define NETWORK_RESYNCH_LATENCY  3   // number of cycles offset before a resync is done....
+#define NETWORK_MAX_LATENCY     30  // maximum possible latency in network master/slave loop
 
     /**
     \Brief This class describes the basic Net Interface, used by both master and slave.
