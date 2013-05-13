@@ -41,6 +41,7 @@ using namespace std;
 #define MASTER_PROTOCOL  6
 #define SLAVE_PROTOCOL   6
 
+#define NET_SYNCHING      0
 #define NET_PACKET_ERROR -2
 
 #define OPTIMIZED_PROTOCOL 1

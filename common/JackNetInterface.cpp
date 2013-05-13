@@ -494,7 +494,7 @@ namespace Jack
 
         if (fCurrentCycleOffset < fMaxCycleOffset && !fSynched) {
             jack_info("Synching with latency = %d", fCurrentCycleOffset);
-            return 0;
+            return NET_SYNCHING;
         } else {
             if (fCurrentCycleOffset == fMaxCycleOffset) {
                 // when the sync offset is reached 

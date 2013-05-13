@@ -520,7 +520,7 @@ namespace Jack
         int res = SyncRecv();
         switch (res) {
         
-            case 0:
+            case NET_SYNCHING:
             case SOCKET_ERROR:
                 return res;
                 
