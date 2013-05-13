@@ -21,10 +21,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JACKNETMANAGER_H__
 
 #include "JackNetInterface.h"
-#include "thread.h"
 #include "jack.h"
-#include "jslist.h"
 #include <list>
+#include <map>
 
 namespace Jack
 {
@@ -33,6 +32,8 @@ namespace Jack
     /**
     \Brief This class describes a Net Master
     */
+    
+    typedef std::list<std::pair<std::string, std::string> > connections_list_t;
 
     class JackNetMaster : public JackNetMasterInterface
     {
@@ -78,6 +79,9 @@ namespace Jack
             void TimebaseCallback(jack_position_t* pos);
             void ConnectPorts();
             void ConnectCallback(jack_port_id_t a, jack_port_id_t b, int connect);
+            
+            void SaveConnections(connections_list_t& connections);
+            void LoadConnections(const connections_list_t& connections);
 
         public:
 
@@ -89,6 +93,7 @@ namespace Jack
 
     typedef std::list<JackNetMaster*> master_list_t;
     typedef master_list_t::iterator master_list_it_t;
+    typedef std::map <std::string, connections_list_t> master_connections_list_t;
 
     /**
     \Brief This class describer the Network Manager
@@ -110,9 +115,11 @@ namespace Jack
             JackNetSocket fSocket;
             jack_native_thread_t fThread;
             master_list_t fMasterList;
+            master_connections_list_t fMasterConnectionList;
             uint32_t fGlobalID;
             bool fRunning;
             bool fAutoConnect;
+            bool fAutoSave;
 
             void Run();
             JackNetMaster* InitMaster(session_params_t& params);

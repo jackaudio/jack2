@@ -529,7 +529,7 @@ JackCoreMidiDriver::Restart()
     Attach();
     Start();
     // Use first alias and partial port naming
-    RestoreConnections(1, false);
+    LoadConnections(1, false);
 }
 
 void

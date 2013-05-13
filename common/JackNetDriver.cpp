@@ -29,7 +29,8 @@ namespace Jack
 {
     JackNetDriver::JackNetDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
                                 const char* ip, int udp_port, int mtu, int midi_input_ports, int midi_output_ports,
-                                char* net_name, uint transport_sync, int network_latency, int celt_encoding, int opus_encoding)
+                                char* net_name, uint transport_sync, int network_latency, 
+                                int celt_encoding, int opus_encoding, bool auto_save)
             : JackWaiterDriver(name, alias, engine, table), JackNetSlaveInterface(ip, udp_port)
     {
         jack_log("JackNetDriver::JackNetDriver ip %s, port %d", ip, udp_port);
@@ -66,6 +67,7 @@ namespace Jack
         fMidiPlaybackPortList = NULL;
         fWantedAudioCaptureChannels = -1;
         fWantedAudioPlaybackChannels = -1;
+        fAutoSave = auto_save;
 #ifdef JACK_MONITOR
         fNetTimeMon = NULL;
         fRcvSyncUst = 0;
@@ -137,7 +139,9 @@ namespace Jack
     bool JackNetDriver::Initialize()
     {
         jack_log("JackNetDriver::Initialize");
-        SaveConnections(0);
+        if (fAutoSave) {
+            SaveConnections(0);
+        }
         FreePorts();
 
         // New loading, but existing socket, restart the driver
@@ -237,7 +241,9 @@ namespace Jack
         // Transport engine parametering
         fEngineControl->fTransport.SetNetworkSync(fParams.fTransportSync);
 
-        RestoreConnections(0);
+        if (fAutoSave) {
+            LoadConnections(0);
+        }
         return true;
     }
 
@@ -687,6 +693,10 @@ namespace Jack
 #endif
             strcpy(value.str, "'hostname'");
             jack_driver_descriptor_add_parameter(desc, &filler, "client-name", 'n', JackDriverParamString, &value, NULL, "Name of the jack client", NULL);
+            
+            value.i = false;
+            jack_driver_descriptor_add_parameter(desc, &filler, "auto-save", 's', JackDriverParamBool, &value, NULL, "Save/restore connection state when restarting", NULL);
+
 
 /*  
 Deactivated for now..
@@ -720,6 +730,7 @@ Deactivated for now..
             int network_latency = 5;
             const JSList* node;
             const jack_driver_param_t* param;
+            bool auto_save = false;
 
             // Possibly use env variable for UDP port
             const char* default_udp_port = getenv("JACK_NETJACK_PORT");
@@ -768,6 +779,9 @@ Deactivated for now..
                     case 'n' :
                         strncpy(net_name, param->value.str, JACK_CLIENT_NAME_SIZE);
                         break;
+                    case 's':
+                        auto_save = param->value.i;
+                        break;
                     /*
                     Deactivated for now..
                     case 't' :
@@ -790,7 +804,7 @@ Deactivated for now..
                         new Jack::JackNetDriver("system", "net_pcm", engine, table, multicast_ip, udp_port, mtu,
                                                 midi_input_ports, midi_output_ports,
                                                 net_name, transport_sync,
-                                                network_latency, celt_encoding, opus_encoding));
+                                                network_latency, celt_encoding, opus_encoding, auto_save));
                 if (driver->Open(period_size, sample_rate, 1, 1, audio_capture_ports, audio_playback_ports, monitor, "from_master_", "to_master_", 0, 0) == 0) {
                     return driver;
                 } else {

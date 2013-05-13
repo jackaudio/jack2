@@ -20,6 +20,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackArgParser.h"
 #include "JackServerGlobals.h"
 #include "JackLockedEngine.h"
+#include "thread.h"
 
 using namespace std;
 
@@ -556,6 +557,65 @@ namespace Jack
 #endif
         return 0;
     }
+    
+    void JackNetMaster::SaveConnections(connections_list_t& connections)
+    {
+        // Audio
+        for (int i = 0; i < fParams.fSendAudioChannels; i++) {
+            const char** connected_port = jack_port_get_all_connections(fClient, fAudioCapturePorts[i]);
+            if (connected_port != NULL) {
+                for (int port = 0; connected_port[port]; port++) {
+                    connections.push_back(make_pair(connected_port[port], jack_port_name(fAudioCapturePorts[i])));
+                    jack_log("INPUT %s ==> %s", connected_port[port], jack_port_name(fAudioCapturePorts[i]));
+                }
+                jack_free(connected_port);
+            }
+        }
+   
+        for (int i = 0; i < fParams.fReturnAudioChannels; i++) {
+            const char** connected_port = jack_port_get_all_connections(fClient, fAudioPlaybackPorts[i]);
+            if (connected_port != NULL) {
+                for (int port = 0; connected_port[port]; port++) {
+                    connections.push_back(make_pair(jack_port_name(fAudioPlaybackPorts[i]), connected_port[port]));
+                    jack_log("OUTPUT %s ==> %s", jack_port_name(fAudioPlaybackPorts[i]), connected_port[port]);
+                }
+                jack_free(connected_port);
+            }
+        }
+        
+        // MIDI
+        for (int i = 0; i < fParams.fSendMidiChannels; i++) {
+            const char** connected_port = jack_port_get_all_connections(fClient, fMidiCapturePorts[i]);
+            if (connected_port != NULL) {
+                for (int port = 0; connected_port[port]; port++) {
+                    connections.push_back(make_pair(connected_port[port], jack_port_name(fMidiCapturePorts[i])));
+                    jack_log("INPUT %s ==> %s", connected_port[port], jack_port_name(fMidiCapturePorts[i]));
+                }
+                jack_free(connected_port);
+            }
+        }
+   
+        for (int i = 0; i < fParams.fReturnMidiChannels; i++) {
+            const char** connected_port = jack_port_get_all_connections(fClient, fMidiPlaybackPorts[i]);
+            if (connected_port != NULL) {
+                for (int port = 0; connected_port[port]; port++) {
+                    connections.push_back(make_pair(jack_port_name(fMidiPlaybackPorts[i]), connected_port[port]));
+                    jack_log("OUTPUT %s ==> %s", jack_port_name(fMidiPlaybackPorts[i]), connected_port[port]);
+                }
+                jack_free(connected_port);
+            }
+        }
+    }
+    
+    void JackNetMaster::LoadConnections(const connections_list_t& connections)
+    {
+        list<pair<string, string> >::const_iterator it;
+        for (it = connections.begin(); it != connections.end(); it++) {
+            pair<string, string> connection = *it;
+            jack_connect(fClient, connection.first.c_str(), connection.second.c_str());
+        }
+    }
+
 
 //JackNetMasterManager***********************************************************************************************
 
@@ -568,6 +628,7 @@ namespace Jack
         fGlobalID = 0;
         fRunning = true;
         fAutoConnect = false;
+        fAutoSave = false;
 
         const JSList* node;
         const jack_driver_param_t* param;
@@ -603,6 +664,10 @@ namespace Jack
 
                 case 'c':
                     fAutoConnect = param->value.i;
+                    break;
+                    
+                case 's':
+                    fAutoSave = param->value.i;
                     break;
             }
         }
@@ -652,7 +717,7 @@ namespace Jack
         }
         master_list_t::iterator it;
         for (it = fMasterList.begin(); it != fMasterList.end(); it++) {
-            delete(*it);
+            delete (*it);
         }
         fMasterList.clear();
         fSocket.Close();
@@ -811,10 +876,14 @@ namespace Jack
         JackNetMaster* master = new JackNetMaster(fSocket, params, fMulticastIP);
         if (master->Init(fAutoConnect)) {
             fMasterList.push_back(master);
+            if (fAutoSave && fMasterConnectionList.find(params.fName) != fMasterConnectionList.end()) {
+                master->LoadConnections(fMasterConnectionList[params.fName]);
+            }
             return master;
+        } else {
+            delete master;
+            return NULL;
         }
-        delete master;
-        return NULL;
     }
 
     master_list_it_t JackNetMasterManager::FindMaster(uint32_t id)
@@ -834,10 +903,14 @@ namespace Jack
     {
         jack_log("JackNetMasterManager::KillMaster ID = %u", params->fID);
 
-        master_list_it_t master = FindMaster(params->fID);
-        if (master != fMasterList.end()) {
-            fMasterList.erase(master);
-            delete *master;
+        master_list_it_t master_it = FindMaster(params->fID);
+        if (master_it != fMasterList.end()) {
+            if (fAutoSave) {
+                fMasterConnectionList[params->fName].clear();
+                (*master_it)->SaveConnections(fMasterConnectionList[params->fName]);
+            }
+            fMasterList.erase(master_it);
+            delete (*master_it);
             return 1;
         }
         return 0;
@@ -867,6 +940,9 @@ extern "C"
 
         value.i = false;
         jack_driver_descriptor_add_parameter(desc, &filler, "auto-connect", 'c', JackDriverParamBool, &value, NULL, "Auto connect netmaster to system ports", NULL);
+
+        value.i = false;
+        jack_driver_descriptor_add_parameter(desc, &filler, "auto-save", 's', JackDriverParamBool, &value, NULL, "Save/restore netmaster connection state when restarted", NULL);
 
         return desc;
     }

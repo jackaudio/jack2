@@ -594,14 +594,14 @@ string JackDriver::MatchPortName(const char* name, const char** ports, int alias
     return "";
 }
 
-void JackDriver::RestoreConnections(int alias, bool full_name)
+void JackDriver::LoadConnections(int alias, bool full_name)
 {
     list<pair<string, pair<string, string> > >::const_iterator it;
     
     if (full_name) {
         for (it = fConnections.begin(); it != fConnections.end(); it++) {
             pair<string, string> connection = (*it).second;
-            jack_info("Restore connection: %s %s", connection.first.c_str(), connection.second.c_str());
+            jack_info("Load connection: %s %s", connection.first.c_str(), connection.second.c_str());
             fEngine->PortConnect(fClientControl.fRefNum, connection.first.c_str(), connection.second.c_str());
         }
     } else {
@@ -613,7 +613,7 @@ void JackDriver::RestoreConnections(int alias, bool full_name)
             string real_input = MatchPortName(connection.first.c_str(), outputs, alias, (*it).first);
             string real_output = MatchPortName(connection.second.c_str(), inputs, alias, (*it).first);
             if ((real_input != "") && (real_output != "")) {
-                jack_info("Restore connection: %s %s", real_input.c_str(), real_output.c_str());
+                jack_info("Load connection: %s %s", real_input.c_str(), real_output.c_str());
                 fEngine->PortConnect(fClientControl.fRefNum, real_input.c_str(), real_output.c_str());
             }
         }
