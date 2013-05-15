@@ -612,7 +612,7 @@ namespace Jack
 
         // set the parameters to send
         strcpy(fParams.fPacketType, "params");
-        fParams.fProtocolVersion = SLAVE_PROTOCOL;
+        fParams.fProtocolVersion = NETWORK_PROTOCOL;
         SetPacketType(&fParams, SLAVE_AVAILABLE);
 
         // init loop : get a master and start, do it until connection is ok
@@ -647,7 +647,7 @@ namespace Jack
 
         // set the parameters to send
         strcpy(fParams.fPacketType, "params");
-        fParams.fProtocolVersion = SLAVE_PROTOCOL;
+        fParams.fProtocolVersion = NETWORK_PROTOCOL;
         SetPacketType(&fParams, SLAVE_AVAILABLE);
 
         net_status_t status;

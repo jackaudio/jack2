@@ -841,8 +841,8 @@ namespace Jack
         jack_log("JackNetMasterManager::InitMaster slave : %s", params.fName);
 
         //check MASTER <<==> SLAVE network protocol coherency
-        if (params.fProtocolVersion != MASTER_PROTOCOL) {
-            jack_error("Error : slave %s is running with a different protocol %d != %d", params.fName,  params.fProtocolVersion, MASTER_PROTOCOL);
+        if (params.fProtocolVersion != NETWORK_PROTOCOL) {
+            jack_error("Error : slave %s is running with a different protocol %d != %d", params.fName,  params.fProtocolVersion, NETWORK_PROTOCOL);
             return NULL;
         }
 

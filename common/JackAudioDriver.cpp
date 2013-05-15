@@ -209,8 +209,9 @@ int JackAudioDriver::Write()
             jack_default_audio_sample_t* buffer = GetOutputBuffer(i);
             int size = sizeof(jack_default_audio_sample_t) * fEngineControl->fBufferSize;
             // Monitor ports
-            if (fWithMonitorPorts && fGraphManager->GetConnectionsNum(fMonitorPortList[i]) > 0)
+            if (fWithMonitorPorts && fGraphManager->GetConnectionsNum(fMonitorPortList[i]) > 0) {
                 memcpy(GetMonitorBuffer(i), buffer, size);
+            }
         }
     }
     return 0;

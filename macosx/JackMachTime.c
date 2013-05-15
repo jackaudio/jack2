@@ -36,7 +36,7 @@ SERVER_EXPORT void InitTime()
 {
 	mach_timebase_info_data_t info;
 	mach_timebase_info(&info);
-	__jack_time_ratio = ((float)info.numer / info.denom) / 1000;
+	__jack_time_ratio = ((double)info.numer / (double)info.denom) / 1000;
 }
 
 SERVER_EXPORT void EndTime()
@@ -44,7 +44,7 @@ SERVER_EXPORT void EndTime()
 
 SERVER_EXPORT jack_time_t GetMicroSeconds(void)
 {
-    return (jack_time_t) (mach_absolute_time () * __jack_time_ratio);
+    return (jack_time_t) (mach_absolute_time() * __jack_time_ratio);
 }
 
 void SetClockSource(jack_timer_type_t source)

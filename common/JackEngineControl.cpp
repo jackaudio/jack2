@@ -47,16 +47,19 @@ void JackEngineControl::CalcCPULoad(JackClientInterface** table,
         for (int i = fDriverNum; i < CLIENT_NUM; i++) {
             JackClientInterface* client = table[i];
             JackClientTiming* timing = manager->GetClientTiming(i);
-            if (client && client->GetClientControl()->fActive && timing->fStatus == Finished)
+            if (client && client->GetClientControl()->fActive && timing->fStatus == Finished) {
                 last_cycle_end = JACK_MAX(last_cycle_end, timing->fFinishedAt);
+            }
         }
     }
 
     // Store the execution time for later averaging
-    if (last_cycle_end > 0)
+    if (last_cycle_end > 0) {
         fRollingClientUsecs[fRollingClientUsecsIndex++] = last_cycle_end - fPrevCycleTime;
-    if (fRollingClientUsecsIndex >= JACK_ENGINE_ROLLING_COUNT)
+    }
+    if (fRollingClientUsecsIndex >= JACK_ENGINE_ROLLING_COUNT) {
         fRollingClientUsecsIndex = 0;
+    }
 
     // Each time we have a full set of iterations, recompute the current
     // usage from the latest JACK_ENGINE_ROLLING_COUNT client entries.
@@ -65,8 +68,7 @@ void JackEngineControl::CalcCPULoad(JackClientInterface** table,
         jack_time_t max_usecs = 0;
 
         for (int i = 0; i < JACK_ENGINE_ROLLING_COUNT; i++) {
-            avg_usecs += fRollingClientUsecs[i]; // This is really a running
-                                                 // total to be averaged later
+            avg_usecs += fRollingClientUsecs[i]; // This is really a running total to be averaged later
             max_usecs = JACK_MAX(fRollingClientUsecs[i], max_usecs);
         }
 
