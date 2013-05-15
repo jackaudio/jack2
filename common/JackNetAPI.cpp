@@ -264,7 +264,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
     {
         // Check MASTER <==> SLAVE network protocol coherency
         if (fParams.fProtocolVersion != NETWORK_PROTOCOL) {
-            jack_error("Error : slave is running with a different protocol %s", fParams.fName);
+            jack_error("Error : slave '%s' is running with a different protocol %d != %d", fParams.fName, fParams.fProtocolVersion, NETWORK_PROTOCOL);
             return -1;
         }
 
