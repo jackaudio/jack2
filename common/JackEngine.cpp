@@ -604,7 +604,7 @@ int JackEngine::ClientExternalOpen(const char* name, int pid, int uuid, int* ref
         EnsureUUID(uuid);
     }
 
-    jack_log("JackEngine::ClientExternalOpen: uuid = %d, name = %s ", uuid, real_name);
+    jack_log("JackEngine::ClientExternalOpen: uuid = %d, name = %s", uuid, real_name);
 
     int refnum = AllocateRefnum();
     if (refnum < 0) {
@@ -895,7 +895,7 @@ int JackEngine::CheckPortsConnect(int refnum, jack_port_id_t src, jack_port_id_t
     JackPort* src_port = fGraphManager->GetPort(src);
     JackPort* dst_port = fGraphManager->GetPort(dst);
 
-    jack_log("CheckPortsConnect(caller = %d, src = %d, dst = %d)", refnum, src_port->GetRefNum(), dst_port->GetRefNum());
+    jack_log("JackEngine::CheckPortsConnect(ref = %d, src = %d, dst = %d)", refnum, src_port->GetRefNum(), dst_port->GetRefNum());
 
     int src_self = src_port->GetRefNum() == refnum ? 1 : 0;
     int dst_self = dst_port->GetRefNum() == refnum ? 1 : 0;
@@ -956,7 +956,7 @@ int JackEngine::CheckPortsConnect(int refnum, jack_port_id_t src, jack_port_id_t
 
 int JackEngine::PortConnect(int refnum, const char* src, const char* dst)
 {
-    jack_log("JackEngine::PortConnect src = %s dst = %s", src, dst);
+    jack_log("JackEngine::PortConnect ref = %d src = %s dst = %s", refnum, src, dst);
     jack_port_id_t port_src, port_dst;
 
     return (fGraphManager->GetTwoPorts(src, dst, &port_src, &port_dst) < 0)
@@ -966,7 +966,7 @@ int JackEngine::PortConnect(int refnum, const char* src, const char* dst)
 
 int JackEngine::PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
 {
-    jack_log("JackEngine::PortConnect src = %d dst = %d", src, dst);
+    jack_log("JackEngine::PortConnect ref = %d src = %d dst = %d", refnum, src, dst);
     JackClientInterface* client;
     int ref;
 
@@ -1008,7 +1008,7 @@ int JackEngine::PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
 
 int JackEngine::PortDisconnect(int refnum, const char* src, const char* dst)
 {
-    jack_log("JackEngine::PortDisconnect src = %s dst = %s", src, dst);
+    jack_log("JackEngine::PortDisconnect ref = %d src = %s dst = %s", refnum, src, dst);
     jack_port_id_t port_src, port_dst;
 
     return (fGraphManager->GetTwoPorts(src, dst, &port_src, &port_dst) < 0)
@@ -1018,7 +1018,7 @@ int JackEngine::PortDisconnect(int refnum, const char* src, const char* dst)
 
 int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
 {
-    jack_log("JackEngine::PortDisconnect src = %d dst = %d", src, dst);
+    jack_log("JackEngine::PortDisconnect ref = %d src = %d dst = %d", refnum, src, dst);
 
     if (dst == ALL_PORTS) {
 

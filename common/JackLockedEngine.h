@@ -88,7 +88,11 @@ class SERVER_EXPORT JackLockedEngine
         {}
         ~JackLockedEngine()
         {}
-
+        
+        bool Lock() { return fEngine.Lock(); }
+        bool Unlock() { return fEngine.Unlock(); }
+        bool Trylock() { return fEngine.Trylock(); }
+  
         int Open()
         {
             // No lock needed

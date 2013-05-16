@@ -519,17 +519,25 @@ JackCoreMidiDriver::CloseAux()
 void
 JackCoreMidiDriver::Restart()
 {
+    // Lock between this thread and RT thread
     JackLock lock(this);
-    // Use first alias
-    SaveConnections(1);
-    Stop();
-    Detach();
-    CloseAux();
-    OpenAux();
-    Attach();
-    Start();
-    // Use first alias and partial port naming
-    LoadConnections(1, false);
+    
+    // Lock between this thread and request thread
+    if (fEngine->Lock()) {
+        // Use first alias
+        SaveConnections(1);
+        Stop();
+        Detach();
+        CloseAux();
+        OpenAux();
+        Attach();
+        Start();
+        // Use first alias and partial port naming
+        LoadConnections(1, false);
+        fEngine->Unlock();
+    } else {
+        jack_error("Cannot acquire engine lock...");
+    }
 }
 
 void
