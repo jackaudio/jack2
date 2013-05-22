@@ -451,9 +451,9 @@ typedef void (*JackInfoShutdownCallback)(jack_status_t code, const char* reason,
 #define JACK_DEFAULT_MIDI_TYPE "8 bit raw midi"
 
 /**
- * Used to check if the current JACK version provides JackPortIsCV flag.
+ * Used to check if the current JACK version provides JackPortIsControlVoltage flag.
  */
-#define JACK_HAS_PORT_IS_CV_FLAG 1
+#define JACK_HAS_PORT_IS_CONTROL_VOLTAGE_FLAG 1
 
 /**
  * For convenience, use this typedef if you want to be able to change
@@ -520,10 +520,10 @@ enum JackPortFlags {
     JackPortIsTerminal = 0x10,
 
     /**
-     * if JackPortIsCV is set, then the audio port is used
+     * if JackPortIsControlVoltage is set, then the audio port is used
      * as control voltage audio signal.
      */
-    JackPortIsCV = 0x100,
+    JackPortIsControlVoltage = 0x20,
 
 };
 
