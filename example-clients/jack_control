@@ -101,35 +101,40 @@ def get_parameters(iface, path):
 
         print "%20s: %s (%s:%s:%s:%s)" %(name, descr, typestr, isset, default, value)
 
+def print_help():
+    print "Usage: %s [command] [command] ..." % os.path.basename(sys.argv[0])
+    print "Commands:"
+    print "    exit                       - exit jack dbus service (stops jack server if currently running)"
+    print "    help                       - print this help text"
+    print "    status                     - check whether jack server is started, return value is 0 if running and 1 otherwise"
+    print "    start                      - start jack server if not currently started"
+    print "    stop                       - stop jack server if currently started"
+    print "    sm                         - switch master to currently selected driver"
+    print "    dl                         - get list of available drivers"
+    print "    dg                         - get currently selected driver"
+    print "    ds <driver>                - select driver"
+    print "    dp                         - get parameters of currently selected driver"
+    print "    dpd <param>                - get long description for driver parameter"
+    print "    dps <param> <value>        - set driver parameter"
+    print "    dpr <param>                - reset driver parameter to its default value"
+    print "    asd <driver>               - add slave driver"
+    print "    rsd <driver>               - remove slave driver"
+    print "    il                         - get list of available internals"
+    print "    ip <name>                  - get parameters of given internal"
+    print "    ipd <name> <param>         - get long description for internal parameter"
+    print "    ips <name> <param> <value> - set internal parameter"
+    print "    ipr <name> <param>         - reset internal parameter to its default value"
+    print "    iload <name>               - load internal"
+    print "    iunload <name>             - unload internal"
+    print "    ep                         - get engine parameters"
+    print "    epd <param>                - get long description for engine parameter"
+    print "    eps <param> <value>        - set engine parameter"
+    print "    epr <param>                - reset engine parameter to its default value"
+
+
 def main():
-    if len(sys.argv) == 1:
-        print "Usage: %s [command] [command] ..." % os.path.basename(sys.argv[0])
-        print "Commands:"
-        print "    exit                       - exit jack dbus service (stops jack server if currently running)"
-        print "    status                     - check whether jack server is started, return value is 0 if running and 1 otherwise"
-        print "    start                      - start jack server if not currently started"
-        print "    stop                       - stop jack server if currently started"
-	print "    sm                         - switch master to currently selected driver"
-        print "    dl                         - get list of available drivers"
-        print "    dg                         - get currently selected driver"
-        print "    ds <driver>                - select driver"
-        print "    dp                         - get parameters of currently selected driver"
-        print "    dpd <param>                - get long description for driver parameter"
-        print "    dps <param> <value>        - set driver parameter"
-        print "    dpr <param>                - reset driver parameter to its default value"
-        print "    asd <driver>               - add slave driver"
-        print "    rsd <driver>               - remove slave driver"
-        print "    il                         - get list of available internals"
-        print "    ip <name>                  - get parameters of given internal"
-        print "    ipd <name> <param>         - get long description for internal parameter"
-        print "    ips <name> <param> <value> - set internal parameter"
-        print "    ipr <name> <param>         - reset internal parameter to its default value"
-        print "    iload <name>               - load internal"
-        print "    iunload <name>             - unload internal"
-        print "    ep                         - get engine parameters"
-        print "    epd <param>                - get long description for engine parameter"
-        print "    eps <param> <value>        - set engine parameter"
-        print "    epr <param>                - reset engine parameter to its default value"
+    if len(sys.argv) == 1 or sys.argv[1] in ["-h", "--help", "help"]:
+        print_help()
         sys.exit(0)
     
     bus = dbus.SessionBus()
