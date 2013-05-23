@@ -308,11 +308,11 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                     jack_session_event_t* event = (jack_session_event_t*)malloc( sizeof(jack_session_event_t));
                     char uuid_buf[JACK_UUID_SIZE];
                     event->type = (jack_session_event_type_t)value1;
-                    event->session_dir = strdup(message);
+                    event->session_dir = _strdup(message);
                     event->command_line = NULL;
                     event->flags = (jack_session_flags_t)0;
                     snprintf(uuid_buf, sizeof(uuid_buf), "%d", GetClientControl()->fSessionID);
-                    event->client_uuid = strdup(uuid_buf);
+                    event->client_uuid = _strdup(uuid_buf);
                     fSessionReply = kPendingSessionReply;
                     // Session callback may change fSessionReply by directly using jack_session_reply
                     fSession(event, fSessionArg);
@@ -1199,7 +1199,7 @@ char* JackClient::GetInternalClientName(int ref)
     char name_res[JACK_CLIENT_NAME_SIZE + 1];
     int result = -1;
     fChannel->GetInternalClientName(GetClientControl()->fRefNum, ref, name_res, &result);
-    return (result < 0) ? NULL : strdup(name_res);
+    return (result < 0) ? NULL : _strdup(name_res);
 }
 
 int JackClient::InternalClientHandle(const char* client_name, jack_status_t* status)
@@ -1288,7 +1288,7 @@ char* JackClient::GetUUIDForClientName(const char* client_name)
     char uuid_res[JACK_UUID_SIZE];
     int result = -1;
     fChannel->GetUUIDForClientName(GetClientControl()->fRefNum, client_name, uuid_res, &result);
-    return (result) ? NULL : strdup(uuid_res);
+    return (result) ? NULL : _strdup(uuid_res);
 }
 
 char* JackClient::GetClientNameByUUID(const char* uuid)
@@ -1296,7 +1296,7 @@ char* JackClient::GetClientNameByUUID(const char* uuid)
     char name_res[JACK_CLIENT_NAME_SIZE + 1];
     int result = -1;
     fChannel->GetClientNameForUUID(GetClientControl()->fRefNum, uuid, name_res, &result);
-    return (result) ? NULL : strdup(name_res);
+    return (result) ? NULL : _strdup(name_res);
 }
 
 int JackClient::ReserveClientName(const char* client_name, const char* uuid)

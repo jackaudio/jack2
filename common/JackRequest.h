@@ -1283,9 +1283,9 @@ struct JackSessionNotifyResult : public JackResult
         int i = 0;
 
         for (std::list<JackSessionCommand>::iterator ci = fCommandList.begin(); ci != fCommandList.end(); ci++) {
-            session_command[i].uuid = strdup(ci->fUUID);
-            session_command[i].client_name = strdup(ci->fClientName);
-            session_command[i].command = strdup(ci->fCommand);
+            session_command[i].uuid = _strdup(ci->fUUID);
+            session_command[i].client_name = _strdup(ci->fClientName);
+            session_command[i].command = _strdup(ci->fCommand);
             session_command[i].flags = ci->fFlags;
             i += 1;
         }

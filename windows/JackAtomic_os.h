@@ -18,59 +18,69 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 #ifndef __JackAtomic_WIN32__
-#define __JackAtomic_WIN32__
+#define __JackAtmic_WIN32__
 
 #include "JackTypes.h"
 
-#ifndef __MINGW32__
-#ifdef __SMP__
-#	define LOCK lock
+#ifndef _WIN64
+
+	#ifndef __MINGW32__
+		#ifdef __SMP__
+			#	define LOCK lock
+		#else
+			#	define LOCK
+	#endif
+
+	#if _MSC_VER <= 1600
+		#ifndef inline
+			#define inline __inline
+		#endif
+	#endif
+
+	//----------------------------------------------------------------
+	// CAS functions
+	//----------------------------------------------------------------
+	inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void * addr)
+	{
+		register char c;
+		__asm {
+	        push	ebx
+		    push	esi
+			mov	esi, addr
+			mov	eax, value
+	        mov	ebx, newvalue
+		    LOCK cmpxchg dword ptr [esi], ebx
+			sete	c
+	        pop	esi
+		    pop	ebx
+		}
+		return c;
+	}
+
+	#else
+
+	#define LOCK "lock ; "
+
+	static inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void* addr)
+	{
+	    register char ret;
+		__asm__ __volatile__ (
+	        "# CAS \n\t"
+		    LOCK "cmpxchg %2, (%1) \n\t"
+			"sete %0               \n\t"
+	        : "=a" (ret)
+		    : "c" (addr), "d" (newvalue), "a" (value)
+			);
+	    return ret;
+	}
+
+	#endif
 #else
-#	define LOCK
-#endif
+			static inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void* addr)
+			{
+				return InterlockedCompareExchange((UInt32*)addr, value, newvalue);
+			}
+#endif // _WIN64
 
-#ifndef inline
-	#define inline __inline
-#endif
-
-//----------------------------------------------------------------
-// CAS functions
-//----------------------------------------------------------------
-inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void * addr)
-{
-    register char c;
-    __asm {
-        push	ebx
-        push	esi
-        mov	esi, addr
-        mov	eax, value
-        mov	ebx, newvalue
-        LOCK cmpxchg dword ptr [esi], ebx
-        sete	c
-        pop	esi
-        pop	ebx
-    }
-    return c;
-}
-
-#else
-
-#define LOCK "lock ; "
-
-static inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void* addr)
-{
-    register char ret;
-    __asm__ __volatile__ (
-        "# CAS \n\t"
-        LOCK "cmpxchg %2, (%1) \n\t"
-        "sete %0               \n\t"
-        : "=a" (ret)
-        : "c" (addr), "d" (newvalue), "a" (value)
-        );
-    return ret;
-}
-
-#endif
-
-#endif
+#endif //__JackAtmic_WIN32__
 

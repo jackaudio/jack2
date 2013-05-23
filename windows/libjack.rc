@@ -3,7 +3,7 @@
 // http://www.resedit.net
 
 #include "resource.h"
-#include "afxres.h"
+#include "WinResrc.h"
 
 
 //

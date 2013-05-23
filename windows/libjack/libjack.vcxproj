@@ -1,0 +1,235 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{E0BBC11B-6FE1-4DCE-AC72-12950181CA2D}</ProjectGuid>
+    <RootNamespace>libjack</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110_xp</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110_xp</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetName>$(ProjectName)_d</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <TargetName>$(ProjectName)_d</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>..\tre-0.8.0\win32;..\tre-0.8.0\lib;..\..\common\jack;..\;..\..\common</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>JACKLIB_STATIC;DEBUG;_CRT_SECURE_NO_WARNINGS;WIN32;__SMP__;STDC_HEADERS;_WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <ProgramDataBaseFileName>$(IntDir)$(ProjectName)_$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>tre.lib</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>..\tre-0.8.0\win32\$(Configuration)</AdditionalLibraryDirectories>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>..\tre-0.8.0\win32;..\tre-0.8.0\lib;..\..\common\jack;..\;..\..\common</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>JACKLIB_STATIC;DEBUG;_CRT_SECURE_NO_WARNINGS;WIN32;__SMP__;STDC_HEADERS;_WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <ProgramDataBaseFileName>$(IntDir)$(ProjectName)_$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>tre.lib</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>x64\$(Configuration)</AdditionalLibraryDirectories>
+    </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PreprocessorDefinitions>JACKLIB_STATIC;NDEBUG;_CRT_SECURE_NO_WARNINGS;WIN32;__SMP__;STDC_HEADERS;_WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>..\tre-0.8.0\win32;..\tre-0.8.0\lib;..\..\common\jack;..\;..\..\common</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>..\tre-0.8.0\win32\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>tre.lib</AdditionalDependencies>
+      <TargetMachine>MachineX86</TargetMachine>
+      <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
+    </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PreprocessorDefinitions>JACKLIB_STATIC;NDEBUG;_CRT_SECURE_NO_WARNINGS;WIN32;__SMP__;STDC_HEADERS;_WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>..\tre-0.8.0\win32;..\tre-0.8.0\lib;..\..\common\jack;..\;..\..\common</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>x64\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>tre.lib</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\common\JackActivationCount.cpp" />
+    <ClCompile Include="..\..\common\JackAPI.cpp" />
+    <ClCompile Include="..\..\common\JackAudioPort.cpp" />
+    <ClCompile Include="..\..\common\JackClient.cpp" />
+    <ClCompile Include="..\..\common\JackConnectionManager.cpp" />
+    <ClCompile Include="..\..\common\JackDebugClient.cpp" />
+    <ClCompile Include="..\..\common\JackEngineControl.cpp" />
+    <ClCompile Include="..\..\common\JackEngineProfiling.cpp" />
+    <ClCompile Include="..\..\common\JackError.cpp" />
+    <ClCompile Include="..\..\common\JackException.cpp" />
+    <ClCompile Include="..\..\common\JackFrameTimer.cpp" />
+    <ClCompile Include="..\..\common\JackGenericClientChannel.cpp" />
+    <ClCompile Include="..\..\common\JackGlobals.cpp" />
+    <ClCompile Include="..\..\common\JackGraphManager.cpp" />
+    <ClCompile Include="..\..\common\JackLibAPI.cpp" />
+    <ClCompile Include="..\..\common\JackLibClient.cpp" />
+    <ClCompile Include="..\..\common\JackMessageBuffer.cpp" />
+    <ClCompile Include="..\..\common\JackMidiAPI.cpp" />
+    <ClCompile Include="..\..\common\JackMidiPort.cpp" />
+    <ClCompile Include="..\..\common\JackPort.cpp" />
+    <ClCompile Include="..\..\common\JackPortType.cpp" />
+    <ClCompile Include="..\..\common\JackShmMem.cpp" />
+    <ClCompile Include="..\..\common\JackTools.cpp" />
+    <ClCompile Include="..\..\common\JackTransportEngine.cpp" />
+    <ClCompile Include="..\..\common\ringbuffer.c" />
+    <ClCompile Include="..\..\common\shm.c" />
+    <ClCompile Include="..\JackMMCSS.cpp" />
+    <ClCompile Include="..\JackWinMutex.cpp" />
+    <ClCompile Include="..\JackWinNamedPipe.cpp" />
+    <ClCompile Include="..\JackWinNamedPipeClientChannel.cpp" />
+    <ClCompile Include="..\JackWinProcessSync.cpp" />
+    <ClCompile Include="..\JackWinSemaphore.cpp" />
+    <ClCompile Include="..\JackWinServerLaunch.cpp" />
+    <ClCompile Include="..\JackWinThread.cpp" />
+    <ClCompile Include="..\JackWinTime.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\common\jack\control.h" />
+    <ClInclude Include="..\..\common\jack\intclient.h" />
+    <ClInclude Include="..\..\common\jack\jack.h" />
+    <ClInclude Include="..\..\common\jack\jslist.h" />
+    <ClInclude Include="..\..\common\jack\midiport.h" />
+    <ClInclude Include="..\..\common\jack\net.h" />
+    <ClInclude Include="..\..\common\jack\ringbuffer.h" />
+    <ClInclude Include="..\..\common\jack\session.h" />
+    <ClInclude Include="..\..\common\jack\statistics.h" />
+    <ClInclude Include="..\..\common\jack\systemdeps.h" />
+    <ClInclude Include="..\..\common\jack\thread.h" />
+    <ClInclude Include="..\..\common\jack\transport.h" />
+    <ClInclude Include="..\..\common\jack\types.h" />
+    <ClInclude Include="..\..\common\jack\weakjack.h" />
+    <ClInclude Include="..\..\common\jack\weakmacros.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\libjack.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
