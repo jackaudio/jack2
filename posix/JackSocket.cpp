@@ -33,7 +33,11 @@ static void BuildName(const char* client_name, char* res, const char* dir, int w
 {
     char ext_client_name[SYNC_MAX_NAME_SIZE + 1];
     JackTools::RewriteName(client_name, ext_client_name);
-    snprintf(res, size, "%s/jack_%s_%d_%d", dir, ext_client_name, JackTools::GetUID(), which);
+    if (getenv("JACK_PROMISCUOUS_SERVER")) {
+	    snprintf(res, size, "%s/jack_%s_%d", dir, ext_client_name, which);
+    } else {
+	    snprintf(res, size, "%s/jack_%s_%d_%d", dir, ext_client_name, JackTools::GetUID(), which);
+    }
 }
 
 JackClientSocket::JackClientSocket(int socket): JackClientRequestInterface(), fSocket(socket),fTimeOut(0)
