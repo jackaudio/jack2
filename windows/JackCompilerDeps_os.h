@@ -21,7 +21,11 @@
 #ifndef __JackCompilerDeps_WIN32__
 #define __JackCompilerDeps_WIN32__
 
-#define	LIB_EXPORT __declspec(dllexport)
+#ifndef JACKLIB_STATIC
+	#define	LIB_EXPORT __declspec(dllexport)
+#else
+	#define	LIB_EXPORT
+#endif
 
 #ifdef SERVER_SIDE
     #define	SERVER_EXPORT __declspec(dllexport)
@@ -42,7 +46,7 @@
 #if defined(_MSC_VER) /* Added by JE - 31-01-2012 */
 #define vsnprintf _vsnprintf
 #define snprintf _snprintf
-#define strdup _strdup
+//#define strdup _strdup
 #endif
 
 #endif
