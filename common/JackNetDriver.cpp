@@ -214,7 +214,7 @@ namespace Jack
         plot_name = string(fParams.fName);
         plot_name += string("_slave");
         plot_name += (fEngineControl->fSyncMode) ? string("_sync") : string("_async");
-        plot_name +=  string("_latency");
+        plot_name += string("_latency");
         fNetTimeMon = new JackGnuPlotMonitor<float>(128, 5, plot_name);
         string net_time_mon_fields[] =
         {
@@ -280,14 +280,17 @@ namespace Jack
         jack_latency_range_t input_range;
         jack_latency_range_t output_range;
         jack_latency_range_t monitor_range;
-
+     
         for (int i = 0; i < fCaptureChannels; i++) {
-            input_range.max = input_range.min = 0;
+            input_range.max = input_range.min = float(fParams.fNetworkLatency * fEngineControl->fBufferSize) / 2.f;
             fGraphManager->GetPort(fCapturePortList[i])->SetLatencyRange(JackCaptureLatency, &input_range);
         }
 
         for (int i = 0; i < fPlaybackChannels; i++) {
-            output_range.max = output_range.min = 0;
+            output_range.max = output_range.min = float(fParams.fNetworkLatency * fEngineControl->fBufferSize) / 2.f;
+            if (!fEngineControl->fSyncMode) {
+                output_range.max = output_range.min += fEngineControl->fBufferSize;
+            }
             fGraphManager->GetPort(fPlaybackPortList[i])->SetLatencyRange(JackPlaybackLatency, &output_range);
             if (fWithMonitorPorts) {
                 monitor_range.min = monitor_range.max = 0;
@@ -377,6 +380,7 @@ namespace Jack
             jack_log("JackNetDriver::AllocPorts() fMidiPlaybackPortList[%d] midi_port_index = %ld fPortLatency = %ld", midi_port_index, port_index, port->GetLatency());
         }
 
+        UpdateLatencies();
         return 0;
     }
 

@@ -1108,7 +1108,7 @@ extern "C"
                                              dont_htonl_floats, always_deadline, jitter_val));
 
             if (driver->Open(period_size, sample_rate, 1, 1, capture_ports, playback_ports,
-                                0, "from_master_", "to_master_", 0, 0) == 0) {
+                                0, "from_master", "to_master", 0, 0) == 0) {
                 return driver;
             } else {
                 delete driver;
