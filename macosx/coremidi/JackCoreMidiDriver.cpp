@@ -136,7 +136,7 @@ bool JackCoreMidiDriver::OpenAux()
         try {
             physical_input_ports =
                 new JackCoreMidiPhysicalInputPort*[potential_pi_count];
-        } catch (std::exception e) {
+        } catch (std::exception& e) {
             jack_error("JackCoreMidiDriver::Open - while creating physical "
                        "input port array: %s", e.what());
             goto destroy;
@@ -149,7 +149,7 @@ bool JackCoreMidiDriver::OpenAux()
                                                       capture_driver_name, i,
                                                       client, internal_input,
                                                       time_ratio);
-            } catch (std::exception e) {
+            } catch (std::exception& e) {
                 jack_error("JackCoreMidiDriver::Open - while creating "
                            "physical input port: %s", e.what());
                 goto destroy;
@@ -172,7 +172,7 @@ bool JackCoreMidiDriver::OpenAux()
         try {
             physical_output_ports =
                 new JackCoreMidiPhysicalOutputPort*[potential_po_count];
-        } catch (std::exception e) {
+        } catch (std::exception& e) {
             jack_error("JackCoreMidiDriver::Open - while creating physical "
                        "output port array: %s", e.what());
             goto destroy;
@@ -185,7 +185,7 @@ bool JackCoreMidiDriver::OpenAux()
                                                        playback_driver_name, i,
                                                        client, internal_output,
                                                        time_ratio);
-            } catch (std::exception e) {
+            } catch (std::exception& e) {
                 jack_error("JackCoreMidiDriver::Open - while creating "
                            "physical output port: %s", e.what());
                 goto destroy;
@@ -199,7 +199,7 @@ bool JackCoreMidiDriver::OpenAux()
         try {
             virtual_input_ports =
                 new JackCoreMidiVirtualInputPort*[in_channels];
-        } catch (std::exception e) {
+        } catch (std::exception& e) {
             jack_error("JackCoreMidiDriver::Open - while creating virtual "
                        "input port array: %s", e.what());
             goto destroy;
@@ -212,7 +212,7 @@ bool JackCoreMidiDriver::OpenAux()
                                                      capture_driver_name,
                                                      vi_count, vi_count + pi_count, client,
                                                      time_ratio);
-            } catch (std::exception e) {
+            } catch (std::exception& e) {
                 jack_error("JackCoreMidiDriver::Open - while creating virtual "
                            "input port: %s", e.what());
                 goto destroy;
@@ -225,7 +225,7 @@ bool JackCoreMidiDriver::OpenAux()
         try {
             virtual_output_ports =
                 new JackCoreMidiVirtualOutputPort*[out_channels];
-        } catch (std::exception e) {
+        } catch (std::exception& e) {
             jack_error("JackCoreMidiDriver::Open - while creating virtual "
                        "output port array: %s", e.what());
             goto destroy;
@@ -237,7 +237,7 @@ bool JackCoreMidiDriver::OpenAux()
                                                       playback_driver_name,
                                                       vo_count, vo_count + po_count, client,
                                                       time_ratio);
-            } catch (std::exception e) {
+            } catch (std::exception& e) {
                 jack_error("JackCoreMidiDriver::Open - while creating virtual "
                            "output port: %s", e.what());
                 goto destroy;

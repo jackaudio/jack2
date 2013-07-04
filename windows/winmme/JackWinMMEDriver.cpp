@@ -170,7 +170,7 @@ JackWinMMEDriver::Open(bool capturing, bool playing, int in_channels,
     if (num_potential_inputs) {
         try {
             input_ports = new JackWinMMEInputPort *[num_potential_inputs];
-        } catch (std::exception e) {
+        } catch (std::exception& e) {
             jack_error("JackWinMMEDriver::Open - while creating input port "
                        "array: %s", e.what());
             goto unset_timer_resolution;
@@ -180,7 +180,7 @@ JackWinMMEDriver::Open(bool capturing, bool playing, int in_channels,
                 input_ports[input_count] =
                     new JackWinMMEInputPort(fAliasName, client_name,
                                             capture_driver_name, i);
-            } catch (std::exception e) {
+            } catch (std::exception& e) {
                 jack_error("JackWinMMEDriver::Open - while creating input "
                            "port: %s", e.what());
                 continue;
@@ -191,7 +191,7 @@ JackWinMMEDriver::Open(bool capturing, bool playing, int in_channels,
     if (num_potential_outputs) {
         try {
             output_ports = new JackWinMMEOutputPort *[num_potential_outputs];
-        } catch (std::exception e) {
+        } catch (std::exception& e) {
             jack_error("JackWinMMEDriver::Open - while creating output port "
                        "array: %s", e.what());
             goto destroy_input_ports;
@@ -201,7 +201,7 @@ JackWinMMEDriver::Open(bool capturing, bool playing, int in_channels,
                 output_ports[output_count] =
                     new JackWinMMEOutputPort(fAliasName, client_name,
                                              playback_driver_name, i);
-            } catch (std::exception e) {
+            } catch (std::exception& e) {
                 jack_error("JackWinMMEDriver::Open - while creating output "
                            "port: %s", e.what());
                 continue;

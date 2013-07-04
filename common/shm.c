@@ -611,7 +611,7 @@ jack_cleanup_shm ()
 		} else {
 
 			/* see if allocator still exists */
-		#ifdef WIN32 // steph
+		#ifdef WIN32 
 			//jack_info("TODO: kill API not available !!");
 		#else
 			if (kill (r->allocator, 0)) {
@@ -741,7 +741,7 @@ jack_access_registry (jack_shm_info_t *ri)
 	jack_shm_header = ri->ptr.attached_at;
 	jack_shm_registry = (jack_shm_registry_t *) (jack_shm_header + 1);
 
-	close (shm_fd); // steph
+	close (shm_fd); 
 	return 0;
 }
 
@@ -800,7 +800,7 @@ jack_create_registry (jack_shm_info_t *ri)
 
 	/* initialize registry contents */
 	jack_shm_init_registry ();
-	close (shm_fd); // steph
+	close (shm_fd); 
 	return 0;
 }
 
