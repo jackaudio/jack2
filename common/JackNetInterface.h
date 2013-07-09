@@ -34,7 +34,7 @@ namespace Jack
 
 #define MANAGER_INIT_TIMEOUT    1000000 * 2   // in usec
 #define MASTER_INIT_TIMEOUT     1000000 * 10  // in usec
-#define SLAVE_INIT_TIMEOUT      1000000 * 10  // in usec
+#define SLAVE_INIT_TIMEOUT      1000000 * 1   // in usec
 #define PACKET_TIMEOUT          500000        // in usec
 
 #define NETWORK_MAX_LATENCY     30  // maximum possible latency in network master/slave loop

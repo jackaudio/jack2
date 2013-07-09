@@ -382,7 +382,7 @@ namespace Jack
         fRunning = false;
 
         // send a 'multicast euthanasia request' - new socket is required on macosx
-        jack_info("Exiting '%s'  %s", fParams.fName, fMulticastIP);
+        jack_info("Exiting '%s' %s", fParams.fName, fMulticastIP);
         SetPacketType(&fParams, KILL_MASTER);
         JackNetSocket mcast_socket(fMulticastIP, fSocket.GetPort());
 
@@ -642,7 +642,7 @@ namespace Jack
     // Separate the connection protocol into two separated step
     bool JackNetSlaveInterface::InitConnection(int time_out_sec)
     {
-        jack_log("JackNetSlaveInterface::InitConnection()");
+        jack_log("JackNetSlaveInterface::InitConnection time_out_sec = %d", time_out_sec);
         int try_count = (time_out_sec > 0) ? ((1000000 * time_out_sec) / SLAVE_INIT_TIMEOUT) : INT_MAX;
 
         // set the parameters to send
@@ -650,17 +650,7 @@ namespace Jack
         fParams.fProtocolVersion = NETWORK_PROTOCOL;
         SetPacketType(&fParams, SLAVE_AVAILABLE);
 
-        net_status_t status;
-        do {
-            // get a master
-            status = SendAvailableToMaster(try_count);
-            if (status == NET_SOCKET_ERROR) {
-                return false;
-            }
-        }
-        while (status != NET_CONNECTED && --try_count > 0);
-
-        return (try_count != 0);
+        return (SendAvailableToMaster(try_count) != NET_SOCKET_ERROR);
     }
 
     bool JackNetSlaveInterface::InitRendering()
@@ -683,7 +673,7 @@ namespace Jack
 
     net_status_t JackNetSlaveInterface::SendAvailableToMaster(int try_count)
     {
-        jack_log("JackNetSlaveInterface::SendAvailableToMaster()");
+        jack_log("JackNetSlaveInterface::SendAvailableToMaster try_count = %d", try_count);
         // utility
         session_params_t host_params;
         int rx_bytes = 0;
