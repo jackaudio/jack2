@@ -84,6 +84,7 @@ extern "C"
     typedef int (*JackNetSlaveBufferSizeCallback) (jack_nframes_t nframes, void *arg);
     typedef int (*JackNetSlaveSampleRateCallback) (jack_nframes_t nframes, void *arg);
     typedef void (*JackNetSlaveShutdownCallback) (void* data);
+    typedef int (*JackNetSlaveRestartCallback) (void* data);
 
     LIB_EXPORT jack_net_slave_t* jack_net_slave_open(const char* ip, int port, const char* name, jack_slave_t* request, jack_master_t* result);
     LIB_EXPORT int jack_net_slave_close(jack_net_slave_t* net);
@@ -95,6 +96,7 @@ extern "C"
     LIB_EXPORT int jack_set_net_slave_buffer_size_callback(jack_net_slave_t* net, JackNetSlaveBufferSizeCallback bufsize_callback, void *arg);
     LIB_EXPORT int jack_set_net_slave_sample_rate_callback(jack_net_slave_t* net, JackNetSlaveSampleRateCallback samplerate_callback, void *arg);
     LIB_EXPORT int jack_set_net_slave_shutdown_callback(jack_net_slave_t* net, JackNetSlaveShutdownCallback shutdown_callback, void *arg);
+    LIB_EXPORT int jack_set_net_slave_restart_callback(jack_net_slave_t* net, JackNetSlaveRestartCallback restart_callback, void *arg);
 
     // NetJack master API
 
@@ -492,6 +494,9 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
 
     JackNetSlaveShutdownCallback fShutdownCallback;
     void* fShutdownArg;
+    
+    JackNetSlaveRestartCallback fRestartCallback;
+    void*  fRestartArg;
 
     JackNetSlaveBufferSizeCallback fBufferSizeCallback;
     void* fBufferSizeArg;
@@ -515,6 +520,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
         :fThread(this),
         fProcessCallback(NULL),fProcessArg(NULL),
         fShutdownCallback(NULL), fShutdownArg(NULL),
+        fRestartCallback(NULL), fRestartArg(NULL),
         fBufferSizeCallback(NULL), fBufferSizeArg(NULL),
         fSampleRateCallback(NULL), fSampleRateArg(NULL),
         fAudioCaptureBuffer(NULL), fAudioPlaybackBuffer(NULL),
@@ -602,17 +608,27 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
         return 0;
     }
 
-    int Restart()
+    int Restart() 
     {
-        // If shutdown cb is set, then call it
-        if (fShutdownCallback) {
-            fShutdownCallback(fShutdownArg);
-        }
+       // Do it until client possibly decides to stop trying to connect...
+        while (true) {
+        
+            // If restart cb is set, then call it
+            if (fRestartCallback) {
+                if (fRestartCallback(fRestartArg) != 0) {
+                    return -1;
+                }
+            // Otherwise if shutdown cb is set, then call it
+            } else if (fShutdownCallback) {
+                fShutdownCallback(fShutdownArg);
+            }
 
-        // Init network connection
-        if (!JackNetSlaveInterface::InitConnection(fConnectTimeOut)) {
-            jack_error("Initing network fails...");
-            return -1;
+            // Init network connection
+            if (!JackNetSlaveInterface::InitConnection(fConnectTimeOut)) {
+                jack_error("Initing network fails after time_out, retry...");
+            } else {
+                break;
+            }
         }
 
          // Finish connection
@@ -629,11 +645,17 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
 
         // We need to notify possibly new buffer size and sample rate (see Execute)
         if (fBufferSizeCallback) {
-            fBufferSizeCallback(fParams.fPeriodSize, fBufferSizeArg);
+            if (fBufferSizeCallback(fParams.fPeriodSize, fBufferSizeArg) != 0) {
+                jack_error("New buffer size = %d cannot be used...", fParams.fPeriodSize);
+                return -1;
+            }
         }
 
         if (fSampleRateCallback) {
-            fSampleRateCallback(fParams.fSampleRate, fSampleRateArg);
+            if (fSampleRateCallback(fParams.fSampleRate, fSampleRateArg) != 0) {
+                jack_error("New sample rate = %d cannot be used...", fParams.fSampleRate);
+                return -1;
+            }
         }
 
         AllocPorts();
@@ -844,6 +866,17 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
             return 0;
         }
     }
+    
+    int SetRestartCallback(JackNetSlaveRestartCallback restart_callback, void *arg)
+    {
+        if (fThread.GetStatus() == JackThread::kRunning) {
+            return -1;
+        } else {
+            fRestartCallback = restart_callback;
+            fRestartArg = arg;
+            return 0;
+        }
+    }
 
     int SetBufferSizeCallback(JackNetSlaveBufferSizeCallback bufsize_callback, void *arg)
     {
@@ -996,6 +1029,12 @@ LIB_EXPORT int jack_set_net_slave_shutdown_callback(jack_net_slave_t *net, JackN
 {
     JackNetExtSlave* slave = (JackNetExtSlave*)net;
     return slave->SetShutdownCallback(shutdown_callback, arg);
+}
+
+LIB_EXPORT int jack_set_net_slave_restart_callback(jack_net_slave_t *net, JackNetSlaveRestartCallback restart_callback, void *arg)
+{
+    JackNetExtSlave* slave = (JackNetExtSlave*)net;
+    return slave->SetRestartCallback(restart_callback, arg);
 }
 
 // Master API

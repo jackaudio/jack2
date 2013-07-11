@@ -784,7 +784,7 @@ Deactivated for now..
                         strncpy(net_name, param->value.str, JACK_CLIENT_NAME_SIZE);
                         break;
                     case 's':
-                        auto_save = param->value.i;
+                        auto_save = true;
                         break;
                     /*
                     Deactivated for now..

@@ -27,6 +27,7 @@ extern "C"
 
 #include <jack/systemdeps.h>
 #include <jack/types.h>
+#include <jack/weakmacros.h>
 
 #define DEFAULT_MULTICAST_IP    "225.3.19.154"
 #define DEFAULT_PORT            19000
@@ -34,6 +35,8 @@ extern "C"
 #define MASTER_NAME_SIZE        256
 
 #define SOCKET_ERROR -1
+
+#define RESTART_CB_API 1
 
 enum JackNetEncoder {
 
@@ -198,7 +201,28 @@ typedef void (*JackNetSlaveShutdownCallback)(void* data);
  *
  * @return 0 on success, otherwise a non-zero error code
  */
-int jack_set_net_slave_shutdown_callback(jack_net_slave_t *net, JackNetSlaveShutdownCallback shutdown_callback, void *arg);
+int jack_set_net_slave_shutdown_callback(jack_net_slave_t *net, JackNetSlaveShutdownCallback shutdown_callback, void *arg) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
+
+/**
+ * Prototype for server Restart callback : this is the new preferable way to be notified when the master has disappeared. 
+ * The client may want to retry connecting a certain number of time (which will be done using the time_out value given in jack_net_slave_open) 
+ * by returning 0. Otherwise returning a non-zero error code will definively close the connection.
+ * If both Shutdown and Restart are supplied, Restart callback will be used.
+ * @param arg pointer to a client supplied structure supplied by jack_set_net_restart_callback()
+ *
+ * @return 0 on success, otherwise a non-zero error code
+ */
+typedef int (*JackNetSlaveRestartCallback)(void* data);
+
+/**
+ * Set network restart callback.
+ * @param net the network connection
+ * @param restart_callback the shutdown callback
+ * @param arg pointer to a client supplied structure
+ *
+ * @return 0 on success, otherwise a non-zero error code
+ */
+int jack_set_net_slave_restart_callback(jack_net_slave_t *net, JackNetSlaveRestartCallback restart_callback, void *arg) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  *  jack_net_master_t is an opaque type, you may only access it using the API provided.

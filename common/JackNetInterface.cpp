@@ -644,13 +644,13 @@ namespace Jack
     {
         jack_log("JackNetSlaveInterface::InitConnection time_out_sec = %d", time_out_sec);
         int try_count = (time_out_sec > 0) ? ((1000000 * time_out_sec) / SLAVE_INIT_TIMEOUT) : INT_MAX;
-
+  
         // set the parameters to send
         strcpy(fParams.fPacketType, "params");
         fParams.fProtocolVersion = NETWORK_PROTOCOL;
         SetPacketType(&fParams, SLAVE_AVAILABLE);
 
-        return (SendAvailableToMaster(try_count) != NET_SOCKET_ERROR);
+        return (SendAvailableToMaster(try_count) == NET_CONNECTED);
     }
 
     bool JackNetSlaveInterface::InitRendering()
@@ -706,6 +706,7 @@ namespace Jack
 
         // send 'AVAILABLE' until 'SLAVE_SETUP' received
         jack_info("Waiting for a master...");
+        
         do {
             // send 'available'
             session_params_t net_params;
@@ -725,7 +726,7 @@ namespace Jack
             }
         }
         while (strcmp(host_params.fPacketType, fParams.fPacketType)  && (GetPacketType(&host_params) != SLAVE_SETUP)  && (--try_count > 0));
-
+    
         // time out failure..
         if (try_count == 0) {
             jack_error("Time out error in connect");
@@ -740,6 +741,7 @@ namespace Jack
             jack_error("Error in connect : %s", StrError(NET_ERROR_CODE));
             return NET_CONNECT_ERROR;
         }
+        
         return NET_CONNECTED;
     }
 

@@ -676,11 +676,11 @@ namespace Jack
                     break;
 
                 case 'c':
-                    fAutoConnect = param->value.i;
+                    fAutoConnect = true;
                     break;
                     
                 case 's':
-                    fAutoSave = param->value.i;
+                    fAutoSave = true;
                     break;
             }
         }
