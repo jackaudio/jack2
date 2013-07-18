@@ -231,6 +231,12 @@ bool JackServerGlobals::Init()
                     port_max = (unsigned int)atol(optarg);
                     break;
 
+                case 'm':
+                    break;
+
+                case 'u':
+                    break;
+
                 case 'v':
                     verbose_aux = 1;
                     break;

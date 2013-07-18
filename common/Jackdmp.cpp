@@ -341,6 +341,12 @@ int main(int argc, char** argv)
                 }
                 break;
 
+            case 'm':
+                break;
+
+            case 'u':
+                break;
+
             case 'v':
                 param = jackctl_get_parameter(server_parameters, "verbose");
                 if (param != NULL) {
