@@ -29,6 +29,8 @@
 #include <pthread.h>
 #include <signal.h>
 #include <getopt.h>
+#include <inttypes.h>
+
 #include <jack/jack.h>
 #include <jack/ringbuffer.h>
 
@@ -334,9 +336,11 @@ main (int argc, char *argv[])
 	setup_ports (argc - optind, &argv[optind], &thread_info);
 
      /* install a signal handler to properly quits jack client */
-    signal(SIGQUIT, signal_handler);
-	signal(SIGTERM, signal_handler);
+#ifndef WIN32
+	signal(SIGQUIT, signal_handler);
 	signal(SIGHUP, signal_handler);
+#endif
+	signal(SIGTERM, signal_handler);
 	signal(SIGINT, signal_handler);
 
 	run_disk_thread (&thread_info);

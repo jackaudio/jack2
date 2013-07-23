@@ -97,18 +97,19 @@ main (int argc, char *argv[])
 		return 1;
 	}
     
-#ifdef WIN32
+#ifndef WIN32
 	signal(SIGINT, signal_handler);
-    signal(SIGABRT, signal_handler);
-	signal(SIGTERM, signal_handler);
-#else
 	signal(SIGQUIT, signal_handler);
-	signal(SIGTERM, signal_handler);
 	signal(SIGHUP, signal_handler);
-	signal(SIGINT, signal_handler);
 #endif
+	signal(SIGABRT, signal_handler);
+	signal(SIGTERM, signal_handler);
 
+#ifdef WIN32
+	Sleep(INFINITE);
+#else
 	sleep (-1);
+#endif
 	exit (0);
 }
 

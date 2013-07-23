@@ -63,6 +63,8 @@ def build(bld):
         os_incdir = ['../macosx', '../posix']
     if bld.env['IS_SUN']:
         os_incdir = ['../solaris', '../posix']
+    if bld.env['IS_WINDOWS']:
+        os_incdir = ['../windows']
     for example_program, example_program_source in list(example_programs.items()):
         if example_program == 'jack_server_control':
             use = ['serverlib', 'STDC++']
@@ -121,6 +123,8 @@ def build(bld):
             prog.use += ['RT', 'SNDFILE']
         if bld.env['IS_SUN']:
             prog.use += ['RT', 'SNDFILE']
+	if bld.env['IS_WINDOWS']:
+            prog.uselib = ['SNDFILE']
         prog.target = 'jack_rec'
 
     if bld.env['IS_LINUX'] or bld.env['IS_MACOSX']:
@@ -149,7 +153,8 @@ def build(bld):
 
     for example_lib, example_lib_source in list(example_libs.items()):
         lib = bld(features = 'c cshlib')
-        lib.env['cshlib_PATTERN'] = '%s.so'
+        if not bld.env['IS_WINDOWS']:
+            lib.env['cshlib_PATTERN'] = '%s.so'
         lib.includes = os_incdir + ['../common/jack', '../common']
         lib.target = example_lib
         lib.source = example_lib_source
@@ -162,6 +167,6 @@ def build(bld):
         lib.use = 'serverlib'
         lib.install_path = '${ADDON_DIR}/'
 
-    bld.symlink_as('${PREFIX}/bin/jack_disconnect', 'jack_connect')
-
-    bld.install_files('${PREFIX}/bin', 'jack_control', chmod=0o755)
+    if not bld.env['IS_WINDOWS']:
+        bld.symlink_as('${PREFIX}/bin/jack_disconnect', 'jack_connect')
+        bld.install_files('${PREFIX}/bin', 'jack_control', chmod=0o755)

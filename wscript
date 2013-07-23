@@ -395,7 +395,7 @@ def build(bld):
 
     if bld.env['IS_WINDOWS']:
         bld.add_subdirs('windows')
-        #bld.add_subdirs('example-clients')
+        bld.add_subdirs('example-clients')
         #bld.add_subdirs('tests')
 
     if bld.env['BUILD_DOXYGEN_DOCS'] == True:

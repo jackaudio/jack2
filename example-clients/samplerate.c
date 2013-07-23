@@ -70,9 +70,11 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
+#ifndef WIN32
 	signal(SIGQUIT, signal_handler);
-	signal(SIGTERM, signal_handler);
 	signal(SIGHUP, signal_handler);
+#endif
+	signal(SIGTERM, signal_handler);
 	signal(SIGINT, signal_handler);
 
 	jack_on_shutdown(client, jack_shutdown, 0);

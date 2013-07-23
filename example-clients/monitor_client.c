@@ -51,7 +51,12 @@ main (int argc, char *argv[])
 		jack_client_close (client);
 		return 1;
 	}
+
+#ifdef WIN32
+	Sleep (30*1000);
+#else
 	sleep (30);
+#endif
 	if (jack_port_request_monitor_by_name (client, argv[1], FALSE)) {
 		fprintf (stderr, "could not disable monitoring for %s\n", argv[1]);
 	}

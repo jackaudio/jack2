@@ -129,7 +129,11 @@ main(int argc, char *argv[])
 		}
 
 		// Wait a second, and repeat
+#ifdef WIN32
+		Sleep(1*1000);
+#else
 		sleep(1);
+#endif
 	}
 
 	exit(0);

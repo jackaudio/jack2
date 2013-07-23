@@ -35,14 +35,18 @@ process(jack_nframes_t nframes, void* arg)
 	if (count++ == 1000) {
         printf("process block\n");
         //while (1) {}
-        sleep(1);
+#if WIN32
+	Sleep(1*1000);
+#else
+	sleep(1);
+#endif
     }
 
     return 0;
 }
 
 static void
-shutdown (void *arg)
+shutdown_handler (void *arg)
 {
     printf("shutdown \n");
     running = 0;
@@ -59,7 +63,7 @@ main (int argc, char *argv[])
 	}
 
     jack_set_process_callback (client, process, NULL);
-    jack_on_shutdown(client, shutdown, NULL);
+    jack_on_shutdown(client, shutdown_handler, NULL);
     output_port = jack_port_register (client, "port1", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
 
 	/* tell the JACK server that we are ready to roll */
@@ -71,7 +75,11 @@ main (int argc, char *argv[])
     jack_connect(client, jack_port_name(output_port), "coreaudio:Built-in Audio:in2");
 
     while (running) {
+#if WIN32
+        Sleep(1*1000);
+#else
         sleep(1);
+#endif
         printf ("run\n");
     }
 

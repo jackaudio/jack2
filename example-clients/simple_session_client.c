@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include <jack/jack.h>
 #include <jack/types.h>
@@ -194,8 +195,11 @@ main (int argc, char *argv[])
         /* keep running until until we get a quit event */
 
         while (!simple_quit)
+#ifdef WIN32
+                Sleep(1*1000);
+#else
                 sleep(1);
-        
+#endif
 
         jack_client_close (client);
         exit (0);

@@ -118,15 +118,21 @@ int main(int narg, char **args)
 		return 1;
 	}
 
-    /* install a signal handler to properly quits jack client */
-    signal(SIGQUIT, signal_handler);
-	signal(SIGTERM, signal_handler);
+	/* install a signal handler to properly quits jack client */
+#ifndef WIN32
+	signal(SIGQUIT, signal_handler);
 	signal(SIGHUP, signal_handler);
+#endif
+	signal(SIGTERM, signal_handler);
 	signal(SIGINT, signal_handler);
 
-    /* run until interrupted */
+	/* run until interrupted */
 	while (1) {
+#ifdef WIN32
+		Sleep(1*1000);
+#else
 		sleep(1);
+#endif
 	};
 
     jack_client_close(client);
