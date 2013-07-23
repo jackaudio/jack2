@@ -273,6 +273,7 @@ int JackPortAudioDriver::Attach()
 
         const char* alias;
 
+#if defined(HAVE_ASIO)
         if (fInputDevice != paNoDevice && fPaDevices->GetHostFromDevice(fInputDevice) == "ASIO") {
             for (int i = 0; i < fCaptureChannels; i++) {
                 if (PaAsio_GetInputChannelName(fInputDevice, i, &alias) == paNoError) {
@@ -290,7 +291,7 @@ int JackPortAudioDriver::Attach()
                 }
             }
         }
-
+#endif
         return 0;
 
     } else {

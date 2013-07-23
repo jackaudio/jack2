@@ -208,7 +208,7 @@ int PortAudioDevices::GetOutputDeviceFromName(const char* devicename, PaDeviceIn
 
 int PortAudioDevices::GetPreferredBufferSize(PaDeviceIndex id)
 {
-#ifdef WIN32
+#if defined(WIN32) && defined(HAVE_ASIO)
     /* ASIO specific latency information */
     if (Pa_GetHostApiInfo(fDeviceInfo[id]->hostApi)->type == paASIO) {
         long minLatency, maxLatency, preferredLatency, granularity;
@@ -261,7 +261,7 @@ void PortAudioDevices::DisplayDevicesNames()
         jack_info("Max inputs                  = %d", fDeviceInfo[id]->maxInputChannels);
         jack_info("Max outputs                 = %d", fDeviceInfo[id]->maxOutputChannels);
         
-    #ifdef WIN32
+    #if defined(WIN32) && defined(HAVE_ASIO)
         /* ASIO specific latency information */
         if (Pa_GetHostApiInfo(fDeviceInfo[id]->hostApi)->type == paASIO) {
             long minLatency, maxLatency, preferredLatency, granularity;
