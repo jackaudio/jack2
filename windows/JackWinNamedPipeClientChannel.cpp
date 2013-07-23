@@ -155,7 +155,7 @@ error:
     // Close the pipes, server wont be able to create them otherwise.
     fNotificationListenPipe.Close();
     fRequest->Close();
-    fClient->ShutDown(JACK_SERVER_FAILURE);
+    fClient->ShutDown(jack_status_t(JackFailure | JackServerError), JACK_SERVER_FAILURE);
     return false;
 }
 
