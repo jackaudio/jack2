@@ -20,6 +20,7 @@
 					<Add option="-D_MBCS" />
 					<Add option="-D_USRDLL" />
 					<Add option="-DSERVER_SIDE" />
+                    <Add option="-DHAVE_ASIO" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -49,6 +50,7 @@
 					<Add option="-D_MBCS" />
 					<Add option="-D_USRDLL" />
 					<Add option="-DSERVER_SIDE" />
+                    <Add option="-DHAVE_ASIO" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -79,6 +81,7 @@
 					<Add option="-D_USRDLL" />
 					<Add option="-DJACK_MONITOR" />
 					<Add option="-DSERVER_SIDE" />
+                    <Add option="-DHAVE_ASIO" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -109,6 +112,7 @@
 					<Add option="-D_MBCS" />
 					<Add option="-D_USRDLL" />
 					<Add option="-DSERVER_SIDE" />
+                    <Add option="-DHAVE_ASIO" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -143,6 +147,7 @@
 					<Add option="-D_MBCS" />
 					<Add option="-D_USRDLL" />
 					<Add option="-DSERVER_SIDE" />
+                    <Add option="-DHAVE_ASIO" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
@@ -178,6 +183,7 @@
 					<Add option="-D_USRDLL" />
 					<Add option="-DJACK_MONITOR" />
 					<Add option="-DSERVER_SIDE" />
+                    <Add option="-DHAVE_ASIO" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
