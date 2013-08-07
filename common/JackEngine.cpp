@@ -1078,9 +1078,7 @@ void JackEngine::SessionNotify(int refnum, const char *target, jack_session_even
         JackSessionNotifyResult res(-1);
         res.Write(socket);
         jack_log("JackEngine::SessionNotify ... busy");
-        if (result != NULL) {
-            *result = NULL;
-        }
+        if (result != NULL) *result = NULL;
         return;
     }
 
@@ -1104,12 +1102,14 @@ void JackEngine::SessionNotify(int refnum, const char *target, jack_session_even
             }
 
             char path_buf[JACK_PORT_NAME_SIZE];
-            snprintf(path_buf, sizeof(path_buf), "%s%s%c", path, client->GetClientControl()->fName, DIR_SEPARATOR);
+            if (path[strlen(path) - 1] == DIR_SEPARATOR) {
+               snprintf(path_buf, sizeof path_buf, "%s%s%c", path, client->GetClientControl()->fName, DIR_SEPARATOR);
+            } else {
+               snprintf(path_buf, sizeof path_buf, "%s%c%s%c", path, DIR_SEPARATOR, client->GetClientControl()->fName, DIR_SEPARATOR);
+            }
 
             int res = JackTools::MkDir(path_buf);
-            if (res) {
-                jack_error("JackEngine::SessionNotify: can not create session directory '%s'", path_buf);
-            }
+            if (res) jack_error("JackEngine::SessionNotify: can not create session directory '%s'", path_buf);
 
             int result = client->ClientNotify(i, client->GetClientControl()->fName, kSessionCallback, true, path_buf, (int)type, 0);
 
@@ -1126,15 +1126,11 @@ void JackEngine::SessionNotify(int refnum, const char *target, jack_session_even
         }
     }
 
-    if (result != NULL) {
-        *result = fSessionResult;
-    }
+    if (result != NULL) *result = fSessionResult;
 
     if (fSessionPendingReplies == 0) {
         fSessionResult->Write(socket);
-        if (result == NULL) {
-            delete fSessionResult;
-        }
+        if (result == NULL) delete fSessionResult;
         fSessionResult = NULL;
     } else {
         fSessionTransaction = socket;
