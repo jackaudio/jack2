@@ -121,7 +121,7 @@ extern "C"
         OpusCustomMode* opus_mode;
 #endif
     };
-
+  
     int netjack_wait( netjack_driver_state_t *netj );
     void netjack_send_silence( netjack_driver_state_t *netj, int syncstate );
     void netjack_read( netjack_driver_state_t *netj, jack_nframes_t nframes ) ;

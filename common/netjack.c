@@ -599,7 +599,6 @@ netjack_driver_state_t *netjack_init (netjack_driver_state_t *netj,
     // might be subject to autoconfig...
     // so dont calculate anything with them...
 
-
     netj->sample_rate = sample_rate;
     netj->period_size = period_size;
     netj->dont_htonl_floats = dont_htonl_floats;
@@ -623,9 +622,7 @@ netjack_driver_state_t *netjack_init (netjack_driver_state_t *netj,
     netj->use_autoconfig = use_autoconfig;
     netj->always_deadline = always_deadline;
 
-
     netj->client = client;
-
 
     if ((bitdepth != 0) && (bitdepth != 8) && (bitdepth != 16) && (bitdepth != CELT_MODE) && (bitdepth != OPUS_MODE)) {
         jack_info ("Invalid bitdepth: %d (8, 16 or 0 for float) !!!", bitdepth);
@@ -633,14 +630,17 @@ netjack_driver_state_t *netjack_init (netjack_driver_state_t *netj,
     }
     netj->bitdepth = bitdepth;
 
-
-    if (resample_factor_up == 0)
+    if (resample_factor_up == 0) {
         resample_factor_up = resample_factor;
+    }
 
     netj->resample_factor = resample_factor;
     netj->resample_factor_up = resample_factor_up;
 
     netj->jitter_val = jitter_val;
+    
+    netj->playback_srcs = NULL;
+    netj->capture_srcs = NULL;
 
     return netj;
 }
