@@ -72,6 +72,7 @@ volatile int output_new_delay = 0;
 volatile float output_offset = 0.0;
 volatile float output_integral = 0.0;
 volatile float output_diff = 0.0;
+volatile int running_freewheel = 0;
 
 snd_pcm_uframes_t real_buffer_size;
 snd_pcm_uframes_t real_period_size;
@@ -312,10 +313,33 @@ double hann( double x )
 }
 
 /**
+ * The freewheel callback.
+ */
+void freewheel (int starting, void* arg) {
+    running_freewheel = starting;
+}
+
+/**
  * The process callback for this JACK application.
  * It is called by JACK at the appropriate times.
  */
 int process (jack_nframes_t nframes, void *arg) {
+
+    if (running_freewheel) {
+	JSList *node = playback_ports;
+
+	while ( node != NULL)
+	{
+	    jack_port_t *port = (jack_port_t *) node->data;
+	    float *buf = jack_port_get_buffer (port, nframes);
+
+	    memset(buf, 0, sizeof(float)*nframes);
+
+	    node = jack_slist_next (node);
+	}
+
+	return 0;
+    }
 
     int rlen;
     int err;
@@ -683,6 +707,12 @@ int main (int argc, char *argv[]) {
        */
 
     jack_set_process_callback (client, process, 0);
+
+    /* tell the JACK server to call `freewheel()' whenever
+       freewheel mode changes.
+       */
+
+    jack_set_freewheel_callback (client, freewheel, 0);
 
     /* tell the JACK server to call `jack_shutdown()' if
        it ever shuts down, either entirely, or if it
