@@ -100,8 +100,8 @@ main (int argc, char *argv[])
 	}
 
     int i;
-    jack_master_t request = { 4, 4, -1, -1, buffer_size, sample_rate, "master" };
-    //jack_master_t request = { -1, -1, -1, -1, buffer_size, sample_rate, "master" };
+    //jack_master_t request = { 4, 4, -1, -1, buffer_size, sample_rate, "master", -1 };
+    jack_master_t request = { -1, -1, -1, -1, buffer_size, sample_rate, "master", 6 };
     jack_slave_t result;
     float** audio_input_buffer;
     float** audio_output_buffer;
@@ -146,7 +146,9 @@ main (int argc, char *argv[])
     WARNING !! : this code is given for demonstration purpose. For proper timing bevahiour
     it has to be called in a real-time context (which is *not* the case here...)
     */
-
+    
+    //usleep(5*1000000);
+  
   	while (1) {
 
         // Copy input to output
@@ -154,17 +156,17 @@ main (int argc, char *argv[])
         for (i = 0; i < result.audio_input; i++) {
             memcpy(audio_output_buffer[i], audio_input_buffer[i], buffer_size * sizeof(float));
         }
-
+   
         if (jack_net_master_send(net, result.audio_output, audio_output_buffer, 0, NULL) < 0) {
             printf("jack_net_master_send failure, exiting\n");
             break;
         }
-
+         
         if (jack_net_master_recv(net, result.audio_input, audio_input_buffer, 0, NULL) < 0) {
             printf("jack_net_master_recv failure, exiting\n");
             break;
         }
-
+        
         usleep(wait_usec);
 	};
 

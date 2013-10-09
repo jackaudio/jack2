@@ -63,6 +63,7 @@ extern "C"
         jack_nframes_t buffer_size;
         jack_nframes_t sample_rate;
         char master_name[MASTER_NAME_SIZE];
+        int time_out;                   
 
     } jack_master_t;
 
@@ -161,6 +162,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
         fRequest.sample_rate = request->sample_rate;
         fRequest.audio_input = request->audio_input;
         fRequest.audio_output = request->audio_output;
+        fRequest.time_out = request->time_out;
         fAudioCaptureBuffer = NULL;
         fAudioPlaybackBuffer = NULL;
         fMidiCaptureBuffer = NULL;
@@ -209,7 +211,8 @@ struct JackNetExtMaster : public JackNetMasterInterface {
          // Main loop, wait for data, deal with it and wait again
         int attempt = 0;
         int rx_bytes = 0;
-
+        int try_count = (fRequest.time_out > 0) ? int((1000000.f * float(fRequest.time_out)) / float(MANAGER_INIT_TIMEOUT)) : INT_MAX;
+       
         do
         {
             session_params_t net_params;
@@ -246,7 +249,12 @@ struct JackNetExtMaster : public JackNetMasterInterface {
                 }
             }
         }
-        while (fRunning);
+        while (fRunning && (--try_count > 0));
+        
+        if (try_count == 0) {
+            jack_error("Time out error in connect");
+            return -1;
+        }
  
         // Set result parameters
         result->audio_input = fParams.fSendAudioChannels;
