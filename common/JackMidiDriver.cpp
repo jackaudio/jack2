@@ -51,7 +51,7 @@ int JackMidiDriver::Open(bool capturing,
 {
     fCaptureChannels = inchannels;
     fPlaybackChannels = outchannels;
-    return JackDriver::Open(capturing, playing, inchannels, outchannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency);
+    return JackDriver::Open(0, 0, capturing, playing, inchannels, outchannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency);
 }
 
 int JackMidiDriver::Attach()

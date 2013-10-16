@@ -41,8 +41,7 @@ JackDriver::JackDriver(const char* name, const char* alias, JackLockedEngine* en
     :fCaptureChannels(0),
     fPlaybackChannels(0),
     fClientControl(name),
-    fWithMonitorPorts(false)
-{
+    fWithMonitorPorts(false){
     assert(strlen(name) < JACK_CLIENT_NAME_SIZE);
     fSynchroTable = table;
     strcpy(fAliasName, alias);
@@ -52,20 +51,6 @@ JackDriver::JackDriver(const char* name, const char* alias, JackLockedEngine* en
     fDelayedUsecs = 0.f;
     fIsMaster = true;
     fIsRunning = false;
- }
-
-JackDriver::JackDriver()
-{
-    fSynchroTable = NULL;
-    fEngine = NULL;
-    fGraphManager = NULL;
-    fBeginDateUst = 0;
-    fDelayedUsecs = 0.f;
-    fIsMaster = true;
-    fIsRunning = false;
-    fCaptureChannels = 0;
-    fPlaybackChannels = 0;
-    fWithMonitorPorts = false;
 }
 
 JackDriver::~JackDriver()
@@ -85,53 +70,6 @@ int JackDriver::Open()
     fClientControl.fRefNum = refnum;
     fClientControl.fActive = true;
     fEngineControl->fDriverNum++;
-    fGraphManager->DirectConnect(fClientControl.fRefNum, fClientControl.fRefNum); // Connect driver to itself for "sync" mode
-    SetupDriverSync(fClientControl.fRefNum, false);
-    return 0;
-}
-
-int JackDriver::Open(bool capturing,
-                     bool playing,
-                     int inchannels,
-                     int outchannels,
-                     bool monitor,
-                     const char* capture_driver_name,
-                     const char* playback_driver_name,
-                     jack_nframes_t capture_latency,
-                     jack_nframes_t playback_latency)
-{
-    jack_log("JackDriver::Open capture_driver_name = %s", capture_driver_name);
-    jack_log("JackDriver::Open playback_driver_name = %s", playback_driver_name);
-    int refnum = -1;
-    char name_res[JACK_CLIENT_NAME_SIZE + 1];
-    int status;
-
-    // Check name and possibly rename
-    if (fEngine->ClientCheck(fClientControl.fName, -1, name_res, JACK_PROTOCOL_VERSION, (int)JackNullOption, (int*)&status) < 0) {
-        jack_error("Client name = %s conflits with another running client", fClientControl.fName);
-        return -1;
-    }
-    strcpy(fClientControl.fName, name_res);
-
-    if (fEngine->ClientInternalOpen(fClientControl.fName, &refnum, &fEngineControl, &fGraphManager, this, false) != 0) {
-        jack_error("Cannot allocate internal client for driver");
-        return -1;
-    }
-
-    fClientControl.fRefNum = refnum;
-    fClientControl.fActive = true;
-    fEngineControl->fDriverNum++;
-    fCaptureLatency = capture_latency;
-    fPlaybackLatency = playback_latency;
-
-    assert(strlen(capture_driver_name) < JACK_CLIENT_NAME_SIZE);
-    assert(strlen(playback_driver_name) < JACK_CLIENT_NAME_SIZE);
-
-    strcpy(fCaptureDriverName, capture_driver_name);
-    strcpy(fPlaybackDriverName, playback_driver_name);
-
-    fEngineControl->UpdateTimeOut();
-
     fGraphManager->DirectConnect(fClientControl.fRefNum, fClientControl.fRefNum); // Connect driver to itself for "sync" mode
     SetupDriverSync(fClientControl.fRefNum, false);
     return 0;
@@ -170,8 +108,12 @@ int JackDriver::Open(jack_nframes_t buffer_size,
     fClientControl.fRefNum = refnum;
     fClientControl.fActive = true;
     fEngineControl->fDriverNum++;
-    fEngineControl->fBufferSize = buffer_size;
-    fEngineControl->fSampleRate = samplerate;
+    if (buffer_size > 0) {
+        fEngineControl->fBufferSize = buffer_size;
+    }
+    if (samplerate > 0) {
+        fEngineControl->fSampleRate = samplerate;
+    }
     fCaptureLatency = capture_latency;
     fPlaybackLatency = playback_latency;
 

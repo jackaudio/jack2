@@ -848,7 +848,7 @@ extern "C" {
         // singleton kind of driver
         if (!driver) {
             driver = new Jack::JackCoreMidiDriver("system_midi", "coremidi", engine, table);
-            if (driver->Open(1, 1, virtual_in, virtual_out, false, "in", "out", 0, 0) == 0) {
+            if (driver->Open(0, 0, 1, 1, virtual_in, virtual_out, false, "in", "out", 0, 0) == 0) {
                 return driver;
             } else {
                 delete driver;

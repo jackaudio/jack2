@@ -85,26 +85,6 @@ int JackAudioDriver::Open(jack_nframes_t buffer_size,
         monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency);
 }
 
-int JackAudioDriver::Open(bool capturing,
-                          bool playing,
-                          int inchannels,
-                          int outchannels,
-                          bool monitor,
-                          const char* capture_driver_name,
-                          const char* playback_driver_name,
-                          jack_nframes_t capture_latency,
-                          jack_nframes_t playback_latency)
-{
-    fCaptureChannels = inchannels;
-    fPlaybackChannels = outchannels;
-    fWithMonitorPorts = monitor;
-    memset(fCapturePortList, 0, sizeof(jack_port_id_t) * DRIVER_PORT_NUM);
-    memset(fPlaybackPortList, 0, sizeof(jack_port_id_t) * DRIVER_PORT_NUM);
-    memset(fMonitorPortList, 0, sizeof(jack_port_id_t) * DRIVER_PORT_NUM);
-    return JackDriver::Open(capturing, playing, inchannels, outchannels,
-        monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency);
-}
-
 void JackAudioDriver::UpdateLatencies()
 {
     jack_latency_range_t input_range;
@@ -174,7 +154,7 @@ int JackAudioDriver::Attach()
                 jack_error("Cannot register monitor port for %s", name);
                 return -1;
             } else {
-                 fMonitorPortList[i] = port_index;
+                fMonitorPortList[i] = port_index;
             }
         }
     }

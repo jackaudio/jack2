@@ -363,7 +363,7 @@ namespace Jack
         if (active_ports == 0) {
             fSubPeriodSize = fPeriodSize;
         } else {
-            jack_nframes_t period = (int) powf(2.f, (int)(log(float(fPacketSize) / (active_ports * sizeof(sample_t))) / log(2.)));
+            jack_nframes_t period = int(powf(2.f, int(log(float(fPacketSize) / (active_ports * sizeof(sample_t))) / log(2.))));
             fSubPeriodSize = (period > fPeriodSize) ? fPeriodSize : period;
         }
 
@@ -403,7 +403,6 @@ namespace Jack
 
         return CheckPacket(cycle, sub_cycle);
     }
-
 
     int NetFloatAudioBuffer::RenderToNetwork(int sub_cycle, uint32_t port_num)
     {
@@ -487,9 +486,9 @@ namespace Jack
     NetCeltAudioBuffer::NetCeltAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer, int kbps)
         :NetAudioBuffer(params, nports, net_buffer)
     {
-        fCeltMode = new CELTMode *[fNPorts];
-        fCeltEncoder = new CELTEncoder *[fNPorts];
-        fCeltDecoder = new CELTDecoder *[fNPorts];
+        fCeltMode = new CELTMode*[fNPorts];
+        fCeltEncoder = new CELTEncoder*[fNPorts];
+        fCeltDecoder = new CELTDecoder*[fNPorts];
 
         memset(fCeltMode, 0, fNPorts * sizeof(CELTMode*));
         memset(fCeltEncoder, 0, fNPorts * sizeof(CELTEncoder*));
@@ -724,9 +723,9 @@ namespace Jack
     NetOpusAudioBuffer::NetOpusAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer, int kbps)
         :NetAudioBuffer(params, nports, net_buffer)
     {
-        fOpusMode = new OpusCustomMode *[fNPorts];
-        fOpusEncoder = new OpusCustomEncoder *[fNPorts];
-        fOpusDecoder = new OpusCustomDecoder *[fNPorts];
+        fOpusMode = new OpusCustomMode*[fNPorts];
+        fOpusEncoder = new OpusCustomEncoder*[fNPorts];
+        fOpusDecoder = new OpusCustomDecoder*[fNPorts];
         fCompressedSizesByte = new unsigned short [fNPorts];
 
         memset(fOpusMode, 0, fNPorts * sizeof(OpusCustomMode*));
@@ -816,15 +815,15 @@ namespace Jack
         for (int i = 0; i < fNPorts; i++)  {
             if (fOpusEncoder[i]) {
                 opus_custom_encoder_destroy(fOpusEncoder[i]);
-                fOpusEncoder[i]=0;
+                fOpusEncoder[i] = 0;
             }
             if (fOpusDecoder[i]) {
                 opus_custom_decoder_destroy(fOpusDecoder[i]);
-                fOpusDecoder[i]=0;
+                fOpusDecoder[i] = 0;
             }
             if (fOpusMode[i]) {
                 opus_custom_mode_destroy(fOpusMode[i]);
-                fOpusMode[i]=0;
+                fOpusMode[i] = 0;
             }
         }
 

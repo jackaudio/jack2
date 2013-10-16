@@ -52,16 +52,6 @@ class SERVER_EXPORT JackDriverInterface
 
         virtual int Open() = 0;
 
-        virtual int Open (bool capturing,
-                         bool playing,
-                         int inchannels,
-                         int outchannels,
-                         bool monitor,
-                         const char* capture_driver_name,
-                         const char* playback_driver_name,
-                         jack_nframes_t capture_latency,
-                         jack_nframes_t playback_latency) = 0;
-
         virtual int Open(jack_nframes_t buffer_size,
                          jack_nframes_t samplerate,
                          bool capturing,
@@ -197,7 +187,6 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
     public:
 
         JackDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table);
-        JackDriver();
         virtual ~JackDriver();
 
         void SetMaster(bool onoff);
@@ -212,16 +201,6 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         }
 
         virtual int Open();
-
-        virtual int Open(bool capturing,
-                         bool playing,
-                         int inchannels,
-                         int outchannels,
-                         bool monitor,
-                         const char* capture_driver_name,
-                         const char* playback_driver_name,
-                         jack_nframes_t capture_latency,
-                         jack_nframes_t playback_latency);
 
         virtual int Open(jack_nframes_t buffer_size,
                          jack_nframes_t samplerate,
