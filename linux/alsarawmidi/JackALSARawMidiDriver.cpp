@@ -642,7 +642,7 @@ extern "C" {
         Jack::JackDriverClientInterface *driver =
             new Jack::JackALSARawMidiDriver("system_midi", "alsarawmidi",
                                             engine, table);
-        if (driver->Open(1, 1, 0, 0, false, "midi in", "midi out", 0, 0)) {
+        if (driver->Open(0, 0, 1, 1, 0, 0, false, "midi in", "midi out", 0, 0)) {
             delete driver;
             driver = 0;
         }
