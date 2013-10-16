@@ -28,10 +28,8 @@
 namespace Jack
 {
 
-JackThreadedDriver::JackThreadedDriver(JackDriver* driver):fThread(this)
-{
-    fDriver = driver;
-}
+JackThreadedDriver::JackThreadedDriver(JackDriver* driver):fThread(this),fDriver(driver)
+{}
 
 JackThreadedDriver::~JackThreadedDriver()
 {
