@@ -30,6 +30,10 @@ namespace Jack
 
 /*!
 \brief The base class for MIDI drivers: drivers with MIDI ports.
+
+A concrete derived class will have to be defined with a real MIDI driver API, 
+either callback based one (like CoreMIDI..) ones or blocking ones (like ALSA MIDI).
+
 */
 
 class SERVER_EXPORT JackMidiDriver : public JackDriver

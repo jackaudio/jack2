@@ -95,9 +95,11 @@ class SERVER_EXPORT JackDriverInterface
         virtual int ProcessRead() = 0;
         virtual int ProcessWrite() = 0;
 
+        // For "slave" driver in "synchronous" mode
         virtual int ProcessReadSync() = 0;
         virtual int ProcessWriteSync() = 0;
 
+        // For "slave" driver in "asynchronous" mode
         virtual int ProcessReadAsync() = 0;
         virtual int ProcessWriteAsync() = 0;
 
@@ -231,15 +233,17 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         int ProcessReadSlaves();
         int ProcessWriteSlaves();
 
-        // For "slave" driver
-        int ProcessRead();
-        int ProcessWrite();
+        // For "slave" driver with typically decompose a given cycle in separated Read and Write parts.
+        virtual int ProcessRead();
+        virtual int ProcessWrite();
 
-        int ProcessReadSync();
-        int ProcessWriteSync();
+        // For "slave" driver in "synchronous" mode
+        virtual int ProcessReadSync();
+        virtual int ProcessWriteSync();
 
-        int ProcessReadAsync();
-        int ProcessWriteAsync();
+        // For "slave" driver in "asynchronous" mode
+        virtual int ProcessReadAsync();
+        virtual int ProcessWriteAsync();
 
         virtual bool IsFixedBufferSize();
         virtual int SetBufferSize(jack_nframes_t buffer_size);

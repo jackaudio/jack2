@@ -203,7 +203,7 @@ int JackAudioDriver::Process()
 }
 
 /*
-The driver ASYNC mode: output buffers computed at the *previous cycle* are used, the server does not
+The driver "asynchronous" mode: output buffers computed at the *previous cycle* are used, the server does not
 synchronize to the end of client graph execution.
 */
 
@@ -239,6 +239,10 @@ void JackAudioDriver::ProcessGraphAsync()
     }
 }
 
+/*
+Used when the driver works in master mode.
+*/
+
 void JackAudioDriver::ProcessGraphAsyncMaster()
 {
     // fBeginDateUst is set in the "low level" layer, fEndDateUst is from previous cycle
@@ -261,6 +265,10 @@ void JackAudioDriver::ProcessGraphAsyncMaster()
     // Does not wait on graph execution end
 }
 
+/*
+Used when the driver works in slave mode.
+*/
+
 void JackAudioDriver::ProcessGraphAsyncSlave()
 {
     if (ResumeRefNum() < 0) {
@@ -269,7 +277,7 @@ void JackAudioDriver::ProcessGraphAsyncSlave()
 }
 
 /*
-The driver SYNC mode: the server does synchronize to the end of client graph execution,
+The driver "synchronous" mode: the server does synchronize to the end of client graph execution,
 if graph process succeed, output buffers computed at the *current cycle* are used.
 */
 
@@ -305,6 +313,10 @@ void JackAudioDriver::ProcessGraphSync()
     }
 }
 
+/*
+Used when the driver works in master mode.
+*/
+
 void JackAudioDriver::ProcessGraphSyncMaster()
 {
     // fBeginDateUst is set in the "low level" layer, fEndDateUst is from previous cycle
@@ -331,6 +343,10 @@ void JackAudioDriver::ProcessGraphSyncMaster()
         jack_error("JackAudioDriver::ProcessGraphSync: Process error");
     }
 }
+
+/*
+Used when the driver works in slave mode.
+*/
 
 void JackAudioDriver::ProcessGraphSyncSlave()
 {
