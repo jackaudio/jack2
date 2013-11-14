@@ -13,6 +13,9 @@ import re
 import Logs
 import sys
 
+import waflib.Options
+from waflib.Build import BuildContext, CleanContext, InstallContext, UninstallContext
+
 VERSION='1.9.10'
 APPNAME='jack'
 JACK_API_VERSION = '0.1.0'
@@ -20,6 +23,9 @@ JACK_API_VERSION = '0.1.0'
 # these variables are mandatory ('/' are converted automatically)
 top = '.'
 out = 'build'
+
+# lib32 variant name used when building in mixed mode
+lib32 = 'lib32'
 
 def display_msg(msg, status = None, color = None):
     sr = msg
@@ -292,10 +298,7 @@ def configure(conf):
             svnrev = m.group(1)
 
     if Options.options.mixed == True:
-        env_variant2 = conf.env.copy()
-        conf.set_env_name('lib32', env_variant2)
-        env_variant2.set_variant('lib32')
-        conf.setenv('lib32')
+        conf.setenv(lib32, env=conf.env.derive())
         conf.env.append_unique('CXXFLAGS', '-m32')
         conf.env.append_unique('CFLAGS', '-m32')
         conf.env.append_unique('LINKFLAGS', '-m32')
@@ -318,12 +321,18 @@ def configure(conf):
     print("Build with a maximum of %d ports per application" % Options.options.application_ports)
  
     display_msg("Install prefix", conf.env['PREFIX'], 'CYAN')
-    display_msg("Library directory", conf.env['LIBDIR'], 'CYAN')
+    display_msg("Library directory", conf.all_envs[""]['LIBDIR'], 'CYAN')
+    if conf.env['BUILD_WITH_32_64'] == True:
+        display_msg("32-bit library directory", conf.all_envs[lib32]['LIBDIR'], 'CYAN')
     display_msg("Drivers directory", conf.env['ADDON_DIR'], 'CYAN')
     display_feature('Build debuggable binaries', conf.env['BUILD_DEBUG'])
-    display_msg('C compiler flags', repr(conf.env['CFLAGS']))
-    display_msg('C++ compiler flags', repr(conf.env['CXXFLAGS']))
-    display_msg('Linker flags', repr(conf.env['LINKFLAGS']))
+    display_msg('C compiler flags', repr(conf.all_envs[""]['CFLAGS']))
+    display_msg('C++ compiler flags', repr(conf.all_envs[""]['CXXFLAGS']))
+    display_msg('Linker flags', repr(conf.all_envs[""]['LINKFLAGS']))
+    if conf.env['BUILD_WITH_32_64'] == True:
+        display_msg('32-bit C compiler flags', repr(conf.all_envs[lib32]['CFLAGS']))
+        display_msg('32-bit C++ compiler flags', repr(conf.all_envs[lib32]['CXXFLAGS']))
+        display_msg('32-bit linker flags', repr(conf.all_envs[lib32]['LINKFLAGS']))
     display_feature('Build doxygen documentation', conf.env['BUILD_DOXYGEN_DOCS'])
     display_feature('Build Opus netjack2', conf.env['WITH_OPUS'])
     display_feature('Build with engine profiling', conf.env['BUILD_WITH_PROFILE'])
@@ -364,13 +373,33 @@ def configure(conf):
             print(Logs.colors.NORMAL, end=' ')
     print()
 
-def build(bld):
-    print("make[1]: Entering directory `" + os.getcwd() + "/" + out + "'")
-    if not os.access('svnversion.h', os.R_OK):
-        create_svnversion_task(bld)
+def init(ctx):
+    for y in (BuildContext, CleanContext, InstallContext, UninstallContext):
+        name = y.__name__.replace('Context','').lower()
+        class tmp(y):
+            cmd = name + '_' + lib32
+            variant = lib32
 
-   # process subfolders from here
+def build(bld):
+    if not bld.variant:
+        out2 = out
+    else:
+        out2 = out + "/" + bld.variant
+    print("make[1]: Entering directory `" + os.getcwd() + "/" + out2 + "'")
+
+    if not bld.variant:
+        if not os.access('svnversion.h', os.R_OK):
+            create_svnversion_task(bld)
+        if bld.env['BUILD_WITH_32_64'] == True:
+            waflib.Options.commands.append(bld.cmd + '_' + lib32)
+
+    # process subfolders from here
     bld.add_subdirs('common')
+
+    if bld.variant:
+        # only the wscript in common/ knows how to handle variants
+        return
+
     if bld.env['IS_LINUX']:
         bld.add_subdirs('linux')
         bld.add_subdirs('example-clients')
