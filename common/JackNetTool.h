@@ -87,25 +87,25 @@ namespace Jack
     PRE_PACKED_STRUCTURE
     struct _session_params
     {
-        char fPacketType[8];                //packet type ('param')
-        uint32_t fProtocolVersion;          //version
-        int32_t fPacketID;                 //indicates the packet type
-        char fName[JACK_CLIENT_NAME_SIZE];  //slave's name
-        char fMasterNetName[256];           //master hostname (network)
-        char fSlaveNetName[256];            //slave hostname (network)
-        uint32_t fMtu;                      //connection mtu
-        uint32_t fID;                       //slave's ID
-        uint32_t fTransportSync;            //is the transport synced ?
-        int32_t fSendAudioChannels;         //number of master->slave channels
-        int32_t fReturnAudioChannels;       //number of slave->master channels
-        int32_t fSendMidiChannels;          //number of master->slave midi channels
-        int32_t fReturnMidiChannels;        //number of slave->master midi channels
-        uint32_t fSampleRate;               //session sample rate
-        uint32_t fPeriodSize;               //period size
-        uint32_t fSampleEncoder;            //samples encoder
-        uint32_t fKBps;                     //KB per second for CELT encoder
-        uint32_t fSlaveSyncMode;            //is the slave in sync mode ?
-        uint32_t fNetworkLatency;           //network latency
+        char fPacketType[8];                        //packet type ('param')
+        uint32_t fProtocolVersion;                  //version
+        int32_t fPacketID;                          //indicates the packet type
+        char fName[JACK_CLIENT_NAME_SIZE];          //slave's name
+        char fMasterNetName[JACK_SERVER_NAME_SIZE]; //master hostname (network)
+        char fSlaveNetName[JACK_SERVER_NAME_SIZE];  //slave hostname (network)
+        uint32_t fMtu;                              //connection mtu
+        uint32_t fID;                               //slave's ID
+        uint32_t fTransportSync;                    //is the transport synced ?
+        int32_t fSendAudioChannels;                 //number of master->slave channels
+        int32_t fReturnAudioChannels;               //number of slave->master channels
+        int32_t fSendMidiChannels;                  //number of master->slave midi channels
+        int32_t fReturnMidiChannels;                //number of slave->master midi channels
+        uint32_t fSampleRate;                       //session sample rate
+        uint32_t fPeriodSize;                       //period size
+        uint32_t fSampleEncoder;                    //samples encoder
+        uint32_t fKBps;                             //KB per second for CELT encoder
+        uint32_t fSlaveSyncMode;                    //is the slave in sync mode ?
+        uint32_t fNetworkLatency;                   //network latency
     } POST_PACKED_STRUCTURE;
 
 //net status **********************************************************************************

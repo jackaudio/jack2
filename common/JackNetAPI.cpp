@@ -378,8 +378,24 @@ struct JackNetExtMaster : public JackNetMasterInterface {
 
     void FreePorts()
     {
-        if (fAudioPlaybackBuffer) {
+        if (fAudioCaptureBuffer) {
             for (int audio_port_index = 0; audio_port_index < fParams.fSendAudioChannels; audio_port_index++) {
+                delete[] fAudioCaptureBuffer[audio_port_index];
+            }
+            delete[] fAudioCaptureBuffer;
+            fAudioCaptureBuffer = NULL;
+        }
+        
+        if (fMidiCaptureBuffer) {
+            for (int midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++) {
+                delete[] fMidiCaptureBuffer[midi_port_index];
+            }
+            delete[] fMidiCaptureBuffer;
+            fMidiCaptureBuffer = NULL;
+        }
+        
+        if (fAudioPlaybackBuffer) {
+            for (int audio_port_index = 0; audio_port_index < fParams.fReturnAudioChannels; audio_port_index++) {
                 delete[] fAudioPlaybackBuffer[audio_port_index];
             }
             delete[] fAudioPlaybackBuffer;
@@ -387,27 +403,11 @@ struct JackNetExtMaster : public JackNetMasterInterface {
         }
 
         if (fMidiPlaybackBuffer) {
-            for (int midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++) {
+            for (int midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++) {
                 delete[] (fMidiPlaybackBuffer[midi_port_index]);
             }
             delete[] fMidiPlaybackBuffer;
             fMidiPlaybackBuffer = NULL;
-        }
-
-        if (fAudioCaptureBuffer) {
-            for (int audio_port_index = 0; audio_port_index < fParams.fReturnAudioChannels; audio_port_index++) {
-                delete[] fAudioCaptureBuffer[audio_port_index];
-            }
-            delete[] fAudioCaptureBuffer;
-            fAudioCaptureBuffer = NULL;
-        }
-
-        if (fMidiCaptureBuffer) {
-            for (int midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++) {
-                delete[] fMidiCaptureBuffer[midi_port_index];
-            }
-            delete[] fMidiCaptureBuffer;
-            fMidiCaptureBuffer = NULL;
         }
     }
 
