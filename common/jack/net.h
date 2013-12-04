@@ -215,7 +215,8 @@ int jack_set_net_slave_shutdown_callback(jack_net_slave_t *net, JackNetSlaveShut
 /**
  * Prototype for server Restart callback : this is the new preferable way to be notified when the master has disappeared. 
  * The client may want to retry connecting a certain number of time (which will be done using the time_out value given in jack_net_slave_open) 
- * by returning 0. Otherwise returning a non-zero error code will definively close the connection.
+ * by returning 0. Otherwise returning a non-zero error code will definively close the connection 
+ * (and jack_net_slave_is_active will later on return false).
  * If both Shutdown and Restart are supplied, Restart callback will be used.
  * @param arg pointer to a client supplied structure supplied by jack_set_net_restart_callback()
  *
