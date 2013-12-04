@@ -74,7 +74,11 @@ def build(bld):
         'JackEngineProfiling.cpp',
         ]
 
-    includes = ['.', './jack', '..']
+    includes = ['.', './jack']
+    if not bld.variant:
+        includes.append('..')
+    else:
+        includes.append('../..')
     uselib = ["PTHREAD", "CELT", "OPUS"]
 
     if bld.env['IS_LINUX']:
@@ -132,6 +136,70 @@ def build(bld):
         uselib.append('WS2_32')
         uselib.append('PSAPI')
         uselib.append('WINMM')
+
+    clientlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
+    clientlib.defines = 'HAVE_CONFIG_H'
+    clientlib.use = uselib
+    if bld.env['IS_WINDOWS']:
+         clientlib.install_path = '${BINDIR}'
+    else:
+         clientlib.install_path = '${LIBDIR}'
+    if bld.env['AUTOSTART_METHOD'] == "dbus":
+        clientlib.use.append('DBUS-1')
+    clientlib.includes = includes
+    clientlib.name         = 'clientlib'
+    clientlib.target       = 'jack'
+    clientlib.source = [] + common_libsources
+    clientlib.source += [
+        'JackLibClient.cpp',
+        'JackLibAPI.cpp',
+        ]
+
+    if bld.env['IS_LINUX']:
+        clientlib.source += [
+            '../posix/JackSocketClientChannel.cpp',
+            '../posix/JackPosixServerLaunch.cpp',
+            ]
+
+    if bld.env['IS_SUN']:
+        clientlib.source += [
+            '../posix/JackSocketClientChannel.cpp',
+            '../posix/JackPosixServerLaunch.cpp',
+            ]
+
+    if bld.env['IS_MACOSX']:
+        clientlib.source += [
+            '../posix/JackSocketClientChannel.cpp',
+            '../posix/JackPosixServerLaunch.cpp',
+            ]
+
+    if bld.env['IS_WINDOWS']:
+        clientlib.source += [
+            '../windows/JackWinNamedPipe.cpp',
+            '../windows/JackWinNamedPipeClientChannel.cpp',
+            '../windows/JackWinServerLaunch.cpp',
+            '../windows/JackMMCSS.cpp',
+            ]
+
+    clientlib.vnum = bld.env['JACK_API_VERSION']
+
+    if bld.env['IS_LINUX']:
+        clientlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+
+    if bld.env['IS_MACOSX']:
+        clientlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+        clientlib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
+        #clientlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module -arch i386 -arch ppc -arch x86_64"
+        clientlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module")
+        clientlib.env.append_value("LINKFLAGS", "-compatibility_version 1 -current_version 1")
+
+    if bld.env['IS_SUN']:
+        clientlib.env.append_value("LINKFLAGS", "-lnsl -lsocket")
+
+    if bld.variant:
+        # if there is variant defined, we expect it to be the 32bit client lib one
+        # we don't want to build other stuff in this variant
+        return
 
     serverlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
     serverlib.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
@@ -269,69 +337,6 @@ def build(bld):
 
         netlib.vnum = bld.env['JACK_API_VERSION']
 
-    clientlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
-    clientlib.defines = 'HAVE_CONFIG_H'
-    clientlib.use = uselib
-    if bld.env['IS_WINDOWS']:
-         clientlib.install_path = '${BINDIR}'
-    else:
-         clientlib.install_path = '${LIBDIR}'
-    if bld.env['AUTOSTART_METHOD'] == "dbus":
-        clientlib.use.append('DBUS-1')
-    clientlib.includes = includes
-    clientlib.name         = 'clientlib'
-    clientlib.target       = 'jack'
-    clientlib.source = [] + common_libsources
-    clientlib.source += [
-        'JackLibClient.cpp',
-        'JackLibAPI.cpp',
-        ]
-
-    if bld.env['IS_LINUX']:
-        clientlib.source += [
-            '../posix/JackSocketClientChannel.cpp',
-            '../posix/JackPosixServerLaunch.cpp',
-            ]
-
-    if bld.env['IS_SUN']:
-        clientlib.source += [
-            '../posix/JackSocketClientChannel.cpp',
-            '../posix/JackPosixServerLaunch.cpp',
-            ]
-
-    if bld.env['IS_MACOSX']:
-        clientlib.source += [
-            '../posix/JackSocketClientChannel.cpp',
-            '../posix/JackPosixServerLaunch.cpp',
-            ]
-
-    if bld.env['IS_WINDOWS']:
-        clientlib.source += [
-            '../windows/JackWinNamedPipe.cpp',
-            '../windows/JackWinNamedPipeClientChannel.cpp',
-            '../windows/JackWinServerLaunch.cpp',
-            '../windows/JackMMCSS.cpp',
-            ]
-
-    clientlib.vnum = bld.env['JACK_API_VERSION']
-
-    if bld.env['IS_LINUX']:
-        clientlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
-    
-    if bld.env['IS_MACOSX']:
-        clientlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
-        clientlib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
-        #clientlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module -arch i386 -arch ppc -arch x86_64"
-        clientlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module")
-        clientlib.env.append_value("LINKFLAGS", "-compatibility_version 1 -current_version 1")
-
-    if bld.env['IS_SUN']:
-        clientlib.env.append_value("LINKFLAGS", "-lnsl -lsocket")
-
-    if bld.env['BUILD_WITH_32_64']:
-        print("create 32bit lib...")
-        clientlib32bit = clientlib.clone('lib32')
-  
     create_jack_process_obj(bld, 'netmanager', 'JackNetManager.cpp', serverlib)
 
     create_jack_process_obj(bld, 'profiler', 'JackProfiler.cpp', serverlib)
