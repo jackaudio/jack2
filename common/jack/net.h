@@ -151,6 +151,14 @@ int jack_net_slave_activate(jack_net_slave_t* net);
 int jack_net_slave_deactivate(jack_net_slave_t* net);
 
 /**
+ * Test if slave is still active.
+ * @param net the network connection
+ *
+ * @return a boolean 
+ */
+int jack_net_slave_is_active(jack_net_slave_t* net);
+
+/**
  * Prototype for BufferSize callback.
  * @param nframes buffer size
  * @param arg pointer to a client supplied structure supplied by jack_set_net_buffer_size_callback()

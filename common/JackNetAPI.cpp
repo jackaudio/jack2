@@ -92,6 +92,7 @@ extern "C"
 
     LIB_EXPORT int jack_net_slave_activate(jack_net_slave_t* net);
     LIB_EXPORT int jack_net_slave_deactivate(jack_net_slave_t* net);
+    LIB_EXPORT int jack_net_slave_is_active(jack_net_slave_t* net);
 
     LIB_EXPORT int jack_set_net_slave_process_callback(jack_net_slave_t* net, JackNetSlaveProcessCallback net_callback, void *arg);
     LIB_EXPORT int jack_set_net_slave_buffer_size_callback(jack_net_slave_t* net, JackNetSlaveBufferSizeCallback bufsize_callback, void *arg);
@@ -757,6 +758,11 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
 
         return (fThread.AcquireSelfRealTime(80) == 0);      // TODO: get a value from the server
     }
+    
+    bool IsRunning()
+    {
+        return (fThread.GetStatus() == JackThread::kRunning);
+    }
 
     bool Execute()
     {
@@ -1019,6 +1025,12 @@ LIB_EXPORT int jack_net_slave_deactivate(jack_net_slave_t* net)
 {
     JackNetExtSlave* slave = (JackNetExtSlave*)net;
     return slave->Stop();
+}
+
+LIB_EXPORT int jack_net_slave_is_active(jack_net_slave_t* net)
+{
+    JackNetExtSlave* slave = (JackNetExtSlave*)net;
+    return slave->IsRunning();
 }
 
 LIB_EXPORT int jack_set_net_slave_buffer_size_callback(jack_net_slave_t *net, JackNetSlaveBufferSizeCallback bufsize_callback, void *arg)
