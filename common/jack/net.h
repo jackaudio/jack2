@@ -34,7 +34,9 @@ extern "C"
 #define DEFAULT_MTU             1500
 #define MASTER_NAME_SIZE        256
 
-#define SOCKET_ERROR -1
+#define NO_ERROR             0
+#define SOCKET_ERROR        -1
+#define NET_PACKET_ERROR    -2
 
 #define RESTART_CB_API 1
 
