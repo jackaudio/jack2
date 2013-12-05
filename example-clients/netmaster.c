@@ -148,6 +148,10 @@ main (int argc, char *argv[])
     */
     
     //usleep(5*1000000);
+    printf("Wait...\n");
+    //sleep(10);
+    usleep(1000000);
+    printf("Wait...OK\n");
   
   	while (1) {
 
@@ -161,6 +165,8 @@ main (int argc, char *argv[])
             printf("jack_net_master_send failure, exiting\n");
             break;
         }
+        
+        usleep(10000);
          
         if (jack_net_master_recv(net, result.audio_input, audio_input_buffer, 0, NULL) < 0) {
             printf("jack_net_master_recv failure, exiting\n");

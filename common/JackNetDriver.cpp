@@ -185,17 +185,20 @@ namespace Jack
         delete[] fMidiCapturePortList;
         delete[] fMidiPlaybackPortList;
         
-        fMidiCapturePortList = new jack_port_id_t [fParams.fSendMidiChannels];
-        fMidiPlaybackPortList = new jack_port_id_t [fParams.fReturnMidiChannels];
-
-        assert(fMidiCapturePortList);
-        assert(fMidiPlaybackPortList);
-
-        for (int midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++) {
-            fMidiCapturePortList[midi_port_index] = 0;
+        if (fParams.fSendMidiChannels > 0) {
+            fMidiCapturePortList = new jack_port_id_t [fParams.fSendMidiChannels];
+            assert(fMidiCapturePortList);
+            for (int midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++) {
+                fMidiCapturePortList[midi_port_index] = 0;
+            }
         }
-        for (int midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++) {
-            fMidiPlaybackPortList[midi_port_index] = 0;
+        
+        if (fParams.fReturnMidiChannels > 0) {
+            fMidiPlaybackPortList = new jack_port_id_t [fParams.fReturnMidiChannels];
+            assert(fMidiPlaybackPortList);
+            for (int midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++) {
+                fMidiPlaybackPortList[midi_port_index] = 0;
+            }
         }
 
         // Register jack ports
@@ -504,17 +507,17 @@ namespace Jack
 
     void JackNetDriver::EncodeTransportData()
     {
-        //is there a timebase master change ?
+        // is there a timebase master change ?
         int refnum;
         bool conditional;
         fEngineControl->fTransport.GetTimebaseMaster(refnum, conditional);
         if (refnum != fLastTimebaseMaster) {
-            //timebase master has released its function
+            // timebase master has released its function
             if (refnum == -1) {
                 fReturnTransportData.fTimebaseMaster = RELEASE_TIMEBASEMASTER;
                 jack_info("Sending a timebase master release request.");
             } else {
-                //there is a new timebase master
+                // there is a new timebase master
                 fReturnTransportData.fTimebaseMaster = (conditional) ? CONDITIONAL_TIMEBASEMASTER : TIMEBASEMASTER;
                 jack_info("Sending a %s timebase master request.", (conditional) ? "conditional" : "non-conditional");
             }
@@ -523,10 +526,10 @@ namespace Jack
             fReturnTransportData.fTimebaseMaster = NO_CHANGE;
         }
 
-        //update transport state and position
+        // update transport state and position
         fReturnTransportData.fState = fEngineControl->fTransport.Query(&fReturnTransportData.fPosition);
 
-        //is it a new state (that the master need to know...) ?
+        // is it a new state (that the master need to know...) ?
         fReturnTransportData.fNewState = ((fReturnTransportData.fState == JackTransportNetStarting) &&
                                            (fReturnTransportData.fState != fLastTransportState) &&
                                            (fReturnTransportData.fState != fSendTransportData.fState));
@@ -540,7 +543,7 @@ namespace Jack
 
     int JackNetDriver::Read()
     {
-        //buffers
+        // buffers
         for (int midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++) {
             fNetMidiCaptureBuffer->SetBuffer(midi_port_index, GetMidiInputBuffer(midi_port_index));
         }
@@ -584,7 +587,7 @@ namespace Jack
 #ifdef JACK_MONITOR
         fNetTimeMon->Add(float(GetMicroSeconds() - fRcvSyncUst) / float(fEngineControl->fPeriodUsecs) * 100.f);
 #endif
-        //audio, midi or sync if driver is late
+        // audio, midi or sync if driver is late
         switch (DataRecv()) {
         
             case SOCKET_ERROR:
@@ -596,7 +599,7 @@ namespace Jack
                 break;
         }
  
-        //take the time at the beginning of the cycle
+        // take the time at the beginning of the cycle
         JackDriver::CycleTakeBeginTime();
 
 #ifdef JACK_MONITOR
@@ -608,7 +611,7 @@ namespace Jack
 
     int JackNetDriver::Write()
     {
-        //buffers
+        // buffers
         for (int midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++) {
             fNetMidiPlaybackBuffer->SetBuffer(midi_port_index, GetMidiOutputBuffer(midi_port_index));
         }
@@ -631,10 +634,9 @@ namespace Jack
         fNetTimeMon->AddLast(float(GetMicroSeconds() - fRcvSyncUst) / float(fEngineControl->fPeriodUsecs) * 100.f);
 #endif
 
-        //sync
         EncodeSyncPacket();
 
-        //send sync
+        // send sync
         if (SyncSend() == SOCKET_ERROR) {
             return SOCKET_ERROR;
         }
@@ -643,7 +645,7 @@ namespace Jack
         fNetTimeMon->Add(((float)(GetMicroSeconds() - fRcvSyncUst) / (float)fEngineControl->fPeriodUsecs) * 100.f);
 #endif
 
-        //send data
+        // send data
         if (DataSend() == SOCKET_ERROR) {
             return SOCKET_ERROR;
         }

@@ -60,7 +60,7 @@ namespace Jack
 
             //sync and transport
             int fLastTransportState;
-
+       
             //monitoring
 #ifdef JACK_MONITOR
             jack_time_t fPeriodUsecs;

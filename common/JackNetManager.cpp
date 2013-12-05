@@ -62,7 +62,7 @@ namespace Jack
         for (port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++) {
             fMidiPlaybackPorts[port_index] = NULL;
         }
-
+    
         //monitor
 #ifdef JACK_MONITOR
         fPeriodUsecs = (int)(1000000.f * ((float) fParams.fPeriodSize / (float) fParams.fSampleRate));
@@ -509,7 +509,7 @@ namespace Jack
         #endif
         }
 
-        //encode the first packet
+        // encode the first packet
         EncodeSyncPacket();
 
         if (SyncSend() == SOCKET_ERROR) {
@@ -520,7 +520,7 @@ namespace Jack
         fNetTimeMon->Add((((float)(GetMicroSeconds() - begin_time)) / (float) fPeriodUsecs) * 100.f);
 #endif
 
-        //send data
+        // send data
         if (DataSend() == SOCKET_ERROR) {
             return SOCKET_ERROR;
         }
@@ -529,7 +529,7 @@ namespace Jack
         fNetTimeMon->Add((((float)(GetMicroSeconds() - begin_time)) / (float) fPeriodUsecs) * 100.f);
 #endif
 
-        //receive sync
+        // receive sync
         int res = SyncRecv();
         switch (res) {
         
@@ -542,7 +542,7 @@ namespace Jack
                  break;
                 
             default:
-                //decode sync
+                // Decode sync
                 DecodeSyncPacket();
                 break;
         }
@@ -551,7 +551,7 @@ namespace Jack
         fNetTimeMon->Add((((float)(GetMicroSeconds() - begin_time)) / (float) fPeriodUsecs) * 100.f);
 #endif
       
-        //receive data
+        // receive data
         res = DataRecv();
         switch (res) {
         

@@ -149,6 +149,8 @@ struct JackNetExtMaster : public JackNetMasterInterface {
     JackMidiBuffer** fMidiPlaybackBuffer;
 
     jack_master_t fRequest;
+    
+    int fPacketTimeOut;
 
     JackNetExtMaster(const char* ip,
                     int port,
@@ -472,7 +474,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
                 return SOCKET_ERROR;
             }
 
-            //send data
+            // send data
             if (DataSend() == SOCKET_ERROR) {
                 return SOCKET_ERROR;
             }
@@ -521,7 +523,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
     JackMidiBuffer** fMidiPlaybackBuffer;
 
     int fConnectTimeOut;
-
+   
     JackNetExtSlave(const char* ip,
                     int port,
                     const char* name,
@@ -767,6 +769,12 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
     bool Execute()
     {
         try  {
+            /*
+                Fist cycle use an INT_MAX time out, so that connection
+                is considered established (with PACKET_TIMEOUT later on)
+                when the first cycle has been done.
+            */
+            DummyProcess();
             // keep running even in case of error
             while (fThread.GetStatus() == JackThread::kRunning) {
                 if (Process() == SOCKET_ERROR) {
@@ -820,6 +828,18 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
         }
 
         return DataSend();
+    }
+    
+    void DummyProcess()
+    {
+        // First cycle with INT_MAX time out
+        SetPackedTimeOut(INT_MAX);
+        
+        // One cycle
+        Process();
+        
+        // Then use PACKET_TIMEOUT for next cycles
+        SetPackedTimeOut(PACKET_TIMEOUT);
     }
 
     int Process()

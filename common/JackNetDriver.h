@@ -52,7 +52,7 @@ namespace Jack
             int fWantedMIDIPlaybackChannels;
             
             bool fAutoSave;
-
+      
             //monitoring
 	#ifdef JACK_MONITOR
             JackGnuPlotMonitor<float>* fNetTimeMon;

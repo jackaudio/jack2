@@ -49,6 +49,7 @@ namespace Jack
         protected:
         
             bool fSetTimeOut;
+            int fPacketTimeOut;
 
             void Initialize();
 
@@ -112,6 +113,12 @@ namespace Jack
             int FinishRecv(NetAudioBuffer* buffer);
             
             void SetRcvTimeOut();
+            void SetPackedTimeOut(int time_out)
+            {
+                // New time out
+                fPacketTimeOut = time_out;
+                fSetTimeOut = false;
+            }
 
             NetAudioBuffer* AudioBufferFactory(int nports, char* buffer);
 
