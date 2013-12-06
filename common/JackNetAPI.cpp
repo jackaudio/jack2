@@ -846,13 +846,13 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
     void DummyProcess()
     {
         // First cycle with INT_MAX time out
-        SetPackedTimeOut(INT_MAX);
+        SetPacketTimeOut(INT_MAX);
         
         // One cycle
         Process();
         
         // Then use PACKET_TIMEOUT for next cycles
-        SetPackedTimeOut(PACKET_TIMEOUT);
+        SetPacketTimeOut(PACKET_TIMEOUT);
     }
 
     int Process()

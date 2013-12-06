@@ -113,7 +113,7 @@ namespace Jack
             int FinishRecv(NetAudioBuffer* buffer);
             
             void SetRcvTimeOut();
-            void SetPackedTimeOut(int time_out)
+            void SetPacketTimeOut(int time_out)
             {
                 // New time out
                 fPacketTimeOut = time_out;
