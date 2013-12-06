@@ -227,7 +227,7 @@ namespace Jack
     int JackNetInterface::FinishRecv(NetAudioBuffer* buffer)
     {
         buffer->RenderToJackPorts();
-        return NET_PACKET_ERROR;
+        return DATA_PACKET_ERROR;
     }
 
     NetAudioBuffer* JackNetInterface::AudioBufferFactory(int nports, char* buffer)
@@ -488,7 +488,7 @@ namespace Jack
             jack_error("Wrong packet type : %c", rx_head->fDataType);
             // not the last packet..
             fRxHeader.fIsLastPckt = 0;
-            return NET_PACKET_ERROR;
+            return SYNC_PACKET_ERROR;
         }
     
         fCurrentCycleOffset = fTxHeader.fCycle - rx_head->fCycle;
@@ -874,7 +874,7 @@ namespace Jack
             jack_error("Wrong packet type : %c", rx_head->fDataType);
             // not the last packet...
             fRxHeader.fIsLastPckt = 0;
-            return NET_PACKET_ERROR;
+            return SYNC_PACKET_ERROR;
         }
      
         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;

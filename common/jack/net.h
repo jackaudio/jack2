@@ -36,7 +36,8 @@ extern "C"
 
 #define NO_ERROR             0
 #define SOCKET_ERROR        -1
-#define NET_PACKET_ERROR    -2
+#define SYNC_PACKET_ERROR   -2
+#define DATA_PACKET_ERROR   -3
 
 #define RESTART_CB_API 1
 

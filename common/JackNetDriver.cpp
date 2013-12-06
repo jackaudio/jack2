@@ -569,7 +569,7 @@ namespace Jack
             case SOCKET_ERROR:
                 return SOCKET_ERROR;
                 
-            case NET_PACKET_ERROR:
+            case SYNC_PACKET_ERROR:
                 // since sync packet is incorrect, don't decode it and continue with data
                 break;
                 
@@ -593,7 +593,7 @@ namespace Jack
             case SOCKET_ERROR:
                 return SOCKET_ERROR;
                 
-            case NET_PACKET_ERROR:
+            case DATA_PACKET_ERROR:
                 jack_time_t cur_time = GetMicroSeconds();
                 NotifyXRun(cur_time, float(cur_time - fBeginDateUst));  // Better this value than nothing...
                 break;

@@ -41,7 +41,8 @@ using namespace std;
 #define NETWORK_PROTOCOL 7
 
 #define NET_SYNCHING      0
-#define NET_PACKET_ERROR -2
+#define SYNC_PACKET_ERROR -2
+#define DATA_PACKET_ERROR -3
 
 #define OPTIMIZED_PROTOCOL 1
 

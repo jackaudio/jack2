@@ -247,7 +247,7 @@ namespace Jack
 
         if (sub_cycle != fLastSubCycle + 1) {
             jack_error("Packet(s) missing from... %d %d", fLastSubCycle, sub_cycle);
-            res = NET_PACKET_ERROR;
+            res = DATA_PACKET_ERROR;
         } else {
             res = 0;
         }

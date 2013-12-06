@@ -86,6 +86,7 @@ extern "C"
     typedef int (*JackNetSlaveSampleRateCallback) (jack_nframes_t nframes, void *arg);
     typedef void (*JackNetSlaveShutdownCallback) (void* data);
     typedef int (*JackNetSlaveRestartCallback) (void* data);
+    typedef int (*JackNetSlaveErrorCallback) (int error_code, void* data);
 
     LIB_EXPORT jack_net_slave_t* jack_net_slave_open(const char* ip, int port, const char* name, jack_slave_t* request, jack_master_t* result);
     LIB_EXPORT int jack_net_slave_close(jack_net_slave_t* net);
@@ -99,6 +100,7 @@ extern "C"
     LIB_EXPORT int jack_set_net_slave_sample_rate_callback(jack_net_slave_t* net, JackNetSlaveSampleRateCallback samplerate_callback, void *arg);
     LIB_EXPORT int jack_set_net_slave_shutdown_callback(jack_net_slave_t* net, JackNetSlaveShutdownCallback shutdown_callback, void *arg);
     LIB_EXPORT int jack_set_net_slave_restart_callback(jack_net_slave_t* net, JackNetSlaveRestartCallback restart_callback, void *arg);
+    LIB_EXPORT int jack_set_net_slave_error_callback(jack_net_slave_t* net, JackNetSlaveErrorCallback error_callback, void *arg);
 
     // NetJack master API
 
@@ -435,7 +437,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
                 case SOCKET_ERROR:
                     return res;
                     
-                case NET_PACKET_ERROR:
+                case SYNC_PACKET_ERROR:
                     // since sync packet is incorrect, don't decode it and continue with data
                     break;
                     
@@ -507,7 +509,10 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
     void* fShutdownArg;
     
     JackNetSlaveRestartCallback fRestartCallback;
-    void*  fRestartArg;
+    void* fRestartArg;
+    
+    JackNetSlaveErrorCallback fErrorCallback;
+    void* fErrorArg;
 
     JackNetSlaveBufferSizeCallback fBufferSizeCallback;
     void* fBufferSizeArg;
@@ -532,6 +537,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
         fProcessCallback(NULL),fProcessArg(NULL),
         fShutdownCallback(NULL), fShutdownArg(NULL),
         fRestartCallback(NULL), fRestartArg(NULL),
+        fErrorCallback(NULL), fErrorArg(NULL),
         fBufferSizeCallback(NULL), fBufferSizeArg(NULL),
         fSampleRateCallback(NULL), fSampleRateArg(NULL),
         fAudioCaptureBuffer(NULL), fAudioPlaybackBuffer(NULL),
@@ -806,8 +812,11 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
             case SOCKET_ERROR:
                 return SOCKET_ERROR;
                 
-            case NET_PACKET_ERROR:
+            case SYNC_PACKET_ERROR:
                 // since sync packet is incorrect, don't decode it and continue with data
+                if (fErrorCallback) {
+                    fErrorCallback(SYNC_PACKET_ERROR, fErrorArg);
+                }
                 break;
                 
             default:
@@ -816,7 +825,11 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
                 break;
         }
 
-        return DataRecv();
+        int res = DataRecv();
+        if (res == DATA_PACKET_ERROR && fErrorCallback) {
+            fErrorCallback(DATA_PACKET_ERROR, fErrorArg);
+        }
+        return res;
     }
 
     int Write()
@@ -908,6 +921,17 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
         } else {
             fRestartCallback = restart_callback;
             fRestartArg = arg;
+            return 0;
+        }
+    }
+    
+    int SetErrorCallback(JackNetSlaveErrorCallback error_callback, void *arg)
+    {
+        if (fThread.GetStatus() == JackThread::kRunning) {
+            return -1;
+        } else {
+            fErrorCallback = error_callback;
+            fErrorArg = arg;
             return 0;
         }
     }
@@ -1075,6 +1099,12 @@ LIB_EXPORT int jack_set_net_slave_restart_callback(jack_net_slave_t *net, JackNe
 {
     JackNetExtSlave* slave = (JackNetExtSlave*)net;
     return slave->SetRestartCallback(restart_callback, arg);
+}
+
+LIB_EXPORT int jack_set_net_slave_error_callback(jack_net_slave_t *net, JackNetSlaveErrorCallback error_callback, void *arg)
+{
+    JackNetExtSlave* slave = (JackNetExtSlave*)net;
+    return slave->SetErrorCallback(error_callback, arg);
 }
 
 // Master API
