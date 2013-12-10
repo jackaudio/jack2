@@ -34,6 +34,8 @@ extern "C"
 #define DEFAULT_MTU             1500
 #define MASTER_NAME_SIZE        256
 
+// Possible error codes
+
 #define NO_ERROR             0
 #define SOCKET_ERROR        -1
 #define SYNC_PACKET_ERROR   -2
@@ -171,15 +173,6 @@ int jack_net_slave_is_active(jack_net_slave_t* net);
 typedef int (*JackNetSlaveBufferSizeCallback)(jack_nframes_t nframes, void *arg);
 
 /**
- * Prototype for SampleRate callback.
- * @param nframes sample rate
- * @param arg pointer to a client supplied structure supplied by jack_set_net_sample_rate_callback()
- *
- * @return zero on success, non-zero on error
- */
-typedef int (*JackNetSlaveSampleRateCallback)(jack_nframes_t nframes, void *arg);
-
-/**
  * Set network buffer size callback.
  * @param net the network connection
  * @param bufsize_callback the buffer size callback
@@ -188,6 +181,15 @@ typedef int (*JackNetSlaveSampleRateCallback)(jack_nframes_t nframes, void *arg)
  * @return 0 on success, otherwise a non-zero error code
  */
 int jack_set_net_slave_buffer_size_callback(jack_net_slave_t *net, JackNetSlaveBufferSizeCallback bufsize_callback, void *arg);
+
+/**
+ * Prototype for SampleRate callback.
+ * @param nframes sample rate
+ * @param arg pointer to a client supplied structure supplied by jack_set_net_sample_rate_callback()
+ *
+ * @return zero on success, non-zero on error
+ */
+typedef int (*JackNetSlaveSampleRateCallback)(jack_nframes_t nframes, void *arg);
 
 /**
  * Set network sample rate callback.
@@ -203,7 +205,7 @@ int jack_set_net_slave_sample_rate_callback(jack_net_slave_t *net, JackNetSlaveS
  * Prototype for server Shutdown callback (if not set, the client will just restart, waiting for an available master again).
  * @param arg pointer to a client supplied structure supplied by jack_set_net_shutdown_callback()
  */
-typedef void (*JackNetSlaveShutdownCallback)(void* data);
+typedef void (*JackNetSlaveShutdownCallback)(void* arg);
 
 /**
  * Set network shutdown callback.
@@ -225,7 +227,7 @@ int jack_set_net_slave_shutdown_callback(jack_net_slave_t *net, JackNetSlaveShut
  *
  * @return 0 on success, otherwise a non-zero error code
  */
-typedef int (*JackNetSlaveRestartCallback)(void* data);
+typedef int (*JackNetSlaveRestartCallback)(void* arg);
 
 /**
  * Set network restart callback.
@@ -236,6 +238,23 @@ typedef int (*JackNetSlaveRestartCallback)(void* data);
  * @return 0 on success, otherwise a non-zero error code
  */
 int jack_set_net_slave_restart_callback(jack_net_slave_t *net, JackNetSlaveRestartCallback restart_callback, void *arg) JACK_OPTIONAL_WEAK_EXPORT;
+
+/**
+ * Prototype for server Error callback.
+ * @param error_code an error code (see "Possible error codes")
+ * @param arg pointer to a client supplied structure supplied by jack_set_net_error_callback()
+ */
+typedef void (*JackNetSlaveErrorCallback) (int error_code, void* arg);
+
+/**
+ * Set error restart callback.
+ * @param net the network connection
+ * @param error_callback the error callback
+ * @param arg pointer to a client supplied structure
+ *
+ * @return 0 on success, otherwise a non-zero error code
+ */
+int jack_set_net_slave_error_callback(jack_net_slave_t *net, JackNetSlaveErrorCallback error_callback, void *arg) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  *  jack_net_master_t is an opaque type, you may only access it using the API provided.
