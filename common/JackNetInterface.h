@@ -46,6 +46,8 @@ namespace Jack
     class SERVER_EXPORT JackNetInterface
     {
 
+        friend class JackNetExt;
+        
         protected:
         
             bool fSetTimeOut;
