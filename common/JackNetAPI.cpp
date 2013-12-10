@@ -350,6 +350,12 @@ struct JackNetExtMaster : public JackNetMasterInterface {
             switch (res) {
             
                 case NET_SYNCHING:
+                    // Data will not be received, so cleanup buffers...
+                    for (int audio_port_index = 0; audio_port_index < audio_input; audio_port_index++) {
+                        memset(audio_input_buffer[audio_port_index], 0, sizeof(float) *  fParams.fPeriodSize);
+                    }
+                    return res;
+                    
                 case SOCKET_ERROR:
                     return res;
                     
