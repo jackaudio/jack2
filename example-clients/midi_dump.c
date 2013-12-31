@@ -101,6 +101,28 @@ static void wearedone(int sig) {
 	keeprunning = 0;
 }
 
+static void usage (int status) {
+	printf ("jack_midi_dump - JACK MIDI Monitor.\n\n");
+	printf ("Usage: jack_midi_dump [ OPTIONS ] [CLIENT-NAME]\n\n");
+	printf ("Options:\n\
+  -a        use absoute timestamps relative to application start\n\
+  -h        display this help and exit\n\
+  -r        use relative timestamps to previous MIDI event\n\
+\n");
+	printf ("\n\
+This tool listens for MIDI events on a JACK MIDI port and prints\n\
+the message to stdout.\n\
+\n\
+Note that this tool is not realtime-safe. The events are printed\n\
+directly from the process() callback!\n\
+\n\
+If no client name is given it defaults to 'midi-monitor'.\n\
+\n\
+See also: jackd(1)\n\
+\n");
+  exit (status);
+}
+
 int
 main (int argc, char* argv[])
 {
@@ -112,8 +134,10 @@ main (int argc, char* argv[])
 	int cn = 1;
 
 	if (argc > 1) {
-		if (!strcmp(argv[1], "-a")) { time_format = 1; cn = 2; }
-		if (!strcmp(argv[1], "-r")) { time_format = 2; cn = 2; }
+		if      (!strcmp (argv[1], "-a")) { time_format = 1; cn = 2; }
+		else if (!strcmp (argv[1], "-r")) { time_format = 2; cn = 2; }
+		else if (!strcmp (argv[1], "-h")) { usage (EXIT_SUCCESS); }
+		else if (argv[1][0] == '-')       { usage (EXIT_FAILURE); }
 	}
 
 	if (argc > cn) {
