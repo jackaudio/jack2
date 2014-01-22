@@ -1216,6 +1216,7 @@ namespace Jack
         dst_header->fActivePorts = htonl(src_header->fActivePorts);
         dst_header->fCycle = htonl(src_header->fCycle);
         dst_header->fSubCycle = htonl(src_header->fSubCycle);
+        dst_header->fCycleSize = htonl(src_header->fCycleSize);
         dst_header->fIsLastPckt = htonl(src_header->fIsLastPckt);
     }
 
@@ -1230,6 +1231,7 @@ namespace Jack
         dst_header->fActivePorts = ntohl(src_header->fActivePorts);
         dst_header->fCycle = ntohl(src_header->fCycle);
         dst_header->fSubCycle = ntohl(src_header->fSubCycle);
+        dst_header->fCycleSize = ntohl(src_header->fCycleSize);
         dst_header->fIsLastPckt = ntohl(src_header->fIsLastPckt);
     }
 

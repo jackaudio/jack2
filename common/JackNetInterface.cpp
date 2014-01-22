@@ -544,7 +544,7 @@ namespace Jack
         return rx_bytes;
     }
 
-    void JackNetMasterInterface::EncodeSyncPacket()
+    void JackNetMasterInterface::EncodeSyncPacket(int cycle_size)
     {
         // This method contains every step of sync packet informations coding
         // first of all, clear sync packet
@@ -565,9 +565,10 @@ namespace Jack
    
         // Write active ports list
         fTxHeader.fActivePorts = (fNetAudioPlaybackBuffer) ? fNetAudioPlaybackBuffer->ActivePortsToNetwork(fTxData) : 0;
+        fTxHeader.fCycleSize = cycle_size;
     }
 
-    void JackNetMasterInterface::DecodeSyncPacket()
+    void JackNetMasterInterface::DecodeSyncPacket(int& cycle_size)
     {
         // This method contains every step of sync packet informations decoding process
         
@@ -590,6 +591,8 @@ namespace Jack
         if (fNetAudioCaptureBuffer) {
             fNetAudioCaptureBuffer->ActivePortsFromNetwork(fRxData, rx_head->fActivePorts);
         }
+        
+        cycle_size = rx_head->fCycleSize;
     }
 
 // JackNetSlaveInterface ************************************************************************************************
@@ -946,7 +949,7 @@ namespace Jack
     }
 
     // network sync------------------------------------------------------------------------
-    void JackNetSlaveInterface::EncodeSyncPacket()
+    void JackNetSlaveInterface::EncodeSyncPacket(int cycle_size)
     {
         // This method contains every step of sync packet informations coding
         // first of all, clear sync packet
@@ -967,9 +970,10 @@ namespace Jack
 
         // Write active ports list
         fTxHeader.fActivePorts = (fNetAudioCaptureBuffer) ? fNetAudioCaptureBuffer->ActivePortsToNetwork(fTxData) : 0;
+        fTxHeader.fCycleSize = cycle_size;
     }
 
-    void JackNetSlaveInterface::DecodeSyncPacket()
+    void JackNetSlaveInterface::DecodeSyncPacket(int& cycle_size)
     {
         // This method contains every step of sync packet informations decoding process
         
@@ -992,6 +996,8 @@ namespace Jack
         if (fNetAudioPlaybackBuffer) {
             fNetAudioPlaybackBuffer->ActivePortsFromNetwork(fRxData, rx_head->fActivePorts);
         }
+        
+        cycle_size = rx_head->fCycleSize;
     }
 
 }

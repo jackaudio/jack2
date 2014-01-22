@@ -361,7 +361,8 @@ namespace Jack
                 
             default:
                 //decode sync
-                DecodeSyncPacket();
+                int unused_cycle_size;
+                DecodeSyncPacket(unused_cycle_size);
                 break;
         }
         

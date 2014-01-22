@@ -38,7 +38,7 @@ using namespace std;
 #endif
 #endif
 
-#define NETWORK_PROTOCOL 7
+#define NETWORK_PROTOCOL 8
 
 #define NET_SYNCHING      0
 #define SYNC_PACKET_ERROR -2
@@ -180,6 +180,7 @@ namespace Jack
         uint32_t fActivePorts;      //number of active ports
         uint32_t fCycle;            //process cycle counter
         uint32_t fSubCycle;         //midi/audio subcycle counter
+        int32_t fCycleSize;         //process cycle size in frames
         uint32_t fIsLastPckt;       //is it the last packet of a given cycle ('y' or 'n')
     } POST_PACKED_STRUCTURE;
 

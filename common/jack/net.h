@@ -75,6 +75,7 @@ typedef struct {
     jack_nframes_t sample_rate;         // master sample rate
     char master_name[MASTER_NAME_SIZE]; // master machine name
     int time_out;                       // in second, -1 means infinite
+    int partial_cycle;                  // if 'true', partial cycle will be used 
 
 } jack_master_t;
 
@@ -281,7 +282,7 @@ jack_net_master_t* jack_net_master_open(const char* ip, int port, const char* na
 int jack_net_master_close(jack_net_master_t* net);
 
 /**
- * Receive sync and data from the network.
+ * Receive sync and data from the network (complete buffer).
  * @param net the network connection
  * @param audio_input number of audio inputs
  * @param audio_input_buffer an array of audio input buffers
@@ -293,7 +294,20 @@ int jack_net_master_close(jack_net_master_t* net);
 int jack_net_master_recv(jack_net_master_t* net, int audio_input, float** audio_input_buffer, int midi_input, void** midi_input_buffer);
 
 /**
- * Send sync and data to the network.
+ * Receive sync and data from the network (incomplete buffer).
+ * @param net the network connection
+ * @param audio_input number of audio inputs
+ * @param audio_input_buffer an array of audio input buffers
+ * @param midi_input number of MIDI inputs
+ * @param midi_input_buffer an array of MIDI input buffers
+ * @param frames the number of frames to receive.
+ *
+ * @return zero on success, non-zero on error
+ */
+int jack_net_master_recv_slice(jack_net_master_t* net, int audio_input, float** audio_input_buffer, int midi_input, void** midi_input_buffer, int frames);
+
+/**
+ * Send sync and data to the network (complete buffer).
  * @param net the network connection
  * @param audio_output number of audio outputs
  * @param audio_output_buffer an array of audio output buffers
@@ -303,6 +317,19 @@ int jack_net_master_recv(jack_net_master_t* net, int audio_input, float** audio_
  * @return zero on success, non-zero on error
  */
 int jack_net_master_send(jack_net_master_t* net, int audio_output, float** audio_output_buffer, int midi_output, void** midi_output_buffer);
+
+/**
+ * Send sync and data to the network (incomplete buffer).
+ * @param net the network connection
+ * @param audio_output number of audio outputs
+ * @param audio_output_buffer an array of audio output buffers
+ * @param midi_output number of MIDI ouputs
+ * @param midi_output_buffer an array of MIDI output buffers
+ * @param frames the number of frames to send.
+ *
+ * @return zero on success, non-zero on error
+ */
+int jack_net_master_send_slice(jack_net_master_t* net, int audio_output, float** audio_output_buffer, int midi_output, void** midi_output_buffer, int frames);
 
 // Experimental Adapter API
 

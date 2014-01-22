@@ -24,45 +24,44 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-JackResampler::JackResampler()
-    :fRatio(1), fRingBufferSize(DEFAULT_RB_SIZE)
+JackRingBuffer::JackRingBuffer(int size):fRingBufferSize(size)
 {
     fRingBuffer = jack_ringbuffer_create(sizeof(jack_default_audio_sample_t) * fRingBufferSize);
-    jack_ringbuffer_read_advance(fRingBuffer, (sizeof(jack_default_audio_sample_t) * fRingBufferSize) / 2);
+    Reset(fRingBufferSize);
 }
 
-JackResampler::~JackResampler()
+JackRingBuffer::~JackRingBuffer()
 {
     if (fRingBuffer) {
         jack_ringbuffer_free(fRingBuffer);
     }
 }
 
-void JackResampler::Reset(unsigned int new_size)
+void JackRingBuffer::Reset(unsigned int new_size)
 {
     fRingBufferSize = new_size;
     jack_ringbuffer_reset(fRingBuffer);
     jack_ringbuffer_reset_size(fRingBuffer, sizeof(jack_default_audio_sample_t) * fRingBufferSize);
-    jack_ringbuffer_read_advance(fRingBuffer, (sizeof(jack_default_audio_sample_t) * fRingBufferSize / 2));
+    jack_ringbuffer_read_advance(fRingBuffer, (sizeof(jack_default_audio_sample_t) * new_size/2));
 }
 
-unsigned int JackResampler::ReadSpace()
+unsigned int JackRingBuffer::ReadSpace()
 {
     return (jack_ringbuffer_read_space(fRingBuffer) / sizeof(jack_default_audio_sample_t));
 }
 
-unsigned int JackResampler::WriteSpace()
+unsigned int JackRingBuffer::WriteSpace()
 {
     return (jack_ringbuffer_write_space(fRingBuffer) / sizeof(jack_default_audio_sample_t));
 }
 
-unsigned int JackResampler::Read(jack_default_audio_sample_t* buffer, unsigned int frames)
+unsigned int JackRingBuffer::Read(jack_default_audio_sample_t* buffer, unsigned int frames)
 {
     size_t len = jack_ringbuffer_read_space(fRingBuffer);
-    jack_log("JackResampler::Read input available = %ld", len / sizeof(jack_default_audio_sample_t));
+    jack_log("JackRingBuffer::Read input available = %ld", len / sizeof(jack_default_audio_sample_t));
 
     if (len < frames * sizeof(jack_default_audio_sample_t)) {
-        jack_error("JackResampler::Read : producer too slow, missing frames = %d", frames);
+        jack_error("JackRingBuffer::Read : producer too slow, missing frames = %d", frames);
         return 0;
     } else {
         jack_ringbuffer_read(fRingBuffer, (char*)buffer, frames * sizeof(jack_default_audio_sample_t));
@@ -70,13 +69,13 @@ unsigned int JackResampler::Read(jack_default_audio_sample_t* buffer, unsigned i
     }
 }
 
-unsigned int JackResampler::Write(jack_default_audio_sample_t* buffer, unsigned int frames)
+unsigned int JackRingBuffer::Write(jack_default_audio_sample_t* buffer, unsigned int frames)
 {
     size_t len = jack_ringbuffer_write_space(fRingBuffer);
-    jack_log("JackResampler::Write output available = %ld", len / sizeof(jack_default_audio_sample_t));
+    jack_log("JackRingBuffer::Write output available = %ld", len / sizeof(jack_default_audio_sample_t));
 
     if (len < frames * sizeof(jack_default_audio_sample_t)) {
-        jack_error("JackResampler::Write : consumer too slow, skip frames = %d", frames);
+        jack_error("JackRingBuffer::Write : consumer too slow, skip frames = %d", frames);
         return 0;
     } else {
         jack_ringbuffer_write(fRingBuffer, (char*)buffer, frames * sizeof(jack_default_audio_sample_t));
@@ -84,13 +83,13 @@ unsigned int JackResampler::Write(jack_default_audio_sample_t* buffer, unsigned 
     }
 }
 
-unsigned int JackResampler::Read(void* buffer, unsigned int bytes)
+unsigned int JackRingBuffer::Read(void* buffer, unsigned int bytes)
 {
     size_t len = jack_ringbuffer_read_space(fRingBuffer);
-    jack_log("JackResampler::Read input available = %ld", len);
+    jack_log("JackRingBuffer::Read input available = %ld", len);
 
     if (len < bytes) {
-        jack_error("JackResampler::Read : producer too slow, missing bytes = %d", bytes);
+        jack_error("JackRingBuffer::Read : producer too slow, missing bytes = %d", bytes);
         return 0;
     } else {
         jack_ringbuffer_read(fRingBuffer, (char*)buffer, bytes);
@@ -98,13 +97,13 @@ unsigned int JackResampler::Read(void* buffer, unsigned int bytes)
     }
 }
 
-unsigned int JackResampler::Write(void* buffer, unsigned int bytes)
+unsigned int JackRingBuffer::Write(void* buffer, unsigned int bytes)
 {
     size_t len = jack_ringbuffer_write_space(fRingBuffer);
-    jack_log("JackResampler::Write output available = %ld", len);
+    jack_log("JackRingBuffer::Write output available = %ld", len);
 
     if (len < bytes) {
-        jack_error("JackResampler::Write : consumer too slow, skip bytes = %d", bytes);
+        jack_error("JackRingBuffer::Write : consumer too slow, skip bytes = %d", bytes);
         return 0;
     } else {
         jack_ringbuffer_write(fRingBuffer, (char*)buffer, bytes);
