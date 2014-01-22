@@ -354,6 +354,17 @@ struct JackNetExtMaster : public JackNetMasterInterface {
         fSocket.Close();
         return 0;
     }
+    
+    void UseRingBuffer(int audio_input, float** audio_input_buffer, int write, int read)
+    {
+        // Possibly use ringbuffer...
+        if (fRingBuffer) {
+            for (int i = 0; i < audio_input; i++) {
+                fRingBuffer[i]->Write(audio_input_buffer[i], write);
+                fRingBuffer[i]->Read(audio_input_buffer[i], read);
+            }
+        }
+    }
   
     int Read(int audio_input, float** audio_input_buffer, int midi_input, void** midi_input_buffer, int frames)
     {
@@ -380,13 +391,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
                     for (int audio_port_index = 0; audio_port_index < audio_input; audio_port_index++) {
                         memset(audio_input_buffer[audio_port_index], 0, sizeof(float) * fParams.fPeriodSize);
                     }
-                    // Possibly use ringbuffer...
-                    if (fRingBuffer) {
-                        for (int i = 0; i < audio_input; i++) {
-                            fRingBuffer[i]->Write(audio_input_buffer[i], fParams.fPeriodSize);
-                            fRingBuffer[i]->Read(audio_input_buffer[i], frames);
-                        }
-                    }
+                    UseRingBuffer(audio_input, audio_input_buffer, fParams.fPeriodSize, frames);
                     return res1;
                     
                 case SOCKET_ERROR:
@@ -398,19 +403,13 @@ struct JackNetExtMaster : public JackNetMasterInterface {
                     
                 default:
                     // decode sync
-                    cycle_size;
+                    int cycle_size;
                     DecodeSyncPacket(cycle_size);
                     break;
             }
           
             int res2 = DataRecv();
-            // Possibly use ringbuffer...
-            if (res2 == 0 && fRingBuffer) {
-                for (int i = 0; i < audio_input; i++) {
-                    fRingBuffer[i]->Write(audio_input_buffer[i], cycle_size);
-                    fRingBuffer[i]->Read(audio_input_buffer[i], frames);
-                }
-            }
+            UseRingBuffer(audio_input, audio_input_buffer, cycle_size, frames);
             return res2;
 
         } catch (JackNetException& e) {
