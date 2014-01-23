@@ -372,7 +372,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
         
             if (frames < 0) frames = fParams.fPeriodSize;
            
-            int cycle_size;
+            int read_frames;
             assert(audio_input == fParams.fReturnAudioChannels);
 
             for (int audio_port_index = 0; audio_port_index < audio_input; audio_port_index++) {
@@ -403,13 +403,12 @@ struct JackNetExtMaster : public JackNetMasterInterface {
                     
                 default:
                     // decode sync
-                    int cycle_size;
-                    DecodeSyncPacket(cycle_size);
+                    DecodeSyncPacket(read_frames);
                     break;
             }
           
             int res2 = DataRecv();
-            UseRingBuffer(audio_input, audio_input_buffer, cycle_size, frames);
+            UseRingBuffer(audio_input, audio_input_buffer, read_frames, frames);
             return res2;
 
         } catch (JackNetException& e) {
@@ -492,7 +491,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
     void* fSampleRateArg;
 
     int fConnectTimeOut;
-    int fCycleSize;
+    int fFrames;
    
     JackNetExtSlave(const char* ip,
                     int port,
@@ -664,8 +663,8 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
             strcpy(result->master_name, fParams.fMasterNetName);
         }
         
-        // By default fCycleSize is fPeriodSize
-        fCycleSize = fParams.fPeriodSize;
+        // By default fFrames is fPeriodSize
+        fFrames = fParams.fPeriodSize;
      
         AllocPorts();
         return 0;
@@ -804,7 +803,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
                 
             default:
                 // decode sync
-                DecodeSyncPacket(fCycleSize);
+                DecodeSyncPacket(fFrames);
                 break;
         }
 
@@ -817,7 +816,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
     
     int Write()
     {
-        EncodeSyncPacket(fCycleSize);
+        EncodeSyncPacket(fFrames);
       
         if (SyncSend() == SOCKET_ERROR) {
             return SOCKET_ERROR;
@@ -845,7 +844,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
             return SOCKET_ERROR;
         }
         
-        fProcessCallback(fCycleSize,
+        fProcessCallback(fFrames,
                         fParams.fSendAudioChannels,
                         fAudioCaptureBuffer,
                         fParams.fSendMidiChannels,

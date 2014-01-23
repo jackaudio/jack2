@@ -172,15 +172,15 @@ namespace Jack
     struct _packet_header
     {
         char fPacketType[8];        //packet type ('headr')
-        uint32_t fDataType;         //a for audio, m for midi and s for sync
-        uint32_t fDataStream;       //s for send, r for return
+        uint32_t fDataType;         //'a' for audio, 'm' for midi and 's' for sync
+        uint32_t fDataStream;       //'s' for send, 'r' for return
         uint32_t fID;               //unique ID of the slave
         uint32_t fNumPacket;        //number of data packets of the cycle
         uint32_t fPacketSize;       //packet size in bytes
         uint32_t fActivePorts;      //number of active ports
         uint32_t fCycle;            //process cycle counter
         uint32_t fSubCycle;         //midi/audio subcycle counter
-        int32_t fCycleSize;         //process cycle size in frames
+        uint32_t fFrames;           //process cycle size in frames
         uint32_t fIsLastPckt;       //is it the last packet of a given cycle ('y' or 'n')
     } POST_PACKED_STRUCTURE;
 

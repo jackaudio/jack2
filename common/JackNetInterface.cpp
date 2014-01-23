@@ -544,7 +544,7 @@ namespace Jack
         return rx_bytes;
     }
 
-    void JackNetMasterInterface::EncodeSyncPacket(int cycle_size)
+    void JackNetMasterInterface::EncodeSyncPacket(int frames)
     {
         // This method contains every step of sync packet informations coding
         // first of all, clear sync packet
@@ -565,10 +565,10 @@ namespace Jack
    
         // Write active ports list
         fTxHeader.fActivePorts = (fNetAudioPlaybackBuffer) ? fNetAudioPlaybackBuffer->ActivePortsToNetwork(fTxData) : 0;
-        fTxHeader.fCycleSize = cycle_size;
+        fTxHeader.fFrames = frames;
     }
 
-    void JackNetMasterInterface::DecodeSyncPacket(int& cycle_size)
+    void JackNetMasterInterface::DecodeSyncPacket(int& frames)
     {
         // This method contains every step of sync packet informations decoding process
         
@@ -592,7 +592,7 @@ namespace Jack
             fNetAudioCaptureBuffer->ActivePortsFromNetwork(fRxData, rx_head->fActivePorts);
         }
         
-        cycle_size = rx_head->fCycleSize;
+        frames = rx_head->fFrames;
     }
 
 // JackNetSlaveInterface ************************************************************************************************
@@ -949,7 +949,7 @@ namespace Jack
     }
 
     // network sync------------------------------------------------------------------------
-    void JackNetSlaveInterface::EncodeSyncPacket(int cycle_size)
+    void JackNetSlaveInterface::EncodeSyncPacket(int frames)
     {
         // This method contains every step of sync packet informations coding
         // first of all, clear sync packet
@@ -970,10 +970,10 @@ namespace Jack
 
         // Write active ports list
         fTxHeader.fActivePorts = (fNetAudioCaptureBuffer) ? fNetAudioCaptureBuffer->ActivePortsToNetwork(fTxData) : 0;
-        fTxHeader.fCycleSize = cycle_size;
+        fTxHeader.fFrames = frames;
     }
 
-    void JackNetSlaveInterface::DecodeSyncPacket(int& cycle_size)
+    void JackNetSlaveInterface::DecodeSyncPacket(int& frames)
     {
         // This method contains every step of sync packet informations decoding process
         
@@ -997,7 +997,7 @@ namespace Jack
             fNetAudioPlaybackBuffer->ActivePortsFromNetwork(fRxData, rx_head->fActivePorts);
         }
         
-        cycle_size = rx_head->fCycleSize;
+        frames = rx_head->fFrames;
     }
 
 }
