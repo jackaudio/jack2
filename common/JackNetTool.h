@@ -180,7 +180,7 @@ namespace Jack
         uint32_t fActivePorts;      //number of active ports
         uint32_t fCycle;            //process cycle counter
         uint32_t fSubCycle;         //midi/audio subcycle counter
-        uint32_t fFrames;           //process cycle size in frames
+        int32_t fFrames;            //process cycle size in frames (can be -1 to indicate entire buffer)
         uint32_t fIsLastPckt;       //is it the last packet of a given cycle ('y' or 'n')
     } POST_PACKED_STRUCTURE;
 

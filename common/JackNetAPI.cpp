@@ -844,6 +844,8 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
             return SOCKET_ERROR;
         }
         
+        if (fFrames < 0) fFrames = fParams.fPeriodSize;
+        
         fProcessCallback(fFrames,
                         fParams.fSendAudioChannels,
                         fAudioCaptureBuffer,

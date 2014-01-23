@@ -996,23 +996,23 @@ namespace Jack
     
     int NetIntAudioBuffer::RenderFromJackPorts()
     {
-        // Count active ports
-        int active_ports = 0;
         for (int port_index = 0; port_index < fNPorts; port_index++) {
             if (fPortBuffer[port_index]) {
                 for (uint frame = 0; frame < fPeriodSize; frame++) {
-                    fIntBuffer[port_index][frame] = short(fPortBuffer[port_index][frame] * 32768.f);
+                    fIntBuffer[port_index][frame] = short(fPortBuffer[port_index][frame] * 32767.f);
                 }
-                active_ports++;
+            } else {
+                memset(fIntBuffer[port_index], 0, fPeriodSize * sizeof(short));
             }
         }
         
-        return active_ports;
+        // All ports active
+        return fNPorts;
     }
 
     void NetIntAudioBuffer::RenderToJackPorts()
     {
-        float coef = 1.f / 32768.f;
+        float coef = 1.f / 32767.f;
         for (int port_index = 0; port_index < fNPorts; port_index++) {
             if (fPortBuffer[port_index]) {
                 for (uint frame = 0; frame < fPeriodSize; frame++) {
