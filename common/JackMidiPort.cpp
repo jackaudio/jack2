@@ -62,16 +62,17 @@ SERVER_EXPORT jack_midi_data_t* JackMidiBuffer::ReserveEvent(jack_nframes_t time
     JackMidiEvent* event = &events[event_count++];
     event->time = time;
     event->size = size;
+    
     if (size <= JackMidiEvent::INLINE_SIZE_MAX) {
         return event->data;
     }
-
+   
     write_pos += size;
     event->offset = buffer_size - write_pos;
     return (jack_midi_data_t*)this + event->offset;
 }
 
-static void MidiBufferInit(void* buffer, size_t buffer_size, jack_nframes_t nframes)
+void MidiBufferInit(void* buffer, size_t buffer_size, jack_nframes_t nframes)
 {
     JackMidiBuffer* midi = (JackMidiBuffer*)buffer;
     midi->magic = JackMidiBuffer::MAGIC;
