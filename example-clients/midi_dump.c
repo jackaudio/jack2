@@ -4,9 +4,14 @@
 #include <string.h>
 #include <unistd.h>
 #include <assert.h>
+#include <inttypes.h>
 #include <jack/jack.h>
 #include <jack/midiport.h>
 #include <jack/ringbuffer.h>
+
+#ifdef __MINGW32__
+#include <pthread.h>
+#endif
 
 #ifndef WIN32
 #include <signal.h>
