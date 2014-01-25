@@ -1,0 +1,14 @@
+#! /usr/bin/env python
+# encoding: utf-8
+
+import Build
+import re
+import os
+
+def configure(conf):
+    conf.check_cc(function_name='Pa_GetVersion', header_name='portaudio.h', lib='portaudio', uselib_store="PORTAUDIO", define_name='HAVE_PORTAUDIO')
+    conf.env['BUILD_DRIVER_PORTAUDIO'] = conf.is_defined('HAVE_PORTAUDIO')
+
+def build(bld):
+	print ""
+
