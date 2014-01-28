@@ -306,7 +306,7 @@ namespace Jack
         }
     }
 
-    int NetAudioBuffer::RenderFromJackPorts()
+    int NetAudioBuffer::RenderFromJackPorts(int unused_frames)
     {
         // Count active ports
         int active_ports = 0;
@@ -319,7 +319,7 @@ namespace Jack
         return active_ports;
     }
 
-    void NetAudioBuffer::RenderToJackPorts()
+    void NetAudioBuffer::RenderToJackPorts(int unused_frames)
     {
         // Nothing to do
         NextCycle();
@@ -629,7 +629,7 @@ namespace Jack
         return fNumPackets;
     }
 
-    int NetCeltAudioBuffer::RenderFromJackPorts()
+    int NetCeltAudioBuffer::RenderFromJackPorts(int nframes)
     {
         float buffer[BUFFER_SIZE_MAX];
 
@@ -640,7 +640,8 @@ namespace Jack
                 memset(buffer, 0, fPeriodSize * sizeof(sample_t));
             }
         #if HAVE_CELT_API_0_8 || HAVE_CELT_API_0_11
-            int res = celt_encode_float(fCeltEncoder[port_index], buffer, fPeriodSize, fCompressedBuffer[port_index], fCompressedSizeByte);
+            //int res = celt_encode_float(fCeltEncoder[port_index], buffer, fPeriodSize, fCompressedBuffer[port_index], fCompressedSizeByte);
+            int res = celt_encode_float(fCeltEncoder[port_index], buffer, frames, fCompressedBuffer[port_index], fCompressedSizeByte);
         #else
             int res = celt_encode_float(fCeltEncoder[port_index], buffer, NULL, fCompressedBuffer[port_index], fCompressedSizeByte);
         #endif
@@ -653,12 +654,13 @@ namespace Jack
         return fNPorts;
     }
 
-    void NetCeltAudioBuffer::RenderToJackPorts()
+    void NetCeltAudioBuffer::RenderToJackPorts(int nframes)
     {
         for (int port_index = 0; port_index < fNPorts; port_index++) {
             if (fPortBuffer[port_index]) {
             #if HAVE_CELT_API_0_8 || HAVE_CELT_API_0_11
-                int res = celt_decode_float(fCeltDecoder[port_index], fCompressedBuffer[port_index], fCompressedSizeByte, fPortBuffer[port_index], fPeriodSize);
+                //int res = celt_decode_float(fCeltDecoder[port_index], fCompressedBuffer[port_index], fCompressedSizeByte, fPortBuffer[port_index], fPeriodSize);
+                int res = celt_decode_float(fCeltDecoder[port_index], fCompressedBuffer[port_index], fCompressedSizeByte, fPortBuffer[port_index], frames);
             #else
                 int res = celt_decode_float(fCeltDecoder[port_index], fCompressedBuffer[port_index], fCompressedSizeByte, fPortBuffer[port_index]);
             #endif
@@ -717,9 +719,9 @@ namespace Jack
 
 #endif
 
+
 #if HAVE_OPUS
 #define CDO (sizeof(short)) ///< compressed data offset (first 2 bytes are length)
-
     NetOpusAudioBuffer::NetOpusAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer, int kbps)
         :NetAudioBuffer(params, nports, net_buffer)
     {
@@ -847,17 +849,19 @@ namespace Jack
         return fNumPackets;
     }
 
-    int NetOpusAudioBuffer::RenderFromJackPorts()
+    int NetOpusAudioBuffer::RenderFromJackPorts(int nframes)
     {
         float buffer[BUFFER_SIZE_MAX];
-
+        
+        printf("NetOpusAudioBuffer::RenderFromJackPorts %d\n", nframes);
+      
         for (int port_index = 0; port_index < fNPorts; port_index++) {
             if (fPortBuffer[port_index]) {
                 memcpy(buffer, fPortBuffer[port_index], fPeriodSize * sizeof(sample_t));
             } else {
                 memset(buffer, 0, fPeriodSize * sizeof(sample_t));
             }
-            int res = opus_custom_encode_float(fOpusEncoder[port_index], buffer, fPeriodSize, fCompressedBuffer[port_index], fCompressedMaxSizeByte);
+            int res = opus_custom_encode_float(fOpusEncoder[port_index], buffer, ((nframes == -1) ? fPeriodSize : nframes), fCompressedBuffer[port_index], fCompressedMaxSizeByte);
             if (res < 0 || res >= 65535) {
                 fCompressedSizesByte[port_index] = 0;
             } else {
@@ -869,12 +873,14 @@ namespace Jack
         return fNPorts;
     }
 
-    void NetOpusAudioBuffer::RenderToJackPorts()
+    void NetOpusAudioBuffer::RenderToJackPorts(int nframes)
     {
+        printf("NetOpusAudioBuffer::RenderToJackPorts %d\n", nframes);
+        
         for (int port_index = 0; port_index < fNPorts; port_index++) {
             if (fPortBuffer[port_index]) {
-                int res = opus_custom_decode_float(fOpusDecoder[port_index], fCompressedBuffer[port_index], fCompressedSizesByte[port_index], fPortBuffer[port_index], fPeriodSize);
-                if (res < 0 || res != fPeriodSize) {
+                int res = opus_custom_decode_float(fOpusDecoder[port_index], fCompressedBuffer[port_index], fCompressedSizesByte[port_index], fPortBuffer[port_index], ((nframes == -1) ? fPeriodSize : nframes));
+                if (res < 0 || res != ((nframes == -1) ? fPeriodSize : nframes)) {
                     jack_error("opus_decode_float error fCompressedSizeByte = %d res = %d", fCompressedSizesByte[port_index], res);
                 }
             }
@@ -994,11 +1000,11 @@ namespace Jack
         return fNumPackets;
     }
     
-    int NetIntAudioBuffer::RenderFromJackPorts()
+    int NetIntAudioBuffer::RenderFromJackPorts(int nframes)
     {
         for (int port_index = 0; port_index < fNPorts; port_index++) {
             if (fPortBuffer[port_index]) {
-                for (uint frame = 0; frame < fPeriodSize; frame++) {
+                for (int frame = 0; frame < nframes; frame++) {
                     fIntBuffer[port_index][frame] = short(fPortBuffer[port_index][frame] * 32767.f);
                 }
             } else {
@@ -1010,12 +1016,12 @@ namespace Jack
         return fNPorts;
     }
 
-    void NetIntAudioBuffer::RenderToJackPorts()
+    void NetIntAudioBuffer::RenderToJackPorts(int nframes)
     {
         float coef = 1.f / 32767.f;
         for (int port_index = 0; port_index < fNPorts; port_index++) {
             if (fPortBuffer[port_index]) {
-                for (uint frame = 0; frame < fPeriodSize; frame++) {
+                for (int frame = 0; frame < nframes; frame++) {
                     fPortBuffer[port_index][frame] = float(fIntBuffer[port_index][frame] * coef);
                 }
             }

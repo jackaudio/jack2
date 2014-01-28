@@ -177,7 +177,7 @@ namespace Jack
         // audio
         if (audio_channels > 0) {
             fTxHeader.fDataType = 'a';
-            fTxHeader.fActivePorts = buffer->RenderFromJackPorts();
+            fTxHeader.fActivePorts = buffer->RenderFromJackPorts(fTxHeader.fFrames);
             fTxHeader.fNumPacket = buffer->GetNumPackets(fTxHeader.fActivePorts);
 
             for (uint subproc = 0; subproc < fTxHeader.fNumPacket; subproc++) {
@@ -215,18 +215,19 @@ namespace Jack
         fRxHeader.fSubCycle = rx_head->fSubCycle;
         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
         fRxHeader.fActivePorts = rx_head->fActivePorts;
+        fRxHeader.fFrames = rx_head->fFrames;
         rx_bytes = buffer->RenderFromNetwork(rx_head->fCycle, rx_head->fSubCycle, fRxHeader.fActivePorts);
         
         // Last audio packet is received, so finish rendering...
         if (fRxHeader.fIsLastPckt) {
-            buffer->RenderToJackPorts();
+            buffer->RenderToJackPorts(fRxHeader.fFrames);
         }
         return rx_bytes;
     }
 
     int JackNetInterface::FinishRecv(NetAudioBuffer* buffer)
     {
-        buffer->RenderToJackPorts();
+        buffer->RenderToJackPorts(fRxHeader.fFrames);
         return DATA_PACKET_ERROR;
     }
 
@@ -591,7 +592,6 @@ namespace Jack
         if (fNetAudioCaptureBuffer) {
             fNetAudioCaptureBuffer->ActivePortsFromNetwork(fRxData, rx_head->fActivePorts);
         }
-        
         frames = rx_head->fFrames;
     }
 

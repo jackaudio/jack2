@@ -320,8 +320,8 @@ namespace Jack
             virtual sample_t* GetBuffer(int index);
 
             //jack<->buffer
-            virtual int RenderFromJackPorts();
-            virtual void RenderToJackPorts();
+            virtual int RenderFromJackPorts(int nframes);
+            virtual void RenderToJackPorts(int nframes);
 
             //network<->buffer
             virtual int RenderFromNetwork(int cycle, int sub_cycle, uint32_t port_num) = 0;
@@ -396,12 +396,12 @@ namespace Jack
             int GetNumPackets(int active_ports);
 
             //jack<->buffer
-            int RenderFromJackPorts();
-            void RenderToJackPorts();
+            int RenderFromJackPorts(int nframes);
+            void RenderToJackPorts(int nframes);
 
             //network<->buffer
             int RenderFromNetwork(int cycle, int sub_cycle, uint32_t port_num);
-            int RenderToNetwork(int sub_cycle, uint32_t  port_num);
+            int RenderToNetwork(int sub_cycle, uint32_t port_num);
     };
 
 #endif
@@ -440,8 +440,8 @@ namespace Jack
             int GetNumPackets(int active_ports);
 
             //jack<->buffer
-            int RenderFromJackPorts();
-            void RenderToJackPorts();
+            int RenderFromJackPorts(int nframes);
+            void RenderToJackPorts(int nframes);
 
             //network<->buffer
             int RenderFromNetwork(int cycle, int sub_cycle, uint32_t port_num);
@@ -473,8 +473,8 @@ namespace Jack
             int GetNumPackets(int active_ports);
 
             //jack<->buffer
-            int RenderFromJackPorts();
-            void RenderToJackPorts();
+            int RenderFromJackPorts(int nframes);
+            void RenderToJackPorts(int nframes);
 
             //network<->buffer
             int RenderFromNetwork(int cycle, int sub_cycle, uint32_t port_num);

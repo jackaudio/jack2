@@ -9948,8 +9948,7 @@
 					"-DUSE_POSIX_SHM",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
-					"-DHAVE_CELT_API_0_7",
-					"-DHAVE_CELT",
+					"-DHAVE_OPUS",
 					"-DSERVER_SIDE",
 					"-D__SMP__",
 					"-DMACH_RPC_MACH_SEMA",
@@ -9959,7 +9958,7 @@
 				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
 				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2 = "-DLIB_DIR=\\\"lib\\\"";
 				OTHER_LDFLAGS = (
-					libcelt.a,
+					/usr/local/lib/libopus.a,
 					"-framework",
 					Carbon,
 					"-framework",
@@ -16450,15 +16449,14 @@
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
-					"-DHAVE_CELT_API_0_7",
-					"-DHAVE_CELT",
+					"-DHAVE_OPUS",
 					"-DMACH_RPC_MACH_SEMA",
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
 				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2 = "-DJACK_LOCATION=\\\"/usr/local/bin\\\"";
 				OTHER_LDFLAGS = (
-					libcelt.a,
+					/usr/local/lib/libopus.a,
 					/opt/local/lib/libsamplerate.a,
 					"-framework",
 					CoreAudio,
@@ -17686,8 +17684,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = (
-					"-DHAVE_CELT_API_0_7",
-					"-DHAVE_CELT",
+					"-DHAVE_OPUS",
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
 				);
