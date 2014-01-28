@@ -852,8 +852,6 @@ namespace Jack
     int NetOpusAudioBuffer::RenderFromJackPorts(int nframes)
     {
         float buffer[BUFFER_SIZE_MAX];
-        
-        printf("NetOpusAudioBuffer::RenderFromJackPorts %d\n", nframes);
       
         for (int port_index = 0; port_index < fNPorts; port_index++) {
             if (fPortBuffer[port_index]) {
@@ -875,8 +873,6 @@ namespace Jack
 
     void NetOpusAudioBuffer::RenderToJackPorts(int nframes)
     {
-        printf("NetOpusAudioBuffer::RenderToJackPorts %d\n", nframes);
-        
         for (int port_index = 0; port_index < fNPorts; port_index++) {
             if (fPortBuffer[port_index]) {
                 int res = opus_custom_decode_float(fOpusDecoder[port_index], fCompressedBuffer[port_index], fCompressedSizesByte[port_index], fPortBuffer[port_index], ((nframes == -1) ? fPeriodSize : nframes));
