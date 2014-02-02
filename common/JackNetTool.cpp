@@ -861,6 +861,7 @@ namespace Jack
             }
             int res = opus_custom_encode_float(fOpusEncoder[port_index], buffer, ((nframes == -1) ? fPeriodSize : nframes), fCompressedBuffer[port_index], fCompressedMaxSizeByte);
             if (res < 0 || res >= 65535) {
+                jack_error("opus_custom_encode_float error res = %d", res);
                 fCompressedSizesByte[port_index] = 0;
             } else {
                 fCompressedSizesByte[port_index] = res;
@@ -877,7 +878,7 @@ namespace Jack
             if (fPortBuffer[port_index]) {
                 int res = opus_custom_decode_float(fOpusDecoder[port_index], fCompressedBuffer[port_index], fCompressedSizesByte[port_index], fPortBuffer[port_index], ((nframes == -1) ? fPeriodSize : nframes));
                 if (res < 0 || res != ((nframes == -1) ? fPeriodSize : nframes)) {
-                    jack_error("opus_decode_float error fCompressedSizeByte = %d res = %d", fCompressedSizesByte[port_index], res);
+                    jack_error("opus_custom_decode_float error fCompressedSizeByte = %d res = %d", fCompressedSizesByte[port_index], res);
                 }
             }
         }
