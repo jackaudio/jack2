@@ -438,8 +438,9 @@ void port_setdead(port_hash_t hash, snd_seq_addr_t addr)
 	port_t *port = port_get(hash, addr);
 	if (port)
 		port->is_dead = 1; // see jack_process
-	else
+	else {
 		debug_log("port_setdead: not found (%d:%d)", addr.client, addr.port);
+	}
 }
 
 static
@@ -728,7 +729,7 @@ void do_jack_input(alsa_seqmidi_t *self, port_t *port, struct process_info *info
 	alsa_midi_event_t ev;
 	while (jack_ringbuffer_read(port->early_events, (char*)&ev, sizeof(ev))) {
 		jack_midi_data_t* buf;
-		jack_nframes_t time = ev.time - info->period_start;
+		int64_t time = ev.time - info->period_start;
 		if (time < 0)
 			time = 0;
 		else if (time >= info->nframes)

@@ -39,7 +39,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackPort.h"
 #include "JackGraphManager.h"
 #include "JackLockedEngine.h"
+#ifdef __ANDROID__
+#include "JackAndroidThread.h"
+#else
 #include "JackPosixThread.h"
+#endif
 #include "JackCompilerDeps.h"
 #include "JackServerGlobals.h"
 
@@ -469,7 +473,11 @@ int JackAlsaDriver::is_realtime() const
 
 int JackAlsaDriver::create_thread(pthread_t *thread, int priority, int realtime, void *(*start_routine)(void*), void *arg)
 {
+#ifdef __ANDROID__
+    return JackAndroidThread::StartImp(thread, priority, realtime, start_routine, arg);
+#else
     return JackPosixThread::StartImp(thread, priority, realtime, start_routine, arg);
+#endif
 }
 
 jack_port_id_t JackAlsaDriver::port_register(const char *port_name, const char *port_type, unsigned long flags, unsigned long buffer_size)
@@ -739,7 +747,11 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
     desc = jack_driver_descriptor_construct("alsa", JackDriverMaster, "Linux ALSA API based audio backend", &filler);
 
     strcpy(value.str, "hw:0");
-    jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, enum_alsa_devices(), "ALSA device name", NULL);
+#ifdef __ANDROID__
+    jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, NULL, "ALSA device name", NULL);
+#else
+    jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, enum_alsa_devices, "ALSA device name", NULL);
+#endif
 
     strcpy(value.str, "none");
     jack_driver_descriptor_add_parameter(desc, &filler, "capture", 'C', JackDriverParamString, &value, NULL, "Provide capture ports.  Optionally set device", NULL);

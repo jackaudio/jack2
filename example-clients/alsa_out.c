@@ -99,6 +99,9 @@ alsa_format_t formats[] = {
 	{ SND_PCM_FORMAT_S24_3LE, 3, sample_move_d24_sS, sample_move_dS_s24, "24bit - real" },
 	{ SND_PCM_FORMAT_S24, 4, sample_move_d24_sS, sample_move_dS_s24, "24bit" },
 	{ SND_PCM_FORMAT_S16, 2, sample_move_d16_sS, sample_move_dS_s16, "16bit" }
+#ifdef __ANDROID__
+	,{ SND_PCM_FORMAT_S16_LE, 2, sample_move_d16_sS, sample_move_dS_s16, "16bit little-endian" }
+#endif
 };
 #define NUMFORMATS (sizeof(formats)/sizeof(formats[0]))
 int format=0;
@@ -127,6 +130,11 @@ static int xrun_recovery(snd_pcm_t *handle, int err) {
 
 static int set_hwformat( snd_pcm_t *handle, snd_pcm_hw_params_t *params )
 {
+#ifdef __ANDROID__
+	format = 5;
+	snd_pcm_hw_params_set_format(handle, params, formats[format].format_id);
+	return 0;
+#else
 	int i;
 	int err;
 
@@ -140,6 +148,7 @@ static int set_hwformat( snd_pcm_t *handle, snd_pcm_hw_params_t *params )
 	}
 
 	return err;
+#endif
 }
 
 static int set_hwparams(snd_pcm_t *handle, snd_pcm_hw_params_t *params, snd_pcm_access_t access, int rate, int channels, int period, int nperiods ) {

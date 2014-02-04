@@ -37,6 +37,8 @@
 #include "midi_unpack.h"
 #include "JackError.h"
 
+extern int clock_nanosleep(clockid_t clock_id, int flags, const struct timespec *req, struct timespec *rem);
+
 enum {
 	NANOSLEEP_RESOLUTION = 7000
 };
@@ -808,8 +810,9 @@ void jack_process(midi_stream_t *str, jack_nframes_t nframes)
 			str->jack.ports[w] = port;
 		++w;
 	}
-	if (str->jack.nports != w)
+	if (str->jack.nports != w) {
 		debug_log("jack_%s: nports %d -> %d", str->name, str->jack.nports, w);
+	}
 	str->jack.nports = w;
 
 	jack_add_ports(str); // it makes no sense to add them earlier since they have no data yet
@@ -910,11 +913,13 @@ void *midi_thread(void *arg)
 				str->midi.ports[wp] = port;
 			++wp;
 		}
-		if (str->midi.nports != wp)
+		if (str->midi.nports != wp) {
 			debug_log("midi_%s: nports %d -> %d", str->name, str->midi.nports, wp);
+		}
 		str->midi.nports = wp;
-		if (npfds != w)
+		if (npfds != w) {
 			debug_log("midi_%s: npfds %d -> %d", str->name, npfds, w);
+		}
 		npfds = w;
 
 		/*
@@ -1054,8 +1059,9 @@ int do_midi_input(process_midi_t *proc)
 		jack_ringbuffer_get_write_vector(port->base.data_ring, vec);
 		if (jack_ringbuffer_write_space(port->base.event_ring) < sizeof(event_head_t) || vec[0].len < 1) {
 			port->overruns++;
-			if (port->base.npfds)
+			if (port->base.npfds) {
 				debug_log("midi_in: internal overflow on %s", port->base.name);
+			}
 			// remove from poll to prevent busy-looping
 			port->base.npfds = 0;
 			return 1;
@@ -1106,8 +1112,9 @@ void do_jack_output(process_jack_t *proc)
 	output_port_t *port = (output_port_t*) proc->port;
 	int nevents = jack_midi_get_event_count(proc->buffer);
 	int i;
-	if (nevents)
+	if (nevents) {
 		debug_log("jack_out: %d events in %s", nevents, port->base.name);
+	}
 	for (i=0; i<nevents; ++i) {
 		jack_midi_event_t event;
 		event_head_t hdr;
@@ -1146,12 +1153,14 @@ int do_midi_output(process_midi_t *proc)
 			port->next_event.time = 0;
 			port->next_event.size = 0;
 			break;
-		} else
+		} else {
 			debug_log("midi_out: at %ld got %d bytes for %ld", (long)proc->cur_time, (int)port->next_event.size, (long)port->next_event.time);
+		}
 	}
 
-	if (port->todo)
+	if (port->todo) {
 		debug_log("midi_out: todo = %d at %ld", (int)port->todo, (long)proc->cur_time);
+	}
 
 	// calc next wakeup time
 	if (!port->todo && port->next_event.time && port->next_event.time < proc->next_time) {
@@ -1193,8 +1202,9 @@ int do_midi_output(process_midi_t *proc)
 
 	if (!port->todo) {
 		int i;
-		if (worked)
+		if (worked) {
 			debug_log("midi_out: relaxing on %s", port->base.name);
+		}
 		for (i=0; i<port->base.npfds; ++i)
 			proc->wpfds[i].events &= ~POLLOUT;
 	} else {
