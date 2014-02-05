@@ -33,6 +33,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "control.h"
 #include "JackConstants.h"
 #include "JackPlatformPlug.h"
+#ifdef __ANDROID__
+#include "JackControlAPIAndroid.h"
+#endif
 
 #if defined(JACK_DBUS) && defined(__linux__)
 #include <dbus/dbus.h>
@@ -191,6 +194,25 @@ static void usage(FILE* file, jackctl_server_t *server)
         print_server_internals(server, file);
     }
 }
+
+#ifdef __ANDROID__
+static void jackctl_server_switch_master_dummy(jackctl_server_t * server_ctl, char * master_driver_name)
+{
+    static bool is_dummy_driver = false;
+    if(!strcmp(master_driver_name, "dummy")) {
+        return;
+    }
+    jackctl_driver_t * driver_ctr;
+    if(is_dummy_driver) {
+        is_dummy_driver = false;
+        driver_ctr = jackctl_server_get_driver(server_ctl, master_driver_name);
+    } else {
+        is_dummy_driver = true;
+        driver_ctr = jackctl_server_get_driver(server_ctl, "dummy");
+    }
+    jackctl_server_switch_master(server_ctl, driver_ctr);
+}
+#endif
 
 // Prototype to be found in libjackserver
 extern "C" void silent_jack_error_callback(const char *desc);
@@ -556,7 +578,19 @@ int main(int argc, char** argv)
     return_value = 0;
 
     // Waits for signal
+#ifdef __ANDROID__
+    //reserve SIGUSR2 signal for switching master driver
+    while(1) {
+        int signal = jackctl_wait_signals_and_return(sigmask);
+        if (signal == SIGUSR2) {
+            jackctl_server_switch_master_dummy(server_ctl, master_driver_name);
+        } else {
+            break;
+        }
+    }
+#else
     jackctl_wait_signals(sigmask);
+#endif
 
  stop_server:
     if (!jackctl_server_stop(server_ctl)) {
