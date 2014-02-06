@@ -359,7 +359,7 @@ namespace Jack
             }
 
         } catch (exception&) {
-            jack_error("NetAudioBuffer allocation error...");
+            jack_error("NetAudioBuffer on master allocation error...");
             return false;
         }
 
@@ -799,7 +799,7 @@ namespace Jack
             }
 
         } catch (exception&) {
-            jack_error("NetAudioBuffer allocation error...");
+            jack_error("NetAudioBuffer on slave allocation error...");
             return false;
         }
 
