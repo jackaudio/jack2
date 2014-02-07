@@ -184,12 +184,12 @@ struct JackNetExtMaster : public JackNetMasterInterface {
     int Open(jack_slave_t* result)
     {
         // Check buffer_size
-        if (fRequest.buffer_size == 0)
+        if (fRequest.buffer_size == 0) {
             jack_error("Incorrect buffer_size...");
             return -1;
         }
         // Check sample_rate
-        if (fRequest.sample_rate == 0)
+        if (fRequest.sample_rate == 0) {
             jack_error("Incorrect sample_rate...");
             return -1;
         }
