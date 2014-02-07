@@ -101,7 +101,7 @@ static void jack_format_and_log(int level, const char *prefix, const char *fmt, 
 
 SERVER_EXPORT void jack_error(const char *fmt, ...)
 {
-	va_list ap;
+    va_list ap;
     char buf[LOG_BUF_SIZE];
     va_start(ap, fmt);
     vsnprintf(buf, LOG_BUF_SIZE, fmt, ap);
@@ -111,24 +111,24 @@ SERVER_EXPORT void jack_error(const char *fmt, ...)
 
 SERVER_EXPORT void jack_info(const char *fmt, ...)
 {
-	va_list ap;
-	char buf[LOG_BUF_SIZE];
-	va_start(ap, fmt);
-	vsnprintf(buf, LOG_BUF_SIZE, fmt, ap);
-	va_end(ap);
-	__android_log_write(ANDROID_LOG_INFO, LOG_TAG, buf);
+    va_list ap;
+    char buf[LOG_BUF_SIZE];
+    va_start(ap, fmt);
+    vsnprintf(buf, LOG_BUF_SIZE, fmt, ap);
+    va_end(ap);
+    __android_log_write(ANDROID_LOG_INFO, LOG_TAG, buf);
 }
 
 SERVER_EXPORT void jack_log(const char *fmt,...)
 {
-	va_list ap;
-	char buf[LOG_BUF_SIZE];
-	if (JackGlobals::fVerbose) {
-		va_start(ap, fmt);
-		vsnprintf(buf, LOG_BUF_SIZE, fmt, ap);
-		va_end(ap);
-		__android_log_write(ANDROID_LOG_VERBOSE, LOG_TAG, buf);
-	}
+    va_list ap;
+    char buf[LOG_BUF_SIZE];
+    if (JackGlobals::fVerbose) {
+        va_start(ap, fmt);
+        vsnprintf(buf, LOG_BUF_SIZE, fmt, ap);
+        va_end(ap);
+        __android_log_write(ANDROID_LOG_VERBOSE, LOG_TAG, buf);
+    }
 }
 
 SERVER_EXPORT void default_jack_error_callback(const char *desc)

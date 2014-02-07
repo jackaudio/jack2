@@ -82,7 +82,7 @@ extern "C"
 #elif __ANDROID__
 
 #ifndef NAME_MAX
-#define NAME_MAX            255
+#define NAME_MAX 255
 #endif
 
 #ifndef SHM_NAME_MAX

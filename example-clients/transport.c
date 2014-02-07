@@ -401,8 +401,8 @@ static void command_loop()
 	/* Define a custom completion function. */
 	rl_completion_entry_function = command_generator;
 #else
-   char line[64] = {0,};
-   char *cmd = NULL;
+	char line[64] = {0,};
+	char *cmd = NULL;
 #endif
 
 	/* Read and execute commands until the user quits. */
@@ -417,9 +417,9 @@ static void command_loop()
 			break;
 		}
 #else
-      printf("%s> ", package);
-      fgets(line, sizeof(line), stdin);
-      line[strlen(line)-1] = '\0';
+		printf("%s> ", package);
+		fgets(line, sizeof(line), stdin);
+		line[strlen(line)-1] = '\0';
 #endif
      
 		/* Remove leading and trailing whitespace from the line. */

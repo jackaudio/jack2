@@ -136,6 +136,25 @@ static jackctl_parameter_t * jackctl_get_parameter(const JSList * parameters_lis
     return NULL;
 }
 
+#ifdef __ANDROID__
+static void jackctl_server_switch_master_dummy(jackctl_server_t * server_ctl, char * master_driver_name)
+{
+    static bool is_dummy_driver = false;
+    if(!strcmp(master_driver_name, "dummy")) {
+        return;
+    }
+    jackctl_driver_t * driver_ctr;
+    if(is_dummy_driver) {
+        is_dummy_driver = false;
+        driver_ctr = jackctl_server_get_driver(server_ctl, master_driver_name);
+    } else {
+        is_dummy_driver = true;
+        driver_ctr = jackctl_server_get_driver(server_ctl, "dummy");
+    }
+    jackctl_server_switch_master(server_ctl, driver_ctr);
+}
+#endif
+
 static void print_server_drivers(jackctl_server_t *server, FILE* file)
 {
     const JSList * node_ptr = jackctl_server_get_drivers_list(server);
@@ -194,25 +213,6 @@ static void usage(FILE* file, jackctl_server_t *server)
         print_server_internals(server, file);
     }
 }
-
-#ifdef __ANDROID__
-static void jackctl_server_switch_master_dummy(jackctl_server_t * server_ctl, char * master_driver_name)
-{
-    static bool is_dummy_driver = false;
-    if(!strcmp(master_driver_name, "dummy")) {
-        return;
-    }
-    jackctl_driver_t * driver_ctr;
-    if(is_dummy_driver) {
-        is_dummy_driver = false;
-        driver_ctr = jackctl_server_get_driver(server_ctl, master_driver_name);
-    } else {
-        is_dummy_driver = true;
-        driver_ctr = jackctl_server_get_driver(server_ctl, "dummy");
-    }
-    jackctl_server_switch_master(server_ctl, driver_ctr);
-}
-#endif
 
 // Prototype to be found in libjackserver
 extern "C" void silent_jack_error_callback(const char *desc);
