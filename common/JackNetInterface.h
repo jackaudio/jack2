@@ -29,6 +29,7 @@ namespace Jack
 #define DEFAULT_MULTICAST_IP "225.3.19.154"
 #define DEFAULT_PORT    19000
 #define DEFAULT_MTU     1500
+#define MAX_MTU         9000
 
 #define SLAVE_SETUP_RETRY   5
 
