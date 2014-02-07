@@ -183,6 +183,17 @@ struct JackNetExtMaster : public JackNetMasterInterface {
 
     int Open(jack_slave_t* result)
     {
+        // Check buffer_size
+        if (fRequest.buffer_size == 0)
+            jack_error("Incorrect buffer_size...");
+            return -1;
+        }
+        // Check sample_rate
+        if (fRequest.sample_rate == 0)
+            jack_error("Incorrect sample_rate...");
+            return -1;
+        }
+                   
         // Init socket API (win32)
         if (SocketAPIInit() < 0) {
             jack_error("Can't init Socket API, exiting...");
@@ -617,6 +628,21 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
 
     int Open(jack_master_t* result)
     {
+        // Check audio/midi parameters
+        if (fParams.fSendAudioChannels == 0
+            && fParams.fReturnAudioChannels == 0
+            && fParams.fSendMidiChannels == 0
+            && fParams.fReturnMidiChannels == 0) {
+            jack_error("Incorrect audio/midi channels number...");
+            return -1;
+        }
+        
+        // Check MTU parameters
+        if ((fParams.fMtu < DEFAULT_MTU) && (fParams.fMtu > MAX_MTU)) {
+            jack_error("MTU is not in the expected range [%d ... %d]", DEFAULT_MTU, MAX_MTU);
+            return -1;
+        }
+            
         // Check CELT encoder parameters
         if ((fParams.fSampleEncoder == JackCeltEncoder) && (fParams.fKBps == 0)) {
             jack_error("CELT encoder with 0 for kps...");
@@ -630,7 +656,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
 
         // Check latency
         if (fParams.fNetworkLatency > NETWORK_MAX_LATENCY) {
-            jack_error("Error : network latency is limited to %d", NETWORK_MAX_LATENCY);
+            jack_error("Network latency is limited to %d", NETWORK_MAX_LATENCY);
             return -1;
         }
 
