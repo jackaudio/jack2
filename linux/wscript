@@ -15,33 +15,11 @@ def configure(conf):
 
     conf.check_cfg(package='gtkIOStream', atleast_version='1.4.0', args='--cflags --libs', mandatory=False)
     conf.env['BUILD_DRIVER_IIO'] = conf.is_defined('HAVE_GTKIOSTREAM')
-    conf.check_cfg(package='eigen3', atleast_version='3.2.0', args='--cflags --libs', mandatory=False)
+    conf.check_cfg(package='eigen3', atleast_version='3.1.2', args='--cflags --libs', mandatory=False)
     conf.env['BUILD_DRIVER_IIO'] += conf.is_defined('HAVE_EIGEN3')
-    conf.check_cfg(package='sox', atleast_version='14.4.1', args='--cflags --libs', mandatory=False)
+    conf.check_cfg(package='sox', atleast_version='14.4.0', args='--cflags --libs', mandatory=False)
     conf.env['BUILD_DRIVER_IIO'] += conf.is_defined('HAVE_SOX')
-    #conf.env['BUILD_DRIVER_IIO'] += conf.is_defined('HAVE_EIGEN3')
-    #print conf.env
-    #conffile.write("\n".join(myconf))
-    #conf.define('HAVE_PPOLL', 1 )
-
-    conf.find_program("mkoctfile", var="MKOCTFILE")
-    if conf.env.MKOCTFILE:
-        conf.env['HAVE_OCTAVE']=1
-        conf.env['define_key'] += ['HAVE_OCTAVE']
-        conf.env['DEFINES'] += ['HAVE_OCTAVE=1']
-        #conf.env('Octave')
-        conf.env['INCLUDES_OCTAVE'] = conf.cmd_and_log([conf.env.MKOCTFILE, "--print", "INCFLAGS" ],
-                                   output=Context.STDOUT).replace('\n', '').replace('-I','').split()
-        lflags = conf.cmd_and_log([conf.env.MKOCTFILE, "--print", "LFLAGS" ],
-                                   output=Context.STDOUT)
-        conf.env['LIB_OCTAVE'] = conf.cmd_and_log([conf.env.MKOCTFILE, "--print", "OCTAVE_LIBS" ],
-                                   output=Context.STDOUT).replace('\n', '').replace('-l','').split()
-        #conf.append("INCFLAGS: " + incflags)
-        #conf.append("LFLAGS: " + lflags)
-        #conf.append("LIBS: " + libs)
-        print conf.env
-    #import pdb; pdb.set_trace()
-
+ 
 
 def create_jack_driver_obj(bld, target, sources, uselib = None):
     driver = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
@@ -118,7 +96,8 @@ def build(bld):
         create_jack_driver_obj(bld, 'firewire', ffado_driver_src, ["LIBFFADO"])
 
     if bld.env['BUILD_DRIVER_IIO'] == True:
-        create_jack_driver_obj(bld, 'iio', iio_driver_src, ["GTKIOSTREAM", "EIGEN3", "OCTAVE"])
+        create_jack_driver_obj(bld, 'iio', iio_driver_src, ["GTKIOSTREAM", "EIGEN3"])
+        #create_jack_driver_obj(bld, 'iio', iio_driver_src, ["GTKIOSTREAM", "EIGEN3", "OCTAVE"])
 
     create_jack_driver_obj(bld, 'net', '../common/JackNetDriver.cpp')
 

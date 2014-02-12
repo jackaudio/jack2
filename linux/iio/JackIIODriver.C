@@ -19,26 +19,90 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackIIODriver.H"
 #include "driver_interface.h"
+#include "JackEngineControl.h"
+#include "JackGraphManager.h"
 
-#define IIO_DEFAULT_SAMPLERATE 1e6; ///< The default sample rate for the default chip
-#define IIO_DEFAULT_PERIODSIZE 1024; ///< The defaul period size
+#include <values.h>
+
+#define IIO_DEFAULT_CHIP "AD7476A" ///< The default IIO recording chip to look for.
+#define IIO_DEFAULT_READ_FS 1.e6 ///< The default IIO sample rate for the default chip.
+#define IIO_DEFAULT_PERIOD_SIZE 2048 ///< The default period size is in the ms range
+#define IIO_DEFAULT_PERIOD_COUNT 2 ///< The default number of periods
+#define IIO_DEFAULT_CAPUTURE_PORT_COUNT MAXINT ///< The default number of capture ports is exceedingly big, trimmed down to a realistic size in driver_initialize
+//#define IIO_SAFETY_FACTOR 2./3. ///< The default safety factor, allow consumption of this fraction of the available DMA buffer before we don't allow the driver to continue.
+#define IIO_SAFETY_FACTOR 1. ///< The default safety factor, allow consumption of this fraction of the available DMA buffer before we don't allow the driver to continue.
 
 namespace Jack {
 
-int JackIIODriver::Open(jack_nframes_t buffer_size,
-                          jack_nframes_t samplerate,
-                          bool capturing,
-                          bool playing,
-                          int inchannels,
-                          int outchannels,
-                          bool monitor,
-                          const char* capture_driver_name,
-                          const char* playback_driver_name,
-                          jack_nframes_t capture_latency,
-                          jack_nframes_t playback_latency)
-{
-    return JackAudioDriver::Open(buffer_size, samplerate, capturing, playing, inchannels, outchannels,
-        monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency);
+int JackIIODriver::Attach() {
+    //cout<<"JackIIODriver::Attach\n";
+    JackAudioDriver::SetSampleRate((jack_nframes_t)IIO_DEFAULT_READ_FS);
+
+    int ret;
+    if ((ret=iio.enable(true))!=NO_ERROR) { // start the DMA
+        iio.close();
+        return ret;
+    }
+    return JackAudioDriver::Attach();
+}
+
+int JackIIODriver::Detach() {
+    //cout<<"JackIIODriver::Detach\n";
+    iio.enable(false); // stop the DMA
+    return JackAudioDriver::Detach();
+}
+
+int JackIIODriver::Read() {
+    //cout<<"JackIIODriver::Read\n";
+
+    if (iio.getDeviceCnt()<1) {
+        jack_error("JackIIODriver:: No IIO devices are present ");
+        return -1;
+    }
+    uint devChCnt=iio[0].getChCnt(); // the number of channels per device
+
+    jack_nframes_t nframes=data.rows()/devChCnt;
+    if (nframes != fEngineControl->fBufferSize)
+        jack_error("JackIIODriver::Read warning : Jack period size = %ld IIO period size = %ld", fEngineControl->fBufferSize, nframes);
+
+//    cout<<"processing buffer size : "<<fEngineControl->fBufferSize<<endl;
+//    cout<<"processing channel count : "<<fCaptureChannels<<endl;
+
+    int ret=iio.read(nframes, data); // read the data from the IIO subsystem
+    if (ret!=NO_ERROR)
+        return -1;
+
+
+    // Keep begin cycle time
+    JackDriver::CycleTakeBeginTime(); // is this necessary ?
+
+    int maxAvailChCnt=data.cols()*devChCnt;
+    jack_default_audio_sample_t scaleFactor=1./32768.;
+
+    if (fCaptureChannels>maxAvailChCnt)
+        jack_error("JackIIODriver::Read warning : Jack period size = %ld IIO period size = %ld", fEngineControl->fBufferSize, nframes);
+
+    for (int i = 0; i < fCaptureChannels; i++) {
+        int col=i/devChCnt; // find the column and offset to read from
+        int rowOffset=i%devChCnt;
+        if (fGraphManager->GetConnectionsNum(fCapturePortList[i]) > 0) {
+            jack_default_audio_sample_t *dest=GetInputBuffer(i);
+
+            for (jack_nframes_t j=0; j<nframes; j++){
+//                dest[j]=(float)j/(float)nframes;
+                dest[j]=(jack_default_audio_sample_t)(data(j*devChCnt+rowOffset, col))*scaleFactor;
+//                cout<<dest[j]<<'\t'<<data(j*devChCnt+rowOffset, col)<<"\t\t";
+            }
+        }
+    }
+
+    return 0;
+}
+
+int JackIIODriver::Write() {
+    //        cout<<"JackIIODriver::Write\n";
+    JackDriver::CycleTakeEndTime(); // is this necessary ?
+    return 0;
 }
 
 } // end namespace Jack
@@ -49,123 +113,111 @@ extern "C"
 {
 #endif
 
-    SERVER_EXPORT const jack_driver_desc_t *
-    driver_get_descriptor () {
-        jack_driver_desc_t * desc;
-        jack_driver_desc_filler_t filler;
-        jack_driver_param_value_t value;
+SERVER_EXPORT const jack_driver_desc_t *
+driver_get_descriptor () {
+    jack_driver_desc_t * desc;
+    jack_driver_desc_filler_t filler;
+    jack_driver_param_value_t value;
 
-        desc = jack_driver_descriptor_construct("iio", JackDriverMaster, "Linux Industrial IO backend", &filler);
+    desc = jack_driver_descriptor_construct("iio", JackDriverMaster, "Linux Industrial IO backend", &filler);
 
-        strcpy(value.str, "AD7476");
-        jack_driver_descriptor_add_parameter(
-            desc,
-            &filler,
-            "device",
-            'd',
-            JackDriverParamString,
-            &value,
-            NULL,
-            "The IIO chip to use.",
-            "The IIO chip to use. Specifies which chip name to scan for on all devices present in /sys/bus/iio.");
+    strcpy(value.str, IIO_DEFAULT_CHIP);
+    jack_driver_descriptor_add_parameter(desc, &filler, "chip", 'C', JackDriverParamString, &value, NULL, "The name of the chip to search for in the IIO devices", NULL);
 
-        value.ui = IIO_DEFAULT_PERIODSIZE;
-        jack_driver_descriptor_add_parameter(desc, &filler, "period", 'p', JackDriverParamUInt, &value, NULL, "Frames per period", NULL);
+    value.ui = IIO_DEFAULT_CAPUTURE_PORT_COUNT;
+    jack_driver_descriptor_add_parameter(desc, &filler, "capture", 'i', JackDriverParamUInt, &value, NULL, "Provide capture count (block size).", NULL);
 
-        value.ui = 2;
-        jack_driver_descriptor_add_parameter(desc, &filler, "nperiods", 'n', JackDriverParamUInt, &value, NULL, "Number of periods of playback latency", NULL);
+    value.ui = IIO_DEFAULT_PERIOD_SIZE;
+    jack_driver_descriptor_add_parameter(desc, &filler, "period", 'p', JackDriverParamUInt, &value, NULL, "Frames (samples per channel) per period", NULL);
 
-        value.ui = (IIO_DEFAULT_SAMPLERATE)U;
-        jack_driver_descriptor_add_parameter(desc, &filler, "rate", 'r', JackDriverParamUInt, &value, NULL, "Sample rate", NULL);
+    value.ui = IIO_DEFAULT_PERIOD_COUNT;
+    jack_driver_descriptor_add_parameter(desc, &filler, "nperiods", 'n', JackDriverParamUInt, &value, NULL, "Number of available periods (block count)", NULL);
 
-        value.i = 0;
-        jack_driver_descriptor_add_parameter(desc, &filler, "capture", 'C', JackDriverParamBool, &value, NULL, "Provide capture ports.", NULL);
-        jack_driver_descriptor_add_parameter(desc, &filler, "playback", 'P', JackDriverParamBool, &value, NULL, "Provide playback ports.", NULL);
+    return desc;
+}
 
-        value.i = 0;
-        jack_driver_descriptor_add_parameter(desc, &filler, "duplex", 'D', JackDriverParamBool, &value, NULL, "Provide both capture and playback ports.", NULL);
+SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) {
 
-        value.ui = 0;
-        jack_driver_descriptor_add_parameter(desc, &filler, "input-latency", 'I', JackDriverParamUInt, &value, NULL, "Extra input latency (frames)", NULL);
-        jack_driver_descriptor_add_parameter(desc, &filler, "output-latency", 'O', JackDriverParamUInt, &value, NULL, "Extra output latency (frames)", NULL);
+    // As of this implementation the IIO driver is only capture... to be expanded.
 
-        value.ui = 0;
-        jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamUInt, &value, NULL, "Number of input channels to provide (note: currently ignored)", NULL);
-        jack_driver_descriptor_add_parameter(desc, &filler, "outchannels", 'o', JackDriverParamUInt, &value, NULL, "Number of output channels to provide (note: currently ignored)", NULL);
+    string chipName(IIO_DEFAULT_CHIP); // the default chip name to search for in the IIO devices.
+    float fs = IIO_DEFAULT_READ_FS; // IIO sample rate is fixed.
+    jack_nframes_t periodSize = IIO_DEFAULT_PERIOD_SIZE; // default block size
+    jack_nframes_t periodCount    = IIO_DEFAULT_PERIOD_COUNT; // default block count
+    uint inChCnt = IIO_DEFAULT_CAPUTURE_PORT_COUNT; // The default number of physical input channels - a very large number, to be reduced.
 
-        value.ui = 3;
-        jack_driver_descriptor_add_parameter(desc, &filler, "verbose", 'v', JackDriverParamUInt, &value, NULL, "gtkIOStream verbose level", NULL);
+    for (const JSList *node = params; node; node = jack_slist_next (node)) {
+        jack_driver_param_t *param = (jack_driver_param_t *) node->data;
 
-//        value.i = 0;
-//        jack_driver_descriptor_add_parameter(desc, &filler, "snoop", 'X', JackDriverParamBool, &value, NULL, "Snoop firewire traffic", NULL);
-
-        return desc;
-    }
-
-    SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) {
-        const JSList * node;
-        const jack_driver_param_t * param;
-
-        char *device_name=(char*)"AD7476";
-
-        for (node = params; node; node = jack_slist_next (node)) {
-            param = (jack_driver_param_t *) node->data;
-
-            switch (param->character) {
-                case 'd':
-                    device_name = const_cast<char*>(param->value.str);
-                    break;
-                case 'p':
-                    cmlparams.period_size = param->value.ui;
-                    cmlparams.period_size_set = 1;
-                    break;
-                case 'n':
-                    cmlparams.buffer_size = param->value.ui;
-                    cmlparams.buffer_size_set = 1;
-                    break;
-                case 'r':
-                    cmlparams.sample_rate = param->value.ui;
-                    cmlparams.sample_rate_set = 1;
-                    break;
-                case 'i':
-                    cmlparams.capture_ports = param->value.ui;
-                    break;
-                case 'o':
-                    cmlparams.playback_ports = param->value.ui;
-                    break;
-                case 'I':
-                    cmlparams.capture_frame_latency = param->value.ui;
-                    break;
-                case 'O':
-                    cmlparams.playback_frame_latency = param->value.ui;
-                    break;
-                case 'x':
-                    cmlparams.slave_mode = param->value.ui;
-                    break;
-//                case 'X':
-//                    cmlparams.snoop_mode = param->value.i;
-//                    break;
-                case 'v':
-                    cmlparams.verbose_level = param->value.ui;
-            }
-        }
-
-        /* duplex is the default */
-        if (!cmlparams.playback_ports && !cmlparams.capture_ports) {
-            cmlparams.playback_ports = 1;
-            cmlparams.capture_ports = 1;
-        }
-
-        iio.findDevicesByChipName(chipName);
-
-        // Special open for FFADO driver...
-        if (ffado_driver->Open(&cmlparams) == 0) {
-            return threaded_driver;
-        } else {
-            delete threaded_driver; // Delete the decorated driver
-            return NULL;
+        switch (param->character) {
+        case 'C': // we are specifying a new chip name
+            chipName = param->value.str;
+            break;
+        case 'i': // we are specifying the number of capture channels
+            inChCnt = param->value.ui;
+            break;
+        case 'p':
+            periodSize = param->value.ui;
+            break;
+        case 'n':
+            periodCount = param->value.ui;
+            break;
         }
     }
+
+    // create the driver which contains the IIO class
+    Jack::JackIIODriver* iio_driver = new Jack::JackIIODriver("system", "iio_pcm", engine, table);
+    if (!iio_driver) {
+        jack_error("\nHave you run out of memory ? I tried to create the IIO driver in memory but failed!\n");
+        return NULL;
+    }
+
+    // interrogate the available iio devices searching for the chip name
+    if (iio_driver->iio.findDevicesByChipName(chipName)!=NO_ERROR) { // find all devices with a particular chip which are present.
+        jack_error("\nThe iio driver found no devices by the name %s\n", chipName.c_str());
+        return NULL;
+    }
+
+    if (iio_driver->iio.getDeviceCnt()<1) { // If there are no devices found by that chip name, then indicate.
+        jack_error("\nThe iio driver found no devices by the name %s\n", chipName.c_str());
+        return NULL;
+    }
+
+    iio_driver->iio.printInfo(); // print out detail about the devices which were found ...
+
+    // if the available number of ports is less then the requested number, then restrict to the number of physical ports.
+    if (iio_driver->iio.getChCnt()<inChCnt)
+        inChCnt=iio_driver->iio.getChCnt();
+
+    // resize the data buffer column count to match the device count
+    int colCnt=(int)ceil((float)inChCnt/(float)iio_driver->iio[0].getChCnt()); // check whether we require less then the available number of channels
+    int ret=iio_driver->iio.getReadArray(periodSize, iio_driver->data); // resize the array to be able to read enough memory
+    if (ret!=NO_ERROR) {
+        jack_error("iio::getReadArray couldn't create the data buffer, indicating the problem.");
+        return NULL;
+    }
+    if (iio_driver->data.cols()>colCnt) // resize the data columns to match the specified number of columns (channels / channels per device)
+        iio_driver->data.resize(iio_driver->data.rows(), colCnt);
+
+    ret=iio_driver->iio.open(periodCount, periodSize); // try to open all IIO devices
+    if (ret!=NO_ERROR)
+        return NULL;
+
+    Jack::JackDriverClientInterface* threaded_driver = new Jack::JackThreadedDriver(iio_driver);
+    if (threaded_driver) {
+        bool capture=true, playback=false, monitor=false;
+        int outChCnt=0;
+        jack_nframes_t inputLatency = periodSize*periodCount, outputLatency=0;
+        // Special open for OSS driver...
+        if (iio_driver->Open(periodSize, periodCount, capture, playback, inChCnt, outChCnt, monitor, "iio:device", "iio:device", inputLatency, outputLatency)!=0) {
+            delete threaded_driver;
+            threaded_driver=NULL;
+        }
+    } else
+        jack_error("\nHave you run out of memory ? I tried to create Jack's standard threaded driver in memory but failed! The good news is that you had enough memory to create the IIO driver.\n");
+
+    return threaded_driver;
+}
 
 #ifdef __cplusplus
 }
