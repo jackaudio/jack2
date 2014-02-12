@@ -750,7 +750,7 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
 #ifdef __ANDROID__
     jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, NULL, "ALSA device name", NULL);
 #else
-    jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, enum_alsa_devices, "ALSA device name", NULL);
+    jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, enum_alsa_devices(), "ALSA device name", NULL);
 #endif
 
     strcpy(value.str, "none");
