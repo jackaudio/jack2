@@ -97,7 +97,6 @@ def build(bld):
 
     if bld.env['BUILD_DRIVER_IIO'] == True:
         create_jack_driver_obj(bld, 'iio', iio_driver_src, ["GTKIOSTREAM", "EIGEN3"])
-        #create_jack_driver_obj(bld, 'iio', iio_driver_src, ["GTKIOSTREAM", "EIGEN3", "OCTAVE"])
 
     create_jack_driver_obj(bld, 'net', '../common/JackNetDriver.cpp')
 
