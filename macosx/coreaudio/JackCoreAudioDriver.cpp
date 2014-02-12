@@ -158,11 +158,10 @@ static bool CheckAvailableDeviceName(const char* device_name, AudioDeviceID* dev
             return false;
         }
 
-        if (strcmp(device_name_aux, device_name) == 0) {
+        if (strncmp(device_name_aux, device_name, strlen(device_name)) == 0) {
             *device_id = devices[i];
             return true;
         }
-
     }
 
     return false;
@@ -613,8 +612,15 @@ OSStatus JackCoreAudioDriver::GetDefaultInputDevice(AudioDeviceID* id)
     }
 
     if (inDefault == 0) {
-        jack_error("Error default input device is 0, please select a correct one !!");
-        return -1;
+        jack_error("Error default input device is 0, will take 'Built-in'...");
+        if (CheckAvailableDeviceName("Built-in Microphone", id) 
+            || CheckAvailableDeviceName("Built-in Line", id)) {
+             jack_log("JackCoreAudioDriver::GetDefaultInputDevice : output = %ld", *id);
+            return noErr;
+        } else {
+            jack_error("Cannot find any input device to use...");
+            return -1;
+        }
     }
     jack_log("JackCoreAudioDriver::GetDefaultInputDevice : input = %ld ", inDefault);
     *id = inDefault;
@@ -632,8 +638,14 @@ OSStatus JackCoreAudioDriver::GetDefaultOutputDevice(AudioDeviceID* id)
     }
 
     if (outDefault == 0) {
-        jack_error("Error default output device is 0, please select a correct one !!");
-        return -1;
+        jack_error("Error default ouput device is 0, will take 'Built-in'...");
+        if (CheckAvailableDeviceName("Built-in Output", id)) {
+            jack_log("JackCoreAudioDriver::GetDefaultOutputDevice : output = %ld", *id);
+            return noErr;
+        } else {
+            jack_error("Cannot find any output device to use...");
+            return -1;
+        }
     }
     jack_log("JackCoreAudioDriver::GetDefaultOutputDevice : output = %ld", outDefault);
     *id = outDefault;
@@ -1240,6 +1252,7 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid,
                     return -1;
                 }
             }
+            
             if (GetDeviceNameFromID(fDeviceID, capture_driver_name) != noErr || GetDeviceNameFromID(fDeviceID, playback_driver_name) != noErr) {
                 jack_error("Cannot get device name from device ID");
                 return -1;
@@ -1299,6 +1312,7 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid,
 
     // Capture only
     } else if (strcmp(capture_driver_uid, "") != 0) {
+    
         jack_log("JackCoreAudioDriver::SetupDevices : capture only");
         if (GetDeviceIDFromUID(capture_driver_uid, &fDeviceID) != noErr) {
             jack_log("JackCoreAudioDriver::SetupDevices : will take default input");
@@ -1307,6 +1321,7 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid,
                 return -1;
             }
         }
+        
         if (GetDeviceNameFromID(fDeviceID, capture_driver_name) != noErr) {
             jack_error("Cannot get device name from device ID");
             return -1;
@@ -1320,6 +1335,7 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid,
 
     // Playback only
     } else if (strcmp(playback_driver_uid, "") != 0) {
+    
         jack_log("JackCoreAudioDriver::SetupDevices : playback only");
         if (GetDeviceIDFromUID(playback_driver_uid, &fDeviceID) != noErr) {
             jack_log("JackCoreAudioDriver::SetupDevices : will take default output");
@@ -1328,6 +1344,7 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid,
                 return -1;
             }
         }
+        
         if (GetDeviceNameFromID(fDeviceID, playback_driver_name) != noErr) {
             jack_error("Cannot get device name from device ID");
             return -1;
