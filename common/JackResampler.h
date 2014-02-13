@@ -35,34 +35,33 @@ inline float Range(float min, float max, float val)
 }
 
 /*!
-\brief Base class for Resampler.
+\brief Base class for RingBuffer in frames.
 */
 
-class JackResampler
+class JackRingBuffer
 {
 
     protected:
 
         jack_ringbuffer_t* fRingBuffer;
-        double fRatio;
         unsigned int fRingBufferSize;
 
     public:
 
-        JackResampler();
-        virtual ~JackResampler();
+        JackRingBuffer(int size = DEFAULT_RB_SIZE);
+        virtual ~JackRingBuffer();
 
         virtual void Reset(unsigned int new_size);
 
-        virtual unsigned int ReadResample(jack_default_audio_sample_t* buffer, unsigned int frames);
-        virtual unsigned int WriteResample(jack_default_audio_sample_t* buffer, unsigned int frames);
-
+        // in frames
         virtual unsigned int Read(jack_default_audio_sample_t* buffer, unsigned int frames);
         virtual unsigned int Write(jack_default_audio_sample_t* buffer, unsigned int frames);
 
+        // in bytes
         virtual unsigned int Read(void* buffer, unsigned int bytes);
         virtual unsigned int Write(void* buffer, unsigned int bytes);
 
+        // in frames
         virtual unsigned int ReadSpace();
         virtual unsigned int WriteSpace();
 
@@ -70,6 +69,29 @@ class JackResampler
         {
             return (jack_ringbuffer_read_space(fRingBuffer) / sizeof(float)) - (fRingBufferSize / 2);
         }
+
+};
+
+/*!
+\brief Base class for Resampler.
+*/
+
+class JackResampler : public JackRingBuffer
+{
+
+    protected:
+
+        double fRatio;
+  
+    public:
+
+        JackResampler():JackRingBuffer(),fRatio(1)
+        {}
+        virtual ~JackResampler()
+        {}
+
+        virtual unsigned int ReadResample(jack_default_audio_sample_t* buffer, unsigned int frames);
+        virtual unsigned int WriteResample(jack_default_audio_sample_t* buffer, unsigned int frames);
 
         void SetRatio(double ratio)
         {

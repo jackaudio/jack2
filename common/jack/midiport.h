@@ -85,6 +85,17 @@ jack_midi_event_get(jack_midi_event_t *event,
 void
 jack_midi_clear_buffer(void *port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
 
+/** Reset an event buffer (from data allocated outside of JACK).
+ *
+ * This should be called at the beginning of each process cycle before calling
+ * @ref jack_midi_event_reserve or @ref jack_midi_event_write. This
+ * function may not be called on an input port's buffer.
+ *
+ * @param port_buffer Port buffer to resetted.
+ */
+void
+jack_midi_reset_buffer(void *port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
+
 
 /** Get the size of the largest event that can be stored by the port.
  *

@@ -355,13 +355,14 @@ namespace Jack
             case SOCKET_ERROR:
                 return 0;
                 
-            case NET_PACKET_ERROR:
+            case SYNC_PACKET_ERROR:
                 // Since sync packet is incorrect, don't decode it and continue with data
                 break;
                 
             default:
                 //decode sync
-                DecodeSyncPacket();
+                int unused_frames;
+                DecodeSyncPacket(unused_frames);
                 break;
         }
         

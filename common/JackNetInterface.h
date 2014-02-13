@@ -29,6 +29,7 @@ namespace Jack
 #define DEFAULT_MULTICAST_IP "225.3.19.154"
 #define DEFAULT_PORT    19000
 #define DEFAULT_MTU     1500
+#define MAX_MTU         9000
 
 #define SLAVE_SETUP_RETRY   5
 
@@ -46,6 +47,8 @@ namespace Jack
     class SERVER_EXPORT JackNetInterface
     {
 
+        friend class JackNetExt;
+        
         protected:
         
             bool fSetTimeOut;
@@ -90,8 +93,8 @@ namespace Jack
             virtual void DecodeTransportData() = 0;
 
             // sync packet
-            virtual void EncodeSyncPacket() = 0;
-            virtual void DecodeSyncPacket() = 0;
+            virtual void EncodeSyncPacket(int frames = -1) = 0;
+            virtual void DecodeSyncPacket(int& frames) = 0;
 
             virtual int SyncRecv() = 0;
             virtual int SyncSend() = 0;
@@ -113,7 +116,7 @@ namespace Jack
             int FinishRecv(NetAudioBuffer* buffer);
             
             void SetRcvTimeOut();
-            void SetPackedTimeOut(int time_out)
+            void SetPacketTimeOut(int time_out)
             {
                 // New time out
                 fPacketTimeOut = time_out;
@@ -158,8 +161,8 @@ namespace Jack
             int DataSend();
 
             // sync packet
-            void EncodeSyncPacket();
-            void DecodeSyncPacket();
+            void EncodeSyncPacket(int frames = -1);
+            void DecodeSyncPacket(int& frames);
 
             int Send(size_t size, int flags);
             int Recv(size_t size, int flags);
@@ -215,8 +218,8 @@ namespace Jack
             int DataSend();
 
             // sync packet
-            void EncodeSyncPacket();
-            void DecodeSyncPacket();
+            void EncodeSyncPacket(int frames = -1);
+            void DecodeSyncPacket(int& frames);
 
             int Recv(size_t size, int flags);
             int Send(size_t size, int flags);

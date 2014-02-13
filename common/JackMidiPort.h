@@ -97,6 +97,8 @@ struct SERVER_EXPORT JackMidiBuffer
     jack_midi_data_t* ReserveEvent(jack_nframes_t time, jack_shmsize_t size);
 };
 
+void MidiBufferInit(void* buffer, size_t buffer_size, jack_nframes_t nframes);
+
 } // namespace Jack
 
 #endif

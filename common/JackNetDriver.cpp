@@ -569,13 +569,14 @@ namespace Jack
             case SOCKET_ERROR:
                 return SOCKET_ERROR;
                 
-            case NET_PACKET_ERROR:
+            case SYNC_PACKET_ERROR:
                 // since sync packet is incorrect, don't decode it and continue with data
                 break;
                 
             default:
                 // decode sync
-                DecodeSyncPacket();
+                int unused_frames;
+                DecodeSyncPacket(unused_frames);
                 break;
         }
   
@@ -593,7 +594,7 @@ namespace Jack
             case SOCKET_ERROR:
                 return SOCKET_ERROR;
                 
-            case NET_PACKET_ERROR:
+            case DATA_PACKET_ERROR:
                 jack_time_t cur_time = GetMicroSeconds();
                 NotifyXRun(cur_time, float(cur_time - fBeginDateUst));  // Better this value than nothing...
                 break;
@@ -724,8 +725,8 @@ Deactivated for now..
             int mtu = DEFAULT_MTU;
             // Desactivated for now...
             uint transport_sync = 0;
-            jack_nframes_t period_size = 1024;
-            jack_nframes_t sample_rate = 48000;
+            jack_nframes_t period_size = 1024;  // to be used while waiting for master period_size
+            jack_nframes_t sample_rate = 48000; // to be used while waiting for master sample_rate
             int audio_capture_ports = -1;
             int audio_playback_ports = -1;
             int midi_input_ports = -1;

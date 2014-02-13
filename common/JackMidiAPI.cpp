@@ -34,6 +34,8 @@ extern "C"
                                    void* port_buffer, uint32_t event_index);
 
     LIB_EXPORT void jack_midi_clear_buffer(void* port_buffer);
+    
+    LIB_EXPORT void jack_midi_reset_buffer(void* port_buffer);
 
     LIB_EXPORT size_t jack_midi_max_event_size(void* port_buffer);
 
@@ -85,6 +87,12 @@ void jack_midi_clear_buffer(void* port_buffer)
     if (buf && buf->IsValid()) {
         buf->Reset(buf->nframes);
     }
+}
+
+LIB_EXPORT
+void jack_midi_reset_buffer(void* port_buffer)
+{
+    MidiBufferInit(port_buffer, BUFFER_SIZE_MAX, BUFFER_SIZE_MAX);
 }
 
 LIB_EXPORT

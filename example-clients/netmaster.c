@@ -17,6 +17,7 @@
 */
 
 #include <stdlib.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <errno.h>
 #ifndef WIN32
@@ -101,7 +102,7 @@ main (int argc, char *argv[])
 
     int i;
     //jack_master_t request = { 4, 4, -1, -1, buffer_size, sample_rate, "master", -1 };
-    jack_master_t request = { -1, -1, -1, -1, buffer_size, sample_rate, "master", 6 };
+    jack_master_t request = { -1, -1, -1, -1, buffer_size, sample_rate, "master", 6, true };
     jack_slave_t result;
     float** audio_input_buffer;
     float** audio_output_buffer;
@@ -161,6 +162,7 @@ main (int argc, char *argv[])
             memcpy(audio_output_buffer[i], audio_input_buffer[i], buffer_size * sizeof(float));
         }
    
+        /*
         if (jack_net_master_send(net, result.audio_output, audio_output_buffer, 0, NULL) < 0) {
             printf("jack_net_master_send failure, exiting\n");
             break;
@@ -169,6 +171,19 @@ main (int argc, char *argv[])
         usleep(10000);
          
         if (jack_net_master_recv(net, result.audio_input, audio_input_buffer, 0, NULL) < 0) {
+            printf("jack_net_master_recv failure, exiting\n");
+            break;
+        }
+        */
+        
+        if (jack_net_master_send_slice(net, result.audio_output, audio_output_buffer, 0, NULL, BUFFER_SIZE/2) < 0) {
+            printf("jack_net_master_send failure, exiting\n");
+            break;
+        }
+        
+        usleep(10000);
+         
+        if (jack_net_master_recv_slice(net, result.audio_input, audio_input_buffer, 0, NULL, BUFFER_SIZE/2) < 0) {
             printf("jack_net_master_recv failure, exiting\n");
             break;
         }

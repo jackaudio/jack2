@@ -537,13 +537,14 @@ namespace Jack
             case SOCKET_ERROR:
                 return res;
                 
-            case NET_PACKET_ERROR:
+            case SYNC_PACKET_ERROR:
                  // Since sync packet is incorrect, don't decode it and continue with data
                  break;
                 
             default:
                 // Decode sync
-                DecodeSyncPacket();
+                int unused_frames;
+                DecodeSyncPacket(unused_frames);
                 break;
         }
 
@@ -559,7 +560,7 @@ namespace Jack
             case SOCKET_ERROR:
                 return res;
                 
-            case NET_PACKET_ERROR:
+            case DATA_PACKET_ERROR:
                 // Well not a real XRun...
                 JackServerGlobals::fInstance->GetEngine()->NotifyClientXRun(ALL_CLIENTS);
                 break;

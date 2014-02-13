@@ -368,7 +368,7 @@ alsa_driver_configure_stream (alsa_driver_t *driver, char *device_name,
 		snd_pcm_format_t format;
 		int swapped;
 	} formats[] = {
- 	    {"32bit float little-endian", SND_PCM_FORMAT_FLOAT_LE},
+		{"32bit float little-endian", SND_PCM_FORMAT_FLOAT_LE, IS_LE},
 		{"32bit integer little-endian", SND_PCM_FORMAT_S32_LE, IS_LE},
 		{"32bit integer big-endian", SND_PCM_FORMAT_S32_BE, IS_BE},
 		{"24bit little-endian", SND_PCM_FORMAT_S24_3LE, IS_LE},
@@ -914,7 +914,7 @@ alsa_driver_get_channel_addresses (alsa_driver_t *driver,
 				   snd_pcm_uframes_t *capture_offset,
 				   snd_pcm_uframes_t *playback_offset)
 {
-	unsigned long err;
+	int err;
 	channel_t chn;
 
 	if (capture_avail) {
@@ -1320,7 +1320,11 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 			driver->poll_late++;
 		}
 
+#ifdef __ANDROID__
+		poll_result = poll (driver->pfd, nfds, -1);  //fix for sleep issue
+#else
 		poll_result = poll (driver->pfd, nfds, driver->poll_timeout);
+#endif
 		if (poll_result < 0) {
 
 			if (errno == EINTR) {
@@ -2034,6 +2038,13 @@ alsa_driver_new (char *name, char *playback_alsa_device,
 				  SND_PCM_NONBLOCK) < 0) {
 			switch (errno) {
 			case EBUSY:
+#ifdef __ANDROID__
+                jack_error ("\n\nATTENTION: The playback device \"%s\" is "
+                            "already in use. Please stop the"
+                            " application using it and "
+                            "run JACK again",
+                            playback_alsa_device);
+#else
                 current_apps = discover_alsa_using_apps ();
                 if (current_apps) {
                         jack_error ("\n\nATTENTION: The playback device \"%s\" is "
@@ -2051,6 +2062,7 @@ alsa_driver_new (char *name, char *playback_alsa_device,
                                     "run JACK again",
                                     playback_alsa_device);
                 }
+#endif
                 alsa_driver_delete (driver);
 				return NULL;
 
@@ -2078,6 +2090,13 @@ alsa_driver_new (char *name, char *playback_alsa_device,
 				  SND_PCM_NONBLOCK) < 0) {
 			switch (errno) {
 			case EBUSY:
+#ifdef __ANDROID__
+                jack_error ("\n\nATTENTION: The capture (recording) device \"%s\" is "
+                            "already in use. Please stop the"
+                            " application using it and "
+                            "run JACK again",
+                            capture_alsa_device);
+#else
                 current_apps = discover_alsa_using_apps ();
                 if (current_apps) {
                         jack_error ("\n\nATTENTION: The capture device \"%s\" is "
@@ -2095,6 +2114,7 @@ alsa_driver_new (char *name, char *playback_alsa_device,
                                     "run JACK again",
                                     capture_alsa_device);
                 }
+#endif
 				alsa_driver_delete (driver);
 				return NULL;
 				break;

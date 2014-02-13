@@ -177,7 +177,7 @@ namespace Jack
         // audio
         if (audio_channels > 0) {
             fTxHeader.fDataType = 'a';
-            fTxHeader.fActivePorts = buffer->RenderFromJackPorts();
+            fTxHeader.fActivePorts = buffer->RenderFromJackPorts(fTxHeader.fFrames);
             fTxHeader.fNumPacket = buffer->GetNumPackets(fTxHeader.fActivePorts);
 
             for (uint subproc = 0; subproc < fTxHeader.fNumPacket; subproc++) {
@@ -215,19 +215,20 @@ namespace Jack
         fRxHeader.fSubCycle = rx_head->fSubCycle;
         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
         fRxHeader.fActivePorts = rx_head->fActivePorts;
+        fRxHeader.fFrames = rx_head->fFrames;
         rx_bytes = buffer->RenderFromNetwork(rx_head->fCycle, rx_head->fSubCycle, fRxHeader.fActivePorts);
         
         // Last audio packet is received, so finish rendering...
         if (fRxHeader.fIsLastPckt) {
-            buffer->RenderToJackPorts();
+            buffer->RenderToJackPorts(fRxHeader.fFrames);
         }
         return rx_bytes;
     }
 
     int JackNetInterface::FinishRecv(NetAudioBuffer* buffer)
     {
-        buffer->RenderToJackPorts();
-        return NET_PACKET_ERROR;
+        buffer->RenderToJackPorts(fRxHeader.fFrames);
+        return DATA_PACKET_ERROR;
     }
 
     NetAudioBuffer* JackNetInterface::AudioBufferFactory(int nports, char* buffer)
@@ -358,7 +359,7 @@ namespace Jack
             }
 
         } catch (exception&) {
-            jack_error("NetAudioBuffer allocation error...");
+            jack_error("NetAudioBuffer on master allocation error...");
             return false;
         }
 
@@ -488,7 +489,7 @@ namespace Jack
             jack_error("Wrong packet type : %c", rx_head->fDataType);
             // not the last packet..
             fRxHeader.fIsLastPckt = 0;
-            return NET_PACKET_ERROR;
+            return SYNC_PACKET_ERROR;
         }
     
         fCurrentCycleOffset = fTxHeader.fCycle - rx_head->fCycle;
@@ -544,7 +545,7 @@ namespace Jack
         return rx_bytes;
     }
 
-    void JackNetMasterInterface::EncodeSyncPacket()
+    void JackNetMasterInterface::EncodeSyncPacket(int frames)
     {
         // This method contains every step of sync packet informations coding
         // first of all, clear sync packet
@@ -565,9 +566,10 @@ namespace Jack
    
         // Write active ports list
         fTxHeader.fActivePorts = (fNetAudioPlaybackBuffer) ? fNetAudioPlaybackBuffer->ActivePortsToNetwork(fTxData) : 0;
+        fTxHeader.fFrames = frames;
     }
 
-    void JackNetMasterInterface::DecodeSyncPacket()
+    void JackNetMasterInterface::DecodeSyncPacket(int& frames)
     {
         // This method contains every step of sync packet informations decoding process
         
@@ -590,6 +592,7 @@ namespace Jack
         if (fNetAudioCaptureBuffer) {
             fNetAudioCaptureBuffer->ActivePortsFromNetwork(fRxData, rx_head->fActivePorts);
         }
+        frames = rx_head->fFrames;
     }
 
 // JackNetSlaveInterface ************************************************************************************************
@@ -796,7 +799,7 @@ namespace Jack
             }
 
         } catch (exception&) {
-            jack_error("NetAudioBuffer allocation error...");
+            jack_error("NetAudioBuffer on slave allocation error...");
             return false;
         }
 
@@ -874,7 +877,7 @@ namespace Jack
             jack_error("Wrong packet type : %c", rx_head->fDataType);
             // not the last packet...
             fRxHeader.fIsLastPckt = 0;
-            return NET_PACKET_ERROR;
+            return SYNC_PACKET_ERROR;
         }
      
         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
@@ -946,7 +949,7 @@ namespace Jack
     }
 
     // network sync------------------------------------------------------------------------
-    void JackNetSlaveInterface::EncodeSyncPacket()
+    void JackNetSlaveInterface::EncodeSyncPacket(int frames)
     {
         // This method contains every step of sync packet informations coding
         // first of all, clear sync packet
@@ -967,9 +970,10 @@ namespace Jack
 
         // Write active ports list
         fTxHeader.fActivePorts = (fNetAudioCaptureBuffer) ? fNetAudioCaptureBuffer->ActivePortsToNetwork(fTxData) : 0;
+        fTxHeader.fFrames = frames;
     }
 
-    void JackNetSlaveInterface::DecodeSyncPacket()
+    void JackNetSlaveInterface::DecodeSyncPacket(int& frames)
     {
         // This method contains every step of sync packet informations decoding process
         
@@ -992,6 +996,8 @@ namespace Jack
         if (fNetAudioPlaybackBuffer) {
             fNetAudioPlaybackBuffer->ActivePortsFromNetwork(fRxData, rx_head->fActivePorts);
         }
+        
+        frames = rx_head->fFrames;
     }
 
 }

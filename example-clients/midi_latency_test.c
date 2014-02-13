@@ -635,7 +635,7 @@ main(int argc, char **argv)
     timeout = 5;
 
     for (;;) {
-        char c = getopt_long(argc, argv, option_string, long_options,
+        signed char c = getopt_long(argc, argv, option_string, long_options,
                              &long_index);
         switch (c) {
         case 'h':

@@ -24,11 +24,16 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef HAVE_READLINE
 #include <readline/readline.h>
 #include <readline/history.h>
+#endif
 #include <jack/jack.h>
 #include <jack/transport.h>
 
+#ifndef HAVE_READLINE
+#define whitespace(c) (((c) == ' ') || ((c) == '\t'))
+#endif
 
 char *package;				/* program name */
 int done = 0;
@@ -384,6 +389,7 @@ static char *command_generator (const char *text, int state)
 
 static void command_loop()
 {
+#ifdef HAVE_READLINE
 	char *line, *cmd;
 	char prompt[32];
 
@@ -394,10 +400,15 @@ static void command_loop()
      
 	/* Define a custom completion function. */
 	rl_completion_entry_function = command_generator;
+#else
+	char line[64] = {0,};
+	char *cmd = NULL;
+#endif
 
 	/* Read and execute commands until the user quits. */
 	while (!done) {
 
+#ifdef HAVE_READLINE
 		line = readline(prompt);
      
 		if (line == NULL) {	/* EOF? */
@@ -405,6 +416,11 @@ static void command_loop()
 			done = 1;
 			break;
 		}
+#else
+		printf("%s> ", package);
+		fgets(line, sizeof(line), stdin);
+		line[strlen(line)-1] = '\0';
+#endif
      
 		/* Remove leading and trailing whitespace from the line. */
 		cmd = stripwhite(line);
@@ -412,11 +428,15 @@ static void command_loop()
 		/* If anything left, add to history and execute it. */
 		if (*cmd)
 		{
+#ifdef HAVE_READLINE
 			add_history(cmd);
+#endif
 			execute_command(cmd);
 		}
      
+#ifdef HAVE_READLINE
 		free(line);		/* realine() called malloc() */
+#endif
 	}
 }
 

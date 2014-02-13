@@ -79,6 +79,19 @@ extern "C"
     typedef char shm_name_t[SHM_NAME_MAX];
     typedef shm_name_t jack_shm_id_t;
 
+#elif __ANDROID__
+
+#ifndef NAME_MAX
+#define NAME_MAX 255
+#endif
+
+#ifndef SHM_NAME_MAX
+#define SHM_NAME_MAX NAME_MAX
+#endif
+    typedef char shm_name_t[SHM_NAME_MAX];
+    typedef shm_name_t jack_shm_id_t;
+    typedef int jack_shm_fd_t;
+
 #else
     /* System V SHM */
     typedef int	jack_shm_id_t;
@@ -88,7 +101,8 @@ extern "C"
     typedef enum {
         shm_POSIX = 1, 			/* POSIX shared memory */
         shm_SYSV = 2, 			/* System V shared memory */
-        shm_WIN32 = 3			/* Windows 32 shared memory */
+        shm_WIN32 = 3,			/* Windows 32 shared memory */
+        shm_ANDROID = 4			/* Android shared memory */
     } jack_shmtype_t;
 
     typedef int16_t jack_shm_registry_index_t;
@@ -135,6 +149,9 @@ extern "C"
 
         jack_shmsize_t size;      /* for POSIX unattach */
         jack_shm_id_t id;        /* API specific, see above */
+#ifdef __ANDROID__
+        jack_shm_fd_t fd;
+#endif
     }
     jack_shm_registry_t;
 
@@ -153,6 +170,9 @@ extern "C"
     struct _jack_shm_info {
         jack_shm_registry_index_t index;       /* offset into the registry */
         uint32_t size;
+#ifdef __ANDROID__
+        jack_shm_fd_t fd;
+#endif
         union {
             void *attached_at;  /* address where attached */
             char ptr_size[8];
