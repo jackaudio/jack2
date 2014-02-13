@@ -19,7 +19,7 @@ def configure(conf):
     conf.env['BUILD_DRIVER_IIO'] += conf.is_defined('HAVE_EIGEN3')
     conf.check_cfg(package='sox', atleast_version='14.4.0', args='--cflags --libs', mandatory=False)
     conf.env['BUILD_DRIVER_IIO'] += conf.is_defined('HAVE_SOX')
- 
+
 
 def create_jack_driver_obj(bld, target, sources, uselib = None):
     driver = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
@@ -82,7 +82,7 @@ def build(bld):
                         'firewire/JackFFADOMidiSendQueue.cpp'
                        ]
 
-    iio_driver_src = ['iio/JackIIODriver.C']
+    iio_driver_src = ['iio/JackIIODriver.cpp']
 
     if bld.env['BUILD_DRIVER_ALSA'] == True:
         create_jack_driver_obj(bld, 'alsa', alsa_driver_src, ["ALSA"])

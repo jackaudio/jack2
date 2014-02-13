@@ -17,7 +17,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#include "JackIIODriver.H"
+#include "JackIIODriver.h"
 #include "driver_interface.h"
 #include "JackEngineControl.h"
 #include "JackGraphManager.h"
@@ -175,11 +175,13 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
     // interrogate the available iio devices searching for the chip name
     if (iio_driver->iio.findDevicesByChipName(chipName)!=NO_ERROR) { // find all devices with a particular chip which are present.
         jack_error("\nThe iio driver found no devices by the name %s\n", chipName.c_str());
+        delete iio_driver;
         return NULL;
     }
 
     if (iio_driver->iio.getDeviceCnt()<1) { // If there are no devices found by that chip name, then indicate.
         jack_error("\nThe iio driver found no devices by the name %s\n", chipName.c_str());
+        delete iio_driver;
         return NULL;
     }
 
@@ -194,6 +196,7 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
     int ret=iio_driver->iio.getReadArray(periodSize, iio_driver->data); // resize the array to be able to read enough memory
     if (ret!=NO_ERROR) {
         jack_error("iio::getReadArray couldn't create the data buffer, indicating the problem.");
+        delete iio_driver;
         return NULL;
     }
     if (iio_driver->data.cols()>colCnt) // resize the data columns to match the specified number of columns (channels / channels per device)
@@ -201,6 +204,7 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
 
     ret=iio_driver->iio.open(periodCount, periodSize); // try to open all IIO devices
     if (ret!=NO_ERROR)
+        delete iio_driver;
         return NULL;
 
     Jack::JackDriverClientInterface* threaded_driver = new Jack::JackThreadedDriver(iio_driver);
@@ -215,6 +219,11 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
         }
     } else
         jack_error("\nHave you run out of memory ? I tried to create Jack's standard threaded driver in memory but failed! The good news is that you had enough memory to create the IIO driver.\n");
+
+    if (!threaded_driver) { // handle the case that the threaded_driver was not created succ.
+        delete iio_driver;
+        iio_driver=NULL;
+    }
 
     return threaded_driver;
 }
