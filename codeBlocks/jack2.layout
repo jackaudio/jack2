@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="../common/JackDriver.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="7200" topLine="18" />
+		</Cursor>
+	</File>
+	<File name="../common/JackNetAPI.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="29070" topLine="800" />
+		</Cursor>
+	</File>
+	<File name="../linux/iio/JackIIODriver.H" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2060" topLine="31" />
+		</Cursor>
+	</File>
+	<File name="../common/JackMidiDriver.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5505" topLine="158" />
+		</Cursor>
+	</File>
+	<File name="../common/jack/systemdeps.h" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4452" topLine="74" />
+		</Cursor>
+	</File>
+	<File name="../common/JackControlAPI.cpp" open="0" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="19941" topLine="707" />
+		</Cursor>
+	</File>
+	<File name="../common/JackError.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2588" topLine="78" />
+		</Cursor>
+	</File>
+	<File name="../common/shm.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="17836" topLine="711" />
+		</Cursor>
+	</File>
+	<File name="../common/JackAudioAdapter.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5048" topLine="151" />
+		</Cursor>
+	</File>
+	<File name="../common/JackDriverLoader.cpp" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="16699" topLine="500" />
+		</Cursor>
+	</File>
+	<File name="../posix/JackCompilerDeps_os.h" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="810" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="../linux/alsa/JackAlsaAdapter.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="13753" topLine="444" />
+		</Cursor>
+	</File>
+	<File name="../waf" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="43" topLine="1" />
+		</Cursor>
+	</File>
+	<File name="../common/JackAudioDriver.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1666" topLine="40" />
+		</Cursor>
+	</File>
+	<File name="../macosx/coremidi/JackCoreMidiDriver.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="26911" topLine="828" />
+		</Cursor>
+	</File>
+	<File name="../common/JackLibSampleRateResampler.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3102" topLine="82" />
+		</Cursor>
+	</File>
+	<File name="../common/JackAC3Encoder.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1149" topLine="36" />
+		</Cursor>
+	</File>
+	<File name="../common/JackFreewheelDriver.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="881" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="../common/JackTimedDriver.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1408" topLine="27" />
+		</Cursor>
+	</File>
+	<File name="../linux/driver.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2258" topLine="52" />
+		</Cursor>
+	</File>
+	<File name="../common/JackThreadedDriver.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2009" topLine="63" />
+		</Cursor>
+	</File>
+	<File name="../linux/wscript" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4882" topLine="94" />
+		</Cursor>
+	</File>
+	<File name="../common/JackArgParser.h" open="0" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="836" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="../common/driver_interface.h" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4239" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="../linux/freebob/JackFreebobDriver.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2811" topLine="58" />
+		</Cursor>
+	</File>
+	<File name="../common/JackAudioAdapter.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="34" />
+		</Cursor>
+	</File>
+	<File name="../linux/alsa/JackAlsaAdapter.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4947" topLine="142" />
+		</Cursor>
+	</File>
+	<File name="../linux/iio/JackIIODriver.C" open="1" top="1" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3010" topLine="65" />
+		</Cursor>
+	</File>
+	<File name="../common/JackLoopbackDriver.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="791" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="../linux/alsa/JackAlsaDriver.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1304" topLine="39" />
+		</Cursor>
+	</File>
+	<File name="../common/Jackdmp.cpp" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4598" topLine="118" />
+		</Cursor>
+	</File>
+	<File name="../linux/freebob/JackFreebobDriver.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="37493" topLine="1062" />
+		</Cursor>
+	</File>
+	<File name="../linux/firewire/JackFFADODriver.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="876" topLine="53" />
+		</Cursor>
+	</File>
+	<File name="../common/JackDummyDriver.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1242" topLine="23" />
+		</Cursor>
+	</File>
+	<File name="../common/JackTimedDriver.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2116" topLine="52" />
+		</Cursor>
+	</File>
+	<File name="../common/JackAudioAdapterInterface.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1667" topLine="40" />
+		</Cursor>
+	</File>
+	<File name="../common/JackAudioPort.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3281" topLine="78" />
+		</Cursor>
+	</File>
+	<File name="../common/JackLoopbackDriver.cpp" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2289" topLine="93" />
+		</Cursor>
+	</File>
+	<File name="../linux/alsa/JackAlsaDriver.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3935" topLine="89" />
+		</Cursor>
+	</File>
+	<File name="../common/JackArgParser.cpp" open="0" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="6777" topLine="174" />
+		</Cursor>
+	</File>
+	<File name="../common/JackDriver.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="6288" topLine="169" />
+		</Cursor>
+	</File>
+	<File name="../common/JackAC3Encoder.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2587" topLine="57" />
+		</Cursor>
+	</File>
+	<File name="../linux/firewire/ffado_driver.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5335" topLine="170" />
+		</Cursor>
+	</File>
+	<File name="../common/JackThreadedDriver.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2310" topLine="65" />
+		</Cursor>
+	</File>
+	<File name="../macosx/coreaudio/JackCoreAudioDriver.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="131" />
+		</Cursor>
+	</File>
+	<File name="../tests/cpu.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2625" topLine="60" />
+		</Cursor>
+	</File>
+	<File name="../common/JackNetDriver.cpp" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="27095" topLine="694" />
+		</Cursor>
+	</File>
+	<File name="../common/JackDummyDriver.cpp" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4054" topLine="85" />
+		</Cursor>
+	</File>
+	<File name="../wscript" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1795" topLine="60" />
+		</Cursor>
+	</File>
+	<File name="../solaris/oss/JackBoomerDriver.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="28383" topLine="766" />
+		</Cursor>
+	</File>
+	<File name="../dbus/wscript" open="0" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="814" topLine="44" />
+		</Cursor>
+	</File>
+	<File name="../linux/alsarawmidi/JackALSARawMidiDriver.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="886" topLine="9" />
+		</Cursor>
+	</File>
+	<File name="../linux/firewire/JackFFADODriver.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="36979" topLine="850" />
+		</Cursor>
+	</File>
+	<File name="../common/JackNetAdapter.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="13012" topLine="344" />
+		</Cursor>
+	</File>
+	<File name="../macosx/coreaudio/JackCoreAudioAdapter.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="111" />
+		</Cursor>
+	</File>
+	<File name="../solaris/oss/JackOSSAdapter.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="19006" topLine="540" />
+		</Cursor>
+	</File>
+	<File name="../linux/freebob/freebob_driver.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="208" />
+		</Cursor>
+	</File>
+	<File name="../linux/alsa/alsa_driver.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="39273" topLine="1550" />
+		</Cursor>
+	</File>
+	<File name="../dbus/reserve.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2044" topLine="36" />
+		</Cursor>
+	</File>
+	<File name="../dbus/controller.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="13679" topLine="496" />
+		</Cursor>
+	</File>
+	<File name="../common/JackAudioAdapterFactory.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2313" topLine="68" />
+		</Cursor>
+	</File>
+	<File name="../common/JackAudioDriver.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2552" topLine="64" />
+		</Cursor>
+	</File>
+	<File name="../solaris/oss/JackOSSDriver.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="23371" topLine="632" />
+		</Cursor>
+	</File>
+	<File name="../common/JackAPI.cpp" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="851" topLine="5" />
+		</Cursor>
+	</File>
+	<File name="../common/JackEngineControl.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3800" topLine="80" />
+		</Cursor>
+	</File>
+	<File name="../common/netjack.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2364" topLine="63" />
+		</Cursor>
+	</File>
+	<File name="../solaris/oss/JackBoomerDriver.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="122" />
+		</Cursor>
+	</File>
+	<File name="../windows/portaudio/JackPortAudioDriver.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2636" topLine="52" />
+		</Cursor>
+	</File>
+	<File name="../linux/JackLinuxTime.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="93" />
+		</Cursor>
+	</File>
+	<File name="../common/JackEngine.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5459" topLine="150" />
+		</Cursor>
+	</File>
+	<File name="../macosx/coreaudio/JackCoreAudioDriver.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="10708" topLine="300" />
+		</Cursor>
+	</File>
+	<File name="../common/JackInternalClient.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="877" topLine="13" />
+		</Cursor>
+	</File>
+	<File name="../common/JackTools.cpp" open="0" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3683" topLine="118" />
+		</Cursor>
+	</File>
+</CodeBlocks_layout_file>
