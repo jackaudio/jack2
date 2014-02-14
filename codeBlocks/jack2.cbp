@@ -477,9 +477,10 @@
 		<Unit filename="../linux/freebob/JackFreebobDriver.cpp" />
 		<Unit filename="../linux/freebob/JackFreebobDriver.h" />
 		<Unit filename="../linux/freebob/freebob_driver.h" />
+		<Unit filename="../linux/iio/JackIIODriver.C">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../linux/iio/JackIIODriver.H" />
-		<Unit filename="../linux/iio/JackIIODriver.cpp" />
-		<Unit filename="../linux/iio/JackIIODriver.h" />
 		<Unit filename="../linux/wscript" />
 		<Unit filename="../macosx/JackAtomic_os.h" />
 		<Unit filename="../macosx/JackCompilerDeps_os.h" />
