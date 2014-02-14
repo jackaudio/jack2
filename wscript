@@ -83,6 +83,7 @@ def options(opt):
     opt.add_option('--firewire', action='store_true', default=False, help='Enable FireWire driver (FFADO)')
     opt.add_option('--freebob', action='store_true', default=False, help='Enable FreeBob driver')
     opt.add_option('--alsa', action='store_true', default=False, help='Enable ALSA driver')
+    opt.add_option('--iio', action='store_true', default=False, help='Enable IIO driver')
     opt.add_option('--autostart', type='string', default="default", help='Autostart method. Possible values: "default", "classic", "dbus", "none"')
     opt.add_option('--portaudio', action='store_true', default=False, help='Enable Portaudio driver')
     opt.add_option('--winmme', action='store_true', default=False, help='Enable WinMME driver')
@@ -149,9 +150,12 @@ def configure(conf):
             conf.fatal('FreeBob driver was explicitly requested but cannot be built')
         if Options.options.firewire and not conf.env['BUILD_DRIVER_FFADO']:
             conf.fatal('FFADO driver was explicitly requested but cannot be built')
+        if Options.options.iio and not conf.env['BUILD_DRIVER_IIO']:
+            conf.fatal('IIO driver was explicitly requested but cannot be built')
         conf.env['BUILD_DRIVER_ALSA'] = Options.options.alsa
         conf.env['BUILD_DRIVER_FFADO'] = Options.options.firewire
         conf.env['BUILD_DRIVER_FREEBOB'] = Options.options.freebob
+        conf.env['BUILD_DRIVER_IIO'] = Options.options.iio
     if conf.env['IS_WINDOWS']:
         conf.sub_config('windows')
         if Options.options.portaudio and not conf.env['BUILD_DRIVER_PORTAUDIO']:
@@ -350,6 +354,7 @@ def configure(conf):
         display_feature('Build with ALSA support', conf.env['BUILD_DRIVER_ALSA'] == True)
         display_feature('Build with FireWire (FreeBob) support', conf.env['BUILD_DRIVER_FREEBOB'] == True)
         display_feature('Build with FireWire (FFADO) support', conf.env['BUILD_DRIVER_FFADO'] == True)
+        display_feature('Build with IIO support', conf.env['BUILD_DRIVER_IIO'] == True)
 
     if conf.env['IS_WINDOWS']:
         display_feature('Build with WinMME support', conf.env['BUILD_DRIVER_WINMME'] == True)
