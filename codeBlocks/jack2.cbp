@@ -570,7 +570,6 @@
 		<Unit filename="../tests/testSynchroServerClient.cpp" />
 		<Unit filename="../tests/testThread.cpp" />
 		<Unit filename="../tests/wscript" />
-		<Unit filename="../waf" />
 		<Unit filename="../windows/JackAtomic_os.h" />
 		<Unit filename="../windows/JackCompilerDeps_os.h" />
 		<Unit filename="../windows/JackMMCSS.cpp" />
