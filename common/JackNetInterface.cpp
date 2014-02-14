@@ -185,7 +185,7 @@ namespace Jack
                 fTxHeader.fIsLastPckt = (subproc == (fTxHeader.fNumPacket - 1)) ? 1 : 0;
                 fTxHeader.fPacketSize = HEADER_SIZE + buffer->RenderToNetwork(subproc, fTxHeader.fActivePorts);
                 memcpy(fTxBuffer, &fTxHeader, HEADER_SIZE);
-                // PacketHeaderDisplay(&fTxHeader);
+                //PacketHeaderDisplay(&fTxHeader);
                 if (Send(fTxHeader.fPacketSize, 0) == SOCKET_ERROR) {
                     return SOCKET_ERROR;
                 }
@@ -458,7 +458,7 @@ namespace Jack
         fTxHeader.fPacketSize = fParams.fMtu;
 
         memcpy(fTxBuffer, &fTxHeader, HEADER_SIZE);
-        // PacketHeaderDisplay(&fTxHeader);
+        //PacketHeaderDisplay(&fTxHeader);
         return Send(fTxHeader.fPacketSize, 0);
     }
 
@@ -936,7 +936,7 @@ namespace Jack
         fTxHeader.fPacketSize = fParams.fMtu;
 
         memcpy(fTxBuffer, &fTxHeader, HEADER_SIZE);
-        // PacketHeaderDisplay(&fTxHeader);
+        //PacketHeaderDisplay(&fTxHeader);
         return Send(fTxHeader.fPacketSize, 0);
     }
 

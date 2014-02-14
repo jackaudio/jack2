@@ -1210,6 +1210,7 @@ namespace Jack
 
     SERVER_EXPORT void PacketHeaderHToN(packet_header_t* src_header, packet_header_t* dst_header)
     {
+        //printf("PacketHeaderHToN _packet_header size %d\n", sizeof(_packet_header));
         memcpy(dst_header, src_header, sizeof(packet_header_t));
         dst_header->fDataType = htonl(src_header->fDataType);
         dst_header->fDataStream = htonl(src_header->fDataStream);
@@ -1225,6 +1226,7 @@ namespace Jack
 
     SERVER_EXPORT void PacketHeaderNToH(packet_header_t* src_header, packet_header_t* dst_header)
     {
+        //printf("PacketHeaderNToH _packet_header size %d\n", sizeof(_packet_header));
         memcpy(dst_header, src_header, sizeof(packet_header_t));
         dst_header->fDataType = ntohl(src_header->fDataType);
         dst_header->fDataStream = ntohl(src_header->fDataStream);
@@ -1240,7 +1242,6 @@ namespace Jack
 
     SERVER_EXPORT void PacketHeaderDisplay(packet_header_t* header)
     {
-        char bitdepth[16];
         jack_info("********************Header********************");
         jack_info("Data type : %c", header->fDataType);
         jack_info("Data stream : %c", header->fDataStream);
@@ -1250,8 +1251,8 @@ namespace Jack
         jack_info("Active ports : %u", header->fActivePorts);
         jack_info("DATA packets : %u", header->fNumPacket);
         jack_info("DATA size : %u", header->fPacketSize);
+        jack_info("DATA frames : %d", header->fFrames);
         jack_info("Last packet : '%s'", (header->fIsLastPckt) ? "yes" : "no");
-        jack_info("Bitdepth : %s", bitdepth);
         jack_info("**********************************************");
     }
 
