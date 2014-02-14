@@ -123,7 +123,7 @@ def build(bld):
             prog.use += ['RT', 'SNDFILE']
         if bld.env['IS_SUN']:
             prog.use += ['RT', 'SNDFILE']
-	if bld.env['IS_WINDOWS']:
+        if bld.env['IS_WINDOWS']:
             prog.uselib = ['SNDFILE']
         prog.target = 'jack_rec'
 
