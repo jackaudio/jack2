@@ -83,7 +83,6 @@ def options(opt):
     opt.add_option('--firewire', action='store_true', default=False, help='Enable FireWire driver (FFADO)')
     opt.add_option('--freebob', action='store_true', default=False, help='Enable FreeBob driver')
     opt.add_option('--alsa', action='store_true', default=False, help='Enable ALSA driver')
-    opt.add_option('--iio', action='store_true', default=False, help='Enable IIO driver')
     opt.add_option('--autostart', type='string', default="default", help='Autostart method. Possible values: "default", "classic", "dbus", "none"')
     opt.add_option('--portaudio', action='store_true', default=False, help='Enable Portaudio driver')
     opt.add_option('--winmme', action='store_true', default=False, help='Enable WinMME driver')
@@ -137,7 +136,7 @@ def configure(conf):
         conf.check_tool('compiler_cc')
         conf.env.append_unique('CCDEFINES', '_POSIX')
         conf.env.append_unique('CXXDEFINES', '_POSIX')
-
+ 
     conf.env.append_unique('CXXFLAGS', '-Wall')
     conf.env.append_unique('CFLAGS', '-Wall')
 
@@ -150,12 +149,9 @@ def configure(conf):
             conf.fatal('FreeBob driver was explicitly requested but cannot be built')
         if Options.options.firewire and not conf.env['BUILD_DRIVER_FFADO']:
             conf.fatal('FFADO driver was explicitly requested but cannot be built')
-        if Options.options.iio and not conf.env['BUILD_DRIVER_IIO']:
-            conf.fatal('IIO driver was explicitly requested but cannot be built')
         conf.env['BUILD_DRIVER_ALSA'] = Options.options.alsa
         conf.env['BUILD_DRIVER_FFADO'] = Options.options.firewire
         conf.env['BUILD_DRIVER_FREEBOB'] = Options.options.freebob
-        conf.env['BUILD_DRIVER_IIO'] = Options.options.iio
     if conf.env['IS_WINDOWS']:
         conf.sub_config('windows')
         if Options.options.portaudio and not conf.env['BUILD_DRIVER_PORTAUDIO']:
@@ -323,7 +319,7 @@ def configure(conf):
 
     print("Build with a maximum of %d JACK clients" % Options.options.clients)
     print("Build with a maximum of %d ports per application" % Options.options.application_ports)
-
+ 
     display_msg("Install prefix", conf.env['PREFIX'], 'CYAN')
     display_msg("Library directory", conf.all_envs[""]['LIBDIR'], 'CYAN')
     if conf.env['BUILD_WITH_32_64'] == True:
@@ -354,12 +350,11 @@ def configure(conf):
         display_feature('Build with ALSA support', conf.env['BUILD_DRIVER_ALSA'] == True)
         display_feature('Build with FireWire (FreeBob) support', conf.env['BUILD_DRIVER_FREEBOB'] == True)
         display_feature('Build with FireWire (FFADO) support', conf.env['BUILD_DRIVER_FFADO'] == True)
-        display_feature('Build with IIO support', conf.env['BUILD_DRIVER_IIO'] == True)
 
     if conf.env['IS_WINDOWS']:
         display_feature('Build with WinMME support', conf.env['BUILD_DRIVER_WINMME'] == True)
         display_feature('Build with Portaudio support', conf.env['BUILD_DRIVER_PORTAUDIO'] == True)
-
+       
     if conf.env['BUILD_JACKDBUS'] == True:
         display_msg('D-Bus service install directory', conf.env['DBUS_SERVICES_DIR'], 'CYAN')
         #display_msg('Settings persistence', xxx)
@@ -412,7 +407,7 @@ def build(bld):
         bld.add_subdirs('man')
         if bld.env['BUILD_JACKDBUS'] == True:
            bld.add_subdirs('dbus')
-
+  
     if bld.env['IS_MACOSX']:
         bld.add_subdirs('macosx')
         bld.add_subdirs('example-clients')
