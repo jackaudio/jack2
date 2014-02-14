@@ -136,7 +136,7 @@ def configure(conf):
         conf.check_tool('compiler_cc')
         conf.env.append_unique('CCDEFINES', '_POSIX')
         conf.env.append_unique('CXXDEFINES', '_POSIX')
- 
+
     conf.env.append_unique('CXXFLAGS', '-Wall')
     conf.env.append_unique('CFLAGS', '-Wall')
 
@@ -319,7 +319,7 @@ def configure(conf):
 
     print("Build with a maximum of %d JACK clients" % Options.options.clients)
     print("Build with a maximum of %d ports per application" % Options.options.application_ports)
- 
+
     display_msg("Install prefix", conf.env['PREFIX'], 'CYAN')
     display_msg("Library directory", conf.all_envs[""]['LIBDIR'], 'CYAN')
     if conf.env['BUILD_WITH_32_64'] == True:
@@ -354,7 +354,7 @@ def configure(conf):
     if conf.env['IS_WINDOWS']:
         display_feature('Build with WinMME support', conf.env['BUILD_DRIVER_WINMME'] == True)
         display_feature('Build with Portaudio support', conf.env['BUILD_DRIVER_PORTAUDIO'] == True)
-       
+
     if conf.env['BUILD_JACKDBUS'] == True:
         display_msg('D-Bus service install directory', conf.env['DBUS_SERVICES_DIR'], 'CYAN')
         #display_msg('Settings persistence', xxx)
@@ -407,7 +407,7 @@ def build(bld):
         bld.add_subdirs('man')
         if bld.env['BUILD_JACKDBUS'] == True:
            bld.add_subdirs('dbus')
-  
+
     if bld.env['IS_MACOSX']:
         bld.add_subdirs('macosx')
         bld.add_subdirs('example-clients')
