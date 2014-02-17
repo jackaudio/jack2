@@ -46,21 +46,26 @@ public:
     virtual ~JackIIODriver() {
     }
 
-//    virtual int Process(){
-////        cout<<"JackIIODriver::Process\n";
-//        return JackAudioDriver::Process();
-//    }
-//
-    virtual int Attach(); ///< Enables the IIO system.
+    virtual int Open(jack_nframes_t buffer_size,
+                     jack_nframes_t samplerate,
+                     bool capturing,
+                     bool playing,
+                     int inchannels,
+                     int outchannels,
+                     bool monitor,
+                     const char* capture_driver_name,
+                     const char* playback_driver_name,
+                     jack_nframes_t capture_latency,
+                     jack_nframes_t playback_latency);
 
-    virtual int Detach(); ///< Disables the IIO system.
+    virtual int Close();
 
     virtual int Read(); ///< Read from the IIO sysetm and load the jack buffers
 
     virtual int Write(); ///< Not implemented.
 
-    virtual int SetBufferSize(jack_nframes_t buffer_size){
-        cout<<"JackIIODriver::SetBufferSize("<<buffer_size<<")\n";
+    virtual int SetBufferSize(jack_nframes_t buffer_size) {
+        //cout<<"JackIIODriver::SetBufferSize("<<buffer_size<<")\n";
         return JackAudioDriver::SetBufferSize(buffer_size);
     }
 };

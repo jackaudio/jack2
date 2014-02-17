@@ -34,22 +34,20 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 namespace Jack {
 
-int JackIIODriver::Attach() {
-    //cout<<"JackIIODriver::Attach\n";
-    JackAudioDriver::SetSampleRate((jack_nframes_t)IIO_DEFAULT_READ_FS);
+int JackIIODriver::Open(jack_nframes_t buffer_size, jack_nframes_t samplerate, bool capturing, bool playing, int inchannels, int outchannels, bool monitor, const char* capture_driver_name, const char* playback_driver_name, jack_nframes_t capture_latency, jack_nframes_t playback_latency) {
+    //cout<<"JackIIODriver::Open\n";
 
-    int ret;
-    if ((ret=iio.enable(true))!=NO_ERROR) { // start the DMA
-        iio.close();
+    int ret=JackAudioDriver::Open(buffer_size, samplerate, capturing, playing, inchannels, outchannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency);
+    if (ret!=NO_ERROR) // check whether the JackAudioDriver opened OK
         return ret;
-    }
-    return JackAudioDriver::Attach();
+    ret=iio.enable(true); // start the DMA
+    return ret;
 }
 
-int JackIIODriver::Detach() {
-    //cout<<"JackIIODriver::Detach\n";
+int JackIIODriver::Close() {
+    //cout<<"JackIIODriver::Close\n";
     iio.enable(false); // stop the DMA
-    return JackAudioDriver::Detach();
+    return JackAudioDriver::Close();
 }
 
 int JackIIODriver::Read() {
@@ -62,11 +60,12 @@ int JackIIODriver::Read() {
     uint devChCnt=iio[0].getChCnt(); // the number of channels per device
 
     jack_nframes_t nframes=data.rows()/devChCnt;
-    if (nframes != fEngineControl->fBufferSize)
-        jack_error("JackIIODriver::Read warning : Jack period size = %ld IIO period size = %ld", fEngineControl->fBufferSize, nframes);
 
-//    cout<<"processing buffer size : "<<fEngineControl->fBufferSize<<endl;
-//    cout<<"processing channel count : "<<fCaptureChannels<<endl;
+    // This is left here for future debugging.
+    //    if (nframes != fEngineControl->fBufferSize)
+    //        jack_error("JackIIODriver::Read warning : Jack period size = %ld IIO period size = %ld", fEngineControl->fBufferSize, nframes);
+    //    cout<<"processing buffer size : "<<fEngineControl->fBufferSize<<endl;
+    //    cout<<"processing channel count : "<<fCaptureChannels<<endl;
 
     int ret=iio.read(nframes, data); // read the data from the IIO subsystem
     if (ret!=NO_ERROR)
@@ -76,11 +75,12 @@ int JackIIODriver::Read() {
     // Keep begin cycle time
     JackDriver::CycleTakeBeginTime(); // is this necessary ?
 
-    int maxAvailChCnt=data.cols()*devChCnt;
     jack_default_audio_sample_t scaleFactor=1./32768.;
 
-    if (fCaptureChannels>maxAvailChCnt)
-        jack_error("JackIIODriver::Read warning : Jack period size = %ld IIO period size = %ld", fEngineControl->fBufferSize, nframes);
+    // This is left in for future debugging.
+    //int maxAvailChCnt=data.cols()*devChCnt;
+    //    if (fCaptureChannels>maxAvailChCnt)
+    //        jack_error("JackIIODriver::Read warning : Jack capture ch. cnt = %ld IIO capture ch. cnt = %ld", fCaptureChannels, maxAvailChCnt);
 
     for (int i = 0; i < fCaptureChannels; i++) {
         int col=i/devChCnt; // find the column and offset to read from
@@ -88,11 +88,8 @@ int JackIIODriver::Read() {
         if (fGraphManager->GetConnectionsNum(fCapturePortList[i]) > 0) {
             jack_default_audio_sample_t *dest=GetInputBuffer(i);
 
-            for (jack_nframes_t j=0; j<nframes; j++){
-//                dest[j]=(float)j/(float)nframes;
+            for (jack_nframes_t j=0; j<nframes; j++)
                 dest[j]=(jack_default_audio_sample_t)(data(j*devChCnt+rowOffset, col))*scaleFactor;
-//                cout<<dest[j]<<'\t'<<data(j*devChCnt+rowOffset, col)<<"\t\t";
-            }
         }
     }
 
@@ -139,11 +136,13 @@ driver_get_descriptor () {
 SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) {
 
     // As of this implementation the IIO driver is only capture... to be expanded.
+    int ret, colCnt;
+    Jack::JackDriverClientInterface* threaded_driver=NULL;
 
     string chipName(IIO_DEFAULT_CHIP); // the default chip name to search for in the IIO devices.
     float fs = IIO_DEFAULT_READ_FS; // IIO sample rate is fixed.
     jack_nframes_t periodSize = IIO_DEFAULT_PERIOD_SIZE; // default block size
-    jack_nframes_t periodCount    = IIO_DEFAULT_PERIOD_COUNT; // default block count
+    jack_nframes_t periodCount = IIO_DEFAULT_PERIOD_COUNT; // default block count
     uint inChCnt = IIO_DEFAULT_CAPUTURE_PORT_COUNT; // The default number of physical input channels - a very large number, to be reduced.
 
     for (const JSList *node = params; node; node = jack_slist_next (node)) {
@@ -175,14 +174,12 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
     // interrogate the available iio devices searching for the chip name
     if (iio_driver->iio.findDevicesByChipName(chipName)!=NO_ERROR) { // find all devices with a particular chip which are present.
         jack_error("\nThe iio driver found no devices by the name %s\n", chipName.c_str());
-        delete iio_driver;
-        return NULL;
+        goto initError;
     }
 
     if (iio_driver->iio.getDeviceCnt()<1) { // If there are no devices found by that chip name, then indicate.
         jack_error("\nThe iio driver found no devices by the name %s\n", chipName.c_str());
-        delete iio_driver;
-        return NULL;
+        goto initError;
     }
 
     iio_driver->iio.printInfo(); // print out detail about the devices which were found ...
@@ -192,40 +189,39 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
         inChCnt=iio_driver->iio.getChCnt();
 
     // resize the data buffer column count to match the device count
-    int colCnt=(int)ceil((float)inChCnt/(float)iio_driver->iio[0].getChCnt()); // check whether we require less then the available number of channels
-    int ret=iio_driver->iio.getReadArray(periodSize, iio_driver->data); // resize the array to be able to read enough memory
+    colCnt=(int)ceil((float)inChCnt/(float)iio_driver->iio[0].getChCnt()); // check whether we require less then the available number of channels
+    ret=iio_driver->iio.getReadArray(periodSize, iio_driver->data); // resize the array to be able to read enough memory
     if (ret!=NO_ERROR) {
         jack_error("iio::getReadArray couldn't create the data buffer, indicating the problem.");
-        delete iio_driver;
-        return NULL;
+        goto initError;
     }
     if (iio_driver->data.cols()>colCnt) // resize the data columns to match the specified number of columns (channels / channels per device)
         iio_driver->data.resize(iio_driver->data.rows(), colCnt);
 
     ret=iio_driver->iio.open(periodCount, periodSize); // try to open all IIO devices
     if (ret!=NO_ERROR)
-        delete iio_driver;
-        return NULL;
+        goto initError;
 
-    Jack::JackDriverClientInterface* threaded_driver = new Jack::JackThreadedDriver(iio_driver);
+initOK: // iio_driver ok, now create the threaded_driver
+    threaded_driver = new Jack::JackThreadedDriver(iio_driver);
     if (threaded_driver) {
         bool capture=true, playback=false, monitor=false;
         int outChCnt=0;
         jack_nframes_t inputLatency = periodSize*periodCount, outputLatency=0;
         // Special open for OSS driver...
-        if (iio_driver->Open(periodSize, periodCount, capture, playback, inChCnt, outChCnt, monitor, "iio:device", "iio:device", inputLatency, outputLatency)!=0) {
+        if (iio_driver->Open(periodSize, (jack_nframes_t)fs, capture, playback, inChCnt, outChCnt, monitor, "iio:device", "iio:device", inputLatency, outputLatency)!=0) {
             delete threaded_driver;
-            threaded_driver=NULL;
+            delete iio_driver;
+            return NULL;
         }
     } else
         jack_error("\nHave you run out of memory ? I tried to create Jack's standard threaded driver in memory but failed! The good news is that you had enough memory to create the IIO driver.\n");
 
-    if (!threaded_driver) { // handle the case that the threaded_driver was not created succ.
-        delete iio_driver;
-        iio_driver=NULL;
-    }
-
     return threaded_driver;
+
+initError: // error during intialisation, delete and return NULL
+        delete iio_driver;
+        return NULL;
 }
 
 #ifdef __cplusplus
