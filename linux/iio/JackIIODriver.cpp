@@ -202,7 +202,6 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
     if (ret!=NO_ERROR)
         goto initError;
 
-initOK: // iio_driver ok, now create the threaded_driver
     threaded_driver = new Jack::JackThreadedDriver(iio_driver);
     if (threaded_driver) {
         bool capture=true, playback=false, monitor=false;
