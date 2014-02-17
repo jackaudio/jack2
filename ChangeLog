@@ -8,7 +8,7 @@ Steven Chamberlain
 Thom Johansen
 Thibault LeMeur
 Tom Szilagyi
-Andrzej Szombierski 
+Andrzej Szombierski
 Kjetil S.Matheussen
 Pieter Palmers
 Tim Blechmann
@@ -18,7 +18,7 @@ Fernando Lopez-Lezcano
 Romain Moret
 Florian Faber
 Michael Voigt
-Torben Hohn  
+Torben Hohn
 Paul Davis
 Peter L Jones
 Devin Anderson
@@ -32,6 +32,7 @@ Valerio Pilo
 Chris Caudle
 John Emmas
 Robin Gareus
+Matt Flax with IIO kernel/hardware peers; Lars-Peter Clausen and Alexandru Tofan.
 
 ---------------------------
   Jackdmp changes log
@@ -39,7 +40,7 @@ Robin Gareus
 
 2012-12-10 Stephane Letz  <letz@grame.fr>
 
-	* Version 1.9.10 started. 
+	* Version 1.9.10 started.
 
 2012-11-21 Stephane Letz  <letz@grame.fr>
 
@@ -206,7 +207,7 @@ Robin Gareus
 
 2011-12-20 Stephane Letz  <letz@grame.fr>
 
-	* Version 1.9.9 started. 
+	* Version 1.9.9 started.
 
 2011-11-25 Stephane Letz  <letz@grame.fr>
 
@@ -246,7 +247,7 @@ Robin Gareus
 
 2011-10-27 Stephane Letz  <letz@grame.fr>
 
-	* Gabriel Beddingfield patch (r4541) reverted.  
+	* Gabriel Beddingfield patch (r4541) reverted.
 
 2011-10-10 Stephane Letz  <letz@grame.fr>
 
@@ -262,7 +263,7 @@ Robin Gareus
 
 2011-08-30 Stephane Letz  <letz@grame.fr>
 
-	* Check driver type in jackdmp.cpp. 
+	* Check driver type in jackdmp.cpp.
 
 2011-08-28 Stephane Letz  <letz@grame.fr>
 
@@ -287,11 +288,11 @@ Robin Gareus
 
 2011-07-25 Stephane Letz  <letz@grame.fr>
 
-	* NetJack2: no more timeout, correct JackWaitThreadedDriver::Execute. 
+	* NetJack2: no more timeout, correct JackWaitThreadedDriver::Execute.
 
 2011-07-25 Stephane Letz  <letz@grame.fr>
 
-	* NetJack2: improve latency management, cleanup. 
+	* NetJack2: improve latency management, cleanup.
 
 2011-07-23 Stephane Letz  <letz@grame.fr>
 
@@ -332,11 +333,11 @@ Robin Gareus
 
 2011-06-29 Stephane Letz  <letz@grame.fr>
 
-	* Special CATCH_CLOSE_EXCEPTION_RETURN to handle Close API calls. 
+	* Special CATCH_CLOSE_EXCEPTION_RETURN to handle Close API calls.
 
 2011-06-28 Stephane Letz  <letz@grame.fr>
 
-	* Another round of code improvements to handle completely buggy Digidesign CoreAudio user-land driver. 
+	* Another round of code improvements to handle completely buggy Digidesign CoreAudio user-land driver.
 
 2011-06-20 Stephane Letz  <letz@grame.fr>
 
@@ -415,15 +416,15 @@ Robin Gareus
 	* Cleanup JackThreadedDriver::Stop.
 	* Correct JackNetOneDriver::Close.
 	* Correction in jackdmp.cpp: notify_server_stop should be done after server destruction.
-	* Improve error management in JackNetDriver. 
+	* Improve error management in JackNetDriver.
 
 2011-03-30 Stephane Letz  <letz@grame.fr>
 
-	* Version 1.9.8 started. 
+	* Version 1.9.8 started.
 
 2011-03-29 Stephane Letz  <letz@grame.fr>
 
-	* Synchronize JackWeakAPI.cpp with new APIs. 
+	* Synchronize JackWeakAPI.cpp with new APIs.
 
 2011-03-28 Stephane Letz  <letz@grame.fr>
 
@@ -456,7 +457,7 @@ Robin Gareus
 2011-03-10 Stephane Letz  <letz@grame.fr>
 
 	* Latency callback must always be activated.
-	* Correct TopologicalSort. 
+	* Correct TopologicalSort.
 	* Add jack_midi_dump client.
 	* Synchronize netjack1 with JACK1 version.
 	* Synchronize jack_connect/jack_disconnect with JACK1 version.
@@ -509,7 +510,7 @@ Robin Gareus
 
 2010-11-05 Stephane Letz  <letz@grame.fr>
 
-	* In jackdmp.cpp, jackctl_setup_signals moved before jackctl_server_start. 
+	* In jackdmp.cpp, jackctl_setup_signals moved before jackctl_server_start.
 	* Correct symbols export in backends on OSX.
 
 2010-11-03 Stephane Letz  <letz@grame.fr>
@@ -518,7 +519,7 @@ Robin Gareus
 
 2010-10-30 Stephane Letz  <letz@grame.fr>
 
-	* Correct JackServer::Open to avoid a race when control API is used on OSX. 
+	* Correct JackServer::Open to avoid a race when control API is used on OSX.
 
 2010-10-29 Stephane Letz  <letz@grame.fr>
 
@@ -636,19 +637,19 @@ Robin Gareus
 
 2009-12-09 Stephane Letz  <letz@grame.fr>
 
-	* When threads are cancelled, the exception has to be rethrown. 
+	* When threads are cancelled, the exception has to be rethrown.
 
 2009-12-08 Stephane Letz  <letz@grame.fr>
 
-	* Josh Green ALSA driver capture only patch.  
+	* Josh Green ALSA driver capture only patch.
 
 2009-12-03 Stephane Letz  <letz@grame.fr>
 
-	* Fix JackCoreMidiDriver::ReadProcAux when ring buffer is full (thanks Devin Anderson).  
+	* Fix JackCoreMidiDriver::ReadProcAux when ring buffer is full (thanks Devin Anderson).
 
 2009-12-02 Stephane Letz  <letz@grame.fr>
 
-	* Special code in JackCoreAudio driver to handle completely buggy Digidesign CoreAudio user-land driver. 
+	* Special code in JackCoreAudio driver to handle completely buggy Digidesign CoreAudio user-land driver.
 	* Ensure that client-side message buffer thread calls thread_init callback if/when it is set by the client (backport of JACK1 rev 3838).
 	* Check dynamic port-max value.
 
@@ -658,7 +659,7 @@ Robin Gareus
 
 2009-11-30 Stephane Letz  <letz@grame.fr>
 
-	* Devin Anderson patch for Jack FFADO driver issues with lost MIDI bytes between periods (and more). 
+	* Devin Anderson patch for Jack FFADO driver issues with lost MIDI bytes between periods (and more).
 
 2009-11-29 Stephane Letz  <letz@grame.fr>
 
@@ -704,15 +705,15 @@ Robin Gareus
 
 2009-11-12 Stephane Letz  <letz@grame.fr>
 
-	* Better memory allocation error checking on client (library) side. 
+	* Better memory allocation error checking on client (library) side.
 
 2009-11-11 Stephane Letz  <letz@grame.fr>
 
-	* Correct JackCoreAudio driver when empty strings are given as -C, -P or -d parameter. 
+	* Correct JackCoreAudio driver when empty strings are given as -C, -P or -d parameter.
 
 2009-11-10 Stephane Letz  <letz@grame.fr>
 
-	* Correct JackInfoShutdownCallback prototype, two new JackClientProcessFailure and JackClientZombie JackStatus code.  
+	* Correct JackInfoShutdownCallback prototype, two new JackClientProcessFailure and JackClientZombie JackStatus code.
 
 2009-11-09 Stephane Letz  <letz@grame.fr>
 
@@ -735,8 +736,8 @@ Robin Gareus
 
 2009-10-30 Stephane Letz  <letz@grame.fr>
 
-	* In JackCoreAudioDriver, improve management of input/output channels: -1 is now used internally to indicate a wanted max value. 
-	* In JackCoreAudioDriver::OpenAUHAL, correct stream format setup and cleanup. 
+	* In JackCoreAudioDriver, improve management of input/output channels: -1 is now used internally to indicate a wanted max value.
+	* In JackCoreAudioDriver::OpenAUHAL, correct stream format setup and cleanup.
 	* Correct crash bug in JackAudioAdapterInterface when not input is used in adapter (temporary fix...)
 	* Sync JackCoreAudioAdapter code on JackCoreAudioDriver one.
 	* JACK_SCHED_POLICY switched to SCHED_FIFO.
@@ -748,7 +749,7 @@ Robin Gareus
 
 2009-10-28 Stephane Letz  <letz@grame.fr>
 
-	* In JackCoreAudioDriver, force the SR value to the wanted one *before* creating aggregate device (otherwise creation will fail). 
+	* In JackCoreAudioDriver, force the SR value to the wanted one *before* creating aggregate device (otherwise creation will fail).
 	* In JackCoreAudioDriver, better cleanup of AD when intermediate open failure.
 
 2009-10-27 Stephane Letz  <letz@grame.fr>
@@ -1058,7 +1059,7 @@ Robin Gareus
 
 2009-01-29 Stephane Letz  <letz@grame.fr>
 
-	* Support for "-h" option in internal clients to print the parameters. 
+	* Support for "-h" option in internal clients to print the parameters.
 	* Support for BIG_ENDIAN machines in NetJack2 for MIDI ports.
 
 2009-01-28 Stephane Letz  <letz@grame.fr>
@@ -1082,7 +1083,7 @@ Robin Gareus
 
 2009-01-17 Stephane Letz  <letz@grame.fr>
 
-	* JackMessageBuffer was using thread "Stop" scheme in destructor, now use the safer thread "Kill" way. 
+	* JackMessageBuffer was using thread "Stop" scheme in destructor, now use the safer thread "Kill" way.
 
 2009-01-14 Stephane Letz  <letz@grame.fr>
 
@@ -1094,7 +1095,7 @@ Robin Gareus
 
 2009-01-09 Stephane Letz  <letz@grame.fr>
 
-	* New JackProfiler class for real-time server monitoring. 
+	* New JackProfiler class for real-time server monitoring.
 
 2009-01-07 Stephane Letz  <letz@grame.fr>
 
@@ -1102,12 +1103,12 @@ Robin Gareus
 
 2009-01-05 Stephane Letz  <letz@grame.fr>
 
-	* Synchronize jack2 public headers with JACK1 ones. 
+	* Synchronize jack2 public headers with JACK1 ones.
 	* Implement jack_client_real_time_priority and jack_client_max_real_time_priority API.
 
 2008-12-18 Stephane Letz  <letz@grame.fr>
 
-	* For ALSA driver, synchronize with latest JACK1 memops functions. 
+	* For ALSA driver, synchronize with latest JACK1 memops functions.
     	* Use memops functions in JackOSSDriver.
 	* Use memops functions in JackOSSAdapter.
 
@@ -1128,7 +1129,7 @@ Robin Gareus
 
 2008-12-04 Stephane Letz  <letz@grame.fr>
 
-	* More profiling in JackOSSDriver: sample conversion duration is measured. 
+	* More profiling in JackOSSDriver: sample conversion duration is measured.
 
 2008-12-02 Stephane Letz  <letz@grame.fr>
 
@@ -1152,7 +1153,7 @@ Robin Gareus
 2008-11-19 Stephane Letz  <letz@grame.fr>
 
 	* Libjack shutdown handler does not "deactivate" (fActive = false) the client anymore, so that jack_deactivate correctly does the job later on.
-	* Filter SIGPIPE to avoid having client get a SIGPIPE when trying to access a died server. 
+	* Filter SIGPIPE to avoid having client get a SIGPIPE when trying to access a died server.
 
 2008-11-14 Stephane Letz  <letz@grame.fr>
 
@@ -1166,58 +1167,58 @@ Robin Gareus
 
 	* Correct JackClient::ShutDown.
         * TimeOut management in JackNetUnixSocket on Solaris.
- 
+
 2008-10-23 Stephane Letz  <letz@grame.fr>
-	
+
 	* In JackOSSDriver, vmix mode is used by default, exclusif (O_EXCL) mode can be selected with -e option.
 	* Fix a crash in JackEngine::Close when backend cannot be loaded.
 	* Tim Blechmann optimization patch.
 	* Backport of latest Paul alsa_seqmidi changes.
 
 2008-10-15 Stephane Letz  <letz@grame.fr>
-	
-	* Fix a conflict with Audio Hijack in JackCoreAudioDriver. 
+
+	* Fix a conflict with Audio Hijack in JackCoreAudioDriver.
 
 2008-10-09 Stephane Letz  <letz@grame.fr>
-	
+
 	* Use a mutex to make jack_client_open/jack_client_close thread safe, remove use of jack_init/jack_uninit.
 
 2008-10-08 Stephane Letz  <letz@grame.fr>
-	
+
 	* Fix a SMP related bug introduced in rev 2957: remove the __SMP__ flag and define LOCK for SMP in all cases.
 
 2008-10-02 Stephane Letz  <letz@grame.fr>
-	
+
 	* Correct file permission for jack-shm-registry POSIX shared memory segment.
-	* Checking for libsamplerate in waf, fix ticket #89." 
+	* Checking for libsamplerate in waf, fix ticket #89."
         * Header cleanup, add --clients and --ports options in configure.
 
 2008-09-22 Stephane Letz  <letz@grame.fr>
-	
+
         * Socket time out implementation on Solaris.
-	* Fix a conflict with Audio Hijack in JackCoreAudioDriver. 
+	* Fix a conflict with Audio Hijack in JackCoreAudioDriver.
 
 2008-10-10 Stephane Letz  <letz@grame.fr>
-	
-	* Improve OSS backend: SNDCTL_DSP_SETFRAGMENT must be done before, use of AFMT_S16_LE kind of values. 
+
+	* Improve OSS backend: SNDCTL_DSP_SETFRAGMENT must be done before, use of AFMT_S16_LE kind of values.
 
 2008-10-09 Stephane Letz  <letz@grame.fr>
-	
+
 	* First version of OSS backend.
 	* Use a mutex to make jack_client_open/jack_client_close thread safe, remove use of jack_init/jack_uninit.
 
 2008-10-08 Stephane Letz  <letz@grame.fr>
-	
+
 	* Fix a SMP related bug introduced in rev 2957: remove the __SMP__ flag and define LOCK for SMP in all cases.
 
 2008-10-03 Stephane Letz  <letz@grame.fr>
-	
+
 	* Add engine profiling tools.
 
 2008-10-02 Stephane Letz  <letz@grame.fr>
-	
+
 	* Correct file permission for jack-shm-registry POSIX shared memory segment.
-	* Checking for libsamplerate in waf, fix ticket #89." 
+	* Checking for libsamplerate in waf, fix ticket #89."
         * Header cleanup, add --clients and --ports options in configure.
 
 2008-10-01 Stephane Letz  <letz@grame.fr>
@@ -1225,76 +1226,76 @@ Robin Gareus
    	* First Solaris version.
 
 2008-09-22 Stephane Letz  <letz@grame.fr>
-	
+
 	* Cleanup jack_port_id_t/jack_port_t mess, should work again on 64 bits machines."
 
 2008-09-20 Stephane Letz  <letz@grame.fr>
-	
+
 	* Michael Voigt JackAPI cleanup patch.
 
 2008-09-19 Stephane Letz  <letz@grame.fr>
-	
+
 	* Michael Voigt JackTime cleanup patch.
 
 2008-09-17 Stephane Letz  <letz@grame.fr>
-	
+
 	* New JackDriverInfo class to cleanup driver loading code.
 
 2008-09-08 Stephane Letz  <letz@grame.fr>
-	
-	* Better symbols export for server and client side libraries. 
+
+	* Better symbols export for server and client side libraries.
 
 2008-09-06 Stephane Letz  <letz@grame.fr>
-	
+
 	* Correct driver hierarchy on macosx and windows targets.
 
 2008-09-05 Stephane Letz  <letz@grame.fr>
-	
+
 	* Merge Michael Voigt "drops" branch after reorganization step.
 
 2008-09-04 Stephane Letz  <letz@grame.fr>
-	
+
 	* Michael Voigt 4th source reorganization patch.
 	* Correct JackNetDriver initialization.
 
 2008-09-03 Stephane Letz  <letz@grame.fr>
-	
+
 	* Implement DBUS entry points to handle internal clients, add new commands in jack_control.
 	* Add new "desc" (extended description) in jack_driver_desc_t, to be used by backends and internal clients.
 
 2008-09-01 Stephane Letz  <letz@grame.fr>
-	
+
 	* Michael Voigt third source reorganization patch.
 	* Add new jack_set_port_rename_callback API, jack_port_set_name is now a server request that call port rename callbacks.
 
 2008-08-31 Stephane Letz  <letz@grame.fr>
-	
+
 	* Michael Voigt second source reorganization patch.
 
 2008-08-28 Stephane Letz  <letz@grame.fr>
-	
+
 	* Michael Voigt first source reorganization patch.
 
 2008-08-26 Stephane Letz  <letz@grame.fr>
-	
+
 	* Better parameter handling in JackCoreAudioAdapter.
 	* Fix memory leaks.
 
 2008-08-23 Stephane Letz  <letz@grame.fr>
-	
+
 	* Implements internal clients management API.
 
 2008-08-22 Stephane Letz  <letz@grame.fr>
-	
+
 	* Move GetCurrentTransportFrame code from JackClient to JackTransportEngine.
 	* Add a fNetworkSync state in JackTransportEngine used in network.
 
 2008-08-03 Stephane Letz  <letz@grame.fr>
-	
+
 	* Fix JackFrameTimer::Time2Frames and JackTimer::Frames2Time, jack_cpu compiled again.
 
 2008-08-01 Stephane Letz  <letz@grame.fr>
-	
+
 	* Fix desallocation of remaining clients when server quits.
 	* Close remaining client sockets in JackSocketServerChannel::Close.
 	* Correct JackClient::Close() to request server close only if server is running.
@@ -1376,11 +1377,11 @@ Robin Gareus
 
 2008-06-09 Stephane Letz  <letz@grame.fr>
 
-	* Improve net driver so that jack clients can be registered even if driver has not yet started. 
+	* Improve net driver so that jack clients can be registered even if driver has not yet started.
 
 2008-06-08 Stephane Letz  <letz@grame.fr>
 
-	* Add a missing EXPORT for JackException class. 
+	* Add a missing EXPORT for JackException class.
 
 2008-06-06 Stephane Letz  <letz@grame.fr>
 
@@ -1403,7 +1404,7 @@ Robin Gareus
 2008-06-02 Stephane Letz  <letz@grame.fr>
 
 	* Cleanup and correct wscript for example-clients.
-	* Add a test for coherent freewheel state in JackDebugClient. 
+	* Add a test for coherent freewheel state in JackDebugClient.
 	* Cleanup JackMutex class.
 
 2008-05-31 Stephane Letz  <letz@grame.fr>
@@ -1449,7 +1450,7 @@ Robin Gareus
 
 2008-05-21 Stephane Letz  <letz@grame.fr>
 
-	* Correct JackEngine::PortUnRegister, JackEngine::ClientCloseAux and JackEngine::ClientDeactivate to correctly send notifications. 
+	* Correct JackEngine::PortUnRegister, JackEngine::ClientCloseAux and JackEngine::ClientDeactivate to correctly send notifications.
 	* New jack_get_client_pid API, implemented on server side.
 	* Better handling of graph state read functions: never wait when used in the real-time thread, current state is used.
 
@@ -1500,88 +1501,88 @@ Robin Gareus
 	* For threaded drivers, AcquireRealTime is called after Init step.
 
 2008-04-30 Stephane Letz  <letz@grame.fr>
-		
+
 	* Fix JackRestartThreadedDriver::Execute.
 	* Better handling of init and run state in JackThread.
 
 2008-04-28 Stephane Letz  <letz@grame.fr>
-		
+
 	* Add exceptions management to distinguish drivers recoverable errors from non recoverable ones. Will be used in special threaded drivers (for network).
 
 2008-04-25 Stephane Letz  <letz@grame.fr>
-		
+
 	* Correct JackServerGlobals::Init: now check is server is already started.
 
 2008-04-24 Stephane Letz  <letz@grame.fr>
-		
+
 	* Correct internal client load.
 
 2008-04-10 Stephane Letz  <letz@grame.fr>
-		
+
 	* Remove Linux Makefile, update Readme.
 
 2008-04-03 Stephane Letz  <letz@grame.fr>
-		
+
 	* Correct a dirty port array issue in JackGraphManager::GetPortsAux.
 
 2008-03-31 Stephane Letz  <letz@grame.fr>
-		
+
 	* New SetNonBlocking method for JackSocket.
 
 2008-03-29 Stephane Letz  <letz@grame.fr>
-		
+
 	* Correct a missing parameter in the usage message of jack_midiseq.
 	* Add a client counter in wrapper layer: library is unloaded only when all clients have been closed.
 
 2008-03-28 Stephane Letz  <letz@grame.fr>
-		
+
 	* Correct PortRegister, port name checking must be done on server side.
 	* Add an Init method for blocking drivers to be decorated using JackThreadedDriver class.
 
 2008-03-27 Stephane Letz  <letz@grame.fr>
-		
+
 	* Pieter Palmers patch for FFADO driver.
 	* Dmitry Baikov patch for alsa_rawmidi driver.
 
 2008-03-26 Stephane Letz  <letz@grame.fr>
-		
+
 	* JackWrapperAPI.cpp: use open_library in jack_client_name_size, jack_port_name_size and jack_port_type_size.
 
 2008-03-20 Stephane Letz  <letz@grame.fr>
-		
+
 	* Transport timebase fix.
 
 2008-03-19 Stephane Letz  <letz@grame.fr>
-		
+
 	* Synchronise transport.h with latest jackd version (Video handling).
 
 2008-03-19 Stephane Letz  <letz@grame.fr>
-		
+
 	* Add jack_port_type_id in jack API.
 
 2008-03-17 Stephane Letz  <letz@grame.fr>
-		
+
 	* New jack_server_control client to test notifications when linked to the server library.
 	* Correct JackClient::Activate so that first kGraphOrderCallback can be received by the client notification thread.
 	* MIDI API in wrapper lib.
 	* Fix connect notification to deliver *one* notification only.
 
 2008-03-16 Stephane Letz  <letz@grame.fr>
-		
+
 	* Use engine in JackAlsaDriver::port_register and JackAlsaDriver::port_unregister.
 	* New JackLockedEngine decorator class to serialize access from ALSA Midi thread, command thread and in-server clients.
 
 2008-03-15 Stephane Letz  <letz@grame.fr>
-		
+
 	* Add -L (extra output latency in aynchronous mode) in CoreAudio driver.
 	* RT scheduling for OSX thread (when use in dummy driver).
 
 2008-03-14 Stephane Letz  <letz@grame.fr>
-		
+
 	* Fernando Lopez-Lezcano scons patch.
 
 2008-03-13 Stephane Letz  <letz@grame.fr>
-		
+
 	* Add test for jack_cycle_wait, jack_cycle_wait and jack_set_process_thread API.
 	* Add jack_set_process_thread in wrapper library.
 	* Correct all backend playback port latency in case of "asynchronous" mode (1 buffer more).
@@ -1589,13 +1590,13 @@ Robin Gareus
 	* Correct jack_port_by_id in wrapper library.
 
 2008-03-12 Stephane Letz  <letz@grame.fr>
-		
+
 	* Marc-Olivier Barre library related scons patch.
 	* Nedko Arnaudov FULL_MIMIC patch.
 	* Automatic server launch in wrapper layer.
 
 2008-03-11 Stephane Letz  <letz@grame.fr>
-		
+
 	* Fix engine real-time notification (was broken since ??).
 	* Correct jack_client_open_aux, jack_client_open and jack_client_new.
 	* Correct jack_internal_client_load for wrapper layer.
@@ -1603,73 +1604,73 @@ Robin Gareus
 	* Correct jack_port_get_connections function (should return NULL when no connections).
 
 2008-03-10 Stephane Letz  <letz@grame.fr>
-		
+
 	* Nedko Arnaudov log patch.
 	* Remove unneeded jack_port_connect API.
 
 2008-03-07 Stephane Letz  <letz@grame.fr>
-		
+
 	* Define an internal jack_client_open_aux needed for library wrapper feature.
 	* Improve wrapper code.
 	* Correct FreeBob driver_initialize.
 
 2008-03-06 Stephane Letz  <letz@grame.fr>
-		
+
 	* Marc-Olivier Barre scons patch (3).
 
 2008-03-06 Stephane Letz  <letz@grame.fr>
-		
-	* Fix JackSocketClientChannel::ClientClose: async call from the client and server does not need to write any reply. 
+
+	* Fix JackSocketClientChannel::ClientClose: async call from the client and server does not need to write any reply.
 	* Correct port notification: 2 notifications have to be sent (src, dst) and (dst, src)...
 
 2008-03-05 Stephane Letz  <letz@grame.fr>
-		
+
 	* libjackdmp.so renamed to libjackservermp.so and same for OSX framework.
 	* tw1.c example added (new thread model).
 	* Marc-Olivier Barre scons patch (2).
 
 2008-03-02 Stephane Letz  <letz@grame.fr>
-		
+
 	* Correct JackSocketClientChannel::ClientClose to use ServerSyncCall instead of ServerAsyncCall.
 	* Better documentation in jack.h.
 	* Marc-Olivier Barre scons patch.
 
 2008-03-02 Stephane Letz  <letz@grame.fr>
-		
+
 	* Correct jack_get_time propotype.
 
 2008-02-25 Stephane Letz  <letz@grame.fr>
-		
+
 	* Add TimeCallback in JackDebugClient class.
 
 2008-02-22 Stephane Letz  <letz@grame.fr>
-		
+
 	* Correct JACK_port_unregister.
 
 2008-02-21 Stephane Letz  <letz@grame.fr>
-		
+
 	* Add port register/unregister notification in JackAlsaDriver.
 
 2008-02-12 Stephane Letz  <letz@grame.fr>
-		
-	* Fix in JackClient::Error(): when RT thread is failing and calling Shutdown, Shutdown was not desactivating the client correctly. 
+
+	* Fix in JackClient::Error(): when RT thread is failing and calling Shutdown, Shutdown was not desactivating the client correctly.
 	* Notify ports unregistration in JackEngine::ClientCloseAux.
 	* Thanks Esben Stien for helping finding these bugs.
 
 2008-02-11 Stephane Letz  <letz@grame.fr>
-		
+
 	* Use SetAlias for port naming. Use jackd midi port naming scheme.
 
 2008-02-08 Stephane Letz  <letz@grame.fr>
-		
+
 	* More robust external API.
 
 2008-02-07 Stephane Letz  <letz@grame.fr>
-		
+
 	* Correct "server_connect": close the communication channel.
 
 2008-02-05 Stephane Letz  <letz@grame.fr>
-		
+
 	* Reduce WaitGraphChange wait value.
 	* Remove use of assert in JackFifo, JackMachSemaphore, and JackPosixSemaphore: print an error instead.
 
@@ -1695,12 +1696,12 @@ Robin Gareus
 	* Add jack_mp_thread_wait client example.
 
 2008-01-30 Stephane Letz  <letz@grame.fr>
-	
+
 	* Latest jack_lsp code from jack SVN.
 	* Update in usx2y.c and JackPort.cpp to match jackd 0.109.2.
 
 2008-01-29 Stephane Letz  <letz@grame.fr>
-	
+
 	* Implement jack_recompute_total_latency and jack_recompute_total_latencies.
 	* Remove fBufferSize field in JackGraphManager object.
 	* Port connection callback, client side.
@@ -1765,7 +1766,7 @@ Robin Gareus
 
 2007-11-29 Stephane Letz  <letz@grame.fr>
 
-	* Correct fPeriodUsecs computation in JackAudioDriver::SetBufferSize and JackAudioDriver::SetSampleRate. 
+	* Correct fPeriodUsecs computation in JackAudioDriver::SetBufferSize and JackAudioDriver::SetSampleRate.
 
 2007-11-28 Stephane Letz  <letz@grame.fr>
 
@@ -1808,8 +1809,8 @@ Robin Gareus
 
 2007-10-26 Stephane Letz  <letz@grame.fr>
 
-	* Add midiseq and midisine examples. 
-	* Cleanup old zombification code. 
+	* Add midiseq and midisine examples.
+	* Cleanup old zombification code.
 	* Linux Makefile now install jack headers.
 	* Use of JACK_CLIENT_DEBUG environment variable to activate debug client mode.
 	* Definition of JACK_LOCATION variable using -D in the Makefile.
@@ -1817,7 +1818,7 @@ Robin Gareus
 
 2007-10-25 Stephane Letz  <letz@grame.fr>
 
-	* Merge of Dmitry Baikov MIDI branch. 
+	* Merge of Dmitry Baikov MIDI branch.
 	* Correct JackGraphManager::GetPortsAux to use port type.
 	* Remove JackEngineTiming class: code moved in JackEngineControl.
 
@@ -1839,11 +1840,11 @@ Robin Gareus
 
 2007-10-16 Stephane Letz  <letz@grame.fr>
 
-	* Internal loadable client implementation, winpipe version added. 
+	* Internal loadable client implementation, winpipe version added.
 
 2007-10-12 Stephane Letz  <letz@grame.fr>
 
-	* Internal loadable client implementation, socket version added. 
+	* Internal loadable client implementation, socket version added.
 	* Fix JackEngine::Close() method.
 
 2007-10-11 Stephane Letz  <letz@grame.fr>
@@ -1852,7 +1853,7 @@ Robin Gareus
 
 2007-10-08 Stephane Letz  <letz@grame.fr>
 
-	* Use .jackdrc file (instead of .jackdmprc). Install script now creates a link "jackd ==> jackdmp" so that automatic launch can work correctly. 
+	* Use .jackdrc file (instead of .jackdmprc). Install script now creates a link "jackd ==> jackdmp" so that automatic launch can work correctly.
 	* Paul Davis patch for -r (--replace-registry) feature.
 
 2007-10-07 Stephane Letz  <letz@grame.fr>
@@ -1980,15 +1981,15 @@ Robin Gareus
 	* Merge JackGraphManager Remove and Release method in a unique Release method.
 
 2007-03-12 Stephane Letz  <letz@grame.fr>
- 
+
 	* Bug fix in JackMidiBuffer::MaxEventSize().
 
 2007-03-09 Stephane Letz  <letz@grame.fr>
- 
+
 	* Dmitry Baikov MIDI patch phase 2.
 
 2007-03-08 Stephane Letz  <letz@grame.fr>
- 
+
 	* Dmitry Baikov jackmp-port-clear patch.
 
 2007-03-06 Stephane Letz  <letz@grame.fr>
@@ -2001,19 +2002,19 @@ Robin Gareus
 	* Dmitry Baikov MIDI patch phase 0.
 
 2007-02-19 Stephane Letz  <letz@grame.fr>
-	
-	* Correct back JackAlsaDriver::Read method. 
+
+	* Correct back JackAlsaDriver::Read method.
 
 2007-02-14 Stephane Letz  <letz@grame.fr>
-	
+
 	* Better error checking in PortAudio driver.
 
 2007-02-07 Stephane Letz  <letz@grame.fr>
-	
+
 	* Thom Johansen fix for port buffer alignment issues.
 
 2007-02-05 Stephane Letz  <letz@grame.fr>
-	
+
 	* Add Pieter Palmers FreeBob driver.
 	* Thibault LeMeur ALSA driver patch.
 
@@ -2047,7 +2048,7 @@ Robin Gareus
 
 2007-01-04 Stephane Letz  <letz@grame.fr>
 
-	*  Add call to the init callback (set up using the jack_set_thread_init_callback API) in Real-Time and Notification threads. Define a new 'kActivateClient' notification. 
+	*  Add call to the init callback (set up using the jack_set_thread_init_callback API) in Real-Time and Notification threads. Define a new 'kActivateClient' notification.
 
 2007-01-02 Stephane Letz  <letz@grame.fr>
 
@@ -2072,9 +2073,9 @@ Robin Gareus
 
 2006-11-22 Stephane Letz  <letz@grame.fr>
 
-	* In synchronous mode, if the driver time out is reached, the server may get desynchronized (pending signal may arrive in later cycles), 
+	* In synchronous mode, if the driver time out is reached, the server may get desynchronized (pending signal may arrive in later cycles),
 	improve audio driver synchronous code to better handle this case.
-	 
+
 2006-11-08 Stephane Letz  <letz@grame.fr>
 
 	* Synchronize ALSA backend with jack one.
@@ -2097,7 +2098,7 @@ Robin Gareus
 
 2006-09-20  Stephane Letz  <letz@grame.fr>
 
-	* On Windows, avoid to use the unsafe Kill thread method. Use thread Stop instead and have blocked IO be unlocked. 
+	* On Windows, avoid to use the unsafe Kill thread method. Use thread Stop instead and have blocked IO be unlocked.
 	* Still get RT thread termination problems, restore a version that works on OSX and Linux with conditionnal compilation for now.
 
 2006-09-16  Stephane Letz  <letz@grame.fr>

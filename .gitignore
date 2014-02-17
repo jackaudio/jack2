@@ -4,3 +4,4 @@ man/*.1
 .lock*
 android/.server/
 android/.client/
+codeBlocks
