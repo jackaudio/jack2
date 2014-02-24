@@ -163,7 +163,6 @@ namespace Jack
                     fPortBuffer[port_index] + (fPortBuffer[port_index]->buffer_size - fPortBuffer[port_index]->write_pos),
                     fPortBuffer[port_index]->write_pos);
             pos += fPortBuffer[port_index]->write_pos;
-
             JackMidiBuffer* midi_buffer = reinterpret_cast<JackMidiBuffer*>(write_pos);
             MidiBufferHToN(midi_buffer, midi_buffer);
         }
@@ -1210,7 +1209,6 @@ namespace Jack
 
     SERVER_EXPORT void PacketHeaderHToN(packet_header_t* src_header, packet_header_t* dst_header)
     {
-        //printf("PacketHeaderHToN _packet_header size %d\n", sizeof(_packet_header));
         memcpy(dst_header, src_header, sizeof(packet_header_t));
         dst_header->fDataType = htonl(src_header->fDataType);
         dst_header->fDataStream = htonl(src_header->fDataStream);
@@ -1226,7 +1224,6 @@ namespace Jack
 
     SERVER_EXPORT void PacketHeaderNToH(packet_header_t* src_header, packet_header_t* dst_header)
     {
-        //printf("PacketHeaderNToH _packet_header size %d\n", sizeof(_packet_header));
         memcpy(dst_header, src_header, sizeof(packet_header_t));
         dst_header->fDataType = ntohl(src_header->fDataType);
         dst_header->fDataStream = ntohl(src_header->fDataStream);

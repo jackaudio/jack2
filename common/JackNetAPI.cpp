@@ -380,7 +380,8 @@ struct JackNetExtMaster : public JackNetMasterInterface {
     int Read(int audio_input, float** audio_input_buffer, int midi_input, void** midi_input_buffer, int frames)
     {
         try {
-        
+            
+            // frames = -1 means : entire buffer
             if (frames < 0) frames = fParams.fPeriodSize;
            
             int read_frames;
@@ -432,6 +433,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
     {
         try {
         
+            // frames = -1 means : entire buffer
             if (frames < 0) frames = fParams.fPeriodSize;
             
             assert(audio_output == fParams.fSendAudioChannels);
