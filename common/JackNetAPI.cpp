@@ -693,6 +693,8 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
         
         // By default fFrames is fPeriodSize
         fFrames = fParams.fPeriodSize;
+        
+        SessionParamsDisplay(&fParams);
      
         AllocPorts();
         return 0;

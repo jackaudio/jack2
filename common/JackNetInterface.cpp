@@ -227,7 +227,11 @@ namespace Jack
 
     int JackNetInterface::FinishRecv(NetAudioBuffer* buffer)
     {
-        buffer->RenderToJackPorts(fRxHeader.fFrames);
+        if (buffer) {
+            buffer->RenderToJackPorts(fRxHeader.fFrames);
+        } else {
+            jack_error("FinishRecv with null buffer...");
+        }
         return DATA_PACKET_ERROR;
     }
 
