@@ -29,6 +29,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackServerLaunch.h"
 #include "JackPlatformPlug.h"
 
+#include <sys/wait.h>
+
 using namespace Jack;
 
 #if defined(USE_LIBDBUS_AUTOLAUNCH)
@@ -175,7 +177,12 @@ static int start_server_classic(const char* server_name)
      * virtual memory tricks, the overhead of the second fork() is
      * probably relatively small.
      */
-    switch (fork()) {
+     
+    int status;
+    pid_t first_child_pid;
+    
+    first_child_pid = fork();
+    switch (first_child_pid) {
         case 0:					/* child process */
             switch (fork()) {
                 case 0:			/* grandchild process */
@@ -189,6 +196,7 @@ static int start_server_classic(const char* server_name)
         case - 1:			/* fork() error */
             return 1;		/* failed to start server */
     }
+    waitpid(first_child_pid, &status, 0);
 
     /* only the original parent process goes here */
     return 0;			/* (probably) successful */
