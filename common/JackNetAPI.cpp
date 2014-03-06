@@ -384,7 +384,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
             // frames = -1 means : entire buffer
             if (frames < 0) frames = fParams.fPeriodSize;
            
-            int read_frames;
+            int read_frames = 0;
             assert(audio_input == fParams.fReturnAudioChannels);
 
             for (int audio_port_index = 0; audio_port_index < audio_input; audio_port_index++) {
