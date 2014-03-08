@@ -431,6 +431,7 @@ namespace Jack
         int rx_bytes;
 
         if (((rx_bytes = fSocket.Recv(fRxBuffer, size, flags)) == SOCKET_ERROR) && fRunning) {
+            fSocket.PrintError();
             FatalRecvError();
         }
   
@@ -838,6 +839,7 @@ namespace Jack
         
         // handle errors
         if (rx_bytes == SOCKET_ERROR) {
+            fSocket.PrintError();
             FatalRecvError();
         }
 

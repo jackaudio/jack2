@@ -107,6 +107,7 @@ namespace Jack
 
             //error management
             net_error_t GetError();
+            void PrintError();
     };
 }
 
