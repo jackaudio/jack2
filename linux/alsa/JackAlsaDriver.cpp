@@ -543,7 +543,7 @@ fill_device(
 
     if (*constraint_ptr_ptr == NULL)
     {
-        *constraint_ptr_ptr = (jack_driver_param_constraint_desc_t *)calloc(1, sizeof(jack_driver_param_value_enum_t));
+        *constraint_ptr_ptr = (jack_driver_param_constraint_desc_t *)calloc(1, sizeof(jack_driver_param_constraint_desc_t));
         *array_size_ptr = 0;
     }
 
