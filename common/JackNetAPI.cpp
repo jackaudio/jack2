@@ -149,8 +149,6 @@ struct JackNetExtMaster : public JackNetMasterInterface {
 
     jack_master_t fRequest;
     
-    int fPacketTimeOut;
-    
     JackRingBuffer** fRingBuffer;
 
     JackNetExtMaster(const char* ip,

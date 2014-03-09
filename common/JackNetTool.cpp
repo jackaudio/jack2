@@ -727,15 +727,15 @@ namespace Jack
         fOpusMode = new OpusCustomMode*[fNPorts];
         fOpusEncoder = new OpusCustomEncoder*[fNPorts];
         fOpusDecoder = new OpusCustomDecoder*[fNPorts];
-        fCompressedSizesByte = new unsigned short [fNPorts];
+        fCompressedSizesByte = new unsigned short[fNPorts];
 
         memset(fOpusMode, 0, fNPorts * sizeof(OpusCustomMode*));
         memset(fOpusEncoder, 0, fNPorts * sizeof(OpusCustomEncoder*));
         memset(fOpusDecoder, 0, fNPorts * sizeof(OpusCustomDecoder*));
-        memset(fCompressedSizesByte, 0, fNPorts * sizeof(int));
+        memset(fCompressedSizesByte, 0, fNPorts * sizeof(short));
 
         int error = OPUS_OK;
-
+        
         for (int i = 0; i < fNPorts; i++)  {
             /* Allocate en/decoders */
             fOpusMode[i] = opus_custom_mode_create(params->fSampleRate, params->fPeriodSize, &error);

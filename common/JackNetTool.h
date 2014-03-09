@@ -376,10 +376,9 @@ namespace Jack
             CELTDecoder** fCeltDecoder;
 
             int fCompressedSizeByte;
+            unsigned char** fCompressedBuffer;
    
             size_t fLastSubPeriodBytesSize;
-
-            unsigned char** fCompressedBuffer;
 
             void FreeCelt();
 
@@ -419,8 +418,8 @@ namespace Jack
             OpusCustomEncoder** fOpusEncoder;
             OpusCustomDecoder** fOpusDecoder;
 
-            unsigned short *fCompressedSizesByte;
             int fCompressedMaxSizeByte;
+            unsigned short* fCompressedSizesByte;
    
             size_t fLastSubPeriodBytesSize;
 
