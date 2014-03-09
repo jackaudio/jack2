@@ -498,6 +498,7 @@ namespace Jack
         for (int i = 0; i < fNPorts; i++)  {
             fCeltMode[i] = celt_mode_create(params->fSampleRate, params->fPeriodSize, &error);
             if (error != CELT_OK) {
+                jack_log("NetCeltAudioBuffer celt_mode_create err = %d", error);
                 goto error;
             }
 
@@ -505,12 +506,14 @@ namespace Jack
 
             fCeltEncoder[i] = celt_encoder_create_custom(fCeltMode[i], 1, &error);
             if (error != CELT_OK) {
+                jack_log("NetCeltAudioBuffer celt_encoder_create_custom err = %d", error);
                 goto error;
             }
             celt_encoder_ctl(fCeltEncoder[i], CELT_SET_COMPLEXITY(1));
 
             fCeltDecoder[i] = celt_decoder_create_custom(fCeltMode[i], 1, &error);
             if (error != CELT_OK) {
+                jack_log("NetCeltAudioBuffer celt_decoder_create_custom err = %d", error);
                 goto error;
             }
             celt_decoder_ctl(fCeltDecoder[i], CELT_SET_COMPLEXITY(1));
@@ -519,12 +522,14 @@ namespace Jack
 
             fCeltEncoder[i] = celt_encoder_create(fCeltMode[i], 1, &error);
             if (error != CELT_OK) {
+                jack_log("NetCeltAudioBuffer celt_mode_create err = %d", error);
                 goto error;
             }
             celt_encoder_ctl(fCeltEncoder[i], CELT_SET_COMPLEXITY(1));
 
             fCeltDecoder[i] = celt_decoder_create(fCeltMode[i], 1, &error);
             if (error != CELT_OK) {
+                jack_log("NetCeltAudioBuffer celt_decoder_create err = %d", error);
                 goto error;
             }
             celt_decoder_ctl(fCeltDecoder[i], CELT_SET_COMPLEXITY(1));
@@ -533,12 +538,14 @@ namespace Jack
 
             fCeltEncoder[i] = celt_encoder_create(fCeltMode[i]);
             if (error != CELT_OK) {
+                jack_log("NetCeltAudioBuffer celt_encoder_create err = %d", error);
                 goto error;
             }
             celt_encoder_ctl(fCeltEncoder[i], CELT_SET_COMPLEXITY(1));
 
             fCeltDecoder[i] = celt_decoder_create(fCeltMode[i]);
             if (error != CELT_OK) {
+                jack_log("NetCeltAudioBuffer celt_decoder_create err = %d", error);
                 goto error;
             }
             celt_decoder_ctl(fCeltDecoder[i], CELT_SET_COMPLEXITY(1));
@@ -740,16 +747,19 @@ namespace Jack
             /* Allocate en/decoders */
             fOpusMode[i] = opus_custom_mode_create(params->fSampleRate, params->fPeriodSize, &error);
             if (error != OPUS_OK) {
+                jack_log("NetOpusAudioBuffer opus_custom_mode_create err = %d", error);
                 goto error;
             }
 
             fOpusEncoder[i] = opus_custom_encoder_create(fOpusMode[i], 1, &error);
             if (error != OPUS_OK) {
+                jack_log("NetOpusAudioBuffer opus_custom_encoder_create err = %d", error);
                 goto error;
             }
 
             fOpusDecoder[i] = opus_custom_decoder_create(fOpusMode[i], 1, &error);
             if (error != OPUS_OK) {
+                jack_log("NetOpusAudioBuffer opus_custom_decoder_create err = %d", error);
                 goto error;
             }
 
@@ -1024,7 +1034,7 @@ namespace Jack
         }
 
         NextCycle();
-     }
+    }
 
     //network<->buffer
     int NetIntAudioBuffer::RenderFromNetwork(int cycle, int sub_cycle, uint32_t port_num)

@@ -422,7 +422,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
             return res2;
 
         } catch (JackNetException& e) {
-            jack_error("Lost connection");
+            jack_error(e.what());
             return -1;
         }
     }
@@ -458,7 +458,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
             return 0;
 
         } catch (JackNetException& e) {
-            jack_error("Lost connection");
+            jack_error(e.what());
             return -1;
         }
     }

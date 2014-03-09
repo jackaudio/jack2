@@ -431,7 +431,6 @@ namespace Jack
         int rx_bytes;
 
         if (((rx_bytes = fSocket.Recv(fRxBuffer, size, flags)) == SOCKET_ERROR) && fRunning) {
-            fSocket.PrintError();
             FatalRecvError();
         }
   
@@ -823,14 +822,12 @@ namespace Jack
 
     void JackNetSlaveInterface::FatalRecvError()
     {
-        jack_error("Recv connection lost error = %s", StrError(NET_ERROR_CODE));
-        throw JackNetException();
+        throw JackNetException("Recv connection lost error");
     }
 
     void JackNetSlaveInterface::FatalSendError()
     {
-        jack_error("Send connection lost error = %s", StrError(NET_ERROR_CODE));
-        throw JackNetException();
+        throw JackNetException("Send connection lost error");
     }
 
     int JackNetSlaveInterface::Recv(size_t size, int flags)
@@ -839,7 +836,6 @@ namespace Jack
         
         // handle errors
         if (rx_bytes == SOCKET_ERROR) {
-            fSocket.PrintError();
             FatalRecvError();
         }
 

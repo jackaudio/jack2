@@ -371,14 +371,19 @@ namespace Jack
             return -1;
         }
     #endif
-        return sendto(fSockfd, buffer, nbytes, flags, reinterpret_cast<socket_address_t*>(&fSendAddr), sizeof(socket_address_t));
+        int res;
+        if ((res = sendto(fSockfd, buffer, nbytes, flags, reinterpret_cast<socket_address_t*>(&fSendAddr), sizeof(socket_address_t))) < 0) {
+            jack_error("SendTo fd = %ld err = %s", fSockfd, strerror(errno));
+        }
+        return res;
     }
 
     int JackNetUnixSocket::SendTo(const void* buffer, size_t nbytes, int flags, const char* ip)
     {
         int addr_conv = inet_aton(ip, &fSendAddr.sin_addr);
-        if (addr_conv < 1)
+        if (addr_conv < 1) {
             return addr_conv;
+        }
     #if defined(__sun__) || defined(sun)
         if (WaitWrite() < 0) {
             return -1;
@@ -394,7 +399,11 @@ namespace Jack
             return -1;
         }
     #endif
-        return send(fSockfd, buffer, nbytes, flags);
+        int res;
+        if ((res = send(fSockfd, buffer, nbytes, flags)) < 0) {
+            jack_error("Send fd = %ld err = %s", fSockfd, strerror(errno));
+        }
+        return res;
     }
 
     int JackNetUnixSocket::RecvFrom(void* buffer, size_t nbytes, int flags)
@@ -405,7 +414,11 @@ namespace Jack
             return -1;
         }
     #endif
-        return recvfrom(fSockfd, buffer, nbytes, flags, reinterpret_cast<socket_address_t*>(&fRecvAddr), &addr_len);
+        int res;
+        if ((res = recvfrom(fSockfd, buffer, nbytes, flags, reinterpret_cast<socket_address_t*>(&fRecvAddr), &addr_len)) < 0) {
+            jack_error("RecvFrom fd = %ld err = %s", fSockfd, strerror(errno));
+        }
+        return res;        
     }
 
     int JackNetUnixSocket::Recv(void* buffer, size_t nbytes, int flags)
@@ -415,7 +428,11 @@ namespace Jack
             return -1;
         }
     #endif
-        return recv(fSockfd, buffer, nbytes, flags);
+        int res;
+        if ((res = recv(fSockfd, buffer, nbytes, flags)) < 0) {
+            jack_error("Recv fd = %ld err = %s", fSockfd, strerror(errno));
+        }
+        return res;        
     }
 
     int JackNetUnixSocket::CatchHost(void* buffer, size_t nbytes, int flags)
@@ -426,7 +443,11 @@ namespace Jack
             return -1;
         }
     #endif
-        return recvfrom(fSockfd, buffer, nbytes, flags, reinterpret_cast<socket_address_t*>(&fSendAddr), &addr_len);
+        int res;
+        if ((res = recvfrom(fSockfd, buffer, nbytes, flags, reinterpret_cast<socket_address_t*>(&fSendAddr), &addr_len)) < 0) {
+            jack_error("CatchHost fd = %ld err = %s", fSockfd, strerror(errno));
+        }
+        return res;                
     }
 
     net_error_t JackNetUnixSocket::GetError()
