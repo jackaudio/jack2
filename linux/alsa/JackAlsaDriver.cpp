@@ -719,11 +719,7 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
             JACK_CONSTRAINT_FLAG_STRICT | JACK_CONSTRAINT_FLAG_FAKE_VALUE,
             dither_constraint_descr_array),
         "Dithering mode",
-        "Dithering mode:\n"
-        "  n - none\n"
-        "  r - rectangular\n"
-        "  s - shaped\n"
-        "  t - triangular");
+        NULL);
 
     value.ui = 0;
     jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamUInt, &value, NULL, "Number of capture channels (defaults to hardware max)", NULL);
