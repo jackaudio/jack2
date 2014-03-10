@@ -142,6 +142,18 @@ struct jackctl_parameter
     jack_driver_param_constraint_desc_t * constraint_ptr;
 };
 
+const char * jack_get_self_connect_mode_description(char mode)
+{
+    struct jack_constraint_enum_char_descriptor * descr_ptr;
+
+    for (descr_ptr = self_connect_mode_constraint_descr_array;
+         descr_ptr->value;
+         descr_ptr++)
+        if (descr_ptr->value == mode) return descr_ptr->short_desc;
+
+    return NULL;
+}
+
 static
 struct jackctl_parameter *
 jackctl_add_parameter(
