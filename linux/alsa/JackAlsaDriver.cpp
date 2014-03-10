@@ -743,11 +743,8 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
         jack_constraint_compose_enum_str(
             JACK_CONSTRAINT_FLAG_STRICT | JACK_CONSTRAINT_FLAG_FAKE_VALUE,
             midi_constraint_descr_array),
-        "ALSA device name",
-        "ALSA MIDI driver:\n"
-        " none - no MIDI driver\n"
-        " seq - ALSA Sequencer driver\n"
-        " raw - ALSA RawMIDI driver\n");
+        "ALSA MIDI driver",
+        NULL);
 
     return desc;
 }
