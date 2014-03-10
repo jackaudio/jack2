@@ -47,13 +47,16 @@
 
 using namespace Jack;
 
-/* JackEngine::CheckPortsConnect() has some assumptions about values of these */
-#define SELF_CONNECT_MODE_ALLOW_CHAR                  ' '
-#define SELF_CONNECT_MODE_FAIL_EXTERNAL_ONLY_CHAR     'E'
-#define SELF_CONNECT_MODE_IGNORE_EXTERNAL_ONLY_CHAR   'e'
-#define SELF_CONNECT_MODE_FAIL_ALL_CHAR               'A'
-#define SELF_CONNECT_MODE_IGNORE_ALL_CHAR             'a'
-#define SELF_CONNECT_MODES_COUNT              5
+/* JackEngine::CheckPortsConnect() has some assumptions about char values */
+static struct jack_constraint_enum_char_descriptor self_connect_mode_constraint_descr_array[] =
+{
+    { ' ', "Don't restrict self connect requests" },
+    { 'E', "Fail self connect requests to external ports only" },
+    { 'e', "Ignore self connect requests to external ports only" },
+    { 'A', "Fail all self connect requests" },
+    { 'a', "Ignore all self connect requests" },
+    { 0 }
+};
 
 struct jackctl_server
 {
@@ -106,8 +109,6 @@ struct jackctl_server
     /* char enum, self connect mode mode */
     union jackctl_parameter_value self_connect_mode;
     union jackctl_parameter_value default_self_connect_mode;
-    jack_driver_param_value_enum_t self_connect_mode_possible_values[SELF_CONNECT_MODES_COUNT];
-    jack_driver_param_constraint_desc_t self_connect_mode_constraint;
 };
 
 struct jackctl_driver
@@ -883,26 +884,7 @@ SERVER_EXPORT jackctl_server_t * jackctl_server_create(
         goto fail_free_parameters;
     }
 
-    server_ptr->self_connect_mode_constraint.flags = JACK_CONSTRAINT_FLAG_STRICT | JACK_CONSTRAINT_FLAG_FAKE_VALUE;
-    server_ptr->self_connect_mode_constraint.constraint.enumeration.count = SELF_CONNECT_MODES_COUNT;
-    server_ptr->self_connect_mode_constraint.constraint.enumeration.possible_values_array = server_ptr->self_connect_mode_possible_values;
-
-    server_ptr->self_connect_mode_possible_values[0].value.c = SELF_CONNECT_MODE_ALLOW_CHAR;
-    strcpy(server_ptr->self_connect_mode_possible_values[0].short_desc, "Don't restrict self connect requests");
-
-    server_ptr->self_connect_mode_possible_values[1].value.c = SELF_CONNECT_MODE_FAIL_EXTERNAL_ONLY_CHAR ;
-    strcpy(server_ptr->self_connect_mode_possible_values[1].short_desc, "Fail self connect requests to external ports only");
-
-    server_ptr->self_connect_mode_possible_values[2].value.c = SELF_CONNECT_MODE_IGNORE_EXTERNAL_ONLY_CHAR;
-    strcpy(server_ptr->self_connect_mode_possible_values[2].short_desc, "Ignore self connect requests to external ports only");
-
-    server_ptr->self_connect_mode_possible_values[3].value.c = SELF_CONNECT_MODE_FAIL_ALL_CHAR;
-    strcpy(server_ptr->self_connect_mode_possible_values[3].short_desc, "Fail all self connect requests");
-
-    server_ptr->self_connect_mode_possible_values[4].value.c = SELF_CONNECT_MODE_IGNORE_ALL_CHAR;
-    strcpy(server_ptr->self_connect_mode_possible_values[4].short_desc, "Ignore all self connect requests");
-
-    value.c = SELF_CONNECT_MODE_ALLOW_CHAR;
+    value.c = JACK_DEFAULT_SELF_CONNECT_MODE;
     if (jackctl_add_parameter(
             &server_ptr->parameters,
             "self-connect-mode",
@@ -912,7 +894,9 @@ SERVER_EXPORT jackctl_server_t * jackctl_server_create(
             &server_ptr->self_connect_mode,
             &server_ptr->default_self_connect_mode,
             value,
-            &server_ptr->self_connect_mode_constraint) == NULL)
+            jack_constraint_compose_enum_char(
+                JACK_CONSTRAINT_FLAG_STRICT | JACK_CONSTRAINT_FLAG_FAKE_VALUE,
+                self_connect_mode_constraint_descr_array)) == NULL)
     {
         goto fail_free_parameters;
     }

@@ -74,6 +74,26 @@ typedef struct {
     char short_desc[64];               /**< A short (~30 chars) description for the user */
 } jack_driver_param_value_enum_t;
 
+struct jack_constraint_enum_uint32_descriptor {
+    uint32_t value;
+    const char * short_desc;
+};
+
+struct jack_constraint_enum_sint32_descriptor {
+    int32_t value;
+    const char * short_desc;
+};
+
+struct jack_constraint_enum_char_descriptor {
+    char value;
+    const char * short_desc;
+};
+
+struct jack_constraint_enum_str_descriptor {
+    const char * value;
+    const char * short_desc;
+};
+
 typedef struct {
     uint32_t flags;         /**< JACK_CONSTRAINT_FLAG_XXX */
     union {
@@ -147,6 +167,28 @@ jack_driver_descriptor_add_parameter(
     jack_driver_param_constraint_desc_t * constraint, /* Pointer to parameter constraint descriptor. NULL if there is no constraint */
     const char * short_desc,            /* A short (~30 chars) description for the user */
     const char * long_desc);            /* A longer description for the user, if NULL short_desc will be used */
+
+SERVER_EXPORT
+int jack_constraint_add_enum(
+    jack_driver_param_constraint_desc_t ** constraint_ptr_ptr,
+    uint32_t * array_size_ptr,
+    jack_driver_param_value_t * value_ptr,
+    const char * short_desc);
+
+SERVER_EXPORT
+void jack_constraint_free(jack_driver_param_constraint_desc_t * constraint_ptr);
+
+#define JACK_CONSTRAINT_COMPOSE_ENUM(type) \
+SERVER_EXPORT                              \
+jack_driver_param_constraint_desc_t *      \
+jack_constraint_compose_enum_ ## type(     \
+    uint32_t flags,                        \
+    struct jack_constraint_enum_ ## type ## _descriptor * descr_array_ptr)
+
+JACK_CONSTRAINT_COMPOSE_ENUM(uint32);
+JACK_CONSTRAINT_COMPOSE_ENUM(sint32);
+JACK_CONSTRAINT_COMPOSE_ENUM(char);
+JACK_CONSTRAINT_COMPOSE_ENUM(str);
 
 typedef jack_driver_desc_t * (*JackDriverDescFunction) ();
 

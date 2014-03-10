@@ -47,6 +47,23 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackCompilerDeps.h"
 #include "JackServerGlobals.h"
 
+static struct jack_constraint_enum_str_descriptor midi_constraint_descr_array[] =
+{
+    { "none", "no MIDI driver" },
+    { "seq", "ALSA Sequencer driver" },
+    { "raw", "ALSA RawMIDI driver" },
+    { 0 }
+};
+
+static struct jack_constraint_enum_char_descriptor dither_constraint_descr_array[] =
+{
+    { 'n', "none" },
+    { 'r', "rectangular" },
+    { 's', "shaped" },
+    { 't', "triangular" },
+    { 0 }
+};
+
 namespace Jack
 {
 
@@ -530,39 +547,6 @@ extern "C"
 #endif
 
 static
-void
-fill_device(
-    jack_driver_param_constraint_desc_t ** constraint_ptr_ptr,
-    uint32_t * array_size_ptr,
-    const char * device_id,
-    const char * device_description)
-{
-    jack_driver_param_value_enum_t * possible_value_ptr;
-
-    //jack_info("%6s - %s", device_id, device_description);
-
-    if (*constraint_ptr_ptr == NULL)
-    {
-        *constraint_ptr_ptr = (jack_driver_param_constraint_desc_t *)calloc(1, sizeof(jack_driver_param_constraint_desc_t));
-        *array_size_ptr = 0;
-    }
-
-    if ((*constraint_ptr_ptr)->constraint.enumeration.count == *array_size_ptr)
-    {
-        *array_size_ptr += 10;
-        (*constraint_ptr_ptr)->constraint.enumeration.possible_values_array =
-            (jack_driver_param_value_enum_t *)realloc(
-                (*constraint_ptr_ptr)->constraint.enumeration.possible_values_array,
-                sizeof(jack_driver_param_value_enum_t) * *array_size_ptr);
-    }
-
-    possible_value_ptr = (*constraint_ptr_ptr)->constraint.enumeration.possible_values_array + (*constraint_ptr_ptr)->constraint.enumeration.count;
-    (*constraint_ptr_ptr)->constraint.enumeration.count++;
-    strcpy(possible_value_ptr->value.str, device_id);
-    strcpy(possible_value_ptr->short_desc, device_description);
-}
-
-static
 jack_driver_param_constraint_desc_t *
 enum_alsa_devices()
 {
@@ -571,8 +555,8 @@ enum_alsa_devices()
     snd_pcm_info_t * pcminfo_capture;
     snd_pcm_info_t * pcminfo_playback;
     int card_no = -1;
-    char card_id[JACK_DRIVER_PARAM_STRING_MAX + 1];
-    char device_id[JACK_DRIVER_PARAM_STRING_MAX + 1];
+    jack_driver_param_value_t card_id;
+    jack_driver_param_value_t device_id;
     char description[64];
     int device_no;
     bool has_capture;
@@ -588,19 +572,24 @@ enum_alsa_devices()
 
     while(snd_card_next(&card_no) >= 0 && card_no >= 0)
     {
-        snprintf(card_id, sizeof(card_id), "hw:%d", card_no);
+        snprintf(card_id.str, sizeof(card_id.str), "hw:%d", card_no);
 
-        if (snd_ctl_open(&handle, card_id, 0) >= 0 &&
+        if (snd_ctl_open(&handle, card_id.str, 0) >= 0 &&
             snd_ctl_card_info(handle, info) >= 0)
         {
-            snprintf(card_id, sizeof(card_id), "hw:%s", snd_ctl_card_info_get_id(info));
-            fill_device(&constraint_ptr, &array_size, card_id, snd_ctl_card_info_get_name(info));
+            snprintf(card_id.str, sizeof(card_id.str), "hw:%s", snd_ctl_card_info_get_id(info));
+            if (!jack_constraint_add_enum(
+                    &constraint_ptr,
+                    &array_size,
+                    &card_id,
+                    snd_ctl_card_info_get_name(info)))
+                goto fail;
 
             device_no = -1;
 
             while (snd_ctl_pcm_next_device(handle, &device_no) >= 0 && device_no != -1)
             {
-                snprintf(device_id, sizeof(device_id), "%s,%d", card_id, device_no);
+                snprintf(device_id.str, sizeof(device_id.str), "%s,%d", card_id.str, device_no);
 
                 snd_pcm_info_set_device(pcminfo_capture, device_no);
                 snd_pcm_info_set_subdevice(pcminfo_capture, 0);
@@ -629,7 +618,12 @@ enum_alsa_devices()
                     continue;
                 }
 
-                fill_device(&constraint_ptr, &array_size, device_id, description);
+                if (!jack_constraint_add_enum(
+                        &constraint_ptr,
+                        &array_size,
+                        &device_id,
+                        description))
+                    goto fail;
             }
 
             snd_ctl_close(handle);
@@ -637,77 +631,9 @@ enum_alsa_devices()
     }
 
     return constraint_ptr;
-}
-
-static
-jack_driver_param_constraint_desc_t *
-get_midi_driver_constraint()
-{
-    jack_driver_param_constraint_desc_t * constraint_ptr;
-    jack_driver_param_value_enum_t * possible_value_ptr;
-
-    //jack_info("%6s - %s", device_id, device_description);
-
-    constraint_ptr = (jack_driver_param_constraint_desc_t *)calloc(1, sizeof(jack_driver_param_value_enum_t));
-    constraint_ptr->flags = JACK_CONSTRAINT_FLAG_STRICT | JACK_CONSTRAINT_FLAG_FAKE_VALUE;
-
-    constraint_ptr->constraint.enumeration.possible_values_array = (jack_driver_param_value_enum_t *)malloc(3 * sizeof(jack_driver_param_value_enum_t));
-    constraint_ptr->constraint.enumeration.count = 3;
-
-    possible_value_ptr = constraint_ptr->constraint.enumeration.possible_values_array;
-
-    strcpy(possible_value_ptr->value.str, "none");
-    strcpy(possible_value_ptr->short_desc, "no MIDI driver");
-
-    possible_value_ptr++;
-
-    strcpy(possible_value_ptr->value.str, "seq");
-    strcpy(possible_value_ptr->short_desc, "ALSA Sequencer driver");
-
-    possible_value_ptr++;
-
-    strcpy(possible_value_ptr->value.str, "raw");
-    strcpy(possible_value_ptr->short_desc, "ALSA RawMIDI driver");
-
-    return constraint_ptr;
-}
-
-static
-jack_driver_param_constraint_desc_t *
-get_dither_constraint()
-{
-    jack_driver_param_constraint_desc_t * constraint_ptr;
-    jack_driver_param_value_enum_t * possible_value_ptr;
-
-    //jack_info("%6s - %s", device_id, device_description);
-
-    constraint_ptr = (jack_driver_param_constraint_desc_t *)calloc(1, sizeof(jack_driver_param_value_enum_t));
-    constraint_ptr->flags = JACK_CONSTRAINT_FLAG_STRICT | JACK_CONSTRAINT_FLAG_FAKE_VALUE;
-
-    constraint_ptr->constraint.enumeration.possible_values_array = (jack_driver_param_value_enum_t *)malloc(4 * sizeof(jack_driver_param_value_enum_t));
-    constraint_ptr->constraint.enumeration.count = 4;
-
-    possible_value_ptr = constraint_ptr->constraint.enumeration.possible_values_array;
-
-    possible_value_ptr->value.c = 'n';
-    strcpy(possible_value_ptr->short_desc, "none");
-
-    possible_value_ptr++;
-
-    possible_value_ptr->value.c = 'r';
-    strcpy(possible_value_ptr->short_desc, "rectangular");
-
-    possible_value_ptr++;
-
-    possible_value_ptr->value.c = 's';
-    strcpy(possible_value_ptr->short_desc, "shaped");
-
-    possible_value_ptr++;
-
-    possible_value_ptr->value.c = 't';
-    strcpy(possible_value_ptr->short_desc, "triangular");
-
-    return constraint_ptr;
+fail:
+    jack_constraint_free(constraint_ptr);
+    return NULL;
 }
 
 static int
@@ -789,7 +715,9 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
         'z',
         JackDriverParamChar,
         &value,
-        get_dither_constraint(),
+        jack_constraint_compose_enum_char(
+            JACK_CONSTRAINT_FLAG_STRICT | JACK_CONSTRAINT_FLAG_FAKE_VALUE,
+            dither_constraint_descr_array),
         "Dithering mode",
         "Dithering mode:\n"
         "  n - none\n"
@@ -816,7 +744,9 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
         'X',
         JackDriverParamString,
         &value,
-        get_midi_driver_constraint(),
+        jack_constraint_compose_enum_str(
+            JACK_CONSTRAINT_FLAG_STRICT | JACK_CONSTRAINT_FLAG_FAKE_VALUE,
+            midi_constraint_descr_array),
         "ALSA device name",
         "ALSA MIDI driver:\n"
         " none - no MIDI driver\n"

@@ -880,3 +880,122 @@ SERVER_EXPORT int jack_driver_descriptor_add_parameter(
     desc_ptr->nparams++;
     return true;
 }
+
+SERVER_EXPORT
+int
+jack_constraint_add_enum(
+    jack_driver_param_constraint_desc_t ** constraint_ptr_ptr,
+    uint32_t * array_size_ptr,
+    jack_driver_param_value_t * value_ptr,
+    const char * short_desc)
+{
+    jack_driver_param_constraint_desc_t * constraint_ptr;
+    uint32_t array_size;
+    jack_driver_param_value_enum_t * possible_value_ptr;
+    size_t len;
+
+    len = strlen(short_desc) + 1;
+    if (len > sizeof(possible_value_ptr->short_desc))
+    {
+        assert(false);
+        return false;
+    }
+
+    constraint_ptr = *constraint_ptr_ptr;
+    if (constraint_ptr == NULL)
+    {
+        constraint_ptr = (jack_driver_param_constraint_desc_t *)calloc(1, sizeof(jack_driver_param_constraint_desc_t));
+        if (constraint_ptr == NULL)
+        {
+            jack_error("calloc() failed to allocate memory for param constraint struct");
+            return false;
+        }
+
+        array_size = 0;
+    }
+    else
+    {
+        array_size = *array_size_ptr;
+    }
+
+    if (constraint_ptr->constraint.enumeration.count == array_size)
+    {
+        array_size += 10;
+        possible_value_ptr =
+            (jack_driver_param_value_enum_t *)realloc(
+                constraint_ptr->constraint.enumeration.possible_values_array,
+                sizeof(jack_driver_param_value_enum_t) * array_size);
+        if (possible_value_ptr == NULL)
+        {
+            jack_error("calloc() failed to (re)allocate memory for possible values array");
+            return false;
+        }
+        constraint_ptr->constraint.enumeration.possible_values_array = possible_value_ptr;
+    }
+    else
+    {
+        possible_value_ptr = constraint_ptr->constraint.enumeration.possible_values_array;
+    }
+
+    possible_value_ptr += constraint_ptr->constraint.enumeration.count;
+    constraint_ptr->constraint.enumeration.count++;
+
+    possible_value_ptr->value = *value_ptr;
+    memcpy(possible_value_ptr->short_desc, short_desc, len);
+
+    *constraint_ptr_ptr = constraint_ptr;
+    *array_size_ptr = array_size;
+
+    return true;
+}
+
+SERVER_EXPORT
+void
+jack_constraint_free(
+    jack_driver_param_constraint_desc_t * constraint_ptr)
+{
+    if (constraint_ptr != NULL)
+    {
+        if ((constraint_ptr->flags & JACK_CONSTRAINT_FLAG_RANGE) == 0)
+        {
+            free(constraint_ptr->constraint.enumeration.possible_values_array);
+        }
+
+        free(constraint_ptr);
+    }
+}
+
+#define JACK_CONSTRAINT_COMPOSE_ENUM_IMPL(type, copy)                   \
+JACK_CONSTRAINT_COMPOSE_ENUM(type)                                      \
+{                                                                       \
+    jack_driver_param_constraint_desc_t * constraint_ptr;               \
+    uint32_t array_size;                                                \
+    jack_driver_param_value_t value;                                    \
+    struct jack_constraint_enum_ ## type ## _descriptor * descr_ptr;    \
+                                                                        \
+    constraint_ptr = NULL;                                              \
+    for (descr_ptr = descr_array_ptr;                                   \
+         descr_ptr->value;                                              \
+         descr_ptr++)                                                   \
+    {                                                                   \
+        copy;                                                           \
+        if (!jack_constraint_add_enum(                                  \
+                &constraint_ptr,                                        \
+                &array_size,                                            \
+                &value,                                                 \
+                descr_ptr->short_desc))                                 \
+        {                                                               \
+            jack_constraint_free(constraint_ptr);                       \
+            return NULL;                                                \
+        }                                                               \
+    }                                                                   \
+                                                                        \
+    constraint_ptr->flags = flags;                                      \
+                                                                        \
+    return constraint_ptr;                                              \
+}
+
+JACK_CONSTRAINT_COMPOSE_ENUM_IMPL(uint32, value.c = descr_ptr->value);
+JACK_CONSTRAINT_COMPOSE_ENUM_IMPL(sint32, value.c = descr_ptr->value);
+JACK_CONSTRAINT_COMPOSE_ENUM_IMPL(char,   value.c = descr_ptr->value);
+JACK_CONSTRAINT_COMPOSE_ENUM_IMPL(str, strcpy(value.str, descr_ptr->value));
