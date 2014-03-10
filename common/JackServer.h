@@ -64,7 +64,7 @@ class SERVER_EXPORT JackServer
 
     public:
 
-        JackServer(bool sync, bool temporary, int timeout, bool rt, int priority, int port_max, bool verbose, jack_timer_type_t clock, JackSelfConnectMode self_connect_mode, const char* server_name);
+        JackServer(bool sync, bool temporary, int timeout, bool rt, int priority, int port_max, bool verbose, jack_timer_type_t clock, char self_connect_mode, const char* server_name);
         ~JackServer();
 
         // Server control

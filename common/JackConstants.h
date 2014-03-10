@@ -84,6 +84,6 @@
 #define EMPTY   0xFFFD
 #define FREE	0xFFFC
 
-#define JACK_DEFAULT_SELF_CONNECT_MODE JackSelfConnectAllow
+#define JACK_DEFAULT_SELF_CONNECT_MODE ' ' /* allow all requests */
 
 #endif

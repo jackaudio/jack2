@@ -48,7 +48,7 @@ int JackServerGlobals::Start(const char* server_name,
                              int port_max,
                              int verbose,
                              jack_timer_type_t clock,
-                             JackSelfConnectMode self_connect_mode)
+                             char self_connect_mode)
 {
     jack_log("Jackdmp: sync = %ld timeout = %ld rt = %ld priority = %ld verbose = %ld ", sync, time_out_ms, rt, priority, verbose);
     new JackServer(sync, temporary, time_out_ms, rt, priority, port_max, verbose, clock, self_connect_mode, server_name);  // Will setup fInstance and fUserCount globals

@@ -47,6 +47,7 @@
 
 using namespace Jack;
 
+/* JackEngine::CheckPortsConnect() has some assumptions about values of these */
 #define SELF_CONNECT_MODE_ALLOW_CHAR                  ' '
 #define SELF_CONNECT_MODE_FAIL_EXTERNAL_ONLY_CHAR     'E'
 #define SELF_CONNECT_MODE_IGNORE_EXTERNAL_ONLY_CHAR   'e'
@@ -1000,7 +1001,6 @@ jackctl_server_open(
     jackctl_server *server_ptr,
     jackctl_driver *driver_ptr)
 {
-    JackSelfConnectMode self_connect_mode;
     JSList * paramlist = NULL;
 
     try {
@@ -1034,27 +1034,6 @@ jackctl_server_open(
             server_ptr->client_timeout.i = 500; /* 0.5 sec; usable when non realtime. */
         }
 
-        switch (server_ptr->self_connect_mode.c)
-        {
-        case SELF_CONNECT_MODE_ALLOW_CHAR:
-            self_connect_mode = JackSelfConnectAllow;
-            break;
-        case SELF_CONNECT_MODE_FAIL_EXTERNAL_ONLY_CHAR:
-            self_connect_mode = JackSelfConnectFailExternalOnly;
-            break;
-        case SELF_CONNECT_MODE_IGNORE_EXTERNAL_ONLY_CHAR:
-            self_connect_mode = JackSelfConnectIgnoreExternalOnly;
-            break;
-        case SELF_CONNECT_MODE_FAIL_ALL_CHAR:
-            self_connect_mode = JackSelfConnectFailAll;
-            break;
-        case SELF_CONNECT_MODE_IGNORE_ALL_CHAR:
-            self_connect_mode = JackSelfConnectIgnoreAll;
-            break;
-        default:
-            self_connect_mode = JACK_DEFAULT_SELF_CONNECT_MODE;
-        }
-
         /* check port max value before allocating server */
         if (server_ptr->port_max.ui > PORT_NUM_MAX) {
             jack_error("Jack server started with too much ports %d (when port max can be %d)", server_ptr->port_max.ui, PORT_NUM_MAX);
@@ -1071,7 +1050,7 @@ jackctl_server_open(
             server_ptr->port_max.ui,
             server_ptr->verbose.b,
             (jack_timer_type_t)server_ptr->clock_source.ui,
-            self_connect_mode,
+            server_ptr->self_connect_mode.c,
             server_ptr->name.str);
         if (server_ptr->engine == NULL)
         {

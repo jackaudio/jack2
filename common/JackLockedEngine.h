@@ -83,7 +83,7 @@ class SERVER_EXPORT JackLockedEngine
 
     public:
 
-        JackLockedEngine(JackGraphManager* manager, JackSynchro* table, JackEngineControl* controler, JackSelfConnectMode self_connect_mode):
+        JackLockedEngine(JackGraphManager* manager, JackSynchro* table, JackEngineControl* controler, char self_connect_mode):
             fEngine(manager, table, controler, self_connect_mode)
         {}
         ~JackLockedEngine()

@@ -50,14 +50,4 @@ typedef enum {
     Finished,
 } jack_client_state_t;
 
-
-enum JackSelfConnectMode
-{
-    JackSelfConnectAllow,
-    JackSelfConnectFailExternalOnly,
-    JackSelfConnectIgnoreExternalOnly,
-    JackSelfConnectFailAll,
-    JackSelfConnectIgnoreAll,
-};
-
 #endif

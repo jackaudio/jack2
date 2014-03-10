@@ -21,6 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <fstream>
 #include <set>
 #include <assert.h>
+#include <ctype.h>
 
 #include "JackSystemDeps.h"
 #include "JackLockedEngine.h"
@@ -39,7 +40,7 @@ namespace Jack
 JackEngine::JackEngine(JackGraphManager* manager,
                        JackSynchro* table,
                        JackEngineControl* control,
-                       JackSelfConnectMode self_connect_mode)
+                       char self_connect_mode)
                     : JackLockAble(control->fServerName), 
                     fSignal(control->fServerName)
 {
@@ -892,66 +893,42 @@ int JackEngine::PortUnRegister(int refnum, jack_port_id_t port_index)
 // TODO: make this work with multiple clients per app
 int JackEngine::CheckPortsConnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
 {
+    if (fSelfConnectMode == ' ') return 1;
+
     JackPort* src_port = fGraphManager->GetPort(src);
     JackPort* dst_port = fGraphManager->GetPort(dst);
 
     jack_log("JackEngine::CheckPortsConnect(ref = %d, src = %d, dst = %d)", refnum, src_port->GetRefNum(), dst_port->GetRefNum());
 
+    //jack_log("%s -> %s", src_port->GetName(), dst_port->GetName());
+    //jack_log("mode = '%c'", fSelfConnectMode);
+
     int src_self = src_port->GetRefNum() == refnum ? 1 : 0;
     int dst_self = dst_port->GetRefNum() == refnum ? 1 : 0;
 
-    jack_log("src_self is %s", src_self ? "true" : "false");
-    jack_log("dst_self is %s", dst_self ? "true" : "false");
+    //jack_log("src_self is %s", src_self ? "true" : "false");
+    //jack_log("dst_self is %s", dst_self ? "true" : "false");
 
-    // 0 means client is connecting other client ports (i.e. control app patchbay functionality)
-    // 1 means client is connecting its own port to port of other client (i.e. self hooking into system app)
-    // 2 means client is connecting its own ports (i.e. for app internal functionality)
-    // TODO: Make this check an engine option and more tweakable (return error or success)
-    // MAYBE: make the engine option changable on the fly and expose it through client or control API
+    // 0 means client is connecting other client ports (control app patchbay functionality)
+    // 1 means client is connecting its own port to port of other client (e.g. self connecting into "system" client)
+    // 2 means client is connecting its own ports (for app internal functionality)
+    int sum = src_self + dst_self;
+    //jack_log("sum = %d", sum);
+    if (sum == 0) return 1;
+    char lmode = tolower(fSelfConnectMode);
+    //jack_log("lmode = '%c'", lmode);
+    if (sum == 2 && lmode == 'e') return 1;
+    bool fail = lmode != fSelfConnectMode; // fail modes are upper case
+    //jack_log("fail = %d", (int)fail);
 
-    switch (fSelfConnectMode)
-    {
-    case JackSelfConnectFailExternalOnly:
-        if (src_self + dst_self == 1)
-        {
-            jack_info("rejecting port self connect request to external port (%s -> %s)", src_port->GetName(), dst_port->GetName());
-            return -1;
-        }
+    jack_info(
+        "%s port self connect request%s (%s -> %s)",
+        fail ? "rejecting" : "ignoring",
+        sum == 1 ? " to external port" : "",
+        src_port->GetName(),
+        dst_port->GetName());
 
-        return 1;
-
-    case JackSelfConnectIgnoreExternalOnly:
-        if (src_self + dst_self == 1)
-        {
-            jack_info("ignoring port self connect request to external port (%s -> %s)", src_port->GetName(), dst_port->GetName());
-            return 0;
-        }
-
-        return 1;
-
-    case JackSelfConnectFailAll:
-        if (src_self + dst_self != 0)
-        {
-            jack_info("rejecting port self connect request (%s -> %s)", src_port->GetName(), dst_port->GetName());
-            return -1;
-        }
-
-        return 1;
-
-    case JackSelfConnectIgnoreAll:
-        if (src_self + dst_self != 0)
-        {
-            jack_info("ignoring port self connect request (%s -> %s)", src_port->GetName(), dst_port->GetName());
-            return 0;
-        }
-
-        return 1;
-
-    case JackSelfConnectAllow:  // fix warning
-        return 1;
-    }
-
-    return 1;
+    return fail ? -1 : 0;
 }
 
 int JackEngine::PortConnect(int refnum, const char* src, const char* dst)
