@@ -183,8 +183,13 @@ static void print_server_internals(jackctl_server_t *server, FILE* file)
     fprintf(file, "\n");
 }
 
-static void usage(FILE* file, jackctl_server_t *server)
+static void usage(FILE* file, jackctl_server_t *server, bool full = true)
 {
+    jackctl_parameter_t * param;
+    const JSList * server_parameters;
+    uint32_t i;
+    union jackctl_parameter_value value;
+
     fprintf(file, "\n"
             "Usage: jackdmp [ --no-realtime OR -r ]\n"
             "               [ --realtime OR -R [ --realtime-priority OR -P priority ] ]\n"
@@ -199,6 +204,24 @@ static void usage(FILE* file, jackctl_server_t *server)
 #ifdef __linux__
             "               [ --clocksource OR -c [ c(ycle) | h(pet) | s(ystem) ]\n"
 #endif
+            "               [ --autoconnect OR -a <modechar>]\n");
+
+    server_parameters = jackctl_server_get_parameters(server);
+    param = jackctl_get_parameter(server_parameters, "self-connect-mode");
+    fprintf(file,
+            "                 where <modechar> is one of:\n");
+    for (i = 0; i < jackctl_parameter_get_enum_constraints_count(param); i++)
+    {
+        value = jackctl_parameter_get_enum_constraint_value(param, i);
+        fprintf(file, "                   '%c' - %s", value.c, jackctl_parameter_get_enum_constraint_description(param, i));
+        if (value.c == JACK_DEFAULT_SELF_CONNECT_MODE)
+        {
+            fprintf(file, " (default)");
+        }
+        fprintf(file, "\n");
+    }
+
+    fprintf(file,
             "               [ --replace-registry ]\n"
             "               [ --silent OR -s ]\n"
             "               [ --sync OR -S ]\n"
@@ -208,7 +231,7 @@ static void usage(FILE* file, jackctl_server_t *server)
             "       jackdmp -d master-backend-name --help\n"
             "             to display options for each master backend\n\n");
     
-    if (server) {
+    if (full) {
         print_server_drivers(server, file);
         print_server_internals(server, file);
     }
@@ -312,7 +335,7 @@ int main(int argc, char** argv)
                         value.ui = JACK_TIMER_SYSTEM_CLOCK;
                         jackctl_parameter_set_value(param, &value);
                     } else {
-                        usage(stdout, NULL);
+                        usage(stdout, server_ctl);
                         goto destroy_server;
                     }
                 }
@@ -333,7 +356,7 @@ int main(int argc, char** argv)
                         value.c = optarg[0];
                         jackctl_parameter_set_value(param, &value);
                     } else {
-                        usage(stdout, NULL);
+                        usage(stdout, server_ctl);
                         goto destroy_server;
                     }
                 }
@@ -468,7 +491,7 @@ int main(int argc, char** argv)
     }
 
     if (!master_driver_name) {
-        usage(stderr, NULL);
+        usage(stderr, server_ctl, false);
         goto destroy_server;
     }
 
