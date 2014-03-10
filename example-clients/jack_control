@@ -131,6 +131,24 @@ def print_help():
     print "    eps <param> <value>        - set engine parameter"
     print "    epr <param>                - reset engine parameter to its default value"
 
+def maybe_print_param_constraint(iface, param):
+    is_range, is_strict, is_fake, values = iface.GetParameterConstraint(param)
+    if is_range:
+        print
+        print("allowed range: %s to %s (inclusive)" % (values[0][0], values[1][0]))
+    elif len(values):
+        print
+        if is_strict:
+            print("allowed values:")
+        else:
+            print("suggested values:")
+
+        max_len = 0
+        for value in values:
+            if len(str(value[0])) > max_len:
+                   max_len = len(str(value[0]))
+        for value in values:
+            print("%*s'%s' - %s" % (1 + max_len - len(str(value[0])), "", str(value[0]), str(value[1])))
 
 def main():
     if len(sys.argv) == 1 or sys.argv[1] in ["-h", "--help", "help"]:
@@ -206,7 +224,8 @@ def main():
 
                 print "--- get driver parameter description (%s)" % param
                 type_char, name, short_descr, long_descr = configure_iface.GetParameterInfo(['driver', param])
-                print long_descr,
+                print long_descr
+                maybe_print_param_constraint(configure_iface, ['driver', param])
             elif arg == 'dps':
                 if index + 1 >= len(sys.argv):
                     print "driver parameter set command requires parameter name and value arguments"
@@ -245,7 +264,8 @@ def main():
                 print "--- get engine parameter description (%s)" % param_name
 
                 type_char, name, short_descr, long_descr = configure_iface.GetParameterInfo(['engine', param_name])
-                print long_descr,
+                print long_descr
+                maybe_print_param_constraint(configure_iface, ['engine', param_name])
             elif arg == 'eps':
                 if index + 1 >= len(sys.argv):
                     print "engine parameter set command requires parameter name and value arguments"
