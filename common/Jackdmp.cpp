@@ -202,7 +202,7 @@ static void usage(FILE* file, jackctl_server_t *server, bool full = true)
             "               [ --internal-client OR -I internal-client-name ]\n"
             "               [ --verbose OR -v ]\n"
 #ifdef __linux__
-            "               [ --clocksource OR -c [ c(ycle) | h(pet) | s(ystem) ]\n"
+            "               [ --clocksource OR -c [ h(pet) | s(ystem) ]\n"
 #endif
             "               [ --autoconnect OR -a <modechar>]\n");
 
