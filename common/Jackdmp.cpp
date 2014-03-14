@@ -329,7 +329,11 @@ int main(int argc, char** argv)
                         value.ui = JACK_TIMER_HPET;
                         jackctl_parameter_set_value(param, &value);
                     } else if (tolower (optarg[0]) == 'c') {
-                        value.ui = JACK_TIMER_CYCLE_COUNTER;
+                        /* For backwards compatibility with scripts, allow
+                         * the user to request the cycle clock on the
+                         * command line, but use the system clock instead
+                         */
+                        value.ui = JACK_TIMER_SYSTEM_CLOCK;
                         jackctl_parameter_set_value(param, &value);
                     } else if (tolower (optarg[0]) == 's') {
                         value.ui = JACK_TIMER_SYSTEM_CLOCK;
