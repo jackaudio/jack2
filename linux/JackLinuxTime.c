@@ -38,7 +38,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <stdlib.h>
 #include <inttypes.h>
 
-static jack_time_t __jack_cpu_mhz = 0;
 jack_time_t (*_jack_get_microseconds)(void) = 0;
 
 #if defined(__gnu_linux__) && (defined(__i386__) || defined(__x86_64__))
@@ -124,61 +123,6 @@ static jack_time_t jack_get_microseconds_from_hpet (void)
 
 #endif /* HPET_SUPPORT */
 
-static jack_time_t jack_get_microseconds_from_cycles (void) {
-	return get_cycles() / __jack_cpu_mhz;
-}
-
-/*
- * This is another kludge.  It looks CPU-dependent, but actually it
- * reflects the lack of standards for the Linux kernel formatting of
- * /proc/cpuinfo.
- */
-
-static jack_time_t jack_get_mhz (void)
-{
-	FILE *f = fopen("/proc/cpuinfo", "r");
-	if (f == 0)
-	{
-		perror("can't open /proc/cpuinfo\n");
-		exit(1);    // TODO : should be remplaced by an exception
-	}
-
-	for (;;)
-	{
-		jack_time_t mhz;
-		int ret;
-		char buf[1000];
-
-		if (fgets(buf, sizeof(buf), f) == NULL) {
-			jack_error ("FATAL: cannot locate cpu MHz in /proc/cpuinfo\n");
-			exit(1);    // TODO : should be remplaced by an exception
-		}
-
-#if defined(__powerpc__)
-		ret = sscanf(buf, "clock\t: %" SCNu64 "MHz", &mhz);
-#elif defined( __i386__ ) || defined (__hppa__)  || defined (__ia64__) || \
-      defined(__x86_64__)
-		ret = sscanf(buf, "cpu MHz         : %" SCNu64, &mhz);
-#elif defined( __sparc__ )
-		ret = sscanf(buf, "Cpu0Bogo        : %" SCNu64, &mhz);
-#elif defined( __mc68000__ )
-		ret = sscanf(buf, "Clocking:       %" SCNu64, &mhz);
-#elif defined( __s390__  )
-		ret = sscanf(buf, "bogomips per cpu: %" SCNu64, &mhz);
-#elif defined( __sh__  )
-		ret = sscanf(buf, "bogomips        : %" SCNu64, &mhz);
-#else /* MIPS, ARM, alpha */
-		ret = sscanf(buf, "BogoMIPS        : %" SCNu64, &mhz);
-#endif
-
-		if (ret == 1)
-		{
-			fclose(f);
-			return (jack_time_t)mhz;
-		}
-	}
-}
-
 #define HAVE_CLOCK_GETTIME 1
 
 #ifndef HAVE_CLOCK_GETTIME
@@ -216,7 +160,7 @@ SERVER_EXPORT void JackSleep(long usec)
 
 SERVER_EXPORT void InitTime()
 {
-	__jack_cpu_mhz = jack_get_mhz ();
+	/* nothing to do on a generic system - we use the system clock */
 }
 
 SERVER_EXPORT void EndTime()
@@ -228,10 +172,6 @@ void SetClockSource(jack_timer_type_t source)
 
 	switch (source)
 	{
-        case JACK_TIMER_CYCLE_COUNTER:
-            _jack_get_microseconds = jack_get_microseconds_from_cycles;
-            break;
-
         case JACK_TIMER_HPET:
             if (jack_hpet_init () == 0) {
                 _jack_get_microseconds = jack_get_microseconds_from_hpet;
@@ -250,8 +190,6 @@ void SetClockSource(jack_timer_type_t source)
 const char* ClockSourceName(jack_timer_type_t source)
 {
 	switch (source) {
-        case JACK_TIMER_CYCLE_COUNTER:
-            return "cycle counter";
         case JACK_TIMER_HPET:
             return "hpet";
         case JACK_TIMER_SYSTEM_CLOCK:
