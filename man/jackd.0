@@ -97,8 +97,8 @@ Unlock libraries GTK+, QT, FLTK, Wine.
 \fB\-v, \-\-verbose\fR
 Give verbose output.
 .TP
-\fB\-c, \-\-clocksource\fR (\fI c(ycle)\fR | \fI h(pet) \fR | \fI s(ystem) \fR)
-Select a specific wall clock (Cycle Counter, HPET timer, System timer).
+\fB\-c, \-\-clocksource\fR (\fI h(pet) \fR | \fI s(ystem) \fR)
+Select a specific wall clock (HPET timer, System timer).
 .TP
 \fB\-V, \-\-version\fR
 Print the current JACK version number and exit.
