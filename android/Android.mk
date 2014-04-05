@@ -238,6 +238,11 @@ audioadapter_libsource := \
     ../common/JackAudioAdapterFactory.cpp \
     ../linux/alsa/JackAlsaAdapter.cpp
 
+ifeq ($(SUPPORT_ANDROID_REALTIME_SCHED), true)
+sched_c_include := bionic/libc/bionic \
+    frameworks/av/services/audioflinger
+endif
+
 # ========================================================
 # libjackserver.so
 # ========================================================
@@ -251,6 +256,12 @@ LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libc libdl libcutils libutils libjackshm
 LOCAL_MODULE_TAGS := eng optional
 LOCAL_MODULE := libjackserver
+ifeq ($(SUPPORT_ANDROID_REALTIME_SCHED), true)
+LOCAL_CFLAGS += -DJACK_ANDROID_REALTIME_SCHED
+LOCAL_C_INCLUDES += $(sched_c_include)
+LOCAL_SHARED_LIBRARIES += libbinder
+LOCAL_STATIC_LIBRARIES := libscheduling_policy
+endif
 
 include $(BUILD_SHARED_LIBRARY)
 
@@ -283,6 +294,12 @@ LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libc libdl libcutils libutils libjackshm
 LOCAL_MODULE_TAGS := eng optional
 LOCAL_MODULE := libjack
+ifeq ($(SUPPORT_ANDROID_REALTIME_SCHED), true)
+LOCAL_CFLAGS += -DJACK_ANDROID_REALTIME_SCHED
+LOCAL_C_INCLUDES += $(sched_c_include)
+LOCAL_SHARED_LIBRARIES += libbinder
+LOCAL_STATIC_LIBRARIES := libscheduling_policy
+endif
 
 include $(BUILD_SHARED_LIBRARY)
 

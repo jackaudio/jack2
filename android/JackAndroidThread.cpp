@@ -27,6 +27,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <unistd.h> // for _POSIX_PRIORITY_SCHEDULING check
 #include <signal.h>
 
+#ifdef JACK_ANDROID_REALTIME_SCHED
+#include "SchedulingPolicyService.h"
+#endif
+
 //#define JACK_SCHED_POLICY SCHED_RR
 #define JACK_SCHED_POLICY SCHED_FIFO
 
@@ -241,12 +245,20 @@ int JackAndroidThread::AcquireRealTimeImp(jack_native_thread_t thread, int prior
 
     jack_log("JackAndroidThread::AcquireRealTimeImp priority = %d", priority);
 
+#ifndef JACK_ANDROID_REALTIME_SCHED
     if ((res = pthread_setschedparam(thread, JACK_SCHED_POLICY, &rtparam)) != 0) {
         jack_error("Cannot use real-time scheduling (RR/%d)"
                    "(%d: %s)", rtparam.sched_priority, res,
                    strerror(res));
         return -1;
     }
+#else
+    if ((res = android::requestPriority(getpid(), gettid(), priority)) != 0) {
+        jack_log("Failed to get SCHED_FIFO priority pid %d tid %d; error %d",
+		    getpid(), gettid(), res);
+        return -1;
+    }
+#endif
     return 0;
 }
 
