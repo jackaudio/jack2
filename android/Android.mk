@@ -5,6 +5,7 @@
 LOCAL_PATH := $(call my-dir)
 JACK_ROOT := $(call my-dir)/..
 SUPPORT_ALSA_IN_JACK := true
+SUPPORT_ANDROID_REALTIME_SCHED := false
 ALSA_INCLUDES := vendor/samsung/common/external/alsa-lib/include
 JACK_STL_LDFLAGS := -Lprebuilts/ndk/current/sources/cxx-stl/gnu-libstdc++/libs/$(TARGET_CPU_ABI) -lgnustl_static
 JACK_STL_INCLUDES := $(JACK_ROOT)/android/cxx-stl/gnu-libstdc++/libs/$(TARGET_CPU_ABI)/include \
