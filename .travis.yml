@@ -1,0 +1,9 @@
+language:
+  - cpp
+compiler:
+  - gcc
+install:
+  - sudo apt-get install libsamplerate-dev libsndfile-dev libasound2-dev
+script:
+  - ./waf configure --alsa
+  - ./waf build
