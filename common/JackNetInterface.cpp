@@ -63,7 +63,7 @@ namespace Jack
         fNetMidiPlaybackBuffer = NULL;
         memset(&fSendTransportData, 0, sizeof(net_transport_data_t));
         memset(&fReturnTransportData, 0, sizeof(net_transport_data_t));
-        fPacketTimeOut = PACKET_TIMEOUT;
+        fPacketTimeOut = PACKET_TIMEOUT * NETWORK_DEFAULT_LATENCY;
     }
 
     void JackNetInterface::FreeNetworkBuffers()
@@ -482,7 +482,7 @@ namespace Jack
         // receive sync (launch the cycle)
         do {
             rx_bytes = Recv(fParams.fMtu, MSG_PEEK);
-            // connection issue, send will detect it, so don't skip the cycle (return 0)
+            // connection issue (return -1)
             if (rx_bytes == SOCKET_ERROR) {
                 return SOCKET_ERROR;
             }
@@ -733,7 +733,7 @@ namespace Jack
                 return NET_RECV_ERROR;
             }
         }
-        while (strcmp(host_params.fPacketType, fParams.fPacketType)  && (GetPacketType(&host_params) != SLAVE_SETUP)  && (--try_count > 0));
+        while (strcmp(host_params.fPacketType, fParams.fPacketType) && (GetPacketType(&host_params) != SLAVE_SETUP)  && (--try_count > 0));
     
         // time out failure..
         if (try_count == 0) {

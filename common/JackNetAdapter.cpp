@@ -49,7 +49,7 @@ namespace Jack
         fParams.fSampleRate = sample_rate;
         fParams.fPeriodSize = buffer_size;
         fParams.fSlaveSyncMode = 1;
-        fParams.fNetworkLatency = 2;
+        fParams.fNetworkLatency = NETWORK_DEFAULT_LATENCY;
         fParams.fSampleEncoder = JackFloatEncoder;
         fClient = jack_client;
     
@@ -353,7 +353,7 @@ namespace Jack
         switch (SyncRecv()) {
         
             case SOCKET_ERROR:
-                return 0;
+                return SOCKET_ERROR;
                 
             case SYNC_PACKET_ERROR:
                 // Since sync packet is incorrect, don't decode it and continue with data
