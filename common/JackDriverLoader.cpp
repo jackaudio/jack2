@@ -448,7 +448,7 @@ static jack_driver_desc_t* jack_get_descriptor (JSList* drivers, const char* sof
     JackDriverDescFunction so_get_descriptor = NULL;
     char filename[1024];
     JSList* node;
-    void* dlhandle;
+    void* dlhandle = NULL;
 
     sprintf(filename, "%s/%s", driver_dir, sofile);
     so_get_descriptor = (JackDriverDescFunction)check_symbol(sofile, symbol, driver_dir, &dlhandle);
@@ -477,8 +477,9 @@ static jack_driver_desc_t* jack_get_descriptor (JSList* drivers, const char* sof
     strncpy(descriptor->file, filename, JACK_PATH_MAX);
 
 error:
-
-    UnloadDriverModule(dlhandle);
+    if (dlhandle) {
+        UnloadDriverModule(dlhandle);
+    }
     return descriptor;
 }
 
