@@ -445,7 +445,7 @@ namespace Jack
     #endif
         int res;
         if ((res = recvfrom(fSockfd, buffer, nbytes, flags, reinterpret_cast<socket_address_t*>(&fSendAddr), &addr_len)) < 0) {
-            jack_error("CatchHost fd = %ld err = %s", fSockfd, strerror(errno));
+            jack_log("CatchHost fd = %ld err = %s", fSockfd, strerror(errno));
         }
         return res;                
     }

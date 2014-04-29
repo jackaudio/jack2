@@ -245,7 +245,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
                 }
             }
 
-            if (rx_bytes == sizeof(session_params_t ))  {
+            if (rx_bytes == sizeof(session_params_t))  {
                 switch (GetPacketType(&fParams)) {
 
                     case SLAVE_AVAILABLE:

@@ -743,7 +743,7 @@ namespace Jack
 
         // everything is OK, copy parameters
         fParams = host_params;
-
+     
         // connect the socket
         if (fSocket.Connect() == SOCKET_ERROR) {
             jack_error("Error in connect : %s", StrError(NET_ERROR_CODE));
