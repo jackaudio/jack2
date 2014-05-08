@@ -26,6 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackGlobals.h"
 #include "JackTime.h"
 #include "JackPortType.h"
+#include "JackMetadata.h"
 #include <math.h>
 
 using namespace Jack;
@@ -37,6 +38,13 @@ extern "C"
 
     typedef void (*print_function)(const char*);
     typedef void *(*thread_routine)(void*);
+
+    const char* JACK_METADATA_PRETTY_NAME = "http://jackaudio.org/metadata/pretty-name";
+    const char* JACK_METADATA_HARDWARE = "http://jackaudio.org/metadata/hardware";
+    const char* JACK_METADATA_CONNECTED = "http://jackaudio.org/metadata/connected";
+    const char* JACK_METADATA_PORT_GROUP = "http://jackaudio.org/metadata/port-group";
+    const char* JACK_METADATA_ICON_SMALL = "http://jackaudio.org/metadata/icon-small";
+    const char* JACK_METADATA_ICON_LARGE = "http://jackaudio.org/metadata/icon-large";
 
     LIB_EXPORT
     void
@@ -262,6 +270,26 @@ extern "C"
     LIB_EXPORT int jack_reserve_client_name(jack_client_t* ext_client, const char* name, const char* uuid);
     LIB_EXPORT void jack_session_commands_free(jack_session_command_t *cmds);
     LIB_EXPORT int jack_client_has_session_callback(jack_client_t *client, const char* client_name);
+
+    LIB_EXPORT int jack_set_property(jack_client_t*, jack_uuid_t subject, const char* key, const char* value, const char* type);
+    LIB_EXPORT int jack_get_property(jack_uuid_t subject, const char* key, char** value, char** type);
+    LIB_EXPORT void jack_free_description(jack_description_t* desc, int free_description_itself);
+    LIB_EXPORT int jack_get_properties(jack_uuid_t subject, jack_description_t* desc);
+    LIB_EXPORT int jack_get_all_properties(jack_description_t** descs);
+    LIB_EXPORT int jack_remove_property(jack_client_t* client, jack_uuid_t subject, const char* key);
+    LIB_EXPORT int jack_remove_properties(jack_client_t* client, jack_uuid_t subject);
+    LIB_EXPORT int jack_remove_all_properties(jack_client_t* client);
+    LIB_EXPORT int jack_set_property_change_callback(jack_client_t* client, JackPropertyChangeCallback callback, void* arg);
+
+    LIB_EXPORT jack_uuid_t jack_client_uuid_generate();
+    LIB_EXPORT jack_uuid_t jack_port_uuid_generate(uint32_t port_id);
+    LIB_EXPORT uint32_t jack_uuid_to_index(jack_uuid_t);
+    LIB_EXPORT int  jack_uuid_compare(jack_uuid_t, jack_uuid_t);
+    LIB_EXPORT void jack_uuid_copy(jack_uuid_t* dst, jack_uuid_t src);
+    LIB_EXPORT void jack_uuid_clear(jack_uuid_t*);
+    LIB_EXPORT int  jack_uuid_parse(const char* buf, jack_uuid_t*);
+    LIB_EXPORT void jack_uuid_unparse(jack_uuid_t, char buf[JACK_UUID_STRING_SIZE]);
+    LIB_EXPORT int  jack_uuid_empty(jack_uuid_t);
 
 #ifdef __cplusplus
 }
@@ -2030,4 +2058,90 @@ LIB_EXPORT int jack_client_has_session_callback(jack_client_t* ext_client, const
     } else {
         return client->ClientHasSessionCallback(client_name);
     }
+}
+
+LIB_EXPORT int jack_set_property(jack_client_t*, jack_uuid_t, const char*, const char*, const char*)
+{
+    return -1;
+}
+
+LIB_EXPORT int jack_get_property(jack_uuid_t, const char*, char**, char**)
+{
+    return -1;
+}
+
+LIB_EXPORT void jack_free_description(jack_description_t*, int)
+{
+}
+
+LIB_EXPORT int jack_get_properties(jack_uuid_t, jack_description_t*)
+{
+    return -1;
+}
+
+LIB_EXPORT int jack_get_all_properties(jack_description_t**)
+{
+    return -1;
+}
+
+LIB_EXPORT int jack_remove_property(jack_client_t*, jack_uuid_t, const char*)
+{
+    return -1;
+}
+
+LIB_EXPORT int jack_remove_properties(jack_client_t*, jack_uuid_t)
+{
+    return -1;
+}
+
+LIB_EXPORT int jack_remove_all_properties(jack_client_t*)
+{
+    return -1;
+}
+
+LIB_EXPORT int jack_set_property_change_callback(jack_client_t*, JackPropertyChangeCallback, void*)
+{
+    return -1;
+}
+
+LIB_EXPORT jack_uuid_t jack_client_uuid_generate()
+{
+    return 0;
+}
+
+LIB_EXPORT jack_uuid_t jack_port_uuid_generate(uint32_t)
+{
+    return 0;
+}
+
+LIB_EXPORT uint32_t jack_uuid_to_index(jack_uuid_t)
+{
+    return 0;
+}
+
+LIB_EXPORT int jack_uuid_compare(jack_uuid_t, jack_uuid_t)
+{
+    return 0;
+}
+
+LIB_EXPORT void jack_uuid_copy(jack_uuid_t*, jack_uuid_t)
+{
+}
+
+LIB_EXPORT void jack_uuid_clear(jack_uuid_t*)
+{
+}
+
+LIB_EXPORT int jack_uuid_parse(const char*, jack_uuid_t*)
+{
+    return 0;
+}
+
+LIB_EXPORT void jack_uuid_unparse(jack_uuid_t, char buf[JACK_UUID_STRING_SIZE])
+{
+}
+
+LIB_EXPORT int jack_uuid_empty(jack_uuid_t)
+{
+    return 0;
 }

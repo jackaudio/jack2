@@ -34,7 +34,7 @@
 #define JACK_SERVER_NAME_SIZE 256
 #define JACK_CLIENT_NAME_SIZE 64
 #define JACK_MESSAGE_SIZE 256
-#define JACK_UUID_SIZE 32
+#define JACK_UUID_SIZE 36 // to match jack1 and uuid.h
 #define JACK_SESSION_COMMAND_SIZE 256
 
 #define SYNC_MAX_NAME_SIZE 256
