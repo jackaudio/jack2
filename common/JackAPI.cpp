@@ -39,12 +39,12 @@ extern "C"
     typedef void (*print_function)(const char*);
     typedef void *(*thread_routine)(void*);
 
-    const char* JACK_METADATA_PRETTY_NAME = "http://jackaudio.org/metadata/pretty-name";
-    const char* JACK_METADATA_HARDWARE = "http://jackaudio.org/metadata/hardware";
-    const char* JACK_METADATA_CONNECTED = "http://jackaudio.org/metadata/connected";
-    const char* JACK_METADATA_PORT_GROUP = "http://jackaudio.org/metadata/port-group";
-    const char* JACK_METADATA_ICON_SMALL = "http://jackaudio.org/metadata/icon-small";
-    const char* JACK_METADATA_ICON_LARGE = "http://jackaudio.org/metadata/icon-large";
+    LIB_EXPORT const char* JACK_METADATA_PRETTY_NAME;
+    LIB_EXPORT const char* JACK_METADATA_HARDWARE;
+    LIB_EXPORT const char* JACK_METADATA_CONNECTED;
+    LIB_EXPORT const char* JACK_METADATA_PORT_GROUP;
+    LIB_EXPORT const char* JACK_METADATA_ICON_SMALL;
+    LIB_EXPORT const char* JACK_METADATA_ICON_LARGE;
 
     LIB_EXPORT
     void
@@ -2059,6 +2059,13 @@ LIB_EXPORT int jack_client_has_session_callback(jack_client_t* ext_client, const
         return client->ClientHasSessionCallback(client_name);
     }
 }
+
+LIB_EXPORT const char* JACK_METADATA_PRETTY_NAME = "http://jackaudio.org/metadata/pretty-name";
+LIB_EXPORT const char* JACK_METADATA_HARDWARE = "http://jackaudio.org/metadata/hardware";
+LIB_EXPORT const char* JACK_METADATA_CONNECTED = "http://jackaudio.org/metadata/connected";
+LIB_EXPORT const char* JACK_METADATA_PORT_GROUP = "http://jackaudio.org/metadata/port-group";
+LIB_EXPORT const char* JACK_METADATA_ICON_SMALL = "http://jackaudio.org/metadata/icon-small";
+LIB_EXPORT const char* JACK_METADATA_ICON_LARGE = "http://jackaudio.org/metadata/icon-large";
 
 LIB_EXPORT int jack_set_property(jack_client_t*, jack_uuid_t, const char*, const char*, const char*)
 {
