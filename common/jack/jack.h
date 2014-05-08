@@ -778,7 +778,7 @@ void * jack_port_get_buffer (jack_port_t *port, jack_nframes_t) JACK_OPTIONAL_WE
  *
  * @see jack_uuid_to_string() to convert into a string representation
  */
-void jack_port_uuid (const jack_port_t *port, jack_uuid_t) JACK_OPTIONAL_WEAK_EXPORT;
+jack_uuid_t jack_port_uuid (const jack_port_t *port, jack_uuid_t) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return the full name of the jack_port_t (including the @a

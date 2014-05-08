@@ -130,6 +130,7 @@ extern "C"
             unsigned long buffer_size);
     LIB_EXPORT int jack_port_unregister(jack_client_t *, jack_port_t *);
     LIB_EXPORT void * jack_port_get_buffer(jack_port_t *, jack_nframes_t);
+    LIB_EXPORT jack_uuid_t  jack_port_uuid(const jack_port_t*, jack_uuid_t);
     LIB_EXPORT const char*  jack_port_name(const jack_port_t *port);
     LIB_EXPORT const char*  jack_port_short_name(const jack_port_t *port);
     LIB_EXPORT int jack_port_flags(const jack_port_t *port);
@@ -371,6 +372,11 @@ LIB_EXPORT void* jack_port_get_buffer(jack_port_t* port, jack_nframes_t frames)
         JackGraphManager* manager = GetGraphManager();
         return (manager ? manager->GetBuffer(myport, frames) : NULL);
     }
+}
+
+LIB_EXPORT jack_uuid_t jack_port_uuid(const jack_port_t*, jack_uuid_t)
+{
+    return 0;
 }
 
 LIB_EXPORT const char* jack_port_name(const jack_port_t* port)
