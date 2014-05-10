@@ -242,29 +242,6 @@ jack_session_command_t *jack_session_notify (
 void jack_session_commands_free (jack_session_command_t *cmds) JACK_WEAK_EXPORT;
 
 /**
- * Get the session ID for a client name.
- *
- * The session manager needs this to reassociate a client name to the session_id.
- *
- * The caller is responsible for calling jack_free(3) on any non-NULL
- * returned value.
- */
-char *jack_get_uuid_for_client_name (jack_client_t *client,
-                                     const char    *client_name) JACK_WEAK_EXPORT;
-
-/**
- * Get the client name for a session_id.
- *
- * In order to snapshot the graph connections, the session manager needs to map
- * session_ids to client names.
- *
- * The caller is responsible for calling jack_free(3) on any non-NULL
- * returned value.
- */
-char *jack_get_client_name_by_uuid (jack_client_t *client,
-                                    const char    *client_uuid ) JACK_WEAK_EXPORT;
-
-/**
  * Reserve a client name and associate it with a UUID.
  *
  * When a client later calls jack_client_open() and specifies the UUID, jackd
