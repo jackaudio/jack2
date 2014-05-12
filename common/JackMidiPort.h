@@ -82,7 +82,6 @@ struct SERVER_EXPORT JackMidiBuffer
     jack_shmsize_t write_pos; //!< data write position from the end of the buffer.
     uint32_t event_count;
     uint32_t lost_events;
-    uint32_t mix_index;
 
     JackMidiEvent events[1]; // Using 0 size does not compile with older GCC versions, so use 1 here.
 
