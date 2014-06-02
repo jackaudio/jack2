@@ -445,12 +445,12 @@ void sample_move_d24_sS (char *dst, jack_default_audio_sample_t *src, unsigned l
 		_mm_store_ss((float*)z+1, (__m128)shuffled1);
 		_mm_store_ss((float*)z+2, (__m128)shuffled2);
 		_mm_store_ss((float*)z+3, (__m128)shuffled3);
+#endif
 
 		for (i = 0; i != 4; ++i) {
 			memcpy (dst, z+i, 3);
 			dst += dst_skip;
 		}
-#endif
 
 		nsamples -= 4;
 		src += 4;
