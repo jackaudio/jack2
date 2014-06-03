@@ -89,7 +89,7 @@ jack_initialize (jack_client_t *client, const char *load_init)
 		fprintf (stderr, "cannot connect input ports\n");
 	}
 	
-	free (ports);
+	jack_free (ports);
 	
 	ports = jack_get_ports (client, NULL, NULL,
 				JackPortIsPhysical|JackPortIsInput);
@@ -102,7 +102,7 @@ jack_initialize (jack_client_t *client, const char *load_init)
 		fprintf (stderr, "cannot connect output ports\n");
 	}
 	
-	free (ports);
+	jack_free (ports);
 
 	return 0;			/* success */
 }
