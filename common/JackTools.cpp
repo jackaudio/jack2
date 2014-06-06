@@ -37,7 +37,11 @@ namespace Jack {
 
     void JackTools::KillServer()
     {
+    #ifdef WIN32
         raise(SIGINT);
+    #else
+        kill(GetPID(), SIGINT);
+    #endif
     }
 
     void JackTools::ThrowJackNetException()
