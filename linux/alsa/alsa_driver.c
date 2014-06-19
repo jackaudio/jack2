@@ -2092,9 +2092,7 @@ alsa_driver_new (char *name, char *playback_alsa_device,
 			case EBUSY:
 #ifdef __ANDROID__
                 jack_error ("\n\nATTENTION: The capture (recording) device \"%s\" is "
-                            "already in use. Please stop the"
-                            " application using it and "
-                            "run JACK again",
+                            "already in use",
                             capture_alsa_device);
 #else
                 current_apps = discover_alsa_using_apps ();
@@ -2114,9 +2112,9 @@ alsa_driver_new (char *name, char *playback_alsa_device,
                                     "run JACK again",
                                     capture_alsa_device);
                 }
-#endif
 				alsa_driver_delete (driver);
 				return NULL;
+#endif
 				break;
 
 			case EPERM:

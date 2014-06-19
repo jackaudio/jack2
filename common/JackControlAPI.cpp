@@ -640,7 +640,12 @@ jackctl_setup_signals(
     sigaddset(&sigmask.signals, SIGQUIT);
     sigaddset(&sigmask.signals, SIGPIPE);
     sigaddset(&sigmask.signals, SIGTERM);
+#ifndef __ANDROID__
+    /* android's bionic c doesn't provide pthread_cancel() and related functions.
+     * to solve this issue, use pthread_kill() & SIGUSR1 instead.
+     */
     sigaddset(&sigmask.signals, SIGUSR1);
+#endif
     sigaddset(&sigmask.signals, SIGUSR2);
 
     /* all child threads will inherit this mask unless they

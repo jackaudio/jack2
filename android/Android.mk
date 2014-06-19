@@ -1,12 +1,16 @@
 #
-# jack-1.9.9.5
+# jack-1.9.10
 #
 
 LOCAL_PATH := $(call my-dir)
 JACK_ROOT := $(call my-dir)/..
 SUPPORT_ALSA_IN_JACK := true
 SUPPORT_ANDROID_REALTIME_SCHED := false
+ifeq ($(TARGET_BOARD_PLATFORM),mrvl)
+ALSA_INCLUDES := vendor/marvell/external/alsa-lib/include
+else
 ALSA_INCLUDES := vendor/samsung/common/external/alsa-lib/include
+endif
 JACK_STL_LDFLAGS := -Lprebuilts/ndk/current/sources/cxx-stl/gnu-libstdc++/libs/$(TARGET_CPU_ABI) -lgnustl_static
 JACK_STL_INCLUDES := $(JACK_ROOT)/android/cxx-stl/gnu-libstdc++/libs/$(TARGET_CPU_ABI)/include \
                      prebuilts/ndk/current/sources/cxx-stl/gnu-libstdc++/libs/$(TARGET_CPU_ABI)/include \
@@ -20,6 +24,11 @@ common_cflags := -O0 -g -Wall -fexceptions -fvisibility=hidden -DHAVE_CONFIG_H
 common_cflags += -Wno-unused -Wno-sign-compare -Wno-deprecated-declarations -Wno-cpp
 common_cppflags := -frtti -Wno-sign-promo -fcheck-new
 common_shm_cflags := -O0 -g -Wall -fexceptions -DHAVE_CONFIG_H -Wno-unused
+ifeq ($(TARGET_BOARD_PLATFORM),clovertrail)
+common_ldflags := -ldl
+else
+common_ldflags :=
+endif
 common_c_includes := \
     $(JACK_ROOT) \
     $(JACK_ROOT)/common \
@@ -252,7 +261,7 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := $(common_libsource_server) $(server_libsource)
 LOCAL_CFLAGS := $(common_cflags) -DSERVER_SIDE
 LOCAL_CPPFLAGS := $(common_cppflags)
-LOCAL_LDFLAGS := $(JACK_STL_LDFLAGS)
+LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libc libdl libcutils libutils libjackshm
 LOCAL_MODULE_TAGS := eng optional
@@ -274,7 +283,7 @@ include $(BUILD_SHARED_LIBRARY)
 #LOCAL_SRC_FILES := $(net_libsource)
 #LOCAL_CFLAGS := $(common_cflags) -DSERVER_SIDE
 #LOCAL_CPPFLAGS := $(common_cppflags)
-#LOCAL_LDFLAGS := $(JACK_STL_LDFLAGS)
+#LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
 #LOCAL_C_INCLUDES := $(common_c_includes) $(JACK_ROOT)/../libsamplerate/include
 #LOCAL_SHARED_LIBRARIES := libc libdl libcutils libsamplerate
 #LOCAL_MODULE_TAGS := eng optional
@@ -290,7 +299,7 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := $(common_libsource_client) $(client_libsource)
 LOCAL_CFLAGS := $(common_cflags)
 LOCAL_CPPFLAGS := $(common_cppflags)
-LOCAL_LDFLAGS := $(JACK_STL_LDFLAGS)
+LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libc libdl libcutils libutils libjackshm
 LOCAL_MODULE_TAGS := eng optional
@@ -312,7 +321,7 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := ../common/JackNetManager.cpp
 LOCAL_CFLAGS := $(common_cflags) -DSERVER_SIDE
 LOCAL_CPPFLAGS := $(common_cppflags)
-LOCAL_LDFLAGS := $(JACK_STL_LDFLAGS)
+LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libc libdl libcutils libjackserver
 LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/jack
@@ -329,7 +338,7 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := ../common/JackProfiler.cpp
 LOCAL_CFLAGS := $(common_cflags) -DSERVER_SIDE
 LOCAL_CPPFLAGS := $(common_cppflags)
-LOCAL_LDFLAGS := $(JACK_STL_LDFLAGS)
+LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libc libdl libcutils libjackserver
 LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/jack
@@ -346,7 +355,7 @@ include $(BUILD_SHARED_LIBRARY)
 #LOCAL_SRC_FILES := $(netadapter_libsource)
 #LOCAL_CFLAGS := $(common_cflags) -DSERVER_SIDE
 #LOCAL_CPPFLAGS := $(common_cppflags)
-#LOCAL_LDFLAGS := $(JACK_STL_LDFLAGS)
+#LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
 #LOCAL_C_INCLUDES := $(common_c_includes) $(JACK_ROOT)/../libsamplerate/include
 #LOCAL_SHARED_LIBRARIES := libc libdl libcutils libsamplerate libjackserver
 #LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/jack
@@ -364,7 +373,7 @@ include $(BUILD_SHARED_LIBRARY)
 #LOCAL_SRC_FILES := $(audioadapter_libsource)
 #LOCAL_CFLAGS := $(common_cflags) -DSERVER_SIDE -D_POSIX_SOURCE
 #LOCAL_CPPFLAGS := $(common_cppflags)
-#LOCAL_LDFLAGS := $(JACK_STL_LDFLAGS)
+#LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
 #LOCAL_C_INCLUDES := $(common_c_includes) $(JACK_ROOT)/../libsamplerate/include $(ALSA_INCLUDES)
 #LOCAL_SHARED_LIBRARIES := libc libdl libcutils libasound libsamplerate libjackserver
 #LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/jack
@@ -373,6 +382,40 @@ include $(BUILD_SHARED_LIBRARY)
 #
 #include $(BUILD_SHARED_LIBRARY)
 ##endif
+
+# ========================================================
+# in.so - sapaproxy internal client
+# ========================================================
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES := JackSapaProxy.cpp JackSapaProxyIn.cpp
+LOCAL_CFLAGS := $(common_cflags) -DSERVER_SIDE
+LOCAL_CPPFLAGS := $(common_cppflags)
+LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
+LOCAL_C_INCLUDES := $(common_c_includes)
+LOCAL_SHARED_LIBRARIES := libc libdl libcutils libjackserver
+LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/jack
+LOCAL_MODULE_TAGS := eng optional
+LOCAL_MODULE := in
+
+include $(BUILD_SHARED_LIBRARY)
+
+# ========================================================
+# out.so - sapaproxy internal client
+# ========================================================
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES := JackSapaProxy.cpp JackSapaProxyOut.cpp
+LOCAL_CFLAGS := $(common_cflags) -DSERVER_SIDE
+LOCAL_CPPFLAGS := $(common_cppflags)
+LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
+LOCAL_C_INCLUDES := $(common_c_includes)
+LOCAL_SHARED_LIBRARIES := libc libdl libcutils libjackserver
+LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/jack
+LOCAL_MODULE_TAGS := eng optional
+LOCAL_MODULE := out
+
+include $(BUILD_SHARED_LIBRARY)
 
 ##########################################################
 # linux
@@ -406,7 +449,7 @@ LOCAL_SRC_FILES := ../common/JackDummyDriver.cpp
 #'HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL', 'HAVE_TIMERFD
 LOCAL_CFLAGS := $(common_cflags) -DSERVER_SIDE
 LOCAL_CPPFLAGS := $(common_cppflags)
-LOCAL_LDFLAGS := $(JACK_STL_LDFLAGS)
+LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libc libdl libcutils libjackserver
 LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/jack
@@ -423,8 +466,6 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := \
     ../linux/alsa/JackAlsaDriver.cpp \
-    ../linux/alsa/alsa_rawmidi.c \
-    ../linux/alsa/alsa_seqmidi.c \
     ../linux/alsa/alsa_midi_jackmp.cpp \
     ../common/memops.c \
     ../linux/alsa/generic_hw.c \
@@ -432,10 +473,12 @@ LOCAL_SRC_FILES := \
     ../linux/alsa/alsa_driver.c \
     ../linux/alsa/hammerfall.c \
     ../linux/alsa/ice1712.c
+#    ../linux/alsa/alsa_rawmidi.c
+#    ../linux/alsa/alsa_seqmidi.c
 #'HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL', 'HAVE_TIMERFD
 LOCAL_CFLAGS := $(common_cflags) -DSERVER_SIDE -D_POSIX_SOURCE -D_XOPEN_SOURCE=600
 LOCAL_CPPFLAGS := $(common_cppflags)
-LOCAL_LDFLAGS := $(JACK_STL_LDFLAGS)
+LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
 LOCAL_C_INCLUDES := $(common_c_includes) $(ALSA_INCLUDES)
 LOCAL_SHARED_LIBRARIES := libc libdl libcutils libjackserver libasound
 LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/jack
@@ -461,7 +504,7 @@ endif
 ##'HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL', 'HAVE_TIMERFD
 #LOCAL_CFLAGS := $(common_cflags) -D_POSIX_SOURCE -D__ALSA_RAWMIDI_H
 #LOCAL_CPPFLAGS := $(common_cppflags)
-#LOCAL_LDFLAGS := $(JACK_STL_LDFLAGS)
+#LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
 #LOCAL_C_INCLUDES := $(common_c_includes) $(ALSA_INCLUDES)
 #LOCAL_SHARED_LIBRARIES := libc libdl libcutils libjackserver libasound
 #LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/jack
@@ -480,7 +523,7 @@ endif
 ##'HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL', 'HAVE_TIMERFD
 #LOCAL_CFLAGS := $(common_cflags) -DSERVER_SIDE
 #LOCAL_CPPFLAGS := $(common_cppflags)
-#LOCAL_LDFLAGS := $(JACK_STL_LDFLAGS)
+#LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
 #LOCAL_C_INCLUDES := $(common_c_includes)
 #LOCAL_SHARED_LIBRARIES := libc libdl libcutils libjackserver
 #LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/jack
@@ -504,7 +547,7 @@ endif
 ##'HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL', 'HAVE_TIMERFD
 #LOCAL_CFLAGS := $(common_cflags) -DSERVER_SIDE
 #LOCAL_CPPFLAGS := $(common_cppflags)
-#LOCAL_LDFLAGS := $(JACK_STL_LDFLAGS)
+#LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
 #LOCAL_C_INCLUDES := $(common_c_includes)
 #LOCAL_SHARED_LIBRARIES := libc libdl libcutils libjackserver
 #LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/jack
@@ -522,7 +565,7 @@ LOCAL_SRC_FILES := ../common/JackNetDriver.cpp
 #'HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL', 'HAVE_TIMERFD
 LOCAL_CFLAGS := $(common_cflags) -DSERVER_SIDE
 LOCAL_CPPFLAGS := $(common_cppflags)
-LOCAL_LDFLAGS := $(JACK_STL_LDFLAGS)
+LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libc libdl libcutils libjackserver
 LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/jack
@@ -540,7 +583,7 @@ LOCAL_SRC_FILES := ../common/JackLoopbackDriver.cpp
 #'HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL', 'HAVE_TIMERFD
 LOCAL_CFLAGS := $(common_cflags) -DSERVER_SIDE
 LOCAL_CPPFLAGS := $(common_cppflags)
-LOCAL_LDFLAGS := $(JACK_STL_LDFLAGS)
+LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libc libdl libcutils libjackserver
 LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/jack
@@ -562,7 +605,7 @@ include $(BUILD_SHARED_LIBRARY)
 ##'HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL', 'HAVE_TIMERFD
 #LOCAL_CFLAGS := $(common_cflags) -DSERVER_SIDE
 #LOCAL_CPPFLAGS := $(common_cppflags)
-#LOCAL_LDFLAGS := $(JACK_STL_LDFLAGS)
+#LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
 #LOCAL_C_INCLUDES := $(common_c_includes) $(JACK_ROOT)/../libsamplerate/include
 #LOCAL_SHARED_LIBRARIES := libc libdl libcutils libsamplerate libjackserver
 #LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/jack
@@ -582,7 +625,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := BnAndroidShm.cpp BpAndroidShm.cpp IAndroidShm.cpp AndroidShm.cpp Shm.cpp
 LOCAL_CFLAGS := $(common_shm_cflags) -DSERVER_SIDE
-LOCAL_LDFLAGS := $(JACK_STL_LDFLAGS)
+LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libc libdl libcutils libutils libbinder
 LOCAL_MODULE_TAGS := eng optional
@@ -598,7 +641,7 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := JackGoldfishDriver.cpp
 LOCAL_CFLAGS := $(common_cflags) -DSERVER_SIDE
 LOCAL_CPPFLAGS := $(common_cppflags)
-LOCAL_LDFLAGS := $(JACK_STL_LDFLAGS)
+LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libc libdl libcutils libjackserver
 LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/jack
@@ -615,7 +658,7 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := JackOpenSLESDriver.cpp opensl_io.c
 LOCAL_CFLAGS := $(common_cflags) -DSERVER_SIDE
 LOCAL_CPPFLAGS := $(common_cppflags)
-LOCAL_LDFLAGS := $(JACK_STL_LDFLAGS)
+LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
 LOCAL_C_INCLUDES := $(common_c_includes) frameworks/wilhelm/include
 LOCAL_SHARED_LIBRARIES := libc libdl libcutils libjackserver libOpenSLES
 LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/jack
@@ -636,7 +679,7 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := ./AndroidShmServer/main_androidshmservice.cpp
 LOCAL_CFLAGS := $(common_cflags)
 LOCAL_CPPFLAGS := $(common_cppflags)
-LOCAL_LDFLAGS := $(JACK_STL_LDFLAGS)
+LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libcutils libutils libbinder libjackshm
 LOCAL_MODULE_TAGS := eng optional
@@ -650,10 +693,13 @@ include $(BUILD_EXECUTABLE)
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ./AndroidShmServer/test/shmservicetest.cpp
+LOCAL_CFLAGS := $(common_cflags) -DLOG_TAG=\"ShmServiceTest\"
+LOCAL_CPPFLAGS := $(common_cppflags)
+LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
+LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libcutils libutils libjackshm libbinder
 LOCAL_MODULE_TAGS := eng optional
 LOCAL_MODULE := shmservicetest
-LOCAL_CFLAGS += -DLOG_TAG=\"ShmServiceTest\" 
 
 include $(BUILD_EXECUTABLE)
 
@@ -663,12 +709,13 @@ include $(BUILD_EXECUTABLE)
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ./AndroidShmServer/test/shmservicedump.cpp
+LOCAL_CFLAGS := $(common_cflags) -DLOG_TAG=\"ShmServiceDump\"
+LOCAL_CPPFLAGS := $(common_cppflags)
+LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
 LOCAL_SHARED_LIBRARIES := libcutils libutils libjackshm libbinder
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_MODULE_TAGS := eng optional
 LOCAL_MODULE := shmservicedump
-LOCAL_CFLAGS += $(common_cflags) -DLOG_TAG=\"ShmServiceDump\"
-LOCAL_LDFLAGS := $(JACK_STL_LDFLAGS)
 
 include $(BUILD_EXECUTABLE)
 
@@ -683,6 +730,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/freewheel.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -698,6 +746,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/connect.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -713,6 +762,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/connect.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -728,6 +778,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/lsp.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -743,6 +794,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/metro.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -758,6 +810,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/midiseq.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -773,6 +826,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/midisine.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -788,6 +842,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/showtime.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -803,6 +858,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/simple_client.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -818,6 +874,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/zombie.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -833,6 +890,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/ipload.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -848,6 +906,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/ipunload.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -863,6 +922,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/alias.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -878,6 +938,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/bufsize.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -893,6 +954,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/wait.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -908,6 +970,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/samplerate.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -923,6 +986,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/evmon.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -938,6 +1002,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/monitor_client.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -953,6 +1018,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/thru_client.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -968,6 +1034,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/cpu_load.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -983,6 +1050,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/simple_session_client.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -998,6 +1066,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/session_notify.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -1013,7 +1082,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/server_control.cpp
 LOCAL_CFLAGS := $(common_cflags)
-LOCAL_LDFLAGS := $(JACK_STL_LDFLAGS)
+LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjackserver
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -1029,6 +1098,7 @@ include $(BUILD_EXECUTABLE)
 #
 #LOCAL_SRC_FILES := ../example-clients/netslave.c
 #LOCAL_CFLAGS := $(common_cflags)
+#LOCAL_LDFLAGS := $(common_ldflags)
 #LOCAL_C_INCLUDES := $(common_c_includes)
 #LOCAL_SHARED_LIBRARIES := libjacknet
 #LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -1044,6 +1114,7 @@ include $(BUILD_EXECUTABLE)
 #
 #LOCAL_SRC_FILES := ../example-clients/netmaster.c
 #LOCAL_CFLAGS := $(common_cflags)
+#LOCAL_LDFLAGS := $(common_ldflags)
 #LOCAL_C_INCLUDES := $(common_c_includes)
 #LOCAL_SHARED_LIBRARIES := libjacknet
 #LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -1059,6 +1130,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/latent_client.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -1074,6 +1146,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/midi_dump.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -1089,6 +1162,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/midi_latency_test.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -1104,6 +1178,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/transport.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -1119,6 +1194,7 @@ include $(BUILD_EXECUTABLE)
 #
 #LOCAL_SRC_FILES := ../example-clients/capture_client.c
 #LOCAL_CFLAGS := $(common_cflags)
+#LOCAL_LDFLAGS := $(common_ldflags)
 #LOCAL_C_INCLUDES := $(common_c_includes)  $(JACK_ROOT)/../libsndfile/src
 #LOCAL_SHARED_LIBRARIES := libjack libsndfile
 #LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -1134,6 +1210,7 @@ include $(BUILD_EXECUTABLE)
 #
 #LOCAL_SRC_FILES := ../example-clients/netsource.c  ../common/netjack_packet.c
 #LOCAL_CFLAGS := $(common_cflags) -DNO_JACK_ERROR
+#LOCAL_LDFLAGS := $(common_ldflags)
 #LOCAL_C_INCLUDES := $(common_c_includes) $(JACK_ROOT)/../libsamplerate/include
 #LOCAL_SHARED_LIBRARIES := libsamplerate libjack
 #LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -1150,6 +1227,7 @@ include $(BUILD_EXECUTABLE)
 #
 #LOCAL_SRC_FILES := ../example-clients/alsa_in.c  ../common/memops.c
 #LOCAL_CFLAGS := $(common_cflags) -DNO_JACK_ERROR -D_POSIX_SOURCE -D_XOPEN_SOURCE=600
+#LOCAL_LDFLAGS := $(common_ldflags)
 #LOCAL_C_INCLUDES := $(common_c_includes) $(JACK_ROOT)/../libsamplerate/include $(ALSA_INCLUDES)
 #LOCAL_SHARED_LIBRARIES := libasound libsamplerate libjack
 #LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -1167,6 +1245,7 @@ include $(BUILD_EXECUTABLE)
 #
 #LOCAL_SRC_FILES := ../example-clients/alsa_out.c  ../common/memops.c
 #LOCAL_CFLAGS := $(common_cflags) -DNO_JACK_ERROR -D_POSIX_SOURCE -D_XOPEN_SOURCE=600
+#LOCAL_LDFLAGS := $(common_ldflags)
 #LOCAL_C_INCLUDES := $(common_c_includes) $(JACK_ROOT)/../libsamplerate/include $(ALSA_INCLUDES)
 #LOCAL_SHARED_LIBRARIES := libasound libsamplerate libjack
 #LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -1182,11 +1261,13 @@ include $(BUILD_EXECUTABLE)
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../example-clients/inprocess.c
-LOCAL_CFLAGS := $(common_cflags)
+LOCAL_CFLAGS := $(common_cflags) -DSERVER_SIDE
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
-LOCAL_SHARED_LIBRARIES := libjackserver
+LOCAL_SHARED_LIBRARIES := libc libdl libcutils libjackserver
+LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/jack
 LOCAL_MODULE_TAGS := eng optional
-LOCAL_MODULE := example_lib
+LOCAL_MODULE := inprocess
 
 include $(BUILD_SHARED_LIBRARY)
 
@@ -1201,7 +1282,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../tests/test.cpp
 LOCAL_CFLAGS := $(common_cflags)
-LOCAL_LDFLAGS := $(JACK_STL_LDFLAGS)
+LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack libjackshm
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -1217,6 +1298,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../tests/cpu.c
 LOCAL_CFLAGS := $(common_cflags)
+LOCAL_LDFLAGS := $(common_ldflags)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack libjackshm
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -1233,7 +1315,7 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := ../tests/iodelay.cpp
 LOCAL_CFLAGS := $(common_cflags)
 LOCAL_CFLAGS += -Wno-narrowing
-LOCAL_LDFLAGS := $(JACK_STL_LDFLAGS)
+LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack libjackshm
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -1249,7 +1331,7 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := ../tests/external_metro.cpp
 LOCAL_CFLAGS := $(common_cflags)
-LOCAL_LDFLAGS := $(JACK_STL_LDFLAGS)
+LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
 LOCAL_C_INCLUDES := $(common_c_includes)
 LOCAL_SHARED_LIBRARIES := libjack libjackshm
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
@@ -1257,3 +1339,4 @@ LOCAL_MODULE_TAGS := eng optional
 LOCAL_MODULE := jack_multiple_metro
 
 include $(BUILD_EXECUTABLE)
+
