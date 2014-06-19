@@ -49,13 +49,6 @@ void* JackAndroidThread::ThreadHandler(void* arg)
     JackRunnableInterface* runnable = obj->fRunnable;
     int err;
 
-    struct sigaction actions;
-    memset(&actions, 0, sizeof(actions)); 
-    sigemptyset(&actions.sa_mask);
-    actions.sa_flags = 0; 
-    actions.sa_handler = thread_exit_handler;
-    sigaction(SIGUSR1,&actions,NULL);
-
     // Signal creation thread when started with StartSync
     jack_log("JackAndroidThread::ThreadHandler : start");
     obj->fStatus = kIniting;
@@ -114,6 +107,13 @@ int JackAndroidThread::StartImp(jack_native_thread_t* thread, int priority, int 
     struct sched_param rt_param;
     pthread_attr_init(&attributes);
     int res;
+
+    struct sigaction actions;
+    memset(&actions, 0, sizeof(actions));
+    sigemptyset(&actions.sa_mask);
+    actions.sa_flags = 0;
+    actions.sa_handler = thread_exit_handler;
+    sigaction(SIGUSR1,&actions,NULL);
 
     if ((res = pthread_attr_setdetachstate(&attributes, PTHREAD_CREATE_JOINABLE))) {
         jack_error("Cannot request joinable thread creation for thread res = %d", res);

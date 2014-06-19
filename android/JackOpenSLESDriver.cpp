@@ -34,7 +34,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "opensl_io.h"
 
 #define JACK_OPENSLES_DEFAULT_SAMPLERATE   48000
-#define JACK_OPENSLES_DEFAULT_BUFFER_SIZE  1024
+#define JACK_OPENSLES_DEFAULT_BUFFER_SIZE  960
 
 namespace Jack
 {
@@ -59,8 +59,6 @@ int JackOpenSLESDriver::Open(jack_nframes_t buffer_size,
         capture_driver_uid, playback_driver_uid, capture_latency, playback_latency) != 0) {
         return -1;
     }
-    //JackAudioDriver::SetBufferSize(buffer_size);
-    //JackAudioDriver::SetSampleRate(samplerate);
 
     if (capturing) {
         inbuffer = (float *) malloc(sizeof(float) * buffer_size);  //mono input
@@ -102,7 +100,6 @@ int JackOpenSLESDriver::Read() {
 
     if (inbuffer) {
         int samps = android_AudioIn(pOpenSL_stream,inbuffer,fEngineControl->fBufferSize);
-        //jack_log("JackOpenSLESDriver::Read(%d)", samps);  //for debug
         for (int i = 0; i < samps; i++) {
             *(inputBuffer_1 + i) = *(inbuffer + i);
             *(inputBuffer_2 + i) = *(inbuffer + i);
@@ -175,7 +172,7 @@ extern "C"
     SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) {
         jack_nframes_t sample_rate = JACK_OPENSLES_DEFAULT_SAMPLERATE;
         jack_nframes_t buffer_size = JACK_OPENSLES_DEFAULT_BUFFER_SIZE;
-        unsigned int capture_ports = 2;
+        unsigned int capture_ports = 0;
         unsigned int playback_ports = 2;
         int wait_time = 0;
         const JSList * node;

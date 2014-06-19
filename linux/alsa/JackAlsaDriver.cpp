@@ -289,10 +289,12 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
     }
 
     alsa_midi_t *midi = 0;
+#ifndef __ANDROID__
     if (strcmp(midi_driver_name, "seq") == 0)
         midi = alsa_seqmidi_new((jack_client_t*)this, 0);
     else if (strcmp(midi_driver_name, "raw") == 0)
         midi = alsa_rawmidi_new((jack_client_t*)this);
+#endif
 
     if (JackServerGlobals::on_device_acquire != NULL) {
         int capture_card = card_to_num(capture_driver_name);

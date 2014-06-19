@@ -12,10 +12,10 @@
 /* #define HAVE_CELT_API_0_7 0 */
 /* #define HAVE_CELT_API_0_5 0 */
 /* #define HAVE_READLINE 0 */
-#define CLIENT_NUM 16
-#define PORT_NUM_FOR_CLIENT 16
-#define PORT_NUM 128
-#define PORT_NUM_MAX 256
+#define CLIENT_NUM 32
+#define PORT_NUM_FOR_CLIENT 24
+#define PORT_NUM 256
+#define PORT_NUM_MAX 512
 #define ADDON_DIR "/system/lib/jack"
 #define JACK_LOCATION "/system/bin"
 #define JACKMP 1
