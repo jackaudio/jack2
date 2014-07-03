@@ -28,7 +28,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "driver_interface.h"
 #include "JackLibGlobals.h"
 
-
 #include <math.h>
 #include <string>
 #include <algorithm>
