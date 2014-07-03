@@ -624,6 +624,9 @@ JackALSARawMidiDriver::Write()
 #ifdef __cplusplus
 extern "C" {
 #endif
+    
+    // singleton kind of driver
+    static Jack::JackALSARawMidiDriver* driver = NULL;
 
     SERVER_EXPORT jack_driver_desc_t *
     driver_get_descriptor()
@@ -639,14 +642,19 @@ extern "C" {
     driver_initialize(Jack::JackLockedEngine *engine, Jack::JackSynchro *table,
                       const JSList *params)
     {
-        Jack::JackDriverClientInterface *driver =
-            new Jack::JackALSARawMidiDriver("system_midi", "alsarawmidi",
-                                            engine, table);
-        if (driver->Open(0, 0, 1, 1, 0, 0, false, "midi in", "midi out", 0, 0)) {
-            delete driver;
-            driver = 0;
+        // singleton kind of driver
+        if (!driver) {
+            driver = new Jack::JackALSARawMidiDriver("system_midi", "alsarawmidi", engine, table);
+            if (driver->Open(1, 1, 0, 0, false, "midi in", "midi out", 0, 0) == 0) {
+                return driver;
+            } else {
+                delete driver;
+                return NULL;
+            }
+        } else {
+            jack_info("JackALSARawMidiDriver already allocated, cannot be loaded twice");
+            return NULL;
         }
-        return driver;
     }
 
 #ifdef __cplusplus

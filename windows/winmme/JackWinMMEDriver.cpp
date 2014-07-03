@@ -359,7 +359,7 @@ extern "C"
 #endif
 
     // singleton kind of driver
-    static Jack::JackDriverClientInterface* driver = NULL;
+    static Jack::JackWinMMEDriver* driver = NULL;
 
     SERVER_EXPORT jack_driver_desc_t * driver_get_descriptor()
     {
@@ -411,7 +411,7 @@ extern "C"
         // singleton kind of driver
         if (!driver) {
             driver = new Jack::JackWinMMEDriver("system_midi", "winmme", engine, table);
-            if (driver->Open(0, 0, 1, 1, 0, 0, false, "in", "out", 0, 0) == 0) {
+            if (driver->Open(1, 1, 0, 0, false, "in", "out", 0, 0) == 0) {
                 return driver;
             } else {
                 delete driver;
