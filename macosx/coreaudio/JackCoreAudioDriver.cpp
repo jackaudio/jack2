@@ -196,7 +196,6 @@ static bool CheckAvailableDevice(AudioDeviceID device_id)
     return false;
 }
 
-
 static OSStatus DisplayDeviceNames()
 {
     UInt32 size;
