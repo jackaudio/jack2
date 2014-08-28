@@ -125,6 +125,7 @@ namespace Jack
     bool JackNetInterface::SetParams()
     {
         // TX header init
+        memset(&fTxHeader, 0, sizeof(fTxHeader));
         strcpy(fTxHeader.fPacketType, "header");
         fTxHeader.fID = fParams.fID;
         fTxHeader.fCycle = 0;
@@ -132,6 +133,7 @@ namespace Jack
         fTxHeader.fIsLastPckt = 0;
 
         // RX header init
+        memset(&fRxHeader, 0, sizeof(fTxHeader));
         strcpy(fRxHeader.fPacketType, "header");
         fRxHeader.fID = fParams.fID;
         fRxHeader.fCycle = 0;
