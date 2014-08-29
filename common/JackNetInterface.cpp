@@ -166,6 +166,7 @@ namespace Jack
                 fTxHeader.fIsLastPckt = ((subproc == (fTxHeader.fNumPacket - 1)) && audio_channels == 0) ? 1 : 0;
                 fTxHeader.fPacketSize = HEADER_SIZE + buffer->RenderToNetwork(subproc, data_size);
                 memcpy(fTxBuffer, &fTxHeader, HEADER_SIZE);
+                 //PacketHeaderDisplay(&fTxHeader);
                 if (Send(fTxHeader.fPacketSize, 0) == SOCKET_ERROR) {
                     return SOCKET_ERROR;
                 }
@@ -207,6 +208,7 @@ namespace Jack
         if (++recvd_midi_pckt == rx_head->fNumPacket) {
             buffer->RenderToJackPorts();
         }
+        //PacketHeaderDisplay(rx_head);
         return rx_bytes;
     }
 
@@ -224,6 +226,7 @@ namespace Jack
         if (fRxHeader.fIsLastPckt) {
             buffer->RenderToJackPorts(fRxHeader.fFrames);
         }
+        //PacketHeaderDisplay(rx_head);
         return rx_bytes;
     }
 
@@ -461,8 +464,8 @@ namespace Jack
         fTxHeader.fSubCycle = 0;
         fTxHeader.fDataType = 's';
         fTxHeader.fIsLastPckt = (fParams.fSendMidiChannels == 0 && fParams.fSendAudioChannels == 0) ? 1 : 0;
-        fTxHeader.fPacketSize = fParams.fMtu;
-
+        fTxHeader.fPacketSize = HEADER_SIZE + fTxHeader.fActivePorts * sizeof(int); // Data part is used to encode active ports
+      
         memcpy(fTxBuffer, &fTxHeader, HEADER_SIZE);
         //PacketHeaderDisplay(&fTxHeader);
         return Send(fTxHeader.fPacketSize, 0);
@@ -490,6 +493,7 @@ namespace Jack
             }
         }
         while (strcmp(rx_head->fPacketType, "header") != 0);
+        //PacketHeaderDisplay(rx_head);
         
         if (rx_head->fDataType != 's') {
             jack_error("Wrong packet type : %c", rx_head->fDataType);
@@ -883,7 +887,8 @@ namespace Jack
             fRxHeader.fIsLastPckt = 0;
             return SYNC_PACKET_ERROR;
         }
-     
+        
+        //PacketHeaderDisplay(rx_head);
         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
         return rx_bytes;
     }
@@ -937,8 +942,8 @@ namespace Jack
         fTxHeader.fSubCycle = 0;
         fTxHeader.fDataType = 's';
         fTxHeader.fIsLastPckt = (fParams.fReturnMidiChannels == 0 && fParams.fReturnAudioChannels == 0) ? 1 : 0;
-        fTxHeader.fPacketSize = fParams.fMtu;
-
+        fTxHeader.fPacketSize = HEADER_SIZE + fTxHeader.fActivePorts * sizeof(int); // Data part is used to encode active ports
+    
         memcpy(fTxBuffer, &fTxHeader, HEADER_SIZE);
         //PacketHeaderDisplay(&fTxHeader);
         return Send(fTxHeader.fPacketSize, 0);

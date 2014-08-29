@@ -299,6 +299,7 @@ namespace Jack
 
         for (uint port_index = 0; port_index < port_num; port_index++) {
             int active_port = ntohl(*active_port_address);
+            assert(active_port < fNPorts);
             fConnectedPorts[active_port] = true;
             active_port_address++;
         }
