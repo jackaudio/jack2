@@ -532,7 +532,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
         fParams.fKBps = request->kbps;
         fParams.fSlaveSyncMode = 1;
         fConnectTimeOut = request->time_out;
-
+     
         // Create name with hostname and client name
         GetHostName(host_name, JACK_CLIENT_NAME_SIZE);
         snprintf(fParams.fName, JACK_CLIENT_NAME_SIZE, "%s_%s", host_name, name);

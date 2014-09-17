@@ -60,8 +60,8 @@ typedef struct {
     int mtu;            // network Maximum Transmission Unit
     int time_out;       // in second, -1 means infinite
     int encoder;        // encoder type (one of JackNetEncoder)
-    int kbps;           // KB per second for CELT encoder
-    int latency;        // network latency
+    int kbps;           // KB per second for CELT or OPUS encoder
+    int latency;        // network latency in number of buffers
 
 } jack_slave_t;
 
