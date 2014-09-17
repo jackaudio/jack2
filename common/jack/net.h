@@ -60,7 +60,7 @@ typedef struct {
     int mtu;            // network Maximum Transmission Unit
     int time_out;       // in second, -1 means infinite
     int encoder;        // encoder type (one of JackNetEncoder)
-    int kbps;           // KB per second for CELT or OPUS encoder
+    int kbps;           // KB per second for CELT or OPUS codec
     int latency;        // network latency in number of buffers
 
 } jack_slave_t;
@@ -75,7 +75,7 @@ typedef struct {
     jack_nframes_t sample_rate;         // master sample rate
     char master_name[MASTER_NAME_SIZE]; // master machine name
     int time_out;                       // in second, -1 means infinite
-    int partial_cycle;                  // if 'true', partial cycle will be used 
+    int partial_cycle;                  // if 'true', partial buffers will be used 
 
 } jack_master_t;
 
@@ -87,6 +87,7 @@ typedef struct _jack_net_slave jack_net_slave_t;
 
  /**
  * Open a network connection with the master machine.
+ *
  * @param ip the multicast address of the master
  * @param port the connection port
  * @param request a connection request structure
@@ -98,6 +99,7 @@ jack_net_slave_t* jack_net_slave_open(const char* ip, int port, const char* name
 
 /**
  * Close the network connection with the master machine.
+ *
  * @param net the network connection to be closed
  *
  * @return 0 on success, otherwise a non-zero error code
@@ -106,6 +108,7 @@ int jack_net_slave_close(jack_net_slave_t* net);
 
 /**
  * Prototype for Process callback.
+ *
  * @param nframes buffer size
  * @param audio_input number of audio inputs
  * @param audio_input_buffer an array of audio input buffers (from master)
@@ -132,6 +135,7 @@ typedef int (* JackNetSlaveProcessCallback) (jack_nframes_t buffer_size,
 
 /**
  * Set network process callback.
+ *
  * @param net the network connection
  * @param net_callback the process callback
  * @param arg pointer to a client supplied structure
@@ -142,6 +146,7 @@ int jack_set_net_slave_process_callback(jack_net_slave_t * net, JackNetSlaveProc
 
 /**
  * Start processing thread, the net_callback will start to be called.
+ *
  * @param net the network connection
  *
  * @return 0 on success, otherwise a non-zero error code
@@ -150,6 +155,7 @@ int jack_net_slave_activate(jack_net_slave_t* net);
 
 /**
  * Stop processing thread.
+ *
  * @param net the network connection
  *
  * @return 0 on success, otherwise a non-zero error code
@@ -158,6 +164,7 @@ int jack_net_slave_deactivate(jack_net_slave_t* net);
 
 /**
  * Test if slave is still active.
+ *
  * @param net the network connection
  *
  * @return a boolean 
@@ -166,6 +173,7 @@ int jack_net_slave_is_active(jack_net_slave_t* net);
 
 /**
  * Prototype for BufferSize callback.
+ *
  * @param nframes buffer size
  * @param arg pointer to a client supplied structure supplied by jack_set_net_buffer_size_callback()
  *
@@ -175,6 +183,7 @@ typedef int (*JackNetSlaveBufferSizeCallback)(jack_nframes_t nframes, void *arg)
 
 /**
  * Set network buffer size callback.
+ *
  * @param net the network connection
  * @param bufsize_callback the buffer size callback
  * @param arg pointer to a client supplied structure
@@ -185,6 +194,7 @@ int jack_set_net_slave_buffer_size_callback(jack_net_slave_t *net, JackNetSlaveB
 
 /**
  * Prototype for SampleRate callback.
+ *
  * @param nframes sample rate
  * @param arg pointer to a client supplied structure supplied by jack_set_net_sample_rate_callback()
  *
@@ -194,6 +204,7 @@ typedef int (*JackNetSlaveSampleRateCallback)(jack_nframes_t nframes, void *arg)
 
 /**
  * Set network sample rate callback.
+ *
  * @param net the network connection
  * @param samplerate_callback the sample rate callback
  * @param arg pointer to a client supplied structure
@@ -204,12 +215,14 @@ int jack_set_net_slave_sample_rate_callback(jack_net_slave_t *net, JackNetSlaveS
 
 /**
  * Prototype for server Shutdown callback (if not set, the client will just restart, waiting for an available master again).
+ *
  * @param arg pointer to a client supplied structure supplied by jack_set_net_shutdown_callback()
  */
 typedef void (*JackNetSlaveShutdownCallback)(void* arg);
 
 /**
  * Set network shutdown callback.
+ *
  * @param net the network connection
  * @param shutdown_callback the shutdown callback
  * @param arg pointer to a client supplied structure
@@ -224,6 +237,7 @@ int jack_set_net_slave_shutdown_callback(jack_net_slave_t *net, JackNetSlaveShut
  * by returning 0. Otherwise returning a non-zero error code will definively close the connection 
  * (and jack_net_slave_is_active will later on return false).
  * If both Shutdown and Restart are supplied, Restart callback will be used.
+ *
  * @param arg pointer to a client supplied structure supplied by jack_set_net_restart_callback()
  *
  * @return 0 on success, otherwise a non-zero error code
@@ -232,6 +246,7 @@ typedef int (*JackNetSlaveRestartCallback)(void* arg);
 
 /**
  * Set network restart callback.
+ *
  * @param net the network connection
  * @param restart_callback the shutdown callback
  * @param arg pointer to a client supplied structure
@@ -242,6 +257,7 @@ int jack_set_net_slave_restart_callback(jack_net_slave_t *net, JackNetSlaveResta
 
 /**
  * Prototype for server Error callback.
+ *
  * @param error_code an error code (see "Possible error codes")
  * @param arg pointer to a client supplied structure supplied by jack_set_net_error_callback()
  */
@@ -249,6 +265,7 @@ typedef void (*JackNetSlaveErrorCallback) (int error_code, void* arg);
 
 /**
  * Set error restart callback.
+ *
  * @param net the network connection
  * @param error_callback the error callback
  * @param arg pointer to a client supplied structure
@@ -264,6 +281,7 @@ typedef struct _jack_net_master jack_net_master_t;
 
  /**
  * Open a network connection with the slave machine.
+ *
  * @param ip the multicast address of the master
  * @param port the connection port
  * @param request a connection request structure
@@ -275,6 +293,7 @@ jack_net_master_t* jack_net_master_open(const char* ip, int port, const char* na
 
 /**
  * Close the network connection with the slave machine.
+ *
  * @param net the network connection to be closed
  *
  * @return 0 on success, otherwise a non-zero error code
@@ -283,6 +302,7 @@ int jack_net_master_close(jack_net_master_t* net);
 
 /**
  * Receive sync and data from the network (complete buffer).
+ *
  * @param net the network connection
  * @param audio_input number of audio inputs
  * @param audio_input_buffer an array of audio input buffers
@@ -295,6 +315,7 @@ int jack_net_master_recv(jack_net_master_t* net, int audio_input, float** audio_
 
 /**
  * Receive sync and data from the network (incomplete buffer).
+ *
  * @param net the network connection
  * @param audio_input number of audio inputs
  * @param audio_input_buffer an array of audio input buffers
@@ -308,6 +329,7 @@ int jack_net_master_recv_slice(jack_net_master_t* net, int audio_input, float** 
 
 /**
  * Send sync and data to the network (complete buffer).
+ *
  * @param net the network connection
  * @param audio_output number of audio outputs
  * @param audio_output_buffer an array of audio output buffers
@@ -320,6 +342,7 @@ int jack_net_master_send(jack_net_master_t* net, int audio_output, float** audio
 
 /**
  * Send sync and data to the network (incomplete buffer).
+ *
  * @param net the network connection
  * @param audio_output number of audio outputs
  * @param audio_output_buffer an array of audio output buffers
@@ -340,6 +363,7 @@ typedef struct _jack_adapter jack_adapter_t;
 
 /**
  * Create an adapter.
+ *
  * @param input number of audio inputs
  * @param output of audio outputs
  * @param host_buffer_size the host buffer size in frames
@@ -357,6 +381,7 @@ jack_adapter_t* jack_create_adapter(int input, int output,
 
 /**
  * Destroy an adapter.
+ *
  * @param adapter the adapter to be destroyed
  *
  * @return 0 on success, otherwise a non-zero error code
@@ -365,6 +390,7 @@ int jack_destroy_adapter(jack_adapter_t* adapter);
 
 /**
  * Flush internal state of an adapter.
+ *
  * @param adapter the adapter to be flushed
  *
  * @return 0 on success, otherwise a non-zero error code
@@ -373,6 +399,7 @@ void jack_flush_adapter(jack_adapter_t* adapter);
 
 /**
  * Push input to and pull output from adapter ringbuffer.
+ *
  * @param adapter the adapter
  * @param input an array of audio input buffers
  * @param output an array of audio ouput buffers
@@ -384,6 +411,7 @@ int jack_adapter_push_and_pull(jack_adapter_t* adapter, float** input, float** o
 
 /**
  * Pull input to and push output from adapter ringbuffer.
+ *
  * @param adapter the adapter
  * @param input an array of audio input buffers
  * @param output an array of audio ouput buffers
