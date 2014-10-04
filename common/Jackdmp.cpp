@@ -38,6 +38,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 #if defined(JACK_DBUS) && defined(__linux__)
+#include <stdlib.h>
 #include <dbus/dbus.h>
 #include "audio_reserve.h"
 #endif
@@ -304,7 +305,10 @@ int main(int argc, char** argv)
 
     copyright(stdout);
 #if defined(JACK_DBUS) && defined(__linux__)
-    server_ctl = jackctl_server_create(audio_acquire, audio_release);
+    if (getenv("JACK_NO_AUDIO_RESERVATION"))
+        server_ctl = jackctl_server_create(NULL, NULL);
+    else
+        server_ctl = jackctl_server_create(audio_acquire, audio_release);
 #else
     server_ctl = jackctl_server_create(NULL, NULL);
 #endif
