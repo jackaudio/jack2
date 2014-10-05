@@ -427,7 +427,7 @@ ASIOBool JackRouter::init(void* sysRef)
 
 	_snprintf(name_log, sizeof(name_log) - 1, "JackRouter_%s.log", name);
 
-	fClient = jack_client_open(name, JackNullOption, NULL);
+	fClient = jack_client_open(name, JackNoStartServer, NULL);
 	if (fClient == NULL) {
 		strcpy(fErrorMessage, "Open error: is JACK server running?");
 		printf("Open error: is JACK server running?\n");

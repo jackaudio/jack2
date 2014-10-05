@@ -321,7 +321,7 @@ int jack_net_master_recv(jack_net_master_t* net, int audio_input, float** audio_
  * @param audio_input_buffer an array of audio input buffers
  * @param midi_input number of MIDI inputs
  * @param midi_input_buffer an array of MIDI input buffers
- * @param frames the number of frames to receive.
+ * @param frames the number of frames to receive
  *
  * @return zero on success, non-zero on error
  */
@@ -348,7 +348,7 @@ int jack_net_master_send(jack_net_master_t* net, int audio_output, float** audio
  * @param audio_output_buffer an array of audio output buffers
  * @param midi_output number of MIDI ouputs
  * @param midi_output_buffer an array of MIDI output buffers
- * @param frames the number of frames to send.
+ * @param frames the number of frames to send
  *
  * @return zero on success, non-zero on error
  */
