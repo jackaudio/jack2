@@ -91,3 +91,4 @@ def build(bld):
                                             '../common/netjack.c',
                                             '../common/netjack_packet.c' ], ["SAMPLERATE", "CELT"])
 
+    create_jack_driver_obj(bld, 'proxy', '../common/JackProxyDriver.cpp')
