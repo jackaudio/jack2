@@ -13,8 +13,8 @@ TEMP_FILE="${OUTPUT_FILE}.tmp"
 
 #echo svnversion...
 #pwd
-#echo $OUTPUT_FILE
-#echo $TEMP_FILE
+#echo "$OUTPUT_FILE"
+#echo "$TEMP_FILE"
 
 OLDPWD=`pwd`
 cd ..
@@ -49,22 +49,22 @@ then
   REV="unknown"
 fi
 
-echo "#define ${DEFINE} \"${REV}\"" > ${TEMP_FILE}
-if test ! -f ${OUTPUT_FILE}
+echo "#define ${DEFINE} \"${REV}\"" > "${TEMP_FILE}"
+if test ! -f "${OUTPUT_FILE}"
 then
   echo "Generated ${OUTPUT_FILE} (${REV})"
-  cp ${TEMP_FILE} ${OUTPUT_FILE}
+  cp "${TEMP_FILE}" "${OUTPUT_FILE}"
   if test $? -ne 0; then exit 1; fi
 else
-  if ! cmp -s ${OUTPUT_FILE} ${TEMP_FILE}
+  if ! cmp -s "${OUTPUT_FILE}" "${TEMP_FILE}"
   then echo "Regenerated ${OUTPUT_FILE} (${REV})"
-    cp ${TEMP_FILE} ${OUTPUT_FILE}
+    cp "${TEMP_FILE}" "${OUTPUT_FILE}"
     if test $? -ne 0; then exit 1; fi
   fi
 fi
 
 cd "${OLDPWD}"
 
-rm ${TEMP_FILE}
+rm "${TEMP_FILE}"
 
 exit $?
