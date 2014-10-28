@@ -371,8 +371,10 @@ alsa_driver_configure_stream (alsa_driver_t *driver, char *device_name,
 		{"32bit float little-endian", SND_PCM_FORMAT_FLOAT_LE, IS_LE},
 		{"32bit integer little-endian", SND_PCM_FORMAT_S32_LE, IS_LE},
 		{"32bit integer big-endian", SND_PCM_FORMAT_S32_BE, IS_BE},
-		{"24bit little-endian", SND_PCM_FORMAT_S24_3LE, IS_LE},
-		{"24bit big-endian", SND_PCM_FORMAT_S24_3BE, IS_BE},
+		{"24bit little-endian in 3bytes format", SND_PCM_FORMAT_S24_3LE, IS_LE},
+		{"24bit big-endian in 3bytes format", SND_PCM_FORMAT_S24_3BE, IS_BE},
+		{"24bit little-endian", SND_PCM_FORMAT_S24_LE, IS_LE},
+		{"24bit big-endian", SND_PCM_FORMAT_S24_BE, IS_BE},
 		{"16bit little-endian", SND_PCM_FORMAT_S16_LE, IS_LE},
 		{"16bit big-endian", SND_PCM_FORMAT_S16_BE, IS_BE},
 	};
@@ -756,6 +758,8 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 		case SND_PCM_FORMAT_S32_LE:
 		case SND_PCM_FORMAT_S24_3LE:
 		case SND_PCM_FORMAT_S24_3BE:
+		case SND_PCM_FORMAT_S24_LE:
+		case SND_PCM_FORMAT_S24_BE:
 		case SND_PCM_FORMAT_S16_LE:
 		case SND_PCM_FORMAT_S32_BE:
 		case SND_PCM_FORMAT_S16_BE:
@@ -774,6 +778,8 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 		case SND_PCM_FORMAT_S32_LE:
 		case SND_PCM_FORMAT_S24_3LE:
 		case SND_PCM_FORMAT_S24_3BE:
+		case SND_PCM_FORMAT_S24_LE:
+		case SND_PCM_FORMAT_S24_BE:
 		case SND_PCM_FORMAT_S16_LE:
 		case SND_PCM_FORMAT_S32_BE:
 		case SND_PCM_FORMAT_S16_BE:
