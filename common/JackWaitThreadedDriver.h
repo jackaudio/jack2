@@ -28,10 +28,10 @@ namespace Jack
 {
 
 /*!
-\brief To be used as a wrapper of JackNetDriver.
+\brief Wrapper for a restartable threaded driver (e.g. JackNetDriver).
 
 The idea is to behave as the "dummy" driver, until the network connection is really started and processing starts.
-The Execute method will call the Process method from the base JackTimedDriver, until the decorated driver Init method returns.
+The Execute method will call the ProcessNull method from the base JackWaiterDriver, until the decorated driver Initialize method returns.
 A helper JackDriverStarter thread is used for that purpose.
 */
 
@@ -89,6 +89,10 @@ class SERVER_EXPORT JackWaitThreadedDriver : public JackThreadedDriver
         // JackRunnableInterface interface
         bool Init();
         bool Execute();
+
+    protected:
+
+        virtual bool ExecuteReal(); /*!< Real work to be done when the decorated driver has finish initializing */
 };
 
 
