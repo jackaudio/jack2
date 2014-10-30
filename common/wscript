@@ -223,6 +223,7 @@ def build(bld):
         'JackThreadedDriver.cpp',
         'JackRestartThreadedDriver.cpp',
         'JackWaitThreadedDriver.cpp',
+        'JackWaitCallbackDriver.cpp',
         'JackServerAPI.cpp',
         'JackDriverLoader.cpp',
         'JackServerGlobals.cpp',
