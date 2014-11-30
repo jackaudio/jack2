@@ -190,12 +190,12 @@ int JackMessageBuffer::SetInitCallback(JackThreadInitCallback callback, void *ar
             JackSleep(1000);
         }
         if (count == 1000)
-            jack_error("JackMessageBuffer::SetInitCallback : callback cannot be executed");
+            jack_error("JackMessageBuffer::SetInitCallback : signal lost");
             return -1;
     #endif
         return 0;
     }
-    jack_error("JackMessageBuffer::SetInitCallback : callback cannot be executed");
+    jack_error("JackMessageBuffer::SetInitCallback : callback could not be executed");
     return -1;
 }
 
