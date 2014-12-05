@@ -189,9 +189,10 @@ int JackMessageBuffer::SetInitCallback(JackThreadInitCallback callback, void *ar
             fGuard.Signal();
             JackSleep(1000);
         }
-        if (count == 1000)
+        if (count == 1000) {
             jack_error("JackMessageBuffer::SetInitCallback : signal lost");
             return -1;
+	}
     #endif
         return 0;
     }
