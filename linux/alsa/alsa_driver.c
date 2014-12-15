@@ -364,7 +364,7 @@ alsa_driver_configure_stream (alsa_driver_t *driver, char *device_name,
 	unsigned int frame_rate;
 	snd_pcm_uframes_t stop_th;
 	static struct {
-		char Name[32];
+		char Name[40];
 		snd_pcm_format_t format;
 		int swapped;
 	} formats[] = {
