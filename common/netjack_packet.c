@@ -516,7 +516,7 @@ packet_cache_drain_socket( packet_cache *pcache, int sockfd )
     u_long parm = 1;
     ioctlsocket( sockfd, FIONBIO, &parm );
 #else
-    int senderlen = sizeof( struct sockaddr_in );
+    unsigned int senderlen = sizeof( struct sockaddr_in );
 #endif
     while (1) {
 #ifdef WIN32
