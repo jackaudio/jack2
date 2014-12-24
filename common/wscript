@@ -380,7 +380,7 @@ def build(bld):
          process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
          process.use = 'SAMPLERATE'
 
-    if bld.env['BUILD_ADAPTER'] and bld.env['IS_WINDOWS']:
+    if bld.env['BUILD_ADAPTER'] and bld.env['IS_WINDOWS'] and bld.env['BUILD_DRIVER_PORTAUDIO']:
          audio_adapter_sources += ['../windows/portaudio/JackPortAudioAdapter.cpp', '../windows/portaudio/JackPortAudioDevices.cpp']
          process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
          process.use += ['SAMPLERATE', 'PORTAUDIO']
