@@ -15,6 +15,8 @@ def configure(conf):
     conf.env['BUILD_ADAPTER'] = conf.is_defined('HAVE_SAMPLERATE')
 
     if conf.env['IS_WINDOWS']:
+        conf.check_cc(fragment='int main(){\n#ifndef _WIN64\nthis is a syntax error\n#endif\n}', define_name='BUILDING_FOR_WIN64', mandatory=False)
+        conf.env['IS_WIN64'] = conf.is_defined('BUILDING_FOR_WIN64')
         try:
             conf.check_cc(function_name='regcomp', header_name='regex.h', lib='regex', uselib_store="REGEX", define_name='HAVE_REGEX_H')
         except:
@@ -184,7 +186,10 @@ def build(bld):
             '../windows/JackMMCSS.cpp',
             ]
 
-    clientlib.vnum = bld.env['JACK_API_VERSION']
+    if bld.env['IS_WIN64']:
+        clientlib.env['cxxshlib_PATTERN'] = '%s64.dll'
+    if not bld.env['IS_WINDOWS']:
+        clientlib.vnum = bld.env['JACK_API_VERSION']
 
     if bld.env['IS_LINUX']:
         clientlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
@@ -283,7 +288,10 @@ def build(bld):
             '../windows/JackNetWinSocket.cpp',
             ]
 
-    serverlib.vnum = bld.env['JACK_API_VERSION']
+    if bld.env['IS_WIN64']:
+        serverlib.env['cxxshlib_PATTERN'] = '%s64.dll'
+    if not bld.env['IS_WINDOWS']:
+        serverlib.vnum = bld.env['JACK_API_VERSION']
 
     if bld.env['IS_LINUX']:
         serverlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
