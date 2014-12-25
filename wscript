@@ -172,6 +172,7 @@ def configure(conf):
         conf.env['LIB_SAMPLERATE'] = ['samplerate']
 
     conf.sub_config('example-clients')
+    conf.sub_config('tools-jack2')
 
     if conf.check_cfg(package='celt', atleast_version='0.11.0', args='--cflags --libs', mandatory=False):
         conf.define('HAVE_CELT', 1)
@@ -408,6 +409,7 @@ def build(bld):
     if bld.env['IS_LINUX']:
         bld.add_subdirs('linux')
         bld.add_subdirs('example-clients')
+        bld.add_subdirs('tools-jack2')
         bld.add_subdirs('tests')
         bld.add_subdirs('man')
         if bld.env['BUILD_JACKDBUS'] == True:
@@ -416,6 +418,7 @@ def build(bld):
     if bld.env['IS_MACOSX']:
         bld.add_subdirs('macosx')
         bld.add_subdirs('example-clients')
+        bld.add_subdirs('tools-jack2')
         bld.add_subdirs('tests')
         if bld.env['BUILD_JACKDBUS'] == True:
             bld.add_subdirs('dbus')
@@ -423,6 +426,7 @@ def build(bld):
     if bld.env['IS_SUN']:
         bld.add_subdirs('solaris')
         bld.add_subdirs('example-clients')
+        bld.add_subdirs('tools-jack2')
         bld.add_subdirs('tests')
         if bld.env['BUILD_JACKDBUS'] == True:
             bld.add_subdirs('dbus')
@@ -430,6 +434,7 @@ def build(bld):
     if bld.env['IS_WINDOWS']:
         bld.add_subdirs('windows')
         bld.add_subdirs('example-clients')
+        bld.add_subdirs('tools-jack2')
         #bld.add_subdirs('tests')
 
     if bld.env['BUILD_DOXYGEN_DOCS'] == True:

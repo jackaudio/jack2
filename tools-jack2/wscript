@@ -5,36 +5,18 @@ example_programs = {
     'jack_freewheel' : 'freewheel.c',
     'jack_connect' : 'connect.c',
     'jack_lsp' : 'lsp.c',
-    'jack_metro' : 'metro.c',
-    'jack_midiseq' : 'midiseq.c',
-    'jack_midisine' : 'midisine.c',
-    'jack_showtime' : 'showtime.c',
-    'jack_simple_client' : 'simple_client.c',
-    'jack_zombie' : 'zombie.c',
     'jack_load' : 'ipload.c',
     'jack_unload' : 'ipunload.c',
-    'jack_showtime' : 'showtime.c',
     'jack_alias' : 'alias.c',
     'jack_bufsize' : 'bufsize.c',
     'jack_wait' : 'wait.c',
     'jack_samplerate' : 'samplerate.c',
     'jack_evmon' : 'evmon.c',
     'jack_monitor_client' : 'monitor_client.c',
-    'jack_thru' : 'thru_client.c',
-    'jack_cpu_load' : 'cpu_load.c',
-    'jack_simple_session_client' : 'simple_session_client.c',
     'jack_session_notify' : 'session_notify.c',
-    'jack_server_control' : 'server_control.cpp',
-    'jack_net_slave' : 'netslave.c',
-    'jack_net_master' : 'netmaster.c',
-    'jack_latent_client' : 'latent_client.c',
     'jack_midi_dump' : 'midi_dump.c',
-    'jack_midi_latency_test' : 'midi_latency_test.c'
     }
 
-example_libs = {
-    'inprocess' : 'inprocess.c',
-    }
 
 def configure(conf):
     e = conf.check_cc(header_name='sndfile.h', define_name="HAVE_SNDFILE")
@@ -66,18 +48,7 @@ def build(bld):
     if bld.env['IS_WINDOWS']:
         os_incdir = ['../windows']
     for example_program, example_program_source in list(example_programs.items()):
-        if example_program == 'jack_server_control':
-            use = ['serverlib', 'STDC++']
-        elif example_program == 'jack_net_slave':
-            if not bld.env['BUILD_NETLIB']:
-                continue
-            use = ['netlib']
-        elif example_program == 'jack_net_master':
-            if not bld.env['BUILD_NETLIB']:
-                continue
-            use = ['netlib']
-        else:
-            use = ['clientlib']
+        use = ['clientlib']
 
         prog = bld(features='c cprogram')
         prog.includes = os_incdir + ['../common/jack', '../common']
@@ -109,24 +80,6 @@ def build(bld):
             prog.use += ['READLINE']
         prog.target = 'jack_transport'
 
-    if bld.env['BUILD_EXAMPLE_CLIENT_REC']:
-        prog = bld(features = 'c cprogram')
-        prog.includes = os_incdir + ['../common/jack', '../common']
-        prog.source = 'capture_client.c'
-        prog.use = ['clientlib']
-        if bld.env['IS_MACOSX']:
-            prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
-            #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc -arch x86_64")
-            prog.env.append_value("LINKFLAGS", "")
-            prog.use += ['SNDFILE']
-        if bld.env['IS_LINUX']:
-            prog.use += ['RT', 'SNDFILE']
-        if bld.env['IS_SUN']:
-            prog.use += ['RT', 'SNDFILE']
-        if bld.env['IS_WINDOWS']:
-            prog.uselib = ['SNDFILE']
-        prog.target = 'jack_rec'
-
     if bld.env['IS_LINUX'] or bld.env['IS_MACOSX']:
         prog = bld(features = 'c cprogram')
         prog.includes = os_incdir + ['.', '..', '../common/jack', '../common']
@@ -150,22 +103,6 @@ def build(bld):
         prog.env.append_value("CFLAGS", "-DNO_JACK_ERROR")
         prog.use = ['clientlib', 'ALSA', 'SAMPLERATE', 'M']
         prog.target = 'alsa_out'
-
-    for example_lib, example_lib_source in list(example_libs.items()):
-        lib = bld(features = 'c cshlib')
-        if not bld.env['IS_WINDOWS']:
-            lib.env['cshlib_PATTERN'] = '%s.so'
-        lib.includes = os_incdir + ['../common/jack', '../common']
-        lib.target = example_lib
-        lib.source = example_lib_source
-        if bld.env['IS_MACOSX']:
-            lib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
-            #lib.env.append_value("LINKFLAGS", "-arch i386 -arch ppc -arch x86_64")
-            lib.env.append_value("LINKFLAGS", "")
-        if bld.env['IS_SUN']:
-            lib.env.append_value("LINKFLAGS", "-lm")
-        lib.use = 'serverlib'
-        lib.install_path = '${ADDON_DIR}/'
 
     if not bld.env['IS_WINDOWS']:
         bld.symlink_as('${PREFIX}/bin/jack_disconnect', 'jack_connect')
