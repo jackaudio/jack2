@@ -1443,6 +1443,7 @@ void jack_set_info_function (void (*func)(const char *)) JACK_OPTIONAL_WEAK_EXPO
  * This is MANDATORY on Windows when otherwise all nasty runtime version related crashes can occur.
  * Developers are strongly encouraged to use this function instead of the standard "free" function in new code.
  *
+ * @param ptr the memory pointer to be deallocated.
  */
 void jack_free(void* ptr) JACK_OPTIONAL_WEAK_EXPORT;
 
