@@ -148,16 +148,36 @@ static void start_server_classic_aux(const char* server_name)
             }
         }
 
-        result = strcspn(arguments + pos, " ");
-        if (result == 0) {
+        /* skip whitespace */
+        while (pos < strlen(arguments) && arguments[pos] && arguments[pos] == ' ') {
+            ++pos;
+        }
+
+        if (pos >= strlen(arguments)) {
             break;
         }
+
+        if (arguments[pos] == '\"') {
+            ++pos;
+            result = strcspn(arguments + pos, "\"");
+        } else {
+            result = strcspn(arguments + pos, " ");
+        }
+
+        if (0 == result) {
+            break;
+        }
+
         argv[i] = (char*)malloc(result + 1);
         strncpy(argv[i], arguments + pos, result);
         argv[i][result] = '\0';
         pos += result + 1;
-        ++i;
+
+        if (++i > 253) {
+            break;
+        }
     }
+
     argv[i] = 0;
     execv(command, argv);
 
