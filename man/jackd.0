@@ -1,4 +1,4 @@
-.TH "JACKD" "1" "!VERSION!" "!DATE!" ""
+.TH "JACKD" "1" "!DATE!" "!VERSION!" ""
 .SH "NAME"
 jackd \- JACK Audio Connection Kit sound server
 .SH "SYNOPSIS"
