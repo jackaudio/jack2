@@ -102,7 +102,7 @@ void JackGenericClientChannel::ClientCheck(const char* name, int uuid, char* nam
     JackClientCheckRequest req(name, protocol, options, uuid, open);
     JackClientCheckResult res;
     ServerSyncCall(&req, &res, result);
-    *status = res.fStatus;
+    *status |= res.fStatus;
     strcpy(name_res, res.fName);
 }
 
