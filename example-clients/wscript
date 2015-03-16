@@ -13,7 +13,6 @@ example_programs = {
     'jack_zombie' : 'zombie.c',
     'jack_load' : 'ipload.c',
     'jack_unload' : 'ipunload.c',
-    'jack_showtime' : 'showtime.c',
     'jack_alias' : 'alias.c',
     'jack_bufsize' : 'bufsize.c',
     'jack_wait' : 'wait.c',
