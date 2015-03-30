@@ -928,7 +928,7 @@ jack_constraint_add_enum(
                 sizeof(jack_driver_param_value_enum_t) * array_size);
         if (possible_value_ptr == NULL)
         {
-            jack_error("calloc() failed to (re)allocate memory for possible values array");
+            jack_error("realloc() failed to (re)allocate memory for possible values array");
             return false;
         }
         constraint_ptr->constraint.enumeration.possible_values_array = possible_value_ptr;

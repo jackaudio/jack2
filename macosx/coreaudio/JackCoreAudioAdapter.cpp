@@ -1466,7 +1466,7 @@ OSStatus JackCoreAudioAdapter::CreateAggregateDeviceAux(vector<AudioDeviceID> ca
     pluginAOPA.mScope = kAudioObjectPropertyScopeGlobal;
     pluginAOPA.mElement = kAudioObjectPropertyElementMaster;
     outDataSize = sizeof(CFStringRef);
-    osErr = AudioObjectSetPropertyData(*outAggregateDevice, &pluginAOPA, 0, NULL, outDataSize, &captureDeviceUID[0]);  // First capture is master...
+    osErr = AudioObjectSetPropertyData(*outAggregateDevice, &pluginAOPA, 0, NULL, outDataSize, &playbackDeviceUID[0]);  // First playback is master...
     if (osErr != noErr) {
         jack_error("JackCoreAudioAdapter::CreateAggregateDevice : AudioObjectSetPropertyData for master device error");
         printError(osErr);
