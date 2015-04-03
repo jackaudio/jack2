@@ -80,6 +80,7 @@ def options(opt):
     opt.add_option('--clients', default=64, type="int", dest="clients", help='Maximum number of JACK clients')
     opt.add_option('--ports-per-application', default=768, type="int", dest="application_ports", help='Maximum number of ports per application')
     opt.add_option('--debug', action='store_true', default=False, dest='debug', help='Build debuggable binaries')
+    opt.add_option('--no-samplerate', action='store_true', default=False, dest='no_samplerate', help='Do not build against libsamplerate if available')
     opt.add_option('--firewire', action='store_true', default=False, help='Enable FireWire driver (FFADO)')
     opt.add_option('--freebob', action='store_true', default=False, help='Enable FreeBob driver')
     opt.add_option('--alsa', action='store_true', default=False, help='Enable ALSA driver')
@@ -141,7 +142,6 @@ def configure(conf):
     conf.env.append_unique('CXXFLAGS', '-Wall')
     conf.env.append_unique('CFLAGS', '-Wall')
 
-    conf.sub_config('common')
     if conf.env['IS_LINUX']:
         conf.sub_config('linux')
         if Options.options.alsa and not conf.env['BUILD_DRIVER_ALSA']:
@@ -166,11 +166,10 @@ def configure(conf):
         if conf.env['BUILD_JACKDBUS'] != True:
             conf.fatal('jackdbus was explicitly requested but cannot be built')
 
-    conf.check_cc(header_name='samplerate.h', define_name="HAVE_SAMPLERATE")
+    if not Options.options.no_samplerate and conf.check_cfg(package='samplerate', args='--cflags --libs', mandatory=False):
+        conf.define('HAVE_SAMPLERATE', 1)
 
-    if conf.is_defined('HAVE_SAMPLERATE'):
-        conf.env['LIB_SAMPLERATE'] = ['samplerate']
-
+    conf.sub_config('common')
     conf.sub_config('example-clients')
 
     if conf.check_cfg(package='celt', atleast_version='0.11.0', args='--cflags --libs', mandatory=False):
