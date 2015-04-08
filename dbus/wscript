@@ -29,11 +29,7 @@ def configure(conf):
     else:
         conf.env['DBUS_SERVICES_DIR'] = os.path.normpath(conf.env['PREFIX'] + '/share/dbus-1/services')
 
-    conf.check(header_name='expat.h', define_name="HAVE_EXPAT", mandatory=False)
-
-    if conf.is_defined('HAVE_EXPAT'):
-        conf.env['LIB_EXPAT'] = ['expat']
-    else:
+    if not conf.check_cfg(package='expat', args='--cflags --libs', mandatory=False):
         print(Logs.colors.RED + 'WARNING !! jackdbus will not be built because of expat is missing' + Logs.colors.NORMAL)
         return
 
