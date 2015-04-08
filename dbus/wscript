@@ -13,12 +13,12 @@ def configure(conf):
     conf.env['BUILD_JACKDBUS'] = False
 
     if not conf.check_cfg(package='dbus-1', atleast_version='1.0.0', args='--cflags --libs', mandatory=False):
-        print(Logs.colors.RED + 'WARNING !! jackdbus will not be built because libdbus-dev is missing' + Logs.colors.NORMAL)
+        print(Logs.colors.RED + 'ERROR !! jackdbus will not be built because libdbus-dev is missing' + Logs.colors.NORMAL)
         return
 
     dbus_dir = conf.check_cfg(package='dbus-1', args='--variable=session_bus_services_dir')
     if not dbus_dir:
-        print(Logs.colors.RED + 'WARNING !! jackdbus will not be built because service dir is unknown' + Logs.colors.NORMAL)
+        print(Logs.colors.RED + 'ERROR !! jackdbus will not be built because service dir is unknown' + Logs.colors.NORMAL)
         return
 
     dbus_dir = dbus_dir.strip()
@@ -30,7 +30,7 @@ def configure(conf):
         conf.env['DBUS_SERVICES_DIR'] = os.path.normpath(conf.env['PREFIX'] + '/share/dbus-1/services')
 
     if not conf.check_cfg(package='expat', args='--cflags --libs', mandatory=False):
-        print(Logs.colors.RED + 'WARNING !! jackdbus will not be built because of expat is missing' + Logs.colors.NORMAL)
+        print(Logs.colors.RED + 'ERROR !! jackdbus will not be built because of expat is missing' + Logs.colors.NORMAL)
         return
 
     conf.env['BUILD_JACKDBUS'] = True
