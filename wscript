@@ -68,25 +68,34 @@ def options(opt):
     opt.tool_options('compiler_cxx')
     opt.tool_options('compiler_cc')
 
+    # install directories
     opt.add_option('--libdir', type='string', help="Library directory [Default: <prefix>/lib]")
     opt.add_option('--libdir32', type='string', help="32bit Library directory [Default: <prefix>/lib32]")
     opt.add_option('--mandir', type='string', help="Manpage directory [Default: <prefix>/share/man/man1]")
-    opt.add_option('--dbus', action='store_true', default=False, help='Enable D-Bus JACK (jackdbus)')
+
+    # options affecting binaries
     opt.add_option('--dist-target', type='string', default='auto', help='Specify the target for cross-compiling [auto,mingw]')
-    opt.add_option('--classic', action='store_true', default=False, help='Force enable standard JACK (jackd) even if D-Bus JACK (jackdbus) is enabled too')
-    opt.add_option('--doxygen', action='store_true', default=False, help='Enable build of doxygen documentation')
-    opt.add_option('--profile', action='store_true', default=False, help='Build with engine profiling')
     opt.add_option('--mixed', action='store_true', default=False, help='Build with 32/64 bits mixed mode')
+    opt.add_option('--debug', action='store_true', default=False, dest='debug', help='Build debuggable binaries')
+
+    # options affecting general jack functionality
+    opt.add_option('--classic', action='store_true', default=False, help='Force enable standard JACK (jackd) even if D-Bus JACK (jackdbus) is enabled too')
+    opt.add_option('--dbus', action='store_true', default=False, help='Enable D-Bus JACK (jackdbus)')
+    opt.add_option('--autostart', type='string', default="default", help='Autostart method. Possible values: "default", "classic", "dbus", "none"')
+    opt.add_option('--profile', action='store_true', default=False, help='Build with engine profiling')
     opt.add_option('--clients', default=64, type="int", dest="clients", help='Maximum number of JACK clients')
     opt.add_option('--ports-per-application', default=768, type="int", dest="application_ports", help='Maximum number of ports per application')
-    opt.add_option('--debug', action='store_true', default=False, dest='debug', help='Build debuggable binaries')
+
+    # options with third party dependencies
+    opt.add_option('--doxygen', action='store_true', default=False, help='Enable build of doxygen documentation')
+    opt.add_option('--alsa', action='store_true', default=False, help='Enable ALSA driver')
     opt.add_option('--firewire', action='store_true', default=False, help='Enable FireWire driver (FFADO)')
     opt.add_option('--freebob', action='store_true', default=False, help='Enable FreeBob driver')
-    opt.add_option('--alsa', action='store_true', default=False, help='Enable ALSA driver')
     opt.add_option('--iio', action='store_true', default=False, help='Enable IIO driver')
-    opt.add_option('--autostart', type='string', default="default", help='Autostart method. Possible values: "default", "classic", "dbus", "none"')
     opt.add_option('--portaudio', action='store_true', default=False, help='Enable Portaudio driver')
     opt.add_option('--winmme', action='store_true', default=False, help='Enable WinMME driver')
+
+    # dbus options
     opt.sub_options('dbus')
 
 def configure(conf):
