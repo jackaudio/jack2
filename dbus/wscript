@@ -12,7 +12,7 @@ def options(opt):
 def configure(conf):
     conf.env['BUILD_JACKDBUS'] = False
 
-    if not conf.check_cfg(package='dbus-1', atleast_version='1.0.0', args='--cflags --libs') or not conf.is_defined('HAVE_DBUS_1'):
+    if not conf.check_cfg(package='dbus-1', atleast_version='1.0.0', args='--cflags --libs'):
         print(Logs.colors.RED + 'WARNING !! jackdbus will not be built because libdbus-dev is missing' + Logs.colors.NORMAL)
         return
 
