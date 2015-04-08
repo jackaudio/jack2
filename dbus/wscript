@@ -29,7 +29,7 @@ def configure(conf):
     else:
         conf.env['DBUS_SERVICES_DIR'] = os.path.normpath(conf.env['PREFIX'] + '/share/dbus-1/services')
 
-    conf.check(header_name='expat.h', define_name="HAVE_EXPAT")
+    conf.check(header_name='expat.h', define_name="HAVE_EXPAT", mandatory=False)
 
     if conf.is_defined('HAVE_EXPAT'):
         conf.env['LIB_EXPAT'] = ['expat']
