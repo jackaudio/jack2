@@ -27,6 +27,8 @@ out = 'build'
 # lib32 variant name used when building in mixed mode
 lib32 = 'lib32'
 
+auto_options = []
+
 def display_msg(msg, status = None, color = None):
     sr = msg
     global g_maxlen
@@ -42,6 +44,13 @@ def display_feature(msg, build):
         display_msg(msg, "yes", 'GREEN')
     else:
         display_msg(msg, "no", 'YELLOW')
+
+def print_error(msg):
+    """
+    This function prints an error without stopping waf. The reason waf should
+    not be stopped is to be able to list all missing dependencies in one chunk.
+    """
+    print(Logs.colors.RED + msg + Logs.colors.NORMAL)
 
 def create_svnversion_task(bld, header='svnversion.h', define=None):
     cmd = '../svnversion_regenerate.sh ${TGT}'
@@ -62,6 +71,298 @@ def create_svnversion_task(bld, header='svnversion.h', define=None):
             post_run = post_run,
             target = [bld.path.find_or_declare(header)]
     )
+
+class AutoOption:
+    """
+    This class is the foundation for the auto options. It adds an option
+    --foo=no|yes to the list of options and deals with all logic and checks for
+    these options.
+
+    Each option can have different dependencies that will be checked. If all
+    dependencies are available and the user has not done any request the option
+    will be enabled. If the user has requested to enable the option the class
+    ensures that all dependencies are available and prints an error message
+    otherwise. If the user disables the option, i.e. --foo=no, no checks are
+    made.
+
+    For each option it is possible to add packages that are required for the
+    option using the add_package function. For dependency programs add_program
+    should be used. For libraries (without pkg-config support) the add_library
+    function should be used. For headers the add_header function exists. If
+    there is another type of requirement or dependency the check hook (an
+    external function called when configuring) can be used.
+
+    When all checks have been made and the class has made a decision the result
+    is saved in conf.env['NAME'] where 'NAME' by default is the uppercase of the
+    name argument to __init__, but it can be changed with the conf_dest argument
+    to __init__.
+
+    The class will define a preprocessor symbol with the result. The default
+    name is HAVE_NAME, but it can be changed using the define argument to
+    __init__.
+    """
+
+    # check hook to call upon configuration
+    check_hook = None
+    check_hook_error = None
+    check_hook_found = True
+
+    # required libraries
+    libs = [] # elements on the form [lib,uselib_store]
+    libs_not_found = [] # elements on the form lib
+
+    # required headers
+    headers = []
+    headers_not_found = []
+
+    # required packages (checked with pkg-config)
+    packages = [] # elements on the form [package,uselib_store,atleast_version]
+    packages_not_found = [] # elements on the form [package,atleast_version]
+
+    # required programs
+    programs = [] # elements on the form [program,var]
+    programs_not_found = [] # elements on the form program
+
+    # the result of the configuration (should the option be enabled or not?)
+    result = False
+
+    def __init__(self, opt, name, help, conf_dest=None, define=None):
+        self.help = help
+        self.option = '--' + name
+        self.dest = 'auto_option_' + name
+        if conf_dest:
+            self.conf_dest = conf_dest
+        else:
+            self.conf_dest = name.upper()
+        if not define:
+            self.define = 'HAVE_' + name.upper()
+        else:
+            self.define = define
+        opt.add_option(self.option, type='string', default='auto', dest=self.dest, help=self.help+' (enabled by default if possible)', metavar='no|yes')
+
+    def add_library(self, library, uselib_store=None):
+        """
+        Add a required library that should be checked during configuration. The
+        library will be checked using the conf.check_cc function. If the
+        uselib_store arugment is not given it defaults to LIBRARY (the uppercase
+        of the library argument). The uselib_store argument will be passed to
+        check_cc which means LIB_LIBRARY, CFLAGS_LIBRARY and DEFINES_LIBRARY,
+        etc. will be defined if the option is enabled.
+        """
+        if not uselib_store:
+            uselib_store = library.upper().replace('-', '_')
+        self.libs.append([library, uselib_store])
+
+    def add_header(self, header):
+        """
+        Add a required header that should be checked during configuration. The
+        header will be checked using the conf.check_cc function which means
+        HAVE_HEADER_H will be defined if found.
+        """
+        self.headers.append(header)
+
+    def add_package(self, package, uselib_store=None, atleast_version=None):
+        """
+        Add a required package that should be checked using pkg-config during
+        configuration. The package will be checked using the conf.check_cfg
+        function and the uselib_store and atleast_version will be passed to
+        check_cfg. If uselib_store is None it defaults to PACKAGE (uppercase of
+        the package argument) with hyphens and dots replaced with underscores.
+        If atleast_version is None it defaults to '0'.
+        """
+        if not uselib_store:
+            uselib_store = package.upper().replace('-', '_').replace('.', '_')
+        if not atleast_version:
+            atleast_version = '0'
+        self.packages.append([package, uselib_store, atleast_version])
+
+    def add_program(self, program, var=None):
+        """
+        Add a required program that should be checked during configuration. If
+        var is not given it defaults to PROGRAM (the uppercase of the program
+        argument). If the option is enabled the program is saved in
+        conf.env.PROGRAM.
+        """
+        if not var:
+            var = program.upper().replace('-', '_')
+        self.programs.append([program, var])
+
+    def check_hook(self, check_hook, check_hook_error):
+        """
+        Add a check hook and a corresponding error printing function to the
+        configure step. The check_hook argument is a function that should return
+        True if the extra prerequisites were found and False if not. The
+        check_hook_error argument is an error printing function that should
+        print an error message telling the user that --foo was explicitly
+        requested but cannot be built since the extra prerequisites were not
+        found. Both function should take a single argument that is the waf
+        configuration context.
+        """
+        self.check_hook = check_hook
+        self.check_hook_error = check_hook_error
+
+    def _check(self, conf):
+        """
+        This is an internal function that runs all necessary configure checks.
+        It checks all dependencies (even if some dependency was not found) so
+        that the user can install all missing dependencies in one go, instead
+        of playing the infamous hit-configure-hit-configure game.
+
+        This function returns True if all dependencies were found and False if
+        not.
+        """
+        all_found = True
+
+        # check for libraries
+        for lib,uselib_store in self.libs:
+            try:
+                conf.check_cc(lib=lib, uselib_store=uselib_store)
+            except conf.errors.ConfigurationError:
+                all_found = False
+                self.libs_not_found.append(lib)
+
+        # check for headers
+        for header in self.headers:
+            try:
+                conf.check_cc(header_name=header)
+            except conf.errors.ConfigurationError:
+                all_found = False
+                self.headers_not_found.append(header)
+
+        # check for packages
+        for package,uselib_store,atleast_version in self.packages:
+            try:
+                conf.check_cfg(package=package, uselib_store=uselib_store, atleast_version=atleast_version, args='--cflags --libs')
+            except conf.errors.ConfigurationError:
+                all_found = False
+                self.packages_not_found.append([package,atleast_version])
+
+        # check for programs
+        for program,var in self.programs:
+            try:
+                conf.find_program(program, var=var)
+            except conf.errors.ConfigurationError:
+                all_found = False
+                self.programs_not_found.append(program)
+
+        # call hook (if specified)
+        if self.check_hook:
+            self.check_hook_found = self.check_hook(conf)
+            if not self.check_hook_found:
+                all_found = False
+
+        return all_found
+
+    def _configure_error(self, conf):
+        """
+        This is an internal function that prints errors for each missing
+        dependency. The error messages tell the user that this option required
+        some dependency, but it cannot be found.
+        """
+
+        for lib in self.libs_not_found:
+            print_error('%s requires the %s library, but it cannot be found.' % (self.option, lib))
+
+        for header in self.headers_not_found:
+            print_error('%s requires the %s header, but it cannot be found.' % (self.option, header))
+
+        for package,atleast_version in self.packages_not_found:
+            string = package
+            if atleast_version:
+                string += ' >= ' + atleast_version
+            print_error('%s requires the package %s, but it cannot be found.' % (self.option, string))
+
+        for program in self.programs_not_found:
+            print_error('%s requires the %s program, but it cannot be found.', (self.option, program))
+
+        if not self.check_hook_found:
+            self.check_hook_error(conf)
+
+    def configure(self, conf):
+        """
+        This function configures the option examining the argument given too
+        --foo (where foo is this option). This function sets self.result to the
+        result of the configuration; True if the option should be enabled or
+        False if not. If not all dependencies were found self.result will shall
+        be False. conf.env['NAME'] will be set to the same value aswell as a
+        preprocessor symbol will be defined according to the result.
+
+        If --foo[=yes] was given, but some dependency was not found an error
+        message is printed (foreach missing dependency).
+
+        This function returns True on success and False on error.
+        """
+        argument = getattr(Options.options, self.dest)
+        if argument == 'no':
+            self.result = False
+            retvalue = True
+        elif argument == 'yes':
+            if self._check(conf):
+                self.result = True
+                retvalue = True
+            else:
+                self.result = False
+                retvalue = False
+                self._configure_error(conf)
+        elif argument == 'auto':
+            self.result = self._check(conf)
+            retvalue = True
+        else:
+            print_error('Invalid argument "' + argument + '" to ' + self.option)
+            self.result = False
+            retvalue = False
+
+        conf.env[self.conf_dest] = self.result
+        if self.result:
+            conf.define(self.define, 1)
+        else:
+            conf.define(self.define, 0)
+        return retvalue
+
+    def display_message(self):
+        """
+        This function displays a result message with the help text and the
+        result of the configuration.
+        """
+        display_feature(self.help, self.result)
+
+def add_auto_option(opt, name, help, conf_dest=None, define=None):
+    """
+    Adds an option to the list of auto options and returns the newly created
+    option.
+    """
+    option = AutoOption(opt, name, help, conf_dest=conf_dest, define=define)
+    auto_options.append(option)
+    return option
+
+def auto_options_argv_hack():
+    """
+    This function applies a hack that for each auto option --foo=no|yes replaces
+    any occurence --foo in argv with --foo=yes, in effect interpreting --foo as
+    --foo=yes. The function has to be called before waf issues the option
+    parser, i.e. before the configure phase.
+    """
+    for option in auto_options:
+        for x in range(1, len(sys.argv)):
+            if sys.argv[x] == option.option:
+                sys.argv[x] += '=yes'
+
+def configure_auto_options(conf):
+    """
+    This function configures all auto options. It stops waf and prints an error
+    message if there were unsatisfied requirements.
+    """
+    ok = True
+    for option in auto_options:
+        if not option.configure(conf):
+            ok = False
+    if not ok:
+        conf.fatal('There were unsatisfied requirements.')
+
+def display_auto_options_messages():
+    """This function displays all options and the configuration result."""
+    for option in auto_options:
+        option.display_message()
 
 def options(opt):
     # options provided by the modules
@@ -97,6 +398,9 @@ def options(opt):
 
     # dbus options
     opt.sub_options('dbus')
+
+    # this must be called before the configure phase
+    auto_options_argv_hack()
 
 def configure(conf):
     conf.load('compiler_cxx')
@@ -149,6 +453,9 @@ def configure(conf):
 
     conf.env.append_unique('CXXFLAGS', '-Wall')
     conf.env.append_unique('CFLAGS', '-Wall')
+
+    # configure all auto options
+    configure_auto_options(conf)
 
     conf.sub_config('common')
     if conf.env['IS_LINUX']:
@@ -358,6 +665,9 @@ def configure(conf):
     if conf.env['BUILD_JACKDBUS'] and conf.env['BUILD_JACKD']:
         print(Logs.colors.RED + 'WARNING !! mixing both jackd and jackdbus may cause issues:' + Logs.colors.NORMAL)
         print(Logs.colors.RED + 'WARNING !! jackdbus does not use .jackdrc nor qjackctl settings' + Logs.colors.NORMAL)
+
+    # display configuration result messages for auto options
+    display_auto_options_messages()
 
     if conf.env['IS_LINUX']:
         display_feature('Build with ALSA support', conf.env['BUILD_DRIVER_ALSA'] == True)
