@@ -402,7 +402,9 @@ def options(opt):
     portaudio = add_auto_option(opt, 'portaudio', help='Enable Portaudio driver', conf_dest='BUILD_DRIVER_PORTAUDIO')
     portaudio.add_header('windows.h') # only build portaudio on windows
     portaudio.add_package('portaudio-2.0', uselib_store='PORTAUDIO', atleast_version='19')
-    opt.add_option('--winmme', action='store_true', default=False, help='Enable WinMME driver')
+    winmme = add_auto_option(opt, 'winmme', help='Enable WinMME driver', conf_dest='BUILD_DRIVER_WINMME')
+    winmme.add_header('mmsystem.h')
+    winmme.add_header('windows.h')
 
     # dbus options
     opt.sub_options('dbus')
@@ -468,8 +470,6 @@ def configure(conf):
     conf.sub_config('common')
     if conf.env['IS_LINUX']:
         conf.sub_config('linux')
-    if conf.env['IS_WINDOWS']:
-         conf.env['BUILD_DRIVER_WINMME'] = Options.options.winmme
     if Options.options.dbus:
         conf.sub_config('dbus')
         if conf.env['BUILD_JACKDBUS'] != True:
@@ -659,9 +659,6 @@ def configure(conf):
 
     # display configuration result messages for auto options
     display_auto_options_messages()
-
-    if conf.env['IS_WINDOWS']:
-        display_feature('Build with WinMME support', conf.env['BUILD_DRIVER_WINMME'] == True)
 
     if conf.env['BUILD_JACKDBUS'] == True:
         display_msg('D-Bus service install directory', conf.env['DBUS_SERVICES_DIR'], 'CYAN')
