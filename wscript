@@ -189,7 +189,7 @@ class AutoOption:
 
     def set_check_hook(self, check_hook, check_hook_error):
         """
-        Add a check hook and a corresponding error printing function to the
+        Set the check hook and the corresponding error printing function to the
         configure step. The check_hook argument is a function that should return
         True if the extra prerequisites were found and False if not. The
         check_hook_error argument is an error printing function that should
