@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 def configure(conf):
-    conf.check_cfg(package='portaudio-2.0', uselib_store='PORTAUDIO', atleast_version='19', args='--cflags --libs')
+    conf.check_cfg(package='portaudio-2.0', uselib_store='PORTAUDIO', atleast_version='19', args='--cflags --libs', mandatory=False)
     conf.env['BUILD_DRIVER_PORTAUDIO'] = conf.is_defined('HAVE_PORTAUDIO')
 
 def create_jack_driver_obj(bld, target, sources, uselib = None):
