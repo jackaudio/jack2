@@ -399,7 +399,9 @@ def options(opt):
     iio = add_auto_option(opt, 'iio', help='Enable IIO driver', conf_dest='BUILD_DRIVER_IIO')
     iio.add_package('gtkIOStream', atleast_version='1.4.0')
     iio.add_package('eigen3', atleast_version='3.1.2')
-    opt.add_option('--portaudio', action='store_true', default=False, help='Enable Portaudio driver')
+    portaudio = add_auto_option(opt, 'portaudio', help='Enable Portaudio driver', conf_dest='BUILD_DRIVER_PORTAUDIO')
+    portaudio.add_header('windows.h') # only build portaudio on windows
+    portaudio.add_package('portaudio-2.0', uselib_store='PORTAUDIO', atleast_version='19')
     opt.add_option('--winmme', action='store_true', default=False, help='Enable WinMME driver')
 
     # dbus options
@@ -467,10 +469,7 @@ def configure(conf):
     if conf.env['IS_LINUX']:
         conf.sub_config('linux')
     if conf.env['IS_WINDOWS']:
-        conf.sub_config('windows')
-        if Options.options.portaudio and not conf.env['BUILD_DRIVER_PORTAUDIO']:
-            conf.fatal('Portaudio driver was explicitly requested but cannot be built')
-        conf.env['BUILD_DRIVER_WINMME'] = Options.options.winmme
+         conf.env['BUILD_DRIVER_WINMME'] = Options.options.winmme
     if Options.options.dbus:
         conf.sub_config('dbus')
         if conf.env['BUILD_JACKDBUS'] != True:
@@ -663,7 +662,6 @@ def configure(conf):
 
     if conf.env['IS_WINDOWS']:
         display_feature('Build with WinMME support', conf.env['BUILD_DRIVER_WINMME'] == True)
-        display_feature('Build with Portaudio support', conf.env['BUILD_DRIVER_PORTAUDIO'] == True)
 
     if conf.env['BUILD_JACKDBUS'] == True:
         display_msg('D-Bus service install directory', conf.env['DBUS_SERVICES_DIR'], 'CYAN')
