@@ -46,7 +46,7 @@ JackMMCSS::JackMMCSS()
 JackMMCSS::~JackMMCSS()
 {}
 
-int JackMMCSS::MMCSSAcquireRealTime(jack_native_thread_t thread)
+int JackMMCSS::MMCSSAcquireRealTime(jack_native_thread_t thread, int priority)
 {
     if (fHandleTable.find(thread) != fHandleTable.end()) {
         return 0;
@@ -57,7 +57,7 @@ int JackMMCSS::MMCSSAcquireRealTime(jack_native_thread_t thread)
         HANDLE task = ffMMCSSFun1("Pro Audio", &dummy);
         if (task == NULL) {
             jack_error("AvSetMmThreadCharacteristics error : %d", GetLastError());
-        } else if (ffMMCSSFun2(task, AVRT_PRIORITY_CRITICAL)) {
+        } else if (ffMMCSSFun2(task, priority - BASE_REALTIME_PRIORITY)) {
             fHandleTable[thread] = task;
             jack_log("AvSetMmThreadPriority success");
             return 0;

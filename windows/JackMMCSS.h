@@ -37,6 +37,8 @@ typedef enum _AVRT_PRIORITY {
   AVRT_PRIORITY_CRITICAL	/* 2 */
 } AVRT_PRIORITY, *PAVRT_PRIORITY;
 
+#define BASE_REALTIME_PRIORITY 90
+
 typedef HANDLE (WINAPI *avSetMmThreadCharacteristics)(LPCTSTR, LPDWORD);
 typedef BOOL (WINAPI *avRevertMmThreadCharacteristics)(HANDLE);
 typedef BOOL (WINAPI *avSetMmThreadPriority)(HANDLE, AVRT_PRIORITY);
@@ -61,7 +63,7 @@ class SERVER_EXPORT JackMMCSS
         JackMMCSS();
         ~JackMMCSS();
 
-        static int MMCSSAcquireRealTime(jack_native_thread_t thread);
+        static int MMCSSAcquireRealTime(jack_native_thread_t thread, int priority);
         static int MMCSSDropRealTime(jack_native_thread_t thread);
 
 };

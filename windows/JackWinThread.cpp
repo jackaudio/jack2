@@ -202,7 +202,7 @@ int JackWinThread::AcquireRealTimeImp(jack_native_thread_t thread, int priority)
 {
     jack_log("JackWinThread::AcquireRealTimeImp priority = %d", priority);
 
-    if (priority >= 90 && MMCSSAcquireRealTime(thread) == 0) {
+    if (priority >= (BASE_REALTIME_PRIORITY - 1) && MMCSSAcquireRealTime(thread, priority) == 0) {
         jack_log("MMCSS API used to acquire RT for thread");
         return 0;
     } else {
