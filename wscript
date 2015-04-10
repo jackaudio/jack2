@@ -774,7 +774,7 @@ def build(bld):
                 Logs.pprint('CYAN', "Removing doxygen generated documentation done.")
         elif bld.cmd =='build':
             if not os.access(html_docs_source_dir, os.R_OK):
-                os.popen("doxygen").read()
+                os.popen(bld.env.DOXYGEN).read()
             else:
                 Logs.pprint('CYAN', "doxygen documentation already built.")
 
