@@ -7,9 +7,6 @@ def configure(conf):
     conf. check_cfg(package='libfreebob', atleast_version='1.0.0', args='--cflags --libs', mandatory=False)
     conf.env['BUILD_DRIVER_FREEBOB'] = conf.is_defined('HAVE_LIBFREEBOB')
 
-    conf. check_cfg(package='libffado', atleast_version='1.999.17', args='--cflags --libs', mandatory=False)
-    conf.env['BUILD_DRIVER_FFADO'] = conf.is_defined('HAVE_LIBFFADO')
-
     conf.define('HAVE_PPOLL', 1 )
 
     conf.check_cfg(package='gtkIOStream', atleast_version='1.4.0', args='--cflags --libs', mandatory=False)
