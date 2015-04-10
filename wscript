@@ -382,6 +382,24 @@ def check_for_celt(conf):
 def check_for_celt_error(conf):
     print_error('--celt requires the package celt, but it could not be found.')
 
+# The readline/readline.h header does not work if stdio.h is not included
+# before. Thus a fragment with both stdio.h and readline/readline.h need to be
+# test-compiled to find out whether readline is available.
+def check_for_readline(conf):
+    try:
+        conf.check_cc(fragment='''
+                      #include <stdio.h>
+                      #include <readline/readline.h>
+                      int main(void) { return 0; }''',
+                      execute=False,
+                      msg='Checking for header readline/readline.h')
+        return True
+    except conf.errors.ConfigurationError:
+        return False
+
+def check_for_readline_error(conf):
+    print_error('--readline requires the readline/readline.h header, but it cannot be found.')
+
 def options(opt):
     # options provided by the modules
     opt.tool_options('compiler_cxx')
@@ -435,6 +453,7 @@ def options(opt):
     sndfile.add_package('sndfile')
     readline = add_auto_option(opt, 'readline', help='Build with readline')
     readline.add_library('readline')
+    readline.set_check_hook(check_for_readline, check_for_readline_error)
 
     # dbus options
     opt.sub_options('dbus')
