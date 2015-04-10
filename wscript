@@ -102,31 +102,31 @@ class AutoOption:
     __init__.
     """
 
-    # check hook to call upon configuration
-    check_hook = None
-    check_hook_error = None
-    check_hook_found = True
-
-    # required libraries
-    libs = [] # elements on the form [lib,uselib_store]
-    libs_not_found = [] # elements on the form lib
-
-    # required headers
-    headers = []
-    headers_not_found = []
-
-    # required packages (checked with pkg-config)
-    packages = [] # elements on the form [package,uselib_store,atleast_version]
-    packages_not_found = [] # elements on the form [package,atleast_version]
-
-    # required programs
-    programs = [] # elements on the form [program,var]
-    programs_not_found = [] # elements on the form program
-
-    # the result of the configuration (should the option be enabled or not?)
-    result = False
-
     def __init__(self, opt, name, help, conf_dest=None, define=None):
+        # check hook to call upon configuration
+        self.check_hook = None
+        self.check_hook_error = None
+        self.check_hook_found = True
+
+        # required libraries
+        self.libs = [] # elements on the form [lib,uselib_store]
+        self.libs_not_found = [] # elements on the form lib
+
+        # required headers
+        self.headers = []
+        self.headers_not_found = []
+
+        # required packages (checked with pkg-config)
+        self.packages = [] # elements on the form [package,uselib_store,atleast_version]
+        self.packages_not_found = [] # elements on the form [package,atleast_version]
+
+        # required programs
+        self.programs = [] # elements on the form [program,var]
+        self.programs_not_found = [] # elements on the form program
+
+        # the result of the configuration (should the option be enabled or not?)
+        self.result = False
+
         self.help = help
         self.option = '--' + name
         self.dest = 'auto_option_' + name
