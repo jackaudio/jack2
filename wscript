@@ -433,6 +433,8 @@ def options(opt):
     samplerate.add_package('samplerate')
     sndfile = add_auto_option(opt, 'sndfile', help='Build with libsndfile')
     sndfile.add_package('sndfile')
+    readline = add_auto_option(opt, 'readline', help='Build with readline')
+    readline.add_library('readline')
 
     # dbus options
     opt.sub_options('dbus')

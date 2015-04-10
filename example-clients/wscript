@@ -36,13 +36,7 @@ example_libs = {
     }
 
 def configure(conf):
-    e = conf.check_cc(lib='readline', define_name="HAVE_READLINE", mandatory=False)
-
-    # define_name="HAVE_READLINE" has no effect, LIB_READLINE is defined if readline is available
-    #if conf.is_defined('HAVE_READLINE'):
-    #    conf.env['LIB_READLINE'] = ['readline']
-
-    conf.env['BUILD_EXAMPLE_CLIENT_TRANSPORT'] = bool(conf.env['LIB_READLINE'])
+    conf.env['BUILD_EXAMPLE_CLIENT_TRANSPORT'] = conf.env['READLINE']
 
     conf.env['BUILD_EXAMPLE_CLIENT_REC'] = conf.env['SNDFILE']
 
