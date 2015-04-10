@@ -53,8 +53,8 @@ JackWinMMEDriver::Attach()
                                     fEngineControl->fSampleRate));
     latency_range.min = latency;
 
-    jack_info("JackWinMMEDriver::Attach - fCaptureChannels  %d", fCaptureChannels);
-    jack_info("JackWinMMEDriver::Attach - fPlaybackChannels  %d", fPlaybackChannels);
+    jack_log("JackWinMMEDriver::Attach - fCaptureChannels  %d", fCaptureChannels);
+    jack_log("JackWinMMEDriver::Attach - fPlaybackChannels  %d", fPlaybackChannels);
 
     // Inputs
     for (int i = 0; i < fCaptureChannels; i++) {
@@ -145,8 +145,8 @@ JackWinMMEDriver::Open(bool capturing, bool playing, int in_channels,
     int num_potential_inputs = midiInGetNumDevs();
     int num_potential_outputs = midiOutGetNumDevs();
 
-    jack_info("JackWinMMEDriver::Open - num_potential_inputs  %d", num_potential_inputs);
-    jack_info("JackWinMMEDriver::Open - num_potential_outputs  %d", num_potential_outputs);
+    jack_log("JackWinMMEDriver::Open - num_potential_inputs %d", num_potential_inputs);
+    jack_log("JackWinMMEDriver::Open - num_potential_outputs %d", num_potential_outputs);
 
     period = 0;
     TIMECAPS caps;
@@ -160,10 +160,8 @@ JackWinMMEDriver::Open(bool capturing, bool playing, int in_channels,
                        "resolution.  Continuing anyway ...");
             period = 0;
         } else {
-
-            jack_info("JackWinMMEDriver::Open - multimedia timer resolution "
+            jack_log("JackWinMMEDriver::Open - multimedia timer resolution "
                       "set to %d milliseconds.", period);
-
         }
     }
 
@@ -210,8 +208,8 @@ JackWinMMEDriver::Open(bool capturing, bool playing, int in_channels,
         }
     }
 
-    jack_info("JackWinMMEDriver::Open - input_count  %d", input_count);
-    jack_info("JackWinMMEDriver::Open - output_count  %d", output_count);
+    jack_log("JackWinMMEDriver::Open - input_count  %d", input_count);
+    jack_log("JackWinMMEDriver::Open - output_count  %d", output_count);
 
     if (! (input_count || output_count)) {
         jack_error("JackWinMMEDriver::Open - no WinMME inputs or outputs "
@@ -274,14 +272,14 @@ JackWinMMEDriver::Write()
 int
 JackWinMMEDriver::Start()
 {
-    jack_info("JackWinMMEDriver::Start - Starting driver.");
+    jack_log("JackWinMMEDriver::Start - Starting driver.");
 
     JackMidiDriver::Start();
 
     int input_count = 0;
     int output_count = 0;
 
-    jack_info("JackWinMMEDriver::Start - Enabling input ports.");
+    jack_log("JackWinMMEDriver::Start - Enabling input ports.");
 
     for (; input_count < fCaptureChannels; input_count++) {
         if (input_ports[input_count]->Start() < 0) {
@@ -291,7 +289,7 @@ JackWinMMEDriver::Start()
         }
     }
 
-    jack_info("JackWinMMEDriver::Start - Enabling output ports.");
+    jack_log("JackWinMMEDriver::Start - Enabling output ports.");
 
     for (; output_count < fPlaybackChannels; output_count++) {
         if (output_ports[output_count]->Start() < 0) {
@@ -301,8 +299,7 @@ JackWinMMEDriver::Start()
         }
     }
 
-    jack_info("JackWinMMEDriver::Start - Driver started.");
-
+    jack_log("JackWinMMEDriver::Start - Driver started.");
     return 0;
 
  stop_output_ports:
@@ -330,7 +327,7 @@ JackWinMMEDriver::Stop()
 
     JackMidiDriver::Stop();
 
-    jack_info("JackWinMMEDriver::Stop - disabling input ports.");
+    jack_log("JackWinMMEDriver::Stop - disabling input ports.");
 
     for (int i = 0; i < fCaptureChannels; i++) {
         if (input_ports[i]->Stop() < 0) {
@@ -340,7 +337,7 @@ JackWinMMEDriver::Stop()
         }
     }
 
-    jack_info("JackWinMMEDriver::Stop - disabling output ports.");
+    jack_log("JackWinMMEDriver::Stop - disabling output ports.");
 
     for (int i = 0; i < fPlaybackChannels; i++) {
         if (output_ports[i]->Stop() < 0) {

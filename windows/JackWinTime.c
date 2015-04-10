@@ -15,8 +15,7 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
- */
-
+*/
 
 #include "JackTime.h"
 #include "JackError.h"
@@ -42,7 +41,7 @@ SERVER_EXPORT void InitTime()
             jack_error("InitTime : could not set minimum timer");
             gPeriod = 0;
         } else {
-            jack_info("InitTime : multimedia timer resolution set to %d milliseconds", gPeriod);
+            jack_log("InitTime : multimedia timer resolution set to %d milliseconds", gPeriod);
        }
     }
 }
