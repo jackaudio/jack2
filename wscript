@@ -426,6 +426,9 @@ def options(opt):
 
     celt = add_auto_option(opt, 'celt', help='Build with CELT')
     celt.set_check_hook(check_for_celt, check_for_celt_error)
+    opus = add_auto_option(opt, 'opus', help='Build Opus netjack2')
+    opus.add_header('opus/opus_custom.h')
+    opus.add_package('opus', atleast_version='0.9.0')
 
     # dbus options
     opt.sub_options('dbus')
@@ -502,15 +505,6 @@ def configure(conf):
         conf.env['LIB_SAMPLERATE'] = ['samplerate']
 
     conf.sub_config('example-clients')
-
-    conf.env['WITH_OPUS'] = False
-    if conf.check_cfg(package='opus', atleast_version='0.9.0' , args='--cflags --libs', mandatory=False):
-        if conf.check_cc(header_name='opus/opus_custom.h', mandatory=False):
-            conf.define('HAVE_OPUS', 1)
-            conf.env['WITH_OPUS'] = True
-        else:
-            conf.define('HAVE_OPUS', 0)
-
 
     conf.env['LIB_PTHREAD'] = ['pthread']
     conf.env['LIB_DL'] = ['dl']
@@ -635,7 +629,6 @@ def configure(conf):
         display_msg('32-bit C compiler flags', repr(conf.all_envs[lib32]['CFLAGS']))
         display_msg('32-bit C++ compiler flags', repr(conf.all_envs[lib32]['CXXFLAGS']))
         display_msg('32-bit linker flags', repr(conf.all_envs[lib32]['LINKFLAGS']))
-    display_feature('Build Opus netjack2', conf.env['WITH_OPUS'])
     display_feature('Build with engine profiling', conf.env['BUILD_WITH_PROFILE'])
     display_feature('Build with 32/64 bits mixed mode', conf.env['BUILD_WITH_32_64'])
 
