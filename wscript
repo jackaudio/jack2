@@ -429,6 +429,8 @@ def options(opt):
     opus = add_auto_option(opt, 'opus', help='Build Opus netjack2')
     opus.add_header('opus/opus_custom.h')
     opus.add_package('opus', atleast_version='0.9.0')
+    samplerate = add_auto_option(opt, 'samplerate', help='Build with libsamplerate')
+    samplerate.add_package('samplerate')
 
     # dbus options
     opt.sub_options('dbus')
@@ -490,14 +492,6 @@ def configure(conf):
 
     # configure all auto options
     configure_auto_options(conf)
-
-    conf.check_cc(header_name='samplerate.h', define_name="HAVE_SAMPLERATE")
-
-    if conf.is_defined('HAVE_SAMPLERATE'):
-        conf.env['LIB_SAMPLERATE'] = ['samplerate']
-        conf.env['SAMPLERATE'] = True
-    else:
-        conf.env['SAMPLERATE'] = False
 
     conf.sub_config('common')
     if conf.env['IS_LINUX']:
