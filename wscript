@@ -491,6 +491,11 @@ def configure(conf):
     # configure all auto options
     configure_auto_options(conf)
 
+    conf.check_cc(header_name='samplerate.h', define_name="HAVE_SAMPLERATE")
+
+    if conf.is_defined('HAVE_SAMPLERATE'):
+        conf.env['LIB_SAMPLERATE'] = ['samplerate']
+
     conf.sub_config('common')
     if conf.env['IS_LINUX']:
         conf.sub_config('linux')
@@ -498,11 +503,6 @@ def configure(conf):
         conf.sub_config('dbus')
         if conf.env['BUILD_JACKDBUS'] != True:
             conf.fatal('jackdbus was explicitly requested but cannot be built')
-
-    conf.check_cc(header_name='samplerate.h', define_name="HAVE_SAMPLERATE")
-
-    if conf.is_defined('HAVE_SAMPLERATE'):
-        conf.env['LIB_SAMPLERATE'] = ['samplerate']
 
     conf.sub_config('example-clients')
 
