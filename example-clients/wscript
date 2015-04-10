@@ -36,11 +36,8 @@ example_libs = {
     }
 
 def configure(conf):
-    e = conf.check_cc(header_name='sndfile.h', define_name="HAVE_SNDFILE", mandatory=False)
+    conf.check_cfg(package='sndfile', args='--cflags --libs', mandatory=False)
  
-    if conf.is_defined('HAVE_SNDFILE'):
-        conf.env['LIB_SNDFILE'] = ['sndfile']
-
     e = conf.check_cc(lib='readline', define_name="HAVE_READLINE", mandatory=False)
 
     # define_name="HAVE_READLINE" has no effect, LIB_READLINE is defined if readline is available
