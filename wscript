@@ -187,7 +187,7 @@ class AutoOption:
             var = program.upper().replace('-', '_')
         self.programs.append([program, var])
 
-    def check_hook(self, check_hook, check_hook_error):
+    def set_check_hook(self, check_hook, check_hook_error):
         """
         Add a check hook and a corresponding error printing function to the
         configure step. The check_hook argument is a function that should return
