@@ -6,8 +6,8 @@ import re
 import os
 
 def configure(conf):
-    conf.env['BUILD_NETLIB'] = conf.is_defined('HAVE_SAMPLERATE')
-    conf.env['BUILD_ADAPTER'] = conf.is_defined('HAVE_SAMPLERATE')
+    conf.env['BUILD_NETLIB'] = conf.env['SAMPLERATE']
+    conf.env['BUILD_ADAPTER'] = conf.env['SAMPLERATE']
 
     if conf.env['IS_WINDOWS']:
         try:

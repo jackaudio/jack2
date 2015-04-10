@@ -495,6 +495,9 @@ def configure(conf):
 
     if conf.is_defined('HAVE_SAMPLERATE'):
         conf.env['LIB_SAMPLERATE'] = ['samplerate']
+        conf.env['SAMPLERATE'] = True
+    else:
+        conf.env['SAMPLERATE'] = False
 
     conf.sub_config('common')
     if conf.env['IS_LINUX']:

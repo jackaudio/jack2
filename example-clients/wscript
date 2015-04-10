@@ -51,7 +51,7 @@ def configure(conf):
 
     conf.env['BUILD_EXAMPLE_CLIENT_REC'] = conf.is_defined('HAVE_SNDFILE')
 
-    conf.env['BUILD_EXAMPLE_ALSA_IO'] = conf.is_defined('HAVE_SAMPLERATE') and conf.env['BUILD_DRIVER_ALSA']
+    conf.env['BUILD_EXAMPLE_ALSA_IO'] = conf.env['SAMPLERATE'] and conf.env['BUILD_DRIVER_ALSA']
 
 def build(bld):
     if bld.env['IS_LINUX']:
