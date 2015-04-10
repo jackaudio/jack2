@@ -273,7 +273,7 @@ class AutoOption:
             print_error('%s requires the package %s, but it cannot be found.' % (self.option, string))
 
         for program in self.programs_not_found:
-            print_error('%s requires the %s program, but it cannot be found.', (self.option, program))
+            print_error('%s requires the %s program, but it cannot be found.' % (self.option, program))
 
         if not self.check_hook_found:
             self.check_hook_error(conf)
