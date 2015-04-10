@@ -36,8 +36,6 @@ example_libs = {
     }
 
 def configure(conf):
-    conf.check_cfg(package='sndfile', args='--cflags --libs', mandatory=False)
- 
     e = conf.check_cc(lib='readline', define_name="HAVE_READLINE", mandatory=False)
 
     # define_name="HAVE_READLINE" has no effect, LIB_READLINE is defined if readline is available
@@ -46,7 +44,7 @@ def configure(conf):
 
     conf.env['BUILD_EXAMPLE_CLIENT_TRANSPORT'] = bool(conf.env['LIB_READLINE'])
 
-    conf.env['BUILD_EXAMPLE_CLIENT_REC'] = conf.is_defined('HAVE_SNDFILE')
+    conf.env['BUILD_EXAMPLE_CLIENT_REC'] = conf.env['SNDFILE']
 
     conf.env['BUILD_EXAMPLE_ALSA_IO'] = conf.env['SAMPLERATE'] and conf.env['BUILD_DRIVER_ALSA']
 

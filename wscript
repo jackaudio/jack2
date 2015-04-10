@@ -431,6 +431,8 @@ def options(opt):
     opus.add_package('opus', atleast_version='0.9.0')
     samplerate = add_auto_option(opt, 'samplerate', help='Build with libsamplerate')
     samplerate.add_package('samplerate')
+    sndfile = add_auto_option(opt, 'sndfile', help='Build with libsndfile')
+    sndfile.add_package('sndfile')
 
     # dbus options
     opt.sub_options('dbus')
