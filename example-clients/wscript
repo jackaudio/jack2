@@ -41,8 +41,6 @@ def configure(conf):
     if conf.is_defined('HAVE_SNDFILE'):
         conf.env['LIB_SNDFILE'] = ['sndfile']
 
-    conf.check_cfg(package='celt', atleast_version='0.5.0', args='--cflags --libs', mandatory=False)
-
     e = conf.check_cc(lib='readline', define_name="HAVE_READLINE", mandatory=False)
 
     # define_name="HAVE_READLINE" has no effect, LIB_READLINE is defined if readline is available
