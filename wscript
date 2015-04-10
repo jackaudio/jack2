@@ -396,7 +396,9 @@ def options(opt):
     firewire.add_package('libffado', atleast_version='1.999.17')
     freebob = add_auto_option(opt, 'freebob', help='Enable FreeBob driver')
     freebob.add_package('libfreebob', atleast_version='1.0.0')
-    opt.add_option('--iio', action='store_true', default=False, help='Enable IIO driver')
+    iio = add_auto_option(opt, 'iio', help='Enable IIO driver', conf_dest='BUILD_DRIVER_IIO')
+    iio.add_package('gtkIOStream', atleast_version='1.4.0')
+    iio.add_package('eigen3', atleast_version='3.1.2')
     opt.add_option('--portaudio', action='store_true', default=False, help='Enable Portaudio driver')
     opt.add_option('--winmme', action='store_true', default=False, help='Enable WinMME driver')
 
@@ -464,9 +466,6 @@ def configure(conf):
     conf.sub_config('common')
     if conf.env['IS_LINUX']:
         conf.sub_config('linux')
-        if Options.options.iio and not conf.env['BUILD_DRIVER_IIO']:
-            conf.fatal('IIO driver was explicitly requested but cannot be built')
-        conf.env['BUILD_DRIVER_IIO'] = Options.options.iio
     if conf.env['IS_WINDOWS']:
         conf.sub_config('windows')
         if Options.options.portaudio and not conf.env['BUILD_DRIVER_PORTAUDIO']:
@@ -661,9 +660,6 @@ def configure(conf):
 
     # display configuration result messages for auto options
     display_auto_options_messages()
-
-    if conf.env['IS_LINUX']:
-        display_feature('Build with IIO support', conf.env['BUILD_DRIVER_IIO'] == True)
 
     if conf.env['IS_WINDOWS']:
         display_feature('Build with WinMME support', conf.env['BUILD_DRIVER_WINMME'] == True)

@@ -6,11 +6,6 @@ from waflib import Context
 def configure(conf):
     conf.define('HAVE_PPOLL', 1 )
 
-    conf.check_cfg(package='gtkIOStream', atleast_version='1.4.0', args='--cflags --libs', mandatory=False)
-    conf.env['BUILD_DRIVER_IIO'] = conf.is_defined('HAVE_GTKIOSTREAM')
-    conf.check_cfg(package='eigen3', atleast_version='3.1.2', args='--cflags --libs', mandatory=False)
-    conf.env['BUILD_DRIVER_IIO'] += conf.is_defined('HAVE_EIGEN3')
-
 def create_jack_driver_obj(bld, target, sources, uselib = None):
     driver = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
     driver.env['cxxshlib_PATTERN'] = 'jack_%s.so'
