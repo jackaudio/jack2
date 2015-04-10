@@ -388,7 +388,8 @@ def options(opt):
     opt.add_option('--ports-per-application', default=768, type="int", dest="application_ports", help='Maximum number of ports per application')
 
     # options with third party dependencies
-    opt.add_option('--doxygen', action='store_true', default=False, help='Enable build of doxygen documentation')
+    doxygen = add_auto_option(opt, 'doxygen', help='Build doxygen documentation', conf_dest='BUILD_DOXYGEN_DOCS')
+    doxygen.add_program('doxygen')
     opt.add_option('--alsa', action='store_true', default=False, help='Enable ALSA driver')
     opt.add_option('--firewire', action='store_true', default=False, help='Enable FireWire driver (FFADO)')
     opt.add_option('--freebob', action='store_true', default=False, help='Enable FreeBob driver')
@@ -537,7 +538,6 @@ def configure(conf):
     conf.env['JACK_API_VERSION'] = JACK_API_VERSION
     conf.env['JACK_VERSION'] = VERSION
 
-    conf.env['BUILD_DOXYGEN_DOCS'] = Options.options.doxygen
     conf.env['BUILD_WITH_PROFILE'] = Options.options.profile
     conf.env['BUILD_WITH_32_64'] = Options.options.mixed
     conf.env['BUILD_CLASSIC'] = Options.options.classic
@@ -653,7 +653,6 @@ def configure(conf):
         display_msg('32-bit C compiler flags', repr(conf.all_envs[lib32]['CFLAGS']))
         display_msg('32-bit C++ compiler flags', repr(conf.all_envs[lib32]['CXXFLAGS']))
         display_msg('32-bit linker flags', repr(conf.all_envs[lib32]['LINKFLAGS']))
-    display_feature('Build doxygen documentation', conf.env['BUILD_DOXYGEN_DOCS'])
     display_feature('Build Opus netjack2', conf.env['WITH_OPUS'])
     display_feature('Build with engine profiling', conf.env['BUILD_WITH_PROFILE'])
     display_feature('Build with 32/64 bits mixed mode', conf.env['BUILD_WITH_32_64'])
