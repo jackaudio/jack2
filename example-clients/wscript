@@ -36,7 +36,7 @@ example_libs = {
     }
 
 def configure(conf):
-    e = conf.check_cc(header_name='sndfile.h', define_name="HAVE_SNDFILE")
+    e = conf.check_cc(header_name='sndfile.h', define_name="HAVE_SNDFILE", mandatory=False)
  
     if conf.is_defined('HAVE_SNDFILE'):
         conf.env['LIB_SNDFILE'] = ['sndfile']
