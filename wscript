@@ -390,7 +390,8 @@ def options(opt):
     # options with third party dependencies
     doxygen = add_auto_option(opt, 'doxygen', help='Build doxygen documentation', conf_dest='BUILD_DOXYGEN_DOCS')
     doxygen.add_program('doxygen')
-    opt.add_option('--alsa', action='store_true', default=False, help='Enable ALSA driver')
+    alsa = add_auto_option(opt, 'alsa', help='Enable ALSA driver', conf_dest='BUILD_DRIVER_ALSA')
+    alsa.add_package('alsa', atleast_version='1.0.18')
     opt.add_option('--firewire', action='store_true', default=False, help='Enable FireWire driver (FFADO)')
     opt.add_option('--freebob', action='store_true', default=False, help='Enable FreeBob driver')
     opt.add_option('--iio', action='store_true', default=False, help='Enable IIO driver')
@@ -461,15 +462,12 @@ def configure(conf):
     conf.sub_config('common')
     if conf.env['IS_LINUX']:
         conf.sub_config('linux')
-        if Options.options.alsa and not conf.env['BUILD_DRIVER_ALSA']:
-            conf.fatal('ALSA driver was explicitly requested but cannot be built')
         if Options.options.freebob and not conf.env['BUILD_DRIVER_FREEBOB']:
             conf.fatal('FreeBob driver was explicitly requested but cannot be built')
         if Options.options.firewire and not conf.env['BUILD_DRIVER_FFADO']:
             conf.fatal('FFADO driver was explicitly requested but cannot be built')
         if Options.options.iio and not conf.env['BUILD_DRIVER_IIO']:
             conf.fatal('IIO driver was explicitly requested but cannot be built')
-        conf.env['BUILD_DRIVER_ALSA'] = Options.options.alsa
         conf.env['BUILD_DRIVER_FFADO'] = Options.options.firewire
         conf.env['BUILD_DRIVER_FREEBOB'] = Options.options.freebob
         conf.env['BUILD_DRIVER_IIO'] = Options.options.iio
@@ -669,7 +667,6 @@ def configure(conf):
     display_auto_options_messages()
 
     if conf.env['IS_LINUX']:
-        display_feature('Build with ALSA support', conf.env['BUILD_DRIVER_ALSA'] == True)
         display_feature('Build with FireWire (FreeBob) support', conf.env['BUILD_DRIVER_FREEBOB'] == True)
         display_feature('Build with FireWire (FFADO) support', conf.env['BUILD_DRIVER_FFADO'] == True)
         display_feature('Build with IIO support', conf.env['BUILD_DRIVER_IIO'] == True)
