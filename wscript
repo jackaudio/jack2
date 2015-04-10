@@ -394,7 +394,8 @@ def options(opt):
     alsa.add_package('alsa', atleast_version='1.0.18')
     firewire = add_auto_option(opt, 'firewire', help='Enable FireWire driver (FFADO)', conf_dest='BUILD_DRIVER_FFADO')
     firewire.add_package('libffado', atleast_version='1.999.17')
-    opt.add_option('--freebob', action='store_true', default=False, help='Enable FreeBob driver')
+    freebob = add_auto_option(opt, 'freebob', help='Enable FreeBob driver')
+    freebob.add_package('libfreebob', atleast_version='1.0.0')
     opt.add_option('--iio', action='store_true', default=False, help='Enable IIO driver')
     opt.add_option('--portaudio', action='store_true', default=False, help='Enable Portaudio driver')
     opt.add_option('--winmme', action='store_true', default=False, help='Enable WinMME driver')
@@ -463,11 +464,8 @@ def configure(conf):
     conf.sub_config('common')
     if conf.env['IS_LINUX']:
         conf.sub_config('linux')
-        if Options.options.freebob and not conf.env['BUILD_DRIVER_FREEBOB']:
-            conf.fatal('FreeBob driver was explicitly requested but cannot be built')
         if Options.options.iio and not conf.env['BUILD_DRIVER_IIO']:
             conf.fatal('IIO driver was explicitly requested but cannot be built')
-        conf.env['BUILD_DRIVER_FREEBOB'] = Options.options.freebob
         conf.env['BUILD_DRIVER_IIO'] = Options.options.iio
     if conf.env['IS_WINDOWS']:
         conf.sub_config('windows')
@@ -665,7 +663,6 @@ def configure(conf):
     display_auto_options_messages()
 
     if conf.env['IS_LINUX']:
-        display_feature('Build with FireWire (FreeBob) support', conf.env['BUILD_DRIVER_FREEBOB'] == True)
         display_feature('Build with IIO support', conf.env['BUILD_DRIVER_IIO'] == True)
 
     if conf.env['IS_WINDOWS']:

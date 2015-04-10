@@ -4,9 +4,6 @@
 from waflib import Context
 
 def configure(conf):
-    conf. check_cfg(package='libfreebob', atleast_version='1.0.0', args='--cflags --libs', mandatory=False)
-    conf.env['BUILD_DRIVER_FREEBOB'] = conf.is_defined('HAVE_LIBFREEBOB')
-
     conf.define('HAVE_PPOLL', 1 )
 
     conf.check_cfg(package='gtkIOStream', atleast_version='1.4.0', args='--cflags --libs', mandatory=False)
