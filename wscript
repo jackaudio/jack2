@@ -364,6 +364,24 @@ def display_auto_options_messages():
     for option in auto_options:
         option.display_message()
 
+def check_for_celt(conf):
+    found = False
+    for version in ['11', '8', '7', '5']:
+        define = 'HAVE_CELT_API_0_' + version
+        if not found:
+            try:
+                conf.check_cfg(package='celt', atleast_version='0.' + version + '.0', args='--cflags --libs')
+                found = True
+                conf.define(define, 1)
+                continue
+            except conf.errors.ConfigurationError:
+                pass
+        conf.define(define, 0)
+    return found
+
+def check_for_celt_error(conf):
+    print_error('--celt requires the package celt, but it could not be found.')
+
 def options(opt):
     # options provided by the modules
     opt.tool_options('compiler_cxx')
@@ -405,6 +423,9 @@ def options(opt):
     winmme = add_auto_option(opt, 'winmme', help='Enable WinMME driver', conf_dest='BUILD_DRIVER_WINMME')
     winmme.add_header('mmsystem.h')
     winmme.add_header('windows.h')
+
+    celt = add_auto_option(opt, 'celt', help='Build with CELT')
+    celt.set_check_hook(check_for_celt, check_for_celt_error)
 
     # dbus options
     opt.sub_options('dbus')
@@ -481,37 +502,6 @@ def configure(conf):
         conf.env['LIB_SAMPLERATE'] = ['samplerate']
 
     conf.sub_config('example-clients')
-
-    if conf.check_cfg(package='celt', atleast_version='0.11.0', args='--cflags --libs', mandatory=False):
-        conf.define('HAVE_CELT', 1)
-        conf.define('HAVE_CELT_API_0_11', 1)
-        conf.define('HAVE_CELT_API_0_8', 0)
-        conf.define('HAVE_CELT_API_0_7', 0)
-        conf.define('HAVE_CELT_API_0_5', 0)
-    elif conf.check_cfg(package='celt', atleast_version='0.8.0', args='--cflags --libs', mandatory=False):
-        conf.define('HAVE_CELT', 1)
-        conf.define('HAVE_CELT_API_0_11', 0)
-        conf.define('HAVE_CELT_API_0_8', 1)
-        conf.define('HAVE_CELT_API_0_7', 0)
-        conf.define('HAVE_CELT_API_0_5', 0)
-    elif conf.check_cfg(package='celt', atleast_version='0.7.0', args='--cflags --libs', mandatory=False):
-        conf.define('HAVE_CELT', 1)
-        conf.define('HAVE_CELT_API_0_11', 0)
-        conf.define('HAVE_CELT_API_0_8', 0)
-        conf.define('HAVE_CELT_API_0_7', 1)
-        conf.define('HAVE_CELT_API_0_5', 0)
-    elif conf.check_cfg(package='celt', atleast_version='0.5.0', args='--cflags --libs', mandatory=False):
-        conf.define('HAVE_CELT', 1)
-        conf.define('HAVE_CELT_API_0_11', 0)
-        conf.define('HAVE_CELT_API_0_8', 0)
-        conf.define('HAVE_CELT_API_0_7', 0)
-        conf.define('HAVE_CELT_API_0_5', 1)
-    else:
-        conf.define('HAVE_CELT', 0)
-        conf.define('HAVE_CELT_API_0_11', 0)
-        conf.define('HAVE_CELT_API_0_8', 0)
-        conf.define('HAVE_CELT_API_0_7', 0)
-        conf.define('HAVE_CELT_API_0_5', 0)
 
     conf.env['WITH_OPUS'] = False
     if conf.check_cfg(package='opus', atleast_version='0.9.0' , args='--cflags --libs', mandatory=False):
