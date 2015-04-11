@@ -406,6 +406,7 @@ def options(opt):
     opt.tool_options('compiler_cc')
 
     # install directories
+    opt.add_option('--htmldir', type='string', default=None, help="HTML documentation directory [Default: <prefix>/share/jack-audio-connection-kit/reference/html/")
     opt.add_option('--libdir', type='string', help="Library directory [Default: <prefix>/lib]")
     opt.add_option('--libdir32', type='string', help="32bit Library directory [Default: <prefix>/lib32]")
     opt.add_option('--mandir', type='string', help="Manpage directory [Default: <prefix>/share/man/man1]")
@@ -545,6 +546,13 @@ def configure(conf):
         conf.env['BUILD_JACKD'] = True
 
     conf.env['BINDIR'] = conf.env['PREFIX'] + '/bin'
+
+    if Options.options.htmldir:
+        conf.env['HTMLDIR'] = Options.options.htmldir
+    else:
+        # set to None here so that the doxygen code can find out the highest
+        # directory to remove upon install
+        conf.env['HTMLDIR'] = None
 
     if Options.options.libdir:
         conf.env['LIBDIR'] = Options.options.libdir
@@ -736,16 +744,53 @@ def build(bld):
         #bld.add_subdirs('tests')
 
     if bld.env['BUILD_DOXYGEN_DOCS'] == True:
-        html_docs_source_dir = "build/default/html"
-        if bld.cmd == 'install':
+        html_build_dir = bld.path.find_or_declare('html').abspath()
+
+        bld(
+            features = 'subst',
+            source = 'doxyfile.in',
+            target = 'doxyfile',
+            HTML_BUILD_DIR = html_build_dir,
+            SRCDIR = bld.srcnode.abspath(),
+            VERSION = VERSION
+        )
+
+        # There are two reasons for logging to doxygen.log and using it as
+        # target in the build rule (rather than html_build_dir):
+        # (1) reduce the noise when running the build
+        # (2) waf has a regular file to check for a timestamp. If the directory
+        #     is used instead waf will rebuild the doxygen target (even upon
+        #     install).
+        def doxygen(task):
+            doxyfile = task.inputs[0].abspath()
+            logfile = task.outputs[0].abspath()
+            cmd = '%s %s &> %s' % (task.env.DOXYGEN, doxyfile, logfile)
+            return task.exec_command(cmd)
+
+        bld(
+            rule = doxygen,
+            source = 'doxyfile',
+            target = 'doxygen.log'
+        )
+
+        # Determine where to install HTML documentation. Since share_dir is the
+        # highest directory the uninstall routine should remove, there is no
+        # better candidate for share_dir, but the requested HTML directory if
+        # --htmldir is given.
+        if bld.env['HTMLDIR']:
+            html_install_dir = bld.options.destdir + bld.env['HTMLDIR']
+            share_dir = html_install_dir
+        else:
             share_dir = bld.options.destdir + bld.env['PREFIX'] + '/share/jack-audio-connection-kit'
-            html_docs_install_dir = share_dir + '/reference/html/'
-            if os.path.isdir(html_docs_install_dir):
+            html_install_dir = share_dir + '/reference/html/'
+
+        if bld.cmd == 'install':
+            if os.path.isdir(html_install_dir):
                 Logs.pprint('CYAN', "Removing old doxygen documentation installation...")
-                shutil.rmtree(html_docs_install_dir)
+                shutil.rmtree(html_install_dir)
                 Logs.pprint('CYAN', "Removing old doxygen documentation installation done.")
             Logs.pprint('CYAN', "Installing doxygen documentation...")
-            shutil.copytree(html_docs_source_dir, html_docs_install_dir)
+            shutil.copytree(html_build_dir, html_install_dir)
             Logs.pprint('CYAN', "Installing doxygen documentation done.")
         elif bld.cmd =='uninstall':
             Logs.pprint('CYAN', "Uninstalling doxygen documentation...")
@@ -753,15 +798,10 @@ def build(bld):
                 shutil.rmtree(share_dir)
             Logs.pprint('CYAN', "Uninstalling doxygen documentation done.")
         elif bld.cmd =='clean':
-            if os.access(html_docs_source_dir, os.R_OK):
+            if os.access(html_build_dir, os.R_OK):
                 Logs.pprint('CYAN', "Removing doxygen generated documentation...")
-                shutil.rmtree(html_docs_source_dir)
+                shutil.rmtree(html_build_dir)
                 Logs.pprint('CYAN', "Removing doxygen generated documentation done.")
-        elif bld.cmd =='build':
-            if not os.access(html_docs_source_dir, os.R_OK):
-                os.popen(bld.env.DOXYGEN).read()
-            else:
-                Logs.pprint('CYAN', "doxygen documentation already built.")
 
 def dist_hook():
     os.remove('svnversion_regenerate.sh')

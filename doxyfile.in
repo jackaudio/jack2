@@ -31,7 +31,7 @@ PROJECT_NAME           = "Jack2"
 # This could be handy for archiving the generated documentation or
 # if some version control system is used.
 
-PROJECT_NUMBER         = 1.9.11
+PROJECT_NUMBER         = @VERSION@
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute)
 # base path where the generated documentation will be put.
@@ -574,22 +574,22 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                  = common \
-                         posix \
-                         macosx \
-                         macosx/coreaudio/ \
-			 macosx/coremidi/ \
-                         linux \
-                         linux/alsa \
-			 linux/alsarawmidi \
-			 linux/firewire \
-			 linux/freebob \
-                         windows \
-                         windows/portaudio \
-                         windows/winmme \
-                         solaris \
-			 solaris/oss \
-                         common/jack/
+INPUT                  = @SRCDIR@/common \
+                         @SRCDIR@/posix \
+                         @SRCDIR@/macosx \
+                         @SRCDIR@/macosx/coreaudio/ \
+                         @SRCDIR@/macosx/coremidi/ \
+                         @SRCDIR@/linux \
+                         @SRCDIR@/linux/alsa \
+                         @SRCDIR@/linux/alsarawmidi \
+                         @SRCDIR@/linux/firewire \
+                         @SRCDIR@/linux/freebob \
+                         @SRCDIR@/windows \
+                         @SRCDIR@/windows/portaudio \
+                         @SRCDIR@/windows/winmme \
+                         @SRCDIR@/solaris \
+                         @SRCDIR@/solaris/oss \
+                         @SRCDIR@/common/jack/
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is
@@ -789,7 +789,7 @@ GENERATE_HTML          = YES
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be
 # put in front of it. If left blank `html' will be used as the default path.
 
-HTML_OUTPUT            =
+HTML_OUTPUT            = @HTML_BUILD_DIR@
 
 # The HTML_FILE_EXTENSION tag can be used to specify the file extension for
 # each generated HTML page (for example: .htm,.php,.asp). If it is left blank
