@@ -743,7 +743,8 @@ def build(bld):
             source = 'doxyfile.in',
             target = 'doxyfile',
             HTML_BUILD_DIR = html_build_dir,
-            SRCDIR = bld.srcnode.abspath()
+            SRCDIR = bld.srcnode.abspath(),
+            VERSION = VERSION
         )
 
         # There are two reasons for logging to doxygen.log and using it as
