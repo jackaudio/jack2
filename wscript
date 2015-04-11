@@ -736,7 +736,34 @@ def build(bld):
         #bld.add_subdirs('tests')
 
     if bld.env['BUILD_DOXYGEN_DOCS'] == True:
-        html_build_dir = "build/default/html"
+        html_build_dir = bld.path.find_or_declare('html').abspath()
+
+        bld(
+            features = 'subst',
+            source = 'doxyfile.in',
+            target = 'doxyfile',
+            HTML_BUILD_DIR = html_build_dir,
+            SRCDIR = bld.srcnode.abspath()
+        )
+
+        # There are two reasons for logging to doxygen.log and using it as
+        # target in the build rule (rather than html_build_dir):
+        # (1) reduce the noise when running the build
+        # (2) waf has a regular file to check for a timestamp. If the directory
+        #     is used instead waf will rebuild the doxygen target (even upon
+        #     install).
+        def doxygen(task):
+            doxyfile = task.inputs[0].abspath()
+            logfile = task.outputs[0].abspath()
+            cmd = '%s %s &> %s' % (task.env.DOXYGEN, doxyfile, logfile)
+            return task.exec_command(cmd)
+
+        bld(
+            rule = doxygen,
+            source = 'doxyfile',
+            target = 'doxygen.log'
+        )
+
         if bld.cmd == 'install':
             share_dir = bld.options.destdir + bld.env['PREFIX'] + '/share/jack-audio-connection-kit'
             html_install_dir = share_dir + '/reference/html/'
@@ -757,11 +784,6 @@ def build(bld):
                 Logs.pprint('CYAN', "Removing doxygen generated documentation...")
                 shutil.rmtree(html_build_dir)
                 Logs.pprint('CYAN', "Removing doxygen generated documentation done.")
-        elif bld.cmd =='build':
-            if not os.access(html_build_dir, os.R_OK):
-                os.popen(bld.env.DOXYGEN).read()
-            else:
-                Logs.pprint('CYAN', "doxygen documentation already built.")
 
 def dist_hook():
     os.remove('svnversion_regenerate.sh')
