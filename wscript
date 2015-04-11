@@ -27,6 +27,8 @@ out = 'build'
 # lib32 variant name used when building in mixed mode
 lib32 = 'lib32'
 
+auto_options = []
+
 def display_msg(msg, status = None, color = None):
     sr = msg
     global g_maxlen
@@ -42,6 +44,13 @@ def display_feature(msg, build):
         display_msg(msg, "yes", 'GREEN')
     else:
         display_msg(msg, "no", 'YELLOW')
+
+def print_error(msg):
+    """
+    This function prints an error without stopping waf. The reason waf should
+    not be stopped is to be able to list all missing dependencies in one chunk.
+    """
+    print(Logs.colors.RED + msg + Logs.colors.NORMAL)
 
 def create_svnversion_task(bld, header='svnversion.h', define=None):
     cmd = '../svnversion_regenerate.sh ${TGT}'
@@ -62,6 +71,334 @@ def create_svnversion_task(bld, header='svnversion.h', define=None):
             post_run = post_run,
             target = [bld.path.find_or_declare(header)]
     )
+
+class AutoOption:
+    """
+    This class is the foundation for the auto options. It adds an option
+    --foo=no|yes to the list of options and deals with all logic and checks for
+    these options.
+
+    Each option can have different dependencies that will be checked. If all
+    dependencies are available and the user has not done any request the option
+    will be enabled. If the user has requested to enable the option the class
+    ensures that all dependencies are available and prints an error message
+    otherwise. If the user disables the option, i.e. --foo=no, no checks are
+    made.
+
+    For each option it is possible to add packages that are required for the
+    option using the add_package function. For dependency programs add_program
+    should be used. For libraries (without pkg-config support) the add_library
+    function should be used. For headers the add_header function exists. If
+    there is another type of requirement or dependency the check hook (an
+    external function called when configuring) can be used.
+
+    When all checks have been made and the class has made a decision the result
+    is saved in conf.env['NAME'] where 'NAME' by default is the uppercase of the
+    name argument to __init__, but it can be changed with the conf_dest argument
+    to __init__.
+
+    The class will define a preprocessor symbol with the result. The default
+    name is HAVE_NAME, but it can be changed using the define argument to
+    __init__.
+    """
+
+    def __init__(self, opt, name, help, conf_dest=None, define=None):
+        # check hook to call upon configuration
+        self.check_hook = None
+        self.check_hook_error = None
+        self.check_hook_found = True
+
+        # required libraries
+        self.libs = [] # elements on the form [lib,uselib_store]
+        self.libs_not_found = [] # elements on the form lib
+
+        # required headers
+        self.headers = []
+        self.headers_not_found = []
+
+        # required packages (checked with pkg-config)
+        self.packages = [] # elements on the form [package,uselib_store,atleast_version]
+        self.packages_not_found = [] # elements on the form [package,atleast_version]
+
+        # required programs
+        self.programs = [] # elements on the form [program,var]
+        self.programs_not_found = [] # elements on the form program
+
+        # the result of the configuration (should the option be enabled or not?)
+        self.result = False
+
+        self.help = help
+        self.option = '--' + name
+        self.dest = 'auto_option_' + name
+        if conf_dest:
+            self.conf_dest = conf_dest
+        else:
+            self.conf_dest = name.upper()
+        if not define:
+            self.define = 'HAVE_' + name.upper()
+        else:
+            self.define = define
+        opt.add_option(self.option, type='string', default='auto', dest=self.dest, help=self.help+' (enabled by default if possible)', metavar='no|yes')
+
+    def add_library(self, library, uselib_store=None):
+        """
+        Add a required library that should be checked during configuration. The
+        library will be checked using the conf.check_cc function. If the
+        uselib_store arugment is not given it defaults to LIBRARY (the uppercase
+        of the library argument). The uselib_store argument will be passed to
+        check_cc which means LIB_LIBRARY, CFLAGS_LIBRARY and DEFINES_LIBRARY,
+        etc. will be defined if the option is enabled.
+        """
+        if not uselib_store:
+            uselib_store = library.upper().replace('-', '_')
+        self.libs.append([library, uselib_store])
+
+    def add_header(self, header):
+        """
+        Add a required header that should be checked during configuration. The
+        header will be checked using the conf.check_cc function which means
+        HAVE_HEADER_H will be defined if found.
+        """
+        self.headers.append(header)
+
+    def add_package(self, package, uselib_store=None, atleast_version=None):
+        """
+        Add a required package that should be checked using pkg-config during
+        configuration. The package will be checked using the conf.check_cfg
+        function and the uselib_store and atleast_version will be passed to
+        check_cfg. If uselib_store is None it defaults to PACKAGE (uppercase of
+        the package argument) with hyphens and dots replaced with underscores.
+        If atleast_version is None it defaults to '0'.
+        """
+        if not uselib_store:
+            uselib_store = package.upper().replace('-', '_').replace('.', '_')
+        if not atleast_version:
+            atleast_version = '0'
+        self.packages.append([package, uselib_store, atleast_version])
+
+    def add_program(self, program, var=None):
+        """
+        Add a required program that should be checked during configuration. If
+        var is not given it defaults to PROGRAM (the uppercase of the program
+        argument). If the option is enabled the program is saved in
+        conf.env.PROGRAM.
+        """
+        if not var:
+            var = program.upper().replace('-', '_')
+        self.programs.append([program, var])
+
+    def set_check_hook(self, check_hook, check_hook_error):
+        """
+        Set the check hook and the corresponding error printing function to the
+        configure step. The check_hook argument is a function that should return
+        True if the extra prerequisites were found and False if not. The
+        check_hook_error argument is an error printing function that should
+        print an error message telling the user that --foo was explicitly
+        requested but cannot be built since the extra prerequisites were not
+        found. Both function should take a single argument that is the waf
+        configuration context.
+        """
+        self.check_hook = check_hook
+        self.check_hook_error = check_hook_error
+
+    def _check(self, conf):
+        """
+        This is an internal function that runs all necessary configure checks.
+        It checks all dependencies (even if some dependency was not found) so
+        that the user can install all missing dependencies in one go, instead
+        of playing the infamous hit-configure-hit-configure game.
+
+        This function returns True if all dependencies were found and False if
+        not.
+        """
+        all_found = True
+
+        # check for libraries
+        for lib,uselib_store in self.libs:
+            try:
+                conf.check_cc(lib=lib, uselib_store=uselib_store)
+            except conf.errors.ConfigurationError:
+                all_found = False
+                self.libs_not_found.append(lib)
+
+        # check for headers
+        for header in self.headers:
+            try:
+                conf.check_cc(header_name=header)
+            except conf.errors.ConfigurationError:
+                all_found = False
+                self.headers_not_found.append(header)
+
+        # check for packages
+        for package,uselib_store,atleast_version in self.packages:
+            try:
+                conf.check_cfg(package=package, uselib_store=uselib_store, atleast_version=atleast_version, args='--cflags --libs')
+            except conf.errors.ConfigurationError:
+                all_found = False
+                self.packages_not_found.append([package,atleast_version])
+
+        # check for programs
+        for program,var in self.programs:
+            try:
+                conf.find_program(program, var=var)
+            except conf.errors.ConfigurationError:
+                all_found = False
+                self.programs_not_found.append(program)
+
+        # call hook (if specified)
+        if self.check_hook:
+            self.check_hook_found = self.check_hook(conf)
+            if not self.check_hook_found:
+                all_found = False
+
+        return all_found
+
+    def _configure_error(self, conf):
+        """
+        This is an internal function that prints errors for each missing
+        dependency. The error messages tell the user that this option required
+        some dependency, but it cannot be found.
+        """
+
+        for lib in self.libs_not_found:
+            print_error('%s requires the %s library, but it cannot be found.' % (self.option, lib))
+
+        for header in self.headers_not_found:
+            print_error('%s requires the %s header, but it cannot be found.' % (self.option, header))
+
+        for package,atleast_version in self.packages_not_found:
+            string = package
+            if atleast_version:
+                string += ' >= ' + atleast_version
+            print_error('%s requires the package %s, but it cannot be found.' % (self.option, string))
+
+        for program in self.programs_not_found:
+            print_error('%s requires the %s program, but it cannot be found.' % (self.option, program))
+
+        if not self.check_hook_found:
+            self.check_hook_error(conf)
+
+    def configure(self, conf):
+        """
+        This function configures the option examining the argument given too
+        --foo (where foo is this option). This function sets self.result to the
+        result of the configuration; True if the option should be enabled or
+        False if not. If not all dependencies were found self.result will shall
+        be False. conf.env['NAME'] will be set to the same value aswell as a
+        preprocessor symbol will be defined according to the result.
+
+        If --foo[=yes] was given, but some dependency was not found an error
+        message is printed (foreach missing dependency).
+
+        This function returns True on success and False on error.
+        """
+        argument = getattr(Options.options, self.dest)
+        if argument == 'no':
+            self.result = False
+            retvalue = True
+        elif argument == 'yes':
+            if self._check(conf):
+                self.result = True
+                retvalue = True
+            else:
+                self.result = False
+                retvalue = False
+                self._configure_error(conf)
+        elif argument == 'auto':
+            self.result = self._check(conf)
+            retvalue = True
+        else:
+            print_error('Invalid argument "' + argument + '" to ' + self.option)
+            self.result = False
+            retvalue = False
+
+        conf.env[self.conf_dest] = self.result
+        if self.result:
+            conf.define(self.define, 1)
+        else:
+            conf.define(self.define, 0)
+        return retvalue
+
+    def display_message(self):
+        """
+        This function displays a result message with the help text and the
+        result of the configuration.
+        """
+        display_feature(self.help, self.result)
+
+def add_auto_option(opt, name, help, conf_dest=None, define=None):
+    """
+    Adds an option to the list of auto options and returns the newly created
+    option.
+    """
+    option = AutoOption(opt, name, help, conf_dest=conf_dest, define=define)
+    auto_options.append(option)
+    return option
+
+def auto_options_argv_hack():
+    """
+    This function applies a hack that for each auto option --foo=no|yes replaces
+    any occurence --foo in argv with --foo=yes, in effect interpreting --foo as
+    --foo=yes. The function has to be called before waf issues the option
+    parser, i.e. before the configure phase.
+    """
+    for option in auto_options:
+        for x in range(1, len(sys.argv)):
+            if sys.argv[x] == option.option:
+                sys.argv[x] += '=yes'
+
+def configure_auto_options(conf):
+    """
+    This function configures all auto options. It stops waf and prints an error
+    message if there were unsatisfied requirements.
+    """
+    ok = True
+    for option in auto_options:
+        if not option.configure(conf):
+            ok = False
+    if not ok:
+        conf.fatal('There were unsatisfied requirements.')
+
+def display_auto_options_messages():
+    """This function displays all options and the configuration result."""
+    for option in auto_options:
+        option.display_message()
+
+def check_for_celt(conf):
+    found = False
+    for version in ['11', '8', '7', '5']:
+        define = 'HAVE_CELT_API_0_' + version
+        if not found:
+            try:
+                conf.check_cfg(package='celt', atleast_version='0.' + version + '.0', args='--cflags --libs')
+                found = True
+                conf.define(define, 1)
+                continue
+            except conf.errors.ConfigurationError:
+                pass
+        conf.define(define, 0)
+    return found
+
+def check_for_celt_error(conf):
+    print_error('--celt requires the package celt, but it could not be found.')
+
+# The readline/readline.h header does not work if stdio.h is not included
+# before. Thus a fragment with both stdio.h and readline/readline.h need to be
+# test-compiled to find out whether readline is available.
+def check_for_readline(conf):
+    try:
+        conf.check_cc(fragment='''
+                      #include <stdio.h>
+                      #include <readline/readline.h>
+                      int main(void) { return 0; }''',
+                      execute=False,
+                      msg='Checking for header readline/readline.h')
+        return True
+    except conf.errors.ConfigurationError:
+        return False
+
+def check_for_readline_error(conf):
+    print_error('--readline requires the readline/readline.h header, but it cannot be found.')
 
 def options(opt):
     # options provided by the modules
@@ -87,16 +424,42 @@ def options(opt):
     opt.add_option('--ports-per-application', default=768, type="int", dest="application_ports", help='Maximum number of ports per application')
 
     # options with third party dependencies
-    opt.add_option('--doxygen', action='store_true', default=False, help='Enable build of doxygen documentation')
-    opt.add_option('--alsa', action='store_true', default=False, help='Enable ALSA driver')
-    opt.add_option('--firewire', action='store_true', default=False, help='Enable FireWire driver (FFADO)')
-    opt.add_option('--freebob', action='store_true', default=False, help='Enable FreeBob driver')
-    opt.add_option('--iio', action='store_true', default=False, help='Enable IIO driver')
-    opt.add_option('--portaudio', action='store_true', default=False, help='Enable Portaudio driver')
-    opt.add_option('--winmme', action='store_true', default=False, help='Enable WinMME driver')
+    doxygen = add_auto_option(opt, 'doxygen', help='Build doxygen documentation', conf_dest='BUILD_DOXYGEN_DOCS')
+    doxygen.add_program('doxygen')
+    alsa = add_auto_option(opt, 'alsa', help='Enable ALSA driver', conf_dest='BUILD_DRIVER_ALSA')
+    alsa.add_package('alsa', atleast_version='1.0.18')
+    firewire = add_auto_option(opt, 'firewire', help='Enable FireWire driver (FFADO)', conf_dest='BUILD_DRIVER_FFADO')
+    firewire.add_package('libffado', atleast_version='1.999.17')
+    freebob = add_auto_option(opt, 'freebob', help='Enable FreeBob driver')
+    freebob.add_package('libfreebob', atleast_version='1.0.0')
+    iio = add_auto_option(opt, 'iio', help='Enable IIO driver', conf_dest='BUILD_DRIVER_IIO')
+    iio.add_package('gtkIOStream', atleast_version='1.4.0')
+    iio.add_package('eigen3', atleast_version='3.1.2')
+    portaudio = add_auto_option(opt, 'portaudio', help='Enable Portaudio driver', conf_dest='BUILD_DRIVER_PORTAUDIO')
+    portaudio.add_header('windows.h') # only build portaudio on windows
+    portaudio.add_package('portaudio-2.0', uselib_store='PORTAUDIO', atleast_version='19')
+    winmme = add_auto_option(opt, 'winmme', help='Enable WinMME driver', conf_dest='BUILD_DRIVER_WINMME')
+    winmme.add_header('mmsystem.h')
+    winmme.add_header('windows.h')
+
+    celt = add_auto_option(opt, 'celt', help='Build with CELT')
+    celt.set_check_hook(check_for_celt, check_for_celt_error)
+    opus = add_auto_option(opt, 'opus', help='Build Opus netjack2')
+    opus.add_header('opus/opus_custom.h')
+    opus.add_package('opus', atleast_version='0.9.0')
+    samplerate = add_auto_option(opt, 'samplerate', help='Build with libsamplerate')
+    samplerate.add_package('samplerate')
+    sndfile = add_auto_option(opt, 'sndfile', help='Build with libsndfile')
+    sndfile.add_package('sndfile')
+    readline = add_auto_option(opt, 'readline', help='Build with readline')
+    readline.add_library('readline')
+    readline.set_check_hook(check_for_readline, check_for_readline_error)
 
     # dbus options
     opt.sub_options('dbus')
+
+    # this must be called before the configure phase
+    auto_options_argv_hack()
 
 def configure(conf):
     conf.load('compiler_cxx')
@@ -150,77 +513,18 @@ def configure(conf):
     conf.env.append_unique('CXXFLAGS', '-Wall')
     conf.env.append_unique('CFLAGS', '-Wall')
 
+    # configure all auto options
+    configure_auto_options(conf)
+
     conf.sub_config('common')
     if conf.env['IS_LINUX']:
         conf.sub_config('linux')
-        if Options.options.alsa and not conf.env['BUILD_DRIVER_ALSA']:
-            conf.fatal('ALSA driver was explicitly requested but cannot be built')
-        if Options.options.freebob and not conf.env['BUILD_DRIVER_FREEBOB']:
-            conf.fatal('FreeBob driver was explicitly requested but cannot be built')
-        if Options.options.firewire and not conf.env['BUILD_DRIVER_FFADO']:
-            conf.fatal('FFADO driver was explicitly requested but cannot be built')
-        if Options.options.iio and not conf.env['BUILD_DRIVER_IIO']:
-            conf.fatal('IIO driver was explicitly requested but cannot be built')
-        conf.env['BUILD_DRIVER_ALSA'] = Options.options.alsa
-        conf.env['BUILD_DRIVER_FFADO'] = Options.options.firewire
-        conf.env['BUILD_DRIVER_FREEBOB'] = Options.options.freebob
-        conf.env['BUILD_DRIVER_IIO'] = Options.options.iio
-    if conf.env['IS_WINDOWS']:
-        conf.sub_config('windows')
-        if Options.options.portaudio and not conf.env['BUILD_DRIVER_PORTAUDIO']:
-            conf.fatal('Portaudio driver was explicitly requested but cannot be built')
-        conf.env['BUILD_DRIVER_WINMME'] = Options.options.winmme
     if Options.options.dbus:
         conf.sub_config('dbus')
         if conf.env['BUILD_JACKDBUS'] != True:
             conf.fatal('jackdbus was explicitly requested but cannot be built')
 
-    conf.check_cc(header_name='samplerate.h', define_name="HAVE_SAMPLERATE")
-
-    if conf.is_defined('HAVE_SAMPLERATE'):
-        conf.env['LIB_SAMPLERATE'] = ['samplerate']
-
     conf.sub_config('example-clients')
-
-    if conf.check_cfg(package='celt', atleast_version='0.11.0', args='--cflags --libs', mandatory=False):
-        conf.define('HAVE_CELT', 1)
-        conf.define('HAVE_CELT_API_0_11', 1)
-        conf.define('HAVE_CELT_API_0_8', 0)
-        conf.define('HAVE_CELT_API_0_7', 0)
-        conf.define('HAVE_CELT_API_0_5', 0)
-    elif conf.check_cfg(package='celt', atleast_version='0.8.0', args='--cflags --libs', mandatory=False):
-        conf.define('HAVE_CELT', 1)
-        conf.define('HAVE_CELT_API_0_11', 0)
-        conf.define('HAVE_CELT_API_0_8', 1)
-        conf.define('HAVE_CELT_API_0_7', 0)
-        conf.define('HAVE_CELT_API_0_5', 0)
-    elif conf.check_cfg(package='celt', atleast_version='0.7.0', args='--cflags --libs', mandatory=False):
-        conf.define('HAVE_CELT', 1)
-        conf.define('HAVE_CELT_API_0_11', 0)
-        conf.define('HAVE_CELT_API_0_8', 0)
-        conf.define('HAVE_CELT_API_0_7', 1)
-        conf.define('HAVE_CELT_API_0_5', 0)
-    elif conf.check_cfg(package='celt', atleast_version='0.5.0', args='--cflags --libs', mandatory=False):
-        conf.define('HAVE_CELT', 1)
-        conf.define('HAVE_CELT_API_0_11', 0)
-        conf.define('HAVE_CELT_API_0_8', 0)
-        conf.define('HAVE_CELT_API_0_7', 0)
-        conf.define('HAVE_CELT_API_0_5', 1)
-    else:
-        conf.define('HAVE_CELT', 0)
-        conf.define('HAVE_CELT_API_0_11', 0)
-        conf.define('HAVE_CELT_API_0_8', 0)
-        conf.define('HAVE_CELT_API_0_7', 0)
-        conf.define('HAVE_CELT_API_0_5', 0)
-
-    conf.env['WITH_OPUS'] = False
-    if conf.check_cfg(package='opus', atleast_version='0.9.0' , args='--cflags --libs', mandatory=False):
-        if conf.check_cc(header_name='opus/opus_custom.h', mandatory=False):
-            conf.define('HAVE_OPUS', 1)
-            conf.env['WITH_OPUS'] = True
-        else:
-            conf.define('HAVE_OPUS', 0)
-
 
     conf.env['LIB_PTHREAD'] = ['pthread']
     conf.env['LIB_DL'] = ['dl']
@@ -230,7 +534,6 @@ def configure(conf):
     conf.env['JACK_API_VERSION'] = JACK_API_VERSION
     conf.env['JACK_VERSION'] = VERSION
 
-    conf.env['BUILD_DOXYGEN_DOCS'] = Options.options.doxygen
     conf.env['BUILD_WITH_PROFILE'] = Options.options.profile
     conf.env['BUILD_WITH_32_64'] = Options.options.mixed
     conf.env['BUILD_CLASSIC'] = Options.options.classic
@@ -346,8 +649,6 @@ def configure(conf):
         display_msg('32-bit C compiler flags', repr(conf.all_envs[lib32]['CFLAGS']))
         display_msg('32-bit C++ compiler flags', repr(conf.all_envs[lib32]['CXXFLAGS']))
         display_msg('32-bit linker flags', repr(conf.all_envs[lib32]['LINKFLAGS']))
-    display_feature('Build doxygen documentation', conf.env['BUILD_DOXYGEN_DOCS'])
-    display_feature('Build Opus netjack2', conf.env['WITH_OPUS'])
     display_feature('Build with engine profiling', conf.env['BUILD_WITH_PROFILE'])
     display_feature('Build with 32/64 bits mixed mode', conf.env['BUILD_WITH_32_64'])
 
@@ -359,15 +660,8 @@ def configure(conf):
         print(Logs.colors.RED + 'WARNING !! mixing both jackd and jackdbus may cause issues:' + Logs.colors.NORMAL)
         print(Logs.colors.RED + 'WARNING !! jackdbus does not use .jackdrc nor qjackctl settings' + Logs.colors.NORMAL)
 
-    if conf.env['IS_LINUX']:
-        display_feature('Build with ALSA support', conf.env['BUILD_DRIVER_ALSA'] == True)
-        display_feature('Build with FireWire (FreeBob) support', conf.env['BUILD_DRIVER_FREEBOB'] == True)
-        display_feature('Build with FireWire (FFADO) support', conf.env['BUILD_DRIVER_FFADO'] == True)
-        display_feature('Build with IIO support', conf.env['BUILD_DRIVER_IIO'] == True)
-
-    if conf.env['IS_WINDOWS']:
-        display_feature('Build with WinMME support', conf.env['BUILD_DRIVER_WINMME'] == True)
-        display_feature('Build with Portaudio support', conf.env['BUILD_DRIVER_PORTAUDIO'] == True)
+    # display configuration result messages for auto options
+    display_auto_options_messages()
 
     if conf.env['BUILD_JACKDBUS'] == True:
         display_msg('D-Bus service install directory', conf.env['DBUS_SERVICES_DIR'], 'CYAN')
@@ -465,7 +759,7 @@ def build(bld):
                 Logs.pprint('CYAN', "Removing doxygen generated documentation done.")
         elif bld.cmd =='build':
             if not os.access(html_docs_source_dir, os.R_OK):
-                os.popen("doxygen").read()
+                os.popen(bld.env.DOXYGEN).read()
             else:
                 Logs.pprint('CYAN', "doxygen documentation already built.")
 

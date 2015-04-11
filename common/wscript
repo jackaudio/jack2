@@ -6,13 +6,8 @@ import re
 import os
 
 def configure(conf):
-    conf.check_cc(header_name='samplerate.h', define_name="HAVE_SAMPLERATE")
-   
-    if conf.is_defined('HAVE_SAMPLERATE'):
-        conf.env['LIB_SAMPLERATE'] = ['samplerate']
-
-    conf.env['BUILD_NETLIB'] = conf.is_defined('HAVE_SAMPLERATE')
-    conf.env['BUILD_ADAPTER'] = conf.is_defined('HAVE_SAMPLERATE')
+    conf.env['BUILD_NETLIB'] = conf.env['SAMPLERATE']
+    conf.env['BUILD_ADAPTER'] = conf.env['SAMPLERATE']
 
     if conf.env['IS_WINDOWS']:
         try:
