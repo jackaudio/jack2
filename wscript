@@ -406,6 +406,7 @@ def options(opt):
     opt.tool_options('compiler_cc')
 
     # install directories
+    opt.add_option('--htmldir', type='string', default=None, help="HTML documentation directory [Default: <prefix>/share/jack-audio-connection-kit/reference/html/")
     opt.add_option('--libdir', type='string', help="Library directory [Default: <prefix>/lib]")
     opt.add_option('--libdir32', type='string', help="32bit Library directory [Default: <prefix>/lib32]")
     opt.add_option('--mandir', type='string', help="Manpage directory [Default: <prefix>/share/man/man1]")
@@ -545,6 +546,13 @@ def configure(conf):
         conf.env['BUILD_JACKD'] = True
 
     conf.env['BINDIR'] = conf.env['PREFIX'] + '/bin'
+
+    if Options.options.htmldir:
+        conf.env['HTMLDIR'] = Options.options.htmldir
+    else:
+        # set to None here so that the doxygen code can find out the highest
+        # directory to remove upon install
+        conf.env['HTMLDIR'] = None
 
     if Options.options.libdir:
         conf.env['LIBDIR'] = Options.options.libdir
@@ -765,8 +773,17 @@ def build(bld):
             target = 'doxygen.log'
         )
 
-        share_dir = bld.options.destdir + bld.env['PREFIX'] + '/share/jack-audio-connection-kit'
-        html_install_dir = share_dir + '/reference/html/'
+        # Determine where to install HTML documentation. Since share_dir is the
+        # highest directory the uninstall routine should remove, there is no
+        # better candidate for share_dir, but the requested HTML directory if
+        # --htmldir is given.
+        if bld.env['HTMLDIR']:
+            html_install_dir = bld.options.destdir + bld.env['HTMLDIR']
+            share_dir = html_install_dir
+        else:
+            share_dir = bld.options.destdir + bld.env['PREFIX'] + '/share/jack-audio-connection-kit'
+            html_install_dir = share_dir + '/reference/html/'
+
         if bld.cmd == 'install':
             if os.path.isdir(html_install_dir):
                 Logs.pprint('CYAN', "Removing old doxygen documentation installation...")
