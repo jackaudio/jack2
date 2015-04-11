@@ -765,9 +765,9 @@ def build(bld):
             target = 'doxygen.log'
         )
 
+        share_dir = bld.options.destdir + bld.env['PREFIX'] + '/share/jack-audio-connection-kit'
+        html_install_dir = share_dir + '/reference/html/'
         if bld.cmd == 'install':
-            share_dir = bld.options.destdir + bld.env['PREFIX'] + '/share/jack-audio-connection-kit'
-            html_install_dir = share_dir + '/reference/html/'
             if os.path.isdir(html_install_dir):
                 Logs.pprint('CYAN', "Removing old doxygen documentation installation...")
                 shutil.rmtree(html_install_dir)
