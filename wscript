@@ -736,7 +736,7 @@ def build(bld):
         #bld.add_subdirs('tests')
 
     if bld.env['BUILD_DOXYGEN_DOCS'] == True:
-        html_source_dir = "build/default/html"
+        html_build_dir = "build/default/html"
         if bld.cmd == 'install':
             share_dir = bld.options.destdir + bld.env['PREFIX'] + '/share/jack-audio-connection-kit'
             html_install_dir = share_dir + '/reference/html/'
@@ -745,7 +745,7 @@ def build(bld):
                 shutil.rmtree(html_install_dir)
                 Logs.pprint('CYAN', "Removing old doxygen documentation installation done.")
             Logs.pprint('CYAN', "Installing doxygen documentation...")
-            shutil.copytree(html_source_dir, html_install_dir)
+            shutil.copytree(html_build_dir, html_install_dir)
             Logs.pprint('CYAN', "Installing doxygen documentation done.")
         elif bld.cmd =='uninstall':
             Logs.pprint('CYAN', "Uninstalling doxygen documentation...")
@@ -753,12 +753,12 @@ def build(bld):
                 shutil.rmtree(share_dir)
             Logs.pprint('CYAN', "Uninstalling doxygen documentation done.")
         elif bld.cmd =='clean':
-            if os.access(html_source_dir, os.R_OK):
+            if os.access(html_build_dir, os.R_OK):
                 Logs.pprint('CYAN', "Removing doxygen generated documentation...")
-                shutil.rmtree(html_source_dir)
+                shutil.rmtree(html_build_dir)
                 Logs.pprint('CYAN', "Removing doxygen generated documentation done.")
         elif bld.cmd =='build':
-            if not os.access(html_source_dir, os.R_OK):
+            if not os.access(html_build_dir, os.R_OK):
                 os.popen(bld.env.DOXYGEN).read()
             else:
                 Logs.pprint('CYAN', "doxygen documentation already built.")
