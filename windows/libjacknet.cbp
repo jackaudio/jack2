@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Win32 Release 64bits">
-				<Option output="Release64\bin\libjacknet" prefix_auto="1" extension_auto="1" />
+				<Option output="Release64\bin\libjacknet64" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release64\libjacknet" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -36,7 +36,7 @@
 				</Linker>
 			</Target>
 			<Target title="Win32 Debug 64bits">
-				<Option output="Debug64\bin\libjacknet" prefix_auto="1" extension_auto="1" />
+				<Option output="Debug64\bin\libjacknet64" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Debug64\libjacknet" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -65,7 +65,7 @@
 				</Linker>
 			</Target>
 			<Target title="Win32 Profiling 64bits">
-				<Option output="Release64\bin\libjacknet" prefix_auto="1" extension_auto="1" />
+				<Option output="Release64\bin\libjacknet64" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release64\libjacknet" />
 				<Option type="3" />
 				<Option compiler="gcc" />

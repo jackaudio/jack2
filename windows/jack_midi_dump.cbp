@@ -6,24 +6,6 @@
 		<Option pch_mode="2" />
 		<Option compiler="mingw_64" />
 		<Build>
-			<Target title="Win32 Release 64bits">
-				<Option output="Release64\bin\jack_midi_dump" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Release64\" />
-				<Option type="1" />
-				<Option compiler="mingw_64" />
-				<Compiler>
-					<Add option="-O2" />
-					<Add option="-Wall" />
-					<Add directory="..\example-clients" />
-					<Add directory="..\windows" />
-					<Add directory="..\common\jack" />
-					<Add directory="..\common" />
-				</Compiler>
-				<Linker>
-					<Add library="libjack64" />
-					<Add directory="Release64\bin" />
-				</Linker>
-			</Target>
 			<Target title="Win32 Debug 64bits">
 				<Option output="Debug64\bin\jack_midi_dump" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Debug64\" />
@@ -57,26 +39,6 @@
 				<Linker>
 					<Add library="libjack64" />
 					<Add directory="Release64\bin" />
-				</Linker>
-			</Target>
-			<Target title="Win32 Release 32bits">
-				<Option output="Release\bin\jack_midi_dump" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Release\" />
-				<Option type="1" />
-				<Option compiler="mingw_64" />
-				<Compiler>
-					<Add option="-O2" />
-					<Add option="-Wall" />
-					<Add option="-m32" />
-					<Add directory="..\example-clients" />
-					<Add directory="..\windows" />
-					<Add directory="..\common\jack" />
-					<Add directory="..\common" />
-				</Compiler>
-				<Linker>
-					<Add option="-m32" />
-					<Add library="libjack" />
-					<Add directory="Release\bin" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Debug 32bits">

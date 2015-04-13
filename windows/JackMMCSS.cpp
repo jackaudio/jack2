@@ -57,7 +57,7 @@ int JackMMCSS::MMCSSAcquireRealTime(jack_native_thread_t thread, int priority)
         HANDLE task = ffMMCSSFun1("Pro Audio", &dummy);
         if (task == NULL) {
             jack_error("AvSetMmThreadCharacteristics error : %d", GetLastError());
-        } else if (ffMMCSSFun2(task, priority - BASE_REALTIME_PRIORITY)) {
+        } else if (ffMMCSSFun2(task, Jack::AVRT_PRIORITY(priority - BASE_REALTIME_PRIORITY))) {
             fHandleTable[thread] = task;
             jack_log("AvSetMmThreadPriority success");
             return 0;

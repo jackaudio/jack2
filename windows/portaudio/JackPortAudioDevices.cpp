@@ -224,10 +224,10 @@ int PortAudioDevices::GetPreferredBufferSize(PaDeviceIndex id)
         } else {
             jack_info("ASIO buffer granularity     = %ld", granularity);
         }
-        
+
         return preferredLatency;
-    } else 
-#endif   
+    } else
+#endif
     {
         return 512; // Non ASIO driver, returns generic value
     }
@@ -260,7 +260,7 @@ void PortAudioDevices::DisplayDevicesNames()
         jack_info("Name                        = %s", GetFullName(id).c_str());
         jack_info("Max inputs                  = %d", fDeviceInfo[id]->maxInputChannels);
         jack_info("Max outputs                 = %d", fDeviceInfo[id]->maxOutputChannels);
-        
+
     #if defined(WIN32) && defined(HAVE_ASIO)
         /* ASIO specific latency information */
         if (Pa_GetHostApiInfo(fDeviceInfo[id]->hostApi)->type == paASIO) {
@@ -278,7 +278,7 @@ void PortAudioDevices::DisplayDevicesNames()
                 jack_info("ASIO buffer granularity     = %ld", granularity);
             }
         }
-    #endif 
+    #endif
         jack_info("Default sample rate         = %8.2f", fDeviceInfo[id]->defaultSampleRate);
 
         /* poll for standard sample rates */
