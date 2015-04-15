@@ -25,9 +25,9 @@ jack_client_t *client;
 #define TABLE_SIZE   (200)
 typedef struct
 {
-    float sine[TABLE_SIZE];
-    int left_phase;
-    int right_phase;
+	float sine[TABLE_SIZE];
+	int left_phase;
+	int right_phase;
 }
 paTestData;
 
@@ -57,14 +57,14 @@ process (jack_nframes_t nframes, void *arg)
 	out2 = (jack_default_audio_sample_t*)jack_port_get_buffer (output_port2, nframes);
 
 	for( i=0; i<nframes; i++ )
-    {
-        out1[i] = data->sine[data->left_phase];  /* left */
-        out2[i] = data->sine[data->right_phase];  /* right */
-        data->left_phase += 1;
-        if( data->left_phase >= TABLE_SIZE ) data->left_phase -= TABLE_SIZE;
-        data->right_phase += 3; /* higher pitch so we can distinguish left and right. */
-        if( data->right_phase >= TABLE_SIZE ) data->right_phase -= TABLE_SIZE;
-    }
+	{
+		out1[i] = data->sine[data->left_phase];  /* left */
+		out2[i] = data->sine[data->right_phase];  /* right */
+		data->left_phase += 1;
+		if( data->left_phase >= TABLE_SIZE ) data->left_phase -= TABLE_SIZE;
+		data->right_phase += 3; /* higher pitch so we can distinguish left and right. */
+		if( data->right_phase >= TABLE_SIZE ) data->right_phase -= TABLE_SIZE;
+	}
     
 	return 0;      
 }
@@ -94,7 +94,7 @@ main (int argc, char *argv[])
 		client_name = argv[1];
 		if (argc >= 3) {	/* server name specified? */
 			server_name = argv[2];
-            int my_option = JackNullOption | JackServerName;
+			int my_option = JackNullOption | JackServerName;
 			options = (jack_options_t)my_option;
 		}
 	} else {			/* use basename of argv[0] */
@@ -107,10 +107,10 @@ main (int argc, char *argv[])
 	}
 
 	for( i=0; i<TABLE_SIZE; i++ )
-    {
-        data.sine[i] = 0.2 * (float) sin( ((double)i/(double)TABLE_SIZE) * M_PI * 2. );
-    }
-    data.left_phase = data.right_phase = 0;
+	{
+		data.sine[i] = 0.2 * (float) sin( ((double)i/(double)TABLE_SIZE) * M_PI * 2. );
+	}
+	data.left_phase = data.right_phase = 0;
   
 
 	/* open a client connection to the JACK server */
@@ -196,7 +196,7 @@ main (int argc, char *argv[])
     /* install a signal handler to properly quits jack client */
 #ifdef WIN32
 	signal(SIGINT, signal_handler);
-    signal(SIGABRT, signal_handler);
+	signal(SIGABRT, signal_handler);
 	signal(SIGTERM, signal_handler);
 #else
 	signal(SIGQUIT, signal_handler);
