@@ -38,7 +38,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 #if defined(JACK_DBUS) && defined(__linux__)
-#include <stdlib.h>
+#include <cstdlib>
 #include <dbus/dbus.h>
 #include "audio_reserve.h"
 #endif
