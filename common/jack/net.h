@@ -90,6 +90,7 @@ typedef struct _jack_net_slave jack_net_slave_t;
  *
  * @param ip the multicast address of the master
  * @param port the connection port
+ * @param name the JACK client name
  * @param request a connection request structure
  * @param result a connection result structure
  *
@@ -289,7 +290,7 @@ typedef struct _jack_net_master jack_net_master_t;
  *
  * @return Opaque net handle if successful or NULL in case of error.
  */
-jack_net_master_t* jack_net_master_open(const char* ip, int port, const char* name, jack_master_t* request, jack_slave_t* result);
+jack_net_master_t* jack_net_master_open(const char* ip, int port, jack_master_t* request, jack_slave_t* result);
 
 /**
  * Close the network connection with the slave machine.

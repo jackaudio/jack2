@@ -102,7 +102,7 @@ main (int argc, char *argv[])
 
     int i;
     //jack_master_t request = { 4, 4, -1, -1, buffer_size, sample_rate, "master", -1 };
-    jack_master_t request = { -1, -1, -1, -1, buffer_size, sample_rate, "master", 6, true };
+    jack_master_t request = { -1, -1, -1, -1, buffer_size, sample_rate, "net_master", 6, true };
     jack_slave_t result;
     float** audio_input_buffer;
     float** audio_output_buffer;
@@ -110,7 +110,7 @@ main (int argc, char *argv[])
 
     printf("Waiting for a slave...\n");
 
-    if ((net = jack_net_master_open(multicast_ip, udp_port, "net_master", &request, &result))  == 0) {
+    if ((net = jack_net_master_open(multicast_ip, udp_port, &request, &result))  == 0) {
         fprintf(stderr, "NetJack master can not be opened\n");
 		return 1;
 	}

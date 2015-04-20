@@ -107,7 +107,7 @@ extern "C"
 
     typedef struct _jack_net_master jack_net_master_t;
 
-    LIB_EXPORT jack_net_master_t* jack_net_master_open(const char* ip, int port, const char* name, jack_master_t* request, jack_slave_t* result);
+    LIB_EXPORT jack_net_master_t* jack_net_master_open(const char* ip, int port, jack_master_t* request, jack_slave_t* result);
     LIB_EXPORT int jack_net_master_close(jack_net_master_t* net);
 
     LIB_EXPORT int jack_net_master_recv(jack_net_master_t* net, int audio_input, float** audio_input_buffer, int midi_input, void** midi_input_buffer);
@@ -153,7 +153,6 @@ struct JackNetExtMaster : public JackNetMasterInterface {
 
     JackNetExtMaster(const char* ip,
                     int port,
-                    const char* name,
                     jack_master_t* request)
     {
         fRunning = true;
@@ -1121,9 +1120,9 @@ LIB_EXPORT int jack_set_net_slave_error_callback(jack_net_slave_t *net, JackNetS
 
 // Master API
 
-LIB_EXPORT jack_net_master_t* jack_net_master_open(const char* ip, int port, const char* name, jack_master_t* request, jack_slave_t* result)
+LIB_EXPORT jack_net_master_t* jack_net_master_open(const char* ip, int port, jack_master_t* request, jack_slave_t* result)
 {
-    JackNetExtMaster* master = new JackNetExtMaster(ip, port, name, request);
+    JackNetExtMaster* master = new JackNetExtMaster(ip, port, request);
     if (master->Open(result) == 0) {
         return (jack_net_master_t*)master;
     } else {
