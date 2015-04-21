@@ -334,8 +334,6 @@ namespace Jack
 
         UpdateParams(max(params->fReturnAudioChannels, params->fSendAudioChannels));
 
-        fSubPeriodBytesSize = fSubPeriodSize * sizeof(sample_t);
-
         fCycleDuration = float(fSubPeriodSize) / float(params->fSampleRate);
         fCycleBytesSize = params->fMtu * (fPeriodSize / fSubPeriodSize);
 
