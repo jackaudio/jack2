@@ -86,4 +86,18 @@ int JackWaiterDriver::ProcessNull()
     return 0;
 }
 
+void JackRestarterDriver::SetRestartDriver(JackDriver* driver)
+{
+    fRestartDriver = driver;
+}
+
+int JackRestarterDriver::RestartWait()
+{
+    if (!fRestartDriver) {
+        jack_error("JackRestartedDriver::RestartWait driver not set");
+        return -1;
+    }
+    return fRestartDriver->Start();
+}
+
 } // end of namespace

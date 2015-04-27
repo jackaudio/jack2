@@ -75,6 +75,32 @@ class SERVER_EXPORT JackWaiterDriver : public JackTimedDriver
 
 };
 
+/*!
+\brief A restartable driver.
+
+When wrapped into a JackWaitCallbackDriver, this driver can restart the
+wrapper thread which will wait again for the Initialize method to return.
+*/
+class SERVER_EXPORT JackRestarterDriver : public JackWaiterDriver
+{
+
+    private:
+
+        JackDriver* fRestartDriver; /*!< The wrapper driver */
+
+    public:
+
+        JackRestarterDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
+            : JackWaiterDriver(name, alias, engine, table), fRestartDriver(NULL)
+        {}
+        virtual ~JackRestarterDriver()
+        {}
+
+        void SetRestartDriver(JackDriver* driver); /*!< Let the wrapper register itself */
+        int RestartWait(); /*!< Restart the wrapper thread */
+
+};
+
 } // end of namespace
 
 #endif

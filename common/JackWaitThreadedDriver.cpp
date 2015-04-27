@@ -37,16 +37,21 @@ bool JackWaitThreadedDriver::Init()
 
 bool JackWaitThreadedDriver::Execute()
 {
+    SetRealTime();
+
+    // Process a null cycle until NetDriver has started
+    while (!fStarter.fRunning && fThread.GetStatus() == JackThread::kRunning) {
+        // Use base class method
+        assert(static_cast<JackWaiterDriver*>(fDriver));
+        static_cast<JackWaiterDriver*>(fDriver)->ProcessNull();
+    }
+
+    return ExecuteReal();
+}
+
+bool JackWaitThreadedDriver::ExecuteReal()
+{
     try {
-
-        SetRealTime();
-
-        // Process a null cycle until NetDriver has started
-        while (!fStarter.fRunning && fThread.GetStatus() == JackThread::kRunning) {
-            // Use base class method
-            assert(static_cast<JackWaiterDriver*>(fDriver));
-            static_cast<JackWaiterDriver*>(fDriver)->ProcessNull();
-        }
 
         // Switch to keep running even in case of error
         while (fThread.GetStatus() == JackThread::kRunning) {
