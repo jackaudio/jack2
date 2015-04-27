@@ -400,6 +400,21 @@ def check_for_readline(conf):
 def check_for_readline_error(conf):
     print_error('--readline requires the readline/readline.h header, but it cannot be found.')
 
+def check_for_mmsystem(conf):
+    try:
+        conf.check_cc(fragment='''
+                      #include <windows.h>
+                      #include <mmsystem.h>
+                      int main(void) { return 0; }''',
+                      execute=False,
+                      msg='Checking for header mmsystem.h')
+        return True
+    except conf.errors.ConfigurationError:
+        return False
+
+def check_for_mmsystem_error(conf):
+    print_error('--winmme requires the mmsystem.h header, but it cannot be found.')
+
 def options(opt):
     # options provided by the modules
     opt.tool_options('compiler_cxx')
@@ -440,8 +455,7 @@ def options(opt):
     portaudio.add_header('windows.h') # only build portaudio on windows
     portaudio.add_package('portaudio-2.0', uselib_store='PORTAUDIO', atleast_version='19')
     winmme = add_auto_option(opt, 'winmme', help='Enable WinMME driver', conf_dest='BUILD_DRIVER_WINMME')
-    winmme.add_header('mmsystem.h')
-    winmme.add_header('windows.h')
+    winmme.set_check_hook(check_for_mmsystem, check_for_mmsystem_error)
 
     celt = add_auto_option(opt, 'celt', help='Build with CELT')
     celt.set_check_hook(check_for_celt, check_for_celt_error)
