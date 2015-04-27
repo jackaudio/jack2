@@ -45,11 +45,9 @@ def display_feature(msg, build):
     else:
         display_msg(msg, "no", 'YELLOW')
 
+# This function prints an error without stopping waf. The reason waf should not
+# be stopped is to be able to list all missing dependencies in one chunk.
 def print_error(msg):
-    """
-    This function prints an error without stopping waf. The reason waf should
-    not be stopped is to be able to list all missing dependencies in one chunk.
-    """
     print(Logs.colors.RED + msg + Logs.colors.NORMAL)
 
 def create_svnversion_task(bld, header='svnversion.h', define=None):
@@ -326,32 +324,26 @@ class AutoOption:
         """
         display_feature(self.help, self.result)
 
+# This function adds an option to the list of auto options and returns the newly
+# created option.
 def add_auto_option(opt, name, help, conf_dest=None, define=None):
-    """
-    Adds an option to the list of auto options and returns the newly created
-    option.
-    """
     option = AutoOption(opt, name, help, conf_dest=conf_dest, define=define)
     auto_options.append(option)
     return option
 
+# This function applies a hack that for each auto option --foo=no|yes replaces
+# any occurence --foo in argv with --foo=yes, in effect interpreting --foo as
+# --foo=yes. The function has to be called before waf issues the option parser,
+# i.e. before the configure phase.
 def auto_options_argv_hack():
-    """
-    This function applies a hack that for each auto option --foo=no|yes replaces
-    any occurence --foo in argv with --foo=yes, in effect interpreting --foo as
-    --foo=yes. The function has to be called before waf issues the option
-    parser, i.e. before the configure phase.
-    """
     for option in auto_options:
         for x in range(1, len(sys.argv)):
             if sys.argv[x] == option.option:
                 sys.argv[x] += '=yes'
 
+# This function configures all auto options. It stops waf and prints an error
+# message if there were unsatisfied requirements.
 def configure_auto_options(conf):
-    """
-    This function configures all auto options. It stops waf and prints an error
-    message if there were unsatisfied requirements.
-    """
     ok = True
     for option in auto_options:
         if not option.configure(conf):
@@ -359,8 +351,8 @@ def configure_auto_options(conf):
     if not ok:
         conf.fatal('There were unsatisfied requirements.')
 
+# This function displays all options and the configuration results.
 def display_auto_options_messages():
-    """This function displays all options and the configuration result."""
     for option in auto_options:
         option.display_message()
 
