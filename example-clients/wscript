@@ -93,6 +93,8 @@ def build(bld):
             prog.use += ['RT', 'READLINE']
         if bld.env['IS_MACOSX']:
             prog.use += ['READLINE']
+        if bld.env['IS_WINDOWS']:
+            prog.use += ['READLINE']
         prog.target = 'jack_transport'
 
     if bld.env['BUILD_EXAMPLE_CLIENT_REC']:
