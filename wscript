@@ -621,11 +621,15 @@ def configure(conf):
     conf.write_config_header('config.h', remove=False)
 
     svnrev = None
-    if os.access('svnversion.h', os.R_OK):
-        data = file('svnversion.h').read()
+    try:
+        f = open('svnversion.h')
+        data = f.read()
         m = re.match(r'^#define SVN_VERSION "([^"]*)"$', data)
         if m != None:
             svnrev = m.group(1)
+        f.close()
+    except FileNotFoundError:
+        pass
 
     if Options.options.mixed == True:
         conf.setenv(lib32, env=conf.env.derive())
