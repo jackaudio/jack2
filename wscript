@@ -720,6 +720,7 @@ def build(bld):
                 before = 'c cxx',
                 color = 'BLUE',
                 post_run = post_run,
+                source = ['svnversion_regenerate.sh'],
                 target = [bld.path.find_or_declare('svnversion.h')]
         )
 
