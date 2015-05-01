@@ -809,6 +809,7 @@ def build(bld):
                 shutil.rmtree(html_build_dir)
                 Logs.pprint('CYAN', "Removing doxygen generated documentation done.")
 
-def dist_hook():
-    os.remove('svnversion_regenerate.sh')
-    os.system('../svnversion_regenerate.sh svnversion.h')
+def dist(ctx):
+    # This code blindly assumes it is working in the toplevel source directory.
+    if not os.path.exists('svnversion.h'):
+        os.system('./svnversion_regenerate.sh svnversion.h')
