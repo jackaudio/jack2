@@ -16,8 +16,6 @@ TEMP_FILE="${OUTPUT_FILE}.tmp"
 #echo "$OUTPUT_FILE"
 #echo "$TEMP_FILE"
 
-OLDPWD=`pwd`
-
 # The script should reside in the toplevel source directory which sould contain
 # all version control files.
 cd `dirname ${0}`
@@ -65,8 +63,6 @@ else
     if test $? -ne 0; then exit 1; fi
   fi
 fi
-
-cd "${OLDPWD}"
 
 rm "${TEMP_FILE}"
 
