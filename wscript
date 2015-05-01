@@ -50,26 +50,6 @@ def display_feature(msg, build):
 def print_error(msg):
     print(Logs.colors.RED + msg + Logs.colors.NORMAL)
 
-def create_svnversion_task(bld, header='svnversion.h', define=None):
-    cmd = '../svnversion_regenerate.sh ${TGT}'
-    if define:
-        cmd += " " + define
-
-    def post_run(self):
-        sg = Utils.h_file(self.outputs[0].abspath(self.env))
-        #print sg.encode('hex')
-        Build.bld.node_sigs[self.env.variant()][self.outputs[0].id] = sg
-
-    bld(
-            rule = cmd,
-            name = 'svnversion',
-            runnable_status = Task.RUN_ME,
-            before = 'c',
-            color = 'BLUE',
-            post_run = post_run,
-            target = [bld.path.find_or_declare(header)]
-    )
-
 class AutoOption:
     """
     This class is the foundation for the auto options. It adds an option
@@ -621,11 +601,15 @@ def configure(conf):
     conf.write_config_header('config.h', remove=False)
 
     svnrev = None
-    if os.access('svnversion.h', os.R_OK):
-        data = file('svnversion.h').read()
+    try:
+        f = open('svnversion.h')
+        data = f.read()
         m = re.match(r'^#define SVN_VERSION "([^"]*)"$', data)
         if m != None:
             svnrev = m.group(1)
+        f.close()
+    except FileNotFoundError:
+        pass
 
     if Options.options.mixed == True:
         conf.setenv(lib32, env=conf.env.derive())
@@ -710,8 +694,6 @@ def build(bld):
     print("make[1]: Entering directory `" + os.getcwd() + "/" + out2 + "'")
 
     if not bld.variant:
-        if not os.access('svnversion.h', os.R_OK):
-            create_svnversion_task(bld)
         if bld.env['BUILD_WITH_32_64'] == True:
             waflib.Options.commands.append(bld.cmd + '_' + lib32)
 
@@ -721,6 +703,26 @@ def build(bld):
     if bld.variant:
         # only the wscript in common/ knows how to handle variants
         return
+
+    if not os.access('svnversion.h', os.R_OK):
+        def post_run(self):
+            sg = Utils.h_file(self.outputs[0].abspath(self.env))
+            #print sg.encode('hex')
+            Build.bld.node_sigs[self.env.variant()][self.outputs[0].id] = sg
+
+        script = bld.path.find_resource('svnversion_regenerate.sh')
+        script = script.abspath()
+
+        bld(
+                rule = '%s ${TGT}' % script,
+                name = 'svnversion',
+                runnable_status = Task.RUN_ME,
+                before = 'c cxx',
+                color = 'BLUE',
+                post_run = post_run,
+                source = ['svnversion_regenerate.sh'],
+                target = [bld.path.find_or_declare('svnversion.h')]
+        )
 
     if bld.env['IS_LINUX']:
         bld.add_subdirs('linux')
@@ -809,6 +811,7 @@ def build(bld):
                 shutil.rmtree(html_build_dir)
                 Logs.pprint('CYAN', "Removing doxygen generated documentation done.")
 
-def dist_hook():
-    os.remove('svnversion_regenerate.sh')
-    os.system('../svnversion_regenerate.sh svnversion.h')
+def dist(ctx):
+    # This code blindly assumes it is working in the toplevel source directory.
+    if not os.path.exists('svnversion.h'):
+        os.system('./svnversion_regenerate.sh svnversion.h')
