@@ -17,7 +17,10 @@ TEMP_FILE="${OUTPUT_FILE}.tmp"
 #echo "$TEMP_FILE"
 
 OLDPWD=`pwd`
-cd ..
+
+# The script should reside in the toplevel source directory which sould contain
+# all version control files.
+cd `dirname ${0}`
 
 if test $# -eq 2
 then
