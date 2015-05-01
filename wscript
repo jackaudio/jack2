@@ -710,8 +710,11 @@ def build(bld):
             #print sg.encode('hex')
             Build.bld.node_sigs[self.env.variant()][self.outputs[0].id] = sg
 
+        script = bld.path.find_resource('svnversion_regenerate.sh')
+        script = script.abspath()
+
         bld(
-                rule = '../svnversion_regenerate.sh ${TGT}',
+                rule = '%s ${TGT}' % script,
                 name = 'svnversion',
                 runnable_status = Task.RUN_ME,
                 before = 'c',
