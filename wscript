@@ -714,8 +714,6 @@ def build(bld):
     print("make[1]: Entering directory `" + os.getcwd() + "/" + out2 + "'")
 
     if not bld.variant:
-        if not os.access('svnversion.h', os.R_OK):
-            create_svnversion_task(bld)
         if bld.env['BUILD_WITH_32_64'] == True:
             waflib.Options.commands.append(bld.cmd + '_' + lib32)
 
@@ -725,6 +723,9 @@ def build(bld):
     if bld.variant:
         # only the wscript in common/ knows how to handle variants
         return
+
+    if not os.access('svnversion.h', os.R_OK):
+        create_svnversion_task(bld)
 
     if bld.env['IS_LINUX']:
         bld.add_subdirs('linux')
