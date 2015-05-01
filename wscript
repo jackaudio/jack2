@@ -717,7 +717,7 @@ def build(bld):
                 rule = '%s ${TGT}' % script,
                 name = 'svnversion',
                 runnable_status = Task.RUN_ME,
-                before = 'c',
+                before = 'c cxx',
                 color = 'BLUE',
                 post_run = post_run,
                 target = [bld.path.find_or_declare('svnversion.h')]
