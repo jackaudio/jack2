@@ -50,26 +50,6 @@ def display_feature(msg, build):
 def print_error(msg):
     print(Logs.colors.RED + msg + Logs.colors.NORMAL)
 
-def create_svnversion_task(bld, header='svnversion.h', define=None):
-    cmd = '../svnversion_regenerate.sh ${TGT}'
-    if define:
-        cmd += " " + define
-
-    def post_run(self):
-        sg = Utils.h_file(self.outputs[0].abspath(self.env))
-        #print sg.encode('hex')
-        Build.bld.node_sigs[self.env.variant()][self.outputs[0].id] = sg
-
-    bld(
-            rule = cmd,
-            name = 'svnversion',
-            runnable_status = Task.RUN_ME,
-            before = 'c',
-            color = 'BLUE',
-            post_run = post_run,
-            target = [bld.path.find_or_declare(header)]
-    )
-
 class AutoOption:
     """
     This class is the foundation for the auto options. It adds an option
@@ -725,7 +705,20 @@ def build(bld):
         return
 
     if not os.access('svnversion.h', os.R_OK):
-        create_svnversion_task(bld)
+        def post_run(self):
+            sg = Utils.h_file(self.outputs[0].abspath(self.env))
+            #print sg.encode('hex')
+            Build.bld.node_sigs[self.env.variant()][self.outputs[0].id] = sg
+
+        bld(
+                rule = '../svnversion_regenerate.sh ${TGT}',
+                name = 'svnversion',
+                runnable_status = Task.RUN_ME,
+                before = 'c',
+                color = 'BLUE',
+                post_run = post_run,
+                target = [bld.path.find_or_declare('svnversion.h')]
+        )
 
     if bld.env['IS_LINUX']:
         bld.add_subdirs('linux')
