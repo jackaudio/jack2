@@ -386,7 +386,7 @@ def check_for_mmsystem_error(conf):
 def options(opt):
     # options provided by the modules
     opt.load('compiler_cxx')
-    opt.load('compiler_cc')
+    opt.load('compiler_c')
 
     # install directories
     opt.add_option('--htmldir', type='string', default=None, help="HTML documentation directory [Default: <prefix>/share/jack-audio-connection-kit/reference/html/")
@@ -446,7 +446,7 @@ def options(opt):
 
 def configure(conf):
     conf.load('compiler_cxx')
-    conf.load('compiler_cc')
+    conf.load('compiler_c')
     if Options.options.dist_target == 'auto':
         platform = sys.platform
         conf.env['IS_MACOSX'] = platform == 'darwin'
