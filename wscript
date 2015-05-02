@@ -13,7 +13,6 @@ import re
 import Logs
 import sys
 
-import waflib.Options
 from waflib.Build import BuildContext, CleanContext, InstallContext, UninstallContext
 
 VERSION='1.9.11'
@@ -695,7 +694,7 @@ def build(bld):
 
     if not bld.variant:
         if bld.env['BUILD_WITH_32_64'] == True:
-            waflib.Options.commands.append(bld.cmd + '_' + lib32)
+            Options.commands.append(bld.cmd + '_' + lib32)
 
     # process subfolders from here
     bld.add_subdirs('common')
