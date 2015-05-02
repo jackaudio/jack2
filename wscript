@@ -385,8 +385,8 @@ def check_for_mmsystem_error(conf):
 
 def options(opt):
     # options provided by the modules
-    opt.tool_options('compiler_cxx')
-    opt.tool_options('compiler_cc')
+    opt.load('compiler_cxx')
+    opt.load('compiler_cc')
 
     # install directories
     opt.add_option('--htmldir', type='string', default=None, help="HTML documentation directory [Default: <prefix>/share/jack-audio-connection-kit/reference/html/")
