@@ -675,7 +675,7 @@ def build(bld):
             Options.commands.append(bld.cmd + '_' + lib32)
 
     # process subfolders from here
-    bld.add_subdirs('common')
+    bld.recurse('common')
 
     if bld.variant:
         # only the wscript in common/ knows how to handle variants
@@ -702,31 +702,31 @@ def build(bld):
         )
 
     if bld.env['IS_LINUX']:
-        bld.add_subdirs('linux')
-        bld.add_subdirs('example-clients')
-        bld.add_subdirs('tests')
-        bld.add_subdirs('man')
+        bld.recurse('linux')
+        bld.recurse('example-clients')
+        bld.recurse('tests')
+        bld.recurse('man')
         if bld.env['BUILD_JACKDBUS'] == True:
-           bld.add_subdirs('dbus')
+           bld.recurse('dbus')
 
     if bld.env['IS_MACOSX']:
-        bld.add_subdirs('macosx')
-        bld.add_subdirs('example-clients')
-        bld.add_subdirs('tests')
+        bld.recurse('macosx')
+        bld.recurse('example-clients')
+        bld.recurse('tests')
         if bld.env['BUILD_JACKDBUS'] == True:
-            bld.add_subdirs('dbus')
+            bld.recurse('dbus')
 
     if bld.env['IS_SUN']:
-        bld.add_subdirs('solaris')
-        bld.add_subdirs('example-clients')
-        bld.add_subdirs('tests')
+        bld.recurse('solaris')
+        bld.recurse('example-clients')
+        bld.recurse('tests')
         if bld.env['BUILD_JACKDBUS'] == True:
-            bld.add_subdirs('dbus')
+            bld.recurse('dbus')
 
     if bld.env['IS_WINDOWS']:
-        bld.add_subdirs('windows')
-        bld.add_subdirs('example-clients')
-        #bld.add_subdirs('tests')
+        bld.recurse('windows')
+        bld.recurse('example-clients')
+        #bld.recurse('tests')
 
     if bld.env['BUILD_DOXYGEN_DOCS'] == True:
         html_build_dir = bld.path.find_or_declare('html').abspath()
