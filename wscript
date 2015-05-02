@@ -608,7 +608,7 @@ def configure(conf):
         if m != None:
             svnrev = m.group(1)
         f.close()
-    except FileNotFoundError:
+    except IOError:
         pass
 
     if Options.options.mixed == True:
