@@ -439,7 +439,7 @@ def options(opt):
     readline.set_check_hook(check_for_readline, check_for_readline_error)
 
     # dbus options
-    opt.sub_options('dbus')
+    opt.recurse('dbus')
 
     # this must be called before the configure phase
     auto_options_argv_hack()
