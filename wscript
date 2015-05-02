@@ -470,26 +470,7 @@ def configure(conf):
     if conf.env['IS_WINDOWS']:
         Logs.pprint('CYAN', "Windows detected")
 
-    if conf.env['IS_LINUX']:
-        conf.check_tool('compiler_cxx')
-        conf.check_tool('compiler_cc')
-
-    if conf.env['IS_MACOSX']:
-        conf.check_tool('compiler_cxx')
-        conf.check_tool('compiler_cc')
-
-    # waf 1.5 : check_tool('compiler_cxx') and check_tool('compiler_cc') do not work correctly, so explicit use of gcc and g++
-    if conf.env['IS_SUN']:
-        conf.check_tool('g++')
-        conf.check_tool('gcc')
-
-    #if conf.env['IS_SUN']:
-    #   conf.check_tool('compiler_cxx')
-    #   conf.check_tool('compiler_cc')
-
     if conf.env['IS_WINDOWS']:
-        conf.check_tool('compiler_cxx')
-        conf.check_tool('compiler_cc')
         conf.env.append_unique('CCDEFINES', '_POSIX')
         conf.env.append_unique('CXXDEFINES', '_POSIX')
 
