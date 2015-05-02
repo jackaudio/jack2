@@ -154,8 +154,8 @@ class AutoOption:
         """
         Add a required program that should be checked during configuration. If
         var is not given it defaults to PROGRAM (the uppercase of the program
-        argument). If the option is enabled the program is saved in
-        conf.env.PROGRAM.
+        argument). If the option is enabled the program is saved as a list (?!)
+        in conf.env['PROGRAM'].
         """
         if not var:
             var = program.upper().replace('-', '_')
@@ -749,7 +749,7 @@ def build(bld):
         def doxygen(task):
             doxyfile = task.inputs[0].abspath()
             logfile = task.outputs[0].abspath()
-            cmd = '%s %s &> %s' % (task.env.DOXYGEN, doxyfile, logfile)
+            cmd = '%s %s &> %s' % (task.env['DOXYGEN'][0], doxyfile, logfile)
             return task.exec_command(cmd)
 
         bld(
