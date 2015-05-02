@@ -499,15 +499,15 @@ def configure(conf):
     # configure all auto options
     configure_auto_options(conf)
 
-    conf.sub_config('common')
+    conf.recurse('common')
     if conf.env['IS_LINUX']:
-        conf.sub_config('linux')
+        conf.recurse('linux')
     if Options.options.dbus:
-        conf.sub_config('dbus')
+        conf.recurse('dbus')
         if conf.env['BUILD_JACKDBUS'] != True:
             conf.fatal('jackdbus was explicitly requested but cannot be built')
 
-    conf.sub_config('example-clients')
+    conf.recurse('example-clients')
 
     conf.env['LIB_PTHREAD'] = ['pthread']
     conf.env['LIB_DL'] = ['dl']
