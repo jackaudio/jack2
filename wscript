@@ -3,16 +3,13 @@
 from __future__ import print_function
 
 import os
-import Utils
-import Options
 import subprocess
 g_maxlen = 40
 import shutil
-import Task
 import re
-import Logs
 import sys
 
+from waflib import Logs, Options, Task, Utils
 from waflib.Build import BuildContext, CleanContext, InstallContext, UninstallContext
 
 VERSION='1.9.11'
