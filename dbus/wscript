@@ -2,9 +2,9 @@
 # encoding: utf-8
 
 import os.path
-import Options
 import re # subst_func
-import Logs
+
+from waflib import Logs, Options
 
 def options(opt):
     opt.add_option('--enable-pkg-config-dbus-service-dir', action='store_true', default=False, help='force D-Bus service install dir to be one returned by pkg-config')
