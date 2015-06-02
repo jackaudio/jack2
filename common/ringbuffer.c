@@ -67,21 +67,16 @@ size_t jack_ringbuffer_write_space(const jack_ringbuffer_t *rb);
 LIB_EXPORT jack_ringbuffer_t *
 jack_ringbuffer_create (size_t sz)
 {
-	int power_of_two;
 	jack_ringbuffer_t *rb;
 
 	if ((rb = (jack_ringbuffer_t *) malloc (sizeof (jack_ringbuffer_t))) == NULL) {
 		return NULL;
 	}
 
-	for (power_of_two = 1; 1 << power_of_two < sz; power_of_two++);
+	rb->buf = NULL;
+	jack_ringbuffer_reset_size( rb, sz );
 
-	rb->size = 1 << power_of_two;
-	rb->size_mask = rb->size;
-	rb->size_mask -= 1;
-	rb->write_ptr = 0;
-	rb->read_ptr = 0;
-	if ((rb->buf = (char *) malloc (rb->size)) == NULL) {
+	if (rb->buf  == NULL) {
 		free (rb);
 		return NULL;
 	}
@@ -129,17 +124,38 @@ jack_ringbuffer_reset (jack_ringbuffer_t * rb)
     memset(rb->buf, 0, rb->size);
 }
 
-/* Reset the read and write pointers to zero. This is not thread
-   safe. */
+/* Reset the size of the ringbuffer.
+
+   Reallocates the internal buffer using the next power-of-two size up from
+   the requested size.
+
+   If the reallocation fails, the previous buffer is left intact.
+   */
 
 LIB_EXPORT void
 jack_ringbuffer_reset_size (jack_ringbuffer_t * rb, size_t sz)
 {
-    rb->size = sz;
-    rb->size_mask = rb->size;
-    rb->size_mask -= 1;
-    rb->read_ptr = 0;
-    rb->write_ptr = 0;
+	/* Attempt to reallocate buffer to size sz */
+	int power_of_two;
+	for (power_of_two = 1; 1 << power_of_two < sz; power_of_two++);
+	size_t newsz = 1 << power_of_two;
+
+	void* newbuf = realloc (rb->buf, newsz);
+	if (NULL != newbuf)
+		{
+		rb->buf = newbuf;
+		rb->size = newsz;
+		rb->size_mask = rb->size;
+		rb->size_mask -= 1;
+		rb->read_ptr = 0;
+		rb->write_ptr = 0;
+		}
+	else
+		{
+		/* Reallocation failed. Ringbuffer is left in initial state
+		 * so application must check ringbuffer size to see if
+		 * the resize succeeded. */
+		}
 }
 
 /* Return the number of bytes available for reading.  This is the
