@@ -76,7 +76,7 @@ void parse_arguments(int argc, char *argv[])
 		exit(2);
 	}
 
-    if (nframes < 1 || nframes > 8182) {
+    if (nframes < 1 || nframes > 8192) {
 		fprintf(stderr, "%s: invalid buffer size: %s (range is 1-8192)\n",
 			package, argv[1]);
 		exit(3);
