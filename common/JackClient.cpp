@@ -856,7 +856,7 @@ int JackClient::SetTimebaseCallback(int conditional, JackTimebaseCallback timeba
     } else {
         fTimebase = NULL;
         fTimebaseArg = NULL;
-        return -1;
+        return result;
     }
 }
 
