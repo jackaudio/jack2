@@ -134,7 +134,7 @@ int jack_midi_event_write(void* port_buffer,
                           jack_nframes_t time, const jack_midi_data_t* data, size_t data_size)
 {
     JackMidiBuffer *buf = (JackMidiBuffer*)port_buffer;
-    if (!buf && !buf->IsValid()) {
+    if (!buf || !buf->IsValid()) {
         return -EINVAL;
     }
     if (time >= buf->nframes || (buf->event_count && buf->events[buf->event_count - 1].time > time)) {
