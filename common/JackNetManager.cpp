@@ -400,28 +400,28 @@ namespace Jack
         for (int i = 0; i < obj->fParams.fSendAudioChannels; i++) {
             //port latency
             range.min = range.max = float(obj->fParams.fNetworkLatency * port_latency) / 2.f;
-            jack_port_set_latency_range(obj->fAudioCapturePorts[i], JackCaptureLatency, &range);
+            jack_port_set_latency_range(obj->fAudioCapturePorts[i], JackPlaybackLatency, &range);
         }
         
         //audio
         for (int i = 0; i < obj->fParams.fReturnAudioChannels; i++) {
             //port latency
             range.min = range.max = float(obj->fParams.fNetworkLatency * port_latency) / 2.f + ((obj->fParams.fSlaveSyncMode) ? 0 : port_latency);
-            jack_port_set_latency_range(obj->fAudioPlaybackPorts[i], JackPlaybackLatency, &range);
+            jack_port_set_latency_range(obj->fAudioPlaybackPorts[i], JackCaptureLatency, &range);
         }
         
         //midi
         for (int i = 0; i < obj->fParams.fSendMidiChannels; i++) {
             //port latency
             range.min = range.max = float(obj->fParams.fNetworkLatency * port_latency) / 2.f;
-            jack_port_set_latency_range(obj->fMidiCapturePorts[i], JackCaptureLatency, &range);
+            jack_port_set_latency_range(obj->fMidiCapturePorts[i], JackPlaybackLatency, &range);
         }
     
         //midi
         for (int i = 0; i < obj->fParams.fReturnMidiChannels; i++) {
             //port latency
             range.min = range.max = obj->fParams.fNetworkLatency * port_latency + ((obj->fParams.fSlaveSyncMode) ? 0 : port_latency);
-            jack_port_set_latency_range(obj->fMidiPlaybackPorts[i], JackPlaybackLatency, &range);
+            jack_port_set_latency_range(obj->fMidiPlaybackPorts[i], JackCaptureLatency, &range);
         }
     }
 
