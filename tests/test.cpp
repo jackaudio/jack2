@@ -186,11 +186,10 @@ void Jack_Client_Registration_Callback(const char* name, int val, void *arg)
 		client_register--;
 }
 
-int Jack_Port_Rename_Callback(jack_port_id_t port, const char* old_name, const char* new_name, void *arg)
+void Jack_Port_Rename_Callback(jack_port_id_t port, const char* old_name, const char* new_name, void *arg)
 {
      Log("Rename callback has been successfully called with old_name '%s' and new_name '%s'. (msg from callback)\n", old_name, new_name);
      port_rename_clbk = 1;
-     return 0;
 }
 
 int Jack_Update_Buffer_Size(jack_nframes_t nframes, void *arg)

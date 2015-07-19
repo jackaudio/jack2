@@ -403,10 +403,8 @@ typedef void (*JackPortConnectCallback)(jack_port_id_t a, jack_port_id_t b, int 
  * @param port the port that has been renamed
  * @param new_name the new name
  * @param arg pointer to a client supplied structure
- *
- * @return zero on success, non-zero on error
  */
-typedef int (*JackPortRenameCallback)(jack_port_id_t port, const char* old_name, const char* new_name, void *arg);
+typedef void (*JackPortRenameCallback)(jack_port_id_t port, const char* old_name, const char* new_name, void *arg);
 
 /**
  * Prototype for the client supplied function that is called

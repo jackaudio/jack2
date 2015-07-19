@@ -887,13 +887,28 @@ int jack_port_tie (jack_port_t *src, jack_port_t *dst) JACK_OPTIONAL_WEAK_DEPREC
 int jack_port_untie (jack_port_t *port) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
 
 /**
+ * \bold THIS FUNCTION IS DEPRECATED AND SHOULD NOT BE USED IN
+ *  NEW JACK CLIENTS
+ *
  * Modify a port's short name.  May be called at any time.  If the
  * resulting full name (including the @a "client_name:" prefix) is
  * longer than jack_port_name_size(), it will be truncated.
  *
  * @return 0 on success, otherwise a non-zero error code.
  */
-int jack_port_set_name (jack_port_t *port, const char *port_name) JACK_OPTIONAL_WEAK_EXPORT;
+int jack_port_set_name (jack_port_t *port, const char *port_name) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
+
+/**
+ * Modify a port's short name.  May NOT be called from a callback handling a server event.
+ * If the resulting full name (including the @a "client_name:" prefix) is
+ * longer than jack_port_name_size(), it will be truncated.
+ *
+ * @return 0 on success, otherwise a non-zero error code.
+ *
+ * This differs from jack_port_set_name() by triggering PortRename notifications to
+ * clients that have registered a port rename handler.
+ */
+int jack_port_rename (jack_client_t* client, jack_port_t *port, const char *port_name) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Set @a alias as an alias for @a port.  May be called at any time.

@@ -36,10 +36,15 @@ Matt Flax
 Lars-Peter Clausen
 Alexandru Tofan
 Kim Jeong Yeon
+Filipe Coelho
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
+
+2015-07-19 Filipe Coelho <falktx@gmail.com>
+
+	* Implement new jack_port_rename API
 
 2014-07-20 Stephane Letz  <letz@grame.fr>
 

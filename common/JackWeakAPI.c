@@ -207,6 +207,7 @@ DECL_VOID_FUNCTION(jack_port_set_latency_range, (jack_port_t *port, jack_latency
 DECL_FUNCTION(int, jack_recompute_total_latencies, (jack_client_t* client),(client));
 
 DECL_FUNCTION(int, jack_port_set_name, (jack_port_t *port, const char *port_name), (port, port_name));
+DECL_FUNCTION(int, jack_port_rename, (jack_client_t *client, jack_port_t *port, const char *port_name), (client, port, port_name));
 DECL_FUNCTION(int, jack_port_set_alias, (jack_port_t *port, const char *alias), (port, alias));
 DECL_FUNCTION(int, jack_port_unset_alias, (jack_port_t *port, const char *alias), (port, alias));
 DECL_FUNCTION(int, jack_port_get_aliases, (const jack_port_t *port, char* const aliases[2]), (port,aliases));

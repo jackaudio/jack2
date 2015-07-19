@@ -159,6 +159,7 @@ extern "C"
     LIB_EXPORT int jack_recompute_total_latencies(jack_client_t*);
 
     LIB_EXPORT int jack_port_set_name(jack_port_t *port, const char* port_name);
+    LIB_EXPORT int jack_port_rename(jack_client_t *client, jack_port_t *port, const char* port_name);
     LIB_EXPORT int jack_port_set_alias(jack_port_t *port, const char* alias);
     LIB_EXPORT int jack_port_unset_alias(jack_port_t *port, const char* alias);
     LIB_EXPORT int jack_port_get_aliases(const jack_port_t *port, char* const aliases[2]);
@@ -635,24 +636,37 @@ LIB_EXPORT int jack_recompute_total_latencies(jack_client_t* ext_client)
 LIB_EXPORT int jack_port_set_name(jack_port_t* port, const char* name)
 {
     JackGlobals::CheckContext("jack_port_set_name");
+    jack_error("jack_port_set_name: deprecated");
 
+    // Find a valid client
+    jack_client_t* client = NULL;
+    for (int i = 0; i < CLIENT_NUM; i++) {
+        if ((client = (jack_client_t*)JackGlobals::fClientTable[i])) {
+            break;
+        }
+    }
+
+    return (client) ? jack_port_rename(client, port, name) : -1;
+}
+
+LIB_EXPORT int jack_port_rename(jack_client_t* ext_client, jack_port_t* port, const char* name)
+{
+    JackGlobals::CheckContext("jack_port_rename");
+
+    JackClient* client = (JackClient*)ext_client;
     uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
-    if (!CheckPort(myport)) {
-        jack_error("jack_port_set_name called with an incorrect port %ld", myport);
+    if (client == NULL) {
+        jack_error("jack_port_rename called with a NULL client");
+        return -1;
+    } else if (!CheckPort(myport)) {
+        jack_error("jack_port_rename called with an incorrect port %ld", myport);
         return -1;
     } else if (name == NULL) {
-        jack_error("jack_port_set_name called with a NULL port name");
+        jack_error("jack_port_rename called with a NULL port name");
         return -1;
     } else {
-        JackClient* client = NULL;
-        for (int i = 0; i < CLIENT_NUM; i++) {
-            // Find a valid client
-            if ((client = JackGlobals::fClientTable[i])) {
-                break;
-            }
-        }
-        return (client) ? client->PortRename(myport, name) : -1;
+        client->PortRename(myport, name);
     }
 }
 
