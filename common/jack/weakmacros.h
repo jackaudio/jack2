@@ -47,7 +47,7 @@
    require linker arguments in the client as well.
 */
 
-#ifdef WIN32
+#ifdef _WIN32
     /*
         Not working with __declspec(dllexport) so normal linking
         Linking with JackWeakAPI.cpp will be the preferred way.
@@ -60,7 +60,7 @@
 #else
 /* Add other things here for non-gcc platforms */
 
-#ifdef WIN32
+#ifdef _WIN32
 #define JACK_WEAK_EXPORT
 #endif
 
@@ -81,7 +81,7 @@
 #else
 /* Add other things here for non-gcc platforms */
 
-#ifdef WIN32
+#ifdef _WIN32
 #define JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT
 #endif
 
