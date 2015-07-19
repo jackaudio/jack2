@@ -58,7 +58,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #endif
 
-#if defined(WIN32) && !defined(__CYGWIN__) && !defined(GNU_WIN32)
+#if defined(_WIN32) && !defined(__CYGWIN__) && !defined(GNU_WIN32)
 
     #include <windows.h>
 
@@ -101,7 +101,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
         typedef pthread_t jack_native_thread_t;
     #endif
 
-#endif /* WIN32 && !__CYGWIN__ && !GNU_WIN32 */
+#endif /* _WIN32 && !__CYGWIN__ && !GNU_WIN32 */
 
 #if defined(__APPLE__) || defined(__linux__) || defined(__sun__) || defined(sun) || defined(__unix__) || defined(__CYGWIN__) || defined(GNU_WIN32)
 
