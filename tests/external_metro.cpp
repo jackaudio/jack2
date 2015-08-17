@@ -17,7 +17,7 @@
 */
 
 #include "external_metro.h"
-#include <stdio.h>
+#include <cstdio>
 
 typedef jack_default_audio_sample_t sample_t;
 

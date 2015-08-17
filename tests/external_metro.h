@@ -21,18 +21,13 @@
 #ifndef __external_metro__
 #define __external_metro__
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cerrno>
 #include <unistd.h>
-#include <math.h>
+#include <cmath>
 #include <getopt.h>
-#include <string.h>
+#include <cstring>
 #include <jack/jack.h>
 #include <jack/transport.h>
 
@@ -62,9 +57,5 @@ extern "C"
         static int process_audio (jack_nframes_t nframes, void* arg);
         static void shutdown (void* arg);
     };
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif
