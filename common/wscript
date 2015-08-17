@@ -414,6 +414,11 @@ def build(bld):
          process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
          process.use = ['ALSA', 'SAMPLERATE']
 
+    if bld.env['BUILD_ADAPTER'] and bld.env['IS_QNX']:
+         audio_adapter_sources += ['../qnx/ioaudio/JackIoAudioAdapter.cpp']
+         process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
+         process.use = ['IOAUDIO', 'SAMPLERATE']
+
     if bld.env['BUILD_ADAPTER'] and bld.env['IS_SUN']:
          audio_adapter_sources += ['../solaris/oss/JackOSSAdapter.cpp', 'memops.c']
          process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
