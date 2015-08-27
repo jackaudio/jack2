@@ -1,0 +1,38 @@
+def configure(conf):
+    conf.check_cc(lib='asound', header_name='audio_driver.h', uselib_store='IOAUDIO', define_name="HAVE_IOAUDIO", mandatory=False)
+    if conf.is_defined('HAVE_IOAUDIO'):
+        conf.env['BUILD_DRIVER_IOAUDIO'] = True
+
+def create_jack_driver_obj(bld, target, sources, uselib=None):
+    driver = bld(features=['c', 'cxx', 'cxxshlib', 'cshlib'])
+    driver.env['cxxshlib_PATTERN'] = 'jack_%s.so'
+
+    driver.defines = ['HAVE_CONFIG_H', 'SERVER_SIDE', 'HAVE_PPOLL', 'HAVE_TIMERFD']
+
+    driver.includes = ['.', '../qnx', '../posix', '../common', '../common/jack', '../dbus', '../']
+    driver.target = target
+    driver.source = sources
+    driver.install_path = '${ADDON_DIR}/'
+    driver.use = []
+    driver.cflags = []
+    if uselib:
+        driver.use += uselib
+    return driver
+
+def build(bld):
+    if bld.env['BUILD_JACKD'] == True:
+        jackd = bld(features=['cxx', 'cxxprogram'])
+        jackd.includes = ['../qnx', '../posix', '../common/jack', '../common', '../dbus', '../']
+        jackd.defines = ['HAVE_CONFIG_H', 'SERVER_SIDE']
+        jackd.source = ['../common/Jackdmp.cpp']
+        jackd.use = ['serverlib']
+        if bld.env['IS_QNX'] and bld.env['BUILD_JACKDBUS']:
+            jackd.source += ['../dbus/reserve.c', '../dbus/audio_reserve.c']
+            jackd.use += ['PTHREAD', 'DL', 'RT', 'M', 'STDC++', 'DBUS-1']
+        else:
+            jackd.use += ['PTHREAD', 'DL', 'RT', 'M', 'STDC++']
+        jackd.target = 'jackd'
+
+    create_jack_driver_obj(bld, 'dummy', '../common/JackDummyDriver.cpp')
+
+    create_jack_driver_obj(bld, 'loopback', '../common/JackLoopbackDriver.cpp')

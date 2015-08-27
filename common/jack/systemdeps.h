@@ -103,7 +103,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #endif /* _WIN32 && !__CYGWIN__ && !GNU_WIN32 */
 
-#if defined(__APPLE__) || defined(__linux__) || defined(__sun__) || defined(sun) || defined(__unix__) || defined(__CYGWIN__) || defined(GNU_WIN32)
+#if defined(__APPLE__) || defined(__linux__) || defined(__QNX__) || defined(__sun__) || defined(sun) || defined(__unix__) || defined(__CYGWIN__) || defined(GNU_WIN32)
 
     #if defined(__CYGWIN__) || defined(GNU_WIN32)
         #include <stdint.h>

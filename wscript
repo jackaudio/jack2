@@ -395,7 +395,7 @@ def options(opt):
     opt.add_option('--mandir', type='string', help="Manpage directory [Default: <prefix>/share/man/man1]")
 
     # options affecting binaries
-    opt.add_option('--dist-target', type='string', default='auto', help='Specify the target for cross-compiling [auto,mingw]')
+    opt.add_option('--dist-target', type='string', default='auto', help='Specify the target for cross-compiling [auto,mingw,qnx]')
     opt.add_option('--mixed', action='store_true', default=False, help='Build with 32/64 bits mixed mode')
     opt.add_option('--debug', action='store_true', default=False, dest='debug', help='Build debuggable binaries')
 
@@ -457,12 +457,17 @@ def configure(conf):
             conf.env['IS_LINUX'] = True
     elif Options.options.dist_target == 'mingw':
         conf.env['IS_WINDOWS'] = True
+    elif Options.options.dist_target == 'qnx':
+        conf.env['IS_QNX'] = True
 
     if conf.env['IS_LINUX']:
         Logs.pprint('CYAN', "Linux detected")
 
     if conf.env['IS_MACOSX']:
         Logs.pprint('CYAN', "MacOS X detected")
+
+    if conf.env['IS_QNX']:
+        Logs.pprint('CYAN', "Cross compile to QNX")
 
     if conf.env['IS_SUN']:
         Logs.pprint('CYAN', "SunOS detected")
@@ -483,6 +488,8 @@ def configure(conf):
     conf.recurse('common')
     if conf.env['IS_LINUX']:
         conf.recurse('linux')
+    if conf.env['IS_QNX']:
+        conf.recurse('qnx')
     if Options.options.dbus:
         conf.recurse('dbus')
         if conf.env['BUILD_JACKDBUS'] != True:
@@ -495,6 +502,14 @@ def configure(conf):
     conf.env['LIB_RT'] = ['rt']
     conf.env['LIB_M'] = ['m']
     conf.env['LIB_STDC++'] = ['stdc++']
+
+    if conf.env['IS_QNX']:
+        conf.env['LIB_PTHREAD'] = ['c']
+        conf.env['LIB_DL'] = ['c']
+        conf.env['LIB_RT'] = []
+        conf.check_cxx( lib=['rt'], uselib_store='RT', mandatory=False )
+        conf.check_cxx( lib=['socket'], uselib_store='SOCKET' )
+
     conf.env['JACK_API_VERSION'] = JACK_API_VERSION
     conf.env['JACK_VERSION'] = VERSION
 
@@ -715,6 +730,14 @@ def build(bld):
         bld.recurse('tests')
         if bld.env['BUILD_JACKDBUS'] == True:
             bld.recurse('dbus')
+
+    if bld.env['IS_QNX']:
+        bld.recurse('qnx')
+        bld.recurse('example-clients')
+        bld.recurse('tests')
+        bld.recurse('man')
+        if bld.env['BUILD_JACKDBUS'] == True:
+           bld.recurse('dbus')
 
     if bld.env['IS_SUN']:
         bld.recurse('solaris')
