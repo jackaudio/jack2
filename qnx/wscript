@@ -36,3 +36,8 @@ def build(bld):
     create_jack_driver_obj(bld, 'dummy', '../common/JackDummyDriver.cpp')
 
     create_jack_driver_obj(bld, 'loopback', '../common/JackLoopbackDriver.cpp')
+
+    if bld.env['BUILD_DRIVER_IOAUDIO']:
+        deva = create_jack_driver_obj(bld, 'jack', 'ioaudio/ioaudio_driver.c', ['IOAUDIO', 'clientlib', 'PTHREAD'])
+        deva.env['cxxshlib_PATTERN'] = 'deva-ctrl-%s.so'
+        deva.install_path = '/lib/dll'

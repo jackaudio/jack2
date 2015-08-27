@@ -438,6 +438,8 @@ def options(opt):
     readline.add_library('readline')
     readline.set_check_hook(check_for_readline, check_for_readline_error)
 
+    ioaudio = add_auto_option(opt, 'ioaudio', help='Enable io-audio driver', conf_dest='BUILD_DRIVER_IOAUDIO')
+
     # dbus options
     opt.recurse('dbus')
 
