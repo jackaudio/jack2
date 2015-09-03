@@ -411,7 +411,7 @@ void jack_flush_adapter(jack_adapter_t* adapter);
 int jack_adapter_push_and_pull(jack_adapter_t* adapter, float** input, float** output, unsigned int frames);
 
 /**
- * Pull input to and push output from adapter ringbuffer.
+ * Pull input from and push output to adapter ringbuffer.
  *
  * @param adapter the adapter
  * @param input an array of audio input buffers

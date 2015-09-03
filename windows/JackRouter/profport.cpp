@@ -23,7 +23,7 @@ History :
 #include <ctype.h> 
 #include "profport.h"   /* function prototypes in here */
 
-#ifndef WIN32
+#ifndef _WIN32
 
 static int read_line (FILE *fp, char *bp, int size);
 static int read_section(FILE *fp, char *section);

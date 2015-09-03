@@ -110,6 +110,36 @@ namespace Jack
     #endif
             StrError(NET_ERROR_CODE);
         }
+        
+        int tos = 0;       /* see <netinet/in.h> */
+        
+        /*
+        DSCP Field Hex/Bin/Dec	Layer 2 Prio	Traffic Type	Acronym	WMM Access Category
+        0x38 / 111000 / 56	7	Network Control	NC	AC_VO
+        0x30 / 110000 / 48	6	Voice	VO	AC_VO
+        0x28 / 101000 / 40	5	Video	VI	AC_VI
+        0x20 / 100000 / 32	4	Controlled Load	CL	AC_VI
+        0x18 / 011000 / 24	3	Excellent Effort	EE	AC_BE
+        0x10 / 010000 / 16	2	Spare	--	AC_BK
+        0x08 / 001000 / 8	1	Background	BK	AC_BK
+        0x00 / 000000 / 0	0	Best Effort	BE	AC_BE
+        */
+        
+        /*
+        socklen_t len = sizeof(tos);
+        
+        res = getsockopt(fSockfd, IPPROTO_IP, IP_TOS, &tos, &len);
+        printf("getsockopt IPPROTO_IP res = %d  tos = %d\n", res, tos);
+        
+        tos = 46 * 4;       // see <netinet/in.h> 
+        res = setsockopt(fSockfd, IPPROTO_IP, IP_TOS, &tos, sizeof(tos));
+        
+        printf("setsockopt IPPROTO_IP res = %d  tos = %d\n", res, tos );
+        
+        res = getsockopt(fSockfd, IPPROTO_IP, IP_TOS, &tos, &len);
+        printf("getsockopt IPPROTO_IP res = %d  tos = %d\n", res, tos);
+        */
+  
         return fSockfd;
     }
 

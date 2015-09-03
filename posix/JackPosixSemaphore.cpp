@@ -48,8 +48,9 @@ bool JackPosixSemaphore::Signal()
         return false;
     }
 
-    if (fFlush)
+    if (fFlush) {
         return true;
+    }
 
     if ((res = sem_post(fSemaphore)) != 0) {
         jack_error("JackPosixSemaphore::Signal name = %s err = %s", fName, strerror(errno));
@@ -66,8 +67,9 @@ bool JackPosixSemaphore::SignalAll()
         return false;
     }
 
-    if (fFlush)
+    if (fFlush) {
         return true;
+    }
 
     if ((res = sem_post(fSemaphore)) != 0) {
         jack_error("JackPosixSemaphore::SignalAll name = %s err = %s", fName, strerror(errno));
@@ -172,11 +174,13 @@ bool JackPosixSemaphore::ConnectInput(const char* name, const char* server_name)
     if ((fSemaphore = sem_open(fName, O_RDWR)) == (sem_t*)SEM_FAILED) {
         jack_error("Connect: can't connect named semaphore name = %s err = %s", fName, strerror(errno));
         return false;
-    } else {
+    } else if (fSemaphore) {
         int val = 0;
         sem_getvalue(fSemaphore, &val);
         jack_log("JackPosixSemaphore::Connect sem_getvalue %ld", val);
         return true;
+    } else {
+        jack_error("Connect: fSemaphore not initialized!");
     }
 }
 
