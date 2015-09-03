@@ -525,6 +525,15 @@ def configure(conf):
     else:
         conf.env['BUILD_JACKD'] = True
 
+    path = os.path
+    if sys.platform == 'win32' and (conf.env['IS_QNX'] or conf.env['IS_LINUX']):
+        # If we are cross-compiling from Windows to a system with POSIX style filenames,
+        # we need to construct file paths using posixpath instead of os.path.  Also, we
+        # need fix PREFIX, since Waf constructed it incorrectly
+        import posixpath
+        path = posixpath
+        conf.env['PREFIX'] = os.path.splitdrive(conf.env['PREFIX'])[1].replace('\\', '/')
+
     conf.env['BINDIR'] = conf.env['PREFIX'] + '/bin'
 
     if Options.options.htmldir:
@@ -581,9 +590,9 @@ def configure(conf):
         # don't define ADDON_DIR in config.h, use the default 'jack' defined in
         # windows/JackPlatformPlug_os.h
     else:
-        conf.env['ADDON_DIR'] = os.path.normpath(os.path.join(conf.env['LIBDIR'], 'jack'))
+        conf.env['ADDON_DIR'] = path.normpath(path.join(conf.env['LIBDIR'], 'jack'))
         conf.define('ADDON_DIR', conf.env['ADDON_DIR'])
-        conf.define('JACK_LOCATION', os.path.normpath(os.path.join(conf.env['PREFIX'], 'bin')))
+        conf.define('JACK_LOCATION', path.normpath(path.join(conf.env['PREFIX'], 'bin')))
 
     if not conf.env['IS_WINDOWS']:
         conf.define('USE_POSIX_SHM', 1)
