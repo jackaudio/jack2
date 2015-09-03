@@ -120,9 +120,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #endif /* __APPLE__ || __linux__ || __sun__ || sun */
 
-#if defined(__arm__)
+#if defined(__arm__) || defined(__ppc__) || defined(__powerpc__)
     #undef POST_PACKED_STRUCTURE
     #define POST_PACKED_STRUCTURE
-#endif /* __arm__ */
+#endif /* __arm__ || __ppc__ || __powerpc__ */
 
 #endif /* __jack_systemdeps_h__ */
