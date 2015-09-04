@@ -47,6 +47,8 @@ def build(bld):
         os_incdir = ['../linux', '../posix']
     if bld.env['IS_MACOSX']:
         os_incdir = ['../macosx', '../posix']
+    if bld.env['IS_QNX']:
+        os_incdir = ['../qnx', '../posix']
     if bld.env['IS_SUN']:
         os_incdir = ['../solaris', '../posix']
     if bld.env['IS_WINDOWS']:
@@ -75,11 +77,12 @@ def build(bld):
             prog.env.append_value("LINKFLAGS", "")
         if bld.env['IS_LINUX']:
             prog.use += ['RT', 'M']
+        if bld.env['IS_QNX']:
+            prog.use += ['M','SOCKET']
         if bld.env['IS_SUN']:
             prog.use += ['M']
 
         prog.target = example_program
-   
     if bld.env['BUILD_EXAMPLE_CLIENT_TRANSPORT']:
         prog = bld(features = 'c cprogram')
         prog.includes = os_incdir + ['../common/jack', '../common']
@@ -95,6 +98,8 @@ def build(bld):
             prog.use += ['READLINE']
         if bld.env['IS_WINDOWS']:
             prog.use += ['READLINE']
+        if bld.env['IS_QNX']:
+            prog.use += ['READLINE']
         prog.target = 'jack_transport'
 
     if bld.env['BUILD_EXAMPLE_CLIENT_REC']:
@@ -109,6 +114,8 @@ def build(bld):
             prog.use += ['SNDFILE']
         if bld.env['IS_LINUX']:
             prog.use += ['RT', 'SNDFILE']
+        if bld.env['IS_QNX']:
+            prog.use += ['SNDFILE']
         if bld.env['IS_SUN']:
             prog.use += ['RT', 'SNDFILE']
         if bld.env['IS_WINDOWS']:

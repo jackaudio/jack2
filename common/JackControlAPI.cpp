@@ -661,7 +661,12 @@ jackctl_setup_signals(
     sigfillset(&allsignals);
     action.sa_handler = signal_handler;
     action.sa_mask = allsignals;
+#ifdef __QNX__
+    // SA_RESTART is not supported in QNX 6.6.0
+    action.sa_flags = SA_RESETHAND;
+#else
     action.sa_flags = SA_RESTART|SA_RESETHAND;
+#endif
 
     for (i = 1; i < NSIG; i++)
     {

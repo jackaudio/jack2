@@ -41,6 +41,8 @@ def build(bld):
         sysdeps_dbus_include = ['../linux', '../posix']
     if bld.env['IS_MACOSX']:
         sysdeps_dbus_include = ['../macosx', '../posix']
+    if bld.env['IS_QNX']:
+        sysdeps_dbus_include = ['../qnx', '../posix']
 
     obj.includes = sysdeps_dbus_include + ['.', '../', '../common', '../common/jack']
     obj.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
@@ -66,6 +68,8 @@ def build(bld):
         obj.use += ['PTHREAD', 'DL', 'RT', 'DBUS-1', 'EXPAT', 'STDC++']
     if bld.env['IS_MACOSX']:
         obj.use += ['PTHREAD', 'DL', 'DBUS-1', 'EXPAT']
+    if bld.env['IS_QNX']:
+        obj.use += ['PTHREAD', 'DL', 'DBUS-1', 'EXPAT', 'STDC++']
     obj.target = 'jackdbus'
 
     # process org.jackaudio.service.in -> org.jackaudio.service

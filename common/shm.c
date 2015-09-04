@@ -49,7 +49,9 @@
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifndef USE_POSIX_SHM
 #include <sys/shm.h>
+#endif
 #include <sys/sem.h>
 #include <stdlib.h>
 
@@ -175,6 +177,49 @@ semaphore_init () {return 0;}
 
 static  int
 semaphore_add (int value) {return 0;}
+
+#elif defined(__QNX__)
+#include <semaphore.h>
+
+static sem_t sem;
+
+/* all semaphore errors are fatal -- issue message, but do not return */
+static void
+semaphore_error (char *msg)
+{
+    jack_error ("JACK semaphore error: %s (%s)",
+            msg, strerror (errno));
+}
+
+static int
+semaphore_init ()
+{
+    semid = sem_init(&sem, JACK_SEMAPHORE_KEY, 1);
+
+    if( semid == -1)
+        {
+        semaphore_error("semaphore_init()");
+        }
+
+
+    return 0;
+}
+
+static inline int
+semaphore_add (int value)
+{
+    while( value > 0 )
+        {
+        sem_post( &sem );
+        --value;
+        }
+    while( value < 0 )
+        {
+        sem_wait( &sem );
+        ++value;
+        }
+    return 0;
+}
 
 #else
 /* all semaphore errors are fatal -- issue message, but do not return */

@@ -26,6 +26,8 @@ def create_jack_process_obj(bld, target, sources, uselib = None):
         env_includes = ['../macosx', '../posix', '../macosx/coreaudio']
     if bld.env['IS_LINUX']:
         env_includes = ['../linux', '../posix', '../linux/alsa']
+    if bld.env['IS_QNX']:
+        env_includes = ['../qnx', '../posix', '../qnx/ioaudio']
     if bld.env['IS_SUN']:
         env_includes = ['../solaris', '../posix', '../solaris/oss']
     if bld.env['IS_WINDOWS']:
@@ -35,6 +37,8 @@ def create_jack_process_obj(bld, target, sources, uselib = None):
     process.target   = target
     process.source   = sources
     if bld.env['IS_LINUX']:
+        process.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+    if bld.env['IS_QNX']:
         process.env.append_value("CPPFLAGS", "-fvisibility=hidden")
     if bld.env['IS_MACOSX']:
         process.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
@@ -92,6 +96,22 @@ def build(bld):
         includes = ['../linux', '../posix'] + includes
         uselib.append('RT')
         uselib.append('DL')
+
+    if bld.env['IS_QNX']:
+        common_libsources += [
+            'JackDebugClient.cpp',
+            'timestamps.c',
+            '../posix/JackPosixThread.cpp',
+            '../posix/JackPosixSemaphore.cpp',
+            '../posix/JackPosixProcessSync.cpp',
+            '../posix/JackPosixMutex.cpp',
+            '../posix/JackSocket.cpp',
+            '../qnx/JackQnxTime.c',
+            ]
+        includes = ['../qnx', '../posix'] + includes
+        uselib.append('RT')
+        uselib.append('DL')
+        uselib.append('SOCKET')
 
     if bld.env['IS_SUN']:
         common_libsources += [
@@ -158,6 +178,12 @@ def build(bld):
             '../posix/JackPosixServerLaunch.cpp',
             ]
 
+    if bld.env['IS_QNX']:
+        clientlib.source += [
+            '../posix/JackSocketClientChannel.cpp',
+            '../posix/JackPosixServerLaunch.cpp',
+            ]
+
     if bld.env['IS_SUN']:
         clientlib.source += [
             '../posix/JackSocketClientChannel.cpp',
@@ -181,6 +207,9 @@ def build(bld):
     clientlib.vnum = bld.env['JACK_API_VERSION']
 
     if bld.env['IS_LINUX']:
+        clientlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+
+    if bld.env['IS_QNX']:
         clientlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
 
     if bld.env['IS_MACOSX']:
@@ -252,6 +281,14 @@ def build(bld):
             '../posix/JackNetUnixSocket.cpp',
             ]
 
+    if bld.env['IS_QNX']:
+        serverlib.source += [
+            '../posix/JackSocketServerChannel.cpp',
+            '../posix/JackSocketNotifyChannel.cpp',
+            '../posix/JackSocketServerNotifyChannel.cpp',
+            '../posix/JackNetUnixSocket.cpp',
+            ]
+
     if bld.env['IS_SUN']:
         serverlib.source += [
             '../posix/JackSocketServerChannel.cpp',
@@ -281,6 +318,9 @@ def build(bld):
     serverlib.vnum = bld.env['JACK_API_VERSION']
 
     if bld.env['IS_LINUX']:
+        serverlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+
+    if bld.env['IS_QNX']:
         serverlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
 
     if bld.env['IS_MACOSX']:
@@ -319,6 +359,10 @@ def build(bld):
 
         if bld.env['IS_LINUX']:
             netlib.source += ['../posix/JackNetUnixSocket.cpp','../posix/JackPosixThread.cpp', '../posix/JackPosixMutex.cpp', '../linux/JackLinuxTime.c']
+            netlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+
+        if bld.env['IS_QNX']:
+            netlib.source += ['../posix/JackNetUnixSocket.cpp','../posix/JackPosixThread.cpp','../posix/JackPosixMutex.cpp','../qnx/JackQnxTime.c']
             netlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
 
         if bld.env['IS_SUN']:
@@ -369,6 +413,11 @@ def build(bld):
          audio_adapter_sources += ['../linux/alsa/JackAlsaAdapter.cpp']
          process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
          process.use = ['ALSA', 'SAMPLERATE']
+
+    if bld.env['BUILD_ADAPTER'] and bld.env['IS_QNX']:
+         audio_adapter_sources += ['../qnx/ioaudio/JackIoAudioAdapter.cpp']
+         process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
+         process.use = ['IOAUDIO', 'SAMPLERATE']
 
     if bld.env['BUILD_ADAPTER'] and bld.env['IS_SUN']:
          audio_adapter_sources += ['../solaris/oss/JackOSSAdapter.cpp', 'memops.c']
