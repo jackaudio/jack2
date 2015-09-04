@@ -166,7 +166,7 @@ namespace Jack
             //get hardware input parameters
             fInputParams->mode = SND_PCM_MODE_BLOCK;
             fInputParams->channel = SND_PCM_CHANNEL_CAPTURE;
-            //fInputParams->sync = Not Supported
+            //fInputParams->sync = Not Supported by io-audio
 
             // Check supported formats, preferring in order: float, sint32, sint16, plugin converted
             if( inputInfo.formats & SND_PCM_FMT_FLOAT )
@@ -192,11 +192,11 @@ namespace Jack
             fInputParams->format.interleave = 1;
             fInputParams->format.rate = fParams.fFrequency;
             fInputParams->format.voices = fNumInputPorts;
-            //fInputParams->digital = Not Implemented
+            //fInputParams->digital = Not currently implemented in io-audio
             fInputParams->start_mode = SND_PCM_START_DATA;
             fInputParams->stop_mode = SND_PCM_STOP_STOP;
-            //fInputParams->time = 1;
-            //fInputParams->ust_time
+            //fInputParams->time = 1; // If set, the driver offers the time when the transfer began (gettimeofday() format)
+            //fInputParams->ust_time = 1; // If set, the driver offers the time when the transfer began (UST format)
             fInputParams->buf.block.frag_size =
                 snd_pcm_format_size( fInputParams->format.format,
                                      fParams.fBuffering * fNumInputPorts );
@@ -218,9 +218,6 @@ namespace Jack
                             fInputParams->why_failed );
                 return err;
                 }
-
-            //set nonblocking mode
-            //check_error(snd_pcm_nonblock_mode(fInputDevice, 1));
 
             //get params record with actual values
             fInputSetup->channel = SND_PCM_CHANNEL_CAPTURE;
@@ -289,7 +286,7 @@ namespace Jack
             check_error( snd_pcm_malloc_struct( &fOutputParams ) );
             fOutputParams->channel = SND_PCM_CHANNEL_PLAYBACK;
             fOutputParams->mode = SND_PCM_MODE_BLOCK;
-            //fOutputParams->sync = Not Supported
+            //fOutputParams->sync = Not Supported by io-audio
 
             // Check supported formats, preferring in order: float, sint32, sint16, plugin converted
             if( outputInfo.formats & SND_PCM_FMT_FLOAT )
@@ -315,11 +312,11 @@ namespace Jack
             fOutputParams->format.interleave = 1;
             fOutputParams->format.rate = fParams.fFrequency;
             fOutputParams->format.voices = fNumOutputPorts;
-            //fOutputParams->digital = Not Implemented
+            //fOutputParams->digital = Not currently implemented by io-audio
             fOutputParams->start_mode = SND_PCM_START_DATA;
             fOutputParams->stop_mode = SND_PCM_STOP_STOP;
-            fOutputParams->time = 1;
-            //fOutputParams->ust_time
+            //fOutputParams->time = 1; // If set, the driver offers the time when the transfer began (gettimeofday() format)
+            //fOutputParams->ust_time = 1; // If set, the driver offers the time when the transfer began (UST Format)
             fOutputParams->buf.block.frag_size =
                 snd_pcm_format_size( fOutputParams->format.format,
                                      fParams.fBuffering * fNumOutputPorts );
@@ -340,9 +337,6 @@ namespace Jack
                             fOutputParams->why_failed );
                 return err;
                 }
-
-//        //set nonblocking mode
-//        check_error(snd_pcm_nonblock_mode(fOutputDevice, 1));
 
             //get params record with actual values
             check_error( snd_pcm_channel_setup( fOutputDevice,
@@ -391,14 +385,6 @@ namespace Jack
         for( unsigned int i = 0; i < fNumOutputPorts; i++ )
             if( fJackOutputBuffers[i] )
                 free( fJackOutputBuffers[i] );
-
-//        for (unsigned int i = 0; i < fNumInputPorts; i++)
-//            if (fInputCardBuffer[i])
-//                free(fInputCardBuffer[i]);
-//
-//        for (unsigned int i = 0; i < fNumOutputPorts; i++)
-//            if (fOutputCardBuffer[i])
-//                free(fOutputCardBuffer[i]);
 
         if( fInputCardBuffer )
             free( fInputCardBuffer );
@@ -450,7 +436,7 @@ namespace Jack
                               count );
                     if( fInputFormat.format == SND_PCM_SFMT_S16 )
                         {
-                        short* buffer16b = (short*)fInputCardBuffer;
+                        int16_t* buffer16b = (int16_t*)fInputCardBuffer;
                         for( s = 0; s < fInputBufferFrames; s++ )
                             for( c = 0; c < fNumInputPorts; c++ )
                                 fJackInputBuffers[c][s] =
@@ -493,10 +479,10 @@ namespace Jack
                               count );
                     if( fInputFormat.format == SND_PCM_SFMT_S16 )
                         {
-                        short* buffer16b;
+                        int16_t* buffer16b;
                         for( c = 0; c < fNumInputPorts; c++ )
                             {
-                            buffer16b = (short*)fInputCardBuffer;
+                            buffer16b = (int16_t*)fInputCardBuffer;
                             for( s = 0; s < fInputBufferFrames; s++ )
                                 fJackInputBuffers[c][s] =
                                     jack_default_audio_sample_t( buffer16b[s] )
@@ -547,7 +533,7 @@ namespace Jack
                 case 1:
                     if( fOutputFormat.format == SND_PCM_SFMT_S16 )
                         {
-                        short* buffer16b = (short*)fOutputCardBuffer;
+                        int16_t* buffer16b = (int16_t*)fOutputCardBuffer;
                         for( f = 0; f < fOutputBufferFrames; f++ )
                             {
                             for( c = 0; c < fNumOutputPorts; c++ )
@@ -602,7 +588,7 @@ namespace Jack
                 case 0:
                     if( fOutputFormat.format == SND_PCM_SFMT_S16 )
                         {
-                        short* buffer16b = (short*)fOutputCardBuffer;
+                        int16_t* buffer16b = (int16_t*)fOutputCardBuffer;
                         for( c = 0; c < fNumOutputPorts; c++ )
                             {
                             for( f = 0; f < fOutputBufferFrames; f++ )
@@ -617,7 +603,7 @@ namespace Jack
                                 }
                             }
                         }
-                    else
+                    else    // SND_PCM_FORMAT_S32
                         {
                         int32_t* buffer32b = (int32_t*)fOutputCardBuffer;
                         for( c = 0; c < fNumOutputPorts; c++ )
@@ -700,7 +686,7 @@ namespace Jack
         snd_ctl_hw_info_t card_info;
         snd_ctl_t* ctl_handle;
 
-//display info
+        //display info
         jack_info( "Audio Interface Description :" );
         jack_info(
                    "Sampling Frequency : %d, Sample Format : %s, buffering : %d, nperiod : %d",
@@ -715,7 +701,7 @@ namespace Jack
                    fNumInputPorts,
                    fNumOutputPorts );
 
-//get audio card info and display
+        //get audio card info and display
         int card = snd_card_name( fParams.fInputCardName );
         check_error( snd_ctl_open( &ctl_handle,
                                    card ) );
@@ -723,7 +709,7 @@ namespace Jack
                                       &card_info ) );
         printCardInfo( &card_info );
 
-//display input/output streams info
+        //display input/output streams info
         if( fNumInputPorts > 0 )
             printHWParams( fInputParams );
         if( fNumOutputPorts > 0 )
@@ -832,9 +818,6 @@ namespace Jack
                                param->value.ui );
                     fAudioInterface.fParams.fPeriod = param->value.ui;
                     break;
-//            case 'd':
-//                fAudioInterface.fParams.fInputCardName = strdup(param->value.str);
-//                break;
                 case 'r':
                     jack_info( "fFrequency = %d",
                                param->value.ui );
@@ -860,28 +843,25 @@ namespace Jack
                     break;
                 }
             }
-
-//        fAudioInterface.setInputs(fCaptureChannels);
-//        fAudioInterface.setOutputs(fPlaybackChannels);
     }
 
     int JackIoAudioAdapter::Open()
     {
-//open audio interface
+        //open audio interface
         if( fAudioInterface.open() )
             return -1;
 
-//start adapter thread
+        //start adapter thread
         if( fThread.StartSync() < 0 )
             {
             jack_error( "Cannot start audioadapter thread" );
             return -1;
             }
 
-//display card info
+        //display card info
         fAudioInterface.longinfo();
 
-//turn the thread realtime
+        //turn the thread realtime
         fThread.AcquireRealTime( GetEngineControl()->fClientPriority );
         return 0;
     }
@@ -894,9 +874,9 @@ namespace Jack
         switch( fThread.GetStatus() )
             {
 
-// Kill the thread in Init phase
+            // Kill the thread in Init phase
             case JackThread::kStarting:
-                case JackThread::kIniting:
+            case JackThread::kIniting:
                 if( fThread.Kill() < 0 )
                     {
                     jack_error( "Cannot kill thread" );
@@ -904,7 +884,7 @@ namespace Jack
                     }
                 break;
 
-                // Stop when the thread cycle is finished
+            // Stop when the thread cycle is finished
             case JackThread::kRunning:
                 if( fThread.Stop() < 0 )
                     {
@@ -945,6 +925,7 @@ namespace Jack
                                         &channel_info );
             snd_pcm_close( device );
 
+            // Determine number of capture channels from card or parameter
             if( 0 == fAudioInterface.fParams.fCardInputVoices )
                 {
                 fCaptureChannels = channel_info.max_voices;
@@ -960,7 +941,7 @@ namespace Jack
 
             fAudioInterface.fNumInputPorts = fCaptureChannels;
 
-            //ringbuffers
+            // Create capture channel ringbuffers
             fCaptureRingBuffer = new JackResampler*[fCaptureChannels];
             for( int i = 0; i < fCaptureChannels; i++ )
                 {
@@ -996,6 +977,7 @@ namespace Jack
                                         &channel_info );
             snd_pcm_close( device );
 
+            // Determine number of playback channels from card or parameter
             if( 0 == fAudioInterface.fParams.fCardOutputVoices )
                 {
                 fPlaybackChannels = channel_info.max_voices;
@@ -1012,7 +994,7 @@ namespace Jack
 
             fAudioInterface.fNumOutputPorts = fPlaybackChannels;
 
-            //ringbuffers
+            // Create playback channel ringbuffers
             fPlaybackRingBuffer = new JackResampler*[fPlaybackChannels];
             for( int i = 0; i < fPlaybackChannels; i++ )
                 {
@@ -1047,7 +1029,7 @@ namespace Jack
 
     bool JackIoAudioAdapter::Init()
     {
-//fill the hardware buffers
+        //fill the hardware buffers
         for( unsigned int i = 0; i < fAudioInterface.fParams.fPeriod; i++ )
             fAudioInterface.write();
         return true;
@@ -1055,7 +1037,7 @@ namespace Jack
 
     bool JackIoAudioAdapter::Execute()
     {
-//read data from audio interface
+        //read data from audio interface
         if( fAudioInterface.read() < 0 )
             return false;
 
@@ -1063,7 +1045,7 @@ namespace Jack
                      fAudioInterface.fJackOutputBuffers,
                      fAdaptedBufferSize );
 
-//write data to audio interface
+        //write data to audio interface
         if( fAudioInterface.write() < 0 )
             return false;
 

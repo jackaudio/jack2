@@ -120,7 +120,7 @@ namespace Jack
         };
 
     /**
-     * An ALSA audio interface
+     * An io-audio client interface
      */
     class AudioInterface
         {
@@ -138,11 +138,6 @@ namespace Jack
         //samples info
         snd_pcm_format_t fInputFormat;
         snd_pcm_format_t fOutputFormat;
-//            uint32_t fSampleAccess;
-
-//channels
-//        const char* fCaptureName;
-//        const char* fPlaybackName;
 
         unsigned int fNumInputPorts;
         unsigned int fNumOutputPorts;
@@ -151,48 +146,15 @@ namespace Jack
         jack_nframes_t fInputBufferFrames;
         jack_nframes_t fOutputBufferFrames;
 
-//interleaved mode audiocard buffers
+        // audiocard buffers
         void* fInputCardBuffer;
         void* fOutputCardBuffer;
 
-//            //non-interleaved mode audiocard buffers
-//            void* fCardInputBuffers[NUM_BUFFERS];
-//            void* fCardOutputBuffers[NUM_BUFFERS];
-//
-//            //non-interleaved mod, floating point software buffers
-//            jack_default_audio_sample_t* fJackInputBuffers[NUM_BUFFERS];
-//            jack_default_audio_sample_t* fJackOutputBuffers[NUM_BUFFERS];
-
-        //non-interleaved mod, floating point software buffers
+        // floating point JACK buffers
         jack_default_audio_sample_t** fJackInputBuffers;
         jack_default_audio_sample_t** fJackOutputBuffers;
 
         //public methods ---------------------------------------------------------
-
-//        const char* cardName()
-//            {
-//            return fInputCardName;
-//            }
-//
-//        int frequency()
-//            {
-//            return fFrequency;
-//            }
-//
-//        int buffering()
-//            {
-//            return fBuffering;
-//            }
-
-//        jack_default_audio_sample_t** inputSoftChannels()
-//            {
-//            return fJackInputBuffers;
-//            }
-//
-//        jack_default_audio_sample_t** outputSoftChannels()
-//            {
-//            return fJackOutputBuffers;
-//            }
 
         AudioInterface(const AudioParam& ap = AudioParam());
 

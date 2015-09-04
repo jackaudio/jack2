@@ -23,7 +23,6 @@
 #define __jack_cycles_h__
 
 #include <sys/neutrino.h>
-//#include <intttypes.h>
 
 typedef uint64_t cycles_t;
 #define get_cycles() ClockCycles()

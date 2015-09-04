@@ -132,10 +132,6 @@ static int parse_commandline(
 
         if( opt >= 0 )
             {
-            ado_debug( DB_LVL_DRIVER,
-                       "deva-ctrl-jack: Parsed option %d (%s)",
-                       opt,
-                       opts[opt] );
             switch( opt )
                 {
                 case 0: /* server: JACK server name */
@@ -148,9 +144,6 @@ static int parse_commandline(
                         {
                         jack_card->server = ado_strdup( value );
                         }
-                    ado_debug( DB_LVL_DRIVER,
-                               "deva-ctrl-jack: argument 'server' parsed as %s",
-                               jack_card->server );
                     break;
                 case 1: /* name: JACK client name */
                     if( NULL == value )
@@ -162,10 +155,6 @@ static int parse_commandline(
                         {
                         jack_card->name = ado_strdup( value );
                         }
-                    ado_debug( DB_LVL_DRIVER,
-                               "deva-ctrl-jack: argument 'name' parsed as %s",
-                               jack_card->name );
-
                     break;
                 case 2: /* type: io-audio channel type */
                     if( NULL != value )
@@ -185,9 +174,6 @@ static int parse_commandline(
                                    "type option value not 'c' or 'p'; defaulting to 'p'" );
                         jack_card->channel_type = SND_PCM_CHANNEL_PLAYBACK;
                         }
-                    ado_debug( DB_LVL_DRIVER,
-                               "deva-ctrl-jack: argument 'type' parsed as %d",
-                               jack_card->channel_type );
                     break;
                 case 3: /* voices: number of voices in io-audio channel and JACK ports */
                     if( NULL != value )
@@ -222,10 +208,6 @@ static int parse_commandline(
                         ado_error( "voices option given without value; failing" );
                         return EINVAL;
                         }
-                    ado_debug( DB_LVL_DRIVER,
-                               "deva-ctrl-jack: argument 'voices' with value '%s' parsed as %d",
-                               value ? value : "NULL",
-                               jack_card->voices );
                     break;
                 default:
                     break;
@@ -238,10 +220,6 @@ static int parse_commandline(
                        value );
             }
         }
-
-    ado_debug( DB_LVL_DRIVER,
-               "deva-ctrl-jack: finished parsing arguments" );
-
     ado_free( argdup );
     return EOK;
 }
@@ -270,86 +248,6 @@ int32_t cb_aquire(
         *why_failed = SND_PCM_PARAMS_NO_CHANNEL;
         return ( EAGAIN );
         }
-    ado_debug( DB_LVL_DRIVER,
-               "config:" );
-    ado_debug( DB_LVL_DRIVER,
-               "  format:" );
-    ado_debug( DB_LVL_DRIVER,
-               "    interleave:  %d",
-               config->format.interleave );
-    ado_debug( DB_LVL_DRIVER,
-               "    format:      {id: %d, name: '%s'}",
-               config->format.format,
-               snd_pcm_get_format_name( config->format.format ) );
-    ado_debug( DB_LVL_DRIVER,
-               "    rate:        %d",
-               config->format.rate );
-    ado_debug( DB_LVL_DRIVER,
-               "    voices:      %d",
-               config->format.voices );
-    ado_debug( DB_LVL_DRIVER,
-               "  mode.block:" );
-    ado_debug( DB_LVL_DRIVER,
-               "    frag_size:   %d",
-               config->mode.block.frag_size );
-    ado_debug( DB_LVL_DRIVER,
-               "    frags_min:   %d",
-               config->mode.block.frags_min );
-    ado_debug( DB_LVL_DRIVER,
-               "    frags_max:   %d",
-               config->mode.block.frags_max );
-    ado_debug( DB_LVL_DRIVER,
-               "    frags_total: %d",
-               config->mode.block.frags_total );
-    ado_debug( DB_LVL_DRIVER,
-               "  dmabuf:" );
-    ado_debug( DB_LVL_DRIVER,
-               "    addr:        %x",
-               config->dmabuf.addr );
-    ado_debug( DB_LVL_DRIVER,
-               "    phys_addr:   %x",
-               config->dmabuf.phys_addr );
-    ado_debug( DB_LVL_DRIVER,
-               "    size:        %d",
-               config->dmabuf.size );
-    ado_debug( DB_LVL_DRIVER,
-               "    name:        '%s'",
-               config->dmabuf.name );
-    ado_debug( DB_LVL_DRIVER,
-               "  mixer_device:  %d",
-               config->mixer_device );
-    ado_debug( DB_LVL_DRIVER,
-               "  mixer_eid:" );
-    ado_debug( DB_LVL_DRIVER,
-               "    type:        %d",
-               config->mixer_eid.type );
-    ado_debug( DB_LVL_DRIVER,
-               "    name:        '%s'",
-               config->mixer_eid.name );
-    ado_debug( DB_LVL_DRIVER,
-               "    index:       %d",
-               config->mixer_eid.index );
-    ado_debug( DB_LVL_DRIVER,
-               "    weight:      %d",
-               config->mixer_eid.weight );
-    ado_debug( DB_LVL_DRIVER,
-               "  mixer_gid:" );
-    ado_debug( DB_LVL_DRIVER,
-               "    type:        %d",
-               config->mixer_gid.type );
-    ado_debug( DB_LVL_DRIVER,
-               "    name:        '%s'",
-               config->mixer_gid.name );
-    ado_debug( DB_LVL_DRIVER,
-               "    index:       %d",
-               config->mixer_gid.index );
-    ado_debug( DB_LVL_DRIVER,
-               "    weight:      %d",
-               config->mixer_gid.weight );
-
-    ado_debug( DB_LVL_DRIVER,
-               "deva-ctrl-jack: creating ringbuffer of %u bytes",
-               config->dmabuf.size );
 
     /*
      * Create shared memory region for ringbuffer
@@ -358,22 +256,6 @@ int32_t cb_aquire(
                                          config->dmabuf.name,
                                          ADO_SHM_DMA_SAFE,
                                          &config->dmabuf.phys_addr );
-    ado_debug( DB_LVL_DRIVER,
-               "deva-ctrl-jack: ado_shm_alloc() has finished. " );
-    ado_debug( DB_LVL_DRIVER,
-               "  dmabuf:" );
-    ado_debug( DB_LVL_DRIVER,
-               "    addr:        %x",
-               config->dmabuf.addr );
-    ado_debug( DB_LVL_DRIVER,
-               "    phys_addr:   %x",
-               config->dmabuf.phys_addr );
-    ado_debug( DB_LVL_DRIVER,
-               "    size:        %d",
-               config->dmabuf.size );
-    ado_debug( DB_LVL_DRIVER,
-               "    name:        '%s'",
-               config->dmabuf.name );
 
     /*
      * Set up JACK ringbuffer structure to use SHM region instead of own
@@ -403,10 +285,11 @@ int32_t cb_release(
     PCM_SUBCHN_CONTEXT_T *pc,
     ado_pcm_config_t *config )
 {
-    pthread_mutex_lock( &jack_card->process_lock );
-
     ado_debug( DB_LVL_DRIVER,
                "deva-ctrl-jack: release()" );
+
+    pthread_mutex_lock( &jack_card->process_lock );
+
     jack_card->subchn.go = 0;
 
     jack_ringbuffer_reset( &jack_card->ringbuffer );
@@ -517,22 +400,8 @@ int jack_process(
     if( jack_card->subchn.go
         && ( 0 == pthread_mutex_trylock( &jack_card->process_lock ) ) )
         {
-        ado_debug( DB_LVL_PCM,
-                   "deva-ctrl-jack: jack_process( %d )",
-                   nframes );
-        ado_debug( DB_LVL_PCM,
-                   "  total_size: %d",
-                   total_size );
-
         int voices = jack_card->subchn.pcm_config->format.voices;
-        ado_debug( DB_LVL_PCM,
-                   "  voices: %d",
-                   voices );
-
         size_t size_per_voice = total_size / voices;
-        ado_debug( DB_LVL_PCM,
-                   "  size_per_voice: %d",
-                   size_per_voice );
 
         void* jack_buf[voices];
         for( v = 0; v < voices; ++v )
@@ -544,14 +413,8 @@ int jack_process(
         for( size_completed = 0; size_completed < total_size; size_completed +=
             size_per_voice )
             {
-            ado_debug( DB_LVL_PCM,
-                       "  size_completed: %d",
-                       size_completed );
             for( v = 0; v < voices; ++v )
                 {
-                ado_debug( DB_LVL_PCM,
-                           "  voice: %d",
-                           v );
                 /*
                  * Advance ringbuffer write pointer on the assumption that io-audio has filled in nframes of data
                  */
@@ -565,16 +428,6 @@ int jack_process(
                 if( SND_PCM_SFMT_FLOAT_LE
                     == jack_card->subchn.pcm_config->format.format )
                     {
-                    ado_debug( DB_LVL_PCM,
-                               "  ringbuffer:" );
-                    ado_debug( DB_LVL_PCM,
-                               "    - { buf: %x, len: %d }",
-                               read_buf[0].buf,
-                               read_buf[0].len );
-                    ado_debug( DB_LVL_PCM,
-                               "    - { buf: %x, len: %d }",
-                               read_buf[1].buf,
-                               read_buf[1].len );
                     jack_ringbuffer_read( &jack_card->ringbuffer,
                                           jack_buf[v],
                                           size_per_voice );
@@ -586,19 +439,6 @@ int jack_process(
                     size_t remaining = size_per_voice / sizeof(sample_t);
                     read_buf[0].len /= sizeof(sample_t);
                     read_buf[1].len /= sizeof(sample_t);
-                    ado_debug( DB_LVL_PCM,
-                               "  samples_remaining: %d",
-                               remaining );
-                    ado_debug( DB_LVL_PCM,
-                               "  ringbuffer:" );
-                    ado_debug( DB_LVL_PCM,
-                               "    - { buf: %x, len: %d }",
-                               read_buf[0].buf,
-                               read_buf[0].len );
-                    ado_debug( DB_LVL_PCM,
-                               "    - { buf: %x, len: %d }",
-                               read_buf[1].buf,
-                               read_buf[1].len );
 
                     int32_t* src = (sample_t*)read_buf[0].buf;
                     sample_t* dest = (sample_t*)jack_buf[v];
@@ -608,22 +448,8 @@ int jack_process(
                         {
                         dest[s] = ( (sample_t)src[s] ) * ( (sample_t)1.0 )
                             / ( (sample_t)INT_MAX );
-//						ado_debug(DB_LVL_PCM, "  %x : %d : %f", &src[s], src[s], dest[s]);
                         }
                     remaining -= amt;
-                    ado_debug( DB_LVL_PCM,
-                               "  samples_remaining: %d",
-                               remaining );
-                    ado_debug( DB_LVL_PCM,
-                               "  ringbuffer:" );
-                    ado_debug( DB_LVL_PCM,
-                               "    - { buf: %x, len: %d }",
-                               read_buf[0].buf,
-                               read_buf[0].len );
-                    ado_debug( DB_LVL_PCM,
-                               "    - { buf: %x, len: %d }",
-                               read_buf[1].buf,
-                               read_buf[1].len );
                     if( remaining > 0 )
                         {
                         src = (int32_t*)read_buf[1].buf;
@@ -645,13 +471,14 @@ int jack_process(
                 }
             dma_interrupt( jack_card->subchn.pcm_subchn );
             }
-        ado_debug( DB_LVL_PCM,
-                   "  size_completed: %d",
-                   size_completed );
         pthread_mutex_unlock( &jack_card->process_lock );
         }
     else
         {
+        /*
+         * In the case where there is no subchannel or we can't aquire the ringbuffer lock,
+         * write zeroes to the JACK buffers rather than let stale data sit in them.
+         */
         for( v = 0; v < jack_card->voices; ++v )
             {
             void* jack_buf = jack_port_get_buffer( jack_card->ports[v],
@@ -684,6 +511,7 @@ void jack_shutdown(
     jack_card_t* card = (jack_card_t*)arg;
 
     /*
+     * TODO
      * Find a way to trigger io-audio to call ctrl_destroy() to clean up
      */
 }
@@ -701,8 +529,6 @@ int ctrl_init(
     ado_debug( DB_LVL_DRIVER,
                "deva-ctrl-jack: ctrl_init" );
 
-    ado_debug( DB_LVL_DRIVER,
-               "deva-ctrl-jack: allocating card" );
     jack_card = ado_calloc( 1,
                             sizeof(jack_card_t) );
     if( NULL == jack_card )
@@ -718,21 +544,14 @@ int ctrl_init(
     pthread_mutex_init( &jack_card->process_lock,
                         NULL );
 
-    ado_debug( DB_LVL_DRIVER,
-               "deva-ctrl-jack: setting card name" );
     ado_card_set_shortname( card,
                             "jack_card" );
     ado_card_set_longname( card,
                            "jack_card",
                            0x1000 );
 
-    ado_debug( DB_LVL_DRIVER,
-               "deva-ctrl-jack: parsing arguments '%s'",
-               args );
     retval = parse_commandline( jack_card,
                                 args );
-    ado_debug( DB_LVL_DRIVER,
-               "deva-ctrl-jack: returned from parsing arguments" );
     if( EOK != retval )
         {
         ado_error(
@@ -753,10 +572,6 @@ int ctrl_init(
                    client_name_size );
         return -1;
         }
-    ado_debug( DB_LVL_DRIVER,
-               "deva-ctrl-jack: Opening jack client with name '%s' on server '%s'",
-               jack_card->name,
-               jack_card->server ? jack_card->server : "DEFAULT" );
     jack_status_t open_status;
     if( NULL != jack_card->server )
         {
@@ -782,8 +597,6 @@ int ctrl_init(
     /*
      * Set JACK and ADO processing callbacks
      */
-    ado_debug( DB_LVL_DRIVER,
-               "deva-ctrl-jack: registering callbacks" );
     jack_set_process_callback( jack_card->client,
                                jack_process,
                                jack_card );
@@ -795,9 +608,6 @@ int ctrl_init(
      * Allocate jack_port_t array
      */
     int voices = jack_card->voices;
-    ado_debug( DB_LVL_DRIVER,
-               "deva-ctrl-jack: allocating array of %d ports",
-               voices );
     jack_card->ports = ado_calloc( voices,
                                    sizeof(jack_port_t*) );
 
@@ -813,9 +623,6 @@ int ctrl_init(
                   port_name_size,
                   PORTNAME_FMT,
                   ( i + 1 ) );
-        ado_debug( DB_LVL_DRIVER,
-                   "deva-ctrl-jack: registering port %d",
-                   ( i + 1 ) );
         jack_card->ports[i] = jack_port_register( jack_card->client,
                                                   portname,
                                                   JACK_DEFAULT_AUDIO_TYPE,
@@ -827,20 +634,13 @@ int ctrl_init(
     /*
      * Initialize Capabilities
      */
-    ado_debug( DB_LVL_DRIVER,
-               "deva-ctrl-jack: initializing driver capabilities" );
     jack_card->caps.chn_flags = SND_PCM_CHNINFO_BLOCK
         | SND_PCM_CHNINFO_NONINTERLEAVE;
     jack_card->caps.formats = 0xFFFF;
     jack_card->caps.formats = SND_PCM_FMT_FLOAT_LE | SND_PCM_FMT_S32_LE;
-//	jack_card->caps.formats = SND_PCM_FMT_FLOAT_LE;
 
     jack_nframes_t rate = jack_get_sample_rate( jack_card->client );
     uint32_t rateflag = ado_pcm_rate2flag( rate );
-    ado_debug( DB_LVL_DRIVER,
-               "deva-ctrl-jack: sample rate of JACK: %u; flag: 0x%x",
-               rate,
-               rateflag );
     jack_card->caps.rates = rateflag;
 
     jack_card->caps.min_voices = 1;
@@ -851,16 +651,11 @@ int ctrl_init(
      */
     jack_card->fragsize = jack_get_buffer_size( jack_card->client )
         * sizeof(sample_t);
-    ado_debug( DB_LVL_DRIVER,
-               "deva-ctrl-jack: fragment is %u bytes",
-               jack_card->fragsize );
     jack_card->caps.min_fragsize = jack_card->fragsize;
     jack_card->caps.max_fragsize = jack_card->fragsize;
     jack_card->caps.max_dma_size = 0;
     jack_card->caps.max_frags = 0;
 
-    ado_debug( DB_LVL_DRIVER,
-               "deva-ctrl-jack: initializing driver callbacks" );
     jack_card->funcs.capabilities2 = cb_capabilities;
     jack_card->funcs.aquire = cb_aquire;
     jack_card->funcs.release = cb_release;
@@ -871,8 +666,6 @@ int ctrl_init(
     /*
      * Create Audio PCM Device
      */
-    ado_debug( DB_LVL_DRIVER,
-               "deva-ctrl-jack: creating PCM device" );
     retval = ado_pcm_create( card,
                              "JACK io-audio driver",
                              ( jack_card->channel_type
