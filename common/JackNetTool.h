@@ -49,8 +49,7 @@ using namespace std;
 #define UDP_HEADER_SIZE 64   // 40 bytes for IP header in IPV6, 20 in IPV4, 8 for UDP, so take 64
 #define HEADER_SIZE (sizeof(packet_header_t))
 
-// TODO : change PACKET_AVAILABLE_SIZE definition ==> #define PACKET_AVAILABLE_SIZE(params) ((params)->fMtu - UDP_HEADER_SIZE - sizeof(packet_header_t))
-#define PACKET_AVAILABLE_SIZE(params) ((params)->fMtu - HEADER_SIZE)
+#define PACKET_AVAILABLE_SIZE(params) ((params)->fMtu - UDP_HEADER_SIZE - HEADER_SIZE)
 
 namespace Jack
 {
