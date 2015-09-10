@@ -778,8 +778,8 @@ namespace Jack
                 memset(fCompressedBuffer[port_index], 0, fCompressedMaxSizeByte * sizeof(char));
             }
 
-            int res1 = (fNPorts * fCompressedMaxSizeByte + CDO) % PACKET_AVAILABLE_SIZE(params);
-            int res2 = (fNPorts * fCompressedMaxSizeByte + CDO) / PACKET_AVAILABLE_SIZE(params);
+            int res1 = (fNPorts * (fCompressedMaxSizeByte + CDO)) % PACKET_AVAILABLE_SIZE(params);
+            int res2 = (fNPorts * (fCompressedMaxSizeByte + CDO)) / PACKET_AVAILABLE_SIZE(params);
 
             fNumPackets = (res1) ? (res2 + 1) : res2;
 
