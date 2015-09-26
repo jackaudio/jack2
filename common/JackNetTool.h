@@ -17,6 +17,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
+#ifndef __JackNetTool__
+#define __JackNetTool__
+
 #include "JackMidiPort.h"
 #include "JackTools.h"
 #include "types.h"
@@ -408,50 +411,6 @@ namespace Jack
 
 #endif
 
-#if HAVE_OPUS
-
-#include <opus/opus.h>
-#include <opus/opus_custom.h>
-
-    class SERVER_EXPORT NetOpusAudioBuffer : public NetAudioBuffer
-    {
-        private:
-
-            OpusCustomMode** fOpusMode;
-            OpusCustomEncoder** fOpusEncoder;
-            OpusCustomDecoder** fOpusDecoder;
-
-            int fCompressedMaxSizeByte;
-            unsigned short* fCompressedSizesByte;
-   
-            size_t fLastSubPeriodBytesSize;
-
-            unsigned char** fCompressedBuffer;
-            void FreeOpus();
-
-        public:
-
-            NetOpusAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer, int kbps);
-            virtual ~NetOpusAudioBuffer();
-
-            // needed size in bytes for an entire cycle
-            size_t GetCycleSize();
-
-             // cycle duration in sec
-            float GetCycleDuration();
-            int GetNumPackets(int active_ports);
-
-            //jack<->buffer
-            int RenderFromJackPorts(int nframes);
-            void RenderToJackPorts(int nframes);
-
-            //network<->buffer
-            int RenderFromNetwork(int cycle, int sub_cycle, uint32_t port_num);
-            int RenderToNetwork(int sub_cycle, uint32_t  port_num);
-    };
-
-#endif
-
     class SERVER_EXPORT NetIntAudioBuffer : public NetAudioBuffer
     {
         private:
@@ -509,3 +468,5 @@ namespace Jack
     SERVER_EXPORT const char* GetTransportState(int transport_state);
     SERVER_EXPORT void NetTransportDataDisplay(net_transport_data_t* data);
 }
+
+#endif

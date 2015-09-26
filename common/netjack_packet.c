@@ -73,8 +73,8 @@
 #endif
 
 #if HAVE_OPUS
-#include <opus/opus.h>
-#include <opus/opus_custom.h>
+#include <opus.h>
+#include <opus_custom.h>
 #endif
 
 #include "netjack_packet.h"
