@@ -1015,6 +1015,7 @@ class InstallContext(BuildContext):
 			if tsk.runnable_status() == Task.ASK_LATER:
 				raise self.WafError('cannot post the task %r' % tsk)
 			tsk.run()
+			tsk.hasrun = True
 
 	def install_files(self, dest, files, env=None, chmod=Utils.O644, relative_trick=False, cwd=None, add=True, postpone=True, task=None):
 		"""

@@ -61,10 +61,17 @@ def waf_entry_point(current_directory, version, wafdir):
 					no_climb = True
 					break
 
+	# if --top is provided assume the build started in the top directory
+	for x in sys.argv:
+		if x.startswith('--top='):
+			Context.run_dir = Context.top_dir = x[6:]
+		if x.startswith('--out='):
+			Context.out_dir = x[6:]
+
 	# try to find a lock file (if the project was configured)
 	# at the same time, store the first wscript file seen
 	cur = current_directory
-	while cur:
+	while cur and not Context.top_dir:
 		lst = os.listdir(cur)
 		if Options.lockfile in lst:
 			env = ConfigSet.ConfigSet()
@@ -557,16 +564,26 @@ def distcheck(ctx):
 	pass
 
 def update(ctx):
-	'''updates the plugins from the *waflib/extras* directory'''
-	lst = Options.options.files.split(',')
-	if not lst:
-		lst = [x for x in Utils.listdir(Context.waf_dir + '/waflib/extras') if x.endswith('.py')]
+	lst = Options.options.files
+	if lst:
+		lst = lst.split(',')
+	else:
+		path = os.path.join(Context.waf_dir, 'waflib', 'extras')
+		lst = [x for x in Utils.listdir(path) if x.endswith('.py')]
 	for x in lst:
 		tool = x.replace('.py', '')
+		if not tool:
+			continue
 		try:
-			Configure.download_tool(tool, force=True, ctx=ctx)
+			dl = Configure.download_tool
+		except AttributeError:
+			ctx.fatal('The command "update" is dangerous; include the tool "use_config" in your project!')
+		try:
+			dl(tool, force=True, ctx=ctx)
 		except Errors.WafError:
-			Logs.error('Could not find the tool %s in the remote repository' % x)
+			Logs.error('Could not find the tool %r in the remote repository' % x)
+		else:
+			Logs.warn('Updated %r' % tool)
 
 def autoconfigure(execute_method):
 	"""

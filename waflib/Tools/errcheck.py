@@ -64,7 +64,7 @@ def check_same_targets(self):
 	if not dupe:
 		for (k, v) in uids.items():
 			if len(v) > 1:
-				Logs.error('* Several tasks use the same identifier. Please check the information on\n   http://docs.waf.googlecode.com/git/apidocs_16/Task.html#waflib.Task.Task.uid')
+				Logs.error('* Several tasks use the same identifier. Please check the information on\n   https://waf.io/apidocs/Task.html?highlight=uid#waflib.Task.Task.uid')
 				for tsk in v:
 					Logs.error('  - object %r (%r) defined in %r' % (tsk.__class__.__name__, tsk, tsk.generator))
 

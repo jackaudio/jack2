@@ -3,7 +3,6 @@
 # Thomas Nagy, 2006-2010 (ita)
 # Ralf Habacker, 2006 (rh)
 
-from waflib import Utils
 from waflib.Tools import ccroot, ar
 from waflib.Configure import conf
 
@@ -51,7 +50,7 @@ def sxx_common_flags(conf):
 	v['cxxprogram_PATTERN']  = '%s'
 
 	# shared library
-	v['CXXFLAGS_cxxshlib']   = ['-Kpic', '-DPIC']
+	v['CXXFLAGS_cxxshlib']   = ['-xcode=pic32', '-DPIC']
 	v['LINKFLAGS_cxxshlib']  = ['-G']
 	v['cxxshlib_PATTERN']    = 'lib%s.so'
 

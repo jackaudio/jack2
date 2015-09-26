@@ -167,6 +167,7 @@ class ConfigSet(object):
 			for x in keys:
 				tbl[x] = copy.deepcopy(tbl[x])
 			self.table = tbl
+		return self
 
 	def get_flat(self, key):
 		"""

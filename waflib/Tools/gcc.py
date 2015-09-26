@@ -97,7 +97,7 @@ def gcc_modifier_darwin(conf):
 	"""Configuration flags for executing gcc on MacOS"""
 	v = conf.env
 	v['CFLAGS_cshlib']       = ['-fPIC']
-	v['LINKFLAGS_cshlib']    = ['-dynamiclib', '-Wl,-compatibility_version,1', '-Wl,-current_version,1']
+	v['LINKFLAGS_cshlib']    = ['-dynamiclib']
 	v['cshlib_PATTERN']      = 'lib%s.dylib'
 	v['FRAMEWORKPATH_ST']    = '-F%s'
 	v['FRAMEWORK_ST']        = ['-framework']

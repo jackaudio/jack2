@@ -21,6 +21,7 @@ def find_clangxx(conf):
 
 def configure(conf):
 	conf.find_clangxx()
+	conf.find_program(['llvm-ar', 'ar'], var='AR')
 	conf.find_ar()
 	conf.gxx_common_flags()
 	conf.gxx_modifier_platform()

@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # encoding: utf-8
-# Thomas Nagy, 2005-2010 (ita)
+# Thomas Nagy, 2005-2015 (ita)
 
 "base for all c/c++ programs and libraries"
 
 import os, sys, re
-from waflib import Utils, Build
+from waflib import Utils, Build, Errors
 from waflib.Configure import conf
 
 def get_extensions(lst):
@@ -44,26 +44,34 @@ def sniff_features(**kw):
 	feats = []
 
 	# watch the order, cxx will have the precedence
-	if 'cxx' in exts or 'cpp' in exts or 'c++' in exts or 'cc' in exts or 'C' in exts:
-		feats.append('cxx')
+	for x in 'cxx cpp c++ cc C'.split():
+		if x in exts:
+			feats.append('cxx')
+			break
 
 	if 'c' in exts or 'vala' in exts:
 		feats.append('c')
+
+	for x in 'f f90 F F90 for FOR'.split():
+		if x in exts:
+			feats.append('fc')
+			break
 
 	if 'd' in exts:
 		feats.append('d')
 
 	if 'java' in exts:
 		feats.append('java')
-
-	if 'java' in exts:
 		return 'java'
 
 	if type in ('program', 'shlib', 'stlib'):
+		will_link = False
 		for x in feats:
-			if x in ('cxx', 'd', 'c'):
+			if x in ('cxx', 'd', 'fc', 'c'):
 				feats.append(x + type)
-
+				will_link = True
+		if not will_link and not kw.get('features', []):
+			raise Errors.WafError('Cannot link from %r, try passing eg: features="cprogram"?' % kw)
 	return feats
 
 def set_features(kw, _type):

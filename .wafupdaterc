@@ -47,6 +47,7 @@ WAFLIB_STRIP_EXTRAS="
     boo
     boost
     c_dumbpreproc
+    c_emscripten
     cabal
     cfg_altoptions
     cfg_cross_gnu

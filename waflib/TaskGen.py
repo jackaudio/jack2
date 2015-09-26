@@ -593,6 +593,12 @@ def process_rule(self):
 		if getattr(self, 'cache_rule', 'True'):
 			cache[(name, self.rule)] = cls
 
+		if getattr(self, 'cls_str', None):
+			setattr(cls, '__str__', self.cls_str)
+
+		if getattr(self, 'cls_keyword', None):
+			setattr(cls, 'keyword', self.cls_keyword)
+
 	# now create one instance
 	tsk = self.create_task(name)
 

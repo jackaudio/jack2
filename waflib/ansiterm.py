@@ -284,7 +284,7 @@ else:
 				wlock.release()
 
 		def writeconsole(self, txt):
-			chars_written = c_int()
+			chars_written = c_ulong()
 			writeconsole = windll.kernel32.WriteConsoleA
 			if isinstance(txt, _type):
 				writeconsole = windll.kernel32.WriteConsoleW
