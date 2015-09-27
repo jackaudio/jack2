@@ -244,6 +244,8 @@ def build(bld):
         'JackMidiWriteQueue.cpp'
         ]
 
+    if bld.env['CELT']:
+        serverlib.source += ['JackNetCelt.cpp']
     if bld.env['OPUS']:
         serverlib.source += ['JackNetOpus.cpp']
 
@@ -320,6 +322,8 @@ def build(bld):
             'JackGlobals.cpp',
             'ringbuffer.c']
 
+        if bld.env['CELT']:
+            netlib.source += ['JackNetCelt.cpp']
         if bld.env['OPUS']:
             netlib.source += ['JackNetOpus.cpp']
 

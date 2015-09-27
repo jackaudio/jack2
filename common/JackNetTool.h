@@ -369,48 +369,6 @@ namespace Jack
 
     };
 
-#if HAVE_CELT
-
-#include <celt/celt.h>
-
-    class SERVER_EXPORT NetCeltAudioBuffer : public NetAudioBuffer
-    {
-        private:
-
-            CELTMode** fCeltMode;
-            CELTEncoder** fCeltEncoder;
-            CELTDecoder** fCeltDecoder;
-
-            int fCompressedSizeByte;
-            unsigned char** fCompressedBuffer;
-   
-            size_t fLastSubPeriodBytesSize;
-
-            void FreeCelt();
-
-        public:
-
-            NetCeltAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer, int kbps);
-            virtual ~NetCeltAudioBuffer();
-
-            // needed size in bytes for an entire cycle
-            size_t GetCycleSize();
-
-             // cycle duration in sec
-            float GetCycleDuration();
-            int GetNumPackets(int active_ports);
-
-            //jack<->buffer
-            int RenderFromJackPorts(int nframes);
-            void RenderToJackPorts(int nframes);
-
-            //network<->buffer
-            int RenderFromNetwork(int cycle, int sub_cycle, uint32_t port_num);
-            int RenderToNetwork(int sub_cycle, uint32_t port_num);
-    };
-
-#endif
-
     class SERVER_EXPORT NetIntAudioBuffer : public NetAudioBuffer
     {
         private:
