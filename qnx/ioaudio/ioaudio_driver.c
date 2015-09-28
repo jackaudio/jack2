@@ -444,7 +444,7 @@ int jack_process(
                     sample_t* dest = (sample_t*)jack_buf[v];
                     size_t amt = min( read_buf[0].len,
                                       remaining );
-                    for( s = 0; s < amt; s += sizeof(sample_t) )
+                    for( s = 0; s < amt; ++s )
                         {
                         dest[s] = ( (sample_t)src[s] ) * ( (sample_t)1.0 )
                             / ( (sample_t)INT_MAX );
@@ -456,7 +456,7 @@ int jack_process(
                         dest += amt;
                         amt = min( read_buf[1].len,
                                    remaining );
-                        for( s = 0; s < amt; s += sizeof(sample_t) )
+                        for( s = 0; s < amt; ++s )
                             {
                             dest[s] = ( (sample_t)src[s] ) * ( (sample_t)1.0 )
                                 / ( (sample_t)INT_MAX );
