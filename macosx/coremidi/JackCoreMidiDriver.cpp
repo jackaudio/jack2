@@ -26,6 +26,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <stdexcept>
 #include <mach/mach_time.h>
+#include <mach/mach_error.h>
 
 using Jack::JackCoreMidiDriver;
 

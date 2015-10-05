@@ -156,7 +156,7 @@ class JackShmReadWritePtr
         void Init(int index, const char* server_name = JACK_DEFAULT_SERVER_NAME)
         {
             if (fInfo.index < 0 && index >= 0) {
-                jack_log("JackShmReadWritePtr::Init %ld %ld", index, fInfo.index);
+                jack_log("JackShmReadWritePtr::Init %ld %d", index, fInfo.index);
                 if (jack_initialize_shm(server_name) < 0) {
                     throw std::bad_alloc();
                 }
@@ -186,11 +186,11 @@ class JackShmReadWritePtr
         ~JackShmReadWritePtr()
         {
             if (!fInitDone) {
-               jack_error("JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for %ld, skipping unlock", fInfo.index);                              
+               jack_error("JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for %d, skipping unlock", fInfo.index);                              
                return;
             }
             if (fInfo.index >= 0) {
-                jack_log("JackShmReadWritePtr::~JackShmReadWritePtr %ld", fInfo.index);
+                jack_log("JackShmReadWritePtr::~JackShmReadWritePtr %d", fInfo.index);
                 GetShmAddress()->UnlockMemory();
                 jack_release_lib_shm(&fInfo);
                 fInfo.index = -1;
@@ -245,7 +245,7 @@ class JackShmReadWritePtr1
         void Init(int index, const char* server_name = JACK_DEFAULT_SERVER_NAME)
         {
             if (fInfo.index < 0 && index >= 0) {
-                jack_log("JackShmReadWritePtr1::Init %ld %ld", index, fInfo.index);
+                jack_log("JackShmReadWritePtr1::Init %ld %d", index, fInfo.index);
                 if (jack_initialize_shm(server_name) < 0) {
                     throw std::bad_alloc();
                 }
@@ -281,11 +281,11 @@ class JackShmReadWritePtr1
         ~JackShmReadWritePtr1()
         {
             if (!fInitDone) {
-               jack_error("JackShmReadWritePtr1::~JackShmReadWritePtr1 - Init not done for %ld, skipping unlock", fInfo.index);                              
+               jack_error("JackShmReadWritePtr1::~JackShmReadWritePtr1 - Init not done for %d, skipping unlock", fInfo.index);                              
                return;
             }
             if (fInfo.index >= 0) {
-                jack_log("JackShmReadWritePtr1::~JackShmReadWritePtr1 %ld", fInfo.index);
+                jack_log("JackShmReadWritePtr1::~JackShmReadWritePtr1 %d", fInfo.index);
                 GetShmAddress()->UnlockMemory();
                 jack_release_lib_shm(&fInfo);
                 fInfo.index = -1;
@@ -340,7 +340,7 @@ class JackShmReadPtr
         void Init(int index, const char* server_name = JACK_DEFAULT_SERVER_NAME)
         {
             if (fInfo.index < 0 && index >= 0) {
-                jack_log("JackShmPtrRead::Init %ld %ld", index, fInfo.index);
+                jack_log("JackShmPtrRead::Init %ld %d", index, fInfo.index);
                 if (jack_initialize_shm(server_name) < 0) {
                     throw std::bad_alloc();
                 }
