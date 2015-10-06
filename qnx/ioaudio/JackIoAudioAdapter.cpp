@@ -229,8 +229,8 @@ namespace Jack
             fNumInputPorts = fInputFormat.voices;
             ssize_t frameSize = snd_pcm_format_size( fInputFormat.format,
                                                      fInputFormat.voices );
-            fInputBufferFrames = fInputSetup->buf.block.frag_size
-                / ( frameSize );
+            fInputFragmentSize = fInputSetup->buf.block.frag_size;
+            fInputBufferFrames = fInputFragmentSize / frameSize;
 
             size_t nfrags = fInputSetup->buf.block.frags_max;
             size_t nframes = fInputBufferFrames;
@@ -422,7 +422,7 @@ namespace Jack
                 case 1:
                     count = snd_pcm_read( fInputDevice,
                                           fInputCardBuffer,
-                                          fInputBufferFrames );
+                                          fInputFragmentSize );
                     if( count < 0 )
                         {
                         display_error_msg( count,
@@ -465,7 +465,7 @@ namespace Jack
                 case 0:
                     count = snd_pcm_read( fInputDevice,
                                           fInputCardBuffer,
-                                          fInputBufferFrames );
+                                          fInputFragmentSize );
                     if( count < 0 )
                         {
                         display_error_msg( count,
