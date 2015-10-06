@@ -17,7 +17,7 @@
 
 #include <sys/asound.h>
 
-static const char* PORTNAME_FMT = "playback_%d";
+static const char* PORTNAME_FMT = "capture_%d";
 typedef jack_default_audio_sample_t sample_t;
 
 struct subchn
