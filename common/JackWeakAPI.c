@@ -54,11 +54,11 @@ void tryload_libjack()
     #ifdef __APPLE__
         libjack_handle = dlopen("libjack.0.dylib", RTLD_LAZY);
         if (!libjack_handle) {
-            fprintf(stderr, "dlopen error : %s \n", fn_name, dlerror());
+            fprintf(stderr, "dlopen error : %s \n", dlerror());
         }
         libjack_handle = dlopen("/usr/local/lib/libjack.0.dylib", RTLD_LAZY);
         if (!libjack_handle) {
-            fprintf(stderr, "dlopen error : %s \n", fn_name, dlerror());
+            fprintf(stderr, "dlopen error : %s \n", dlerror());
         }
     #elif defined(WIN32)
         #ifdef _WIN64
