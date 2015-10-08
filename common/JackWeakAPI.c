@@ -53,6 +53,13 @@ void tryload_libjack()
     if (getenv("SKIP_LIBJACK") == 0) { // just in case libjack is causing troubles..
     #ifdef __APPLE__
         libjack_handle = dlopen("libjack.0.dylib", RTLD_LAZY);
+        if (!libjack_handle) {
+            fprintf(stderr, "dlopen error : %s \n", fn_name, dlerror());
+        }
+        libjack_handle = dlopen("/usr/local/lib/libjack.0.dylib", RTLD_LAZY);
+        if (!libjack_handle) {
+            fprintf(stderr, "dlopen error : %s \n", fn_name, dlerror());
+        }
     #elif defined(WIN32)
         #ifdef _WIN64
             libjack_handle = LoadLibrary("libjack64.dll");
@@ -62,7 +69,6 @@ void tryload_libjack()
     #else
         libjack_handle = dlopen("libjack.so.0", RTLD_LAZY);
     #endif
-
     }
     libjack_is_present = (libjack_handle != 0);
 }
@@ -83,9 +89,9 @@ void *load_jack_function(const char *fn_name)
 #ifdef WIN32
         char* lpMsgBuf;
         FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,NULL,GetLastError(),MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),(LPTSTR) &lpMsgBuf,0,NULL );
-        fprintf (stderr, "could not GetProcAddress( %s ), %s \n", fn_name, lpMsgBuf) ;
+        fprintf(stderr, "could not GetProcAddress( %s ), %s \n", fn_name, lpMsgBuf);
 #else
-        fprintf (stderr, "could not dlsym( %s ), %s \n", fn_name, dlerror()) ;
+        fprintf(stderr, "could not dlsym( %s ), %s \n", fn_name, dlerror());
 #endif
     }
     return fn;
