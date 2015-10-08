@@ -60,8 +60,13 @@ namespace Jack { typedef JackMachThread JackThread; }
 
 /* __JackPlatformSynchro__  client activation */
 #ifndef MY_TARGET_OS_IPHONE
-#include "JackMachSemaphore.h"
-namespace Jack { typedef JackMachSemaphore JackSynchro; }
+//#include "JackMachSemaphore.h"
+//namespace Jack { typedef JackMachSemaphore JackSynchro; }
+
+
+#include "JackPosixSemaphore.h"
+namespace Jack { typedef JackPosixSemaphore JackSynchro; }
+
 #endif
 
 /* __JackPlatformProcessSync__ */

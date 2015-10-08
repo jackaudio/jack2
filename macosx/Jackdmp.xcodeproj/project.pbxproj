@@ -471,6 +471,14 @@
 		4B49D44D14865F22003390F8 /* session.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B49D44114865F22003390F8 /* session.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4B49D44E14865F22003390F8 /* net.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B49D44014865F22003390F8 /* net.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4B49D44F14865F22003390F8 /* session.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B49D44114865F22003390F8 /* session.h */; };
+		4B4C3B641BC2FF670004CC35 /* JackPosixSemaphore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BC3B6B70E703BAA0066E42F /* JackPosixSemaphore.cpp */; };
+		4B4C3B651BC2FF6A0004CC35 /* JackPosixSemaphore.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BC3B6B80E703BAA0066E42F /* JackPosixSemaphore.h */; };
+		4B4C3B6A1BC2FFB30004CC35 /* JackPosixSemaphore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BC3B6B70E703BAA0066E42F /* JackPosixSemaphore.cpp */; };
+		4B4C3B6B1BC2FFB50004CC35 /* JackPosixSemaphore.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BC3B6B80E703BAA0066E42F /* JackPosixSemaphore.h */; };
+		4B4C3B6C1BC2FFC40004CC35 /* JackPosixSemaphore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BC3B6B70E703BAA0066E42F /* JackPosixSemaphore.cpp */; };
+		4B4C3B6D1BC2FFC70004CC35 /* JackPosixSemaphore.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BC3B6B80E703BAA0066E42F /* JackPosixSemaphore.h */; };
+		4B4C3B6E1BC2FFDD0004CC35 /* JackPosixSemaphore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BC3B6B70E703BAA0066E42F /* JackPosixSemaphore.cpp */; };
+		4B4C3B6F1BC2FFE00004CC35 /* JackPosixSemaphore.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BC3B6B80E703BAA0066E42F /* JackPosixSemaphore.h */; };
 		4B4CA9750E02CF9600F4BFDA /* JackRestartThreadedDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B4CA9730E02CF9600F4BFDA /* JackRestartThreadedDriver.h */; };
 		4B4CA9760E02CF9600F4BFDA /* JackRestartThreadedDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B4CA9740E02CF9600F4BFDA /* JackRestartThreadedDriver.cpp */; };
 		4B4CA9770E02CF9600F4BFDA /* JackRestartThreadedDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B4CA9730E02CF9600F4BFDA /* JackRestartThreadedDriver.h */; };
@@ -3622,6 +3630,7 @@
 				4B1499F714BDA5B300A51A3C /* JackGenericClientChannel.h in Headers */,
 				4BB4215114D2C0A700A1CAE1 /* JackPosixMutex.h in Headers */,
 				4BB4215314D2C0A700A1CAE1 /* JackPosixProcessSync.h in Headers */,
+				4B4C3B651BC2FF6A0004CC35 /* JackPosixSemaphore.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3709,6 +3718,7 @@
 				4B90669B14BEE6D20074CD40 /* JackRequestDecoder.h in Headers */,
 				4BB4215714D2C0A700A1CAE1 /* JackPosixMutex.h in Headers */,
 				4BB4215914D2C0A700A1CAE1 /* JackPosixProcessSync.h in Headers */,
+				4B4C3B6D1BC2FFC70004CC35 /* JackPosixSemaphore.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4010,6 +4020,7 @@
 				4B1499F914BDA5B300A51A3C /* JackGenericClientChannel.h in Headers */,
 				4BB4215414D2C0A700A1CAE1 /* JackPosixMutex.h in Headers */,
 				4BB4215614D2C0A700A1CAE1 /* JackPosixProcessSync.h in Headers */,
+				4B4C3B6B1BC2FFB50004CC35 /* JackPosixSemaphore.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4423,6 +4434,7 @@
 				4B90669D14BEE6D20074CD40 /* JackRequestDecoder.h in Headers */,
 				4BB4215A14D2C0A700A1CAE1 /* JackPosixMutex.h in Headers */,
 				4BB4215C14D2C0A700A1CAE1 /* JackPosixProcessSync.h in Headers */,
+				4B4C3B6F1BC2FFE00004CC35 /* JackPosixSemaphore.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7159,6 +7171,7 @@
 				4B327BAB14B4B50400976483 /* JackPosixMutex.cpp in Sources */,
 				4B1499F614BDA5B300A51A3C /* JackGenericClientChannel.cpp in Sources */,
 				4BB4215214D2C0A700A1CAE1 /* JackPosixProcessSync.cpp in Sources */,
+				4B4C3B641BC2FF670004CC35 /* JackPosixSemaphore.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7231,6 +7244,7 @@
 				4B1499F014BDA5B300A51A3C /* JackGenericClientChannel.cpp in Sources */,
 				4B90669A14BEE6D20074CD40 /* JackRequestDecoder.cpp in Sources */,
 				4BB4215814D2C0A700A1CAE1 /* JackPosixProcessSync.cpp in Sources */,
+				4B4C3B6C1BC2FFC40004CC35 /* JackPosixSemaphore.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7545,6 +7559,7 @@
 				4B327BAC14B4B50400976483 /* JackPosixMutex.cpp in Sources */,
 				4B1499F814BDA5B300A51A3C /* JackGenericClientChannel.cpp in Sources */,
 				4BB4215514D2C0A700A1CAE1 /* JackPosixProcessSync.cpp in Sources */,
+				4B4C3B6A1BC2FFB30004CC35 /* JackPosixSemaphore.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7932,6 +7947,7 @@
 				4B1499F214BDA5B300A51A3C /* JackGenericClientChannel.cpp in Sources */,
 				4B90669C14BEE6D20074CD40 /* JackRequestDecoder.cpp in Sources */,
 				4BB4215B14D2C0A700A1CAE1 /* JackPosixProcessSync.cpp in Sources */,
+				4B4C3B6E1BC2FFDD0004CC35 /* JackPosixSemaphore.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9681,8 +9697,9 @@
 					../common/jack,
 				);
 				INFOPLIST_FILE = "Jack-Info.plist";
-				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
+				MACH_O_TYPE = mh_dylib;
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
 					"-D__SMP__",
@@ -9745,8 +9762,9 @@
 					../common/jack,
 				);
 				INFOPLIST_FILE = "Jack-Info.plist";
-				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
+				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
@@ -9864,7 +9882,7 @@
 					../common/jack,
 				);
 				INFOPLIST_FILE = "Jack-Info.plist";
-				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OTHER_CFLAGS = (
 					"-DSERVER_SIDE",
@@ -9930,7 +9948,7 @@
 					../common/jack,
 				);
 				INFOPLIST_FILE = "Jack-Info.plist";
-				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
@@ -13559,7 +13577,7 @@
 					../common/jack,
 				);
 				INFOPLIST_FILE = "Jack-Info.plist";
-				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
@@ -13624,7 +13642,7 @@
 					../common/jack,
 				);
 				INFOPLIST_FILE = "Jack-Info.plist";
-				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
@@ -13680,7 +13698,7 @@
 					RPC,
 					../common/jack,
 				);
-				INFOPLIST_FILE = "Jack-Info copy 2.plist";
+				INFOPLIST_FILE = "Jack-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OTHER_CFLAGS = (
@@ -14395,7 +14413,7 @@
 					../common/jack,
 				);
 				INFOPLIST_FILE = "Jack-Info.plist";
-				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
@@ -14458,7 +14476,7 @@
 					../common/jack,
 				);
 				INFOPLIST_FILE = "Jack-Info.plist";
-				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
@@ -14573,7 +14591,7 @@
 					../common/jack,
 				);
 				INFOPLIST_FILE = "Jack-Info.plist";
-				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
@@ -14637,7 +14655,7 @@
 					../common/jack,
 				);
 				INFOPLIST_FILE = "Jack-Info.plist";
-				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
@@ -16358,7 +16376,7 @@
 					../common/jack,
 				);
 				INFOPLIST_FILE = "Jack-Info.plist";
-				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					/opt/local/lib,
 					/usr/lib/gcc/darwin/3.3,
@@ -16424,7 +16442,7 @@
 					../common/jack,
 				);
 				INFOPLIST_FILE = "Jack-Info.plist";
-				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					/opt/local/lib,
 					/usr/lib/gcc/darwin/3.3,
@@ -16480,7 +16498,7 @@
 					RPC,
 					../common/jack,
 				);
-				INFOPLIST_FILE = "Jack-Info copy.plist";
+				INFOPLIST_FILE = "Jack-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OTHER_CFLAGS = (
@@ -16878,7 +16896,7 @@
 					../common/jack,
 				);
 				INFOPLIST_FILE = "Jack-Info.plist";
-				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OTHER_CFLAGS = (
 					"-DJACK_MONITOR",
@@ -16945,7 +16963,7 @@
 					../common/jack,
 				);
 				INFOPLIST_FILE = "Jack-Info.plist";
-				INSTALL_PATH = "$(SYSTEM_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
