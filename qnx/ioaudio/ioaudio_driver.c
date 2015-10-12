@@ -92,9 +92,19 @@ typedef struct jack_card
     int voices;
 
     /**
-     * Ringbuffer between io-audio and JACK
+     * DMA buffer between io-audio and JACK.
      */
-    jack_ringbuffer_t ringbuffer;
+    void * dmabuf;
+
+    /**
+     * Current DMA buffer fragment index between io-audio and JACK.
+     */
+    int current_frag;
+
+    /**
+     * Number of DMA buffer fragments between io-audio and JACK.
+     */
+    int num_frags;
 
     /**
      * Number of audio frames per fragment
@@ -250,21 +260,15 @@ int32_t cb_aquire(
         }
 
     /*
-     * Create shared memory region for ringbuffer
+     * Create shared memory region for DMA transfer
      */
     config->dmabuf.addr = ado_shm_alloc( config->dmabuf.size,
                                          config->dmabuf.name,
                                          ADO_SHM_DMA_SAFE,
                                          &config->dmabuf.phys_addr );
-
-    /*
-     * Set up JACK ringbuffer structure to use SHM region instead of own
-     * buffer.
-     */
-    jack_card->ringbuffer.buf = (char*)config->dmabuf.addr;
-    jack_card->ringbuffer.size = config->dmabuf.size;
-    jack_card->ringbuffer.size_mask = config->dmabuf.size - 1;
-    jack_ringbuffer_reset( &jack_card->ringbuffer );
+    jack_card->dmabuf = config->dmabuf.addr;
+    jack_card->current_frag = 0;
+    jack_card->num_frags = config->mode.block.frags_total;
 
     /*
      * Store parameters for future use
@@ -292,8 +296,6 @@ int32_t cb_release(
 
     jack_card->subchn.go = 0;
 
-    jack_ringbuffer_reset( &jack_card->ringbuffer );
-
     ado_shm_free( pc->pcm_config->dmabuf.addr,
                   pc->pcm_config->dmabuf.size,
                   pc->pcm_config->dmabuf.name );
@@ -310,7 +312,11 @@ int32_t cb_prepare(
 {
     ado_debug( DB_LVL_DRIVER,
                "deva-ctrl-jack: prepare()" );
-    jack_ringbuffer_reset( &jack_card->ringbuffer );
+
+    /* Reset the DMA buffer fragment index. */
+    pthread_mutex_lock( &jack_card->process_lock );
+    jack_card->current_frag = 0;
+    pthread_mutex_unlock( &jack_card->process_lock );
     return EOK;
 }
 
@@ -384,93 +390,55 @@ int jack_process(
     int v;
     jack_card_t* jack_card = (jack_card_t*)arg;
 
-    size_t total_size = nframes * sizeof(sample_t);
-    size_t size_completed;
+    size_t frame_size = nframes * sizeof(sample_t);
+    size_t frag_size = frame_size * jack_card->voices;
 
-    if( ( jack_card->fragsize != total_size ) )
+    if( jack_card->fragsize != frag_size )
         {
         ado_error(
                    "deva_ctrl-jack: mismatch of fragment size with number of frames requested" );
         }
-
     /*
      * Try to lock the process mutex. If the lock can't be acquired, assume something is happening with the subchannel
      * and write zeroes to JACK instead.
      */
-    if( jack_card->subchn.go
+    else if( jack_card->subchn.go
         && ( 0 == pthread_mutex_trylock( &jack_card->process_lock ) ) )
         {
-        int voices = jack_card->subchn.pcm_config->format.voices;
-        size_t size_per_voice = total_size / voices;
+        /* Get the current frame ( voice ) buffer */
+        char * frame_buf = (char * )jack_card->dmabuf;
+        frame_buf += jack_card->current_frag * frag_size;
 
-        void* jack_buf[voices];
-        for( v = 0; v < voices; ++v )
+        for( v = 0; v < jack_card->voices; ++v )
             {
-            jack_buf[v] = jack_port_get_buffer( jack_card->ports[v],
-                                                nframes );
-            }
-
-        for( size_completed = 0; size_completed < total_size; size_completed +=
-            size_per_voice )
-            {
-            for( v = 0; v < voices; ++v )
+            sample_t * jack_buf;
+            jack_buf = jack_port_get_buffer( jack_card->ports[v], nframes );
+            if( SND_PCM_SFMT_FLOAT_LE
+                == jack_card->subchn.pcm_config->format.format )
                 {
-                /*
-                 * Advance ringbuffer write pointer on the assumption that io-audio has filled in nframes of data
-                 */
-                jack_ringbuffer_write_advance( &jack_card->ringbuffer,
-                                               size_per_voice );
-
-                jack_ringbuffer_data_t read_buf[2];
-                jack_ringbuffer_get_read_vector( &jack_card->ringbuffer,
-                                                 read_buf );
-
-                if( SND_PCM_SFMT_FLOAT_LE
-                    == jack_card->subchn.pcm_config->format.format )
-                    {
-                    jack_ringbuffer_read( &jack_card->ringbuffer,
-                                          jack_buf[v],
-                                          size_per_voice );
-                    }
-                else if( SND_PCM_SFMT_S32_LE
-                    == jack_card->subchn.pcm_config->format.format )
-                    {
-                    int s;
-                    size_t remaining = size_per_voice / sizeof(sample_t);
-                    read_buf[0].len /= sizeof(sample_t);
-                    read_buf[1].len /= sizeof(sample_t);
-
-                    int32_t* src = (sample_t*)read_buf[0].buf;
-                    sample_t* dest = (sample_t*)jack_buf[v];
-                    size_t amt = min( read_buf[0].len,
-                                      remaining );
-                    for( s = 0; s < amt; ++s )
-                        {
-                        dest[s] = ( (sample_t)src[s] ) * ( (sample_t)1.0 )
-                            / ( (sample_t)INT_MAX );
-                        }
-                    remaining -= amt;
-                    if( remaining > 0 )
-                        {
-                        src = (int32_t*)read_buf[1].buf;
-                        dest += amt;
-                        amt = min( read_buf[1].len,
-                                   remaining );
-                        for( s = 0; s < amt; ++s )
-                            {
-                            dest[s] = ( (sample_t)src[s] ) * ( (sample_t)1.0 )
-                                / ( (sample_t)INT_MAX );
-                            }
-                        }
-                    jack_ringbuffer_read_advance( &jack_card->ringbuffer,
-                                                  size_per_voice );
-                    }
-
-                jack_buf[v] += size_per_voice;
-
+                float * read_buf = ( float * )frame_buf;
+                memcpy( jack_buf, read_buf, frame_size );
                 }
-            dma_interrupt( jack_card->subchn.pcm_subchn );
+            else if( SND_PCM_SFMT_S32_LE
+                == jack_card->subchn.pcm_config->format.format )
+                {
+                int32_t * read_buf = ( int32_t * )frame_buf;
+                int s;
+                for( s = 0; s < nframes; ++s )
+                    {
+                    jack_buf[s] = ( (sample_t)read_buf[s] ) * ( (sample_t)1.0 )
+                        / ( (sample_t)INT_MAX );
+
+                    }
+                }
+            frame_buf += frame_size;
             }
+        ++jack_card->current_frag;
+        if( jack_card->current_frag >= jack_card->num_frags )
+            {
+            jack_card->current_frag = 0;
+            }
+        dma_interrupt( jack_card->subchn.pcm_subchn );
         pthread_mutex_unlock( &jack_card->process_lock );
         }
     else
@@ -485,7 +453,7 @@ int jack_process(
                                                    nframes );
             memset( jack_buf,
                     0,
-                    total_size );
+                    frame_size );
             }
         }
 
@@ -643,14 +611,14 @@ int ctrl_init(
     uint32_t rateflag = ado_pcm_rate2flag( rate );
     jack_card->caps.rates = rateflag;
 
-    jack_card->caps.min_voices = 1;
+    jack_card->caps.min_voices = jack_card->voices;
     jack_card->caps.max_voices = jack_card->voices;
 
     /*
      * Get size of ringbuffer from JACK server
      */
     jack_card->fragsize = jack_get_buffer_size( jack_card->client )
-        * sizeof(sample_t);
+        * sizeof(sample_t) * jack_card->voices;
     jack_card->caps.min_fragsize = jack_card->fragsize;
     jack_card->caps.max_fragsize = jack_card->fragsize;
     jack_card->caps.max_dma_size = 0;
