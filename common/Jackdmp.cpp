@@ -50,7 +50,7 @@ are "hard-coded" in the source. A much better approach would be to use the contr
 - get available drivers and their possible parameters, then prepare to parse them.
 */
 
-#ifdef __APPLE__
+#if defined(__APPLE__)
 #include <CoreFoundation/CFNotificationCenter.h>
 #include <CoreFoundation/CoreFoundation.h>
 
@@ -76,6 +76,20 @@ static void notify_server_stop(const char* server_name)
             NULL,
             kCFNotificationDeliverImmediately | kCFNotificationPostToAllSessions);
     CFRelease(ref1);
+}
+
+#elif defined(JACK_SYSTEMD)
+
+#include <systemd/sd-daemon.h>
+
+static void notify_server_start(const char* server_name)
+{
+    sd_notify(0, "READY=1");
+}
+
+static void notify_server_stop(const char* server_name)
+{
+    sd_notify(0, "STOPPING=1");
 }
 
 #else

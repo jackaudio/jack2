@@ -35,6 +35,8 @@ def build(bld):
         else:
             jackd.use += ['PTHREAD', 'DL', 'RT', 'M', 'STDC++']
         jackd.target = 'jackd'
+        if bld.env['BUILD_SYSTEMD_SUPPORT']:
+            jackd.use += ['LIBSYSTEMD']
 
     create_jack_driver_obj(bld, 'dummy', '../common/JackDummyDriver.cpp')
 

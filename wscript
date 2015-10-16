@@ -439,6 +439,8 @@ def options(opt):
     readline.set_check_hook(check_for_readline, check_for_readline_error)
 
     ioaudio = add_auto_option(opt, 'ioaudio', help='Enable io-audio driver', conf_dest='BUILD_DRIVER_IOAUDIO')
+    systemd = add_auto_option(opt, 'systemd', help='Enable systemd support', conf_dest='BUILD_SYSTEMD_SUPPORT')
+    systemd.add_package('libsystemd')
 
     # dbus options
     opt.recurse('dbus')
@@ -601,6 +603,8 @@ def configure(conf):
         conf.define('JACK_DBUS', 1)
     if conf.env['BUILD_WITH_PROFILE'] == True:
         conf.define('JACK_MONITOR', 1)
+    if conf.env['BUILD_SYSTEMD_SUPPORT'] == True:
+        conf.define('JACK_SYSTEMD', 1)
     conf.write_config_header('config.h', remove=False)
 
     svnrev = None
