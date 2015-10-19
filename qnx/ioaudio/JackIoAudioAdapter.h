@@ -134,6 +134,7 @@ namespace Jack
         snd_pcm_channel_params_t *fOutputParams;
         snd_pcm_channel_setup_t *fInputSetup;
         snd_pcm_channel_setup_t *fOutputSetup;
+        size_t fInputFragmentSize;
 
         //samples info
         snd_pcm_format_t fInputFormat;
