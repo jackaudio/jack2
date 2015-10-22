@@ -185,6 +185,7 @@ bool JackPosixSemaphore::ConnectInput(const char* name, const char* server_name)
         return true;
     } else {
         jack_error("Connect: fSemaphore not initialized!");
+        return false;
     }
 }
 
