@@ -43,7 +43,7 @@ enum {
 	NANOSLEEP_RESOLUTION = 7000
 };
 
-#define NFRAMES_INF INT_MAX
+#define NFRAMES_INF ULLONG_MAX
 
 enum {
 #ifndef JACK_MIDI_DEBUG
