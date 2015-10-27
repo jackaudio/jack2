@@ -22,6 +22,7 @@ def build(bld):
 	        prog.includes = ['..','../linux', '../posix', '../common/jack', '../common']
         if bld.env['IS_QNX']:
 	        prog.includes = ['..','../qnx', '../posix', '../common/jack', '../common']
+	        prog.uselib = 'M'
         if bld.env['IS_SUN']:
 	        prog.includes = ['..','../solaris', '../posix', '../common/jack', '../common']
         prog.source = test_program_sources

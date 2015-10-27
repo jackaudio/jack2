@@ -56,18 +56,22 @@ def build(bld):
     for example_program, example_program_source in list(example_programs.items()):
         if example_program == 'jack_server_control':
             use = ['serverlib', 'STDC++']
+            features = 'cxx cxxprogram'
         elif example_program == 'jack_net_slave':
             if not bld.env['BUILD_NETLIB']:
                 continue
             use = ['netlib']
+            features = 'c cprogram'
         elif example_program == 'jack_net_master':
             if not bld.env['BUILD_NETLIB']:
                 continue
             use = ['netlib']
+            features = 'c cprogram'
         else:
             use = ['clientlib']
+            features = 'c cprogram'
 
-        prog = bld(features='c cprogram')
+        prog = bld(features=features)
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = example_program_source
         prog.use = use

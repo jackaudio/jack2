@@ -511,6 +511,7 @@ def configure(conf):
         conf.env['LIB_PTHREAD'] = ['c']
         conf.env['LIB_DL'] = ['c']
         conf.env['LIB_RT'] = []
+        conf.env['LIB_STDC++'] = []
         conf.check_cxx( lib=['rt'], uselib_store='RT', mandatory=False )
         conf.check_cxx( lib=['socket'], uselib_store='SOCKET' )
 
