@@ -74,7 +74,7 @@ jack_get_version(
  *
  */
 const char *
-jack_get_version_string() JACK_OPTIONAL_WEAK_EXPORT;
+jack_get_version_string(void) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @defgroup ClientFunctions Creating & manipulating clients
@@ -1403,7 +1403,7 @@ jack_nframes_t jack_time_to_frames(const jack_client_t *client, jack_time_t) JAC
  *
  * The value returned is guaranteed to be monotonic, but not linear.
  */
-jack_time_t jack_get_time() JACK_OPTIONAL_WEAK_EXPORT;
+jack_time_t jack_get_time(void) JACK_OPTIONAL_WEAK_EXPORT;
 
 /*@}*/
 
