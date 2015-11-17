@@ -69,7 +69,7 @@ def build(bld):
     if bld.env['IS_MACOSX']:
         obj.use += ['PTHREAD', 'DL', 'DBUS-1', 'EXPAT']
     if bld.env['IS_QNX']:
-        obj.use += ['PTHREAD', 'DL', 'DBUS-1', 'EXPAT', 'STDC++']
+        obj.use += ['PTHREAD', 'DL', 'DBUS-1', 'EXPAT']
     obj.target = 'jackdbus'
 
     # process org.jackaudio.service.in -> org.jackaudio.service

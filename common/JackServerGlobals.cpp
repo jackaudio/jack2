@@ -200,15 +200,15 @@ bool JackServerGlobals::Init()
             switch (opt) {
 
                 case 'c':
-                    if (tolower (optarg[0]) == 'h') {
+                    if (std::tolower (optarg[0]) == 'h') {
                         clock_source = JACK_TIMER_HPET;
-                    } else if (tolower (optarg[0]) == 'c') {
+                    } else if (std::tolower (optarg[0]) == 'c') {
                         /* For backwards compatibility with scripts, allow
                          * the user to request the cycle clock on the
                          * command line, but use the system clock instead
                          */
                         clock_source = JACK_TIMER_SYSTEM_CLOCK;
-                    } else if (tolower (optarg[0]) == 's') {
+                    } else if (std::tolower (optarg[0]) == 's') {
                         clock_source = JACK_TIMER_SYSTEM_CLOCK;
                     } else {
                         jack_error("unknown option character %c", optopt);

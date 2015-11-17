@@ -19,6 +19,8 @@
 #include "external_metro.h"
 #include <cstdio>
 
+using namespace std;
+
 typedef jack_default_audio_sample_t sample_t;
 
 const double PI = 3.14;
