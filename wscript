@@ -187,10 +187,23 @@ class AutoOption:
         """
         all_found = True
 
+        # Use-variables that should be used when checking libraries, headers and
+        # programs. The list will be populated when looking for packages.
+        use = []
+
+        # check for packages
+        for package,uselib_store,atleast_version in self.packages:
+            try:
+                conf.check_cfg(package=package, uselib_store=uselib_store, atleast_version=atleast_version, args='--cflags --libs')
+                use.append(uselib_store)
+            except conf.errors.ConfigurationError:
+                all_found = False
+                self.packages_not_found.append([package,atleast_version])
+
         # check for libraries
         for lib,uselib_store in self.libs:
             try:
-                conf.check_cc(lib=lib, uselib_store=uselib_store)
+                conf.check_cc(lib=lib, uselib_store=uselib_store, use=use)
             except conf.errors.ConfigurationError:
                 all_found = False
                 self.libs_not_found.append(lib)
@@ -198,23 +211,15 @@ class AutoOption:
         # check for headers
         for header in self.headers:
             try:
-                conf.check_cc(header_name=header)
+                conf.check_cc(header_name=header, use=use)
             except conf.errors.ConfigurationError:
                 all_found = False
                 self.headers_not_found.append(header)
 
-        # check for packages
-        for package,uselib_store,atleast_version in self.packages:
-            try:
-                conf.check_cfg(package=package, uselib_store=uselib_store, atleast_version=atleast_version, args='--cflags --libs')
-            except conf.errors.ConfigurationError:
-                all_found = False
-                self.packages_not_found.append([package,atleast_version])
-
         # check for programs
         for program,var in self.programs:
             try:
-                conf.find_program(program, var=var)
+                conf.find_program(program, var=var, use=use)
             except conf.errors.ConfigurationError:
                 all_found = False
                 self.programs_not_found.append(program)
@@ -428,8 +433,8 @@ def options(opt):
     celt = add_auto_option(opt, 'celt', help='Build with CELT')
     celt.set_check_hook(check_for_celt, check_for_celt_error)
     opus = add_auto_option(opt, 'opus', help='Build Opus netjack2')
-    opus.add_header('opus/opus_custom.h')
     opus.add_package('opus', atleast_version='0.9.0')
+    opus.add_header('opus_custom.h')
     samplerate = add_auto_option(opt, 'samplerate', help='Build with libsamplerate')
     samplerate.add_package('samplerate')
     sndfile = add_auto_option(opt, 'sndfile', help='Build with libsndfile')

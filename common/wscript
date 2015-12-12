@@ -244,6 +244,11 @@ def build(bld):
         'JackMidiWriteQueue.cpp'
         ]
 
+    if bld.env['CELT']:
+        serverlib.source += ['JackNetCelt.cpp']
+    if bld.env['OPUS']:
+        serverlib.source += ['JackNetOpus.cpp']
+
     if bld.env['IS_LINUX']:
         serverlib.source += [
             '../posix/JackSocketServerChannel.cpp',
@@ -316,6 +321,11 @@ def build(bld):
             'JackResampler.cpp',
             'JackGlobals.cpp',
             'ringbuffer.c']
+
+        if bld.env['CELT']:
+            netlib.source += ['JackNetCelt.cpp']
+        if bld.env['OPUS']:
+            netlib.source += ['JackNetOpus.cpp']
 
         if bld.env['IS_LINUX']:
             netlib.source += ['../posix/JackNetUnixSocket.cpp','../posix/JackPosixThread.cpp', '../posix/JackPosixMutex.cpp', '../linux/JackLinuxTime.c']

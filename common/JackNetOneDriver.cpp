@@ -40,8 +40,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 #if HAVE_OPUS
-#include <opus/opus.h>
-#include <opus/opus_custom.h>
+#include <opus.h>
+#include <opus_custom.h>
 #endif
 
 #define MIN(x,y) ((x)<(y) ? (x) : (y))

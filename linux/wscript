@@ -89,6 +89,6 @@ def build(bld):
 
     create_jack_driver_obj(bld, 'netone', [ '../common/JackNetOneDriver.cpp',
                                             '../common/netjack.c',
-                                            '../common/netjack_packet.c' ], ["SAMPLERATE", "CELT"])
+                                            '../common/netjack_packet.c' ], ["SAMPLERATE", "CELT", "OPUS"])
 
     create_jack_driver_obj(bld, 'proxy', '../common/JackProxyDriver.cpp')

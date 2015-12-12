@@ -20,6 +20,14 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackException.h"
 #include "JackError.h"
 
+#if HAVE_CELT
+#include "JackNetCelt.h"
+#endif
+
+#if HAVE_OPUS
+#include "JackNetOpus.h"
+#endif
+
 #include <assert.h>
 
 using namespace std;
