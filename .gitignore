@@ -2,6 +2,7 @@ build/
 man/*.1
 .lock*
 __pycache__
+*.pyc
 android/.server/
 android/.client/
 codeBlocks
