@@ -388,6 +388,9 @@ def options(opt):
     opt.load('compiler_cxx')
     opt.load('compiler_c')
 
+    opt.load('xcode')
+    opt.load('xcode6')
+
     # install directories
     opt.add_option('--htmldir', type='string', default=None, help="HTML documentation directory [Default: <prefix>/share/jack-audio-connection-kit/reference/html/")
     opt.add_option('--libdir', type='string', help="Library directory [Default: <prefix>/lib]")
