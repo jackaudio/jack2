@@ -194,10 +194,14 @@ echo LIB=%%LIB%%;%%LIBPATH%%
 	try:
 		try:
 			conf.cmd_and_log(cxx + ['/help'], env=env)
+		except UnicodeError:
+			st = Utils.ex_stack()
+			if conf.logger:
+				conf.logger.error(st)
+			conf.fatal('msvc: Unicode error - check the code page?')
 		except Exception as e:
-			debug('msvc: get_msvc_version: %r %r %r -> failure' % (compiler, version, target))
-			debug(str(e))
-			conf.fatal('msvc: cannot run the compiler (in get_msvc_version)')
+			debug('msvc: get_msvc_version: %r %r %r -> failure %s' % (compiler, version, target, str(e)))
+			conf.fatal('msvc: cannot run the compiler in get_msvc_version (run with -v to display errors)')
 		else:
 			debug('msvc: get_msvc_version: %r %r %r -> OK', compiler, version, target)
 	finally:
@@ -235,7 +239,7 @@ def gather_wsdk_versions(conf, versions):
 			path,type = Utils.winreg.QueryValueEx(msvc_version,'InstallationFolder')
 		except WindowsError:
 			continue
-		if os.path.isfile(os.path.join(path, 'bin', 'SetEnv.cmd')):
+		if path and os.path.isfile(os.path.join(path, 'bin', 'SetEnv.cmd')):
 			targets = []
 			for target,arch in all_msvc_platforms:
 				try:
@@ -328,8 +332,8 @@ def get_compiler_env(conf, compiler, version, bat_target, bat, select=None):
 	"""
 	Gets the compiler environment variables as a tuple. Evaluation is eager by default.
 	If set to lazy with ``--msvc_lazy_autodetect`` or ``env.MSVC_LAZY_AUTODETECT``
-        the environment is evaluated when the tuple is destructured or iterated. This means
-        destructuring can throw :py:class:`conf.errors.ConfigurationError`.
+	the environment is evaluated when the tuple is destructured or iterated. This means
+	destructuring can throw :py:class:`conf.errors.ConfigurationError`.
 
 	:param conf: configuration context to use to eventually get the version environment
 	:param compiler: compiler name
@@ -350,26 +354,26 @@ def get_compiler_env(conf, compiler, version, bat_target, bat, select=None):
 class lazytup(object):
 	"""
 	A tuple that evaluates its elements from a function when iterated or destructured.
-	
+
 	:param fn: thunk to evaluate the tuple on demand
 	:param lazy: whether to delay evaluation or evaluate in the constructor
 	:param default: optional default for :py:func:`repr` if it should not evaluate
 	"""
-        def __init__(self, fn, lazy=True, default=None):
+	def __init__(self, fn, lazy=True, default=None):
 		self.fn = fn
 		self.default = default
 		if not lazy:
 			self.evaluate()
-        def __len__(self):
+	def __len__(self):
 		self.evaluate()
-                return len(self.value)
-        def __iter__(self):
+		return len(self.value)
+	def __iter__(self):
 		self.evaluate()
-                for i, v in enumerate(self.value):
-                        yield v
-        def __getitem__(self, i):
+		for i, v in enumerate(self.value):
+			yield v
+	def __getitem__(self, i):
 		self.evaluate()
-                return self.value[i]
+		return self.value[i]
 	def __repr__(self):
 		if hasattr(self, 'value'):
 			return repr(self.value)
@@ -594,9 +598,9 @@ def gather_intel_composer_versions(conf, versions):
 							if (r'if exist "%VS110COMNTOOLS%..\IDE\VSWinExpress.exe"' in Utils.readf(compilervars_arch) and
 								not os.path.exists(vs_express_path) and not os.path.exists(dev_env_path)):
 								Logs.warn(('The Intel compilervar_arch.bat only checks for one Visual Studio SKU '
-								           '(VSWinExpress.exe) but it does not seem to be installed at %r. '
-								           'The intel command line set up will fail to configure unless the file %r'
-								           'is patched. See: %s') % (vs_express_path, compilervars_arch, patch_url))
+								'(VSWinExpress.exe) but it does not seem to be installed at %r. '
+								'The intel command line set up will fail to configure unless the file %r'
+								'is patched. See: %s') % (vs_express_path, compilervars_arch, patch_url))
 			except WindowsError:
 				pass
 		major = version[0:2]
@@ -833,9 +837,6 @@ def find_msvc(conf):
 	v.MSVC_MANIFEST = (compiler == 'msvc' and version >= 8) or (compiler == 'wsdk' and version >= 6) or (compiler == 'intel' and version >= 11)
 
 	# compiler
-	cxx = None
-	if v['CXX']: cxx = v['CXX']
-	elif 'CXX' in conf.environ: cxx = conf.environ['CXX']
 	cxx = conf.find_program(compiler_name, var='CXX', path_list=path)
 
 	# before setting anything, check if the compiler is really msvc

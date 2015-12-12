@@ -278,6 +278,13 @@ class Parallel(object):
 		:param tsk: task
 		:type tsk: :py:attr:`waflib.Task.TaskBase`
 		"""
+		if hasattr(tsk, 'scan') and hasattr(tsk, 'uid'):
+			# TODO waf 1.9 - this breaks encapsulation
+			key = (tsk.uid(), 'imp')
+			try:
+				del self.bld.task_sigs[key]
+			except KeyError:
+				pass
 		if not self.bld.keep:
 			self.stop = True
 		self.error.append(tsk)

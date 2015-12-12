@@ -46,6 +46,7 @@ def waf_entry_point(current_directory, version, wafdir):
 		# perhaps extract 'wscript' as a constant
 		if os.path.basename(potential_wscript) == 'wscript' and os.path.isfile(potential_wscript):
 			# need to explicitly normalize the path, as it may contain extra '/.'
+			# TODO abspath?
 			current_directory = os.path.normpath(os.path.dirname(potential_wscript))
 			sys.argv.pop(1)
 
@@ -62,11 +63,14 @@ def waf_entry_point(current_directory, version, wafdir):
 					break
 
 	# if --top is provided assume the build started in the top directory
-	for x in sys.argv:
+	for i, x in enumerate(sys.argv):
+		# WARNING: this modifies sys.argv
 		if x.startswith('--top='):
-			Context.run_dir = Context.top_dir = x[6:]
+			Context.run_dir = Context.top_dir = Utils.sane_path(x[6:])
+			sys.argv[i] = '--top=' + Context.run_dir
 		if x.startswith('--out='):
-			Context.out_dir = x[6:]
+			Context.out_dir = Utils.sane_path(x[6:])
+			sys.argv[i] = '--out=' + Context.out_dir
 
 	# try to find a lock file (if the project was configured)
 	# at the same time, store the first wscript file seen
@@ -137,7 +141,7 @@ def waf_entry_point(current_directory, version, wafdir):
 		sys.exit(1)
 
 	try:
-		set_main_module(os.path.join(Context.run_dir, Context.WSCRIPT_FILE))
+		set_main_module(os.path.normpath(os.path.join(Context.run_dir, Context.WSCRIPT_FILE)))
 	except Errors.WafError as e:
 		Logs.pprint('RED', e.verbose_msg)
 		Logs.error(str(e))

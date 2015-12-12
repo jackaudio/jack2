@@ -6,7 +6,7 @@
 C/C++/D configuration helpers
 """
 
-import os, re, shlex, sys
+import os, re, shlex
 from waflib import Build, Utils, Task, Options, Logs, Errors, Runner
 from waflib.TaskGen import after_method, feature
 from waflib.Configure import conf
@@ -288,11 +288,11 @@ def exec_cfg(self, kw):
 	"""
 
 	path = Utils.to_list(kw['path'])
-
+	env = self.env.env or None
 	def define_it():
 		pkgname = kw.get('uselib_store', kw['package'].upper())
 		if kw.get('global_define'):
-			# compatibility
+			# compatibility, replace by pkgname in WAF 1.9?
 			self.define(self.have_define(kw['package']), 1, False)
 		else:
 			self.env.append_unique('DEFINES_%s' % pkgname, "%s=1" % self.have_define(pkgname))
@@ -301,7 +301,7 @@ def exec_cfg(self, kw):
 	# pkg-config version
 	if 'atleast_pkgconfig_version' in kw:
 		cmd = path + ['--atleast-pkgconfig-version=%s' % kw['atleast_pkgconfig_version']]
-		self.cmd_and_log(cmd)
+		self.cmd_and_log(cmd, env=env)
 		if not 'okmsg' in kw:
 			kw['okmsg'] = 'yes'
 		return
@@ -310,7 +310,7 @@ def exec_cfg(self, kw):
 	for x in cfg_ver:
 		y = x.replace('-', '_')
 		if y in kw:
-			self.cmd_and_log(path + ['--%s=%s' % (x, kw[y]), kw['package']])
+			self.cmd_and_log(path + ['--%s=%s' % (x, kw[y]), kw['package']], env=env)
 			if not 'okmsg' in kw:
 				kw['okmsg'] = 'yes'
 			define_it()
@@ -318,7 +318,7 @@ def exec_cfg(self, kw):
 
 	# retrieving the version of a module
 	if 'modversion' in kw:
-		version = self.cmd_and_log(path + ['--modversion', kw['modversion']]).strip()
+		version = self.cmd_and_log(path + ['--modversion', kw['modversion']], env=env).strip()
 		self.define('%s_VERSION' % Utils.quote_define_name(kw.get('uselib_store', kw['modversion'])), version)
 		return version
 
@@ -342,19 +342,19 @@ def exec_cfg(self, kw):
 
 	# retrieving variables of a module
 	if 'variables' in kw:
-		env = kw.get('env', self.env)
+		v = kw.get('env', self.env)
 		uselib = kw.get('uselib_store', kw['package'].upper())
 		vars = Utils.to_list(kw['variables'])
 		for v in vars:
-			val = self.cmd_and_log(lst + ['--variable=' + v]).strip()
+			val = self.cmd_and_log(lst + ['--variable=' + v], env=env).strip()
 			var = '%s_%s' % (uselib, v)
-			env[var] = val
+			v[var] = val
 		if not 'okmsg' in kw:
 			kw['okmsg'] = 'yes'
 		return
 
 	# so we assume the command-line will output flags to be parsed afterwards
-	ret = self.cmd_and_log(lst)
+	ret = self.cmd_and_log(lst, env=env)
 	if not 'okmsg' in kw:
 		kw['okmsg'] = 'yes'
 
@@ -482,7 +482,10 @@ def validate_c(self, kw):
 		kw['type'] = 'cprogram'
 
 	if not 'features' in kw:
-		kw['features'] = [kw['compile_mode'], kw['type']] # "cprogram c"
+		if not 'header_name' in kw or kw.get('link_header_test', True):
+			kw['features'] = [kw['compile_mode'], kw['type']] # "c ccprogram"
+		else:
+			kw['features'] = [kw['compile_mode']]
 	else:
 		kw['features'] = Utils.to_list(kw['features'])
 
@@ -604,6 +607,11 @@ def validate_c(self, kw):
 	if self.env[INCKEYS]:
 		kw['code'] = '\n'.join(['#include <%s>' % x for x in self.env[INCKEYS]]) + '\n' + kw['code']
 
+	# in case defines lead to very long command-lines
+	if kw.get('merge_config_header', False) or env.merge_config_header:
+		kw['code'] = '%s\n\n%s' % (self.get_config_header(), kw['code'])
+		env.DEFINES = [] # modify the copy
+
 	if not kw.get('success'): kw['success'] = None
 
 	if 'define_name' in kw:
@@ -626,7 +634,7 @@ def post_check(self, *k, **kw):
 		is_success = (kw['success'] == 0)
 
 	if 'define_name' in kw:
-		# TODO simplify?
+		# TODO simplify!
 		if 'header_name' in kw or 'function_name' in kw or 'type_name' in kw or 'fragment' in kw:
 			if kw['execute'] and kw.get('define_ret', None) and isinstance(is_success, str):
 				self.define(kw['define_name'], is_success, quote=kw.get('quote', 1))
@@ -634,6 +642,10 @@ def post_check(self, *k, **kw):
 				self.define_cond(kw['define_name'], is_success)
 		else:
 			self.define_cond(kw['define_name'], is_success)
+
+		# consistency with check_cfg
+		if kw.get('global_define', None):
+			self.env[kw['define_name']] = is_success
 
 	if 'header_name' in kw:
 		if kw.get('auto_add_header_name', False):

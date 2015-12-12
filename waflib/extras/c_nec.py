@@ -6,7 +6,6 @@
 NEC SX Compiler for SX vector systems
 """
 
-import os
 import re
 from waflib import Utils
 from waflib.Tools import ccroot,ar

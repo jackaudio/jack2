@@ -37,11 +37,14 @@ SKIP_ME = -2
 RUN_ME = -3
 """The task must be executed"""
 
+# To save some memory during the build, consider discarding tsk.last_cmd in the two templates below
+
 COMPILE_TEMPLATE_SHELL = '''
 def f(tsk):
 	env = tsk.env
 	gen = tsk.generator
 	bld = gen.bld
+	cwdx = getattr(bld, 'cwdx', bld.bldnode) # TODO single cwd value in waf 1.9
 	wd = getattr(tsk, 'cwd', None)
 	p = env.get_flat
 	tsk.last_cmd = cmd = \'\'\' %s \'\'\' % s
@@ -53,6 +56,7 @@ def f(tsk):
 	env = tsk.env
 	gen = tsk.generator
 	bld = gen.bld
+	cwdx = getattr(bld, 'cwdx', bld.bldnode) # TODO single cwd value in waf 1.9
 	wd = getattr(tsk, 'cwd', None)
 	def to_list(xx):
 		if isinstance(xx, str): return [xx]
@@ -81,11 +85,10 @@ class store_task_type(type):
 			name = name.replace('_task', '')
 		if name != 'evil' and name != 'TaskBase':
 			global classes
-
 			if getattr(cls, 'run_str', None):
 				# if a string is provided, convert it to a method
 				(f, dvars) = compile_fun(cls.run_str, cls.shell)
-				cls.hcode = cls.run_str
+				cls.hcode = Utils.h_cmd(cls.run_str)
 				cls.orig_run_str = cls.run_str
 				# change the name of run_str or it is impossible to subclass with a function
 				cls.run_str = None
@@ -94,10 +97,7 @@ class store_task_type(type):
 				cls.vars.sort()
 			elif getattr(cls, 'run', None) and not 'hcode' in cls.__dict__:
 				# getattr(cls, 'hcode') would look in the upper classes
-				cls.hcode = Utils.h_fun(cls.run)
-
-			if sys.hexversion > 0x3000000:
-				cls.hcode = cls.hcode.encode('iso8859-1', 'xmlcharrefreplace')
+				cls.hcode = Utils.h_cmd(cls.run)
 
 			# be creative
 			getattr(cls, 'register', classes)[name] = cls
@@ -206,6 +206,7 @@ class TaskBase(evil):
 		# remove the task signature immediately before it is executed
 		# in case of failure the task will be executed again
 		try:
+			# TODO waf 1.9 - this breaks encapsulation
 			del self.generator.bld.task_sigs[self.uid()]
 		except KeyError:
 			pass
@@ -972,17 +973,17 @@ def compile_fun_shell(line):
 	for (var, meth) in extr:
 		if var == 'SRC':
 			if meth: app('tsk.inputs%s' % meth)
-			else: app('" ".join([a.path_from(bld.bldnode) for a in tsk.inputs])')
+			else: app('" ".join([a.path_from(cwdx) for a in tsk.inputs])')
 		elif var == 'TGT':
 			if meth: app('tsk.outputs%s' % meth)
-			else: app('" ".join([a.path_from(bld.bldnode) for a in tsk.outputs])')
+			else: app('" ".join([a.path_from(cwdx) for a in tsk.outputs])')
 		elif meth:
 			if meth.startswith(':'):
 				m = meth[1:]
 				if m == 'SRC':
-					m = '[a.path_from(bld.bldnode) for a in tsk.inputs]'
+					m = '[a.path_from(cwdx) for a in tsk.inputs]'
 				elif m == 'TGT':
-					m = '[a.path_from(bld.bldnode) for a in tsk.outputs]'
+					m = '[a.path_from(cwdx) for a in tsk.outputs]'
 				elif m[:3] not in ('tsk', 'gen', 'bld'):
 					dvars.extend([var, meth[1:]])
 					m = '%r' % m
@@ -1027,17 +1028,17 @@ def compile_fun_noshell(line):
 		(var, meth) = extr[x]
 		if var == 'SRC':
 			if meth: app('lst.append(tsk.inputs%s)' % meth)
-			else: app("lst.extend([a.path_from(bld.bldnode) for a in tsk.inputs])")
+			else: app("lst.extend([a.path_from(cwdx) for a in tsk.inputs])")
 		elif var == 'TGT':
 			if meth: app('lst.append(tsk.outputs%s)' % meth)
-			else: app("lst.extend([a.path_from(bld.bldnode) for a in tsk.outputs])")
+			else: app("lst.extend([a.path_from(cwdx) for a in tsk.outputs])")
 		elif meth:
 			if meth.startswith(':'):
 				m = meth[1:]
 				if m == 'SRC':
-					m = '[a.path_from(bld.bldnode) for a in tsk.inputs]'
+					m = '[a.path_from(cwdx) for a in tsk.inputs]'
 				elif m == 'TGT':
-					m = '[a.path_from(bld.bldnode) for a in tsk.outputs]'
+					m = '[a.path_from(cwdx) for a in tsk.outputs]'
 				elif m[:3] not in ('tsk', 'gen', 'bld'):
 					dvars.extend([var, m])
 					m = '%r' % m
@@ -1074,9 +1075,27 @@ def compile_fun(line, shell=False):
 	The reserved keywords *TGT* and *SRC* represent the task input and output nodes
 
 	"""
-	if line.find('<') > 0 or line.find('>') > 0 or line.find('&&') > 0:
-		shell = True
-
+	if isinstance(line, str):
+		if line.find('<') > 0 or line.find('>') > 0 or line.find('&&') > 0:
+			shell = True
+	else:
+		dvars_lst = []
+		funs_lst = []
+		for x in line:
+			if isinstance(x, str):
+				fun, dvars = compile_fun(x, shell)
+				dvars_lst += dvars
+				funs_lst.append(fun)
+			else:
+				# assume a function to let through
+				funs_lst.append(x)
+		def composed_fun(task):
+			for x in funs_lst:
+				ret = x(task)
+				if ret:
+					return ret
+			return None
+		return composed_fun, dvars
 	if shell:
 		return compile_fun_shell(line)
 	else:
@@ -1111,7 +1130,7 @@ def task_factory(name, func=None, vars=None, color='GREEN', ext_in=[], ext_out=[
 		'scan': scan,
 	}
 
-	if isinstance(func, str):
+	if isinstance(func, str) or isinstance(func, tuple):
 		params['run_str'] = func
 	else:
 		params['run'] = func
