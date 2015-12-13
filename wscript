@@ -722,6 +722,15 @@ def build_jackd(bld):
 
 # FIXME: Is SERVER_SIDE needed?
 def create_driver_obj(bld, **kw):
+    if bld.env['IS_MACOSX'] or bld.env['IS_WINDOWS']:
+        # On MacOSX this is necessary.
+        # I do not know if this is necessary on Windows.
+        # Note added on 2015-12-13 by lilrc.
+        if 'use' in kw:
+            kw['use'] += ['serverlib']
+        else:
+            kw['use'] = ['serverlib']
+
     driver = bld(
         features = ['c', 'cshlib', 'cxx', 'cxxshlib'],
         defines = ['HAVE_CONFIG_H', 'SERVER_SIDE'],
@@ -907,28 +916,26 @@ def build_drivers(bld):
             bld,
             target = 'portaudio',
             source = portaudio_src,
-            use = ['serverlib', 'PORTAUDIO']) # FIXME: Is serverlib needed here?
+            use = ['PORTAUDIO'])
 
     if bld.env['BUILD_DRIVER_WINMME']:
         create_driver_obj(
             bld,
             target = 'winmme',
             source = winmme_src,
-            use = ['serverlib', 'WINMME']) # FIXME: Is serverlib needed here?
+            use = ['WINMME'])
 
     if bld.env['IS_MACOSX']:
         create_driver_obj(
             bld,
             target = 'coreaudio',
             source = coreaudio_src,
-            use = ['serverlib'], # FIXME: Is this needed?
             framework = ['AudioUnit', 'CoreAudio', 'CoreServices'])
 
         create_driver_obj(
             bld,
             target = 'coremidi',
             source = coremidi_src,
-            use = ['serverlib'], # FIXME: Is this needed?
             framework = ['AudioUnit', 'CoreMIDI', 'CoreServices'])
 
     if bld.env['IS_SUN']:
