@@ -37,8 +37,6 @@ def create_jack_process_obj(bld, target, sources, uselib = None):
     if bld.env['IS_LINUX']:
         process.env.append_value("CPPFLAGS", "-fvisibility=hidden")
     if bld.env['IS_MACOSX']:
-        process.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
-        #process.env.append_value("LINKFLAGS", "-arch i386 -arch ppc -arch x86_64")
         process.env.append_value("CPPFLAGS", "-fvisibility=hidden")
     process.install_path = '${ADDON_DIR}/'
     process.use = [uselib.name]
@@ -185,8 +183,6 @@ def build(bld):
 
     if bld.env['IS_MACOSX']:
         clientlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
-        clientlib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
-        #clientlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module -arch i386 -arch ppc -arch x86_64"
         clientlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module")
         clientlib.env.append_value("LINKFLAGS", "-compatibility_version 1 -current_version 1")
 
@@ -285,8 +281,6 @@ def build(bld):
 
     if bld.env['IS_MACOSX']:
         serverlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
-        serverlib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
-        #serverlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module -arch i386 -arch ppc -arch x86_64")
         serverlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework CoreFoundation -framework vecLib -single_module")
         serverlib.env.append_value("LINKFLAGS", "-compatibility_version 1 -current_version 1")
 
