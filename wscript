@@ -480,9 +480,14 @@ def configure(conf):
     # configure all auto options
     configure_auto_options(conf)
 
+    # Check for functions.
+    conf.check_cc(
+        function_name='ppoll',
+        header_name=['poll.h', 'signal.h'],
+        defines=['_GNU_SOURCE'],
+        mandatory=False)
+
     conf.recurse('common')
-    if conf.env['IS_LINUX']:
-        conf.recurse('linux')
     if Options.options.dbus:
         conf.recurse('dbus')
         if conf.env['BUILD_JACKDBUS'] != True:
