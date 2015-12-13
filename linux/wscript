@@ -8,8 +8,7 @@ def create_jack_driver_obj(bld, target, sources, uselib = None):
     driver = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
     driver.env['cxxshlib_PATTERN'] = 'jack_%s.so'
 
-    #driver.defines = ['HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL']
-    driver.defines = ['HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL', 'HAVE_TIMERFD']
+    driver.defines = ['HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL']
 
     driver.includes = ['.', '../linux', '../posix', '../common', '../common/jack', '../dbus', '../']
     driver.target = target
