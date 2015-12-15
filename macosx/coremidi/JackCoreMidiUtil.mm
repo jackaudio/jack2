@@ -25,13 +25,15 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 std::string
 Jack::GetMacOSErrorString(OSStatus status)
 {
-    const char *message = GetMacOSStatusErrorString(status);
-    if (! message) {
-        std::stringstream stream;
-        stream << "error (code: '" << status << "')";
-        return stream.str();
+    NSError *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+    NSString *errorString = [error localizedDescription];
+    std::string returnString;
+    if (errorString){
+        returnString = std::string([errorString UTF8String]);
+    } else {
+        returnString = std::string("No error");
     }
-    return std::string(message);
+    return returnString;
 }
 
 void
