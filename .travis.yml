@@ -1,9 +1,34 @@
+sudo: false
+os:
+    - osx
+    - linux
 language:
-  - cpp
+    - cpp
 compiler:
-  - gcc
-install:
-  - sudo apt-get install libsamplerate-dev libsndfile-dev libasound2-dev
+    - gcc
+    - clang
+addons:
+    apt:
+        packages:
+            - libsamplerate-dev
+            - libsndfile-dev
+            - libasound2-dev
+
+before_install:
+    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
+    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew outdated pkg-config || brew upgrade pkg-config; fi
+    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install aften; fi 
+    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libsamplerate; fi
+    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libsndfile; fi
+    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install opus; fi
+    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install readline; fi
+
 script:
-  - ./waf configure --alsa
-  - ./waf build
+    - if [ "$TRAVIS_OS_NAME" == "linux" ]; then ./waf configure --alsa; fi
+    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then ./waf configure --opus=no --readline=no; fi
+    - ./waf build
+
+matrix:
+    exclude:
+        - os: osx
+          compiler: gcc
