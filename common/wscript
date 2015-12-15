@@ -111,8 +111,9 @@ def build(bld):
             'timestamps.c',
             '../posix/JackPosixProcessSync.cpp',
             '../posix/JackPosixThread.cpp',
-            '../macosx/JackMachThread.cpp',
-            '../macosx/JackMachSemaphore.cpp',
+            '../posix/JackPosixMutex.cpp',
+            '../macosx/JackMachThread.mm',
+            '../macosx/JackMachSemaphore.mm',
             '../posix/JackSocket.cpp',
             '../macosx/JackMachTime.c',
             ]
@@ -132,7 +133,10 @@ def build(bld):
         uselib.append('PSAPI')
         uselib.append('WINMM')
 
-    clientlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
+    if bld.env['IS_MACOSX']:
+        clientlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'], framework = ['CoreAudio', 'Accelerate'])
+    else:
+        clientlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
     clientlib.defines = 'HAVE_CONFIG_H'
     clientlib.use = uselib
     if bld.env['IS_WINDOWS']:
@@ -183,8 +187,7 @@ def build(bld):
 
     if bld.env['IS_MACOSX']:
         clientlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
-        clientlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module")
-        clientlib.env.append_value("LINKFLAGS", "-compatibility_version 1 -current_version 1")
+        clientlib.env.append_value("LINKFLAGS", "-single_module")
 
     if bld.env['IS_SUN']:
         clientlib.env.append_value("LINKFLAGS", "-lnsl -lsocket")
@@ -194,7 +197,10 @@ def build(bld):
         # we don't want to build other stuff in this variant
         return
 
-    serverlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
+    if bld.env['IS_MACOSX']:
+        serverlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'], framework = ['CoreAudio', 'CoreFoundation', 'Accelerate'])
+    else:
+        serverlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
     serverlib.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
     serverlib.includes = includes
     serverlib.name         = 'serverlib'
@@ -281,14 +287,16 @@ def build(bld):
 
     if bld.env['IS_MACOSX']:
         serverlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
-        serverlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework CoreFoundation -framework vecLib -single_module")
-        serverlib.env.append_value("LINKFLAGS", "-compatibility_version 1 -current_version 1")
+        serverlib.env.append_value("LINKFLAGS", "-single_module")
 
     if bld.env['IS_SUN']:
         serverlib.env.append_value("LINKFLAGS", "-lnsl -lsocket")
 
     if bld.env['BUILD_NETLIB'] == True:
-        netlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
+        if bld.env['IS_MACOSX']:
+            netlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'], framework =  ['CoreAudio'])
+        else:
+            netlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
         netlib.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
         netlib.includes = includes
         netlib.name         = 'netlib'
@@ -297,6 +305,8 @@ def build(bld):
         if bld.env['IS_WINDOWS']:
              netlib.install_path = '${BINDIR}'
              netlib.use += ['WS2_32', 'WINMM']
+        elif bld.env['IS_MACOSX']:
+             netlib.install_path = '${LIBDIR}'
         else:
              netlib.use += ['RT']
              netlib.install_path = '${LIBDIR}'
@@ -321,8 +331,8 @@ def build(bld):
        
 
         if bld.env['IS_MACOSX']:
-            netlib.source += ['../posix/JackNetUnixSocket.cpp','../posix/JackPosixThread.cpp', '../posix/JackPosixMutex.cpp', '../macosx/JackMachThread.cpp', '../macosx/JackMachTime.c']
-            netlib.env.append_value("LINKFLAGS", "-framework CoreAudio -single_module")
+            netlib.source += ['../posix/JackNetUnixSocket.cpp','../posix/JackPosixThread.cpp', '../posix/JackPosixMutex.cpp', '../macosx/JackMachThread.mm', '../macosx/JackMachTime.c']
+            netlib.env.append_value("LINKFLAGS", "-single_module")
 
         if bld.env['IS_WINDOWS']:
             netlib.source += ['../windows/JackNetWinSocket.cpp','../windows/JackWinThread.cpp', '../windows/JackMMCSS.cpp', '../windows/JackWinTime.c']
@@ -353,10 +363,19 @@ def build(bld):
         'JackAudioAdapterFactory.cpp',
          ]
 
-    if bld.env['BUILD_ADAPTER'] and bld.env['IS_MACOSX']:
-         audio_adapter_sources += ['../macosx/coreaudio/JackCoreAudioAdapter.cpp']
-         process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
-         process.env.append_value("LINKFLAGS", "-framework CoreAudio -framework AudioUnit -framework AudioToolbox -framework CoreServices")
+    if bld.env['BUILD_ADAPTER'] and bld.env['IS_MACOSX'] and False:
+         audio_adapter_sources += ['../macosx/coreaudio/JackCoreAudioAdapter.mm']
+         process = create_jack_process_obj(bld,
+              'audioadapter',
+              audio_adapter_sources,
+              serverlib,
+              framework = [
+                      "CoreAudio",
+                      "AudioUnit",
+                      "AudioToolbox",
+                      "CoreServices"
+              ]
+         )
          process.use = 'SAMPLERATE'
 
     if bld.env['BUILD_ADAPTER'] and bld.env['IS_LINUX'] and bld.env['BUILD_DRIVER_ALSA']:
