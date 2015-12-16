@@ -702,8 +702,7 @@ def build_jackd(bld):
         includes = ['.', 'common', 'common/jack'],
         target = 'jackd',
         source = ['common/Jackdmp.cpp'],
-        use = ['serverlib'],
-        framework = ['CoreFoundation']
+        use = ['serverlib']
     )
 
     if bld.env['BUILD_JACKDBUS']:
@@ -715,6 +714,7 @@ def build_jackd(bld):
 
     if bld.env['IS_MACOSX']:
         jackd.use += ['DL', 'PTHREAD']
+        jackd.framework = ['CoreFoundation']
 
     if bld.env['IS_SUN']:
         jackd.use += ['DL', 'PTHREAD']
