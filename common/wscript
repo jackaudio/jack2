@@ -17,12 +17,14 @@ def configure(conf):
         conf.check_cc(function_name='timeGetDevCaps', header_name=['windows.h', 'mmsystem.h'], lib='winmm', uselib_store="WINMM", define_name='HAVE_MMSYSTEM_H')
         conf.check_cc(function_name='EnumProcesses', header_name=['windows.h', 'psapi.h'], lib='psapi', uselib_store="PSAPI", define_name='HAVE_PSAPI_H')
 
-def create_jack_process_obj(bld, target, sources, uselib = None):
+def create_jack_process_obj(bld, target, sources, uselib = None, framework = None):
     process = bld(features = ['cxx', 'cxxshlib'])
     if not bld.env['IS_WINDOWS']:
         process.env['cxxshlib_PATTERN'] = '%s.so'
     process.defines  = ['HAVE_CONFIG_H','SERVER_SIDE']
     if bld.env['IS_MACOSX']:
+        if framework:
+            process.framework = framework
         env_includes = ['../macosx', '../posix', '../macosx/coreaudio']
     if bld.env['IS_LINUX']:
         env_includes = ['../linux', '../posix', '../linux/alsa']
@@ -113,7 +115,8 @@ def build(bld):
             '../posix/JackPosixThread.cpp',
             '../posix/JackPosixMutex.cpp',
             '../macosx/JackMachThread.mm',
-            '../macosx/JackMachSemaphore.mm',
+            #'../macosx/JackMachSemaphore.mm',
+            '../posix/JackPosixSemaphore.cpp',
             '../posix/JackSocket.cpp',
             '../macosx/JackMachTime.c',
             ]
@@ -360,7 +363,7 @@ def build(bld):
         'JackAudioAdapterFactory.cpp',
          ]
 
-    if bld.env['BUILD_ADAPTER'] and bld.env['IS_MACOSX'] and False:
+    if bld.env['BUILD_ADAPTER'] and bld.env['IS_MACOSX']:
          audio_adapter_sources += ['../macosx/coreaudio/JackCoreAudioAdapter.mm']
          process = create_jack_process_obj(bld,
               'audioadapter',
@@ -373,7 +376,7 @@ def build(bld):
                       "CoreServices"
               ]
          )
-         process.use = 'SAMPLERATE'
+         process.use += ['SAMPLERATE']
 
     if bld.env['BUILD_ADAPTER'] and bld.env['IS_LINUX'] and bld.env['BUILD_DRIVER_ALSA']:
          audio_adapter_sources += ['../linux/alsa/JackAlsaAdapter.cpp']
