@@ -133,10 +133,9 @@ def build(bld):
         uselib.append('PSAPI')
         uselib.append('WINMM')
 
+    clientlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
     if bld.env['IS_MACOSX']:
-        clientlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'], framework = ['CoreAudio', 'Accelerate'])
-    else:
-        clientlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
+        clientlib.framework = ['CoreAudio', 'Accelerate']
     clientlib.defines = 'HAVE_CONFIG_H'
     clientlib.use = uselib
     if bld.env['IS_WINDOWS']:
@@ -197,10 +196,9 @@ def build(bld):
         # we don't want to build other stuff in this variant
         return
 
+    serverlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
     if bld.env['IS_MACOSX']:
-        serverlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'], framework = ['CoreAudio', 'CoreFoundation', 'Accelerate'])
-    else:
-        serverlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
+        serverlib.framework = ['CoreAudio', 'CoreFoundation', 'Accelerate']
     serverlib.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
     serverlib.includes = includes
     serverlib.name         = 'serverlib'
@@ -293,10 +291,9 @@ def build(bld):
         serverlib.env.append_value("LINKFLAGS", "-lnsl -lsocket")
 
     if bld.env['BUILD_NETLIB'] == True:
+        netlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
         if bld.env['IS_MACOSX']:
-            netlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'], framework =  ['CoreAudio'])
-        else:
-            netlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
+            netlib.framework =  ['CoreAudio']
         netlib.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
         netlib.includes = includes
         netlib.name         = 'netlib'
