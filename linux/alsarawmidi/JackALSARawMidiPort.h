@@ -31,12 +31,12 @@ namespace Jack {
 
     private:
 
-        char alias[REAL_JACK_PORT_NAME_SIZE];
+        char alias[REAL_JACK_PORT_NAME_SIZE+1];
         struct pollfd *alsa_poll_fds;
         int alsa_poll_fd_count;
         int fds[2];
         unsigned short io_mask;
-        char name[REAL_JACK_PORT_NAME_SIZE];
+        char name[REAL_JACK_PORT_NAME_SIZE+1];
         struct pollfd *queue_poll_fd;
 
     protected:

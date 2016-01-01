@@ -422,10 +422,10 @@ static string RemoveLast(const string& name)
 void JackDriver::SaveConnections(int alias)
 {
     const char** connections;
-    char alias1[REAL_JACK_PORT_NAME_SIZE];
-    char alias2[REAL_JACK_PORT_NAME_SIZE];
-    char system_alias1[REAL_JACK_PORT_NAME_SIZE];
-    char system_alias2[REAL_JACK_PORT_NAME_SIZE];
+    char alias1[REAL_JACK_PORT_NAME_SIZE+1];
+    char alias2[REAL_JACK_PORT_NAME_SIZE+1];
+    char system_alias1[REAL_JACK_PORT_NAME_SIZE+1];
+    char system_alias2[REAL_JACK_PORT_NAME_SIZE+1];
     char* aliases[2];
     char* system_aliases[2];
 
@@ -506,8 +506,8 @@ void JackDriver::SaveConnections(int alias)
 
 string JackDriver::MatchPortName(const char* name, const char** ports, int alias, const std::string& type)
 {
-    char alias1[REAL_JACK_PORT_NAME_SIZE];
-    char alias2[REAL_JACK_PORT_NAME_SIZE];
+    char alias1[REAL_JACK_PORT_NAME_SIZE+1];
+    char alias2[REAL_JACK_PORT_NAME_SIZE+1];
     char* aliases[2];
   
     aliases[0] = alias1;

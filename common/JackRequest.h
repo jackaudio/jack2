@@ -157,7 +157,7 @@ struct JackResult
 struct JackClientCheckRequest : public JackRequest
 {
 
-    char fName[JACK_CLIENT_NAME_SIZE + 1];
+    char fName[JACK_CLIENT_NAME_SIZE+1];
     int fProtocol;
     int fOptions;
     int fUUID;
@@ -202,7 +202,7 @@ struct JackClientCheckRequest : public JackRequest
 struct JackClientCheckResult : public JackResult
 {
 
-    char fName[JACK_CLIENT_NAME_SIZE + 1];
+    char fName[JACK_CLIENT_NAME_SIZE+1];
     int fStatus;
 
     JackClientCheckResult(): JackResult(), fStatus(0)
@@ -240,7 +240,7 @@ struct JackClientOpenRequest : public JackRequest
 
     int fPID;
     int fUUID;
-    char fName[JACK_CLIENT_NAME_SIZE + 1];
+    char fName[JACK_CLIENT_NAME_SIZE+1];
 
     JackClientOpenRequest()
     {}
@@ -517,8 +517,8 @@ struct JackPortConnectNameRequest : public JackRequest
 {
 
     int fRefNum;
-    char fSrc[REAL_JACK_PORT_NAME_SIZE + 1];    // port full name
-    char fDst[REAL_JACK_PORT_NAME_SIZE + 1];    // port full name
+    char fSrc[REAL_JACK_PORT_NAME_SIZE+1];    // port full name
+    char fDst[REAL_JACK_PORT_NAME_SIZE+1];    // port full name
 
     JackPortConnectNameRequest()
     {}
@@ -559,8 +559,8 @@ struct JackPortDisconnectNameRequest : public JackRequest
 {
 
     int fRefNum;
-    char fSrc[REAL_JACK_PORT_NAME_SIZE + 1];    // port full name
-    char fDst[REAL_JACK_PORT_NAME_SIZE + 1];    // port full name
+    char fSrc[REAL_JACK_PORT_NAME_SIZE+1];    // port full name
+    char fDst[REAL_JACK_PORT_NAME_SIZE+1];    // port full name
 
     JackPortDisconnectNameRequest()
     {}
@@ -901,7 +901,7 @@ struct JackGetInternalClientNameRequest : public JackRequest
 struct JackGetInternalClientNameResult : public JackResult
 {
 
-    char fName[JACK_CLIENT_NAME_SIZE + 1];
+    char fName[JACK_CLIENT_NAME_SIZE+1];
 
     JackGetInternalClientNameResult(): JackResult()
     {}
@@ -936,7 +936,7 @@ struct JackInternalClientHandleRequest : public JackRequest
 {
 
     int fRefNum;
-    char fName[JACK_CLIENT_NAME_SIZE + 1];
+    char fName[JACK_CLIENT_NAME_SIZE+1];
 
     JackInternalClientHandleRequest()
     {}
@@ -1010,9 +1010,9 @@ struct JackInternalClientLoadRequest : public JackRequest
 #endif
 
     int fRefNum;
-    char fName[JACK_CLIENT_NAME_SIZE + 1];
-    char fDllName[MAX_PATH + 1];
-    char fLoadInitName[JACK_LOAD_INIT_LIMIT + 1];
+    char fName[JACK_CLIENT_NAME_SIZE+1];
+    char fDllName[MAX_PATH+1];
+    char fLoadInitName[JACK_LOAD_INIT_LIMIT+1];
     int fOptions;
     int fUUID;
 
@@ -1194,7 +1194,7 @@ struct JackClientNotificationRequest : public JackRequest
 struct JackSessionCommand
 {
     char fUUID[JACK_UUID_SIZE];
-    char fClientName[JACK_CLIENT_NAME_SIZE + 1];
+    char fClientName[JACK_CLIENT_NAME_SIZE+1];
     char fCommand[JACK_SESSION_COMMAND_SIZE];
     jack_session_flags_t fFlags;
 
@@ -1305,8 +1305,8 @@ struct JackSessionNotifyResult : public JackResult
 
 struct JackSessionNotifyRequest : public JackRequest
 {
-    char fPath[JACK_MESSAGE_SIZE + 1];
-    char fDst[JACK_CLIENT_NAME_SIZE + 1];
+    char fPath[JACK_MESSAGE_SIZE+1];
+    char fDst[JACK_CLIENT_NAME_SIZE+1];
     jack_session_event_type_t fEventType;
     int fRefNum;
 
@@ -1377,7 +1377,7 @@ struct JackSessionReplyRequest : public JackRequest
 
 struct JackClientNameResult : public JackResult
 {
-    char fName[JACK_CLIENT_NAME_SIZE + 1];
+    char fName[JACK_CLIENT_NAME_SIZE+1];
 
     JackClientNameResult(): JackResult()
     {}
@@ -1433,7 +1433,7 @@ struct JackUUIDResult : public JackResult
 
 struct JackGetUUIDRequest : public JackRequest
 {
-    char fName[JACK_CLIENT_NAME_SIZE + 1];
+    char fName[JACK_CLIENT_NAME_SIZE+1];
 
     JackGetUUIDRequest()
     {}
@@ -1496,7 +1496,7 @@ struct JackGetClientNameRequest : public JackRequest
 struct JackReserveNameRequest : public JackRequest
 {
     int  fRefNum;
-    char fName[JACK_CLIENT_NAME_SIZE + 1];
+    char fName[JACK_CLIENT_NAME_SIZE+1];
     char fUUID[JACK_UUID_SIZE];
 
     JackReserveNameRequest()
@@ -1533,7 +1533,7 @@ struct JackReserveNameRequest : public JackRequest
 
 struct JackClientHasSessionCallbackRequest : public JackRequest
 {
-    char fName[JACK_CLIENT_NAME_SIZE + 1];
+    char fName[JACK_CLIENT_NAME_SIZE+1];
 
     JackClientHasSessionCallbackRequest()
     {}
@@ -1569,13 +1569,13 @@ struct JackClientHasSessionCallbackRequest : public JackRequest
 struct JackClientNotification
 {
     int fSize; 
-    char fName[JACK_CLIENT_NAME_SIZE + 1];
+    char fName[JACK_CLIENT_NAME_SIZE+1];
     int fRefNum;
     int fNotify;
     int fValue1;
     int fValue2;
     int fSync;
-    char fMessage[JACK_MESSAGE_SIZE + 1];
+    char fMessage[JACK_MESSAGE_SIZE+1];
 
     JackClientNotification(): fNotify(-1), fValue1(-1), fValue2(-1)
     {}

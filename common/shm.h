@@ -123,7 +123,7 @@ extern "C"
         pid_t pid;	/* process ID */
 #endif
 
-        char	name[JACK_SERVER_NAME_SIZE];
+        char	name[JACK_SERVER_NAME_SIZE+1];
     }
     jack_shm_server_t;
 

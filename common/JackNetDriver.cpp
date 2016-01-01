@@ -318,8 +318,8 @@ namespace Jack
 
         JackPort* port;
         jack_port_id_t port_index;
-        char name[REAL_JACK_PORT_NAME_SIZE];
-        char alias[REAL_JACK_PORT_NAME_SIZE];
+        char name[REAL_JACK_PORT_NAME_SIZE+1];
+        char alias[REAL_JACK_PORT_NAME_SIZE+1];
         int audio_port_index;
         int midi_port_index;
      
@@ -720,7 +720,7 @@ Deactivated for now..
         SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)
         {
             char multicast_ip[32];
-            char net_name[JACK_CLIENT_NAME_SIZE + 1] = {0};
+            char net_name[JACK_CLIENT_NAME_SIZE+1] = {0};
             int udp_port;
             int mtu = DEFAULT_MTU;
             // Desactivated for now...

@@ -119,7 +119,7 @@ static jack_shm_info_t registry_info = { /* SHM info for the registry */
 /* pointers to registry header and array */
 static jack_shm_header_t   *jack_shm_header = NULL;
 static jack_shm_registry_t *jack_shm_registry = NULL;
-static char jack_shm_server_prefix[JACK_SERVER_NAME_SIZE] = "";
+static char jack_shm_server_prefix[JACK_SERVER_NAME_SIZE+1] = "";
 
 /* jack_shm_lock_registry() serializes updates to the shared memory
  * segment JACK uses to keep track of the SHM segments allocated to

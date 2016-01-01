@@ -2262,8 +2262,8 @@ int JackCoreAudioDriver::Attach()
     UInt32 size;
     Boolean isWritable;
     char channel_name[64];
-    char name[REAL_JACK_PORT_NAME_SIZE];
-    char alias[REAL_JACK_PORT_NAME_SIZE];
+    char name[REAL_JACK_PORT_NAME_SIZE+1];
+    char alias[REAL_JACK_PORT_NAME_SIZE+1];
 
     jack_log("JackCoreAudioDriver::Attach : fBufferSize %ld fSampleRate %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
 

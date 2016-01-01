@@ -129,10 +129,9 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
 
     protected:
 
-        char fCaptureDriverName[JACK_CLIENT_NAME_SIZE + 1];
-        char fPlaybackDriverName[JACK_CLIENT_NAME_SIZE + 1];
-
-        char fAliasName[JACK_CLIENT_NAME_SIZE + 1];
+        char fCaptureDriverName[JACK_CLIENT_NAME_SIZE+1];
+        char fPlaybackDriverName[JACK_CLIENT_NAME_SIZE+1];
+        char fAliasName[JACK_CLIENT_NAME_SIZE+1];
 
         jack_nframes_t fCaptureLatency;
         jack_nframes_t fPlaybackLatency;

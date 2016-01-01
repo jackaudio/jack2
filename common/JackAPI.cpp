@@ -1481,12 +1481,12 @@ LIB_EXPORT char* jack_get_client_name(jack_client_t* ext_client)
 
 LIB_EXPORT int jack_client_name_size(void)
 {
-    return JACK_CLIENT_NAME_SIZE;
+    return JACK_CLIENT_NAME_SIZE+1;
 }
 
 LIB_EXPORT int jack_port_name_size(void)
 {
-    return REAL_JACK_PORT_NAME_SIZE;
+    return REAL_JACK_PORT_NAME_SIZE+1;
 }
 
 LIB_EXPORT int jack_port_type_size(void)

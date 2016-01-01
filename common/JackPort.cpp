@@ -230,7 +230,7 @@ void JackPort::SetName(const char* new_name)
 
 bool JackPort::NameEquals(const char* target)
 {
-    char buf[REAL_JACK_PORT_NAME_SIZE];
+    char buf[REAL_JACK_PORT_NAME_SIZE+1];
 
     /* this nasty, nasty kludge is here because between 0.109.0 and 0.109.1,
        the ALSA audio backend had the name "ALSA", whereas as before and

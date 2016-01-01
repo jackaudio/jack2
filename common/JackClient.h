@@ -87,7 +87,7 @@ class SERVER_EXPORT JackClient : public JackClientInterface, public JackRunnable
         void* fThreadFunArg;
         void* fSessionArg;
         void* fLatencyArg;
-        char fServerName[JACK_SERVER_NAME_SIZE];
+        char fServerName[JACK_SERVER_NAME_SIZE+1];
 
         JackThread fThread;    /*! Thread to execute the Process function */
         detail::JackClientChannelInterface* fChannel;

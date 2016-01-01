@@ -59,7 +59,7 @@ class JackDebugClient : public JackClient
         int fIsDeactivated;
         int fIsClosed;
         bool fFreewheel;
-        char fClientName[JACK_CLIENT_NAME_SIZE + 1];
+        char fClientName[JACK_CLIENT_NAME_SIZE+1];
         JackProcessCallback fProcessTimeCallback;
         void* fProcessTimeCallbackArg;
 
