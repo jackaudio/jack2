@@ -22,6 +22,7 @@ typos = {
 
 meths_typos = ['__call__', 'program', 'shlib', 'stlib', 'objects']
 
+import sys
 from waflib import Logs, Build, Node, Task, TaskGen, ConfigSet, Errors, Utils
 import waflib.Tools.ccroot
 
@@ -84,6 +85,9 @@ def check_invalid_constraints(self):
 
 	# the build scripts have been read, so we can check for invalid after/before attributes on task classes
 	for cls in list(Task.classes.values()):
+		if sys.hexversion > 0x3000000 and issubclass(cls, Task.Task) and isinstance(cls.hcode, str):
+			raise Errors.WafError('Class %r has hcode value %r of type <str>, expecting <bytes> (use Utils.h_cmd() ?)' % (cls, cls.hcode))
+
 		for x in ('before', 'after'):
 			for y in Utils.to_list(getattr(cls, x, [])):
 				if not Task.classes.get(y, None):
@@ -103,7 +107,6 @@ def replace(m):
 			if x in kw:
 				if x == 'iscopy' and 'subst' in getattr(self, 'features', ''):
 					continue
-				err = True
 				Logs.error('Fix the typo %r -> %r on %r' % (x, typos[x], ret))
 		return ret
 	setattr(Build.BuildContext, m, call)

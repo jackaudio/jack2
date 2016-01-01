@@ -11,13 +11,13 @@ from waflib import Utils, Errors, Logs
 import waflib.Node
 
 # the following 3 constants are updated on each new release (do not touch)
-HEXVERSION=0x1080e00
+HEXVERSION=0x1081100
 """Constant updated on new releases"""
 
-WAFVERSION="1.8.14"
+WAFVERSION="1.8.17"
 """Constant updated on new releases"""
 
-WAFREVISION="ce8234c396bb246a20ea9f51594ee051d5b378e7"
+WAFREVISION="cd7579a727d1b390bf9cbf111c1b20e811370bc0"
 """Git revision when the waf version is updated"""
 
 ABI = 98
@@ -307,6 +307,10 @@ class Context(ctx):
 				elif not node:
 					if not mandatory:
 						continue
+					try:
+						os.listdir(d)
+					except OSError:
+						raise Errors.WafError('Cannot read the folder %r' % d)
 					raise Errors.WafError('No wscript file in directory %s' % d)
 
 	def exec_command(self, cmd, **kw):
@@ -610,7 +614,7 @@ class Context(ctx):
 				doban = False
 				for b in ban:
 					r = b.replace("*", ".*")
-					if re.match(b, f):
+					if re.match(r, f):
 						doban = True
 				if not doban:
 					f = f.replace('.py', '')

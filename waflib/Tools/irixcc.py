@@ -6,8 +6,6 @@ compiler definition for irix/MIPSpro cc compiler
 based on suncc.py from waf
 """
 
-import os
-from waflib import Utils
 from waflib.Tools import ccroot, ar
 from waflib.Configure import conf
 

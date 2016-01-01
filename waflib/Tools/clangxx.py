@@ -6,7 +6,6 @@
 Detect the Clang++ C++ compiler
 """
 
-import os, sys
 from waflib.Tools import ccroot, ar, gxx
 from waflib.Configure import conf
 

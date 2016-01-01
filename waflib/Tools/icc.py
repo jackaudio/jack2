@@ -7,7 +7,7 @@
 Detect the Intel C compiler
 """
 
-import os, sys
+import sys
 from waflib.Tools import ccroot, ar, gcc
 from waflib.Configure import conf
 

@@ -134,4 +134,5 @@ WAFLIB_STRIP_EXTRAS="
     why
     win32_opts
     xcode
+    xcode6
 "

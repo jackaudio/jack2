@@ -409,10 +409,25 @@ def split_path_win32(path):
 		return ret
 	return re.split(re_sp, path)
 
+msysroot = None
+def split_path_msys(path):
+	if (path.startswith('/') or path.startswith('\\')) and not path.startswith('//') and not path.startswith('\\\\'):
+		# msys paths can be in the form /usr/bin
+		global msysroot
+		if not msysroot:
+			# msys has python 2.7 or 3, so we can use this
+			msysroot = subprocess.check_output(['cygpath', '-w', '/']).decode(sys.stdout.encoding or 'iso8859-1')
+			msysroot = msysroot.strip()
+		path = os.path.normpath(msysroot + os.sep + path)
+	return split_path_win32(path)
+
 if sys.platform == 'cygwin':
 	split_path = split_path_cygwin
 elif is_win32:
-	split_path = split_path_win32
+	if os.environ.get('MSYSTEM', None):
+		split_path = split_path_msys
+	else:
+		split_path = split_path_win32
 else:
 	split_path = split_path_unix
 
@@ -441,6 +456,7 @@ def check_dir(path):
 def check_exe(name, env=None):
 	"""
 	Ensure that a program exists
+
 	:type name: string
 	:param name: name or path to program
 	:return: path of the program or None
@@ -523,6 +539,25 @@ def h_fun(fun):
 			pass
 		return h
 
+def h_cmd(ins):
+	"""
+	Task command hashes are calculated by calling this function. The inputs can be
+	strings, functions, tuples/lists containing strings/functions
+	"""
+	# this function is not meant to be particularly fast
+	if isinstance(ins, str):
+		# a command is either a string
+		ret = ins
+	elif isinstance(ins, list) or isinstance(ins, tuple):
+		# or a list of functions/strings
+		ret = str([h_cmd(x) for x in ins])
+	else:
+		# or just a python function
+		ret = str(h_fun(ins))
+	if sys.hexversion > 0x3000000:
+		ret = ret.encode('iso8859-1', 'xmlcharrefreplace')
+	return ret
+
 reg_subst = re.compile(r"(\\\\)|(\$\$)|\$\{([^}]+)\}")
 def subst_vars(expr, params):
 	"""
@@ -545,6 +580,8 @@ def subst_vars(expr, params):
 			return params.get_flat(m.group(3))
 		except AttributeError:
 			return params[m.group(3)]
+		# if you get a TypeError, it means that 'expr' is not a string...
+		# Utils.subst_vars(None, env)  will not work
 	return reg_subst.sub(repl_var, expr)
 
 def destos_to_binfmt(key):
@@ -595,6 +632,9 @@ def unversioned_sys_platform():
 		return 'darwin'
 	if s == 'win32' or s == 'os2':
 		return s
+	if s == 'cli' and os.name == 'nt':
+		# ironpython is only on windows as far as we know
+		return 'win32'
 	return re.split('\d+$', s)[0]
 
 def nada(*k, **kw):
@@ -709,6 +749,7 @@ def run_once(fun):
 			cache[k] = ret
 			return ret
 	wrap.__cache__ = cache
+	wrap.__name__ = fun.__name__
 	return wrap
 
 def get_registry_app_path(key, filename):
@@ -729,4 +770,8 @@ def lib64():
 			if os.path.exists('/usr/lib64') and not os.path.exists('/usr/lib32'):
 				return '64'
 	return ''
+
+def sane_path(p):
+	# private function for the time being!
+	return os.path.abspath(os.path.expanduser(p))
 

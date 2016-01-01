@@ -6,8 +6,8 @@
 MacOSX related tools
 """
 
-import os, shutil, sys, platform
-from waflib import TaskGen, Task, Build, Options, Utils, Errors
+import os, shutil, platform
+from waflib import Task, Utils, Errors
 from waflib.TaskGen import taskgen_method, feature, after_method, before_method
 
 app_info = '''
@@ -48,7 +48,6 @@ def create_bundle_dirs(self, name, out):
 	"""
 	Create bundle folders, used by :py:func:`create_task_macplist` and :py:func:`create_task_macapp`
 	"""
-	bld = self.bld
 	dir = out.parent.find_or_declare(name)
 	dir.mkdir()
 	macos = dir.find_or_declare(['Contents', 'MacOS'])
@@ -102,7 +101,7 @@ def create_task_macapp(self):
 			inst_to = getattr(self, 'install_path', '/Applications') + '/%s/Resources' % name
 			for node in self.to_nodes(self.mac_files):
 				relpath = node.path_from(mac_files_root or node.parent)
-				tsk = self.create_task('macapp', node, res_dir.make_node(relpath))
+				self.create_task('macapp', node, res_dir.make_node(relpath))
 				self.bld.install_as(os.path.join(inst_to, relpath), node)
 
 		if getattr(self, 'mac_resources', None):
@@ -121,7 +120,7 @@ def create_task_macapp(self):
 					nodes = [node]
 				for node in nodes:
 					rel = node.path_from(parent)
-					tsk = self.create_task('macapp', node, res_dir.make_node(rel))
+					self.create_task('macapp', node, res_dir.make_node(rel))
 					self.bld.install_as(inst_to + '/%s' % rel, node)
 
 		if getattr(self.bld, 'is_install', None):

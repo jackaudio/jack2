@@ -256,7 +256,7 @@ class OptionsContext(Context.Context):
 				commands.append(arg)
 
 		if options.destdir:
-			options.destdir = os.path.abspath(os.path.expanduser(options.destdir))
+			options.destdir = Utils.sane_path(options.destdir)
 
 		if options.verbose >= 1:
 			self.load('errcheck')

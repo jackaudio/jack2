@@ -564,7 +564,15 @@ def process_rule(self):
 		except KeyError:
 			pass
 	if not cls:
-		cls = Task.task_factory(name, self.rule,
+
+		rule = self.rule
+		if hasattr(self, 'chmod'):
+			def chmod_fun(tsk):
+				for x in tsk.outputs:
+					os.chmod(x.abspath(), self.chmod)
+			rule = (self.rule, chmod_fun)
+
+		cls = Task.task_factory(name, rule,
 			getattr(self, 'vars', []),
 			shell=getattr(self, 'shell', True), color=getattr(self, 'color', 'BLUE'),
 			scan = getattr(self, 'scan', None))
@@ -614,7 +622,7 @@ def process_rule(self):
 				x.parent.mkdir() # if a node was given, create the required folders
 				tsk.outputs.append(x)
 		if getattr(self, 'install_path', None):
-			self.bld.install_files(self.install_path, tsk.outputs)
+			self.bld.install_files(self.install_path, tsk.outputs, chmod=getattr(self, 'chmod', Utils.O644))
 
 	if getattr(self, 'source', None):
 		tsk.inputs = self.to_nodes(self.source)
@@ -669,24 +677,34 @@ class subst_pc(Task.Task):
 	in the substitution changes.
 	"""
 
+	def force_permissions(self):
+		"Private for the time being, we will probably refactor this into run_str=[run1,chmod]"
+		if getattr(self.generator, 'chmod', None):
+			for x in self.outputs:
+				os.chmod(x.abspath(), self.generator.chmod)
+
 	def run(self):
 		"Substitutes variables in a .in file"
 
 		if getattr(self.generator, 'is_copy', None):
-			self.outputs[0].write(self.inputs[0].read('rb'), 'wb')
-			if getattr(self.generator, 'chmod', None):
-				os.chmod(self.outputs[0].abspath(), self.generator.chmod)
+			for i, x in enumerate(self.outputs):
+				x.write(self.inputs[i].read('rb'), 'wb')
+			self.force_permissions()
 			return None
 
 		if getattr(self.generator, 'fun', None):
-			return self.generator.fun(self)
+			ret = self.generator.fun(self)
+			if not ret:
+				self.force_permissions()
+			return ret
 
 		code = self.inputs[0].read(encoding=getattr(self.generator, 'encoding', 'ISO8859-1'))
 		if getattr(self.generator, 'subst_fun', None):
 			code = self.generator.subst_fun(self, code)
 			if code is not None:
 				self.outputs[0].write(code, encoding=getattr(self.generator, 'encoding', 'ISO8859-1'))
-			return
+			self.force_permissions()
+			return None
 
 		# replace all % by %% to prevent errors by % signs
 		code = code.replace('%', '%%')
@@ -722,8 +740,7 @@ class subst_pc(Task.Task):
 		try: delattr(self, 'cache_sig')
 		except AttributeError: pass
 
-		if getattr(self.generator, 'chmod', None):
-			os.chmod(self.outputs[0].abspath(), self.generator.chmod)
+		self.force_permissions()
 
 	def sig_vars(self):
 		"""
@@ -816,7 +833,7 @@ def process_subst(self):
 				b = y
 
 		if not a:
-			raise Errors.WafError('cound not find %r for %r' % (x, self))
+			raise Errors.WafError('could not find %r for %r' % (x, self))
 
 		has_constraints = False
 		tsk = self.create_task('subst', a, b)

@@ -6,7 +6,7 @@
 logging, colors, terminal width and pretty-print
 """
 
-import os, re, traceback, sys, types
+import os, re, traceback, sys
 from waflib import Utils, ansiterm
 
 if not os.environ.get('NOSYNC', False):
@@ -42,6 +42,11 @@ colors_lst = {
 }
 
 indicator = '\r\x1b[K%s%s%s'
+
+try:
+	unicode
+except NameError:
+	unicode = None
 
 def enable_colors(use):
 	if use == 1:
@@ -150,7 +155,7 @@ class log_handler(logging.StreamHandler):
 	def emit_override(self, record, **kw):
 		self.terminator = getattr(record, 'terminator', '\n')
 		stream = self.stream
-		if hasattr(types, "UnicodeType"):
+		if unicode:
 			# python2
 			msg = self.formatter.format(record)
 			fs = '%s' + self.terminator
@@ -316,7 +321,7 @@ def free_logger(logger):
 		for x in logger.handlers:
 			x.close()
 			logger.removeHandler(x)
-	except Exception as e:
+	except Exception:
 		pass
 
 def pprint(col, msg, label='', sep='\n'):

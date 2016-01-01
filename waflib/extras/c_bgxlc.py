@@ -6,7 +6,6 @@
 IBM XL Compiler for Blue Gene
 """
 
-import os
 from waflib.Tools import ccroot,ar
 from waflib.Configure import conf
 

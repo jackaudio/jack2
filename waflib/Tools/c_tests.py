@@ -9,7 +9,6 @@ Various configuration tests.
 from waflib import Task
 from waflib.Configure import conf
 from waflib.TaskGen import feature, before_method, after_method
-import sys
 
 LIB_CODE = '''
 #ifdef _MSC_VER

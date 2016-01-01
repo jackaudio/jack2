@@ -8,8 +8,6 @@
 g++/llvm detection.
 """
 
-import os, sys
-from waflib import Configure, Options, Utils
 from waflib.Tools import ccroot, ar
 from waflib.Configure import conf
 

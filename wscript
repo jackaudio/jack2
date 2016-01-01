@@ -187,10 +187,23 @@ class AutoOption:
         """
         all_found = True
 
+        # Use-variables that should be used when checking libraries, headers and
+        # programs. The list will be populated when looking for packages.
+        use = []
+
+        # check for packages
+        for package,uselib_store,atleast_version in self.packages:
+            try:
+                conf.check_cfg(package=package, uselib_store=uselib_store, atleast_version=atleast_version, args='--cflags --libs')
+                use.append(uselib_store)
+            except conf.errors.ConfigurationError:
+                all_found = False
+                self.packages_not_found.append([package,atleast_version])
+
         # check for libraries
         for lib,uselib_store in self.libs:
             try:
-                conf.check_cc(lib=lib, uselib_store=uselib_store)
+                conf.check_cc(lib=lib, uselib_store=uselib_store, use=use)
             except conf.errors.ConfigurationError:
                 all_found = False
                 self.libs_not_found.append(lib)
@@ -198,23 +211,15 @@ class AutoOption:
         # check for headers
         for header in self.headers:
             try:
-                conf.check_cc(header_name=header)
+                conf.check_cc(header_name=header, use=use)
             except conf.errors.ConfigurationError:
                 all_found = False
                 self.headers_not_found.append(header)
 
-        # check for packages
-        for package,uselib_store,atleast_version in self.packages:
-            try:
-                conf.check_cfg(package=package, uselib_store=uselib_store, atleast_version=atleast_version, args='--cflags --libs')
-            except conf.errors.ConfigurationError:
-                all_found = False
-                self.packages_not_found.append([package,atleast_version])
-
         # check for programs
         for program,var in self.programs:
             try:
-                conf.find_program(program, var=var)
+                conf.find_program(program, var=var, use=use)
             except conf.errors.ConfigurationError:
                 all_found = False
                 self.programs_not_found.append(program)
@@ -480,9 +485,14 @@ def configure(conf):
     # configure all auto options
     configure_auto_options(conf)
 
+    # Check for functions.
+    conf.check_cc(
+        function_name='ppoll',
+        header_name=['poll.h', 'signal.h'],
+        defines=['_GNU_SOURCE'],
+        mandatory=False)
+
     conf.recurse('common')
-    if conf.env['IS_LINUX']:
-        conf.recurse('linux')
     if Options.options.dbus:
         conf.recurse('dbus')
         if conf.env['BUILD_JACKDBUS'] != True:
@@ -663,6 +673,271 @@ def init(ctx):
             cmd = name + '_' + lib32
             variant = lib32
 
+def obj_add_includes(bld, obj):
+    if bld.env['BUILD_JACKDBUS']:
+        obj.includes += ['dbus']
+
+    if bld.env['IS_LINUX']:
+        obj.includes += ['linux', 'posix']
+
+    if bld.env['IS_MACOSX']:
+        obj.includes += ['macosx', 'posix']
+
+    if bld.env['IS_SUN']:
+        obj.includes += ['posix', 'solaris']
+
+    if bld.env['IS_WINDOWS']:
+        obj.includes += ['windows']
+
+# FIXME: Is SERVER_SIDE needed?
+def build_jackd(bld):
+    jackd = bld(
+        features = ['cxx', 'cxxprogram'],
+        defines = ['HAVE_CONFIG_H','SERVER_SIDE'],
+        includes = ['.', 'common', 'common/jack'],
+        target = 'jackd',
+        source = ['common/Jackdmp.cpp'],
+        use = ['serverlib'])
+
+    if bld.env['BUILD_JACKDBUS']:
+        jackd.source += ['dbus/audio_reserve.c', 'dbus/reserve.c']
+        jackd.use += ['DBUS-1']
+
+    if bld.env['IS_LINUX']:
+        jackd.use += ['DL', 'M', 'PTHREAD', 'RT', 'STDC++']
+
+    if bld.env['IS_MACOSX']:
+        bld.framework = ['CoreFoundation']
+        jackd.use += ['DL', 'PTHREAD']
+
+    if bld.env['IS_SUN']:
+        jackd.use += ['DL', 'PTHREAD']
+
+    obj_add_includes(bld, jackd)
+
+    return jackd
+
+# FIXME: Is SERVER_SIDE needed?
+def create_driver_obj(bld, **kw):
+    driver = bld(
+        features = ['c', 'cshlib', 'cxx', 'cxxshlib'],
+        defines = ['HAVE_CONFIG_H', 'SERVER_SIDE'],
+        includes = ['.', 'common', 'common/jack'],
+        install_path = '${ADDON_DIR}/',
+        **kw)
+
+    if bld.env['IS_WINDOWS']:
+        driver.env['cxxshlib_PATTERN'] = 'jack_%s.dll'
+    else:
+        driver.env['cxxshlib_PATTERN'] = 'jack_%s.so'
+
+    obj_add_includes(bld, driver)
+
+    return driver
+
+def build_drivers(bld):
+    # Non-hardware driver sources. Lexically sorted.
+    dummy_src = [
+        'common/JackDummyDriver.cpp'
+    ]
+
+    loopback_src = [
+        'common/JackLoopbackDriver.cpp'
+    ]
+
+    net_src = [
+        'common/JackNetDriver.cpp'
+    ]
+
+    netone_src = [
+        'common/JackNetOneDriver.cpp',
+        'common/netjack.c',
+        'common/netjack_packet.c'
+    ]
+
+    proxy_src = [
+        'common/JackProxyDriver.cpp'
+    ]
+
+    # Hardware driver sources. Lexically sorted.
+    alsa_src = [
+        'common/memops.c',
+        'linux/alsa/JackAlsaDriver.cpp',
+        'linux/alsa/alsa_rawmidi.c',
+        'linux/alsa/alsa_seqmidi.c',
+        'linux/alsa/alsa_midi_jackmp.cpp',
+        'linux/alsa/generic_hw.c',
+        'linux/alsa/hdsp.c',
+        'linux/alsa/alsa_driver.c',
+        'linux/alsa/hammerfall.c',
+        'linux/alsa/ice1712.c'
+    ]
+
+    alsarawmidi_src = [
+        'linux/alsarawmidi/JackALSARawMidiDriver.cpp',
+        'linux/alsarawmidi/JackALSARawMidiInputPort.cpp',
+        'linux/alsarawmidi/JackALSARawMidiOutputPort.cpp',
+        'linux/alsarawmidi/JackALSARawMidiPort.cpp',
+        'linux/alsarawmidi/JackALSARawMidiReceiveQueue.cpp',
+        'linux/alsarawmidi/JackALSARawMidiSendQueue.cpp',
+        'linux/alsarawmidi/JackALSARawMidiUtil.cpp'
+    ]
+
+    boomer_src = [
+        'common/memops.c',
+        'solaris/oss/JackBoomerDriver.cpp'
+    ]
+
+    coreaudio_src = [
+        'macosx/coreaudio/JackCoreAudioDriver.cpp'
+    ]
+
+    coremidi_src = [
+        'macosx/coremidi/JackCoreMidiInputPort.cpp',
+        'macosx/coremidi/JackCoreMidiOutputPort.cpp',
+        'macosx/coremidi/JackCoreMidiPhysicalInputPort.cpp',
+        'macosx/coremidi/JackCoreMidiPhysicalOutputPort.cpp',
+        'macosx/coremidi/JackCoreMidiVirtualInputPort.cpp',
+        'macosx/coremidi/JackCoreMidiVirtualOutputPort.cpp',
+        'macosx/coremidi/JackCoreMidiPort.cpp',
+        'macosx/coremidi/JackCoreMidiUtil.cpp',
+        'macosx/coremidi/JackCoreMidiDriver.cpp'
+    ]
+
+    ffado_src = [
+        'linux/firewire/JackFFADODriver.cpp',
+        'linux/firewire/JackFFADOMidiInputPort.cpp',
+        'linux/firewire/JackFFADOMidiOutputPort.cpp',
+        'linux/firewire/JackFFADOMidiReceiveQueue.cpp',
+        'linux/firewire/JackFFADOMidiSendQueue.cpp'
+    ]
+
+    freebob_src = [
+        'linux/freebob/JackFreebobDriver.cpp'
+    ]
+
+    iio_driver_src = [
+        'linux/iio/JackIIODriver.cpp'
+    ]
+
+    oss_src = [
+        'common/memops.c',
+        'solaris/oss/JackOSSDriver.cpp'
+    ]
+
+    portaudio_src = [
+        'windows/portaudio/JackPortAudioDevices.cpp',
+        'windows/portaudio/JackPortAudioDriver.cpp',
+    ]
+
+    winmme_driver_src = [
+        'windows/winmme/JackWinMMEDriver.cpp',
+        'windows/winmme/JackWinMMEInputPort.cpp',
+        'windows/winmme/JackWinMMEOutputPort.cpp',
+        'windows/winmme/JackWinMMEPort.cpp',
+    ]
+
+    # Create non-hardware driver objects. Lexically sorted.
+    create_driver_obj(
+        bld,
+        target = 'dummy',
+        source = dummy_src)
+
+    create_driver_obj(
+        bld,
+        target = 'loopback',
+        source = loopback_src)
+
+    create_driver_obj(
+        bld,
+        target = 'net',
+        source = net_src)
+
+    create_driver_obj(
+        bld,
+        target = 'netone',
+        source = netone_src,
+        use = ['SAMPLERATE', 'CELT'])
+
+    create_driver_obj(
+        bld,
+        target = 'proxy',
+        source = proxy_src)
+
+    # Create hardware driver objects. Lexically sorted after the conditional,
+    # e.g. BUILD_DRIVER_ALSA.
+    if bld.env['BUILD_DRIVER_ALSA']:
+        create_driver_obj(
+            bld,
+            target = 'alsa',
+            source = alsa_src,
+            use = ['ALSA'])
+        create_driver_obj(
+            bld,
+            target = 'alsarawmidi',
+            source = alsarawmidi_src,
+            use = ['ALSA'])
+
+    if bld.env['BUILD_DRIVER_FREEBOB']:
+        create_driver_obj(
+            bld,
+            target = 'freebob',
+            source = freebob_src,
+            use = ['LIBFREEBOB'])
+
+    if bld.env['BUILD_DRIVER_FFADO']:
+        create_driver_obj(
+            bld,
+            target = 'firewire',
+            source = ffado_src,
+            use = ['LIBFFADO'])
+
+    if bld.env['BUILD_DRIVER_IIO']:
+        create_driver_obj(
+            bld,
+            target = 'iio',
+            source = iio_src,
+            use = ['GTKIOSTREAM', 'EIGEN3'])
+
+    if bld.env['BUILD_DRIVER_PORTAUDIO']:
+        create_driver_obj(
+            bld,
+            target = 'portaudio',
+            source = portaudio_src,
+            use = ['serverlib', 'PORTAUDIO']) # FIXME: Is serverlib needed here?
+
+    if bld.env['BUILD_DRIVER_WINMME']:
+        create_driver_obj(
+            bld,
+            target = 'winmme',
+            source = winmme_src,
+            use = ['serverlib', 'WINMME']) # FIXME: Is serverlib needed here?
+
+    if bld.env['IS_MACOSX']:
+        create_driver_obj(
+            bld,
+            target = 'coreaudio',
+            source = coreaudio_src,
+            use = ['serverlib'], # FIXME: Is this needed?
+            framework = ['AudioUnit', 'CoreAudio', 'CoreServices'])
+
+        create_driver_obj(
+            bld,
+            target = 'coremidi',
+            source = coremidi_src,
+            use = ['serverlib'], # FIXME: Is this needed?
+            framework = ['AudioUnit', 'CoreMIDI', 'CoreServices'])
+
+    if bld.env['IS_SUN']:
+        create_driver_obj(
+            bld,
+            target = 'boomer',
+            source = boomer_src)
+        create_driver_obj(
+            bld,
+            target = 'oss',
+            source = oss_src)
+
 def build(bld):
     if not bld.variant:
         out2 = out
@@ -701,8 +976,12 @@ def build(bld):
                 target = [bld.path.find_or_declare('svnversion.h')]
         )
 
+    if bld.env['BUILD_JACKD']:
+        build_jackd(bld)
+
+    build_drivers(bld)
+
     if bld.env['IS_LINUX']:
-        bld.recurse('linux')
         bld.recurse('example-clients')
         bld.recurse('tests')
         bld.recurse('man')
@@ -710,21 +989,18 @@ def build(bld):
            bld.recurse('dbus')
 
     if bld.env['IS_MACOSX']:
-        bld.recurse('macosx')
         bld.recurse('example-clients')
         bld.recurse('tests')
         if bld.env['BUILD_JACKDBUS'] == True:
             bld.recurse('dbus')
 
     if bld.env['IS_SUN']:
-        bld.recurse('solaris')
         bld.recurse('example-clients')
         bld.recurse('tests')
         if bld.env['BUILD_JACKDBUS'] == True:
             bld.recurse('dbus')
 
     if bld.env['IS_WINDOWS']:
-        bld.recurse('windows')
         bld.recurse('example-clients')
         #bld.recurse('tests')
 

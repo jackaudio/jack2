@@ -10,7 +10,7 @@ A system for recording all outputs to a log file. Just add the following to your
 """
 
 import atexit, sys, time, os, shutil, threading
-from waflib import Logs, Context
+from waflib import ansiterm, Logs, Context
 
 # adding the logs under the build/ directory will clash with the clean/ command
 try:
@@ -68,8 +68,12 @@ def init(ctx):
 	# sys.stdout has already been replaced, so __stdout__ will be faster
 	#sys.stdout = log_to_file(sys.stdout, fileobj, filename)
 	#sys.stderr = log_to_file(sys.stderr, fileobj, filename)
-	sys.stdout = log_to_file(sys.__stdout__, fileobj, filename)
-	sys.stderr = log_to_file(sys.__stderr__, fileobj, filename)
+	def wrap(stream):
+		if stream.isatty():
+			return ansiterm.AnsiTerm(stream)
+		return stream
+	sys.stdout = log_to_file(wrap(sys.__stdout__), fileobj, filename)
+	sys.stderr = log_to_file(wrap(sys.__stderr__), fileobj, filename)
 
 	# now mess with the logging module...
 	for x in Logs.log.handlers:
