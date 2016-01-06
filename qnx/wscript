@@ -43,9 +43,10 @@ def build(bld):
         deva.install_path = '/lib/dll'
 
     ioaudio_driver_src = [
-               'ioaudio/JackIoAudioDriver.cpp',
                '../common/memops.c',
+               'ioaudio/generic_hw.c',
                'ioaudio/ioaudio_backend.c',
+               'ioaudio/JackIoAudioDriver.cpp',
                ]
     create_jack_driver_obj(bld, 'ioaudio', ioaudio_driver_src, ['IOAUDIO', 'PTHREAD'])
         

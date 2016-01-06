@@ -34,6 +34,8 @@
 #ifndef __bitset_h__
 #define __bitset_h__
 
+#include <malloc.h>
+#include <string.h>
 #include <inttypes.h>			/* POSIX standard fixed-size types */
 #include <assert.h>			/* `#define NDEBUG' to disable */
 
