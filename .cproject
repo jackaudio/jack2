@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?fileVersion 4.0.0?>
-
-<cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
 		<cconfiguration id="com.qnx.qcc.toolChain.1426688628">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.qnx.qcc.toolChain.1426688628" moduleId="org.eclipse.cdt.core.settings" name="Default">
@@ -46,6 +44,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/jack2/qnx}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/jack2/qnx/ioaudio}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/QNX Headers/usr_include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/QNX Headers/usr_include/c++/4.7.3}&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.1801463510" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__INT_BITS__=32"/>

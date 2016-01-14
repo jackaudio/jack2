@@ -26,6 +26,11 @@
 #include "jslist.h"
 #include "driver_interface.h"
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 typedef float gain_t;
 typedef long channel_t;
 
@@ -296,5 +301,9 @@ jack_driver_nt_t;
 
 void jack_driver_nt_init (jack_driver_nt_t * driver);
 void jack_driver_nt_finish (jack_driver_nt_t * driver);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __jack_driver_h__ */

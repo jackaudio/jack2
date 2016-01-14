@@ -44,8 +44,8 @@ def build(bld):
 
     ioaudio_driver_src = [
                '../common/memops.c',
-               'ioaudio/generic_hw.c',
-               'ioaudio/ioaudio_backend.c',
+               #'ioaudio/generic_hw.c',
+               #'ioaudio/ioaudio_backend.c',
                'ioaudio/JackIoAudioDriver.cpp',
                ]
     create_jack_driver_obj(bld, 'ioaudio', ioaudio_driver_src, ['IOAUDIO', 'PTHREAD'])
