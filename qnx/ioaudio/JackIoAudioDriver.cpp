@@ -38,7 +38,6 @@
 #include <limits>
 
 #include <sys/asoundlib.h>
-#include <sys/poll.h>
 #include "bitset.h"
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
@@ -51,11 +50,7 @@
 
 #include "types.h"
 #include "hardware.h"
-//#include "driver.h"
 #include "memops.h"
-//#include "ioaudio_midi.h"
-
-#include <iostream>
 
 #include "JackIoAudioDriver.h"
 #include "JackEngineControl.h"
@@ -91,181 +86,24 @@ namespace Jack
     /* Delay (in process calls) before jackd will report an xrun */
 #define XRUN_REPORT_DELAY 0
 
-//    const char driver_client_name[] = "ioaudio_pcm";
-
-    enum IoAudioDriverChannels
-    {
-        Playback = SND_PCM_CHANNEL_PLAYBACK,
-        Capture = SND_PCM_CHANNEL_CAPTURE,
-        Extra = SND_PCM_CHANNEL_MAX,
-        IoAudioDriverChannels_COUNT
-    };
-
-//static Jack::JackIoAudioDriver* g_ioaudio_driver;
-
 ///////////////////////////////////////////////////////////////////////////////
 // TYPES
 ///////////////////////////////////////////////////////////////////////////////
-    typedef void (*ReadCopyFunction)(
-        jack_default_audio_sample_t *dst,
-        char *src,
-        unsigned long src_bytes,
-        unsigned long src_skip_bytes );
-    typedef void (*WriteCopyFunction)(
-        char *dst,
-        jack_default_audio_sample_t *src,
-        unsigned long src_bytes,
-        unsigned long dst_skip_bytes,
-        dither_state_t *state );
 
-    struct Voice
-    {
-        unsigned long interleave_skip;
-        char* addr;
-        unsigned long silent;
-        dither_state_t dither_state;
-    };
+///////////////////////////////////////////////////////////////////////////////
+// PROTOTYPES
+///////////////////////////////////////////////////////////////////////////////
 
-    struct Channel
-    {
-        Voice* voices;
-        unsigned int nperiods;
-        snd_pcm_t *handle;
-        snd_pcm_channel_params_t params;
-        snd_pcm_channel_setup_t setup;
-        snd_pcm_mmap_control_t *mmap;
-        void *mmap_buf;
-        void *buffer;
-
-        ReadCopyFunction read;
-        WriteCopyFunction write;
-
-        ssize_t sample_bytes()
-        {
-        return snd_pcm_format_size( setup.format.format,
-                                    1 );
-        }
-        ssize_t frame_bytes()
-        {
-        return snd_pcm_format_size( setup.format.format,
-                                    setup.format.voices );
-        }
-
-        ssize_t frag_bytes()
-        {
-        return setup.buf.block.frag_size;
-        }
-
-        ssize_t frag_frames()
-        {
-        return frag_bytes() / frame_bytes();
-        }
-
-    };
-
-    struct ioaudio_driver_t
-    {
-
-        //JACK_DRIVER_NT_DECL
-
-        int poll_timeout_msecs;
-        jack_time_t poll_last;
-        jack_time_t poll_next;
-        int poll_late;
-
-        struct pollfd pfd[IoAudioDriverChannels_COUNT];
-        unsigned long interleave_unit;
-        unsigned int max_nchannels;
-        unsigned int user_nchannels;
-//        int user_capture_nchnls;
-//        int user_playback_nchnls;
-
-        jack_nframes_t frame_rate;
-//        jack_nframes_t frames_per_cycle;
-//        jack_nframes_t capture_frame_latency;
-//        jack_nframes_t playback_frame_latency;
-
-//        unsigned long *silent;
-//        char *ioaudio_driver;
-        bitset_t channels_not_done;
-        bitset_t channels_done;
-//        float max_sample_val;
-//        unsigned long user_nperiods;
-//        unsigned long last_mask;
-//        snd_ctl_t *ctl_handle;
-
-        Channel playback;
-
-        Channel capture;
-
-//        Voice* playback_voices;
-////        char *ioaudio_name_playback;
-////        unsigned long *playback_interleave_skip;
-//        unsigned int playback_nperiods;
-//        snd_pcm_t *playback_handle;
-//        snd_pcm_channel_params_t playback_params;
-//        snd_pcm_channel_setup_t playback_setup;
-//        snd_pcm_mmap_control_t *playback_mmap;
-//        void *playback_mmap_buf;
-//        void *playback_buffer;
-////        char **playback_addr;
-//        WriteCopyFunction write_via_copy;
-//
-//        Voice* capture_voices;
-////        char *ioaudio_name_capture;
-////        unsigned long *capture_interleave_skip;
-//        unsigned int capture_nperiods;
-//        snd_pcm_t *capture_handle;
-//        snd_pcm_channel_params_t capture_params;
-//        snd_pcm_channel_setup_t capture_setup;
-//        snd_pcm_mmap_control_t *capture_mmap;
-//        void *capture_buffer;
-////        char **capture_addr;
-//        ReadCopyFunction read_via_copy;
-
-        jack_hardware_t *hw;
-//        ClockSyncStatus *clock_sync_data;
-        jack_client_t *client;
-//        JSList *capture_ports;
-//        JSList *playback_ports;
-//        JSList *monitor_ports;
-
-//        char soft_mode;
-//        bool all_monitor_in;
-        bool capture_and_playback_not_synced;
-//        char with_monitor_ports;
-        bool has_clock_sync_reporting;
-
-        bool has_hw_monitoring;
-        bool do_hw_monitoring;
-        unsigned long input_monitor_mask;
-
-        bool has_hw_metering;
-        bool do_hw_metering;
-        bool quirk_bswap;
-
-//        int dither;
-//        dither_state_t *dither_state;
-
-//        SampleClockMode clock_mode;
-//        JSList *clock_sync_listeners;
-//        pthread_mutex_t clock_sync_lock;
-//        unsigned long next_clock_sync_listener_id;
-
-//        int running;
-//        int run;
-
-        int xrun_count;
-        int process_count;
-
-//        ioaudio_midi_t *midi;
-//        char *midi;
-        int xrun_recovery;
-
-    };
+///////////////////////////////////////////////////////////////////////////////
+// IMPLEMENTATIONS
+///////////////////////////////////////////////////////////////////////////////
 
     class generic_hardware: public jack_hardware_t
     {
+        virtual ~generic_hardware()
+        {
+        }
+
         virtual double get_hardware_peak(
             jack_port_t *port,
             jack_nframes_t frames )
@@ -299,44 +137,59 @@ namespace Jack
 
     };
 
-///////////////////////////////////////////////////////////////////////////////
-// PROTOTYPES
-///////////////////////////////////////////////////////////////////////////////
+    JackIoAudioDriver::JackIoAudioDriver(
+        Args args,
+        JackLockedEngine* engine,
+        JackSynchro* table ) :
+            JackAudioDriver( args.jack_name,
+                             args.jack_alias,
+                             engine,
+                             table ),
+            fArgs( args )
+    {
 
-//    jack_hardware_t *
-//    jack_ioaudio_generic_hw_new(
-//        ioaudio_driver_t *fDriver );
-//
-//    jack_time_t jack_get_microseconds(
-//        void );
+    jack_log( "creating ioaudio driver ... %s|%s|%" PRIu32 "|%" PRIu32
+              "|%" PRIu32"|%" PRIu32"|%" PRIu32 "|%s|%s|%s|%s",
+              fArgs.playback ? fArgs.playback_pcm_name : "-",
+              fArgs.capture ? fArgs.capture_pcm_name : "-",
+              fArgs.frames_per_interrupt,
+              fArgs.user_nperiods,
+              fArgs.srate,
+              fArgs.user_capture_nchnls,
+              fArgs.user_playback_nchnls,
+              fArgs.hw_monitoring ? "hwmon" : "nomon",
+              fArgs.hw_metering ? "hwmeter" : "swmeter",
+              fArgs.soft_mode ? "soft-mode" : "-",
+              fArgs.shorts_first ? "16bit" : "32bit" );
+    }
 
-// Code implemented in JackioaudioDriver.cpp
+    JackIoAudioDriver::~JackIoAudioDriver()
+    {
+    //if (fmidi)
+    //        (midi->destroy)(midi);
 
-//void ReadInput(jack_nframes_t orig_nframes, ssize_t contiguous,
-    //        ssize_t nread);
-//void MonitorInput();
-//void ClearOutput();
-//void WriteOutput(jack_nframes_t orig_nframes, ssize_t contiguous,
-//        ssize_t nwritten);
-//void SetTime(jack_time_t time);
-//int Restart();
+    if( capture.handle )
+        {
+        snd_pcm_close( capture.handle );
+        capture.handle = 0;
+        }
 
-//    extern void store_work_time(
-//        int );
-//    extern void store_wait_time(
-//        int );
-//    extern void show_wait_times();
-//    extern void show_work_times();
-//
-//    char* strcasestr(
-//        const char* haystack,
-//        const char* needle );
+    if( playback.handle )
+        {
+        snd_pcm_close( playback.handle );
+        capture.handle = 0;
+        }
 
-///////////////////////////////////////////////////////////////////////////////
-// IMPLEMENTATIONS
-///////////////////////////////////////////////////////////////////////////////
+    if( hw )
+        {
+        hw->release();
+        delete hw;
+        hw = 0;
+        }
 
-    /* DRIVER "PLUGIN" INTERFACE */
+    delete[] playback.voices;
+    delete[] capture.voices;
+    }
 
     int JackIoAudioDriver::Attach()
     {
@@ -349,12 +202,12 @@ namespace Jack
     assert( fCaptureChannels < DRIVER_PORT_NUM );
     assert( fPlaybackChannels < DRIVER_PORT_NUM );
 
-    if( fDriver->has_hw_monitoring )
+    if( has_hw_monitoring )
         port_flags |= JackPortCanMonitor;
 
     // io-audio driver may have changed the values
     JackAudioDriver::SetBufferSize( fArgs.frames_per_interrupt );
-    JackAudioDriver::SetSampleRate( fDriver->frame_rate );
+    JackAudioDriver::SetSampleRate( frame_rate );
 
     jack_log( "JackIoAudioDriver::Attach fBufferSize %ld fSampleRate %ld",
               fEngineControl->fBufferSize,
@@ -446,10 +299,10 @@ namespace Jack
             }
         }
 
-    UpdateLatencies();
+    update_latencies();
 
-    //if (fDriver->midi) {
-    //    int err = (fDriver->midi->attach)(fDriver->midi);
+    //if (midi) {
+    //    int err = (midi->attach)(midi);
     //    if (err)
     //        jack_error ("io-audio: cannot attach MIDI: %d", err);
     //}
@@ -457,26 +310,12 @@ namespace Jack
     return 0;
     }
 
-    void JackIoAudioDriver::ClearOutputAux()
-    {
-    for( int chn = 0; chn < fPlaybackChannels; chn++ )
-        {
-        jack_default_audio_sample_t* buf =
-            (jack_default_audio_sample_t*)fGraphManager->GetBuffer( fPlaybackPortList[chn],
-                                                                    fEngineControl->fBufferSize );
-        memset( buf,
-                0,
-                sizeof(jack_default_audio_sample_t)
-                    * fEngineControl->fBufferSize );
-        }
-    }
-
     int JackIoAudioDriver::Close()
     {
     // Generic audio driver close
     int res = JackAudioDriver::Close();
 
-    destroy();
+//    destroy();
 
     if( JackServerGlobals::on_device_release != NULL )
         {
@@ -508,46 +347,31 @@ namespace Jack
     int JackIoAudioDriver::Detach()
     {
     //ioaudio_driver_t* ioaudio_driver = (ioaudio_driver_t*)fDriver;
-    //if (fDriver->midi)
-    //    (fDriver->midi->detach)(fDriver->midi);
+    //if (midi)
+    //    (midi->detach)(midi);
 
     return JackAudioDriver::Detach();
     }
 
-    void JackIoAudioDriver::MonitorInputAux()
+    int JackIoAudioDriver::Open()
     {
-    for( int chn = 0; chn < fCaptureChannels; chn++ )
-        {
-        JackPort* port = fGraphManager->GetPort( fCapturePortList[chn] );
-        if( port->MonitoringInput() )
-            {
-            ( (ioaudio_driver_t *)fDriver )->input_monitor_mask |= ( 1 << chn );
-            }
-        }
-    }
+    int err;
 
-    int JackIoAudioDriver::Open(
-        ioaudio_driver_args_t args )
-    {
     // Generic JackAudioDriver Open
-    if( JackAudioDriver::Open( args.frames_per_interrupt,
-                               args.srate,
-                               args.capture,
-                               args.playback,
-                               args.user_capture_nchnls,
-                               args.user_playback_nchnls,
-                               args.monitor,
-                               args.capture_pcm_name,
-                               args.playback_pcm_name,
-                               args.systemic_input_latency,
-                               args.systemic_output_latency ) != 0 )
+    if( JackAudioDriver::Open( fArgs.frames_per_interrupt,
+                               fArgs.srate,
+                               fArgs.capture,
+                               fArgs.playback,
+                               fArgs.user_capture_nchnls,
+                               fArgs.user_playback_nchnls,
+                               fArgs.monitor,
+                               fArgs.capture_pcm_name,
+                               fArgs.playback_pcm_name,
+                               fArgs.systemic_input_latency,
+                               fArgs.systemic_output_latency ) != 0 )
         {
         return -1;
         }
-
-    memcpy( &fArgs,
-            &args,
-            sizeof(ioaudio_driver_args_t) );
 
     //ioaudio_midi_t *midi = 0;
     //if (strcmp(midi_driver_name, "seq") == 0)
@@ -555,63 +379,172 @@ namespace Jack
     //else if (strcmp(midi_driver_name, "raw") == 0)
     //    midi = ioaudio_rawmidi_new((jack_client_t*)this);
 
+    //midi = midi_driver;
+
+    err = check_card_type();
+    if( err )
+        {
+        return err;
+        }
+
     if( JackServerGlobals::on_device_acquire != NULL )
         {
-        int capture_card = snd_card_name( args.capture_pcm_name );
-        int playback_card = snd_card_name( args.playback_pcm_name );
-        char audio_name[32];
-
-        if( capture_card >= 0 )
+        if( fArgs.capture )
             {
-            snprintf( audio_name,
-                      sizeof( audio_name ),
-                      "Audio%d",
-                      capture_card );
-            if( !JackServerGlobals::on_device_acquire( audio_name ) )
+            if( !JackServerGlobals::on_device_acquire( fArgs.capture_pcm_name ) )
                 {
                 jack_error( "Audio device %s cannot be acquired...",
-                            args.capture_pcm_name );
-                return -1;
+                            fArgs.capture_pcm_name );
+                fArgs.capture = false;
                 }
             }
 
-        if( playback_card >= 0 && playback_card != capture_card )
+        if( fArgs.playback )
             {
-            snprintf( audio_name,
-                      sizeof( audio_name ),
-                      "Audio%d",
-                      playback_card );
-            if( !JackServerGlobals::on_device_acquire( audio_name ) )
+            if( !JackServerGlobals::on_device_acquire( fArgs.playback_pcm_name ) )
                 {
                 jack_error( "Audio device %s cannot be acquired...",
-                            args.playback_pcm_name );
-                if( capture_card >= 0 )
+                            fArgs.playback_pcm_name );
+                fArgs.playback = false;
+                if( fArgs.capture )
                     {
-                    snprintf( audio_name,
-                              sizeof( audio_name ),
-                              "Audio%d",
-                              capture_card );
-                    JackServerGlobals::on_device_release( audio_name );
+                    JackServerGlobals::on_device_release( fArgs.capture_pcm_name );
                     }
-                return -1;
                 }
             }
         }
 
-    create( (char*)"ioaudio_pcm",
-            NULL );
-    if( fDriver )
+    hw_specific();
+
+    if( fArgs.playback )
         {
-        // io-audio driver may have changed the in/out values
-        fCaptureChannels = fDriver->capture.setup.format.voices;
-        fPlaybackChannels = fDriver->playback.setup.format.voices;
-        return 0;
+        err =
+            snd_pcm_open_name( &playback.handle,
+                               fArgs.playback_pcm_name,
+                               SND_PCM_OPEN_PLAYBACK | SND_PCM_OPEN_NONBLOCK );
+        if( err < 0 )
+            {
+            switch( errno )
+                {
+                case EBUSY:
+                    jack_error( "\n\nATTENTION: The playback device \"%s\" is "
+                                "already in use. Please stop the"
+                                " application using it and "
+                                "run JACK again",
+                                fArgs.playback_pcm_name );
+                    return EBUSY;
+
+                case EPERM:
+                    jack_error( "you do not have permission to open "
+                                "the audio device \"%s\" for playback",
+                                fArgs.playback_pcm_name );
+                    return EPERM;
+                }
+
+            playback.handle = NULL;
+            }
+
+        if( playback.handle )
+            {
+            snd_pcm_nonblock_mode( playback.handle,
+                                   0 );
+            }
+        else
+            {
+
+            /* they asked for playback, but we can't do it */
+
+            jack_error( "io-audio: Cannot open PCM device %s for "
+                        "playback. Falling back to capture-only"
+                        " mode",
+                        fArgs.playback_pcm_name );
+            fArgs.playback = false;
+            }
+
         }
-    else
+
+    if( fArgs.capture )
+        {
+        err = snd_pcm_open_name( &capture.handle,
+                                 fArgs.capture_pcm_name,
+                                 SND_PCM_OPEN_CAPTURE | SND_PCM_OPEN_NONBLOCK );
+        if( err < 0 )
+            {
+            switch( errno )
+                {
+                case EBUSY:
+                    jack_error( "\n\nATTENTION: The capture (recording) device \"%s\" is "
+                                "already in use. Please stop the"
+                                " application using it and "
+                                "run JACK again",
+                                fArgs.capture_pcm_name );
+                    break;
+
+                case EPERM:
+                    jack_error( "you do not have permission to open "
+                                "the audio device \"%s\" for capture",
+                                fArgs.capture_pcm_name );
+                    break;
+                }
+
+            capture.handle = NULL;
+            }
+
+        if( capture.handle )
+            {
+            snd_pcm_nonblock_mode( capture.handle,
+                                   0 );
+            }
+        else
+            {
+
+            /* they asked for capture, but we can't do it */
+
+            jack_error( "io-audio: Cannot open PCM device %s for "
+                        "capture. Falling back to playback-only"
+                        " mode",
+                        fArgs.capture_pcm_name );
+
+            fArgs.capture = false;
+            }
+        }
+
+    if( playback.handle == NULL && capture.handle == NULL )
+        {
+        /* can't do anything */
+        return err;
+        }
+
+    err = set_parameters();
+    if( 0 != err )
+        {
+        return err;
+        }
+
+    capture_and_playback_not_synced = false;
+
+    if( capture.handle && playback.handle )
+        {
+        if( snd_pcm_link( playback.handle,
+                          capture.handle ) != 0 )
+            {
+            capture_and_playback_not_synced = true;
+            }
+        }
+
+    if( err )
         {
         JackAudioDriver::Close();
         return -1;
         }
+    else
+        {
+        // io-audio driver may have changed the in/out values
+        fCaptureChannels = capture.setup.format.voices;
+        fPlaybackChannels = playback.setup.format.voices;
+        return 0;
+        }
+
     }
 
     int JackIoAudioDriver::Read()
@@ -653,111 +586,137 @@ namespace Jack
     return read( fEngineControl->fBufferSize );
     }
 
-    void JackIoAudioDriver::ReadInputAux(
-        jack_nframes_t orig_nframes,
-        ssize_t contiguous,
-        ssize_t nread )
-    {
-    for( int chn = 0; chn < fCaptureChannels; chn++ )
-        {
-        if( fGraphManager->GetConnectionsNum( fCapturePortList[chn] ) > 0 )
-            {
-            jack_default_audio_sample_t* buf =
-                (jack_default_audio_sample_t*)fGraphManager->GetBuffer( fCapturePortList[chn],
-                                                                        orig_nframes );
-            fDriver->capture.read( buf + nread,
-                                   fDriver->capture.voices[chn].addr,
-                                   contiguous,
-                                   fDriver->capture.voices[chn].interleave_skip );
-            }
-        }
-    }
-
     int JackIoAudioDriver::SetBufferSize(
         jack_nframes_t buffer_size )
     {
     jack_log( "JackIoAudioDriver::SetBufferSize %ld",
               buffer_size );
     fArgs.frames_per_interrupt = buffer_size;
-    int res = reset_parameters();
+    int res = set_parameters();
 
     if( res == 0 )
         {
         // update fEngineControl and fGraphManager
         JackAudioDriver::SetBufferSize( buffer_size ); // Generic change, never fails
         // io-audio specific
-        UpdateLatencies();
+        update_latencies();
         }
     else
         {
         // Restore old values
         fArgs.frames_per_interrupt = fEngineControl->fBufferSize;
-        reset_parameters();
+        set_parameters();
         }
 
     return res;
     }
 
-//    void JackIoAudioDriver::SetTimetAux(
-//        jack_time_t time )
-//    {
-//    fBeginDateUst = time;
-//    }
-
     int JackIoAudioDriver::Start()
     {
-    int res = JackAudioDriver::Start();
-    if( res >= 0 )
+    int err;
+    int res = 0;
+
+    res = JackAudioDriver::Start();
+    if( res < 0 )
         {
-        res = start();
-        if( res < 0 )
+        return res;
+        }
+
+    poll_last = 0;
+    poll_next = 0;
+
+    if( playback.handle )
+        {
+        if( ( err = snd_pcm_playback_prepare( playback.handle ) ) < 0 )
             {
-            JackAudioDriver::Stop();
+            jack_error( "io-audio: prepare error for playback on "
+                        "\"%s\" (%s)",
+                        fArgs.playback_pcm_name,
+                        snd_strerror( err ) );
+            res = -1;
             }
         }
+
+    if( ( capture.handle && capture_and_playback_not_synced )
+        || !playback.handle )
+        {
+        if( ( err = snd_pcm_capture_prepare( capture.handle ) ) < 0 )
+            {
+            jack_error( "io-audio: prepare error for capture on \"%s\""
+                        " (%s)",
+                        fArgs.capture_pcm_name,
+                        snd_strerror( err ) );
+            res = -1;
+            }
+        }
+
+    res = JackIoAudioDriver::Write();
+
+    if( res < 0 )
+        {
+        JackAudioDriver::Stop();
+        }
+
     return res;
     }
 
     int JackIoAudioDriver::Stop()
     {
-    int res = stop();
-    if( JackAudioDriver::Stop() < 0 )
-        {
-        res = -1;
-        }
-    return res;
-    }
+    int err;
+    int res = 0;
 
-    void JackIoAudioDriver::UpdateLatencies()
-    {
-    jack_latency_range_t range;
-
-    for( int i = 0; i < fCaptureChannels; i++ )
+    /* silence all capture port buffers, because we might
+     be entering offline mode.
+     */
+    for( int chn = 0; chn < fPlaybackChannels; chn++ )
         {
-        range.min = range.max = fArgs.frames_per_interrupt
-            + fArgs.systemic_input_latency;
-        fGraphManager->GetPort( fCapturePortList[i] )->SetLatencyRange( JackCaptureLatency,
-                                                                        &range );
+        jack_default_audio_sample_t* buf =
+            (jack_default_audio_sample_t*)fGraphManager->GetBuffer( fPlaybackPortList[chn],
+                                                                    fEngineControl->fBufferSize );
+        memset( buf,
+                0,
+                sizeof(jack_default_audio_sample_t)
+                    * fEngineControl->fBufferSize );
         }
 
-    for( int i = 0; i < fPlaybackChannels; i++ )
+    if( playback.handle )
         {
-        // Add one buffer more latency if "async" mode is used...
-        range.min = range.max =
-            ( fArgs.frames_per_interrupt * ( fArgs.user_nperiods - 1 ) )
-                + ( ( fEngineControl->fSyncMode ) ?
-                    0 : fEngineControl->fBufferSize )
-                + fArgs.systemic_output_latency;
-        fGraphManager->GetPort( fPlaybackPortList[i] )->SetLatencyRange( JackPlaybackLatency,
-                                                                         &range );
-        // Monitor port
-        if( fWithMonitorPorts )
+        err = snd_pcm_playback_flush( playback.handle );
+        if( err < 0 )
             {
-            range.min = range.max = fArgs.frames_per_interrupt;
-            fGraphManager->GetPort( fMonitorPortList[i] )->SetLatencyRange( JackCaptureLatency,
-                                                                            &range );
+            jack_error( "io-audio: channel flush for playback "
+                        "failed (%s)",
+                        snd_strerror( err ) );
+            res = -1;
             }
         }
+
+    if( !playback.handle || capture_and_playback_not_synced )
+        {
+        if( capture.handle )
+            {
+            err = snd_pcm_capture_flush( capture.handle );
+            if( err < 0 )
+                {
+                jack_error( "io-audio: channel flush for "
+                            "capture failed (%s)",
+                            snd_strerror( err ) );
+                res = -1;
+                }
+            }
+        }
+
+    if( do_hw_monitoring )
+        {
+        hw->set_input_monitor_mask( 0 );
+        }
+
+    //if (midi && !xrun_recovery)
+    //    (midi->stop)(midi);
+
+    res = JackAudioDriver::Stop();
+
+    return res;
     }
 
     int JackIoAudioDriver::Write()
@@ -771,9 +730,9 @@ namespace Jack
     //jack_port_t *port;
     int err;
 
-    fDriver->process_count++;
+    process_count++;
 
-    if( !fDriver->playback.handle )
+    if( !playback.handle )
         {
         return 0;
         }
@@ -783,8 +742,8 @@ namespace Jack
         return -1;
         }
 
-    //if (fDriver->midi)
-    //    (fDriver->midi->write)(fDriver->midi, nframes);
+    //if (midi)
+    //    (midi->write)(midi, nframes);
 
     nwritten = 0;
     contiguous = 0;
@@ -792,15 +751,22 @@ namespace Jack
 
     /* check current input monitor request status */
 
-    fDriver->input_monitor_mask = 0;
+    input_monitor_mask = 0;
 
-    MonitorInputAux();
-
-    if( fDriver->do_hw_monitoring )
+    for( int chn = 0; chn < fCaptureChannels; chn++ )
         {
-        if( fDriver->hw->input_monitor_mask != fDriver->input_monitor_mask )
+        JackPort* port = fGraphManager->GetPort( fCapturePortList[chn] );
+        if( port->MonitoringInput() )
             {
-            fDriver->hw->set_input_monitor_mask( fDriver->input_monitor_mask );
+            input_monitor_mask |= ( 1 << chn );
+            }
+        }
+
+    if( do_hw_monitoring )
+        {
+        if( hw->input_monitor_mask != input_monitor_mask )
+            {
+            hw->set_input_monitor_mask( input_monitor_mask );
             }
         }
 
@@ -817,18 +783,47 @@ namespace Jack
             return -1;
             }
 
-        WriteOutputAux( orig_nframes,
-                        contiguous,
-                        nwritten );
-
-        if( !bitset_empty( fDriver->channels_not_done ) )
+        for( int chn = 0; chn < fPlaybackChannels; chn++ )
             {
-            silence_untouched_channels( contiguous );
+            // Output ports
+            if( fGraphManager->GetConnectionsNum( fPlaybackPortList[chn] ) > 0 )
+                {
+                jack_default_audio_sample_t* buf =
+                    (jack_default_audio_sample_t*)fGraphManager->GetBuffer( fPlaybackPortList[chn],
+                                                                            orig_nframes );
+                playback.write( playback.voices[chn].addr,
+                                buf + nwritten,
+                                contiguous,
+                                playback.voices[chn].interleave_skip,
+                                &playback.voices[chn].dither_state );
+
+                // Monitor ports
+                if( fWithMonitorPorts
+                    && fGraphManager->GetConnectionsNum( fMonitorPortList[chn] )
+                        > 0 )
+                    {
+                    jack_default_audio_sample_t* monbuf =
+                        (jack_default_audio_sample_t*)fGraphManager->GetBuffer( fMonitorPortList[chn],
+                                                                                orig_nframes );
+                    memcpy( monbuf + nwritten,
+                            buf + nwritten,
+                            contiguous * sizeof(jack_default_audio_sample_t) );
+                    }
+                }
+            else
+                {
+                memset_interleave( playback.voices[chn].addr,
+                                   0,
+                                   playback.sample_bytes() * contiguous,
+                                   interleave_unit,
+                                   playback.voices[chn].interleave_skip );
+                }
+
             }
 
-        err = snd_pcm_write( fDriver->playback.handle,
-                             fDriver->playback.buffer,
-                             fDriver->playback.frag_bytes() );
+        err = snd_pcm_write( playback.handle,
+                             playback.buffer,
+                             playback.frag_bytes() );
         if( err < 0 )
             {
             jack_error( "io-audio: could not complete playback of %"
@@ -845,88 +840,6 @@ namespace Jack
 
     return 0;
     }
-
-    void JackIoAudioDriver::WriteOutputAux(
-        jack_nframes_t orig_nframes,
-        ssize_t contiguous,
-        ssize_t nwritten )
-    {
-    for( int chn = 0; chn < fPlaybackChannels; chn++ )
-        {
-        // Output ports
-        if( fGraphManager->GetConnectionsNum( fPlaybackPortList[chn] ) > 0 )
-            {
-            jack_default_audio_sample_t* buf =
-                (jack_default_audio_sample_t*)fGraphManager->GetBuffer( fPlaybackPortList[chn],
-                                                                        orig_nframes );
-            fDriver->playback.write( fDriver->playback.voices[chn].addr,
-                                     buf + nwritten,
-                                     contiguous,
-                                     fDriver->playback.voices[chn].interleave_skip,
-                                     &fDriver->playback.voices[chn].dither_state );
-            mark_channel_done( chn );
-
-            // Monitor ports
-            if( fWithMonitorPorts
-                && fGraphManager->GetConnectionsNum( fMonitorPortList[chn] )
-                    > 0 )
-                {
-                jack_default_audio_sample_t* monbuf =
-                    (jack_default_audio_sample_t*)fGraphManager->GetBuffer( fMonitorPortList[chn],
-                                                                            orig_nframes );
-                memcpy( monbuf + nwritten,
-                        buf + nwritten,
-                        contiguous * sizeof(jack_default_audio_sample_t) );
-                }
-            }
-        }
-    }
-//
-//    ssize_t JackIoAudioDriver::capture_sample_bytes()
-//    {
-//    return snd_pcm_format_size( fDriver->capture.setup.format.format,
-//                                1 );
-//    }
-//    ssize_t JackIoAudioDriver::capture_frame_bytes()
-//    {
-//    return snd_pcm_format_size( fDriver->capture.setup.format.format,
-//                                fDriver->capture.setup.format.voices );
-//    }
-//    ssize_t JackIoAudioDriver::capture_frag_bytes()
-//    {
-//    return snd_pcm_format_size( fDriver->capture.setup.format.format,
-//                                fDriver->capture.setup.format.voices
-//                                    * fArgs.frames_per_interrupt );
-//    }
-//    ssize_t JackIoAudioDriver::capture_frag_frames()
-//    {
-//    return capture_frag_bytes()
-//        / snd_pcm_format_size( fDriver->capture.setup.format.format,
-//                               fDriver->capture.setup.format.voices );
-//    }
-//
-//    ssize_t JackIoAudioDriver::playback_sample_bytes()
-//    {
-//    return snd_pcm_format_size( fDriver->playback.setup.format.format,
-//                                1 );
-//    }
-//    ssize_t JackIoAudioDriver::playback_frame_bytes()
-//    {
-//    return snd_pcm_format_size( fDriver->playback.setup.format.format,
-//                                fDriver->playback.setup.format.voices );
-//    }
-//    ssize_t JackIoAudioDriver::playback_frag_bytes()
-//    {
-//    return snd_pcm_format_size( fDriver->playback.setup.format.format,
-//                                fDriver->playback.setup.format.voices
-//                                    * fArgs.frames_per_interrupt );
-//    }
-//    ssize_t JackIoAudioDriver::playback_frag_frames()
-//    {
-//    return playback_frag_bytes()
-//        / snd_pcm_format_size( fDriver->playback.setup.format.format,
-//                               fDriver->playback.setup.format.voices );
-//    }
 
     int JackIoAudioDriver::check_capabilities(
         const char *devicename,
@@ -1093,14 +1006,14 @@ namespace Jack
         }
 
 #if defined(SND_LITTLE_ENDIAN)
-    fDriver->quirk_bswap = snd_pcm_format_big_endian(formats[format]);
+    quirk_bswap = snd_pcm_format_big_endian(formats[format]);
 #elif defined(SND_BIG_ENDIAN)
-    fDriver->quirk_bswap = snd_pcm_format_little_endian( formats[format] );
+    quirk_bswap = snd_pcm_format_little_endian( formats[format] );
 #else
-    fDriver->quirk_bswap = 0;
+    quirk_bswap = 0;
 #endif
 
-    params->format.rate = fDriver->frame_rate;
+    params->format.rate = frame_rate;
 
     if( 0 == params->format.voices )
         {
@@ -1146,249 +1059,6 @@ namespace Jack
     return 0;
     }
 
-    void JackIoAudioDriver::create(
-        char *name,
-        jack_client_t *client )
-    {
-    int err;
-
-    jack_log( "creating ioaudio driver ... %s|%s|%" PRIu32 "|%" PRIu32
-              "|%" PRIu32"|%" PRIu32"|%" PRIu32 "|%s|%s|%s|%s",
-              fArgs.playback ? fArgs.playback_pcm_name : "-",
-              fArgs.capture ? fArgs.capture_pcm_name : "-",
-              fArgs.frames_per_interrupt,
-              fArgs.user_nperiods,
-              fArgs.srate,
-              fArgs.user_capture_nchnls,
-              fArgs.user_playback_nchnls,
-              fArgs.hw_monitoring ? "hwmon" : "nomon",
-              fArgs.hw_metering ? "hwmeter" : "swmeter",
-              fArgs.soft_mode ? "soft-mode" : "-",
-              fArgs.shorts_first ? "16bit" : "32bit" );
-
-//    fDriver = (ioaudio_driver_t *)calloc( 1,
-//                                          sizeof(ioaudio_driver_t) );
-    fDriver = new ioaudio_driver_t;
-
-//    fDriver->user_playback_nchnls = fArgs.user_playback_nchnls;
-//    fDriver->user_capture_nchnls = fArgs.user_capture_nchnls;
-//    fDriver->capture.frame_latency = fArgs.systemic_input_latency;
-//    fDriver->playback.frame_latency = fArgs.systemic_output_latency;
-
-//    fDriver->with_monitor_ports = fArgs.monitor;
-
-//    fDriver->clock_mode = ClockMaster; /* XXX is it? */
-
-//    fDriver->dither = fArgs.dither;
-//    fDriver->soft_mode = fArgs.soft_mode;
-
-//    pthread_mutex_init( &fDriver->clock_sync_lock,
-//                        0 );
-
-//        fDriver->ioaudio_name_playback = strdup(fArgs.playback_pcm_name);
-//        fDriver->ioaudio_name_capture = strdup(fArgs.capture_pcm_name);
-
-    //fDriver->midi = midi_driver;
-
-    if( check_card_type() )
-        {
-        destroy();
-        return;
-        }
-
-    hw_specific();
-
-    if( fArgs.playback )
-        {
-        err =
-            snd_pcm_open_name( &fDriver->playback.handle,
-                               fArgs.playback_pcm_name,
-                               SND_PCM_OPEN_PLAYBACK | SND_PCM_OPEN_NONBLOCK );
-        if( err < 0 )
-            {
-            switch( errno )
-                {
-                case EBUSY:
-                    jack_error( "\n\nATTENTION: The playback device \"%s\" is "
-                                "already in use. Please stop the"
-                                " application using it and "
-                                "run JACK again",
-                                fArgs.playback_pcm_name );
-                    destroy();
-                    return;
-
-                case EPERM:
-                    jack_error( "you do not have permission to open "
-                                "the audio device \"%s\" for playback",
-                                fArgs.playback_pcm_name );
-                    destroy();
-                    return;
-                }
-
-            fDriver->playback.handle = NULL;
-            }
-
-        if( fDriver->playback.handle )
-            {
-            snd_pcm_nonblock_mode( fDriver->playback.handle,
-                                   0 );
-            }
-        else
-            {
-
-            /* they asked for playback, but we can't do it */
-
-            jack_error( "io-audio: Cannot open PCM device %s for "
-                        "playback. Falling back to capture-only"
-                        " mode",
-                        name );
-            fArgs.playback = false;
-            }
-
-        }
-
-    if( fArgs.capture )
-        {
-        err = snd_pcm_open_name( &fDriver->capture.handle,
-                                 fArgs.capture_pcm_name,
-                                 SND_PCM_OPEN_CAPTURE | SND_PCM_OPEN_NONBLOCK );
-        if( err < 0 )
-            {
-            switch( errno )
-                {
-                case EBUSY:
-                    jack_error( "\n\nATTENTION: The capture (recording) device \"%s\" is "
-                                "already in use. Please stop the"
-                                " application using it and "
-                                "run JACK again",
-                                fArgs.capture_pcm_name );
-                    destroy();
-                    return;
-
-                case EPERM:
-                    jack_error( "you do not have permission to open "
-                                "the audio device \"%s\" for capture",
-                                fArgs.capture_pcm_name );
-                    destroy();
-                    return;
-                }
-
-            fDriver->capture.handle = NULL;
-            }
-
-        if( fDriver->capture.handle )
-            {
-            snd_pcm_nonblock_mode( fDriver->capture.handle,
-                                   0 );
-            }
-        else
-            {
-
-            /* they asked for capture, but we can't do it */
-
-            jack_error( "io-audio: Cannot open PCM device %s for "
-                        "capture. Falling back to playback-only"
-                        " mode",
-                        name );
-
-            fArgs.capture = false;
-            }
-        }
-
-    if( fDriver->playback.handle == NULL && fDriver->capture.handle == NULL )
-        {
-        /* can't do anything */
-        destroy();
-        return;
-        }
-
-    err = set_parameters();
-    if( 0 != err )
-        {
-        destroy();
-        return;
-        }
-
-    fDriver->capture_and_playback_not_synced = false;
-
-    if( fDriver->capture.handle && fDriver->playback.handle )
-        {
-        if( snd_pcm_link( fDriver->playback.handle,
-                          fDriver->capture.handle ) != 0 )
-            {
-            fDriver->capture_and_playback_not_synced = true;
-            }
-        }
-
-    fDriver->client = client;
-    }
-
-    void JackIoAudioDriver::destroy()
-    {
-//    JSList *node;
-
-    //if (ffDriver->midi)
-    //        (fDriver->midi->destroy)(fDriver->midi);
-
-//    for( node = fDriver->clock_sync_listeners; node;
-//        node = jack_slist_next( node ) )
-//        {
-//        free( node->data );
-//        }
-//    jack_slist_free( fDriver->clock_sync_listeners );
-
-//        if (fDriver->ctl_handle)
-//            {
-//            snd_ctl_close(fDriver->ctl_handle);
-//            fDriver->ctl_handle = 0;
-//            }
-
-    if( fDriver->capture.handle )
-        {
-        snd_pcm_close( fDriver->capture.handle );
-        fDriver->capture.handle = 0;
-        }
-
-    if( fDriver->playback.handle )
-        {
-        snd_pcm_close( fDriver->playback.handle );
-        fDriver->capture.handle = 0;
-        }
-
-    if( fDriver->hw )
-        {
-        fDriver->hw->release();
-        delete fDriver->hw;
-        fDriver->hw = 0;
-        }
-//        free(fDriver->ioaudio_name_playback);
-//        free(fDriver->ioaudio_name_capture);
-//        free(fDriver->ioaudio_driver);
-
-    release_channel_dependent_memory();
-//    free( fDriver );
-    delete fDriver;
-    fDriver = NULL;
-    }
-
-//    int JackIoAudioDriver::generic_hardware()
-//    {
-//    jack_hardware_t *hw;
-//
-//    hw = (jack_hardware_t *)malloc( sizeof(jack_hardware_t) );
-//
-//    hw->capabilities = 0;
-//    hw->input_monitor_mask = 0;
-//
-//    hw->set_input_monitor_mask = generic_set_input_monitor_mask;
-//    hw->change_sample_clock = generic_change_sample_clock;
-//    hw->release = generic_release;
-//
-//    fDriver->hw = hw;
-//
-//    return 0;
-//    }
-
     int JackIoAudioDriver::get_channel_addresses(
         size_t *capture_avail,
         size_t *playback_avail,
@@ -1399,25 +1069,24 @@ namespace Jack
 
     if( capture_avail )
         {
-        ssize_t samp_bytes = fDriver->capture.sample_bytes();
-        ssize_t frame_bytes = fDriver->capture.frame_bytes();
-        for( chn = 0; chn < fDriver->capture.setup.format.voices; chn++ )
+        ssize_t samp_bytes = capture.sample_bytes();
+        ssize_t frame_bytes = capture.frame_bytes();
+        for( chn = 0; chn < capture.setup.format.voices; chn++ )
             {
-            fDriver->capture.voices[chn].addr = (char*)fDriver->capture.buffer
-                + chn * samp_bytes;
-            fDriver->capture.voices[chn].interleave_skip = frame_bytes;
+            capture.voices[chn].addr = (char*)capture.buffer + chn * samp_bytes;
+            capture.voices[chn].interleave_skip = frame_bytes;
             }
         }
 
     if( playback_avail )
         {
-        ssize_t samp_bytes = fDriver->playback.sample_bytes();
-        ssize_t frame_bytes = fDriver->playback.frame_bytes();
-        for( chn = 0; chn < fDriver->playback.setup.format.voices; chn++ )
+        ssize_t samp_bytes = playback.sample_bytes();
+        ssize_t frame_bytes = playback.frame_bytes();
+        for( chn = 0; chn < playback.setup.format.voices; chn++ )
             {
-            fDriver->playback.voices[chn].addr = (char*)fDriver->playback.buffer
+            playback.voices[chn].addr = (char*)playback.buffer
                 + chn * samp_bytes;
-            fDriver->playback.voices[chn].interleave_skip = frame_bytes;
+            playback.voices[chn].interleave_skip = frame_bytes;
 
             }
         }
@@ -1427,56 +1096,46 @@ namespace Jack
 
     int JackIoAudioDriver::hw_specific()
     {
-    int err;
-
-    fDriver->hw = new Jack::generic_hardware;
-    if( NULL == fDriver->hw )
+    hw = new Jack::generic_hardware;
+    if( NULL == hw )
         {
         return -ENOMEM;
         }
 
-    if( fDriver->hw->capabilities & Cap_HardwareMonitoring )
+    if( hw->capabilities & Cap_HardwareMonitoring )
         {
-        fDriver->has_hw_monitoring = true;
+        has_hw_monitoring = true;
         /* XXX need to ensure that this is really false or
          * true or whatever*/
-        fDriver->do_hw_monitoring = fArgs.hw_monitoring;
+        do_hw_monitoring = fArgs.hw_monitoring;
         }
     else
         {
-        fDriver->has_hw_monitoring = false;
-        fDriver->do_hw_monitoring = false;
+        has_hw_monitoring = false;
+        do_hw_monitoring = false;
         }
 
-    if( fDriver->hw->capabilities & Cap_ClockLockReporting )
+    if( hw->capabilities & Cap_ClockLockReporting )
         {
-        fDriver->has_clock_sync_reporting = true;
+        has_clock_sync_reporting = true;
         }
     else
         {
-        fDriver->has_clock_sync_reporting = false;
+        has_clock_sync_reporting = false;
         }
 
-    if( fDriver->hw->capabilities & Cap_HardwareMetering )
+    if( hw->capabilities & Cap_HardwareMetering )
         {
-        fDriver->has_hw_metering = true;
-        fDriver->do_hw_metering = fArgs.hw_metering;
+        has_hw_metering = true;
+        do_hw_metering = fArgs.hw_metering;
         }
     else
         {
-        fDriver->has_hw_metering = false;
-        fDriver->do_hw_metering = false;
+        has_hw_metering = false;
+        do_hw_metering = false;
         }
 
     return 0;
-    }
-
-    void JackIoAudioDriver::mark_channel_done(
-        int chn )
-    {
-    bitset_remove( fDriver->channels_not_done,
-                   chn );
-    fDriver->playback.voices[chn].silent = 0;
     }
 
     int JackIoAudioDriver::read(
@@ -1493,10 +1152,10 @@ namespace Jack
         return -1;
         }
 
-    //if (fDriver->midi)
-    //    (fDriver->midi->read)(fDriver->midi, nframes);
+    //if (midi)
+    //    (midi->read)(midi, nframes);
 
-    if( !fDriver->capture.handle )
+    if( !capture.handle )
         {
         return 0;
         }
@@ -1518,9 +1177,9 @@ namespace Jack
             return -1;
             }
 
-        err = snd_pcm_read( fDriver->capture.handle,
-                            fDriver->capture.buffer,
-                            fDriver->capture.frag_bytes() );
+        err = snd_pcm_read( capture.handle,
+                            capture.buffer,
+                            capture.frag_bytes() );
         if( err < 0 )
             {
             jack_error( "io-audio: could not complete read of %"
@@ -1530,9 +1189,19 @@ namespace Jack
             return -1;
             }
 
-        ReadInputAux( orig_nframes,
-                      contiguous,
-                      nread );
+        for( int chn = 0; chn < fCaptureChannels; chn++ )
+            {
+            if( fGraphManager->GetConnectionsNum( fCapturePortList[chn] ) > 0 )
+                {
+                jack_default_audio_sample_t* buf =
+                    (jack_default_audio_sample_t*)fGraphManager->GetBuffer( fCapturePortList[chn],
+                                                                            orig_nframes );
+                capture.read( buf + nread,
+                              capture.voices[chn].addr,
+                              contiguous,
+                              capture.voices[chn].interleave_skip );
+                }
+            }
 
         nframes -= contiguous;
         nread += contiguous;
@@ -1541,87 +1210,15 @@ namespace Jack
     return 0;
     }
 
-    void JackIoAudioDriver::release_channel_dependent_memory()
-    {
-    bitset_destroy( &fDriver->channels_done );
-    bitset_destroy( &fDriver->channels_not_done );
-
-    delete[] fDriver->capture.voices;
-    delete[] fDriver->playback.voices;
-
-//    if( fDriver->playback.addr )
-//        {
-//        free( fDriver->playback.addr );
-//        fDriver->playback.addr = 0;
-//        }
-//
-//    if( fDriver->capture.addr )
-//        {
-//        free( fDriver->capture.addr );
-//        fDriver->capture.addr = 0;
-//        }
-//
-//    if( fDriver->playback.interleave_skip )
-//        {
-//        free( fDriver->playback.interleave_skip );
-//        fDriver->playback.interleave_skip = NULL;
-//        }
-//
-//    if( fDriver->capture.interleave_skip )
-//        {
-//        free( fDriver->capture.interleave_skip );
-//        fDriver->capture.interleave_skip = NULL;
-//        }
-//
-//    if( fDriver->silent )
-//        {
-//        free( fDriver->silent );
-//        fDriver->silent = 0;
-//        }
-//
-//    if( fDriver->dither_state )
-//        {
-//        free( fDriver->dither_state );
-//        fDriver->dither_state = 0;
-//        }
-    }
-
-    int JackIoAudioDriver::reset_parameters()
-    {
-    /* XXX unregister old ports ? */
-    release_channel_dependent_memory();
-    return set_parameters();
-    }
-
-    int JackIoAudioDriver::restart()
-    {
-    int res;
-
-    fDriver->xrun_recovery = 1;
-    if( ( res = Stop() ) == 0 )
-        {
-        res = Start();
-        }
-    fDriver->xrun_recovery = 0;
-
-    //if (res && fDriver->midi)
-    //    (fDriver->midi->stop)(fDriver->midi);
-
-    return res;
-    }
-
     int JackIoAudioDriver::set_parameters()
     {
     ssize_t p_period_size = 0;
     size_t c_period_size = 0;
-    int chn;
     unsigned int pr = 0;
     unsigned int cr = 0;
     int err;
 
-    fDriver->frame_rate = fArgs.srate;
-//        fArgs.frames_per_interrupt = fArgs.frames_per_interrupt;
-//        fArgs.user_nperiods = fArgs.user_nperiods;
+    frame_rate = fArgs.srate;
 
     jack_log( "configuring for %" PRIu32 "Hz, period = %"
               PRIu32 " frames (%.1f ms), buffer = %" PRIu32 " periods",
@@ -1631,28 +1228,28 @@ namespace Jack
                   * 1000.0f ),
               fArgs.user_nperiods );
 
-    if( fDriver->capture.handle )
+    if( capture.handle )
         {
-        memset( &fDriver->capture.params,
+        memset( &capture.params,
                 0,
                 sizeof(snd_pcm_channel_params_t) );
-        fDriver->capture.params.channel = SND_PCM_CHANNEL_CAPTURE;
+        capture.params.channel = SND_PCM_CHANNEL_CAPTURE;
         if( configure_stream( fArgs.capture_pcm_name,
                               "capture",
-                              fDriver->capture.handle,
-                              &fDriver->capture.params,
-                              &fDriver->capture.nperiods ) )
+                              capture.handle,
+                              &capture.params,
+                              &capture.nperiods ) )
             {
             jack_error( "io-audio: cannot configure capture channel" );
             return -1;
             }
-        fDriver->capture.setup.channel = SND_PCM_CHANNEL_CAPTURE;
-        snd_pcm_channel_setup( fDriver->capture.handle,
-                               &fDriver->capture.setup );
-        cr = fDriver->capture.setup.format.rate;
+        capture.setup.channel = SND_PCM_CHANNEL_CAPTURE;
+        snd_pcm_channel_setup( capture.handle,
+                               &capture.setup );
+        cr = capture.setup.format.rate;
 
         /* check the fragment size, since thats non-negotiable */
-        c_period_size = fDriver->capture.setup.buf.block.frag_size;
+        c_period_size = capture.setup.buf.block.frag_size;
 
         if( c_period_size != fArgs.frames_per_interrupt )
             {
@@ -1665,7 +1262,7 @@ namespace Jack
             }
 
         /* check the sample format */
-        switch( fDriver->capture.setup.format.format )
+        switch( capture.setup.format.format )
             {
             case SND_PCM_SFMT_FLOAT_LE:
             case SND_PCM_SFMT_S32_LE:
@@ -1682,12 +1279,12 @@ namespace Jack
                 return -1;
             }
 
-        if( fDriver->capture.setup.format.interleave )
+        if( capture.setup.format.interleave )
             {
-            if( ( err = snd_pcm_mmap( fDriver->capture.handle,
+            if( ( err = snd_pcm_mmap( capture.handle,
                                       SND_PCM_CHANNEL_CAPTURE,
-                                      &fDriver->capture.mmap,
-                                      &fDriver->capture.buffer ) ) < 0 )
+                                      &capture.mmap,
+                                      &capture.buffer ) ) < 0 )
                 {
                 jack_error( "io-audio: %s: mmap areas info error",
                             fArgs.capture_pcm_name );
@@ -1696,32 +1293,32 @@ namespace Jack
             }
         }
 
-    if( fDriver->playback.handle )
+    if( playback.handle )
         {
-        memset( &fDriver->playback.params,
+        memset( &playback.params,
                 0,
                 sizeof(snd_pcm_channel_params_t) );
-        fDriver->playback.params.channel = SND_PCM_CHANNEL_PLAYBACK;
+        playback.params.channel = SND_PCM_CHANNEL_PLAYBACK;
 
         if( configure_stream( fArgs.playback_pcm_name,
                               "playback",
-                              fDriver->playback.handle,
-                              &fDriver->playback.params,
-                              &fDriver->playback.nperiods ) )
+                              playback.handle,
+                              &playback.params,
+                              &playback.nperiods ) )
             {
             jack_error( "io-audio: cannot configure playback channel" );
             return -1;
             }
 
-        fDriver->playback.setup.channel = SND_PCM_CHANNEL_PLAYBACK;
-        snd_pcm_channel_setup( fDriver->playback.handle,
-                               &fDriver->playback.setup );
-        pr = fDriver->playback.setup.format.rate;
+        playback.setup.channel = SND_PCM_CHANNEL_PLAYBACK;
+        snd_pcm_channel_setup( playback.handle,
+                               &playback.setup );
+        pr = playback.setup.format.rate;
 
         /* check the fragment size, since thats non-negotiable */
-        p_period_size = fDriver->playback.setup.buf.block.frag_size;
+        p_period_size = playback.setup.buf.block.frag_size;
 
-        if( p_period_size != fDriver->playback.frag_bytes() )
+        if( p_period_size != playback.frag_bytes() )
             {
             jack_error( "ioaudio_pcm: requested an interrupt every %"
                         PRIu32
@@ -1732,7 +1329,7 @@ namespace Jack
             }
 
         /* check the sample format */
-        switch( fDriver->playback.setup.format.format )
+        switch( playback.setup.format.format )
             {
             case SND_PCM_SFMT_FLOAT_LE:
             case SND_PCM_SFMT_S32_LE:
@@ -1749,20 +1346,19 @@ namespace Jack
                 return -1;
             }
 
-        fDriver->playback.buffer = malloc( fArgs.user_nperiods
-            * p_period_size );
-        if( fDriver->playback.setup.format.interleave )
+        playback.buffer = malloc( fArgs.user_nperiods * p_period_size );
+        if( playback.setup.format.interleave )
             {
-            fDriver->interleave_unit = fDriver->playback.sample_bytes();
+            interleave_unit = playback.sample_bytes();
             }
         else
             {
-            fDriver->interleave_unit = 0; /* NOT USED */
+            interleave_unit = 0; /* NOT USED */
             }
         }
 
     /* check the rate, since thats rather important */
-    if( fDriver->capture.handle && fDriver->playback.handle )
+    if( capture.handle && playback.handle )
         {
         if( cr != pr )
             {
@@ -1777,112 +1373,73 @@ namespace Jack
          * still works properly in full-duplex with slightly
          * different rate values between adc and dac
          */
-        if( cr != fDriver->frame_rate && pr != fDriver->frame_rate )
+        if( cr != frame_rate && pr != frame_rate )
             {
             jack_error( "sample rate in use (%d Hz) does not "
                         "match requested rate (%d Hz)",
                         cr,
-                        fDriver->frame_rate );
-            fDriver->frame_rate = cr;
+                        frame_rate );
+            frame_rate = cr;
             }
 
         }
-    else if( fDriver->capture.handle && cr != fDriver->frame_rate )
+    else if( capture.handle && cr != frame_rate )
         {
         jack_error( "capture sample rate in use (%d Hz) does not "
                     "match requested rate (%d Hz)",
                     cr,
-                    fDriver->frame_rate );
-        fDriver->frame_rate = cr;
+                    frame_rate );
+        frame_rate = cr;
         }
-    else if( fDriver->playback.handle && pr != fDriver->frame_rate )
+    else if( playback.handle && pr != frame_rate )
         {
         jack_error( "playback sample rate in use (%d Hz) does not "
                     "match requested rate (%d Hz)",
                     pr,
-                    fDriver->frame_rate );
-        fDriver->frame_rate = pr;
+                    frame_rate );
+        frame_rate = pr;
         }
 
-    fDriver->max_nchannels = std::max( fDriver->playback.setup.format.voices,
-                                       fDriver->capture.setup.format.voices );
-    fDriver->user_nchannels = std::min( fDriver->playback.setup.format.voices,
-                                        fDriver->capture.setup.format.voices );
+    max_nchannels = std::max( playback.setup.format.voices,
+                              capture.setup.format.voices );
+    user_nchannels = std::min( playback.setup.format.voices,
+                               capture.setup.format.voices );
 
     setup_io_function_pointers();
 
-    /* Allocate and initialize structures that rely on the
-     channels counts.
-
-     Set up the bit pattern that is used to record which
-     channels require action on every cycle. any bits that are
-     not set after the engine's process() call indicate channels
-     that potentially need to be silenced.
-     */
-
-    bitset_create( &fDriver->channels_done,
-                   fDriver->max_nchannels );
-    bitset_create( &fDriver->channels_not_done,
-                   fDriver->max_nchannels );
-
-    if( fDriver->playback.handle )
+    if( playback.handle )
         {
-        fDriver->playback.voices = new Voice[fDriver->max_nchannels];
-//        fDriver->playback.addr = (char **)calloc( fDriver->max_nchannels,
-//                                                  sizeof(char *) );
-
-//        fDriver->playback.interleave_skip =
-//            (unsigned long *)calloc( fDriver->max_nchannels,
-//                                     sizeof(unsigned long) );
-
-//        fDriver->silent = (unsigned long *)calloc( fDriver->max_nchannels,
-//                                                   sizeof(unsigned long) );
-
-        for( chn = 0; chn < fDriver->playback.setup.format.voices; chn++ )
-            {
-            bitset_add( fDriver->channels_done,
-                        chn );
-            }
-
-//        fDriver->dither_state =
-//            (dither_state_t *)calloc( fDriver->max_nchannels,
-//                                      sizeof(dither_state_t) );
+        if( playback.voices )
+            delete[] playback.voices;
+        playback.voices = new Voice[max_nchannels];
         }
 
-    if( fDriver->capture.handle )
+    if( capture.handle )
         {
-        fDriver->capture.voices = new Voice[fDriver->max_nchannels];
-//        fDriver->capture.addr = (char **)calloc( fDriver->max_nchannels,
-//                                                 sizeof(char *) );
-
-//        fDriver->capture.interleave_skip =
-//            (unsigned long *)calloc( fDriver->max_nchannels,
-//                                     sizeof(unsigned long) );
+        if( capture.voices )
+            delete[] capture.voices;
+        capture.voices = new Voice[max_nchannels];
         }
 
-//    fDriver->clock_sync_data =
-//        (ClockSyncStatus *)calloc( fDriver->max_nchannels,
-//                                   sizeof(ClockSyncStatus) );
+    float period_usecs = ( ( (float)fArgs.frames_per_interrupt ) / frame_rate )
+        * 1000000.0f;
 
-    float period_usecs = ( ( (float)fArgs.frames_per_interrupt )
-        / fDriver->frame_rate ) * 1000000.0f;
-
-    fDriver->poll_timeout_msecs = (int)floor( 1.5f * period_usecs / 1000.0f );
+    poll_timeout_msecs = (int)floor( 1.5f * period_usecs / 1000.0f );
 
     return 0;
     }
 
     void JackIoAudioDriver::setup_io_function_pointers()
     {
-    if( fDriver->playback.handle )
+    if( playback.handle )
         {
-        if( SND_PCM_FMT_FLOAT_LE == fDriver->playback.setup.format.format )
+        if( SND_PCM_FMT_FLOAT_LE == playback.setup.format.format )
             {
-            fDriver->playback.write = sample_move_dS_floatLE;
+            playback.write = sample_move_dS_floatLE;
             }
         else
             {
-            ssize_t bytes = fDriver->playback.sample_bytes();
+            ssize_t bytes = playback.sample_bytes();
             switch( bytes )
                 {
                 case 2:
@@ -1890,46 +1447,45 @@ namespace Jack
                         {
                         case Rectangular:
                             jack_log( "Rectangular dithering at 16 bits" );
-                            fDriver->playback.write =
-                                fDriver->quirk_bswap ?
+                            playback.write =
+                                quirk_bswap ?
                                     sample_move_dither_rect_d16_sSs :
                                     sample_move_dither_rect_d16_sS;
                             break;
 
                         case Triangular:
                             jack_log( "Triangular dithering at 16 bits" );
-                            fDriver->playback.write =
-                                fDriver->quirk_bswap ?
+                            playback.write =
+                                quirk_bswap ?
                                     sample_move_dither_tri_d16_sSs :
                                     sample_move_dither_tri_d16_sS;
                             break;
 
                         case Shaped:
                             jack_log( "Noise-shaped dithering at 16 bits" );
-                            fDriver->playback.write =
-                                fDriver->quirk_bswap ?
+                            playback.write =
+                                quirk_bswap ?
                                     sample_move_dither_shaped_d16_sSs :
                                     sample_move_dither_shaped_d16_sS;
                             break;
 
                         default:
-                            fDriver->playback.write =
-                                fDriver->quirk_bswap ?
+                            playback.write =
+                                quirk_bswap ?
                                     sample_move_d16_sSs : sample_move_d16_sS;
                             break;
                         }
                     break;
 
                 case 3: /* NO DITHER */
-                    fDriver->playback.write =
-                        fDriver->quirk_bswap ?
-                            sample_move_d24_sSs : sample_move_d24_sS;
+                    playback.write =
+                        quirk_bswap ? sample_move_d24_sSs : sample_move_d24_sS;
 
                     break;
 
                 case 4: /* NO DITHER */
-                    fDriver->playback.write =
-                        fDriver->quirk_bswap ?
+                    playback.write =
+                        quirk_bswap ?
                             sample_move_d32u24_sSs : sample_move_d32u24_sS;
                     break;
 
@@ -1941,30 +1497,28 @@ namespace Jack
             }
         }
 
-    if( fDriver->capture.handle )
+    if( capture.handle )
         {
-        if( SND_PCM_FMT_FLOAT_LE == fDriver->capture.setup.format.format )
+        if( SND_PCM_FMT_FLOAT_LE == capture.setup.format.format )
             {
-            fDriver->capture.read = sample_move_floatLE_sSs;
+            capture.read = sample_move_floatLE_sSs;
             }
         else
             {
-            ssize_t bytes = fDriver->capture.sample_bytes();
+            ssize_t bytes = capture.sample_bytes();
             switch( bytes )
                 {
                 case 2:
-                    fDriver->capture.read =
-                        fDriver->quirk_bswap ?
-                            sample_move_dS_s16s : sample_move_dS_s16;
+                    capture.read =
+                        quirk_bswap ? sample_move_dS_s16s : sample_move_dS_s16;
                     break;
                 case 3:
-                    fDriver->capture.read =
-                        fDriver->quirk_bswap ?
-                            sample_move_dS_s24s : sample_move_dS_s24;
+                    capture.read =
+                        quirk_bswap ? sample_move_dS_s24s : sample_move_dS_s24;
                     break;
                 case 4:
-                    fDriver->capture.read =
-                        fDriver->quirk_bswap ?
+                    capture.read =
+                        quirk_bswap ?
                             sample_move_dS_s32u24s : sample_move_dS_s32u24;
                     break;
                 }
@@ -1972,179 +1526,36 @@ namespace Jack
         }
     }
 
-    void JackIoAudioDriver::silence_on_channel(
-        int chn,
-        jack_nframes_t nframes )
+    void JackIoAudioDriver::update_latencies()
     {
-    silence_on_channel_no_mark( chn,
-                                nframes );
-    mark_channel_done( chn );
-    }
+    jack_latency_range_t range;
 
-    void JackIoAudioDriver::silence_on_channel_no_mark(
-        int chn,
-        jack_nframes_t nframes )
-    {
-    if( fDriver->playback.setup.format.interleave )
+    for( int i = 0; i < fCaptureChannels; i++ )
         {
-        memset_interleave( fDriver->playback.voices[chn].addr,
-                           0,
-                           fDriver->playback.sample_bytes() * nframes,
-                           fDriver->interleave_unit,
-                           fDriver->playback.voices[chn].interleave_skip );
+        range.min = range.max = fArgs.frames_per_interrupt
+            + fArgs.systemic_input_latency;
+        fGraphManager->GetPort( fCapturePortList[i] )->SetLatencyRange( JackCaptureLatency,
+                                                                        &range );
         }
-    else
-        {
-        memset( fDriver->playback.voices[chn].addr,
-                0,
-                fDriver->playback.sample_bytes() * nframes );
-        }
-    }
 
-    void JackIoAudioDriver::silence_untouched_channels(
-        jack_nframes_t nframes )
-    {
-    int chn;
-    jack_nframes_t buffer_frames = fArgs.frames_per_interrupt
-        * fDriver->playback.nperiods;
-
-    for( chn = 0; chn < fDriver->playback.setup.format.voices; chn++ )
+    for( int i = 0; i < fPlaybackChannels; i++ )
         {
-        if( bitset_contains( fDriver->channels_not_done,
-                             chn ) )
+        // Add one buffer more latency if "async" mode is used...
+        range.min = range.max =
+            ( fArgs.frames_per_interrupt * ( fArgs.user_nperiods - 1 ) )
+                + ( ( fEngineControl->fSyncMode ) ?
+                    0 : fEngineControl->fBufferSize )
+                + fArgs.systemic_output_latency;
+        fGraphManager->GetPort( fPlaybackPortList[i] )->SetLatencyRange( JackPlaybackLatency,
+                                                                         &range );
+        // Monitor port
+        if( fWithMonitorPorts )
             {
-            if( fDriver->playback.voices[chn].silent < buffer_frames )
-                {
-                silence_on_channel_no_mark( chn,
-                                            nframes );
-                fDriver->playback.voices[chn].silent += nframes;
-                }
+            range.min = range.max = fArgs.frames_per_interrupt;
+            fGraphManager->GetPort( fMonitorPortList[i] )->SetLatencyRange( JackCaptureLatency,
+                                                                            &range );
             }
         }
-    }
-
-    int JackIoAudioDriver::start()
-    {
-    int err;
-    size_t poffset, pavail;
-    int chn;
-
-    fDriver->poll_last = 0;
-    fDriver->poll_next = 0;
-
-    if( fDriver->playback.handle )
-        {
-        if( ( err = snd_pcm_playback_prepare( fDriver->playback.handle ) ) < 0 )
-            {
-            jack_error( "io-audio: prepare error for playback on "
-                        "\"%s\" (%s)",
-                        fArgs.playback_pcm_name,
-                        snd_strerror( err ) );
-            return -1;
-            }
-        }
-
-    if( ( fDriver->capture.handle && fDriver->capture_and_playback_not_synced )
-        || !fDriver->playback.handle )
-        {
-        if( ( err = snd_pcm_capture_prepare( fDriver->capture.handle ) ) < 0 )
-            {
-            jack_error( "io-audio: prepare error for capture on \"%s\""
-                        " (%s)",
-                        fArgs.capture_pcm_name,
-                        snd_strerror( err ) );
-            return -1;
-            }
-        }
-
-    if( fDriver->do_hw_monitoring )
-        {
-        fDriver->hw->set_input_monitor_mask( fDriver->input_monitor_mask );
-        }
-
-    if( fDriver->playback.handle )
-        {
-        /* fill playback buffer with zeroes, and mark
-         all fragments as having data.
-         */
-
-        pavail = fArgs.frames_per_interrupt * fDriver->playback.nperiods;
-
-        if( pavail != fArgs.frames_per_interrupt * fDriver->playback.nperiods )
-            {
-            jack_error( "io-audio: full buffer not available at start" );
-            return -1;
-            }
-
-        if( get_channel_addresses( 0,
-                                   &pavail,
-                                   0,
-                                   &poffset ) )
-            {
-            return -1;
-            }
-
-        for( chn = 0; chn < fDriver->playback.setup.format.voices; chn++ )
-            {
-            silence_on_channel( chn,
-                                fArgs.user_nperiods
-                                    * fArgs.frames_per_interrupt );
-            }
-
-        snd_pcm_write( fDriver->playback.handle,
-                       fDriver->playback.buffer,
-                       fDriver->playback.frag_bytes() * fArgs.user_nperiods );
-
-        }
-
-    return 0;
-    }
-
-    int JackIoAudioDriver::stop()
-    {
-    int err;
-
-    /* silence all capture port buffers, because we might
-     be entering offline mode.
-     */
-    ClearOutputAux();
-
-    if( fDriver->playback.handle )
-        {
-        err = snd_pcm_playback_flush( fDriver->playback.handle );
-        if( err < 0 )
-            {
-            jack_error( "io-audio: channel flush for playback "
-                        "failed (%s)",
-                        snd_strerror( err ) );
-            return -1;
-            }
-        }
-
-    if( !fDriver->playback.handle || fDriver->capture_and_playback_not_synced )
-        {
-        if( fDriver->capture.handle )
-            {
-            err = snd_pcm_capture_flush( fDriver->capture.handle );
-            if( err < 0 )
-                {
-                jack_error( "io-audio: channel flush for "
-                            "capture failed (%s)",
-                            snd_strerror( err ) );
-                return -1;
-                }
-            }
-        }
-
-    if( fDriver->do_hw_monitoring )
-        {
-        fDriver->hw->set_input_monitor_mask( 0 );
-        }
-
-    //if (fDriver->midi && !fDriver->xrun_recovery)
-    //    (fDriver->midi->stop)(fDriver->midi);
-
-    return 0;
     }
 
     jack_nframes_t JackIoAudioDriver::wait(
@@ -2164,9 +1575,9 @@ namespace Jack
     *status = -1;
     *delayed_usecs = 0;
 
-    need_capture = fDriver->capture.handle ? true : false;
+    need_capture = capture.handle ? true : false;
 
-    need_playback = fDriver->playback.handle ? true : false;
+    need_playback = playback.handle ? true : false;
 
     again:
 
@@ -2178,46 +1589,46 @@ namespace Jack
 
         if( need_playback )
             {
-            int fd = snd_pcm_file_descriptor( fDriver->playback.handle,
+            int fd = snd_pcm_file_descriptor( playback.handle,
                                               SND_PCM_CHANNEL_PLAYBACK );
 
-            fDriver->pfd[Playback].fd = fd;
-            fDriver->pfd[Playback].events = POLLOUT;
+            pfd[Playback].fd = fd;
+            pfd[Playback].events = POLLOUT;
             }
         else
             {
-            fDriver->pfd[Playback].fd = -1;
+            pfd[Playback].fd = -1;
             }
 
         if( need_capture )
             {
-            int fd = snd_pcm_file_descriptor( fDriver->capture.handle,
+            int fd = snd_pcm_file_descriptor( capture.handle,
                                               SND_PCM_CHANNEL_CAPTURE );
 
-            fDriver->pfd[Capture].fd = fd;
-            fDriver->pfd[Capture].events = POLLIN;
+            pfd[Capture].fd = fd;
+            pfd[Capture].events = POLLIN;
             }
         else
             {
-            fDriver->pfd[Capture].fd = -1;
+            pfd[Capture].fd = -1;
             }
 
         poll_enter = jack_get_microseconds();
 
-        if( poll_enter > fDriver->poll_next )
+        if( poll_enter > poll_next )
             {
             /*
              * This processing cycle was delayed past the
              * next due interrupt!  Do not account this as
              * a wakeup delay:
              */
-            fDriver->poll_next = 0;
-            fDriver->poll_late++;
+            poll_next = 0;
+            poll_late++;
             }
 
-        poll_result = poll( fDriver->pfd,
+        poll_result = poll( pfd,
                             SND_PCM_CHANNEL_MAX,
-                            fDriver->poll_timeout_msecs );
+                            poll_timeout_msecs );
 
         if( poll_result < 0 )
             {
@@ -2246,16 +1657,15 @@ namespace Jack
 
         // JACK2
         JackDriver::CycleTakeBeginTime();
-//        SetTimetAux( poll_ret );
 
         if( need_playback )
             {
             snd_pcm_channel_status_t chstatus;
             chstatus.channel = SND_PCM_CHANNEL_PLAYBACK;
-            snd_pcm_channel_status( fDriver->playback.handle,
+            snd_pcm_channel_status( playback.handle,
                                     &chstatus );
 
-            revents = fDriver->pfd[Playback].revents;
+            revents = pfd[Playback].revents;
 
             if( revents & POLLERR )
                 {
@@ -2277,10 +1687,10 @@ namespace Jack
             {
             snd_pcm_channel_status_t chstatus;
             chstatus.channel = SND_PCM_CHANNEL_CAPTURE;
-            snd_pcm_channel_status( fDriver->playback.handle,
+            snd_pcm_channel_status( playback.handle,
                                     &chstatus );
 
-            revents = fDriver->pfd[Capture].revents;
+            revents = pfd[Capture].revents;
 
             if( revents & POLLERR )
                 {
@@ -2309,18 +1719,18 @@ namespace Jack
 
         }
 
-    if( fDriver->capture.handle )
+    if( capture.handle )
         {
-        capture_avail = fDriver->capture.frag_bytes() / fDriver->capture.frame_bytes();
+        capture_avail = capture.frag_bytes() / capture.frame_bytes();
         }
     else
         {
         capture_avail = std::numeric_limits < ssize_t > ::max();
         }
 
-    if( fDriver->playback.handle )
+    if( playback.handle )
         {
-        playback_avail = fDriver->playback.frag_bytes() / fDriver->playback.frame_bytes();
+        playback_avail = playback.frag_bytes() / playback.frame_bytes();
         }
     else
         {
@@ -2335,7 +1745,6 @@ namespace Jack
         }
 
     *status = 0;
-//        fDriver->last_wait_ust = poll_ret;
 
     avail = capture_avail < playback_avail ? capture_avail : playback_avail;
 
@@ -2344,11 +1753,6 @@ namespace Jack
         "cavail = %lu\n",
         avail, playback_avail, capture_avail);
 #endif
-
-    /* mark all channels not done for now. read/write will change this */
-
-    bitset_copy( fDriver->channels_not_done,
-                 fDriver->channels_done );
 
     /* constrain the available count to the nearest (round down) number of
      periods.
@@ -2363,10 +1767,10 @@ namespace Jack
     snd_pcm_channel_status_t status;
     int res;
 
-    if( fDriver->capture.handle )
+    if( capture.handle )
         {
         status.channel = SND_PCM_CHANNEL_CAPTURE;
-        if( ( res = snd_pcm_channel_status( fDriver->capture.handle,
+        if( ( res = snd_pcm_channel_status( capture.handle,
                                             &status ) ) < 0 )
             {
             jack_error( "status error: %s",
@@ -2376,7 +1780,7 @@ namespace Jack
     else
         {
         status.channel = SND_PCM_CHANNEL_PLAYBACK;
-        if( ( res = snd_pcm_channel_status( fDriver->playback.handle,
+        if( ( res = snd_pcm_channel_status( playback.handle,
                                             &status ) ) < 0 )
             {
             jack_error( "status error: %s",
@@ -2387,10 +1791,9 @@ namespace Jack
     if( status.status == SND_PCM_STATUS_READY )
         {
         jack_log( "**** ioaudio_pcm: pcm in suspended state, resuming it" );
-        if( fDriver->capture.handle )
+        if( capture.handle )
             {
-            if( ( res = snd_pcm_capture_prepare( fDriver->capture.handle ) )
-                < 0 )
+            if( ( res = snd_pcm_capture_prepare( capture.handle ) ) < 0 )
                 {
                 jack_error( "error preparing after suspend: %s",
                             snd_strerror( res ) );
@@ -2398,8 +1801,7 @@ namespace Jack
             }
         else
             {
-            if( ( res = snd_pcm_playback_prepare( fDriver->playback.handle ) )
-                < 0 )
+            if( ( res = snd_pcm_playback_prepare( playback.handle ) ) < 0 )
                 {
                 jack_error( "error preparing after suspend: %s",
                             snd_strerror( res ) );
@@ -2408,10 +1810,10 @@ namespace Jack
         }
 
     if( status.status == SND_PCM_STATUS_OVERRUN
-        && fDriver->process_count > XRUN_REPORT_DELAY )
+        && process_count > XRUN_REPORT_DELAY )
         {
         struct timeval now, diff, tstamp;
-        fDriver->xrun_count++;
+        xrun_count++;
         gettimeofday( &now,
                       NULL );
         tstamp = status.stop_time;
@@ -2423,551 +1825,562 @@ namespace Jack
                   *delayed_usecs / 1000.0 );
         }
 
-    if( restart() )
+    in_xrun_recovery = 1;
+    if( ( res = Stop() ) == 0 )
+        {
+        res = Start();
+        }
+    in_xrun_recovery = 0;
+
+    //if (res && midi)
+    //    (midi->stop)(midi);
+
+    if( 0 != res )
         {
         return -1;
         }
     return 0;
     }
 
-}
-// end of namespace
-
 #ifdef __cplusplus
-extern "C"
-{
+    extern "C"
+    {
 #endif
 
-    static int dither_opt(
-        char c,
-        DitherAlgorithm* dither )
-    {
-    switch( c )
+        static int dither_opt(
+            char c,
+            DitherAlgorithm* dither )
         {
-        case '-':
-        case 'n':
-            *dither = None;
-            break;
-
-        case 'r':
-            *dither = Rectangular;
-            break;
-
-        case 's':
-            *dither = Shaped;
-            break;
-
-        case 't':
-            *dither = Triangular;
-            break;
-
-        default:
-            fprintf( stderr,
-                     "io-audio driver: illegal dithering mode %c\n",
-                     c );
-            return -1;
-        }
-    return 0;
-    }
-
-    static jack_driver_param_constraint_desc_t *
-    enum_ioaudio_devices()
-    {
-    snd_ctl_t * handle;
-    snd_ctl_hw_info_t hwinfo;
-    snd_pcm_info_t pcminfo;
-    int card_no = -1;
-    jack_driver_param_value_t card_id;
-    jack_driver_param_value_t device_id;
-    char description[64];
-    uint32_t device_no;
-    bool has_capture;
-    bool has_playback;
-    jack_driver_param_constraint_desc_t * constraint_ptr;
-    uint32_t array_size = 0;
-
-    constraint_ptr = NULL;
-
-    int cards_over = 0;
-    int numcards = snd_cards_list( NULL,
-                                   0,
-                                   &cards_over );
-    int* cards = new int[cards_over];
-    numcards = snd_cards_list( cards,
-                               cards_over,
-                               &cards_over );
-
-    for( int c = 0; c < numcards; ++c )
-        {
-        card_no = cards[c];
-
-        if( snd_ctl_open( &handle,
-                          card_no ) >= 0 && snd_ctl_hw_info( handle,
-                                                             &hwinfo ) >= 0 )
+        switch( c )
             {
-            strncpy( card_id.str,
-                     hwinfo.id,
-                     sizeof( card_id.str ) );
-            strncpy( description,
-                     hwinfo.longname,
-                     sizeof( description ) );
-            if( !jack_constraint_add_enum( &constraint_ptr,
-                                           &array_size,
-                                           &card_id,
-                                           description ) )
-                goto fail;
-
-            device_no = -1;
-
-            for( device_no = 0; device_no < hwinfo.pcmdevs; ++device_no )
-                {
-                snprintf( device_id.str,
-                          sizeof( device_id.str ),
-                          "%s,%d",
-                          card_id.str,
-                          device_no );
-
-                snd_ctl_pcm_info( handle,
-                                  device_no,
-                                  &pcminfo );
-                has_capture = pcminfo.flags & SND_PCM_INFO_CAPTURE;
-                has_playback = pcminfo.flags & SND_PCM_INFO_PLAYBACK;
-
-                if( has_capture && has_playback )
-                    {
-                    snprintf( description,
-                              sizeof( description ),
-                              "%s (duplex)",
-                              pcminfo.name );
-                    }
-                else if( has_capture )
-                    {
-                    snprintf( description,
-                              sizeof( description ),
-                              "%s (capture)",
-                              pcminfo.name );
-                    }
-                else if( has_playback )
-                    {
-                    snprintf( description,
-                              sizeof( description ),
-                              "%s (playback)",
-                              pcminfo.name );
-                    }
-                else
-                    {
-                    continue;
-                    }
-
-                if( !jack_constraint_add_enum( &constraint_ptr,
-                                               &array_size,
-                                               &device_id,
-                                               description ) )
-                    goto fail;
-                }
-
-            snd_ctl_close( handle );
-            }
-        }
-
-    delete[] cards;
-    return constraint_ptr;
-
-    fail: jack_constraint_free( constraint_ptr );
-    delete[] cards;
-    return NULL;
-    }
-
-    SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor()
-    {
-    jack_driver_desc_t * desc;
-    jack_driver_desc_filler_t filler;
-    jack_driver_param_value_t value;
-
-    desc =
-        jack_driver_descriptor_construct( "io-audio",
-                                          JackDriverMaster,
-                                          "QNX io-audio API based audio backend",
-                                          &filler );
-
-    strcpy( value.str,
-            "pcmPreferredp" );
-    jack_driver_descriptor_add_parameter( desc,
-                                          &filler,
-                                          "device",
-                                          'd',
-                                          JackDriverParamString,
-                                          &value,
-                                          enum_ioaudio_devices(),
-                                          "io-audio device name",
-                                          NULL );
-
-    strcpy( value.str,
-            "none" );
-    jack_driver_descriptor_add_parameter( desc,
-                                          &filler,
-                                          "capture",
-                                          'C',
-                                          JackDriverParamString,
-                                          &value,
-                                          NULL,
-                                          "Provide capture ports.  Optionally set device",
-                                          NULL );
-    jack_driver_descriptor_add_parameter( desc,
-                                          &filler,
-                                          "playback",
-                                          'P',
-                                          JackDriverParamString,
-                                          &value,
-                                          NULL,
-                                          "Provide playback ports.  Optionally set device",
-                                          NULL );
-
-    value.ui = 48000U;
-    jack_driver_descriptor_add_parameter( desc,
-                                          &filler,
-                                          "rate",
-                                          'r',
-                                          JackDriverParamUInt,
-                                          &value,
-                                          NULL,
-                                          "Sample rate",
-                                          NULL );
-
-    value.ui = 1024U;
-    jack_driver_descriptor_add_parameter( desc,
-                                          &filler,
-                                          "period",
-                                          'p',
-                                          JackDriverParamUInt,
-                                          &value,
-                                          NULL,
-                                          "Frames per period",
-                                          NULL );
-
-    value.ui = 2U;
-    jack_driver_descriptor_add_parameter( desc,
-                                          &filler,
-                                          "nperiods",
-                                          'n',
-                                          JackDriverParamUInt,
-                                          &value,
-                                          NULL,
-                                          "Number of periods of playback latency",
-                                          NULL );
-
-    value.i = 0;
-    jack_driver_descriptor_add_parameter( desc,
-                                          &filler,
-                                          "hwmon",
-                                          'H',
-                                          JackDriverParamBool,
-                                          &value,
-                                          NULL,
-                                          "Hardware monitoring, if available",
-                                          NULL );
-
-    value.i = 0;
-    jack_driver_descriptor_add_parameter( desc,
-                                          &filler,
-                                          "hwmeter",
-                                          'M',
-                                          JackDriverParamBool,
-                                          &value,
-                                          NULL,
-                                          "Hardware metering, if available",
-                                          NULL );
-
-    value.i = 1;
-    jack_driver_descriptor_add_parameter( desc,
-                                          &filler,
-                                          "duplex",
-                                          'D',
-                                          JackDriverParamBool,
-                                          &value,
-                                          NULL,
-                                          "Provide both capture and playback ports",
-                                          NULL );
-
-    value.i = 0;
-    jack_driver_descriptor_add_parameter( desc,
-                                          &filler,
-                                          "softmode",
-                                          's',
-                                          JackDriverParamBool,
-                                          &value,
-                                          NULL,
-                                          "Soft-mode, no xrun handling",
-                                          NULL );
-
-    value.i = 0;
-    jack_driver_descriptor_add_parameter( desc,
-                                          &filler,
-                                          "monitor",
-                                          'm',
-                                          JackDriverParamBool,
-                                          &value,
-                                          NULL,
-                                          "Provide monitor ports for the output",
-                                          NULL );
-
-    value.c = 'n';
-    jack_driver_descriptor_add_parameter( desc,
-                                          &filler,
-                                          "dither",
-                                          'z',
-                                          JackDriverParamChar,
-                                          &value,
-                                          jack_constraint_compose_enum_char(
-                                                                             JACK_CONSTRAINT_FLAG_STRICT
-                                                                                 | JACK_CONSTRAINT_FLAG_FAKE_VALUE,
-                                                                             dither_constraint_descr_array ),
-                                          "Dithering mode",
-                                          NULL );
-
-    value.ui = 0;
-    jack_driver_descriptor_add_parameter( desc,
-                                          &filler,
-                                          "inchannels",
-                                          'i',
-                                          JackDriverParamUInt,
-                                          &value,
-                                          NULL,
-                                          "Number of capture channels (defaults to hardware max)",
-                                          NULL );
-    jack_driver_descriptor_add_parameter( desc,
-                                          &filler,
-                                          "outchannels",
-                                          'o',
-                                          JackDriverParamUInt,
-                                          &value,
-                                          NULL,
-                                          "Number of playback channels (defaults to hardware max)",
-                                          NULL );
-
-    value.i = false;
-    jack_driver_descriptor_add_parameter( desc,
-                                          &filler,
-                                          "shorts",
-                                          'S',
-                                          JackDriverParamBool,
-                                          &value,
-                                          NULL,
-                                          "Try 16-bit samples before 32-bit",
-                                          NULL );
-
-    value.ui = 0;
-    jack_driver_descriptor_add_parameter( desc,
-                                          &filler,
-                                          "input-latency",
-                                          'I',
-                                          JackDriverParamUInt,
-                                          &value,
-                                          NULL,
-                                          "Extra input latency (frames)",
-                                          NULL );
-    jack_driver_descriptor_add_parameter( desc,
-                                          &filler,
-                                          "output-latency",
-                                          'O',
-                                          JackDriverParamUInt,
-                                          &value,
-                                          NULL,
-                                          "Extra output latency (frames)",
-                                          NULL );
-
-    strcpy( value.str,
-            "none" );
-    jack_driver_descriptor_add_parameter( desc,
-                                          &filler,
-                                          "midi-driver",
-                                          'X',
-                                          JackDriverParamString,
-                                          &value,
-                                          jack_constraint_compose_enum_str(
-                                                                            JACK_CONSTRAINT_FLAG_STRICT
-                                                                                | JACK_CONSTRAINT_FLAG_FAKE_VALUE,
-                                                                            midi_constraint_descr_array ),
-                                          "io-audio MIDI driver",
-                                          NULL );
-
-    return desc;
-    }
-
-    SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(
-        Jack::JackLockedEngine* engine,
-        Jack::JackSynchro* table,
-        const JSList* params )
-    {
-    ioaudio_driver_args_t args;
-    args.srate = 48000;
-    args.frames_per_interrupt = 1024;
-    args.user_nperiods = 2;
-    args.playback_pcm_name = "pcmPreferredp";
-    args.capture_pcm_name = "pcmPreferredc";
-    args.hw_monitoring = false;
-    args.hw_metering = false;
-    args.capture = false;
-    args.playback = false;
-    args.soft_mode = false;
-    args.monitor = false;
-    args.dither = None;
-    args.user_capture_nchnls = 0;
-    args.user_playback_nchnls = 0;
-    args.shorts_first = false;
-    args.systemic_input_latency = 0;
-    args.systemic_output_latency = 0;
-    args.midi_driver = "none";
-
-    const JSList * node;
-    const jack_driver_param_t * param;
-
-    for( node = params; node; node = jack_slist_next( node ) )
-        {
-        param = (const jack_driver_param_t *)node->data;
-
-        switch( param->character )
-            {
-
-            case 'C':
-                if( strcmp( param->value.str,
-                            "none" ) != 0 )
-                    {
-                    args.capture = true;
-                    args.capture_pcm_name = strdup( param->value.str );
-                    jack_log( "capture device %s",
-                              args.capture_pcm_name );
-                    }
-                break;
-
-            case 'P':
-                if( strcmp( param->value.str,
-                            "none" ) != 0 )
-                    {
-                    args.playback = true;
-                    args.playback_pcm_name = strdup( param->value.str );
-                    jack_log( "playback device %s",
-                              args.playback_pcm_name );
-                    }
-                break;
-
-            case 'D':
-                args.playback = true;
-                args.capture = true;
-                break;
-
-            case 'd':
-                if( strcmp( param->value.str,
-                            "none" ) != 0 )
-                    {
-                    args.playback = true;
-                    args.playback_pcm_name = strdup( param->value.str );
-                    args.capture = true;
-                    args.capture_pcm_name = strdup( param->value.str );
-                    jack_log( "playback device %s",
-                              args.playback_pcm_name );
-                    jack_log( "capture device %s",
-                              args.capture_pcm_name );
-                    }
-                break;
-
-            case 'H':
-                args.hw_monitoring = param->value.i;
-                break;
-
-            case 'm':
-                args.monitor = param->value.i;
-                break;
-
-            case 'M':
-                args.hw_metering = param->value.i;
+            case '-':
+            case 'n':
+                *dither = None;
                 break;
 
             case 'r':
-                args.srate = param->value.ui;
-                jack_log( "apparent rate = %d",
-                          args.srate );
-                break;
-
-            case 'p':
-                args.frames_per_interrupt = param->value.ui;
-                jack_log( "frames per period = %d",
-                          args.frames_per_interrupt );
-                break;
-
-            case 'n':
-                args.user_nperiods = param->value.ui;
-                if( args.user_nperiods < 2 )
-                    { /* enforce minimum value */
-                    args.user_nperiods = 2;
-                    }
+                *dither = Rectangular;
                 break;
 
             case 's':
-                args.soft_mode = param->value.i;
+                *dither = Shaped;
                 break;
 
-            case 'z':
-                if( dither_opt( param->value.c,
-                                &args.dither ) )
+            case 't':
+                *dither = Triangular;
+                break;
+
+            default:
+                fprintf( stderr,
+                         "io-audio driver: illegal dithering mode %c\n",
+                         c );
+                return -1;
+            }
+        return 0;
+        }
+
+        static jack_driver_param_constraint_desc_t *
+        enum_ioaudio_devices()
+        {
+        snd_ctl_t * handle;
+        snd_ctl_hw_info_t hwinfo;
+        snd_pcm_info_t pcminfo;
+        int card_no = -1;
+        jack_driver_param_value_t card_id;
+        jack_driver_param_value_t device_id;
+        char description[64];
+        uint32_t device_no;
+        bool has_capture;
+        bool has_playback;
+        jack_driver_param_constraint_desc_t * constraint_ptr;
+        uint32_t array_size = 0;
+
+        constraint_ptr = NULL;
+
+        int cards_over = 0;
+        int numcards = snd_cards_list( NULL,
+                                       0,
+                                       &cards_over );
+        int* cards = new int[cards_over];
+        numcards = snd_cards_list( cards,
+                                   cards_over,
+                                   &cards_over );
+
+        for( int c = 0; c < numcards; ++c )
+            {
+            card_no = cards[c];
+
+            if( snd_ctl_open( &handle,
+                              card_no ) >= 0
+                && snd_ctl_hw_info( handle,
+                                    &hwinfo ) >= 0 )
+                {
+                strncpy( card_id.str,
+                         hwinfo.id,
+                         sizeof( card_id.str ) );
+                strncpy( description,
+                         hwinfo.longname,
+                         sizeof( description ) );
+                if( !jack_constraint_add_enum( &constraint_ptr,
+                                               &array_size,
+                                               &card_id,
+                                               description ) )
+                    goto fail;
+
+                device_no = -1;
+
+                for( device_no = 0; device_no < hwinfo.pcmdevs; ++device_no )
                     {
-                    return NULL;
+                    snprintf( device_id.str,
+                              sizeof( device_id.str ),
+                              "%s,%d",
+                              card_id.str,
+                              device_no );
+
+                    snd_ctl_pcm_info( handle,
+                                      device_no,
+                                      &pcminfo );
+                    has_capture = pcminfo.flags & SND_PCM_INFO_CAPTURE;
+                    has_playback = pcminfo.flags & SND_PCM_INFO_PLAYBACK;
+
+                    if( has_capture && has_playback )
+                        {
+                        snprintf( description,
+                                  sizeof( description ),
+                                  "%s (duplex)",
+                                  pcminfo.name );
+                        }
+                    else if( has_capture )
+                        {
+                        snprintf( description,
+                                  sizeof( description ),
+                                  "%s (capture)",
+                                  pcminfo.name );
+                        }
+                    else if( has_playback )
+                        {
+                        snprintf( description,
+                                  sizeof( description ),
+                                  "%s (playback)",
+                                  pcminfo.name );
+                        }
+                    else
+                        {
+                        continue;
+                        }
+
+                    if( !jack_constraint_add_enum( &constraint_ptr,
+                                                   &array_size,
+                                                   &device_id,
+                                                   description ) )
+                        goto fail;
                     }
-                break;
 
-            case 'i':
-                args.user_capture_nchnls = param->value.ui;
-                break;
+                snd_ctl_close( handle );
+                }
+            }
 
-            case 'o':
-                args.user_playback_nchnls = param->value.ui;
-                break;
+        delete[] cards;
+        return constraint_ptr;
 
-            case 'S':
-                args.shorts_first = param->value.i;
-                break;
+        fail: jack_constraint_free( constraint_ptr );
+        delete[] cards;
+        return NULL;
+        }
 
-            case 'I':
-                args.systemic_input_latency = param->value.ui;
-                break;
+        SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor()
+        {
+        jack_driver_desc_t * desc;
+        jack_driver_desc_filler_t filler;
+        jack_driver_param_value_t value;
 
-            case 'O':
-                args.systemic_output_latency = param->value.ui;
-                break;
+        desc =
+            jack_driver_descriptor_construct( "io-audio",
+                                              JackDriverMaster,
+                                              "QNX io-audio API based audio backend",
+                                              &filler );
 
-            case 'X':
-                args.midi_driver = strdup( param->value.str );
-                break;
+        strcpy( value.str,
+                "pcmPreferredp" );
+        jack_driver_descriptor_add_parameter( desc,
+                                              &filler,
+                                              "device",
+                                              'd',
+                                              JackDriverParamString,
+                                              &value,
+                                              enum_ioaudio_devices(),
+                                              "io-audio device name",
+                                              NULL );
+
+        strcpy( value.str,
+                "none" );
+        jack_driver_descriptor_add_parameter( desc,
+                                              &filler,
+                                              "capture",
+                                              'C',
+                                              JackDriverParamString,
+                                              &value,
+                                              NULL,
+                                              "Provide capture ports.  Optionally set device",
+                                              NULL );
+        jack_driver_descriptor_add_parameter( desc,
+                                              &filler,
+                                              "playback",
+                                              'P',
+                                              JackDriverParamString,
+                                              &value,
+                                              NULL,
+                                              "Provide playback ports.  Optionally set device",
+                                              NULL );
+
+        value.ui = 48000U;
+        jack_driver_descriptor_add_parameter( desc,
+                                              &filler,
+                                              "rate",
+                                              'r',
+                                              JackDriverParamUInt,
+                                              &value,
+                                              NULL,
+                                              "Sample rate",
+                                              NULL );
+
+        value.ui = 1024U;
+        jack_driver_descriptor_add_parameter( desc,
+                                              &filler,
+                                              "period",
+                                              'p',
+                                              JackDriverParamUInt,
+                                              &value,
+                                              NULL,
+                                              "Frames per period",
+                                              NULL );
+
+        value.ui = 2U;
+        jack_driver_descriptor_add_parameter( desc,
+                                              &filler,
+                                              "nperiods",
+                                              'n',
+                                              JackDriverParamUInt,
+                                              &value,
+                                              NULL,
+                                              "Number of periods of playback latency",
+                                              NULL );
+
+        value.i = 0;
+        jack_driver_descriptor_add_parameter( desc,
+                                              &filler,
+                                              "hwmon",
+                                              'H',
+                                              JackDriverParamBool,
+                                              &value,
+                                              NULL,
+                                              "Hardware monitoring, if available",
+                                              NULL );
+
+        value.i = 0;
+        jack_driver_descriptor_add_parameter( desc,
+                                              &filler,
+                                              "hwmeter",
+                                              'M',
+                                              JackDriverParamBool,
+                                              &value,
+                                              NULL,
+                                              "Hardware metering, if available",
+                                              NULL );
+
+        value.i = 1;
+        jack_driver_descriptor_add_parameter( desc,
+                                              &filler,
+                                              "duplex",
+                                              'D',
+                                              JackDriverParamBool,
+                                              &value,
+                                              NULL,
+                                              "Provide both capture and playback ports",
+                                              NULL );
+
+        value.i = 0;
+        jack_driver_descriptor_add_parameter( desc,
+                                              &filler,
+                                              "softmode",
+                                              's',
+                                              JackDriverParamBool,
+                                              &value,
+                                              NULL,
+                                              "Soft-mode, no xrun handling",
+                                              NULL );
+
+        value.i = 0;
+        jack_driver_descriptor_add_parameter( desc,
+                                              &filler,
+                                              "monitor",
+                                              'm',
+                                              JackDriverParamBool,
+                                              &value,
+                                              NULL,
+                                              "Provide monitor ports for the output",
+                                              NULL );
+
+        value.c = 'n';
+        jack_driver_descriptor_add_parameter( desc,
+                                              &filler,
+                                              "dither",
+                                              'z',
+                                              JackDriverParamChar,
+                                              &value,
+                                              jack_constraint_compose_enum_char(
+                                                                                 JACK_CONSTRAINT_FLAG_STRICT
+                                                                                     | JACK_CONSTRAINT_FLAG_FAKE_VALUE,
+                                                                                 dither_constraint_descr_array ),
+                                              "Dithering mode",
+                                              NULL );
+
+        value.ui = 0;
+        jack_driver_descriptor_add_parameter( desc,
+                                              &filler,
+                                              "inchannels",
+                                              'i',
+                                              JackDriverParamUInt,
+                                              &value,
+                                              NULL,
+                                              "Number of capture channels (defaults to hardware max)",
+                                              NULL );
+        jack_driver_descriptor_add_parameter( desc,
+                                              &filler,
+                                              "outchannels",
+                                              'o',
+                                              JackDriverParamUInt,
+                                              &value,
+                                              NULL,
+                                              "Number of playback channels (defaults to hardware max)",
+                                              NULL );
+
+        value.i = false;
+        jack_driver_descriptor_add_parameter( desc,
+                                              &filler,
+                                              "shorts",
+                                              'S',
+                                              JackDriverParamBool,
+                                              &value,
+                                              NULL,
+                                              "Try 16-bit samples before 32-bit",
+                                              NULL );
+
+        value.ui = 0;
+        jack_driver_descriptor_add_parameter( desc,
+                                              &filler,
+                                              "input-latency",
+                                              'I',
+                                              JackDriverParamUInt,
+                                              &value,
+                                              NULL,
+                                              "Extra input latency (frames)",
+                                              NULL );
+        jack_driver_descriptor_add_parameter( desc,
+                                              &filler,
+                                              "output-latency",
+                                              'O',
+                                              JackDriverParamUInt,
+                                              &value,
+                                              NULL,
+                                              "Extra output latency (frames)",
+                                              NULL );
+
+        strcpy( value.str,
+                "none" );
+        jack_driver_descriptor_add_parameter( desc,
+                                              &filler,
+                                              "midi-driver",
+                                              'X',
+                                              JackDriverParamString,
+                                              &value,
+                                              jack_constraint_compose_enum_str(
+                                                                                JACK_CONSTRAINT_FLAG_STRICT
+                                                                                    | JACK_CONSTRAINT_FLAG_FAKE_VALUE,
+                                                                                midi_constraint_descr_array ),
+                                              "io-audio MIDI driver",
+                                              NULL );
+
+        return desc;
+        }
+
+        SERVER_EXPORT JackDriverClientInterface* driver_initialize(
+            JackLockedEngine* engine,
+            JackSynchro* table,
+            const JSList* params )
+        {
+        JackIoAudioDriver::Args args;
+        args.jack_name = "system";
+        args.jack_alias = "ioaudio_pcm";
+        args.srate = 48000;
+        args.frames_per_interrupt = 1024;
+        args.user_nperiods = 2;
+        args.playback_pcm_name = "pcmPreferredp";
+        args.capture_pcm_name = "pcmPreferredc";
+        args.hw_monitoring = false;
+        args.hw_metering = false;
+        args.capture = false;
+        args.playback = false;
+        args.soft_mode = false;
+        args.monitor = false;
+        args.dither = None;
+        args.user_capture_nchnls = 0;
+        args.user_playback_nchnls = 0;
+        args.shorts_first = false;
+        args.systemic_input_latency = 0;
+        args.systemic_output_latency = 0;
+        args.midi_driver = "none";
+
+        const JSList * node;
+        const jack_driver_param_t * param;
+
+        for( node = params; node; node = jack_slist_next( node ) )
+            {
+            param = (const jack_driver_param_t *)node->data;
+
+            switch( param->character )
+                {
+
+                case 'C':
+                    if( strcmp( param->value.str,
+                                "none" ) != 0 )
+                        {
+                        args.capture = true;
+                        args.capture_pcm_name = strdup( param->value.str );
+                        jack_log( "capture device %s",
+                                  args.capture_pcm_name );
+                        }
+                    break;
+
+                case 'P':
+                    if( strcmp( param->value.str,
+                                "none" ) != 0 )
+                        {
+                        args.playback = true;
+                        args.playback_pcm_name = strdup( param->value.str );
+                        jack_log( "playback device %s",
+                                  args.playback_pcm_name );
+                        }
+                    break;
+
+                case 'D':
+                    args.playback = true;
+                    args.capture = true;
+                    break;
+
+                case 'd':
+                    if( strcmp( param->value.str,
+                                "none" ) != 0 )
+                        {
+                        args.playback = true;
+                        args.playback_pcm_name = strdup( param->value.str );
+                        args.capture = true;
+                        args.capture_pcm_name = strdup( param->value.str );
+                        jack_log( "playback device %s",
+                                  args.playback_pcm_name );
+                        jack_log( "capture device %s",
+                                  args.capture_pcm_name );
+                        }
+                    break;
+
+                case 'H':
+                    args.hw_monitoring = param->value.i;
+                    break;
+
+                case 'm':
+                    args.monitor = param->value.i;
+                    break;
+
+                case 'M':
+                    args.hw_metering = param->value.i;
+                    break;
+
+                case 'r':
+                    args.srate = param->value.ui;
+                    jack_log( "apparent rate = %d",
+                              args.srate );
+                    break;
+
+                case 'p':
+                    args.frames_per_interrupt = param->value.ui;
+                    jack_log( "frames per period = %d",
+                              args.frames_per_interrupt );
+                    break;
+
+                case 'n':
+                    args.user_nperiods = param->value.ui;
+                    if( args.user_nperiods < 2 )
+                        { /* enforce minimum value */
+                        args.user_nperiods = 2;
+                        }
+                    break;
+
+                case 's':
+                    args.soft_mode = param->value.i;
+                    break;
+
+                case 'z':
+                    if( dither_opt( param->value.c,
+                                    &args.dither ) )
+                        {
+                        return NULL;
+                        }
+                    break;
+
+                case 'i':
+                    args.user_capture_nchnls = param->value.ui;
+                    break;
+
+                case 'o':
+                    args.user_playback_nchnls = param->value.ui;
+                    break;
+
+                case 'S':
+                    args.shorts_first = param->value.i;
+                    break;
+
+                case 'I':
+                    args.systemic_input_latency = param->value.ui;
+                    break;
+
+                case 'O':
+                    args.systemic_output_latency = param->value.ui;
+                    break;
+
+                case 'X':
+                    args.midi_driver = strdup( param->value.str );
+                    break;
+                }
+            }
+
+        /* duplex is the default */
+        if( !args.capture && !args.playback )
+            {
+            args.capture = true;
+            args.playback = true;
+            }
+
+        JackIoAudioDriver* ioaudio_driver = new JackIoAudioDriver( args,
+                                                                   engine,
+                                                                   table );
+        JackDriverClientInterface* threaded_driver =
+            new JackThreadedDriver( ioaudio_driver );
+        // Special open for io-audio driver
+        if( ioaudio_driver->Open() == 0 )
+            {
+            return threaded_driver;
+            }
+        else
+            {
+            delete threaded_driver; // Delete the decorated driver
+            return NULL;
             }
         }
 
-    /* duplex is the default */
-    if( !args.capture && !args.playback )
-        {
-        args.capture = true;
-        args.playback = true;
-        }
-
-    Jack::JackIoAudioDriver* ioaudio_driver =
-        new Jack::JackIoAudioDriver( "system",
-                                     "ioaudio_pcm",
-                                     engine,
-                                     table );
-    Jack::JackDriverClientInterface* threaded_driver =
-        new Jack::JackThreadedDriver( ioaudio_driver );
-    // Special open for io-audio driver
-    if( ioaudio_driver->Open( args ) == 0 )
-        {
-        return threaded_driver;
-        }
-    else
-        {
-        delete threaded_driver; // Delete the decorated driver
-        return NULL;
-        }
-    }
-
 #ifdef __cplusplus
-}
+    }
 #endif
+
+}
+// end of namespace
 

@@ -26,39 +26,30 @@
 #include "JackTime.h"
 #include "driver.h"
 #include "memops.h"
-
-typedef struct _ioaudio_driver_args
-{
-    char* device;
-
-    bool capture;
-    const char* capture_pcm_name;
-    size_t user_capture_nchnls;
-
-    bool playback;
-    const char* playback_pcm_name;
-    size_t user_playback_nchnls;
-
-    size_t srate;
-    size_t frames_per_interrupt;
-    size_t user_nperiods;
-    DitherAlgorithm dither;
-    bool hw_monitoring;
-    bool hw_metering;
-    bool duplex;
-    bool soft_mode;
-    bool monitor;
-    bool shorts_first;
-    size_t systemic_input_latency;
-    size_t systemic_output_latency;
-    const char* midi_driver;
-} ioaudio_driver_args_t;
-
+#include <sys/poll.h>
 
 namespace Jack
 {
 
-    struct ioaudio_driver_t;
+///////////////////////////////////////////////////////////////////////////////
+// CONSTANTS
+///////////////////////////////////////////////////////////////////////////////
+
+    enum IoAudioDriverChannels
+    {
+        Playback = SND_PCM_CHANNEL_PLAYBACK,
+        Capture = SND_PCM_CHANNEL_CAPTURE,
+        Extra = SND_PCM_CHANNEL_MAX,
+        IoAudioDriverChannels_COUNT
+    };
+
+///////////////////////////////////////////////////////////////////////////////
+// TYPES
+///////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+// IMPLEMENTATIONS
+///////////////////////////////////////////////////////////////////////////////
 
     /*!
      \brief The IoAudio driver.
@@ -66,38 +57,108 @@ namespace Jack
 
     class JackIoAudioDriver: public JackAudioDriver
     {
+    public:
+        typedef void (*ReadCopyFunction)(
+            jack_default_audio_sample_t *dst,
+            char *src,
+            unsigned long src_bytes,
+            unsigned long src_skip_bytes );
+        typedef void (*WriteCopyFunction)(
+            char *dst,
+            jack_default_audio_sample_t *src,
+            unsigned long src_bytes,
+            unsigned long dst_skip_bytes,
+            dither_state_t *state );
+
+        struct Args
+        {
+            const char* jack_name;
+            const char* jack_alias;
+
+            char* device;
+
+            bool capture;
+            const char* capture_pcm_name;
+            size_t user_capture_nchnls;
+
+            bool playback;
+            const char* playback_pcm_name;
+            size_t user_playback_nchnls;
+
+            size_t srate;
+            size_t frames_per_interrupt;
+            size_t user_nperiods;
+            DitherAlgorithm dither;
+            bool hw_monitoring;
+            bool hw_metering;
+            bool duplex;
+            bool soft_mode;
+            bool monitor;
+            bool shorts_first;
+            size_t systemic_input_latency;
+            size_t systemic_output_latency;
+            const char* midi_driver;
+        };
+
+        struct Voice
+        {
+            unsigned long interleave_skip;
+            char* addr;
+            unsigned long silent;
+            dither_state_t dither_state;
+        };
+
+        struct Channel
+        {
+            Voice* voices;
+            unsigned int nperiods;
+            snd_pcm_t *handle;
+            snd_pcm_channel_params_t params;
+            snd_pcm_channel_setup_t setup;
+            snd_pcm_mmap_control_t *mmap;
+            void *mmap_buf;
+            void *buffer;
+
+            ReadCopyFunction read;
+            WriteCopyFunction write;
+
+            ssize_t sample_bytes()
+            {
+            return snd_pcm_format_size( setup.format.format,
+                                        1 );
+            }
+            ssize_t frame_bytes()
+            {
+            return snd_pcm_format_size( setup.format.format,
+                                        setup.format.voices );
+            }
+
+            ssize_t frag_bytes()
+            {
+            return setup.buf.block.frag_size;
+            }
+
+            ssize_t frag_frames()
+            {
+            return frag_bytes() / frame_bytes();
+            }
+
+        };
 
     public:
 
         JackIoAudioDriver(
-            const char* name,
-            const char* alias,
+            Args args,
             JackLockedEngine* engine,
-            JackSynchro* table ) :
-                JackAudioDriver( name,
-                                 alias,
-                                 engine,
-                                 table ),
-                fDriver( NULL )
-        {
-        }
+            JackSynchro* table );
 
-        virtual ~JackIoAudioDriver()
-        {
-        }
+        virtual ~JackIoAudioDriver();
 
-        int Open(
-            ioaudio_driver_args_t args );
+        int Attach();
 
         int Close();
-        int Attach();
+
         int Detach();
-
-        int Start();
-        int Stop();
-
-        int Read();
-        int Write();
 
         // BufferSize can be changed
         bool IsFixedBufferSize()
@@ -105,89 +166,57 @@ namespace Jack
         return false;
         }
 
+        int Open();
+
+        int Read();
+
         int SetBufferSize(
             jack_nframes_t buffer_size );
 
-        void ReadInputAux(
-            jack_nframes_t orig_nframes,
-            ssize_t contiguous,
-            ssize_t nread );
-        void MonitorInputAux();
-        void ClearOutputAux();
-        void WriteOutputAux(
-            jack_nframes_t orig_nframes,
-            ssize_t contiguous,
-            ssize_t nwritten );
-//        void SetTimetAux(
-//            jack_time_t time );
+        int Start();
+
+        int Stop();
+
+        int Write();
 
     private:
-        ioaudio_driver_args_t fArgs;
-        ioaudio_driver_t* fDriver;
+        Args fArgs;
 
-        void UpdateLatencies();
+        int poll_timeout_msecs;
+        jack_time_t poll_last;
+        jack_time_t poll_next;
+        int poll_late;
 
-        ssize_t capture_sample_bytes();
-        ssize_t capture_frame_bytes();
-        ssize_t capture_frag_bytes();
-        ssize_t capture_frag_frames();
+        struct pollfd pfd[IoAudioDriverChannels_COUNT];
+        unsigned long interleave_unit;
+        unsigned int max_nchannels;
+        unsigned int user_nchannels;
 
-        ssize_t playback_sample_bytes();
-        ssize_t playback_frame_bytes();
-        ssize_t playback_frag_bytes();
-        ssize_t playback_frag_frames();
+        jack_nframes_t frame_rate;
 
-        void
-        create(
-            char *name,
-            jack_client_t *client );
+        Channel playback;
 
-        void
-        destroy();
+        Channel capture;
 
-        int
-        start();
+        jack_hardware_t *hw;
 
-        int
-        stop();
+        bool capture_and_playback_not_synced;
+        bool has_clock_sync_reporting;
 
-        jack_nframes_t
-        wait(
-            int *status,
-            float *delayed_usecs );
+        bool has_hw_monitoring;
+        bool do_hw_monitoring;
+        unsigned long input_monitor_mask;
 
-        int
-        read(
-            jack_nframes_t nframes );
+        bool has_hw_metering;
+        bool do_hw_metering;
+        bool quirk_bswap;
 
-        void silence_untouched_channels(
-            jack_nframes_t nframes );
+        int xrun_count;
+        int process_count;
 
-        int
-        reset_parameters();
-
-        void mark_channel_done(
-            int chn );
-
-        void silence_on_channel(
-            int chn,
-            jack_nframes_t nframes );
-
-        void silence_on_channel_no_mark(
-            int chn,
-            jack_nframes_t nframes );
-
-//        void read_from_channel(
-//            int chn,
-//            jack_default_audio_sample_t *buf,
-//            jack_nframes_t nsamples );
-
-//        void write_to_channel(
-//            int chn,
-//            jack_default_audio_sample_t *buf,
-//            jack_nframes_t nsamples );
-
-        void release_channel_dependent_memory();
+        //ioaudio_midi_t *midi;
+        //char *midi;
+        int in_xrun_recovery;
 
         int check_capabilities(
             const char *devicename,
@@ -195,11 +224,7 @@ namespace Jack
 
         int check_card_type();
 
-        int generic_hardware();
-
-        int hw_specific();
-
-        void setup_io_function_pointers();
+        void clear_output_aux();
 
         int configure_stream(
             const char *device_name,
@@ -208,7 +233,10 @@ namespace Jack
             snd_pcm_channel_params_t *params,
             unsigned int *nperiodsp );
 
-        int set_parameters();
+        int create(
+            jack_client_t *client );
+
+        int generic_hardware();
 
         int get_channel_addresses(
             size_t *capture_avail,
@@ -216,7 +244,32 @@ namespace Jack
             size_t *capture_offset,
             size_t *playback_offset );
 
-        int restart();
+        int hw_specific();
+
+        void monitor_input_aux();
+
+        int read(
+            jack_nframes_t nframes );
+
+        void read_input_aux(
+            jack_nframes_t orig_nframes,
+            ssize_t contiguous,
+            ssize_t nread );
+
+        int set_parameters();
+
+        void setup_io_function_pointers();
+
+        void update_latencies();
+
+        jack_nframes_t wait(
+            int *status,
+            float *delayed_usecs );
+
+        void write_output_aux(
+            jack_nframes_t orig_nframes,
+            ssize_t contiguous,
+            ssize_t nwritten );
 
         int xrun_recovery(
             float *delayed_usecs );

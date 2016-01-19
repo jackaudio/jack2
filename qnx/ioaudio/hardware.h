@@ -53,6 +53,8 @@ struct jack_hardware_t
     {
     }
 
+    virtual ~jack_hardware_t() {}
+
     virtual void release() = 0;
 
     virtual int set_input_monitor_mask(
