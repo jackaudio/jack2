@@ -24,14 +24,14 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef HAVE_READLINE
+#if HAVE_READLINE
 #include <readline/readline.h>
 #include <readline/history.h>
 #endif
 #include <jack/jack.h>
 #include <jack/transport.h>
 
-#ifndef HAVE_READLINE
+#if !HAVE_READLINE
 #define whitespace(c) (((c) == ' ') || ((c) == '\t'))
 #endif
 
@@ -389,7 +389,7 @@ static char *command_generator (const char *text, int state)
 
 static void command_loop()
 {
-#ifdef HAVE_READLINE
+#if HAVE_READLINE
 	char *line, *cmd;
 	char prompt[32];
 
@@ -408,7 +408,7 @@ static void command_loop()
 	/* Read and execute commands until the user quits. */
 	while (!done) {
 
-#ifdef HAVE_READLINE
+#if HAVE_READLINE
 		line = readline(prompt);
 
 		if (line == NULL) {	/* EOF? */
@@ -428,13 +428,13 @@ static void command_loop()
 		/* If anything left, add to history and execute it. */
 		if (*cmd)
 		{
-#ifdef HAVE_READLINE
+#if HAVE_READLINE
 			add_history(cmd);
 #endif
 			execute_command(cmd);
 		}
 
-#ifdef HAVE_READLINE
+#if HAVE_READLINE
 		free(line);		/* realine() called malloc() */
 #endif
 	}
@@ -459,7 +459,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-#ifndef WIN32
+#if !WIN32
 	signal(SIGQUIT, signal_handler);
 	signal(SIGHUP, signal_handler);
 #endif
