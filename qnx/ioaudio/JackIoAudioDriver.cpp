@@ -61,7 +61,6 @@
 #include "JackPosixThread.h"
 #include "JackCompilerDeps.h"
 #include "JackServerGlobals.h"
-#include "JackTime.h"
 
 #include "JackError.h"
 
@@ -1613,7 +1612,7 @@ namespace Jack
             pfd[Capture].fd = -1;
             }
 
-        poll_enter = jack_get_microseconds();
+        poll_enter = GetMicroSeconds();
 
         if( poll_enter > poll_next )
             {
@@ -1653,7 +1652,7 @@ namespace Jack
 
             }
 
-        poll_ret = jack_get_microseconds();
+        poll_ret = GetMicroSeconds();
 
         // JACK2
         JackDriver::CycleTakeBeginTime();
@@ -2383,4 +2382,3 @@ namespace Jack
 
 }
 // end of namespace
-
