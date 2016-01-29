@@ -97,7 +97,6 @@ namespace Jack
             bool shorts_first;
             size_t systemic_input_latency;
             size_t systemic_output_latency;
-            const char* midi_driver;
         };
 
         struct Voice
@@ -214,8 +213,6 @@ namespace Jack
         int xrun_count;
         int process_count;
 
-        //ioaudio_midi_t *midi;
-        //char *midi;
         int in_xrun_recovery;
 
         int check_capabilities(

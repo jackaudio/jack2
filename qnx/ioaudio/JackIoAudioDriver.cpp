@@ -64,11 +64,6 @@
 
 #include "JackError.h"
 
-static struct jack_constraint_enum_str_descriptor midi_constraint_descr_array[] =
-    { { "none", "no MIDI driver" }, { "seq", "io-audio Sequencer driver" }, {
-        "raw", "io-audio RawMIDI driver" },
-      { 0 } };
-
 static struct jack_constraint_enum_char_descriptor dither_constraint_descr_array[] =
     { { 'n', "none" }, { 'r', "rectangular" }, { 's', "shaped" },
       { 't', "triangular" }, { 0 } };
@@ -164,9 +159,6 @@ namespace Jack
 
     JackIoAudioDriver::~JackIoAudioDriver()
     {
-    //if (fmidi)
-    //        (midi->destroy)(midi);
-
     if( capture.handle )
         {
         snd_pcm_close( capture.handle );
@@ -300,12 +292,6 @@ namespace Jack
 
     update_latencies();
 
-    //if (midi) {
-    //    int err = (midi->attach)(midi);
-    //    if (err)
-    //        jack_error ("io-audio: cannot attach MIDI: %d", err);
-    //}
-
     return 0;
     }
 
@@ -313,8 +299,6 @@ namespace Jack
     {
     // Generic audio driver close
     int res = JackAudioDriver::Close();
-
-//    destroy();
 
     if( JackServerGlobals::on_device_release != NULL )
         {
@@ -345,10 +329,6 @@ namespace Jack
 
     int JackIoAudioDriver::Detach()
     {
-    //ioaudio_driver_t* ioaudio_driver = (ioaudio_driver_t*)fDriver;
-    //if (midi)
-    //    (midi->detach)(midi);
-
     return JackAudioDriver::Detach();
     }
 
@@ -371,14 +351,6 @@ namespace Jack
         {
         return -1;
         }
-
-    //ioaudio_midi_t *midi = 0;
-    //if (strcmp(midi_driver_name, "seq") == 0)
-    //    midi = ioaudio_seqmidi_new((jack_client_t*)this, 0);
-    //else if (strcmp(midi_driver_name, "raw") == 0)
-    //    midi = ioaudio_rawmidi_new((jack_client_t*)this);
-
-    //midi = midi_driver;
 
     err = check_card_type();
     if( err )
@@ -710,9 +682,6 @@ namespace Jack
         hw->set_input_monitor_mask( 0 );
         }
 
-    //if (midi && !xrun_recovery)
-    //    (midi->stop)(midi);
-
     res = JackAudioDriver::Stop();
 
     return res;
@@ -726,7 +695,6 @@ namespace Jack
     ssize_t nwritten;
     ssize_t contiguous;
     size_t offset = 0;
-    //jack_port_t *port;
     int err;
 
     process_count++;
@@ -740,9 +708,6 @@ namespace Jack
         {
         return -1;
         }
-
-    //if (midi)
-    //    (midi->write)(midi, nframes);
 
     nwritten = 0;
     contiguous = 0;
@@ -1150,9 +1115,6 @@ namespace Jack
         {
         return -1;
         }
-
-    //if (midi)
-    //    (midi->read)(midi, nframes);
 
     if( !capture.handle )
         {
@@ -1831,9 +1793,6 @@ namespace Jack
         }
     in_xrun_recovery = 0;
 
-    //if (res && midi)
-    //    (midi->stop)(midi);
-
     if( 0 != res )
         {
         return -1;
@@ -2185,21 +2144,6 @@ namespace Jack
                                               "Extra output latency (frames)",
                                               NULL );
 
-        strcpy( value.str,
-                "none" );
-        jack_driver_descriptor_add_parameter( desc,
-                                              &filler,
-                                              "midi-driver",
-                                              'X',
-                                              JackDriverParamString,
-                                              &value,
-                                              jack_constraint_compose_enum_str(
-                                                                                JACK_CONSTRAINT_FLAG_STRICT
-                                                                                    | JACK_CONSTRAINT_FLAG_FAKE_VALUE,
-                                                                                midi_constraint_descr_array ),
-                                              "io-audio MIDI driver",
-                                              NULL );
-
         return desc;
         }
 
@@ -2228,7 +2172,6 @@ namespace Jack
         args.shorts_first = false;
         args.systemic_input_latency = 0;
         args.systemic_output_latency = 0;
-        args.midi_driver = "none";
 
         const JSList * node;
         const jack_driver_param_t * param;
@@ -2344,10 +2287,6 @@ namespace Jack
 
                 case 'O':
                     args.systemic_output_latency = param->value.ui;
-                    break;
-
-                case 'X':
-                    args.midi_driver = strdup( param->value.str );
                     break;
                 }
             }

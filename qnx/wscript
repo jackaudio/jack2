@@ -49,4 +49,3 @@ def build(bld):
                'ioaudio/JackIoAudioDriver.cpp',
                ]
     create_jack_driver_obj(bld, 'ioaudio', ioaudio_driver_src, ['IOAUDIO', 'PTHREAD'])
-        
