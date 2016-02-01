@@ -48,7 +48,7 @@ int JackAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
     fGraphManager->SetBufferSize(buffer_size);
     
     fEngineControl->UpdateTimeOut();
-    UpdateLatencies();
+    update_latencies();
 
     // Redirected on slaves drivers...
     return JackDriver::SetBufferSize(buffer_size);
@@ -85,7 +85,7 @@ int JackAudioDriver::Open(jack_nframes_t buffer_size,
         monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency);
 }
 
-void JackAudioDriver::UpdateLatencies()
+void JackAudioDriver::update_latencies()
 {
     jack_latency_range_t input_range;
     jack_latency_range_t output_range;
@@ -159,7 +159,7 @@ int JackAudioDriver::Attach()
         }
     }
 
-    UpdateLatencies();
+    update_latencies();
     return 0;
 }
 

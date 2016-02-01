@@ -49,7 +49,7 @@ class SERVER_EXPORT JackAudioDriver : public JackDriver
         jack_default_audio_sample_t* GetMonitorBuffer(int port_index);
 
         void HandleLatencyCallback(int status);
-        virtual void UpdateLatencies();
+        virtual void update_latencies();
 
         int ProcessAsync();
         void ProcessGraphAsync();

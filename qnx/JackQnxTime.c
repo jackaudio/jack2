@@ -208,9 +208,3 @@ SERVER_EXPORT jack_time_t GetMicroSeconds()
 {
 	return _jack_get_microseconds();
 }
-
-SERVER_EXPORT jack_time_t jack_get_microseconds()
-{
-	return _jack_get_microseconds();
-}
-
