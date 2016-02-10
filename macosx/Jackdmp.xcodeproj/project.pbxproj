@@ -1785,7 +1785,6 @@
 		4B49D3C214864D49003390F8 /* pa_asio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pa_asio.h; path = ../windows/portaudio/pa_asio.h; sourceTree = SOURCE_ROOT; };
 		4B49D3C314864D49003390F8 /* portaudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = portaudio.h; path = ../windows/portaudio/portaudio.h; sourceTree = SOURCE_ROOT; };
 		4B49D3C914864DA7003390F8 /* JackLinuxTime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = JackLinuxTime.c; path = ../linux/JackLinuxTime.c; sourceTree = SOURCE_ROOT; };
-		4B49D3CB14864DB2003390F8 /* cycles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cycles.h; path = ../linux/cycles.h; sourceTree = SOURCE_ROOT; };
 		4B49D3D814864DEC003390F8 /* JackWinThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinThread.cpp; path = ../windows/JackWinThread.cpp; sourceTree = SOURCE_ROOT; };
 		4B49D3D914864DEC003390F8 /* JackWinServerLaunch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinServerLaunch.cpp; path = ../windows/JackWinServerLaunch.cpp; sourceTree = SOURCE_ROOT; };
 		4B49D3DA14864DEC003390F8 /* JackWinSemaphore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackWinSemaphore.cpp; path = ../windows/JackWinSemaphore.cpp; sourceTree = SOURCE_ROOT; };
@@ -2905,7 +2904,6 @@
 			isa = PBXGroup;
 			children = (
 				4B05A07D0DF72BC000840F4C /* driver.h */,
-				4B49D3CB14864DB2003390F8 /* cycles.h */,
 				4B49D3C914864DA7003390F8 /* JackLinuxTime.c */,
 				4B349837133A6B6F00D130AB /* firewire */,
 				4B349825133A6AF500D130AB /* alsarawmidi */,

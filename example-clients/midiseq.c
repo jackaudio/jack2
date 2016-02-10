@@ -50,49 +50,44 @@ static void usage()
 
 static int process(jack_nframes_t nframes, void *arg)
 {
-	int i,j;
-	void* port_buf = jack_port_get_buffer(output_port, nframes);
-	unsigned char* buffer;
-	jack_midi_clear_buffer(port_buf);
-	/*memset(buffer, 0, nframes*sizeof(jack_default_audio_sample_t));*/
+    int i,j;
+    void* port_buf = jack_port_get_buffer(output_port, nframes);
+    unsigned char* buffer;
+    jack_midi_reset_buffer(port_buf);
+    /*memset(buffer, 0, nframes*sizeof(jack_default_audio_sample_t));*/
 
-	for(i=0; i<nframes; i++)
-	{
-		for(j=0; j<num_notes; j++)
-		{
-			if(note_starts[j] == loop_index)
-			{
-				buffer = jack_midi_event_reserve(port_buf, i, 3);
-/*				printf("wrote a note on, port buffer = 0x%x, event buffer = 0x%x\n", port_buf, buffer);*/
-				buffer[2] = 64;		/* velocity */
-				buffer[1] = note_frqs[j];
-				buffer[0] = 0x90;	/* note on */
-			}
-			else if(note_starts[j] + note_lengths[j] == loop_index)
-			{
-				buffer = jack_midi_event_reserve(port_buf, i, 3);
-/*				printf("wrote a note off, port buffer = 0x%x, event buffer = 0x%x\n", port_buf, buffer);*/
-				buffer[2] = 64;		/* velocity */
-				buffer[1] = note_frqs[j];
-				buffer[0] = 0x80;	/* note off */
-			}
-		}
-		loop_index = loop_index+1 >= loop_nsamp ? 0 : loop_index+1;
-	}
-	return 0;
+    for (i = 0; i < nframes; i++) {
+        for (j = 0; j < num_notes; j++) {
+            if (note_starts[j] == loop_index) {
+                if ((buffer = jack_midi_event_reserve(port_buf, i, 3))) {
+                    /* printf("wrote a note on, port buffer = 0x%x, event buffer = 0x%x\n", port_buf, buffer); */
+                    buffer[2] = 64;		/* velocity */
+                    buffer[1] = note_frqs[j];
+                    buffer[0] = 0x90;	/* note on */
+                }
+            } else if (note_starts[j] + note_lengths[j] == loop_index) {
+                if ((buffer = jack_midi_event_reserve(port_buf, i, 3))) {
+                    /* printf("wrote a note off, port buffer = 0x%x, event buffer = 0x%x\n", port_buf, buffer); */
+                    buffer[2] = 64;		/* velocity */
+                    buffer[1] = note_frqs[j];
+                    buffer[0] = 0x80;	/* note off */
+                }
+            }
+        }
+        loop_index = loop_index+1 >= loop_nsamp ? 0 : loop_index+1;
+    }
+    return 0;
 }
 
 int main(int narg, char **args)
 {
 	int i;
 	jack_nframes_t nframes;
-	if((narg<6) || ((narg-3)%3 !=0))
-	{
+	if ((narg<6) || ((narg-3)%3 != 0)) {
 		usage();
 		exit(1);
 	}
-	if((client = jack_client_open (args[1], JackNullOption, NULL)) == 0)
-	{
+	if ((client = jack_client_open (args[1], JackNullOption, NULL)) == 0) {
 		fprintf (stderr, "JACK server not running?\n");
 		return 1;
 	}
@@ -105,15 +100,13 @@ int main(int narg, char **args)
 	note_starts = malloc(num_notes*sizeof(jack_nframes_t));
 	note_lengths = malloc(num_notes*sizeof(jack_nframes_t));
 	loop_nsamp = atoi(args[2]);
-	for(i=0; i<num_notes; i++)
-	{
+	for (i = 0; i < num_notes; i++) {
 		note_starts[i] = atoi(args[3 + 3*i]);
 		note_frqs[i] = atoi(args[4 + 3*i]);
 		note_lengths[i] = atoi(args[5 + 3*i]);
 	}
 
-	if (jack_activate(client))
-	{
+	if (jack_activate(client)) {
 		fprintf (stderr, "cannot activate client");
 		return 1;
 	}
