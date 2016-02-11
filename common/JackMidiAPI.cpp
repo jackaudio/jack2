@@ -99,8 +99,9 @@ LIB_EXPORT
 size_t jack_midi_max_event_size(void* port_buffer)
 {
     JackMidiBuffer *buf = (JackMidiBuffer*)port_buffer;
-    if (buf && buf->IsValid())
+    if (buf && buf->IsValid()) {
         return buf->MaxEventSize();
+    }
     return 0;
 }
 
@@ -152,7 +153,8 @@ LIB_EXPORT
 uint32_t jack_midi_get_lost_event_count(void* port_buffer)
 {
     JackMidiBuffer *buf = (JackMidiBuffer*)port_buffer;
-    if (buf && buf->IsValid())
+    if (buf && buf->IsValid()) {
         return buf->lost_events;
+    }
     return 0;
 }

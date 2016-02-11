@@ -53,7 +53,7 @@ static int process(jack_nframes_t nframes, void *arg)
     int i,j;
     void* port_buf = jack_port_get_buffer(output_port, nframes);
     unsigned char* buffer;
-    jack_midi_reset_buffer(port_buf);
+    jack_midi_clear_buffer(port_buf);
     /*memset(buffer, 0, nframes*sizeof(jack_default_audio_sample_t));*/
 
     for (i = 0; i < nframes; i++) {

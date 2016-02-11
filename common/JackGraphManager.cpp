@@ -301,8 +301,9 @@ int JackGraphManager::ComputeTotalLatencies()
     jack_port_id_t port_index;
     for (port_index = FIRST_AVAILABLE_PORT; port_index < fPortMax; port_index++) {
         JackPort* port = GetPort(port_index);
-        if (port->IsUsed())
+        if (port->IsUsed()) {
             ComputeTotalLatency(port_index);
+        }
     }
     return 0;
 }
@@ -321,14 +322,17 @@ void JackGraphManager::RecalculateLatencyAux(jack_port_id_t port_index, jack_lat
 
         dst_port->GetLatencyRange(mode, &other_latency);
 
-        if (other_latency.max > latency.max)
+        if (other_latency.max > latency.max) {
 			latency.max = other_latency.max;
-		if (other_latency.min < latency.min)
+        }
+		if (other_latency.min < latency.min) {
 			latency.min = other_latency.min;
+        }
     }
 
-    if (latency.min == UINT32_MAX)
+    if (latency.min == UINT32_MAX) {
 		latency.min = 0;
+    }
 
 	port->SetLatencyRange(mode, &latency);
 }
@@ -355,8 +359,9 @@ void JackGraphManager::SetBufferSize(jack_nframes_t buffer_size)
     jack_port_id_t port_index;
     for (port_index = FIRST_AVAILABLE_PORT; port_index < fPortMax; port_index++) {
         JackPort* port = GetPort(port_index);
-        if (port->IsUsed())
+        if (port->IsUsed()) {
             port->ClearBuffer(buffer_size);
+        }
     }
 }
 
@@ -370,8 +375,9 @@ jack_port_id_t JackGraphManager::AllocatePortAux(int refnum, const char* port_na
         JackPort* port = GetPort(port_index);
         if (!port->IsUsed()) {
             jack_log("JackGraphManager::AllocatePortAux port_index = %ld name = %s type = %s", port_index, port_name, port_type);
-            if (!port->Allocate(refnum, port_name, port_type, flags))
+            if (!port->Allocate(refnum, port_name, port_type, flags)) {
                 return NO_PORT;
+            }
             break;
         }
     }

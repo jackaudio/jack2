@@ -51,7 +51,7 @@ struct SERVER_EXPORT JackMidiEvent
     uint32_t time;
     jack_shmsize_t size;
     union {
-        jack_shmsize_t   offset;
+        jack_shmsize_t offset;
         jack_midi_data_t data[INLINE_SIZE_MAX];
     };
 
