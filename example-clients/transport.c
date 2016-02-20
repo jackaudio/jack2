@@ -2,7 +2,7 @@
  *  transport.c -- JACK transport master example client.
  *
  *  Copyright (C) 2003 Jack O'Quin.
- *  
+ *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2 of the License, or
@@ -24,14 +24,14 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef HAVE_READLINE
+#if HAVE_READLINE
 #include <readline/readline.h>
 #include <readline/history.h>
 #endif
 #include <jack/jack.h>
 #include <jack/transport.h>
 
-#ifndef HAVE_READLINE
+#if !HAVE_READLINE
 #define whitespace(c) (((c) == ' ') || ((c) == '\t'))
 #endif
 
@@ -53,7 +53,7 @@ volatile int time_reset = 1;		/* true when time values change */
  *
  * Runs in the process thread.  Realtime, must not wait.
  */
-static void timebase(jack_transport_state_t state, jack_nframes_t nframes, 
+static void timebase(jack_transport_state_t state, jack_nframes_t nframes,
 	      jack_position_t *pos, int new_pos, void *arg)
 {
 	double min;			/* minutes since frame 0 */
@@ -238,7 +238,7 @@ command_t commands[] = {
 	{"?",		com_help,	"Synonym for `help'" },
 	{(char *)NULL, (cmd_function_t *)NULL, (char *)NULL }
 };
-     
+
 static command_t *find_command(char *name)
 {
 	register int i;
@@ -258,7 +258,7 @@ static command_t *find_command(char *name)
 			else
 				return (&commands[i]);
 		}
-     
+
 	return ((command_t *)NULL);
 }
 
@@ -302,33 +302,33 @@ static void execute_command(char *line)
 	register int i;
 	command_t *command;
 	char *word;
-     
+
 	/* Isolate the command word. */
 	i = 0;
 	while (line[i] && whitespace(line[i]))
 		i++;
 	word = line + i;
-     
+
 	while (line[i] && !whitespace(line[i]))
 		i++;
-     
+
 	if (line[i])
 		line[i++] = '\0';
-     
+
 	command = find_command(word);
-     
+
 	if (!command) {
 		fprintf(stderr, "%s: No such command.  There is `help\'.\n",
 			word);
 		return;
 	}
-     
+
 	/* Get argument to command, if any. */
 	while (whitespace(line[i]))
 		i++;
-     
+
 	word = line + i;
-     
+
 	/* invoke the command function. */
 	(*command->func)(word);
 }
@@ -345,28 +345,28 @@ static char *stripwhite(char *string)
 
 	if (*s == '\0')
 		return s;
-     
+
 	t = s + strlen (s) - 1;
 	while (t > s && whitespace(*t))
 		t--;
 	*++t = '\0';
-     
+
 	return s;
 }
-     
+
 static char *dupstr(char *s)
 {
 	char *r = malloc(strlen(s) + 1);
 	strcpy(r, s);
 	return r;
 }
-     
+
 /* Readline generator function for command completion. */
 static char *command_generator (const char *text, int state)
 {
 	static int list_index, len;
 	char *name;
-     
+
 	/* If this is a new word to complete, initialize now.  This
 	   includes saving the length of TEXT for efficiency, and
 	   initializing the index variable to 0. */
@@ -374,22 +374,22 @@ static char *command_generator (const char *text, int state)
 		list_index = 0;
 		len = strlen (text);
 	}
-     
+
 	/* Return the next name which partially matches from the
 	   command list. */
 	while ((name = commands[list_index].name)) {
 		list_index++;
-     
+
 		if (strncmp(name, text, len) == 0)
 			return dupstr(name);
 	}
-     
+
 	return (char *) NULL;		/* No names matched. */
 }
 
 static void command_loop()
 {
-#ifdef HAVE_READLINE
+#if HAVE_READLINE
 	char *line, *cmd;
 	char prompt[32];
 
@@ -397,7 +397,7 @@ static void command_loop()
 
 	/* Allow conditional parsing of the ~/.inputrc file. */
 	rl_readline_name = package;
-     
+
 	/* Define a custom completion function. */
 	rl_completion_entry_function = command_generator;
 #else
@@ -408,9 +408,9 @@ static void command_loop()
 	/* Read and execute commands until the user quits. */
 	while (!done) {
 
-#ifdef HAVE_READLINE
+#if HAVE_READLINE
 		line = readline(prompt);
-     
+
 		if (line == NULL) {	/* EOF? */
 			printf("\n");	/* close out prompt */
 			done = 1;
@@ -421,20 +421,20 @@ static void command_loop()
 		fgets(line, sizeof(line), stdin);
 		line[strlen(line)-1] = '\0';
 #endif
-     
+
 		/* Remove leading and trailing whitespace from the line. */
 		cmd = stripwhite(line);
 
 		/* If anything left, add to history and execute it. */
 		if (*cmd)
 		{
-#ifdef HAVE_READLINE
+#if HAVE_READLINE
 			add_history(cmd);
 #endif
 			execute_command(cmd);
 		}
-     
-#ifdef HAVE_READLINE
+
+#if HAVE_READLINE
 		free(line);		/* realine() called malloc() */
 #endif
 	}
@@ -459,7 +459,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-#ifndef WIN32
+#if !WIN32
 	signal(SIGQUIT, signal_handler);
 	signal(SIGHUP, signal_handler);
 #endif

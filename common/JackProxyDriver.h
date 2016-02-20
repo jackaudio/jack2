@@ -62,9 +62,9 @@ namespace Jack
 
         private:
 
-            char fUpstream[JACK_CLIENT_NAME_SIZE];   /*<! the upstream server name */
-            char fClientName[JACK_CLIENT_NAME_SIZE]; /*<! client name to use when connecting */
-            const char* fPromiscuous;                /*<! if not null, group or gid to use for promiscuous mode */
+            char fUpstream[JACK_CLIENT_NAME_SIZE+1];    /*<! the upstream server name */
+            char fClientName[JACK_CLIENT_NAME_SIZE+1];  /*<! client name to use when connecting */
+            const char* fPromiscuous;                   /*<! if not null, group or gid to use for promiscuous mode */
 
             //jack data
             jack_client_t* fClient;                  /*<! client handle */

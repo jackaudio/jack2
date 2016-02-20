@@ -124,7 +124,7 @@ namespace android {
             static jack_shm_info_t registry_info;
             static jack_shm_header_t   *jack_shm_header;
             static jack_shm_registry_t *jack_shm_registry;
-            static char jack_shm_server_prefix[JACK_SERVER_NAME_SIZE];
+            static char jack_shm_server_prefix[JACK_SERVER_NAME_SIZE+1];
             static int semid;
             static pthread_mutex_t mutex;
             static Shm* ref;

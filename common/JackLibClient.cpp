@@ -98,7 +98,7 @@ int JackLibClient::Open(const char* server_name, const char* name, int uuid, jac
     strncpy(fServerName, server_name, sizeof(fServerName));
 
     // Open server/client channel
-    char name_res[JACK_CLIENT_NAME_SIZE + 1];
+    char name_res[JACK_CLIENT_NAME_SIZE+1];
     if (fChannel->Open(server_name, name, uuid, name_res, this, options, status) < 0) {
         jack_error("Cannot connect to the server");
         goto error;

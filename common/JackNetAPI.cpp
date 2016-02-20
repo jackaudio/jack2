@@ -519,7 +519,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
         fBufferSizeCallback(NULL), fBufferSizeArg(NULL),
         fSampleRateCallback(NULL), fSampleRateArg(NULL)
    {
-        char host_name[JACK_CLIENT_NAME_SIZE];
+        char host_name[JACK_CLIENT_NAME_SIZE + 1];
 
         // Request parameters
         assert(strlen(ip) < 32);

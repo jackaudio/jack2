@@ -81,7 +81,7 @@ namespace android {
     /* pointers to registry header and array */
     jack_shm_header_t   *Shm::jack_shm_header = NULL;
     jack_shm_registry_t *Shm::jack_shm_registry = NULL;
-    char Shm::jack_shm_server_prefix[JACK_SERVER_NAME_SIZE] = "";
+    char Shm::jack_shm_server_prefix[JACK_SERVER_NAME_SIZE+1] = "";
     
     /* jack_shm_lock_registry() serializes updates to the shared memory
      * segment JACK uses to keep track of the SHM segments allocated to

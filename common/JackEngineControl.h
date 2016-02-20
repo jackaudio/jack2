@@ -63,7 +63,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
     int fServerPriority;
     int fClientPriority;
     int fMaxClientPriority;
-    char fServerName[JACK_SERVER_NAME_SIZE];
+    char fServerName[JACK_SERVER_NAME_SIZE+1];
     JackTransportEngine fTransport;
     jack_timer_type_t fClockSource;
     int fDriverNum;

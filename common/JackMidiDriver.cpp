@@ -58,8 +58,8 @@ int JackMidiDriver::Attach()
 {
     JackPort* port;
     jack_port_id_t port_index;
-    char name[REAL_JACK_PORT_NAME_SIZE];
-    char alias[REAL_JACK_PORT_NAME_SIZE];
+    char name[REAL_JACK_PORT_NAME_SIZE+1];
+    char alias[REAL_JACK_PORT_NAME_SIZE+1];
     int i;
 
     jack_log("JackMidiDriver::Attach fBufferSize = %ld fSampleRate = %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate);

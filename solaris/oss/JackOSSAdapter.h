@@ -55,8 +55,8 @@ class JackOSSAdapter : public JackAudioAdapterInterface, public JackRunnableInte
 
         JackThread fThread;
 
-        char fCaptureDriverName[JACK_CLIENT_NAME_SIZE + 1];
-        char fPlaybackDriverName[JACK_CLIENT_NAME_SIZE + 1];
+        char fCaptureDriverName[JACK_CLIENT_NAME_SIZE+1];
+        char fPlaybackDriverName[JACK_CLIENT_NAME_SIZE+1];
 
         int fInFD;
         int fOutFD;

@@ -31,9 +31,9 @@ namespace Jack {
 
     private:
 
-        char alias[REAL_JACK_PORT_NAME_SIZE];
+        char alias[REAL_JACK_PORT_NAME_SIZE+1];
+        char name[REAL_JACK_PORT_NAME_SIZE+1];
         bool initialized;
-        char name[REAL_JACK_PORT_NAME_SIZE];
 
     protected:
 
