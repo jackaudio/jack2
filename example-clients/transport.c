@@ -31,7 +31,10 @@
 #include <jack/jack.h>
 #include <jack/transport.h>
 
-#if !HAVE_READLINE
+/* Use a copy of the readline macro whitespace if it does not exist.
+ * Not all readline compatible libraries supply the whitespace macro
+ * (libedit for example), so pull in the copy in those cases too. */
+#if !HAVE_READLINE || !defined(whitespace)
 #define whitespace(c) (((c) == ' ') || ((c) == '\t'))
 #endif
 
