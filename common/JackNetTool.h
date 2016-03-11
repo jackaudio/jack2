@@ -38,7 +38,7 @@ using namespace std;
 #endif
 #endif
 
-#define NETWORK_PROTOCOL 8
+#define NETWORK_PROTOCOL 9
 
 #define NET_SYNCHING      0
 #define SYNC_PACKET_ERROR -2
