@@ -1,5 +1,7 @@
 #!/bin/sh
+d=""
+[ -z "$SOURCE_DATE_EPOCH" ] || d=--date=@$SOURCE_DATE_EPOCH
 
 for i in *.0 ; do
-   sed -e "s/!VERSION!/${1}/g" -e "s/!DATE!/`date '+%B %Y'`/g" < ${i} > ${i%%0}1
+   sed -e "s/!VERSION!/${1}/g" -e "s/!DATE!/`date $d '+%B %Y'`/g" < ${i} > ${i%%0}1
 done
