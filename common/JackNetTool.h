@@ -94,9 +94,9 @@ namespace Jack
         char fPacketType[8];                        //packet type ('param')
         uint32_t fProtocolVersion;                  //version
         int32_t fPacketID;                          //indicates the packet type
-        char fName[JACK_CLIENT_NAME_SIZE+8];        //slave's name
-        char fMasterNetName[JACK_SERVER_NAME_SIZE+8]; //master hostname (network)
-        char fSlaveNetName[JACK_SERVER_NAME_SIZE+8]; //slave hostname (network)
+        char fName[JACK_CLIENT_NAME_SIZE];          //slave's name
+        char fMasterNetName[JACK_SERVER_NAME_SIZE]; //master hostname (network)
+        char fSlaveNetName[JACK_SERVER_NAME_SIZE];  //slave hostname (network)
         uint32_t fMtu;                              //connection mtu
         uint32_t fID;                               //slave's ID
         uint32_t fTransportSync;                    //is the transport synced ?
