@@ -293,7 +293,7 @@ def build(bld):
     if bld.env['IS_SUN']:
         serverlib.env.append_value("LINKFLAGS", "-lnsl -lsocket")
 
-    if bld.env['BUILD_NETLIB'] == True:
+    if bld.env['BUILD_NETLIB']:
         netlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
         netlib.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
         netlib.includes = includes
@@ -347,7 +347,7 @@ def build(bld):
         'JackNetAdapter.cpp',
         ]
 
-    if bld.env['BUILD_ADAPTER'] == True:
+    if bld.env['BUILD_ADAPTER']:
         process = create_jack_process_obj(bld, 'netadapter', net_adapter_sources, serverlib)
         process.use += ['SAMPLERATE']
 

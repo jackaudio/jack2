@@ -537,10 +537,10 @@ def configure(conf):
         conf.fatal("Invalid autostart value \"" + Options.options.autostart + "\"")
 
     if Options.options.autostart == "default":
-        if conf.env['BUILD_JACKDBUS'] == True and conf.env['BUILD_JACKD'] == False:
-            conf.env['AUTOSTART_METHOD'] = "dbus"
+        if conf.env['BUILD_JACKD']:
+            conf.env['AUTOSTART_METHOD'] = 'classic'
         else:
-            conf.env['AUTOSTART_METHOD'] = "classic"
+            conf.env['AUTOSTART_METHOD'] = 'dbus'
     else:
         conf.env['AUTOSTART_METHOD'] = Options.options.autostart
 
@@ -572,9 +572,9 @@ def configure(conf):
     if not conf.env['IS_WINDOWS']:
         conf.define('USE_POSIX_SHM', 1)
     conf.define('JACKMP', 1)
-    if conf.env['BUILD_JACKDBUS'] == True:
+    if conf.env['BUILD_JACKDBUS']:
         conf.define('JACK_DBUS', 1)
-    if conf.env['BUILD_WITH_PROFILE'] == True:
+    if conf.env['BUILD_WITH_PROFILE']:
         conf.define('JACK_MONITOR', 1)
     conf.write_config_header('config.h', remove=False)
 
@@ -589,7 +589,7 @@ def configure(conf):
     except IOError:
         pass
 
-    if Options.options.mixed == True:
+    if Options.options.mixed:
         conf.setenv(lib32, env=conf.env.derive())
         conf.env.append_unique('CXXFLAGS', '-m32')
         conf.env.append_unique('CFLAGS', '-m32')
@@ -614,7 +614,7 @@ def configure(conf):
 
     conf.msg('Install prefix', conf.env['PREFIX'], color='CYAN')
     conf.msg('Library directory', conf.all_envs[""]['LIBDIR'], color='CYAN')
-    if conf.env['BUILD_WITH_32_64'] == True:
+    if conf.env['BUILD_WITH_32_64']:
         conf.msg('32-bit library directory', conf.all_envs[lib32]['LIBDIR'], color='CYAN')
     conf.msg('Drivers directory', conf.env['ADDON_DIR'], color='CYAN')
     display_feature(conf, 'Build debuggable binaries', conf.env['BUILD_DEBUG'])
@@ -630,7 +630,7 @@ def configure(conf):
             flags += conf.all_envs[""][var]
         conf.msg(name, repr(flags), color='NORMAL')
 
-    if conf.env['BUILD_WITH_32_64'] == True:
+    if conf.env['BUILD_WITH_32_64']:
         conf.msg('32-bit C compiler flags', repr(conf.all_envs[lib32]['CFLAGS']))
         conf.msg('32-bit C++ compiler flags', repr(conf.all_envs[lib32]['CXXFLAGS']))
         conf.msg('32-bit linker flags', repr(conf.all_envs[lib32]['LINKFLAGS']))
@@ -648,7 +648,7 @@ def configure(conf):
     # display configuration result messages for auto options
     display_auto_options_messages(conf)
 
-    if conf.env['BUILD_JACKDBUS'] == True:
+    if conf.env['BUILD_JACKDBUS']:
         conf.msg('D-Bus service install directory', conf.env['DBUS_SERVICES_DIR'], color='CYAN')
 
         if conf.env['DBUS_SERVICES_DIR'] != conf.env['DBUS_SERVICES_DIR_REAL']:
@@ -938,9 +938,8 @@ def build_drivers(bld):
             source = oss_src)
 
 def build(bld):
-    if not bld.variant:
-        if bld.env['BUILD_WITH_32_64'] == True:
-            Options.commands.append(bld.cmd + '_' + lib32)
+    if not bld.variant and bld.env['BUILD_WITH_32_64']:
+        Options.commands.append(bld.cmd + '_' + lib32)
 
     # process subfolders from here
     bld.recurse('common')
@@ -974,30 +973,15 @@ def build(bld):
 
     build_drivers(bld)
 
+    bld.recurse('example-clients')
     if bld.env['IS_LINUX']:
-        bld.recurse('example-clients')
-        bld.recurse('tests')
         bld.recurse('man')
-        if bld.env['BUILD_JACKDBUS'] == True:
-           bld.recurse('dbus')
-
-    if bld.env['IS_MACOSX']:
-        bld.recurse('example-clients')
+    if not bld.env['IS_WINDOWS']:
         bld.recurse('tests')
-        if bld.env['BUILD_JACKDBUS'] == True:
-            bld.recurse('dbus')
+    if bld.env['BUILD_JACKDBUS']:
+        bld.recurse('dbus')
 
-    if bld.env['IS_SUN']:
-        bld.recurse('example-clients')
-        bld.recurse('tests')
-        if bld.env['BUILD_JACKDBUS'] == True:
-            bld.recurse('dbus')
-
-    if bld.env['IS_WINDOWS']:
-        bld.recurse('example-clients')
-        #bld.recurse('tests')
-
-    if bld.env['BUILD_DOXYGEN_DOCS'] == True:
+    if bld.env['BUILD_DOXYGEN_DOCS']:
         html_build_dir = bld.path.find_or_declare('html').abspath()
 
         bld(
