@@ -618,9 +618,18 @@ def configure(conf):
         conf.msg('32-bit library directory', conf.all_envs[lib32]['LIBDIR'], color='CYAN')
     conf.msg('Drivers directory', conf.env['ADDON_DIR'], color='CYAN')
     display_feature(conf, 'Build debuggable binaries', conf.env['BUILD_DEBUG'])
-    conf.msg('C compiler flags', repr(conf.all_envs[""]['CFLAGS']), color='NORMAL')
-    conf.msg('C++ compiler flags', repr(conf.all_envs[""]['CXXFLAGS']), color='NORMAL')
-    conf.msg('Linker flags', repr(conf.all_envs[""]['LINKFLAGS']), color='NORMAL')
+
+    tool_flags = [
+        ('C compiler flags',   ['CFLAGS', 'CPPFLAGS']),
+        ('C++ compiler flags', ['CXXFLAGS', 'CPPFLAGS']),
+        ('Linker flags',       ['LINKFLAGS', 'LDFLAGS'])
+    ]
+    for name,vars in tool_flags:
+        flags = []
+        for var in vars:
+            flags += conf.all_envs[""][var]
+        conf.msg(name, repr(flags), color='NORMAL')
+
     if conf.env['BUILD_WITH_32_64'] == True:
         conf.msg('32-bit C compiler flags', repr(conf.all_envs[lib32]['CFLAGS']))
         conf.msg('32-bit C++ compiler flags', repr(conf.all_envs[lib32]['CXXFLAGS']))
