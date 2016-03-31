@@ -4,7 +4,6 @@ from __future__ import print_function
 
 import os
 import subprocess
-g_maxlen = 40
 import shutil
 import re
 import sys
@@ -25,21 +24,11 @@ lib32 = 'lib32'
 
 auto_options = []
 
-def display_msg(msg, status = None, color = None):
-    sr = msg
-    global g_maxlen
-    g_maxlen = max(g_maxlen, len(msg))
-    if status:
-        Logs.pprint('NORMAL', "%s :" % msg.ljust(g_maxlen), sep=' ')
-        Logs.pprint(color, status)
-    else:
-        print("%s" % msg.ljust(g_maxlen))
-
-def display_feature(msg, build):
+def display_feature(conf, msg, build):
     if build:
-        display_msg(msg, "yes", 'GREEN')
+        conf.msg(msg, 'yes', color='GREEN')
     else:
-        display_msg(msg, "no", 'YELLOW')
+        conf.msg(msg, 'no', color='YELLOW')
 
 # This function prints an error without stopping waf. The reason waf should not
 # be stopped is to be able to list all missing dependencies in one chunk.
@@ -298,12 +287,12 @@ class AutoOption:
             conf.define(self.define, 0)
         return retvalue
 
-    def display_message(self):
+    def display_message(self, conf):
         """
         This function displays a result message with the help text and the
         result of the configuration.
         """
-        display_feature(self.help, self.result)
+        display_feature(conf, self.help, self.result)
 
 # This function adds an option to the list of auto options and returns the newly
 # created option.
@@ -333,9 +322,9 @@ def configure_auto_options(conf):
         conf.fatal('There were unsatisfied requirements.')
 
 # This function displays all options and the configuration results.
-def display_auto_options_messages():
+def display_auto_options_messages(conf):
     for option in auto_options:
-        option.display_message()
+        option.display_message(conf)
 
 def check_for_celt(conf):
     found = False
@@ -403,7 +392,7 @@ def options(opt):
     opt.add_option('--mandir', type='string', help="Manpage directory [Default: <prefix>/share/man/man1]")
 
     # options affecting binaries
-    opt.add_option('--dist-target', type='string', default='auto', help='Specify the target for cross-compiling [auto,mingw]')
+    opt.add_option('--platform', type='string', default=sys.platform, help='Target platform for cross-compiling, e.g. cygwin or win32')
     opt.add_option('--mixed', action='store_true', default=False, help='Build with 32/64 bits mixed mode')
     opt.add_option('--debug', action='store_true', default=False, dest='debug', help='Build debuggable binaries')
 
@@ -452,33 +441,33 @@ def options(opt):
     # this must be called before the configure phase
     auto_options_argv_hack()
 
+def detect_platform(conf):
+    # GNU/kFreeBSD and GNU/Hurd are treated as Linux
+    platforms = [
+        # ('KEY, 'Human readable name', ['strings', 'to', 'check', 'for'])
+        ('IS_LINUX',   'Linux',   ['gnu0', 'gnukfreebsd', 'linux', 'posix']),
+        ('IS_MACOSX',  'MacOS X', ['darwin']),
+        ('IS_SUN',     'SunOS',   ['sunos']),
+        ('IS_WINDOWS', 'Windows', ['cygwin', 'win32'])
+    ]
+
+    for key,name,strings in platforms:
+        conf.env[key] = False
+
+    conf.start_msg('Checking platform')
+    platform = Options.options.platform
+    for key,name,strings in platforms:
+        for s in strings:
+            if platform.startswith(s):
+                conf.env[key] = True
+                conf.end_msg(name, color='CYAN')
+                break
+
 def configure(conf):
     conf.load('compiler_cxx')
     conf.load('compiler_c')
 
-    if Options.options.dist_target == 'auto':
-        platform = sys.platform
-        conf.env['IS_MACOSX'] = platform == 'darwin'
-        conf.env['IS_LINUX'] = platform == 'linux' or platform == 'linux2' or platform == 'linux3' or platform == 'posix'
-        conf.env['IS_SUN'] = platform == 'sunos'
-        # GNU/kFreeBSD and GNU/Hurd are treated as Linux
-        if platform.startswith('gnu0') or platform.startswith('gnukfreebsd'):
-            conf.env['IS_LINUX'] = True
-    elif Options.options.dist_target == 'mingw':
-        conf.env['IS_WINDOWS'] = True
-
-    if conf.env['IS_LINUX']:
-        Logs.pprint('CYAN', "Linux detected")
-
-    if conf.env['IS_MACOSX']:
-        Logs.pprint('CYAN', "MacOS X detected")
-        conf.check(lib='aften', uselib='AFTEN', define_name='AFTEN') 
-
-    if conf.env['IS_SUN']:
-        Logs.pprint('CYAN', "SunOS detected")
-
-    if conf.env['IS_WINDOWS']:
-        Logs.pprint('CYAN', "Windows detected")
+    detect_platform(conf)
 
     if conf.env['IS_WINDOWS']:
         conf.env.append_unique('CCDEFINES', '_POSIX')
@@ -486,6 +475,9 @@ def configure(conf):
 
     conf.env.append_unique('CXXFLAGS', '-Wall')
     conf.env.append_unique('CFLAGS', '-Wall')
+
+    if conf.env['IS_MACOSX']:
+        conf.check(lib='aften', uselib='AFTEN', define_name='AFTEN')
 
     # configure all auto options
     configure_auto_options(conf)
@@ -551,10 +543,10 @@ def configure(conf):
         conf.fatal("Invalid autostart value \"" + Options.options.autostart + "\"")
 
     if Options.options.autostart == "default":
-        if conf.env['BUILD_JACKDBUS'] == True and conf.env['BUILD_JACKD'] == False:
-            conf.env['AUTOSTART_METHOD'] = "dbus"
+        if conf.env['BUILD_JACKD']:
+            conf.env['AUTOSTART_METHOD'] = 'classic'
         else:
-            conf.env['AUTOSTART_METHOD'] = "classic"
+            conf.env['AUTOSTART_METHOD'] = 'dbus'
     else:
         conf.env['AUTOSTART_METHOD'] = Options.options.autostart
 
@@ -586,9 +578,9 @@ def configure(conf):
     if not conf.env['IS_WINDOWS']:
         conf.define('USE_POSIX_SHM', 1)
     conf.define('JACKMP', 1)
-    if conf.env['BUILD_JACKDBUS'] == True:
+    if conf.env['BUILD_JACKDBUS']:
         conf.define('JACK_DBUS', 1)
-    if conf.env['BUILD_WITH_PROFILE'] == True:
+    if conf.env['BUILD_WITH_PROFILE']:
         conf.define('JACK_MONITOR', 1)
     conf.write_config_header('config.h', remove=False)
 
@@ -603,7 +595,7 @@ def configure(conf):
     except IOError:
         pass
 
-    if Options.options.mixed == True:
+    if Options.options.mixed:
         conf.setenv(lib32, env=conf.env.derive())
         conf.env.append_unique('CXXFLAGS', '-m32')
         conf.env.append_unique('CFLAGS', '-m32')
@@ -615,7 +607,7 @@ def configure(conf):
         conf.write_config_header('config.h')
 
     print()
-    display_msg("==================")
+    print('==================')
     version_msg = "JACK " + VERSION
     if svnrev:
         version_msg += " exported from r" + svnrev
@@ -623,39 +615,47 @@ def configure(conf):
         version_msg += " svn revision will checked and eventually updated during build"
     print(version_msg)
 
-    print("Build with a maximum of %d JACK clients" % Options.options.clients)
-    print("Build with a maximum of %d ports per application" % Options.options.application_ports)
+    conf.msg('Maximum JACK clients', Options.options.clients, color='NORMAL')
+    conf.msg('Maximum ports per application', Options.options.application_ports, color='NORMAL')
 
-    display_msg("Install prefix", conf.env['PREFIX'], 'CYAN')
-    display_msg("Library directory", conf.all_envs[""]['LIBDIR'], 'CYAN')
-    if conf.env['BUILD_WITH_32_64'] == True:
-        display_msg("32-bit library directory", conf.all_envs[lib32]['LIBDIR'], 'CYAN')
-    display_msg("Drivers directory", conf.env['ADDON_DIR'], 'CYAN')
-    display_feature('Build debuggable binaries', conf.env['BUILD_DEBUG'])
-    display_msg('C compiler flags', repr(conf.all_envs[""]['CFLAGS']))
-    display_msg('C++ compiler flags', repr(conf.all_envs[""]['CXXFLAGS']))
-    display_msg('Linker flags', repr(conf.all_envs[""]['LINKFLAGS']))
-    if conf.env['BUILD_WITH_32_64'] == True:
-        display_msg('32-bit C compiler flags', repr(conf.all_envs[lib32]['CFLAGS']))
-        display_msg('32-bit C++ compiler flags', repr(conf.all_envs[lib32]['CXXFLAGS']))
-        display_msg('32-bit linker flags', repr(conf.all_envs[lib32]['LINKFLAGS']))
-    display_feature('Build with engine profiling', conf.env['BUILD_WITH_PROFILE'])
-    display_feature('Build with 32/64 bits mixed mode', conf.env['BUILD_WITH_32_64'])
+    conf.msg('Install prefix', conf.env['PREFIX'], color='CYAN')
+    conf.msg('Library directory', conf.all_envs[""]['LIBDIR'], color='CYAN')
+    if conf.env['BUILD_WITH_32_64']:
+        conf.msg('32-bit library directory', conf.all_envs[lib32]['LIBDIR'], color='CYAN')
+    conf.msg('Drivers directory', conf.env['ADDON_DIR'], color='CYAN')
+    display_feature(conf, 'Build debuggable binaries', conf.env['BUILD_DEBUG'])
 
-    display_feature('Build standard JACK (jackd)', conf.env['BUILD_JACKD'])
-    display_feature('Build D-Bus JACK (jackdbus)', conf.env['BUILD_JACKDBUS'])
-    display_msg('Autostart method', conf.env['AUTOSTART_METHOD'])
+    tool_flags = [
+        ('C compiler flags',   ['CFLAGS', 'CPPFLAGS']),
+        ('C++ compiler flags', ['CXXFLAGS', 'CPPFLAGS']),
+        ('Linker flags',       ['LINKFLAGS', 'LDFLAGS'])
+    ]
+    for name,vars in tool_flags:
+        flags = []
+        for var in vars:
+            flags += conf.all_envs[""][var]
+        conf.msg(name, repr(flags), color='NORMAL')
+
+    if conf.env['BUILD_WITH_32_64']:
+        conf.msg('32-bit C compiler flags', repr(conf.all_envs[lib32]['CFLAGS']))
+        conf.msg('32-bit C++ compiler flags', repr(conf.all_envs[lib32]['CXXFLAGS']))
+        conf.msg('32-bit linker flags', repr(conf.all_envs[lib32]['LINKFLAGS']))
+    display_feature(conf, 'Build with engine profiling', conf.env['BUILD_WITH_PROFILE'])
+    display_feature(conf, 'Build with 32/64 bits mixed mode', conf.env['BUILD_WITH_32_64'])
+
+    display_feature(conf, 'Build standard JACK (jackd)', conf.env['BUILD_JACKD'])
+    display_feature(conf, 'Build D-Bus JACK (jackdbus)', conf.env['BUILD_JACKDBUS'])
+    conf.msg('Autostart method', conf.env['AUTOSTART_METHOD'])
 
     if conf.env['BUILD_JACKDBUS'] and conf.env['BUILD_JACKD']:
         print(Logs.colors.RED + 'WARNING !! mixing both jackd and jackdbus may cause issues:' + Logs.colors.NORMAL)
         print(Logs.colors.RED + 'WARNING !! jackdbus does not use .jackdrc nor qjackctl settings' + Logs.colors.NORMAL)
 
     # display configuration result messages for auto options
-    display_auto_options_messages()
+    display_auto_options_messages(conf)
 
-    if conf.env['BUILD_JACKDBUS'] == True:
-        display_msg('D-Bus service install directory', conf.env['DBUS_SERVICES_DIR'], 'CYAN')
-        #display_msg('Settings persistence', xxx)
+    if conf.env['BUILD_JACKDBUS']:
+        conf.msg('D-Bus service install directory', conf.env['DBUS_SERVICES_DIR'], color='CYAN')
 
         if conf.env['DBUS_SERVICES_DIR'] != conf.env['DBUS_SERVICES_DIR_REAL']:
             print()
@@ -955,15 +955,8 @@ def build_drivers(bld):
             source = oss_src)
 
 def build(bld):
-    if not bld.variant:
-        out2 = out
-    else:
-        out2 = out + "/" + bld.variant
-    print("make[1]: Entering directory `" + os.getcwd() + "/" + out2 + "'")
-
-    if not bld.variant:
-        if bld.env['BUILD_WITH_32_64'] == True:
-            Options.commands.append(bld.cmd + '_' + lib32)
+    if not bld.variant and bld.env['BUILD_WITH_32_64']:
+        Options.commands.append(bld.cmd + '_' + lib32)
 
     # process subfolders from here
     bld.recurse('common')
@@ -997,30 +990,15 @@ def build(bld):
 
     build_drivers(bld)
 
+    bld.recurse('example-clients')
     if bld.env['IS_LINUX']:
-        bld.recurse('example-clients')
-        bld.recurse('tests')
         bld.recurse('man')
-        if bld.env['BUILD_JACKDBUS'] == True:
-           bld.recurse('dbus')
-
-    if bld.env['IS_MACOSX']:
-        bld.recurse('example-clients')
+    if not bld.env['IS_WINDOWS']:
         bld.recurse('tests')
-        if bld.env['BUILD_JACKDBUS'] == True:
-            bld.recurse('dbus')
+    if bld.env['BUILD_JACKDBUS']:
+        bld.recurse('dbus')
 
-    if bld.env['IS_SUN']:
-        bld.recurse('example-clients')
-        bld.recurse('tests')
-        if bld.env['BUILD_JACKDBUS'] == True:
-            bld.recurse('dbus')
-
-    if bld.env['IS_WINDOWS']:
-        bld.recurse('example-clients')
-        #bld.recurse('tests')
-
-    if bld.env['BUILD_DOXYGEN_DOCS'] == True:
+    if bld.env['BUILD_DOXYGEN_DOCS']:
         html_build_dir = bld.path.find_or_declare('html').abspath()
 
         bld(
