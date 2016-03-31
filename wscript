@@ -939,12 +939,6 @@ def build_drivers(bld):
 
 def build(bld):
     if not bld.variant:
-        out2 = out
-    else:
-        out2 = out + "/" + bld.variant
-    print("make[1]: Entering directory `" + os.getcwd() + "/" + out2 + "'")
-
-    if not bld.variant:
         if bld.env['BUILD_WITH_32_64'] == True:
             Options.commands.append(bld.cmd + '_' + lib32)
 
