@@ -4,7 +4,6 @@ from __future__ import print_function
 
 import os
 import subprocess
-g_maxlen = 40
 import shutil
 import re
 import sys
@@ -25,21 +24,11 @@ lib32 = 'lib32'
 
 auto_options = []
 
-def display_msg(msg, status = None, color = None):
-    sr = msg
-    global g_maxlen
-    g_maxlen = max(g_maxlen, len(msg))
-    if status:
-        Logs.pprint('NORMAL', "%s :" % msg.ljust(g_maxlen), sep=' ')
-        Logs.pprint(color, status)
-    else:
-        print("%s" % msg.ljust(g_maxlen))
-
-def display_feature(msg, build):
+def display_feature(conf, msg, build):
     if build:
-        display_msg(msg, "yes", 'GREEN')
+        conf.msg(msg, 'yes', color='GREEN')
     else:
-        display_msg(msg, "no", 'YELLOW')
+        conf.msg(msg, 'no', color='YELLOW')
 
 # This function prints an error without stopping waf. The reason waf should not
 # be stopped is to be able to list all missing dependencies in one chunk.
@@ -298,12 +287,12 @@ class AutoOption:
             conf.define(self.define, 0)
         return retvalue
 
-    def display_message(self):
+    def display_message(self, conf):
         """
         This function displays a result message with the help text and the
         result of the configuration.
         """
-        display_feature(self.help, self.result)
+        display_feature(conf, self.help, self.result)
 
 # This function adds an option to the list of auto options and returns the newly
 # created option.
@@ -333,9 +322,9 @@ def configure_auto_options(conf):
         conf.fatal('There were unsatisfied requirements.')
 
 # This function displays all options and the configuration results.
-def display_auto_options_messages():
+def display_auto_options_messages(conf):
     for option in auto_options:
-        option.display_message()
+        option.display_message(conf)
 
 def check_for_celt(conf):
     found = False
@@ -612,7 +601,7 @@ def configure(conf):
         conf.write_config_header('config.h')
 
     print()
-    display_msg("==================")
+    print('==================')
     version_msg = "JACK " + VERSION
     if svnrev:
         version_msg += " exported from r" + svnrev
@@ -620,39 +609,38 @@ def configure(conf):
         version_msg += " svn revision will checked and eventually updated during build"
     print(version_msg)
 
-    print("Build with a maximum of %d JACK clients" % Options.options.clients)
-    print("Build with a maximum of %d ports per application" % Options.options.application_ports)
+    conf.msg('Maximum JACK clients', Options.options.clients, color='NORMAL')
+    conf.msg('Maximum ports per application', Options.options.application_ports, color='NORMAL')
 
-    display_msg("Install prefix", conf.env['PREFIX'], 'CYAN')
-    display_msg("Library directory", conf.all_envs[""]['LIBDIR'], 'CYAN')
+    conf.msg('Install prefix', conf.env['PREFIX'], color='CYAN')
+    conf.msg('Library directory', conf.all_envs[""]['LIBDIR'], color='CYAN')
     if conf.env['BUILD_WITH_32_64'] == True:
-        display_msg("32-bit library directory", conf.all_envs[lib32]['LIBDIR'], 'CYAN')
-    display_msg("Drivers directory", conf.env['ADDON_DIR'], 'CYAN')
-    display_feature('Build debuggable binaries', conf.env['BUILD_DEBUG'])
-    display_msg('C compiler flags', repr(conf.all_envs[""]['CFLAGS']))
-    display_msg('C++ compiler flags', repr(conf.all_envs[""]['CXXFLAGS']))
-    display_msg('Linker flags', repr(conf.all_envs[""]['LINKFLAGS']))
+        conf.msg('32-bit library directory', conf.all_envs[lib32]['LIBDIR'], color='CYAN')
+    conf.msg('Drivers directory', conf.env['ADDON_DIR'], color='CYAN')
+    display_feature(conf, 'Build debuggable binaries', conf.env['BUILD_DEBUG'])
+    conf.msg('C compiler flags', repr(conf.all_envs[""]['CFLAGS']), color='NORMAL')
+    conf.msg('C++ compiler flags', repr(conf.all_envs[""]['CXXFLAGS']), color='NORMAL')
+    conf.msg('Linker flags', repr(conf.all_envs[""]['LINKFLAGS']), color='NORMAL')
     if conf.env['BUILD_WITH_32_64'] == True:
-        display_msg('32-bit C compiler flags', repr(conf.all_envs[lib32]['CFLAGS']))
-        display_msg('32-bit C++ compiler flags', repr(conf.all_envs[lib32]['CXXFLAGS']))
-        display_msg('32-bit linker flags', repr(conf.all_envs[lib32]['LINKFLAGS']))
-    display_feature('Build with engine profiling', conf.env['BUILD_WITH_PROFILE'])
-    display_feature('Build with 32/64 bits mixed mode', conf.env['BUILD_WITH_32_64'])
+        conf.msg('32-bit C compiler flags', repr(conf.all_envs[lib32]['CFLAGS']))
+        conf.msg('32-bit C++ compiler flags', repr(conf.all_envs[lib32]['CXXFLAGS']))
+        conf.msg('32-bit linker flags', repr(conf.all_envs[lib32]['LINKFLAGS']))
+    display_feature(conf, 'Build with engine profiling', conf.env['BUILD_WITH_PROFILE'])
+    display_feature(conf, 'Build with 32/64 bits mixed mode', conf.env['BUILD_WITH_32_64'])
 
-    display_feature('Build standard JACK (jackd)', conf.env['BUILD_JACKD'])
-    display_feature('Build D-Bus JACK (jackdbus)', conf.env['BUILD_JACKDBUS'])
-    display_msg('Autostart method', conf.env['AUTOSTART_METHOD'])
+    display_feature(conf, 'Build standard JACK (jackd)', conf.env['BUILD_JACKD'])
+    display_feature(conf, 'Build D-Bus JACK (jackdbus)', conf.env['BUILD_JACKDBUS'])
+    conf.msg('Autostart method', conf.env['AUTOSTART_METHOD'])
 
     if conf.env['BUILD_JACKDBUS'] and conf.env['BUILD_JACKD']:
         print(Logs.colors.RED + 'WARNING !! mixing both jackd and jackdbus may cause issues:' + Logs.colors.NORMAL)
         print(Logs.colors.RED + 'WARNING !! jackdbus does not use .jackdrc nor qjackctl settings' + Logs.colors.NORMAL)
 
     # display configuration result messages for auto options
-    display_auto_options_messages()
+    display_auto_options_messages(conf)
 
     if conf.env['BUILD_JACKDBUS'] == True:
-        display_msg('D-Bus service install directory', conf.env['DBUS_SERVICES_DIR'], 'CYAN')
-        #display_msg('Settings persistence', xxx)
+        conf.msg('D-Bus service install directory', conf.env['DBUS_SERVICES_DIR'], color='CYAN')
 
         if conf.env['DBUS_SERVICES_DIR'] != conf.env['DBUS_SERVICES_DIR_REAL']:
             print()
