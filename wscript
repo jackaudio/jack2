@@ -400,7 +400,7 @@ def options(opt):
     opt.add_option('--mandir', type='string', help="Manpage directory [Default: <prefix>/share/man/man1]")
 
     # options affecting binaries
-    opt.add_option('--dist-target', type='string', default='auto', help='Specify the target for cross-compiling [auto,mingw]')
+    opt.add_option('--platform', type='string', default=sys.platform, help='Target platform for cross-compiling, e.g. cygwin or win32')
     opt.add_option('--mixed', action='store_true', default=False, help='Build with 32/64 bits mixed mode')
     opt.add_option('--debug', action='store_true', default=False, dest='debug', help='Build debuggable binaries')
 
@@ -449,31 +449,33 @@ def options(opt):
     # this must be called before the configure phase
     auto_options_argv_hack()
 
+def detect_platform(conf):
+    # GNU/kFreeBSD and GNU/Hurd are treated as Linux
+    platforms = [
+        # ('KEY, 'Human readable name', ['strings', 'to', 'check', 'for'])
+        ('IS_LINUX',   'Linux',   ['gnu0', 'gnukfreebsd', 'linux', 'posix']),
+        ('IS_MACOSX',  'MacOS X', ['darwin']),
+        ('IS_SUN',     'SunOS',   ['sunos']),
+        ('IS_WINDOWS', 'Windows', ['cygwin', 'win32'])
+    ]
+
+    for key,name,strings in platforms:
+        conf.env[key] = False
+
+    conf.start_msg('Checking platform')
+    platform = Options.options.platform
+    for key,name,strings in platforms:
+        for s in strings:
+            if platform.startswith(s):
+                conf.env[key] = True
+                conf.end_msg(name, color='CYAN')
+                break
+
 def configure(conf):
     conf.load('compiler_cxx')
     conf.load('compiler_c')
-    if Options.options.dist_target == 'auto':
-        platform = sys.platform
-        conf.env['IS_MACOSX'] = platform == 'darwin'
-        conf.env['IS_LINUX'] = platform == 'linux' or platform == 'linux2' or platform == 'linux3' or platform == 'posix'
-        conf.env['IS_SUN'] = platform == 'sunos'
-        # GNU/kFreeBSD and GNU/Hurd are treated as Linux
-        if platform.startswith('gnu0') or platform.startswith('gnukfreebsd'):
-            conf.env['IS_LINUX'] = True
-    elif Options.options.dist_target == 'mingw':
-        conf.env['IS_WINDOWS'] = True
 
-    if conf.env['IS_LINUX']:
-        Logs.pprint('CYAN', "Linux detected")
-
-    if conf.env['IS_MACOSX']:
-        Logs.pprint('CYAN', "MacOS X detected")
-
-    if conf.env['IS_SUN']:
-        Logs.pprint('CYAN', "SunOS detected")
-
-    if conf.env['IS_WINDOWS']:
-        Logs.pprint('CYAN', "Windows detected")
+    detect_platform(conf)
 
     if conf.env['IS_WINDOWS']:
         conf.env.append_unique('CCDEFINES', '_POSIX')
