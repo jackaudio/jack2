@@ -168,6 +168,7 @@ struct JackClientCheckRequest : public JackRequest
     JackClientCheckRequest(const char* name, int protocol, int options, int uuid, int open = false)
         : JackRequest(JackRequest::kClientCheck), fProtocol(protocol), fOptions(options), fUUID(uuid), fOpen(open)
     {
+        memset(fName, 0, sizeof(fName));
         snprintf(fName, sizeof(fName), "%s", name);
     }
 
@@ -210,6 +211,7 @@ struct JackClientCheckResult : public JackResult
     JackClientCheckResult(int32_t result, const char* name, int status)
             : JackResult(result), fStatus(status)
     {
+        memset(fName, 0, sizeof(fName));
         snprintf(fName, sizeof(fName), "%s", name);
     }
 
@@ -246,6 +248,7 @@ struct JackClientOpenRequest : public JackRequest
     {}
     JackClientOpenRequest(const char* name, int pid, int uuid): JackRequest(JackRequest::kClientOpen)
     {
+        memset(fName, 0, sizeof(fName));
         snprintf(fName, sizeof(fName), "%s", name);
         fPID = pid;
         fUUID = uuid;
@@ -418,8 +421,10 @@ struct JackPortRegisterRequest : public JackRequest
     JackPortRegisterRequest(int refnum, const char* name, const char* port_type, unsigned int flags, unsigned int buffer_size)
             : JackRequest(JackRequest::kRegisterPort), fRefNum(refnum), fFlags(flags), fBufferSize(buffer_size)
     {
-        strcpy(fName, name);
-        strcpy(fPortType, port_type);
+        memset(fName, 0, sizeof(fName));
+        memset(fPortType, 0, sizeof(fPortType));
+        strncpy(fName, name, sizeof(fName)-1);
+        strncpy(fPortType, port_type, sizeof(fPortType)-1);
     }
 
     int Read(detail::JackChannelTransactionInterface* trans)
@@ -525,8 +530,10 @@ struct JackPortConnectNameRequest : public JackRequest
     JackPortConnectNameRequest(int refnum, const char* src_name, const char* dst_name)
         : JackRequest(JackRequest::kConnectNamePorts), fRefNum(refnum)
     {
-        strcpy(fSrc, src_name);
-        strcpy(fDst, dst_name);
+        memset(fSrc, 0, sizeof(fSrc));
+        memset(fDst, 0, sizeof(fDst));
+        strncpy(fSrc, src_name, sizeof(fSrc)-1);
+        strncpy(fDst, dst_name, sizeof(fDst)-1);
     }
 
     int Read(detail::JackChannelTransactionInterface* trans)
@@ -567,8 +574,10 @@ struct JackPortDisconnectNameRequest : public JackRequest
     JackPortDisconnectNameRequest(int refnum, const char* src_name, const char* dst_name)
         : JackRequest(JackRequest::kDisconnectNamePorts), fRefNum(refnum)
     {
-        strcpy(fSrc, src_name);
-        strcpy(fDst, dst_name);
+        memset(fSrc, 0, sizeof(fSrc));
+        memset(fDst, 0, sizeof(fDst));
+        strncpy(fSrc, src_name, sizeof(fSrc)-1);
+        strncpy(fDst, dst_name, sizeof(fDst)-1);
     }
 
     int Read(detail::JackChannelTransactionInterface* trans)
@@ -685,7 +694,8 @@ struct JackPortRenameRequest : public JackRequest
     JackPortRenameRequest(int refnum, jack_port_id_t port, const char* name)
         : JackRequest(JackRequest::kPortRename), fRefNum(refnum), fPort(port)
     {
-        strcpy(fName, name);
+        memset(fName, 0, sizeof(fName));
+        strncpy(fName, name, sizeof(fName)-1);
     }
 
     int Read(detail::JackChannelTransactionInterface* trans)
@@ -908,6 +918,7 @@ struct JackGetInternalClientNameResult : public JackResult
     JackGetInternalClientNameResult(int32_t result, const char* name)
             : JackResult(result)
     {
+        memset(fName, 0, sizeof(fName));
         snprintf(fName, sizeof(fName), "%s", name);
     }
 
@@ -943,6 +954,7 @@ struct JackInternalClientHandleRequest : public JackRequest
     JackInternalClientHandleRequest(int refnum, const char* client_name)
             : JackRequest(JackRequest::kInternalClientHandle), fRefNum(refnum)
     {
+        memset(fName, 0, sizeof(fName));
         snprintf(fName, sizeof(fName), "%s", client_name);
     }
 
@@ -1021,6 +1033,9 @@ struct JackInternalClientLoadRequest : public JackRequest
     JackInternalClientLoadRequest(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int uuid )
             : JackRequest(JackRequest::kInternalClientLoad), fRefNum(refnum), fOptions(options), fUUID(uuid)
     {
+        memset(fName, 0, sizeof(fName));
+        memset(fDllName, 0, sizeof(fDllName));
+        memset(fLoadInitName, 0, sizeof(fLoadInitName));
         snprintf(fName, sizeof(fName), "%s", client_name);
         snprintf(fDllName, sizeof(fDllName), "%s", so_name);
         snprintf(fLoadInitName, sizeof(fLoadInitName), "%s", objet_data);
@@ -1203,9 +1218,12 @@ struct JackSessionCommand
 
     JackSessionCommand(const char *uuid, const char *clientname, const char *command, jack_session_flags_t flags)
     {
-        strncpy(fUUID, uuid, sizeof(fUUID));
-        strncpy(fClientName, clientname, sizeof(fClientName));
-        strncpy(fCommand, command, sizeof(fCommand));
+        memset(fUUID, 0, sizeof(fUUID));
+        memset(fClientName, 0, sizeof(fClientName));
+        memset(fCommand, 0, sizeof(fCommand));
+        strncpy(fUUID, uuid, sizeof(fUUID)-1);
+        strncpy(fClientName, clientname, sizeof(fClientName)-1);
+        strncpy(fCommand, command, sizeof(fCommand)-1);
         fFlags = flags;
     }
 };
@@ -1315,11 +1333,13 @@ struct JackSessionNotifyRequest : public JackRequest
     JackSessionNotifyRequest(int refnum, const char* path, jack_session_event_type_t type, const char* dst)
             : JackRequest(JackRequest::kSessionNotify), fEventType(type), fRefNum(refnum)
     {
+        memset(fPath, 0, sizeof(fPath));
+        memset(fDst, 0, sizeof(fDst));
         snprintf(fPath, sizeof(fPath), "%s", path);
+        fPath[JACK_MESSAGE_SIZE] = 0;
         if (dst) {
             snprintf(fDst, sizeof(fDst), "%s", dst);
-        } else {
-            fDst[0] = '\0';
+            fDst[JACK_CLIENT_NAME_SIZE] = 0;
         }
     }
 
@@ -1384,6 +1404,7 @@ struct JackClientNameResult : public JackResult
     JackClientNameResult(int32_t result, const char* name)
             : JackResult(result)
     {
+        memset(fName, 0, sizeof(fName));
         snprintf(fName, sizeof(fName), "%s", name);
     }
 
@@ -1412,6 +1433,7 @@ struct JackUUIDResult : public JackResult
     JackUUIDResult(int32_t result, const char* uuid)
             : JackResult(result)
     {
+        memset(fUUID, 0, sizeof(fUUID));
         snprintf(fUUID, sizeof(fUUID), "%s", uuid);
     }
 
@@ -1441,7 +1463,8 @@ struct JackGetUUIDRequest : public JackRequest
     JackGetUUIDRequest(const char* client_name)
             : JackRequest(JackRequest::kGetUUIDByClient)
     {
-        strncpy(fName, client_name, sizeof(fName));
+        memset(fName, 0, sizeof(fName));
+        strncpy(fName, client_name, sizeof(fName)-1);
     }
 
     int Read(detail::JackChannelTransactionInterface* trans)
@@ -1472,7 +1495,8 @@ struct JackGetClientNameRequest : public JackRequest
     JackGetClientNameRequest(const char* uuid)
             : JackRequest(JackRequest::kGetClientByUUID)
     {
-        strncpy(fUUID, uuid, sizeof(fUUID));
+        memset(fUUID, 0, sizeof(fUUID));
+        strncpy(fUUID, uuid, sizeof(fUUID)-1);
     }
 
     int Read(detail::JackChannelTransactionInterface* trans)
@@ -1505,8 +1529,10 @@ struct JackReserveNameRequest : public JackRequest
     JackReserveNameRequest(int refnum, const char *name, const char* uuid)
             : JackRequest(JackRequest::kReserveClientName), fRefNum(refnum)
     {
-        strncpy(fName, name, sizeof(fName));
-        strncpy(fUUID, uuid, sizeof(fUUID));
+        memset(fName, 0, sizeof(fName));
+        memset(fUUID, 0, sizeof(fUUID));
+        strncpy(fName, name, sizeof(fName)-1);
+        strncpy(fUUID, uuid, sizeof(fUUID)-1);
     }
 
     int Read(detail::JackChannelTransactionInterface* trans)
@@ -1541,7 +1567,8 @@ struct JackClientHasSessionCallbackRequest : public JackRequest
     JackClientHasSessionCallbackRequest(const char *name)
             : JackRequest(JackRequest::kClientHasSessionCallback)
     {
-        strncpy(fName, name, sizeof(fName));
+        memset(fName, 0, sizeof(fName));
+        strncpy(fName, name, sizeof(fName)-1);
     }
 
     int Read(detail::JackChannelTransactionInterface* trans)
@@ -1582,6 +1609,8 @@ struct JackClientNotification
     JackClientNotification(const char* name, int refnum, int notify, int sync, const char* message, int value1, int value2)
             : fRefNum(refnum), fNotify(notify), fValue1(value1), fValue2(value2), fSync(sync)
     {
+        memset(fName, 0, sizeof(fName));
+        memset(fMessage, 0, sizeof(fMessage));
         snprintf(fName, sizeof(fName), "%s", name);
         snprintf(fMessage, sizeof(fMessage), "%s", message);
         fSize = Size();
