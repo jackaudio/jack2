@@ -10,12 +10,12 @@ def configure(conf):
 
     if conf.env['IS_WINDOWS']:
         try:
-            conf.check_cc(function_name='regcomp', header_name='regex.h', lib='regex', uselib_store="REGEX", define_name='HAVE_REGEX_H')
+            conf.check(function_name='regcomp', header_name='regex.h', lib='regex', uselib_store="REGEX", define_name='HAVE_REGEX_H')
         except:
-            conf.check_cc(function_name='regcomp', header_name='regex.h', lib='tre', uselib_store="REGEX", define_name='HAVE_REGEX_H')
-        conf.check_cc(function_name='htons', header_name='winsock2.h', lib='ws2_32', uselib_store="WS2_32", define_name='HAVE_WINSOCK2_H')
-        conf.check_cc(function_name='timeGetDevCaps', header_name=['windows.h', 'mmsystem.h'], lib='winmm', uselib_store="WINMM", define_name='HAVE_MMSYSTEM_H')
-        conf.check_cc(function_name='EnumProcesses', header_name=['windows.h', 'psapi.h'], lib='psapi', uselib_store="PSAPI", define_name='HAVE_PSAPI_H')
+            conf.check(function_name='regcomp', header_name='regex.h', lib='tre', uselib_store="REGEX", define_name='HAVE_REGEX_H')
+        conf.check(function_name='htons', header_name='winsock2.h', lib='ws2_32', uselib_store="WS2_32", define_name='HAVE_WINSOCK2_H')
+        conf.check(function_name='timeGetDevCaps', header_name=['windows.h', 'mmsystem.h'], lib='winmm', uselib_store="WINMM", define_name='HAVE_MMSYSTEM_H')
+        conf.check(function_name='EnumProcesses', header_name=['windows.h', 'psapi.h'], lib='psapi', uselib_store="PSAPI", define_name='HAVE_PSAPI_H')
 
 def create_jack_process_obj(bld, target, sources, uselib = None):
     process = bld(features = ['cxx', 'cxxshlib'])

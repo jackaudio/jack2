@@ -106,11 +106,11 @@ class AutoOption:
     def add_library(self, library, uselib_store=None):
         """
         Add a required library that should be checked during configuration. The
-        library will be checked using the conf.check_cc function. If the
+        library will be checked using the conf.check function. If the
         uselib_store arugment is not given it defaults to LIBRARY (the uppercase
         of the library argument). The uselib_store argument will be passed to
-        check_cc which means LIB_LIBRARY, CFLAGS_LIBRARY and DEFINES_LIBRARY,
-        etc. will be defined if the option is enabled.
+        check which means LIB_LIBRARY, CFLAGS_LIBRARY and DEFINES_LIBRARY, etc.
+        will be defined if the option is enabled.
         """
         if not uselib_store:
             uselib_store = library.upper().replace('-', '_')
@@ -119,7 +119,7 @@ class AutoOption:
     def add_header(self, header):
         """
         Add a required header that should be checked during configuration. The
-        header will be checked using the conf.check_cc function which means
+        header will be checked using the conf.check function which means
         HAVE_HEADER_H will be defined if found.
         """
         self.headers.append(header)
@@ -192,7 +192,7 @@ class AutoOption:
         # check for libraries
         for lib,uselib_store in self.libs:
             try:
-                conf.check_cc(lib=lib, uselib_store=uselib_store, use=use)
+                conf.check(lib=lib, uselib_store=uselib_store, use=use)
             except conf.errors.ConfigurationError:
                 all_found = False
                 self.libs_not_found.append(lib)
@@ -200,7 +200,7 @@ class AutoOption:
         # check for headers
         for header in self.headers:
             try:
-                conf.check_cc(header_name=header, use=use)
+                conf.check(header_name=header, use=use)
             except conf.errors.ConfigurationError:
                 all_found = False
                 self.headers_not_found.append(header)
@@ -348,13 +348,16 @@ def check_for_celt_error(conf):
 # before. Thus a fragment with both stdio.h and readline/readline.h need to be
 # test-compiled to find out whether readline is available.
 def check_for_readline(conf):
+    # FIXME: This check can be incorporated into the AutoOptions class by
+    #        passing header_name=['stdio.h', 'readline/readline.h'] to check.
     try:
-        conf.check_cc(fragment='''
-                      #include <stdio.h>
-                      #include <readline/readline.h>
-                      int main(void) { return 0; }''',
-                      execute=False,
-                      msg='Checking for header readline/readline.h')
+        conf.check(fragment='''
+                   #include <stdio.h>
+                   #include <readline/readline.h>
+                   int main(void) { return 0; }''',
+                   execute=False,
+                   msg='Checking for header readline/readline.h',
+                   errmsg='not found')
         return True
     except conf.errors.ConfigurationError:
         return False
@@ -363,13 +366,15 @@ def check_for_readline_error(conf):
     print_error('--readline requires the readline/readline.h header, but it cannot be found.')
 
 def check_for_mmsystem(conf):
+    # FIXME: See comment in check_for_readline.
     try:
-        conf.check_cc(fragment='''
-                      #include <windows.h>
-                      #include <mmsystem.h>
-                      int main(void) { return 0; }''',
-                      execute=False,
-                      msg='Checking for header mmsystem.h')
+        conf.check(fragment='''
+                   #include <windows.h>
+                   #include <mmsystem.h>
+                   int main(void) { return 0; }''',
+                   execute=False,
+                   msg='Checking for header mmsystem.h',
+                   errmsg='not found')
         return True
     except conf.errors.ConfigurationError:
         return False
@@ -477,7 +482,7 @@ def configure(conf):
     configure_auto_options(conf)
 
     # Check for functions.
-    conf.check_cc(
+    conf.check(
         function_name='ppoll',
         header_name=['poll.h', 'signal.h'],
         defines=['_GNU_SOURCE'],
