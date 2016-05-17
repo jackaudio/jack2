@@ -1064,7 +1064,6 @@ struct JackInternalClientLoadRequest : public JackRequest
         snprintf(fName, sizeof(fName), "%s", client_name);
         snprintf(fDllName, sizeof(fDllName), "%s", so_name);
         snprintf(fLoadInitName, sizeof(fLoadInitName), "%s", objet_data);
-        snprintf(fLoadInitName, sizeof(fLoadInitName), "%s", objet_data);
     }
 
     int Read(detail::JackChannelTransactionInterface* trans)
