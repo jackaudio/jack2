@@ -104,7 +104,7 @@ static void signal_segv(int signum, siginfo_t* info, void*ptr) {
     jack_error("info.si_errno = %d", info->si_errno);
     jack_error("info.si_code  = %d (%s)", info->si_code, si_code_str);
     jack_error("info.si_addr  = %p", info->si_addr);
-#if !defined(__alpha__) && !defined(__ia64__) && !defined(__FreeBSD_kernel__) && !defined(__arm__) && !defined(__hppa__) && !defined(__sh__) && !defined(__aarch64__) && !defined(nios2) && !defined(__XTENSA__)
+#if !defined(__alpha__) && !defined(__ia64__) && !defined(__FreeBSD_kernel__) && !defined(__arm__) && !defined(__hppa__) && !defined(__sh__) && !defined(__aarch64__) && !defined(nios2) && !defined(__XTENSA__) && !defined(__arc__)
     for(i = 0; i < NGREG; i++)
         jack_error("reg[%02d]       = 0x" REGFORMAT, i, 
 #if defined(__powerpc64__)
