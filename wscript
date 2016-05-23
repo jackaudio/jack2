@@ -496,6 +496,21 @@ def configure(conf):
 
     conf.recurse('example-clients')
 
+    # test for the availability of ucontext, and how it should be used
+    for t in ("gp_regs", "uc_regs", "mc_gregs", "gregs"):
+        fragment = "#include <ucontext.h>\n"
+        fragment += "int main() { ucontext_t *ucontext; return (int) ucontext->uc_mcontext.%s[0]; }" % t
+        confvar = "HAVE_UCONTEXT_%s" % t.upper()
+        conf.check_cc(fragment=fragment, define_name=confvar, mandatory=False,
+                      msg="Checking for ucontext->uc_mcontext.%s" % t)
+        if conf.is_defined(confvar):
+            conf.define('HAVE_UCONTEXT', 1)
+
+    fragment = "#include <ucontext.h>\n"
+    fragment += "int main() { return NGREG; }"
+    conf.check_cc(fragment=fragment, define_name="HAVE_NGREG", mandatory=False,
+                  msg="Checking for NGREG")
+
     conf.env['LIB_PTHREAD'] = ['pthread']
     conf.env['LIB_DL'] = ['dl']
     conf.env['LIB_RT'] = ['rt']
