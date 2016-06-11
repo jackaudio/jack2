@@ -286,10 +286,10 @@ static bool HasNoConnection(jack_int_t* table)
 
 void JackConnectionManager::TopologicalSort(std::vector<jack_int_t>& sorted)
 {
-    JackFixedMatrix<CLIENT_NUM> tmp;
+    JackFixedMatrix<CLIENT_NUM>* tmp = new JackFixedMatrix<CLIENT_NUM>;
     std::set<jack_int_t> level;
 
-    fConnectionRef.Copy(tmp);
+    fConnectionRef.Copy(*tmp);
 
     // Inputs of the graph
     level.insert(AUDIO_DRIVER_REFNUM);
@@ -299,18 +299,20 @@ void JackConnectionManager::TopologicalSort(std::vector<jack_int_t>& sorted)
         jack_int_t refnum = *level.begin();
         sorted.push_back(refnum);
         level.erase(level.begin());
-        const jack_int_t* output_ref1 = tmp.GetItems(refnum);
+        const jack_int_t* output_ref1 = tmp->GetItems(refnum);
         for (int dst = 0; dst < CLIENT_NUM; dst++) {
             if (output_ref1[dst] > 0) {
-                tmp.ClearItem(refnum, dst);
+                tmp->ClearItem(refnum, dst);
                 jack_int_t output_ref2[CLIENT_NUM];
-                tmp.GetOutputTable1(dst, output_ref2);
+                tmp->GetOutputTable1(dst, output_ref2);
                 if (HasNoConnection(output_ref2)) {
                     level.insert(dst);
                 }
             }
         }
     }
+
+    delete tmp;
 }
 
 /*!
