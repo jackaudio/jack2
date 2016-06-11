@@ -20,6 +20,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <math.h>
 #include <unistd.h>
 #include <jack/jack.h>
@@ -167,8 +168,8 @@ static jack_client_t  *jack_handle;
 static jack_port_t    *jack_capt;
 static jack_port_t    *jack_play;
 
-jack_latency_range_t   capture_latency = {-1, -1};
-jack_latency_range_t   playback_latency = {-1, -1};
+jack_latency_range_t   capture_latency = {UINT32_MAX, UINT32_MAX};
+jack_latency_range_t   playback_latency = {UINT32_MAX, UINT32_MAX};
 
 void
 latency_cb (jack_latency_callback_mode_t mode, void *arg)
