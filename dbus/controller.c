@@ -813,20 +813,23 @@ jack_controller_run(
 
 #ifdef __linux__
     if (sysinfo(&si) != 0)
-#elif defined(__APPLE__)
-    if (sysctl(mib, 2, &boottime, &size, NULL, 0) != -1)
-#endif
     {
         jack_error("sysinfo() failed with %d", errno);
     }
-#ifdef __linux__
     else if (si.uptime < controller_ptr->pending_save + 2) /* delay save by two seconds */
-#elif defined(__APPLE__)
-    else if (boottime.tv_sec < controller_ptr->pending_save + 2) /* delay save by two seconds */
-#endif
     {
         return;
     }
+#elif defined(__APPLE__)
+    if (sysctl(mib, 2, &boottime, &size, NULL, 0) != -1)
+    {
+        jack_error("sysctl() failed with %d", errno);
+    }
+    else if (boottime.tv_sec < controller_ptr->pending_save + 2) /* delay save by two seconds */
+    {
+        return;
+    }
+#endif
 
     controller_ptr->pending_save = 0;
     jack_controller_settings_save_auto(controller_ptr);
@@ -857,7 +860,11 @@ jack_controller_pending_save(
         if (sysctl(mib, 2, &boottime, &size, NULL, 0) != -1)
 #endif
         {
+#ifdef __linux__
             jack_error("sysinfo() failed with %d.", errno);
+#elif defined(__APPLE__)
+            jack_error("sysctl() failed with %d.", errno);
+#endif
             controller_ptr->pending_save = 0;
             jack_controller_settings_save_auto(controller_ptr);
             return;
