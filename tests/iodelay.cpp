@@ -20,6 +20,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#define __STDC_LIMIT_MACROS
 #include <stdint.h>
 #include <math.h>
 #include <unistd.h>
