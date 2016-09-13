@@ -414,6 +414,7 @@ namespace Jack
         if (addr_conv < 1) {
             return addr_conv;
         }
+        fSendAddr.sin_port = htons(fPort);
     #if defined(__sun__) || defined(sun)
         if (WaitWrite() < 0) {
             return -1;

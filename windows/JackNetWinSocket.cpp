@@ -322,6 +322,7 @@ namespace Jack
     int JackNetWinSocket::SendTo(const void* buffer, size_t nbytes, int flags, const char* ip)
     {
         fSendAddr.sin_addr.s_addr = inet_addr(ip);
+        fSendAddr.sin_port = htons(fPort);
         return SendTo(buffer, nbytes, flags);
     }
 
