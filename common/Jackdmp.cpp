@@ -241,6 +241,15 @@ static void usage(FILE* file, jackctl_server_t *server, bool full = true)
 // Prototype to be found in libjackserver
 extern "C" void silent_jack_error_callback(const char *desc);
 
+void print_version()
+{
+    printf( "jackdmp version " VERSION " tmpdir "
+            jack_server_dir " protocol %d" "\n",
+            JACK_PROTOCOL_VERSION);
+    exit(-1);
+
+}
+
 int main(int argc, char** argv)
 {
     jackctl_server_t * server_ctl;
@@ -249,6 +258,12 @@ int main(int argc, char** argv)
     jackctl_driver_t * master_driver_ctl;
     jackctl_driver_t * loopback_driver_ctl = NULL;
     int replace_registry = 0;
+
+    for(int a = 1; a < argc; ++a) {
+        if(strstr(argv[a], "--version") || strstr(argv[a], "-V")) {
+            print_version();
+        }
+    }
     const char *options = "-d:X:I:P:uvshVrRL:STFl:t:mn:p:"
         "a:"
 #ifdef __linux__
@@ -470,6 +485,9 @@ int main(int argc, char** argv)
                 break;
 
             case 'V':
+                //TODO unreachable (refactoring needed)
+                fprintf(stderr, "should not be reachable.\n");
+                return -1;
                 show_version = true;
                 break;
 
@@ -491,11 +509,7 @@ int main(int argc, char** argv)
     }
 
     if (show_version) {
-        printf( "jackdmp version " VERSION
-                " tmpdir " jack_server_dir
-                " protocol %d"
-                "\n", JACK_PROTOCOL_VERSION);
-        return -1;
+        //TODO refactor unreachable
     }
 
     if (!master_driver_name) {
