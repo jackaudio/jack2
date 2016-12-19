@@ -227,10 +227,10 @@ static void com_toggle(char *arg)
         	com_stop( arg );
 		break;
 	case JackTransportStarting:
-		printf ("state: Starting - no transport toggling");
+		fprintf(stderr, "state: Starting - no transport toggling");
 		break;
 	default:
-		printf ("state: Starting - no transport toggling");
+		fprintf(stderr, "state: Starting - no transport toggling");
 	} 
 }
 
