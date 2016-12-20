@@ -211,6 +211,29 @@ static void com_timeout(char *arg)
 	jack_set_sync_timeout(client, (jack_time_t) (timeout*1000000));
 }
 
+/* Toggle between play and stop state */
+static void com_toggle(char *arg)
+{       
+	jack_position_t current;
+	jack_transport_state_t transport_state;
+
+	transport_state = jack_transport_query (client, &current);
+
+	switch (transport_state) {
+	case JackTransportStopped:
+        	com_play( arg );
+		break;
+	case JackTransportRolling:
+        	com_stop( arg );
+		break;
+	case JackTransportStarting:
+		fprintf(stderr, "state: Starting - no transport toggling");
+		break;
+	default:
+		fprintf(stderr, "state: Starting - no transport toggling");
+	} 
+}
+
 
 /* Command parsing based on GNU readline info examples. */
 
@@ -238,6 +261,7 @@ command_t commands[] = {
 	{"stop",	com_stop,	"Stop transport"},
 	{"tempo",	com_tempo,	"Set beat tempo <beats_per_min>"},
 	{"timeout",	com_timeout,	"Set sync timeout in <seconds>"},
+	{"toggle",	com_toggle,	"Toggle transport rolling"},
 	{"?",		com_help,	"Synonym for `help'" },
 	{(char *)NULL, (cmd_function_t *)NULL, (char *)NULL }
 };
