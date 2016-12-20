@@ -230,7 +230,7 @@ static void com_toggle(char *arg)
 		fprintf(stderr, "state: Starting - no transport toggling");
 		break;
 	default:
-		fprintf(stderr, "state: Starting - no transport toggling");
+		fprintf(stderr, "unexpected state: no transport toggling");
 	} 
 }
 
