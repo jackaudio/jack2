@@ -27,7 +27,9 @@
 #include <stdio.h>
 #include <signal.h>
 #include <dlfcn.h>
-#include <execinfo.h>
+#ifdef HAVE_EXECINFO_H
+# include <execinfo.h>
+#endif
 #include <errno.h>
 #ifndef NO_CPP_DEMANGLE
 char * __cxa_demangle(const char * __mangled_name, char * __output_buffer, size_t * __length, int * __status);
@@ -161,12 +163,16 @@ static void signal_segv(int signum, siginfo_t* info, void*ptr) {
         bp = (void**)bp[0];
     }
 #else
+# ifdef HAVE_EXECINFO_H
     jack_error("Stack trace (non-dedicated):");
     sz = backtrace(bt, 20);
     strings = backtrace_symbols(bt, sz);
 
     for(i = 0; i < sz; ++i)
         jack_error("%s", strings[i]);
+# else
+    jack_error("Stack trace not available");
+# endif
 #endif
     jack_error("End of stack trace");
     exit (-1);

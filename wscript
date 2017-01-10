@@ -488,6 +488,12 @@ def configure(conf):
         defines=['_GNU_SOURCE'],
         mandatory=False)
 
+    # Check for backtrace support
+    conf.check(
+        header_name='execinfo.h',
+        define_name='HAVE_EXECINFO_H',
+        mandatory=False)
+
     conf.recurse('common')
     if Options.options.dbus:
         conf.recurse('dbus')
