@@ -264,7 +264,7 @@ int main(int argc, char** argv)
             print_version();
         }
     }
-    const char *options = "-d:X:I:P:uvshVrRL:STFl:t:mn:p:"
+    const char *options = "-d:X:I:P:uvshrRL:STFl:t:mn:p:"
         "a:"
 #ifdef __linux__
         "c:"
@@ -292,7 +292,6 @@ int main(int argc, char** argv)
                                        { "realtime-priority", 1, 0, 'P' },
                                        { "timeout", 1, 0, 't' },
                                        { "temporary", 0, 0, 'T' },
-                                       { "version", 0, 0, 'V' },
                                        { "silent", 0, 0, 's' },
                                        { "sync", 0, 0, 'S' },
                                        { "autoconnect", 1, 0, 'a' },
@@ -305,7 +304,6 @@ int main(int argc, char** argv)
     char** master_driver_args = NULL;
     int master_driver_nargs = 1;
     int loopback = 0;
-    bool show_version = false;
     jackctl_sigmask_t * sigmask;
     jackctl_parameter_t* param;
     union jackctl_parameter_value value;
