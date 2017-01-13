@@ -484,13 +484,6 @@ int main(int argc, char** argv)
                 }
                 break;
 
-            case 'V':
-                //TODO unreachable (refactoring needed)
-                fprintf(stderr, "should not be reachable.\n");
-                return -1;
-                show_version = true;
-                break;
-
             default:
                 fprintf(stderr, "unknown option character %c\n", optopt);
                 /*fallthru*/
@@ -506,10 +499,6 @@ int main(int argc, char** argv)
     if (param != NULL) {
         value.b = replace_registry;
         jackctl_parameter_set_value(param, &value);
-    }
-
-    if (show_version) {
-        //TODO refactor unreachable
     }
 
     if (!master_driver_name) {
