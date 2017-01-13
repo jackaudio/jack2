@@ -260,7 +260,7 @@ int main(int argc, char** argv)
     int replace_registry = 0;
 
     for(int a = 1; a < argc; ++a) {
-        if(strstr(argv[a], "--version") || strstr(argv[a], "-V")) {
+        if( !strcmp(argv[a], "--version") || !strcmp(argv[a], "-V") ) {
             print_version();
         }
     }
