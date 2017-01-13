@@ -241,6 +241,15 @@ static void usage(FILE* file, jackctl_server_t *server, bool full = true)
 // Prototype to be found in libjackserver
 extern "C" void silent_jack_error_callback(const char *desc);
 
+void print_version()
+{
+    printf( "jackdmp version " VERSION " tmpdir "
+            jack_server_dir " protocol %d" "\n",
+            JACK_PROTOCOL_VERSION);
+    exit(-1);
+
+}
+
 int main(int argc, char** argv)
 {
     jackctl_server_t * server_ctl;
@@ -249,7 +258,13 @@ int main(int argc, char** argv)
     jackctl_driver_t * master_driver_ctl;
     jackctl_driver_t * loopback_driver_ctl = NULL;
     int replace_registry = 0;
-    const char *options = "-d:X:I:P:uvshVrRL:STFl:t:mn:p:"
+
+    for(int a = 1; a < argc; ++a) {
+        if( !strcmp(argv[a], "--version") || !strcmp(argv[a], "-V") ) {
+            print_version();
+        }
+    }
+    const char *options = "-d:X:I:P:uvshrRL:STFl:t:mn:p:"
         "a:"
 #ifdef __linux__
         "c:"
@@ -277,7 +292,6 @@ int main(int argc, char** argv)
                                        { "realtime-priority", 1, 0, 'P' },
                                        { "timeout", 1, 0, 't' },
                                        { "temporary", 0, 0, 'T' },
-                                       { "version", 0, 0, 'V' },
                                        { "silent", 0, 0, 's' },
                                        { "sync", 0, 0, 'S' },
                                        { "autoconnect", 1, 0, 'a' },
@@ -290,7 +304,6 @@ int main(int argc, char** argv)
     char** master_driver_args = NULL;
     int master_driver_nargs = 1;
     int loopback = 0;
-    bool show_version = false;
     jackctl_sigmask_t * sigmask;
     jackctl_parameter_t* param;
     union jackctl_parameter_value value;
@@ -469,10 +482,6 @@ int main(int argc, char** argv)
                 }
                 break;
 
-            case 'V':
-                show_version = true;
-                break;
-
             default:
                 fprintf(stderr, "unknown option character %c\n", optopt);
                 /*fallthru*/
@@ -488,14 +497,6 @@ int main(int argc, char** argv)
     if (param != NULL) {
         value.b = replace_registry;
         jackctl_parameter_set_value(param, &value);
-    }
-
-    if (show_version) {
-        printf( "jackdmp version " VERSION
-                " tmpdir " jack_server_dir
-                " protocol %d"
-                "\n", JACK_PROTOCOL_VERSION);
-        return -1;
     }
 
     if (!master_driver_name) {
