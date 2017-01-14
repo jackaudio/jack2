@@ -199,7 +199,7 @@ static inline __m128i float_24_sse(__m128 s)
 static unsigned int seed = 22222;
 
 static inline unsigned int fast_rand() {
-	seed = (seed * 96314165) + 907633515;
+	seed = (seed * 196314165) + 907633515;
 	return seed;
 }
 
