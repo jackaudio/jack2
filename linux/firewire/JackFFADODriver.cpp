@@ -403,6 +403,11 @@ JackFFADODriver::ffado_driver_new (const char *name,
 //         driver->client = client;
     driver->engine = NULL;
 
+    //from jack1 ffado_driver.c: put arg -dxxx to ffado device_info_t struct
+    driver->device_info.nb_device_spec_strings=1;
+    driver->device_info.device_spec_strings=(char**)calloc(1, sizeof(char *));
+    driver->device_info.device_spec_strings[0]=strdup(params->device_info);
+
     memset(&driver->device_options, 0, sizeof(driver->device_options));
     driver->device_options.sample_rate = params->sample_rate;
     driver->device_options.period_size = params->period_size;
