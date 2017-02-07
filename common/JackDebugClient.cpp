@@ -58,7 +58,7 @@ JackDebugClient::~JackDebugClient()
     if (fOpenPortNumber != 0)
         *fStream << "!!! WARNING !!! Some ports have not been unregistered ! Incorrect exiting !" << endl;
     if (fIsDeactivated != fIsActivated)
-        *fStream << "!!! ERROR !!! Client seem to not perform symetric activation-deactivation ! (not the same number of activate and deactivate)" << endl;
+        *fStream << "!!! ERROR !!! Client seem to not perform symmetric activation-deactivation ! (not the same number of activate and deactivate)" << endl;
     if (fIsClosed == 0)
         *fStream << "!!! ERROR !!! Client have not been closed with jack_client_close() !" << endl;
 
