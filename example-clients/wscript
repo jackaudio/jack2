@@ -28,7 +28,8 @@ example_programs = {
     'jack_net_master' : 'netmaster.c',
     'jack_latent_client' : 'latent_client.c',
     'jack_midi_dump' : 'midi_dump.c',
-    'jack_midi_latency_test' : 'midi_latency_test.c'
+    'jack_midi_latency_test' : 'midi_latency_test.c',
+    'jack_simdtests' : 'simdtests.cpp'
     }
 
 example_libs = {
