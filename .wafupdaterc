@@ -133,6 +133,4 @@ WAFLIB_STRIP_EXTRAS="
     valadoc
     why
     win32_opts
-    xcode
-    xcode6
 "

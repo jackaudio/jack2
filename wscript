@@ -387,6 +387,9 @@ def options(opt):
     opt.load('compiler_cxx')
     opt.load('compiler_c')
 
+    opt.load('xcode')
+    opt.load('xcode6')
+
     # install directories
     opt.add_option('--htmldir', type='string', default=None, help="HTML documentation directory [Default: <prefix>/share/jack-audio-connection-kit/reference/html/")
     opt.add_option('--libdir', type='string', help="Library directory [Default: <prefix>/lib]")
@@ -477,6 +480,9 @@ def configure(conf):
 
     conf.env.append_unique('CXXFLAGS', '-Wall')
     conf.env.append_unique('CFLAGS', '-Wall')
+
+    if conf.env['IS_MACOSX']:
+        conf.check(lib='aften', uselib='AFTEN', define_name='AFTEN')
 
     # configure all auto options
     configure_auto_options(conf)
@@ -722,7 +728,8 @@ def build_jackd(bld):
         includes = ['.', 'common', 'common/jack'],
         target = 'jackd',
         source = ['common/Jackdmp.cpp'],
-        use = ['serverlib'])
+        use = ['serverlib']
+    )
 
     if bld.env['BUILD_JACKDBUS']:
         jackd.source += ['dbus/audio_reserve.c', 'dbus/reserve.c']
@@ -732,8 +739,8 @@ def build_jackd(bld):
         jackd.use += ['DL', 'M', 'PTHREAD', 'RT', 'STDC++']
 
     if bld.env['IS_MACOSX']:
-        bld.framework = ['CoreFoundation']
         jackd.use += ['DL', 'PTHREAD']
+        jackd.framework = ['CoreFoundation']
 
     if bld.env['IS_SUN']:
         jackd.use += ['DL', 'PTHREAD']
@@ -744,6 +751,15 @@ def build_jackd(bld):
 
 # FIXME: Is SERVER_SIDE needed?
 def create_driver_obj(bld, **kw):
+    if bld.env['IS_MACOSX'] or bld.env['IS_WINDOWS']:
+        # On MacOSX this is necessary.
+        # I do not know if this is necessary on Windows.
+        # Note added on 2015-12-13 by lilrc.
+        if 'use' in kw:
+            kw['use'] += ['serverlib']
+        else:
+            kw['use'] = ['serverlib']
+
     driver = bld(
         features = ['c', 'cshlib', 'cxx', 'cxxshlib'],
         defines = ['HAVE_CONFIG_H', 'SERVER_SIDE'],
@@ -814,19 +830,20 @@ def build_drivers(bld):
     ]
 
     coreaudio_src = [
-        'macosx/coreaudio/JackCoreAudioDriver.cpp'
+        'macosx/coreaudio/JackCoreAudioDriver.mm',
+        'common/JackAC3Encoder.cpp'
     ]
 
     coremidi_src = [
-        'macosx/coremidi/JackCoreMidiInputPort.cpp',
-        'macosx/coremidi/JackCoreMidiOutputPort.cpp',
-        'macosx/coremidi/JackCoreMidiPhysicalInputPort.cpp',
-        'macosx/coremidi/JackCoreMidiPhysicalOutputPort.cpp',
-        'macosx/coremidi/JackCoreMidiVirtualInputPort.cpp',
-        'macosx/coremidi/JackCoreMidiVirtualOutputPort.cpp',
-        'macosx/coremidi/JackCoreMidiPort.cpp',
-        'macosx/coremidi/JackCoreMidiUtil.cpp',
-        'macosx/coremidi/JackCoreMidiDriver.cpp'
+        'macosx/coremidi/JackCoreMidiInputPort.mm',
+        'macosx/coremidi/JackCoreMidiOutputPort.mm',
+        'macosx/coremidi/JackCoreMidiPhysicalInputPort.mm',
+        'macosx/coremidi/JackCoreMidiPhysicalOutputPort.mm',
+        'macosx/coremidi/JackCoreMidiVirtualInputPort.mm',
+        'macosx/coremidi/JackCoreMidiVirtualOutputPort.mm',
+        'macosx/coremidi/JackCoreMidiPort.mm',
+        'macosx/coremidi/JackCoreMidiUtil.mm',
+        'macosx/coremidi/JackCoreMidiDriver.mm'
     ]
 
     ffado_src = [
@@ -929,21 +946,21 @@ def build_drivers(bld):
             bld,
             target = 'portaudio',
             source = portaudio_src,
-            use = ['serverlib', 'PORTAUDIO']) # FIXME: Is serverlib needed here?
+            use = ['PORTAUDIO'])
 
     if bld.env['BUILD_DRIVER_WINMME']:
         create_driver_obj(
             bld,
             target = 'winmme',
             source = winmme_src,
-            use = ['serverlib', 'WINMME']) # FIXME: Is serverlib needed here?
+            use = ['WINMME'])
 
     if bld.env['IS_MACOSX']:
         create_driver_obj(
             bld,
             target = 'coreaudio',
             source = coreaudio_src,
-            use = ['serverlib'], # FIXME: Is this needed?
+            use = ['AFTEN'],
             framework = ['AudioUnit', 'CoreAudio', 'CoreServices'])
 
         create_driver_obj(
@@ -951,7 +968,7 @@ def build_drivers(bld):
             target = 'coremidi',
             source = coremidi_src,
             use = ['serverlib'], # FIXME: Is this needed?
-            framework = ['AudioUnit', 'CoreMIDI', 'CoreServices'])
+            framework = ['AudioUnit', 'CoreMIDI', 'CoreServices', 'Foundation'])
 
     if bld.env['IS_SUN']:
         create_driver_obj(
@@ -1071,3 +1088,9 @@ def dist(ctx):
     # This code blindly assumes it is working in the toplevel source directory.
     if not os.path.exists('svnversion.h'):
         os.system('./svnversion_regenerate.sh svnversion.h')
+
+from waflib import TaskGen
+@TaskGen.extension('.mm')
+def mm_hook(self, node):
+	"""Alias .mm files to be compiled the same as .cpp files, gcc will do the right thing."""
+	return self.create_compiled_task('cxx', node)

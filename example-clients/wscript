@@ -66,14 +66,13 @@ def build(bld):
         else:
             use = ['clientlib']
 
-        prog = bld(features='c cprogram')
+        if bld.env['IS_MACOSX']:
+            prog = bld(features='c cprogram', framework = ["Foundation"])
+        else:
+            prog = bld(features='c cprogram')
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = example_program_source
         prog.use = use
-        if bld.env['IS_MACOSX']:
-            prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
-            #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc -arch x86_64")
-            prog.env.append_value("LINKFLAGS", "")
         if bld.env['IS_LINUX']:
             prog.use += ['RT', 'M']
         if bld.env['IS_SUN']:
@@ -86,10 +85,6 @@ def build(bld):
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = 'transport.c'
         prog.use = ['clientlib']
-        if bld.env['IS_MACOSX']:
-            prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
-            #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc -arch x86_64")
-            prog.env.append_value("LINKFLAGS", "")
         if bld.env['IS_LINUX']:
             prog.use += ['RT', 'READLINE']
         if bld.env['IS_MACOSX']:
@@ -104,9 +99,6 @@ def build(bld):
         prog.source = 'capture_client.c'
         prog.use = ['clientlib']
         if bld.env['IS_MACOSX']:
-            prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
-            #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc -arch x86_64")
-            prog.env.append_value("LINKFLAGS", "")
             prog.use += ['SNDFILE']
         if bld.env['IS_LINUX']:
             prog.use += ['RT', 'SNDFILE']
@@ -147,10 +139,6 @@ def build(bld):
         lib.includes = os_incdir + ['../common/jack', '../common']
         lib.target = example_lib
         lib.source = example_lib_source
-        if bld.env['IS_MACOSX']:
-            lib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc -arch x86_64")
-            #lib.env.append_value("LINKFLAGS", "-arch i386 -arch ppc -arch x86_64")
-            lib.env.append_value("LINKFLAGS", "")
         if bld.env['IS_SUN']:
             lib.env.append_value("LINKFLAGS", "-lm")
         lib.use = 'serverlib'
