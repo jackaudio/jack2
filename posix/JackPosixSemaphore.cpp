@@ -102,6 +102,11 @@ bool JackPosixSemaphore::Wait()
 {
     int res;
 
+    if (!fSemaphore) {
+        jack_error("JackPosixSemaphore::Wait name = %s already deallocated!!", fName);
+        return false;
+    }
+
     while ((res = sem_wait(fSemaphore) < 0)) {
         jack_error("JackPosixSemaphore::Wait name = %s err = %s", fName, strerror(errno));
         if (errno != EINTR) {
