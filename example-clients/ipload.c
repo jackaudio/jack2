@@ -32,11 +32,17 @@ char *intclient_name;
 char *load_name;
 char *load_init = "";
 char *server_name = NULL;
+int autoclose_opt = 0;
 int wait_opt = 0;
+volatile int idling = 1;
 
 static void
 signal_handler (int sig)
 {
+	/* do nothing if internal client closed itself */
+	if (idling == 0)
+		return;
+
 	jack_status_t status;
 
 	fprintf (stderr, "signal received, unloading...");
@@ -45,8 +51,24 @@ signal_handler (int sig)
 		fprintf (stderr, "(failed), status = 0x%2.0x\n", status);
 	else
 		fprintf (stderr, "(succeeded)\n");
+	if (autoclose_opt)
+		jack_deactivate(client);
 	jack_client_close (client);
 	exit (0);
+}
+
+static void
+registration_callback (const char *name, int reg, void *arg)
+{
+	if (reg || strcmp(intclient_name, name))
+		return;
+
+	/* this will stop the wait loop and thus close this application. */
+	idling = 0;
+	return;
+
+	/* unused */
+	(void)arg;
 }
 
 static void
@@ -56,6 +78,7 @@ show_usage ()
 		 "[ init-string]]\n\noptions:\n", client_name);
 	fprintf (stderr,
 		 "\t-h, --help \t\t print help message\n"
+		 "\t-a, --autoclose\t automatically close when intclient is unloaded\n"
 		 "\t-i, --init string\t initialize string\n"
 		 "\t-s, --server name\t select JACK server\n"
 		 "\t-w, --wait \t\t wait for signal, then unload\n"
@@ -68,9 +91,10 @@ parse_args (int argc, char *argv[])
 {
 	int c;
 	int option_index = 0;
-	char *short_options = "hi:s:w";
+	char *short_options = "hai:s:w";
 	struct option long_options[] = {
 		{ "help", 0, 0, 'h' },
+		{ "autoclose", 0, 0, 'a' },
 		{ "init", required_argument, 0, 'i' },
 		{ "server", required_argument, 0, 's' },
 		{ "wait", 0, 0, 'w' },
@@ -87,6 +111,9 @@ parse_args (int argc, char *argv[])
 	while ((c = getopt_long (argc, argv, short_options, long_options,
 				 &option_index)) >= 0) {
 		switch (c) {
+		case 'a':
+			autoclose_opt = 1;
+			break;
 		case 'i':
 			load_init = optarg;
 			break;
@@ -102,6 +129,10 @@ parse_args (int argc, char *argv[])
 			return 1;
 		}
 	}
+
+	/* autoclose makes no sense without wait */
+	if (autoclose_opt && ! wait_opt)
+		autoclose_opt = 0;
 
 	if (optind == argc) {		/* no positional args? */
 		show_usage ();
@@ -176,6 +207,11 @@ main (int argc, char *argv[])
 		free(name);
 	}
 
+	if (autoclose_opt) {
+		jack_set_client_registration_callback(client, registration_callback, NULL);
+		jack_activate(client);
+	}
+
 	if (wait_opt) {
 		/* define a signal handler to unload the client, then
 		 * wait for it to exit */
@@ -190,7 +226,7 @@ main (int argc, char *argv[])
 		signal(SIGINT, signal_handler);
 	#endif
 
-		while (1) {
+		while (idling) {
 			#ifdef WIN32
 				Sleep(1000);
 			#else
@@ -199,7 +235,11 @@ main (int argc, char *argv[])
 		}
 	}
 
-    jack_client_close(client);
+	if (autoclose_opt) {
+		jack_deactivate(client);
+	}
+
+	jack_client_close(client);
 	return 0;
 }
 
