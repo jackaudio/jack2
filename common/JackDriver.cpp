@@ -48,6 +48,7 @@ JackDriver::JackDriver(const char* name, const char* alias, JackLockedEngine* en
     fEngine = engine;
     fGraphManager = NULL;
     fBeginDateUst = 0;
+    fEndDateUst = 0;
     fDelayedUsecs = 0.f;
     fIsMaster = true;
     fIsRunning = false;
