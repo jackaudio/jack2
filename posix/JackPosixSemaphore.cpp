@@ -81,7 +81,6 @@ bool JackPosixSemaphore::SignalAll()
     return (res == 0);
 }
 
-/*
 bool JackPosixSemaphore::Wait()
 {
     int res;
@@ -90,17 +89,6 @@ bool JackPosixSemaphore::Wait()
         jack_error("JackPosixSemaphore::Wait name = %s already deallocated!!", fName);
         return false;
     }
-
-    if ((res = sem_wait(fSemaphore)) != 0) {
-        jack_error("JackPosixSemaphore::Wait name = %s err = %s", fName, strerror(errno));
-    }
-    return (res == 0);
-}
-*/
-
-bool JackPosixSemaphore::Wait()
-{
-    int res;
 
     while ((res = sem_wait(fSemaphore) < 0)) {
         jack_error("JackPosixSemaphore::Wait name = %s err = %s", fName, strerror(errno));
