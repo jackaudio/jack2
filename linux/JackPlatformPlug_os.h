@@ -54,8 +54,8 @@ namespace Jack { typedef JackPosixThread JackThread; }
 namespace Jack { typedef JackFifo JackSynchro; }
 */
 
-#include "JackPosixSemaphore.h"
-namespace Jack { typedef JackPosixSemaphore JackSynchro; }
+#include "JackLinuxFutex.h"
+namespace Jack { typedef JackLinuxFutex JackSynchro; }
 
 /* __JackPlatformChannelTransaction__ */
 /*

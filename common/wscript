@@ -83,10 +83,10 @@ def build(bld):
             'JackDebugClient.cpp',
             'timestamps.c',
             '../posix/JackPosixThread.cpp',
-            '../posix/JackPosixSemaphore.cpp',
             '../posix/JackPosixProcessSync.cpp',
             '../posix/JackPosixMutex.cpp',
             '../posix/JackSocket.cpp',
+            '../linux/JackLinuxFutex.cpp',
             '../linux/JackLinuxTime.c',
             ]
         includes = ['../linux', '../posix'] + includes
