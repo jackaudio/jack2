@@ -353,7 +353,7 @@ int process (jack_nframes_t nframes, void *arg) {
 
     delay = snd_pcm_avail( alsa_handle );
 
-    delay -= jack_frames_since_cycle_start( client );
+    delay -= round( jack_frames_since_cycle_start( client ) / static_resample_factor );
     // Do it the hard way.
     // this is for compensating xruns etc...
 
@@ -510,7 +510,7 @@ latency_cb (jack_latency_callback_mode_t mode, void *arg)
 	jack_latency_range_t range;
 	JSList *node;
 
-	range.min = range.max = target_delay;
+	range.min = range.max = round(target_delay * static_resample_factor);
 
 	if (mode == JackCaptureLatency) {
 		for (node = capture_ports; node; node = jack_slist_next (node)) {
