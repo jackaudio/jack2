@@ -52,6 +52,7 @@
 #include <sys/shm.h>
 #include <sys/sem.h>
 #include <stdlib.h>
+#include "gid.h"
 
 #endif
 
@@ -837,6 +838,7 @@ jack_shmalloc (const char *shm_name, jack_shmsize_t size, jack_shm_info_t* si)
 	int shm_fd;
 	int rc = -1;
 	char name[SHM_NAME_MAX+1];
+	const char* promiscuous;
 
 	if (jack_shm_lock_registry () < 0) {
         jack_error ("jack_shm_lock_registry fails...");
@@ -875,6 +877,21 @@ jack_shmalloc (const char *shm_name, jack_shmsize_t size, jack_shm_info_t* si)
 			    strerror (errno));
 		close (shm_fd);
 		goto unlock;
+	}
+
+	if ((promiscuous = getenv("JACK_PROMISCUOUS_SERVER")) != NULL) {
+		gid_t gid = jack_group2gid(promiscuous);
+		mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
+		if (gid >= 0) {
+			if (fchown(shm_fd, -1, gid) < 0) {
+				jack_log("Cannot chgrp shm segment %s (%s)", name, strerror (errno));
+			} else {
+				mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
+			}
+		}
+		if (fchmod(shm_fd, mode) < 0) {
+			jack_log("Cannot chmod shm segment %s (%s)", name, strerror (errno));
+		}
 	}
 
 	close (shm_fd);

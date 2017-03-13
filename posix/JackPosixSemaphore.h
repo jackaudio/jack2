@@ -39,6 +39,10 @@ class SERVER_EXPORT JackPosixSemaphore : public detail::JackSynchro
     private:
 
         sem_t* fSemaphore;
+        bool fPromiscuous;
+#ifdef __linux__
+        int fPromiscuousGid;
+#endif
 
     protected:
 
@@ -46,8 +50,7 @@ class SERVER_EXPORT JackPosixSemaphore : public detail::JackSynchro
 
     public:
 
-        JackPosixSemaphore():JackSynchro(), fSemaphore(NULL)
-        {}
+        JackPosixSemaphore();
 
         bool Signal();
         bool SignalAll();
