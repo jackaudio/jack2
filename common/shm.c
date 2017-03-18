@@ -52,6 +52,7 @@
 #include <sys/shm.h>
 #include <sys/sem.h>
 #include <stdlib.h>
+#include "promiscuous.h"
 
 #endif
 
@@ -837,6 +838,7 @@ jack_shmalloc (const char *shm_name, jack_shmsize_t size, jack_shm_info_t* si)
 	int shm_fd;
 	int rc = -1;
 	char name[SHM_NAME_MAX+1];
+	const char* promiscuous;
 
 	if (jack_shm_lock_registry () < 0) {
         jack_error ("jack_shm_lock_registry fails...");
@@ -876,6 +878,10 @@ jack_shmalloc (const char *shm_name, jack_shmsize_t size, jack_shm_info_t* si)
 		close (shm_fd);
 		goto unlock;
 	}
+
+	promiscuous = getenv("JACK_PROMISCUOUS_SERVER");
+	if ((promiscuous != NULL) && (jack_promiscuous_perms(shm_fd, name, jack_group2gid(promiscuous)) < 0))
+		goto unlock;
 
 	close (shm_fd);
 	registry->size = size;
