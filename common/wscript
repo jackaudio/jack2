@@ -82,6 +82,7 @@ def build(bld):
         common_libsources += [
             'JackDebugClient.cpp',
             'timestamps.c',
+            'promiscuous.c',
             '../posix/JackPosixThread.cpp',
             '../posix/JackPosixProcessSync.cpp',
             '../posix/JackPosixMutex.cpp',
@@ -97,6 +98,7 @@ def build(bld):
         common_libsources += [
             'JackDebugClient.cpp',
             'timestamps.c',
+            'promiscuous.c',
            '../posix/JackPosixThread.cpp',
            '../posix/JackFifo.cpp',
            '../posix/JackPosixProcessSync.cpp',
@@ -111,6 +113,7 @@ def build(bld):
         common_libsources += [
             'JackDebugClient.cpp',
             'timestamps.c',
+            'promiscuous.c',
             '../posix/JackPosixProcessSync.cpp',
             '../posix/JackPosixThread.cpp',
             '../posix/JackPosixMutex.cpp',
