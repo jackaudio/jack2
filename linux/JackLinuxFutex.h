@@ -53,6 +53,8 @@ class SERVER_EXPORT JackLinuxFutex : public detail::JackSynchro
         int fSharedMem;
         FutexData* fFutex;
         bool fPrivate;
+        bool fPromiscuous;
+        int fPromiscuousGid;
 
     protected:
 
@@ -60,8 +62,7 @@ class SERVER_EXPORT JackLinuxFutex : public detail::JackSynchro
 
     public:
 
-        JackLinuxFutex():JackSynchro(), fSharedMem(-1), fFutex(NULL), fPrivate(false)
-        {}
+        JackLinuxFutex();
 
         bool Signal();
         bool SignalAll();

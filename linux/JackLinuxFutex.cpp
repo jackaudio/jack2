@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackTools.h"
 #include "JackConstants.h"
 #include "JackError.h"
+#include "promiscuous.h"
 #include <fcntl.h>
 #include <stdio.h>
 #include <sys/mman.h>
@@ -31,11 +32,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
+JackLinuxFutex::JackLinuxFutex() : JackSynchro(), fSharedMem(-1), fFutex(NULL), fPrivate(false)
+{
+    const char* promiscuous = getenv("JACK_PROMISCUOUS_SERVER");
+    fPromiscuous = (promiscuous != NULL);
+    fPromiscuousGid = jack_group2gid(promiscuous);
+}
+
 void JackLinuxFutex::BuildName(const char* client_name, const char* server_name, char* res, int size)
 {
     char ext_client_name[SYNC_MAX_NAME_SIZE + 1];
     JackTools::RewriteName(client_name, ext_client_name);
-    if (getenv("JACK_PROMISCUOUS_SERVER")) {
+    if (fPromiscuous) {
         snprintf(res, size, "jack_sem.%s_%s", server_name, ext_client_name);
     } else {
         snprintf(res, size, "jack_sem.%d_%s_%s", JackTools::GetUID(), server_name, ext_client_name);
@@ -131,6 +139,13 @@ bool JackLinuxFutex::Allocate(const char* name, const char* server_name, int val
     }
 
     ftruncate(fSharedMem, sizeof(FutexData));
+
+    if (fPromiscuous && (jack_promiscuous_perms(fSharedMem, fName, fPromiscuousGid) < 0)) {
+        close(fSharedMem);
+        fSharedMem = -1;
+        shm_unlink(fName);
+        return false;
+    }
 
     if ((fFutex = (FutexData*)mmap(NULL, sizeof(FutexData), PROT_READ|PROT_WRITE, MAP_SHARED|MAP_LOCKED, fSharedMem, 0)) == NULL) {
         jack_error("Allocate: can't check in named futex name = %s err = %s", fName, strerror(errno));
