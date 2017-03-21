@@ -464,7 +464,6 @@ namespace Jack
         fTxHeader.fSubCycle = 0;
         fTxHeader.fDataType = 's';
         fTxHeader.fIsLastPckt = (fParams.fSendMidiChannels == 0 && fParams.fSendAudioChannels == 0) ? 1 : 0;
-        fTxHeader.fPacketSize = HEADER_SIZE + fTxHeader.fActivePorts * sizeof(int); // Data part is used to encode active ports
       
         memcpy(fTxBuffer, &fTxHeader, HEADER_SIZE);
         //PacketHeaderDisplay(&fTxHeader);
@@ -559,7 +558,8 @@ namespace Jack
     {
         // This method contains every step of sync packet informations coding
         // first of all, clear sync packet
-        memset(fTxData, 0, PACKET_AVAILABLE_SIZE(&fParams));
+        char* sync_data = fTxData;
+        memset(sync_data, 0, PACKET_AVAILABLE_SIZE(&fParams));
     
         // Transport not used for now...
         /*
@@ -568,27 +568,33 @@ namespace Jack
             EncodeTransportData();
             TransportDataHToN(&fSendTransportData, &fSendTransportData);
             // copy to TxBuffer
-            memcpy(fTxData, &fSendTransportData, sizeof(net_transport_data_t));
+            memcpy(sync_data, &fSendTransportData, sizeof(net_transport_data_t));
+            sync_data += sizeof(net_transport_data_t);
         }
         // then others (freewheel etc.)
         // ...
         */
    
         // Write active ports list
-        fTxHeader.fActivePorts = (fNetAudioPlaybackBuffer) ? fNetAudioPlaybackBuffer->ActivePortsToNetwork(fTxData) : 0;
+        fTxHeader.fActivePorts = (fNetAudioPlaybackBuffer) ? fNetAudioPlaybackBuffer->ActivePortsToNetwork(sync_data) : 0;
+        sync_data += fTxHeader.fActivePorts * sizeof(int);
+
         fTxHeader.fFrames = frames;
+        fTxHeader.fPacketSize = HEADER_SIZE + (sync_data - fTxData);
     }
 
     void JackNetMasterInterface::DecodeSyncPacket(int& frames)
     {
         // This method contains every step of sync packet informations decoding process
-        
+        char* sync_data = fRxData;
+
         // Transport not used for now...
         /*
         // first : transport
         if (fParams.fTransportSync) {
             // copy received transport data to transport data structure
-            memcpy(&fReturnTransportData, fRxData, sizeof(net_transport_data_t));
+            memcpy(&fReturnTransportData, sync_data, sizeof(net_transport_data_t));
+            sync_data += sizeof(net_transport_data_t);
             TransportDataNToH(&fReturnTransportData,  &fReturnTransportData);
             DecodeTransportData();
         }
@@ -600,7 +606,7 @@ namespace Jack
 
         // Read active ports list
         if (fNetAudioCaptureBuffer) {
-            fNetAudioCaptureBuffer->ActivePortsFromNetwork(fRxData, rx_head->fActivePorts);
+            fNetAudioCaptureBuffer->ActivePortsFromNetwork(sync_data, rx_head->fActivePorts);
         }
         frames = rx_head->fFrames;
     }
@@ -942,7 +948,6 @@ namespace Jack
         fTxHeader.fSubCycle = 0;
         fTxHeader.fDataType = 's';
         fTxHeader.fIsLastPckt = (fParams.fReturnMidiChannels == 0 && fParams.fReturnAudioChannels == 0) ? 1 : 0;
-        fTxHeader.fPacketSize = HEADER_SIZE + fTxHeader.fActivePorts * sizeof(int); // Data part is used to encode active ports
     
         memcpy(fTxBuffer, &fTxHeader, HEADER_SIZE);
         //PacketHeaderDisplay(&fTxHeader);
@@ -962,7 +967,8 @@ namespace Jack
     {
         // This method contains every step of sync packet informations coding
         // first of all, clear sync packet
-        memset(fTxData, 0, PACKET_AVAILABLE_SIZE(&fParams));
+        char* sync_data = fTxData;
+        memset(sync_data, 0, PACKET_AVAILABLE_SIZE(&fParams));
 
         // then first step : transport
         // Transport is not used for now...
@@ -971,27 +977,33 @@ namespace Jack
             EncodeTransportData();
             TransportDataHToN(&fReturnTransportData, &fReturnTransportData);
             // copy to TxBuffer
-            memcpy(fTxData, &fReturnTransportData, sizeof(net_transport_data_t));
+            memcpy(sync_data, &fReturnTransportData, sizeof(net_transport_data_t));
+            sync_data += sizeof(net_transport_data_t);
         }
         // then others
         // ...
         */
 
         // Write active ports list
-        fTxHeader.fActivePorts = (fNetAudioCaptureBuffer) ? fNetAudioCaptureBuffer->ActivePortsToNetwork(fTxData) : 0;
+        fTxHeader.fActivePorts = (fNetAudioCaptureBuffer) ? fNetAudioCaptureBuffer->ActivePortsToNetwork(sync_data) : 0;
+        sync_data += fTxHeader.fActivePorts * sizeof(int);
+
         fTxHeader.fFrames = frames;
+        fTxHeader.fPacketSize = HEADER_SIZE + (sync_data - fTxData);
     }
 
     void JackNetSlaveInterface::DecodeSyncPacket(int& frames)
     {
         // This method contains every step of sync packet informations decoding process
-        
+        char* sync_data = fRxData;
+
         // Transport not used for now...
         /*
         // first : transport
         if (fParams.fTransportSync) {
             // copy received transport data to transport data structure
-            memcpy(&fSendTransportData, fRxData, sizeof(net_transport_data_t));
+            memcpy(&fSendTransportData, sync_data, sizeof(net_transport_data_t));
+            sync_data += sizeof(net_transport_data_t);
             TransportDataNToH(&fSendTransportData, &fSendTransportData);
             DecodeTransportData();
         }
@@ -1003,7 +1015,7 @@ namespace Jack
 
         // Read active ports list
         if (fNetAudioPlaybackBuffer) {
-            fNetAudioPlaybackBuffer->ActivePortsFromNetwork(fRxData, rx_head->fActivePorts);
+            fNetAudioPlaybackBuffer->ActivePortsFromNetwork(sync_data, rx_head->fActivePorts);
         }
         
         frames = rx_head->fFrames;
