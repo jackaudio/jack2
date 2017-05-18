@@ -176,7 +176,7 @@
 /* generates same as _mm_set_ps(1.f, 1.f, 1f., 1f) but faster  */
 static inline __m128 gen_one(void)
 {
-    volatile __m128i x;
+    volatile __m128i x = { 0 }; /* shut up, GCC */
     __m128i ones = _mm_cmpeq_epi32(x, x);
     return (__m128)_mm_slli_epi32 (_mm_srli_epi32(ones, 25), 23);
 }
