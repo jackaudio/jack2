@@ -11,7 +11,7 @@ import sys
 from waflib import Logs, Options, Task, Utils
 from waflib.Build import BuildContext, CleanContext, InstallContext, UninstallContext
 
-VERSION='1.9.11'
+VERSION='1.9.11-RC1'
 APPNAME='jack'
 JACK_API_VERSION = '0.1.0'
 

@@ -42,6 +42,10 @@ Filipe Coelho
   Jackdmp changes log
 ---------------------------
 
+2017-06-13 Filipe Coelho <falktx@gmail.com>
+
+	* Version 1.9.11-RC1
+
 2015-07-19 Filipe Coelho <falktx@gmail.com>
 
 	* Implement new jack_port_rename API
