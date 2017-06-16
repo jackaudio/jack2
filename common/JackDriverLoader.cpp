@@ -36,11 +36,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 static char* locate_dll_driver_dir()
 {
-#ifdef _WIN64
-    HMODULE libjack_handle = LoadLibrary("libjackserver64.dll");
-#else
-    HMODULE libjack_handle = LoadLibrary("libjackserver.dll");
-#endif
+    HMODULE libjack_handle = NULL;
+    GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                      reinterpret_cast<LPCSTR>(locate_dll_driver_dir), &libjack_handle);
 
     // For WIN32 ADDON_DIR is defined in JackConstants.h as relative path
     char driver_dir_storage[512];
@@ -52,11 +50,9 @@ static char* locate_dll_driver_dir()
         jack_info("Drivers/internals found in : %s", driver_dir_storage);
         strcat(driver_dir_storage, "/");
         strcat(driver_dir_storage, ADDON_DIR);
-        FreeLibrary(libjack_handle);
         return strdup(driver_dir_storage);
     } else {
         jack_error("Cannot get JACK dll directory : %d", GetLastError());
-        FreeLibrary(libjack_handle);
         return NULL;
     }
 }
