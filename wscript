@@ -391,10 +391,10 @@ def options(opt):
     opt.load('xcode6')
 
     # install directories
-    opt.add_option('--htmldir', type='string', default=None, help="HTML documentation directory [Default: <prefix>/share/jack-audio-connection-kit/reference/html/")
-    opt.add_option('--libdir', type='string', help="Library directory [Default: <prefix>/lib]")
-    opt.add_option('--libdir32', type='string', help="32bit Library directory [Default: <prefix>/lib32]")
-    opt.add_option('--mandir', type='string', help="Manpage directory [Default: <prefix>/share/man/man1]")
+    opt.add_option('--htmldir', type='string', default=None, help='HTML documentation directory [Default: <prefix>/share/jack-audio-connection-kit/reference/html/')
+    opt.add_option('--libdir', type='string', help='Library directory [Default: <prefix>/lib]')
+    opt.add_option('--libdir32', type='string', help='32bit Library directory [Default: <prefix>/lib32]')
+    opt.add_option('--mandir', type='string', help='Manpage directory [Default: <prefix>/share/man/man1]')
 
     # options affecting binaries
     opt.add_option('--platform', type='string', default=sys.platform, help='Target platform for cross-compiling, e.g. cygwin or win32')
@@ -404,10 +404,10 @@ def options(opt):
     # options affecting general jack functionality
     opt.add_option('--classic', action='store_true', default=False, help='Force enable standard JACK (jackd) even if D-Bus JACK (jackdbus) is enabled too')
     opt.add_option('--dbus', action='store_true', default=False, help='Enable D-Bus JACK (jackdbus)')
-    opt.add_option('--autostart', type='string', default="default", help='Autostart method. Possible values: "default", "classic", "dbus", "none"')
+    opt.add_option('--autostart', type='string', default='default', help='Autostart method. Possible values: "default", "classic", "dbus", "none"')
     opt.add_option('--profile', action='store_true', default=False, help='Build with engine profiling')
-    opt.add_option('--clients', default=64, type="int", dest="clients", help='Maximum number of JACK clients')
-    opt.add_option('--ports-per-application', default=768, type="int", dest="application_ports", help='Maximum number of ports per application')
+    opt.add_option('--clients', default=64, type='int', dest='clients', help='Maximum number of JACK clients')
+    opt.add_option('--ports-per-application', default=768, type='int', dest='application_ports', help='Maximum number of ports per application')
 
     # options with third party dependencies
     doxygen = add_auto_option(opt, 'doxygen', help='Build doxygen documentation', conf_dest='BUILD_DOXYGEN_DOCS')
@@ -509,19 +509,19 @@ def configure(conf):
     conf.recurse('example-clients')
 
     # test for the availability of ucontext, and how it should be used
-    for t in ("gp_regs", "uc_regs", "mc_gregs", "gregs"):
-        fragment = "#include <ucontext.h>\n"
-        fragment += "int main() { ucontext_t *ucontext; return (int) ucontext->uc_mcontext.%s[0]; }" % t
-        confvar = "HAVE_UCONTEXT_%s" % t.upper()
+    for t in ['gp_regs', 'uc_regs', 'mc_gregs', 'gregs']:
+        fragment = '#include <ucontext.h>\n'
+        fragment += 'int main() { ucontext_t *ucontext; return (int) ucontext->uc_mcontext.%s[0]; }' % t
+        confvar = 'HAVE_UCONTEXT_%s' % t.upper()
         conf.check_cc(fragment=fragment, define_name=confvar, mandatory=False,
-                      msg="Checking for ucontext->uc_mcontext.%s" % t)
+                      msg='Checking for ucontext->uc_mcontext.%s' % t)
         if conf.is_defined(confvar):
             conf.define('HAVE_UCONTEXT', 1)
 
-    fragment = "#include <ucontext.h>\n"
-    fragment += "int main() { return NGREG; }"
-    conf.check_cc(fragment=fragment, define_name="HAVE_NGREG", mandatory=False,
-                  msg="Checking for NGREG")
+    fragment = '#include <ucontext.h>\n'
+    fragment += 'int main() { return NGREG; }'
+    conf.check_cc(fragment=fragment, define_name='HAVE_NGREG', mandatory=False,
+                  msg='Checking for NGREG')
 
     conf.env['LIB_PTHREAD'] = ['pthread']
     conf.env['LIB_DL'] = ['dl']
@@ -565,10 +565,10 @@ def configure(conf):
         conf.env.append_unique('CFLAGS', '-g')
         conf.env.append_unique('LINKFLAGS', '-g')
 
-    if not Options.options.autostart in ["default", "classic", "dbus", "none"]:
-        conf.fatal("Invalid autostart value \"" + Options.options.autostart + "\"")
+    if not Options.options.autostart in ['default', 'classic', 'dbus' 'none']:
+        conf.fatal('Invalid autostart value "' + Options.options.autostart + '"')
 
-    if Options.options.autostart == "default":
+    if Options.options.autostart == 'default':
         if conf.env['BUILD_JACKD']:
             conf.env['AUTOSTART_METHOD'] = 'classic'
         else:
@@ -576,14 +576,14 @@ def configure(conf):
     else:
         conf.env['AUTOSTART_METHOD'] = Options.options.autostart
 
-    if conf.env['AUTOSTART_METHOD'] == "dbus" and not conf.env['BUILD_JACKDBUS']:
-        conf.fatal("D-Bus autostart mode was specified but jackdbus will not be built")
-    if conf.env['AUTOSTART_METHOD'] == "classic" and not conf.env['BUILD_JACKD']:
-        conf.fatal("Classic autostart mode was specified but jackd will not be built")
+    if conf.env['AUTOSTART_METHOD'] == 'dbus' and not conf.env['BUILD_JACKDBUS']:
+        conf.fatal('D-Bus autostart mode was specified but jackdbus will not be built')
+    if conf.env['AUTOSTART_METHOD'] == 'classic' and not conf.env['BUILD_JACKD']:
+        conf.fatal('Classic autostart mode was specified but jackd will not be built')
 
-    if conf.env['AUTOSTART_METHOD'] == "dbus":
+    if conf.env['AUTOSTART_METHOD'] == 'dbus':
         conf.define('USE_LIBDBUS_AUTOLAUNCH', 1)
-    elif conf.env['AUTOSTART_METHOD'] == "classic":
+    elif conf.env['AUTOSTART_METHOD'] == 'classic':
         conf.define('USE_CLASSIC_AUTOLAUNCH', 1)
 
     conf.define('CLIENT_NUM', Options.options.clients)
@@ -634,18 +634,18 @@ def configure(conf):
 
     print()
     print('==================')
-    version_msg = "JACK " + VERSION
+    version_msg = 'JACK ' + VERSION
     if svnrev:
-        version_msg += " exported from r" + svnrev
+        version_msg += ' exported from r' + svnrev
     else:
-        version_msg += " svn revision will checked and eventually updated during build"
+        version_msg += ' svn revision will checked and eventually updated during build'
     print(version_msg)
 
     conf.msg('Maximum JACK clients', Options.options.clients, color='NORMAL')
     conf.msg('Maximum ports per application', Options.options.application_ports, color='NORMAL')
 
     conf.msg('Install prefix', conf.env['PREFIX'], color='CYAN')
-    conf.msg('Library directory', conf.all_envs[""]['LIBDIR'], color='CYAN')
+    conf.msg('Library directory', conf.all_envs['']['LIBDIR'], color='CYAN')
     if conf.env['BUILD_WITH_32_64']:
         conf.msg('32-bit library directory', conf.all_envs[lib32]['LIBDIR'], color='CYAN')
     conf.msg('Drivers directory', conf.env['ADDON_DIR'], color='CYAN')
@@ -659,7 +659,7 @@ def configure(conf):
     for name,vars in tool_flags:
         flags = []
         for var in vars:
-            flags += conf.all_envs[""][var]
+            flags += conf.all_envs[''][var]
         conf.msg(name, repr(flags), color='NORMAL')
 
     if conf.env['BUILD_WITH_32_64']:
@@ -685,11 +685,11 @@ def configure(conf):
 
         if conf.env['DBUS_SERVICES_DIR'] != conf.env['DBUS_SERVICES_DIR_REAL']:
             print()
-            print(Logs.colors.RED + "WARNING: D-Bus session services directory as reported by pkg-config is")
-            print(Logs.colors.RED + "WARNING:", end=' ')
+            print(Logs.colors.RED + 'WARNING: D-Bus session services directory as reported by pkg-config is')
+            print(Logs.colors.RED + 'WARNING:', end=' ')
             print(Logs.colors.CYAN + conf.env['DBUS_SERVICES_DIR_REAL'])
             print(Logs.colors.RED + 'WARNING: but service file will be installed in')
-            print(Logs.colors.RED + "WARNING:", end=' ')
+            print(Logs.colors.RED + 'WARNING:', end=' ')
             print(Logs.colors.CYAN + conf.env['DBUS_SERVICES_DIR'])
             print(Logs.colors.RED + 'WARNING: You may need to adjust your D-Bus configuration after installing jackdbus')
             print('WARNING: You can override dbus service install directory')
@@ -761,7 +761,7 @@ def create_driver_obj(bld, **kw):
             kw['use'] = ['serverlib']
 
     driver = bld(
-        features = ['c', 'cshlib', 'cxx', 'cxxshlib'],
+        features = ['c', 'cxx', 'cshlib', 'cxxshlib'],
         defines = ['HAVE_CONFIG_H', 'SERVER_SIDE'],
         includes = ['.', 'common', 'common/jack'],
         install_path = '${ADDON_DIR}/',
@@ -1067,22 +1067,22 @@ def build(bld):
 
         if bld.cmd == 'install':
             if os.path.isdir(html_install_dir):
-                Logs.pprint('CYAN', "Removing old doxygen documentation installation...")
+                Logs.pprint('CYAN', 'Removing old doxygen documentation installation...')
                 shutil.rmtree(html_install_dir)
-                Logs.pprint('CYAN', "Removing old doxygen documentation installation done.")
-            Logs.pprint('CYAN', "Installing doxygen documentation...")
+                Logs.pprint('CYAN', 'Removing old doxygen documentation installation done.')
+            Logs.pprint('CYAN', 'Installing doxygen documentation...')
             shutil.copytree(html_build_dir, html_install_dir)
-            Logs.pprint('CYAN', "Installing doxygen documentation done.")
+            Logs.pprint('CYAN', 'Installing doxygen documentation done.')
         elif bld.cmd =='uninstall':
-            Logs.pprint('CYAN', "Uninstalling doxygen documentation...")
+            Logs.pprint('CYAN', 'Uninstalling doxygen documentation...')
             if os.path.isdir(share_dir):
                 shutil.rmtree(share_dir)
-            Logs.pprint('CYAN', "Uninstalling doxygen documentation done.")
+            Logs.pprint('CYAN', 'Uninstalling doxygen documentation done.')
         elif bld.cmd =='clean':
             if os.access(html_build_dir, os.R_OK):
-                Logs.pprint('CYAN', "Removing doxygen generated documentation...")
+                Logs.pprint('CYAN', 'Removing doxygen generated documentation...')
                 shutil.rmtree(html_build_dir)
-                Logs.pprint('CYAN', "Removing doxygen generated documentation done.")
+                Logs.pprint('CYAN', 'Removing doxygen generated documentation done.')
 
 def dist(ctx):
     # This code blindly assumes it is working in the toplevel source directory.
@@ -1092,5 +1092,5 @@ def dist(ctx):
 from waflib import TaskGen
 @TaskGen.extension('.mm')
 def mm_hook(self, node):
-	"""Alias .mm files to be compiled the same as .cpp files, gcc will do the right thing."""
-	return self.create_compiled_task('cxx', node)
+    """Alias .mm files to be compiled the same as .cpp files, gcc will do the right thing."""
+    return self.create_compiled_task('cxx', node)

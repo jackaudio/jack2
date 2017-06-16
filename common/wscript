@@ -10,12 +10,12 @@ def configure(conf):
 
     if conf.env['IS_WINDOWS']:
         try:
-            conf.check(function_name='regcomp', header_name='regex.h', lib='regex', uselib_store="REGEX", define_name='HAVE_REGEX_H')
+            conf.check(function_name='regcomp', header_name='regex.h', lib='regex', uselib_store='REGEX', define_name='HAVE_REGEX_H')
         except:
-            conf.check(function_name='regcomp', header_name='regex.h', lib='tre', uselib_store="REGEX", define_name='HAVE_REGEX_H')
-        conf.check(function_name='htons', header_name='winsock2.h', lib='ws2_32', uselib_store="WS2_32", define_name='HAVE_WINSOCK2_H')
-        conf.check(function_name='timeGetDevCaps', header_name=['windows.h', 'mmsystem.h'], lib='winmm', uselib_store="WINMM", define_name='HAVE_MMSYSTEM_H')
-        conf.check(function_name='EnumProcesses', header_name=['windows.h', 'psapi.h'], lib='psapi', uselib_store="PSAPI", define_name='HAVE_PSAPI_H')
+            conf.check(function_name='regcomp', header_name='regex.h', lib='tre', uselib_store='REGEX', define_name='HAVE_REGEX_H')
+        conf.check(function_name='htons', header_name='winsock2.h', lib='ws2_32', uselib_store='WS2_32', define_name='HAVE_WINSOCK2_H')
+        conf.check(function_name='timeGetDevCaps', header_name=['windows.h', 'mmsystem.h'], lib='winmm', uselib_store='WINMM', define_name='HAVE_MMSYSTEM_H')
+        conf.check(function_name='EnumProcesses', header_name=['windows.h', 'psapi.h'], lib='psapi', uselib_store='PSAPI', define_name='HAVE_PSAPI_H')
 
 def create_jack_process_obj(bld, target, sources, uselib = None, framework = None):
     process = bld(features = ['cxx', 'cxxshlib'])
@@ -36,10 +36,8 @@ def create_jack_process_obj(bld, target, sources, uselib = None, framework = Non
     process.name     = target
     process.target   = target
     process.source   = sources
-    if bld.env['IS_LINUX']:
-        process.env.append_value("CPPFLAGS", "-fvisibility=hidden")
-    if bld.env['IS_MACOSX']:
-        process.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+    if bld.env['IS_LINUX'] or bld.env['IS_MACOSX']:
+        process.env.append_value('CPPFLAGS', '-fvisibility=hidden')
     process.install_path = '${ADDON_DIR}/'
     process.use = [uselib.name]
     return process
@@ -76,7 +74,7 @@ def build(bld):
         includes.append('..')
     else:
         includes.append('../..')
-    uselib = ["PTHREAD", "CELT", "OPUS"]
+    uselib = ['PTHREAD', 'CELT', 'OPUS']
 
     if bld.env['IS_LINUX']:
         common_libsources += [
@@ -145,7 +143,7 @@ def build(bld):
          clientlib.install_path = '${BINDIR}'
     else:
          clientlib.install_path = '${LIBDIR}'
-    if bld.env['AUTOSTART_METHOD'] == "dbus":
+    if bld.env['AUTOSTART_METHOD'] == 'dbus':
         clientlib.use.append('DBUS-1')
     clientlib.includes = includes
     clientlib.name         = 'clientlib'
@@ -185,14 +183,14 @@ def build(bld):
     clientlib.vnum = bld.env['JACK_API_VERSION']
 
     if bld.env['IS_LINUX']:
-        clientlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+        clientlib.env.append_value('CPPFLAGS', '-fvisibility=hidden')
 
     if bld.env['IS_MACOSX']:
-        clientlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
-        clientlib.env.append_value("LINKFLAGS", "-single_module")
+        clientlib.env.append_value('CPPFLAGS', '-fvisibility=hidden')
+        clientlib.env.append_value('LINKFLAGS', '-single_module')
 
     if bld.env['IS_SUN']:
-        clientlib.env.append_value("LINKFLAGS", "-lnsl -lsocket")
+        clientlib.env.append_value('LINKFLAGS', '-lnsl -lsocket')
 
     if bld.variant:
         # if there is variant defined, we expect it to be the 32bit client lib one
@@ -284,14 +282,14 @@ def build(bld):
     serverlib.vnum = bld.env['JACK_API_VERSION']
 
     if bld.env['IS_LINUX']:
-        serverlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+        serverlib.env.append_value('CPPFLAGS', '-fvisibility=hidden')
 
     if bld.env['IS_MACOSX']:
-        serverlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
-        serverlib.env.append_value("LINKFLAGS", "-single_module")
+        serverlib.env.append_value('CPPFLAGS', '-fvisibility=hidden')
+        serverlib.env.append_value('LINKFLAGS', '-single_module')
 
     if bld.env['IS_SUN']:
-        serverlib.env.append_value("LINKFLAGS", "-lnsl -lsocket")
+        serverlib.env.append_value('LINKFLAGS', '-lnsl -lsocket')
 
     if bld.env['BUILD_NETLIB']:
         netlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
@@ -323,16 +321,16 @@ def build(bld):
 
         if bld.env['IS_LINUX']:
             netlib.source += ['../posix/JackNetUnixSocket.cpp','../posix/JackPosixThread.cpp', '../posix/JackPosixMutex.cpp', '../linux/JackLinuxTime.c']
-            netlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+            netlib.env.append_value('CPPFLAGS', '-fvisibility=hidden')
 
         if bld.env['IS_SUN']:
             netlib.source += ['../posix/JackNetUnixSocket.cpp','../posix/JackPosixThread.cpp', '../posix/JackPosixMutex.cpp', '../solaris/JackSolarisTime.c']
-            netlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
-       
+            netlib.env.append_value('CPPFLAGS', '-fvisibility=hidden')
+
 
         if bld.env['IS_MACOSX']:
             netlib.source += ['../posix/JackNetUnixSocket.cpp','../posix/JackPosixThread.cpp', '../posix/JackPosixMutex.cpp', '../macosx/JackMachThread.mm', '../macosx/JackMachTime.c']
-            netlib.env.append_value("LINKFLAGS", "-single_module")
+            netlib.env.append_value('LINKFLAGS', '-single_module')
 
         if bld.env['IS_WINDOWS']:
             netlib.source += ['../windows/JackNetWinSocket.cpp','../windows/JackWinThread.cpp', '../windows/JackMMCSS.cpp', '../windows/JackWinTime.c']
@@ -370,10 +368,10 @@ def build(bld):
               audio_adapter_sources,
               serverlib,
               framework = [
-                      "CoreAudio",
-                      "AudioUnit",
-                      "AudioToolbox",
-                      "CoreServices"
+                      'CoreAudio',
+                      'AudioUnit',
+                      'AudioToolbox',
+                      'CoreServices'
               ]
          )
          process.use += ['SAMPLERATE']
