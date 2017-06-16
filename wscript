@@ -453,7 +453,7 @@ def detect_platform(conf):
         ('IS_LINUX',   'Linux',   ['gnu0', 'gnukfreebsd', 'linux', 'posix']),
         ('IS_MACOSX',  'MacOS X', ['darwin']),
         ('IS_SUN',     'SunOS',   ['sunos']),
-        ('IS_WINDOWS', 'Windows', ['cygwin', 'win32'])
+        ('IS_WINDOWS', 'Windows', ['cygwin', 'msys', 'win32'])
     ]
 
     for key,name,strings in platforms:
@@ -872,7 +872,7 @@ def build_drivers(bld):
         'windows/portaudio/JackPortAudioDriver.cpp',
     ]
 
-    winmme_driver_src = [
+    winmme_src = [
         'windows/winmme/JackWinMMEDriver.cpp',
         'windows/winmme/JackWinMMEInputPort.cpp',
         'windows/winmme/JackWinMMEOutputPort.cpp',
