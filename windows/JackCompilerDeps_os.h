@@ -40,9 +40,29 @@
 #endif
 
 #if defined(_MSC_VER) /* Added by JE - 31-01-2012 */
-#define vsnprintf _vsnprintf
-#define snprintf _snprintf
 #define strdup _strdup
+#if _MSC_VER < 1900
+// This wrapper is not fully standard-compliant.  _snprintf() does not
+// distinguish whether a result is truncated or a format error occurs.
+inline int vsnprintf(char* buf, size_t buf_len, const char* fmt, va_list args)
+{
+	int str_len = _vsnprintf(buf, buf_len - 1, fmt, args);
+	if (str_len == buf_len - 1 || str_len < 0) {
+		buf[buf_len - 1] = '\0';
+		return buf_len - 1;
+	}
+	return str_len;
+}
+
+inline int snprintf(char* buf, size_t buf_len, const char* fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+	int str_len = vsnprintf(buf, buf_len, fmt, args);
+	va_end(args);
+	return str_len;
+}
+#endif
 #endif
 
 #endif
