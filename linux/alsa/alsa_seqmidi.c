@@ -856,7 +856,6 @@ void do_jack_output(alsa_seqmidi_t *self, port_t *port, struct process_info* inf
 		int64_t frame_offset;
 		int64_t out_time;
 		snd_seq_real_time_t out_rt;
-		int err;
 
 		jack_midi_event_get(&jack_event, port->jack_buf, i);
 
@@ -896,7 +895,7 @@ void do_jack_output(alsa_seqmidi_t *self, port_t *port, struct process_info* inf
 		out_rt.tv_sec = out_time / NSEC_PER_SEC;
 		snd_seq_ev_schedule_real(&alsa_event, self->queue, 0, &out_rt);
 
-		err = snd_seq_event_output(self->seq, &alsa_event);
+		snd_seq_event_output(self->seq, &alsa_event);
 		debug_log("alsa_out: written %d bytes to %s at %+d (%lld): %d", (int)jack_event.size, port->name, (int)frame_offset, out_time, err);
 	}
 }
