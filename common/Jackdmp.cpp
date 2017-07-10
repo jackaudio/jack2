@@ -606,6 +606,11 @@ int main(int argc, char** argv)
         }
     }
 
+    if (!jackctl_server_load_conf_file(server_ctl, "/etc/jackd.conf")) {
+        fprintf(stderr, "Configuration file %s can not be loaded\n", "TODO");
+        goto stop_server;
+    }
+
     notify_server_start(server_name);
     notify_sent = true;
     return_value = 0;

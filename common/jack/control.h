@@ -243,6 +243,21 @@ jackctl_server_load_internal(
     jackctl_internal_t * internal);
 
 /**
+ * Call this function to load one internal client.
+ * (can be used when the server is running)
+ *
+ * @param server server object handle
+ * @param file the configuration file
+ * which contains the clients and connections
+ * which should be loaded
+ *
+ * @return success status: true - success, false - fail
+ */
+bool jackctl_server_load_conf_file(
+    jackctl_server * const server_ptr,
+    const char* const file);
+
+/**
  * Call this function to unload one internal client.
  * (can be used when the server is running)
  *

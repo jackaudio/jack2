@@ -232,6 +232,10 @@ SERVER_EXPORT bool jackctl_server_load_internal(
     jackctl_server * server,
     jackctl_internal * internal);
 
+SERVER_EXPORT bool jackctl_server_load_conf_file(
+    jackctl_server * const server_ptr,
+    const char* const file);
+
 SERVER_EXPORT bool jackctl_server_unload_internal(
     jackctl_server * server,
     jackctl_internal * internal);
