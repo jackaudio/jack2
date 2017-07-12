@@ -196,8 +196,12 @@ int JackPortAudioDriver::Open(jack_nframes_t buffer_size,
     }
 
     // Generic JackAudioDriver Open
+    char capture_driver_name[JACK_CLIENT_NAME_SIZE];
+    char playback_driver_name[JACK_CLIENT_NAME_SIZE];
+    snprintf(capture_driver_name, sizeof(capture_driver_name), "%s", capture_driver_uid);
+    snprintf(playback_driver_name, sizeof(playback_driver_name), "%s", playback_driver_uid);
     if (JackAudioDriver::Open(buffer_size, samplerate, capturing, playing, inchannels, outchannels, monitor,
-        capture_driver_uid, playback_driver_uid, capture_latency, playback_latency) != 0) {
+        capture_driver_name, playback_driver_name, capture_latency, playback_latency) != 0) {
         return -1;
     }
 
@@ -238,12 +242,6 @@ int JackPortAudioDriver::Open(jack_nframes_t buffer_size,
     fEngineControl->fComputation = JackTools::ComputationMicroSec(fEngineControl->fBufferSize) * 1000;
     fEngineControl->fConstraint = fEngineControl->fPeriodUsecs * 1000;
 #endif
-
-    assert(strlen(capture_driver_uid) < JACK_CLIENT_NAME_SIZE);
-    assert(strlen(playback_driver_uid) < JACK_CLIENT_NAME_SIZE);
-
-    strcpy(fCaptureDriverName, capture_driver_uid);
-    strcpy(fPlaybackDriverName, playback_driver_uid);
 
     return 0;
 

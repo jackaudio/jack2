@@ -22,6 +22,7 @@
 #define __JackSystemDeps_WIN32__
 
 #include <windows.h>
+#include "JackCompilerDeps.h"
 
 #ifndef PATH_MAX
 #define PATH_MAX   512
@@ -49,9 +50,18 @@
 #define JACK_DEBUG false
 #endif
 
-#if defined(_MSC_VER)
-#define snprintf _snprintf
-#endif
+inline int setenv(const char* name, const char* value, int overwrite)
+{
+	if (overwrite == 0 && getenv(name) != NULL) {
+		return 0;
+	}
+	return _putenv_s(name, value);
+}
+
+inline int unsetenv(const char* name)
+{
+	return _putenv_s(name, "");
+}
 
 #endif
 
