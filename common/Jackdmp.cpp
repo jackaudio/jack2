@@ -162,7 +162,7 @@ static void print_server_drivers(jackctl_server_t *server, FILE* file)
     const JSList * node_ptr = jackctl_server_get_drivers_list(server);
 
     fprintf(file, "Available backends:\n");
-    
+
     while (node_ptr) {
         jackctl_driver_t* driver = (jackctl_driver_t *)node_ptr->data;
         fprintf(file, "      %s (%s)\n", jackctl_driver_get_name(driver), (jackctl_driver_get_type(driver) == JackMaster) ? "master" : "slave");
@@ -176,7 +176,7 @@ static void print_server_internals(jackctl_server_t *server, FILE* file)
     const JSList * node_ptr = jackctl_server_get_internals_list(server);
 
     fprintf(file, "Available internals:\n");
-    
+
     while (node_ptr) {
         jackctl_internal_t* internal = (jackctl_internal_t *)node_ptr->data;
         fprintf(file, "      %s\n", jackctl_internal_get_name(internal));
@@ -202,6 +202,7 @@ static void usage(FILE* file, jackctl_server_t *server, bool full = true)
             "               [ --port-max OR -p maximum-number-of-ports]\n"
             "               [ --slave-backend OR -X slave-backend-name ]\n"
             "               [ --internal-client OR -I internal-client-name ]\n"
+            "               [ --audio-path-conf OR -C audio-path-configuration-file ]\n"
             "               [ --verbose OR -v ]\n"
 #ifdef __linux__
             "               [ --clocksource OR -c [ h(pet) | s(ystem) ]\n"
@@ -232,7 +233,7 @@ static void usage(FILE* file, jackctl_server_t *server, bool full = true)
             "         -d master-backend-name [ ... master-backend args ... ]\n"
             "       jackdmp -d master-backend-name --help\n"
             "             to display options for each master backend\n\n");
-    
+
     if (full) {
         print_server_drivers(server, file);
         print_server_internals(server, file);
@@ -265,7 +266,7 @@ int main(int argc, char** argv)
             print_version();
         }
     }
-    const char *options = "-d:X:I:P:uvshrRL:STFl:t:mn:p:"
+    const char *options = "-d:X:I:P:uvshrRL:STFl:t:mn:p:C:"
         "a:"
 #ifdef __linux__
         "c:"
@@ -276,6 +277,7 @@ int main(int argc, char** argv)
 #ifdef __linux__
                                        { "clock-source", 1, 0, 'c' },
 #endif
+                                       { "audio-path-conf", 1, 0, 'C' },
                                        { "loopback-driver", 1, 0, 'L' },
                                        { "audio-driver", 1, 0, 'd' },
                                        { "midi-driver", 1, 0, 'X' },
@@ -301,6 +303,7 @@ int main(int argc, char** argv)
 
     int i,opt = 0;
     int option_index = 0;
+    char* audio_path_conf_file = NULL;
     char* master_driver_name = NULL;
     char** master_driver_args = NULL;
     int master_driver_nargs = 1;
@@ -441,6 +444,10 @@ int main(int argc, char** argv)
                     strncpy(value.str, optarg, JACK_PARAM_STRING_MAX);
                     jackctl_parameter_set_value(param, &value);
                 }
+                break;
+
+            case 'C':
+                audio_path_conf_file = optarg;
                 break;
 
             case 'P':
@@ -606,9 +613,11 @@ int main(int argc, char** argv)
         }
     }
 
-    if (!jackctl_server_load_conf_file(server_ctl, "/etc/jackd.conf")) {
-        fprintf(stderr, "Configuration file %s can not be loaded\n", "TODO");
-        goto stop_server;
+    if (audio_path_conf_file != NULL) {
+        if (!jackctl_server_load_conf_file(server_ctl, audio_path_conf_file)) {
+            fprintf(stderr, "Audio path configuration file %s cannot be loaded!\n", audio_path_conf_file);
+            goto stop_server;
+        }
     }
 
     notify_server_start(server_name);
