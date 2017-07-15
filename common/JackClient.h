@@ -124,7 +124,6 @@ class SERVER_EXPORT JackClient : public JackClientInterface, public JackRunnable
 
     public:
 
-        JackClient();
         JackClient(JackSynchro* table);
         virtual ~JackClient();
 
