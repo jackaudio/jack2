@@ -244,7 +244,8 @@ def build(bld):
         'JackMidiReceiveQueue.cpp',
         'JackMidiSendQueue.cpp',
         'JackMidiUtil.cpp',
-        'JackMidiWriteQueue.cpp'
+        'JackMidiWriteQueue.cpp',
+        'JackLoader.cpp'
         ]
 
     if bld.env['IS_LINUX']:

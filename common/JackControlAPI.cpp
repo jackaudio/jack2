@@ -1347,6 +1347,17 @@ SERVER_EXPORT bool jackctl_server_load_internal(
     }
 }
 
+SERVER_EXPORT bool jackctl_server_load_conf_file(
+    jackctl_server * const server_ptr,
+    const char* const file)
+{
+    if (!server_ptr || !file || !server_ptr->engine) {
+        return false;
+    }
+
+    return (server_ptr->engine->InternalLoadFromConfFile(file) >= 0);
+}
+
 SERVER_EXPORT bool jackctl_server_unload_internal(
     jackctl_server * server_ptr,
     jackctl_internal * internal)

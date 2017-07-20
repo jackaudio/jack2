@@ -86,6 +86,7 @@ class SERVER_EXPORT JackServer
         // Internals clients
         int InternalClientLoad1(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int uuid, int* status);
         int InternalClientLoad2(const char* client_name, const char* so_name, const JSList * parameters, int options, int* int_ref, int uuid, int* status);
+        int InternalLoadFromConfFile(const char* const file);
    
         // Transport management
         int ReleaseTimebase(int refnum);

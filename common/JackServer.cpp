@@ -33,6 +33,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackInternalClient.h"
 #include "JackError.h"
 #include "JackMessageBuffer.h"
+#include "JackLoader.h"
 
 const char * jack_get_self_connect_mode_description(char mode);
 
@@ -224,6 +225,12 @@ int JackServer::InternalClientLoadAux(JackLoadableInternalClient* client, const 
         return 0;
     }
  }
+
+int JackServer::InternalLoadFromConfFile(const char* const file)
+{
+    JackLoader loader(this);
+    return loader.Load(file);
+}
 
 //---------------------------
 // From request thread : API 
