@@ -548,6 +548,10 @@ environments, this affects \fBjackd\fR unless its \fB\-\-name\fR
 parameter is set, and all JACK clients unless they pass an explicit
 name to \fBjack_client_open()\fR.
 
+Defining \fB$JACK_NO_AUDIO_RESERVATION\fR will bypass audio device
+reservation via session bus (DBus). This can be useful if JACK
+was compiled with DBus support but should run on a headless system.
+
 .SH "SEE ALSO:"
 .PP
 .I http://www.jackaudio.org
