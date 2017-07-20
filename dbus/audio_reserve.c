@@ -47,7 +47,8 @@ SERVER_EXPORT int audio_reservation_init()
     dbus_error_init(&error);
 
     if (!(gConnection = dbus_bus_get(DBUS_BUS_SESSION, &error))) {
-        jack_error("Failed to connect to session bus for device reservation %s\n", error.message);
+        jack_error("Failed to connect to session bus for device reservation: %s\n", error.message);
+        jack_info("To bypass device reservation via session bus, set JACK_NO_AUDIO_RESERVATION=1 prior to starting jackd.\n");
         return -1;
     }
 
