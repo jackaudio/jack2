@@ -22,7 +22,13 @@ Linux version
 
 The published version still uses fifos for server/client synchronization. The use of POSIX named semaphore is implemented but still a bit unstable. Sockets are used for server/client communications. The ALSA backend derived from jackd implementation is used. To build jackdmp, a "waf" (http://code.google.com/p/waf/) based compilation system is available. The code has to be compiled on a machine where ALSA and possibly freebob (FFADO) headers and libraries are corrected installed.
 
-In the top folder do :
+If building from git, remeber to run :
+
+git submodule update --init
+
+prior to compiling the project.
+
+To configure, compile and install the project, run :
 
 ./waf configure 
 ./waf build 
@@ -48,7 +54,13 @@ Solaris version
 
 The published version uses fifos for server/client synchronization. Sockets are used for server/client communications. An OSS backend is used. To build jackdmp, a "waf" (http://code.google.com/p/waf/) based compilation system is available. The code has to be compiled on a machine where OSS 4.0 headers and libraries are corrected installed.
 
-In the top folder do :
+If building from git, remeber to run :
+
+git submodule update --init
+
+prior to compiling the project.
+
+To configure, compile and install the project, run :
 
 ./waf configure 
 ./waf build 
