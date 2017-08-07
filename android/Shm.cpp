@@ -283,7 +283,7 @@ namespace android {
     }
 
     int Shm::GetUID() {
-        return getuid();
+        return geteuid();
     }
 
     int Shm::GetPID() {
