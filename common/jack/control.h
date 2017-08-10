@@ -257,6 +257,20 @@ jackctl_server_unload_internal(
     jackctl_internal_t * internal);
 
 /**
+ * Call this function to load a session file.
+ * (can be used when the server is running)
+ *
+ * @param server server object handle
+ * @param file the session file to load, containing a list of
+ * internal clients and connections to be made.
+ *
+ * @return success status: true - success, false - fail
+ */
+bool jackctl_server_load_session_file(
+    jackctl_server * server_ptr,
+    const char * file);
+
+/**
  * Call this function to add a slave in the driver slave list.
  * (cannot be used when the server is running that is between
  * jackctl_server_start and jackctl_server_stop)

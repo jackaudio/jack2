@@ -1364,6 +1364,17 @@ SERVER_EXPORT bool jackctl_server_unload_internal(
     }
 }
 
+SERVER_EXPORT bool jackctl_server_load_session_file(
+    jackctl_server * server_ptr,
+    const char * file)
+{
+    if (!server_ptr || !file || !server_ptr->engine) {
+        return false;
+    }
+
+    return (server_ptr->engine->LoadInternalSessionFile(file) >= 0);
+}
+
 SERVER_EXPORT bool jackctl_server_add_slave(jackctl_server * server_ptr, jackctl_driver * driver_ptr)
 {
     if (server_ptr && server_ptr->engine) {

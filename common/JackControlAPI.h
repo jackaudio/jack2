@@ -236,6 +236,10 @@ SERVER_EXPORT bool jackctl_server_unload_internal(
     jackctl_server * server,
     jackctl_internal * internal);
 
+SERVER_EXPORT bool jackctl_server_load_session_file(
+    jackctl_server * server_ptr,
+    const char * file);
+
 SERVER_EXPORT bool jackctl_server_add_slave(jackctl_server_t * server,
                             jackctl_driver_t * driver);
 

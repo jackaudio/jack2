@@ -90,6 +90,33 @@ Prevent JACK from ever kicking out clients because they were too slow.
 This cancels the effect any specified timeout value, but JACK and its clients are
 still subject to the supervision of the watchdog thread or its equivalent.
 .TP
+\fB\-C, \-\-internal-session-file \fIinternal-session-file\fR
+.br
+Load internal clients and connections from \fIinternal-session-file\fR.
+Each line of this configuration file starts with a command.
+The following commands are available:
+.br
+\fBl(oad)\fR \fIclient-name lib-name client-args\fR
+.br
+With this command an internal JACK client will be instantiated.
+\fIclient-name\fR and \fIlib-name\fR cannot contain spaces.
+The rest of the line will be interpreted as \fIclient-args\fR and 
+sent to the client library.
+.br
+\fBc(on)\fR \fIsource-port destination-port\fR
+.br
+With this command a source port will be connected to a destination port.
+\fIsource-port\fR and \fIdestination-port\fR cannot contain spaces.
+.br
+Comments are allowed, they start with \fB#\fR.
+.br
+An example configuration could look like the following:
+.br
+ l inprocess1 inprocess
+ l amp1 jalv http://lv2plug.in/plugins/eg-amp
+.br
+ c amp:out system:playback_1
+.TP
 \fB\-u, \-\-unlock\fR
 .br
 Unlock libraries GTK+, QT, FLTK, Wine.

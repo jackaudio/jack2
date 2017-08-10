@@ -221,6 +221,7 @@ def build(bld):
         'JackExternalClient.cpp',
         'JackFreewheelDriver.cpp',
         'JackInternalClient.cpp',
+        'JackInternalSessionLoader.cpp',
         'JackServer.cpp',
         'JackThreadedDriver.cpp',
         'JackRestartThreadedDriver.cpp',
@@ -244,7 +245,7 @@ def build(bld):
         'JackMidiReceiveQueue.cpp',
         'JackMidiSendQueue.cpp',
         'JackMidiUtil.cpp',
-        'JackMidiWriteQueue.cpp'
+        'JackMidiWriteQueue.cpp',
         ]
 
     if bld.env['IS_LINUX']:
