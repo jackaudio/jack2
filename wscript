@@ -565,7 +565,7 @@ def configure(conf):
         conf.env.append_unique('CFLAGS', '-g')
         conf.env.append_unique('LINKFLAGS', '-g')
 
-    if not Options.options.autostart in ['default', 'classic', 'dbus' 'none']:
+    if not Options.options.autostart in ['default', 'classic', 'dbus', 'none']:
         conf.fatal('Invalid autostart value "' + Options.options.autostart + '"')
 
     if Options.options.autostart == 'default':
