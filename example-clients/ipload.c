@@ -206,6 +206,7 @@ main (int argc, char *argv[])
 		printf("client name = %s\n", name);
 		free(name);
 	}
+	fflush(stdout);
 
 	if (autoclose_opt) {
 		jack_set_client_registration_callback(client, registration_callback, NULL);
