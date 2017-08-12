@@ -267,7 +267,7 @@ jackctl_server_unload_internal(
  * @return success status: true - success, false - fail
  */
 bool jackctl_server_load_session_file(
-    jackctl_server * server_ptr,
+    jackctl_server_t * server_ptr,
     const char * file);
 
 /**
