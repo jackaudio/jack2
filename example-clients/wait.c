@@ -124,7 +124,7 @@ main(int argc, char *argv[])
 		if (wait_timeout) {
 		       if ((time(NULL) - start_timestamp) > wait_timeout) {
 			       fprintf(stdout, "timeout\n");
-			       break;
+			       exit(EXIT_FAILURE);
 		       }
 		}
 
