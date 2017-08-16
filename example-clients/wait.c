@@ -122,10 +122,10 @@ main(int argc, char *argv[])
 			}
 		}
 		if (wait_timeout) {
-		       if ((time(NULL) - start_timestamp) > wait_timeout) {
-			       fprintf(stdout, "timeout\n");
-			       exit(EXIT_FAILURE);
-		       }
+			if ((time(NULL) - start_timestamp) > wait_timeout) {
+				fprintf(stdout, "timeout\n");
+				exit(EXIT_FAILURE);
+			}
 		}
 
 		// Wait a second, and repeat
