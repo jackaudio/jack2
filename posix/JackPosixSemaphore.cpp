@@ -24,9 +24,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <fcntl.h>
 #include <stdio.h>
 #include <sys/time.h>
+#ifdef __linux__
+#include "promiscuous.h"
+#endif
 
 namespace Jack
 {
+
+JackPosixSemaphore::JackPosixSemaphore() : JackSynchro(), fSemaphore(NULL)
+{
+    const char* promiscuous = getenv("JACK_PROMISCUOUS_SERVER");
+    fPromiscuous = (promiscuous != NULL);
+#ifdef __linux__
+    fPromiscuousGid = jack_group2gid(promiscuous);
+#endif
+}
 
 void JackPosixSemaphore::BuildName(const char* client_name, const char* server_name, char* res, int size)
 {
@@ -35,7 +47,7 @@ void JackPosixSemaphore::BuildName(const char* client_name, const char* server_n
 #if __APPLE__  // POSIX semaphore names are limited to 32 characters... 
     snprintf(res, 32, "js_%s", ext_client_name); 
 #else
-    if (getenv("JACK_PROMISCUOUS_SERVER")) {
+    if (fPromiscuous) {
         snprintf(res, size, "jack_sem.%s_%s", server_name, ext_client_name);
     } else {
         snprintf(res, size, "jack_sem.%d_%s_%s", JackTools::GetUID(), server_name, ext_client_name);
@@ -147,6 +159,14 @@ bool JackPosixSemaphore::Allocate(const char* name, const char* server_name, int
         jack_error("Allocate: can't check in named semaphore name = %s err = %s", fName, strerror(errno));
         return false;
     } else {
+#ifdef __linux__
+        if (fPromiscuous) {
+            char sempath[SYNC_MAX_NAME_SIZE+13];
+            snprintf(sempath, sizeof(sempath), "/dev/shm/sem.%s", fName);
+            if (jack_promiscuous_perms(-1, sempath, fPromiscuousGid) < 0)
+                return false;
+        }
+#endif
         return true;
     }
 }

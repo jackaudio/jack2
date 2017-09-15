@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackConstants.h"
 #include "JackTools.h"
 #include "JackError.h"
+#include "promiscuous.h"
 #include <string.h>
 #include <stdio.h>
 #include <pthread.h>
@@ -29,18 +30,25 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
-static void BuildName(const char* client_name, char* res, const char* dir, int which, int size)
+static void BuildName(const char* client_name, char* res, const char* dir, int which, int size, bool promiscuous)
 {
     char ext_client_name[SYNC_MAX_NAME_SIZE + 1];
     JackTools::RewriteName(client_name, ext_client_name);
-    if (getenv("JACK_PROMISCUOUS_SERVER")) {
+    if (promiscuous) {
 	    snprintf(res, size, "%s/jack_%s_%d", dir, ext_client_name, which);
     } else {
 	    snprintf(res, size, "%s/jack_%s_%d_%d", dir, ext_client_name, JackTools::GetUID(), which);
     }
 }
 
-JackClientSocket::JackClientSocket(int socket): JackClientRequestInterface(), fSocket(socket),fTimeOut(0)
+JackClientSocket::JackClientSocket(): JackClientRequestInterface(), fSocket(-1), fTimeOut(0)
+{
+    const char* promiscuous = getenv("JACK_PROMISCUOUS_SERVER");
+    fPromiscuous = (promiscuous != NULL);
+    fPromiscuousGid = jack_group2gid(promiscuous);
+}
+
+JackClientSocket::JackClientSocket(int socket): JackClientRequestInterface(), fSocket(socket),fTimeOut(0), fPromiscuous(false), fPromiscuousGid(-1)
 {}
 
 #if defined(__sun__) || defined(sun)
@@ -123,7 +131,7 @@ int JackClientSocket::Connect(const char* dir, const char* name, int which) // A
     }
 
     addr.sun_family = AF_UNIX;
-    BuildName(name, addr.sun_path, dir, which, sizeof(addr.sun_path));
+    BuildName(name, addr.sun_path, dir, which, sizeof(addr.sun_path), fPromiscuous);
     jack_log("JackClientSocket::Connect : addr.sun_path %s", addr.sun_path);
 
     if (connect(fSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
@@ -247,6 +255,13 @@ int JackClientSocket::Write(void* data, int len)
     }
 }
 
+JackServerSocket::JackServerSocket(): fSocket( -1)
+{
+    const char* promiscuous = getenv("JACK_PROMISCUOUS_SERVER");
+    fPromiscuous = (promiscuous != NULL);
+    fPromiscuousGid = jack_group2gid(promiscuous);
+}
+
 int JackServerSocket::Bind(const char* dir, const char* name, int which) // A revoir : utilisation de "which"
 {
     struct sockaddr_un addr;
@@ -258,7 +273,7 @@ int JackServerSocket::Bind(const char* dir, const char* name, int which) // A re
 
     addr.sun_family = AF_UNIX;
     // Socket name has to be kept in fName to be "unlinked".
-    BuildName(name, fName, dir, which, sizeof(addr.sun_path));
+    BuildName(name, fName, dir, which, sizeof(addr.sun_path), fPromiscuous);
     strncpy(addr.sun_path, fName, sizeof(addr.sun_path) - 1);
    
     jack_log("JackServerSocket::Bind : addr.sun_path %s", addr.sun_path);
@@ -273,6 +288,9 @@ int JackServerSocket::Bind(const char* dir, const char* name, int which) // A re
         jack_error("Cannot enable listen on server socket err = %s", strerror(errno));
         goto error;
     }
+
+    if (fPromiscuous && (jack_promiscuous_perms(-1, fName, fPromiscuousGid) < 0))
+        goto error;
 
     return 0;
 

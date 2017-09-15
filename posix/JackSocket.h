@@ -45,11 +45,12 @@ class JackClientSocket : public detail::JackClientRequestInterface
 
         int fSocket;
         int fTimeOut;
+        bool fPromiscuous;
+        int fPromiscuousGid;
 
     public:
 
-        JackClientSocket():JackClientRequestInterface(), fSocket(-1), fTimeOut(0)
-        {}
+        JackClientSocket();
         JackClientSocket(int socket);
 
         int Connect(const char* dir, const char* name, int which);
@@ -80,11 +81,12 @@ class JackServerSocket
 
         int fSocket;
         char fName[SOCKET_MAX_NAME_SIZE];
+        bool fPromiscuous;
+        int fPromiscuousGid;
 
     public:
 
-        JackServerSocket(): fSocket( -1)
-        {}
+        JackServerSocket();
         ~JackServerSocket()
         {}
 
