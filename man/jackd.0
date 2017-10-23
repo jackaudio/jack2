@@ -27,7 +27,7 @@ ground up for professional audio work. It focuses on two key areas:
 synchronous execution of all clients and low latency operation.
 
 The name JACK makes a reference to the classical way of patching audio 
-connections with pyhsical audio jack cables.
+connections with physical audio jack cables.
 JACK is also a recursive acronym, that is an abbreviation which is part 
 of itself. \fIJ\fRACK \fIA\fRudio \fIC\fRonnection \fIK\fRit.
 
