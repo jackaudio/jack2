@@ -31,7 +31,7 @@ connections with pyhsical audio jack cables.
 JACK is also a recursive acronym, that is an abbreviation which is part 
 of itself. \fIJ\fRACK \fIA\fRudio \fIC\fRonnection \fIK\fRit.
 
-For the latest JACK information, please consult the web site,
+For the latest JACK information please consult the web site: 
 <\fBhttp://www.jackaudio.org/\fR>.
 
 
@@ -61,12 +61,13 @@ Do not attempt to lock memory, even if \fB\-\-realtime\fR.
 \fB\-n, \-\-name\fR \fIserver\-name\fR
 Name this \fBjackd\fR instance \fIserver\-name\fR. If unspecified,
 this name comes from the \fB$JACK_DEFAULT_SERVER\fR environment
-variable. It will be "default" if that is not defined.
+variable. 
+(default: "default")
 
 .TP
 \fB\-p, \-\-port\-max \fI n\fR
 Set the maximum number of ports the JACK server can manage. 
-The default value is 256.
+(default: 256)
 
 .TP
 \fB\-\-replace-registry\fR 
@@ -79,10 +80,11 @@ that are incompatible across JACK versions (which is rare).
 .TP
 \fB\-R, \-\-realtime\fR 
 .br
-Use realtime scheduling (default = true). This is needed for reliable low\-latency
+Use realtime scheduling. This is needed for reliable low\-latency
 performance. On many systems, it requires \fBjackd\fR to run with
 special scheduler and memory allocation privileges, which may be
 obtained in several ways. 
+(default: true) 
 
 .TP
 \fB\-r, \-\-no-realtime\fR
@@ -106,8 +108,9 @@ Exit once all clients have closed their connections.
 .TP
 \fB\-t, \-\-timeout \fIint\fR
 .br
-Set client timeout limit in milliseconds. The default is 500 msec.
-In realtime mode the client timeout must be smaller than the watchdog timeout (5000 msec).
+Set client timeout limit in milliseconds.
+In realtime mode the client timeout must be smaller than the watchdog timeout (5000 msec). 
+(default: 500)
 
 .TP
 \fB\-Z, \-\-nozombies\fR
@@ -181,7 +184,8 @@ Only the first letter of the mode name is required.
 .TP
 \fB\-D, \-\-duplex\fR
 Provide both capture and playback ports. Defaults to on unless only one 
-of \-P or \-C is specified.
+of \-P or \-C is specified. 
+(default: true)
 
 .TP
 \fB\-h, \-\-help\fR Print a brief usage message describing only the
@@ -218,18 +222,20 @@ imposing the basic JACK system latency determined by the
 .TP
 \fB\-i, \-\-inchannels \fIint\fR
 .br
-Number of capture channels. Default is maximum supported by hardware.
+Number of capture channels. 
+(default: maximum supported by hardware)
 
 .TP
 \fB\-I, \-\-input\-latency\fR
-Extra input latency (frames) (default: 0)
+Extra input latency (frames). 
+(default: 0)
 
 .TP
 \fB\-n, \-\-nperiods \fIint\fR
 .br
 Specify the number of periods of playback latency. In seconds, this
 corresponds to \fB\-\-nperiods\fR times \fB\-\-period\fR divided by
-\fB\-\-rate\fR. The default is 2, the minimum allowable. For most
+\fB\-\-rate\fR. The default is 2, the minimum allowed. For most
 devices, there is no need for any other value with the
 \fB\-\-realtime\fR option. Without realtime privileges or with boards
 providing unreliable interrupts (like ymfpci), a larger value may
@@ -249,11 +255,13 @@ devices supported by FFADO (formerly Freebob) are configured with
 .TP
 \fB\-o, \-\-outchannels \fIint\fR
 .br
-Number of playback channels. Default is maximum supported by hardware.
+Number of playback channels. 
+(default: maximum supported by hardware)
 
 .TP
 \fB\-O, \-\-output\-latency\fR
-Extra output latency (frames) (default: 0)
+Extra output latency (frames). 
+(default: 0)
 
 .TP
 \fB\-P, \-\-playback\fR [ \fIname\fR ]
@@ -264,20 +272,23 @@ playback device name.
 \fB\-p, \-\-period \fIint\fR
 .br
 Specify the number of frames between JACK \fBprocess()\fR calls. This
-value must be a power of 2, and the default is 1024. If you need low 
+value must be a power of 2. If you need low 
 latency, set \fB\-p\fR as low as you can go without seeing xruns. A larger 
 period size yields higher latency, but makes xruns less likely. The JACK 
 capture latency in seconds is \fB\-\-period\fR divided by \fB\-\-rate\fR.
+(default: 1024)
 
 .TP
 \fB\-r, \-\-rate \fIint\fR
-Specify the sample rate. The default is 48000.
+Specify the sample rate. 
+(default: 48000)
 
 .TP
 \fB\-S, \-\-shorts
 .br
 Try to configure card for 16\-bit samples first, only trying 32\-bits if
-unsuccessful. Default is to prefer 32\-bit samples.
+unsuccessful. 
+(default: 32\-bit samples)
 
 .TP
 \fB\-s, \-\-softmode\fR 
@@ -299,320 +310,397 @@ software written to use the ALSA "sequencer" API.
 
 .TP
 \fB\-c, \-\-channels\fR
-Maximum number of channels (default: 2)
+Maximum number of channels. 
+(default: 2)
 
 .TP
 \fB\-i, \-\-inchannels\fR
-Maximum number of input channels (default: 2)
+Maximum number of input channels.
+(default: 2)
 
 .TP
 \fB\-o, \-\-outchannels\fR
-Maximum number of output channels (default: 2)
+Maximum number of output channels.
+(default: 2)
 
 .TP
 \fB\-C, \-\-capture\fR
-Whether or not to capture (default: true)
+Whether or not to capture.
+(default: true)
 
 .TP
 \fB\-P, \-\-playback\fR
-Whether or not to playback (default: true)
+Whether or not to playback.
+(default: true)
 
 .TP
 \fB\-D, \-\-monitor\fR
-Provide monitor ports for the output (default: false)
+Provide monitor ports for the output.
+(default: false)
 
 .TP
 \fB\-D, \-\-duplex\fR
-Capture and playback (default: true)
+Capture and playback.
+(default: true)
 
 .TP
 \fB\-r, \-\-rate\fR
-Sample rate (default: 44100)
+Sample rate.
+(default: 44100)
 
 .TP
 \fB\-p, \-\-period\fR
-Frames per period (default: 128). Must be a power of 2.
+Frames per period, must be a power of 2. 
+(default: 128)
 
 .TP
 \fB\-d, \-\-device\fR
-CoreAudio device name (default: none)
+CoreAudio device name. 
+(default: none)
 
 .TP
 \fB\-I, \-\-input\-latency\fR
-Extra input latency (frames) (default: 0)
+Extra input latency (frames). 
+(default: 0)
 
 .TP
 \fB\-O, \-\-output\-latency\fR
-Extra output latency (frames) (default: 0)
+Extra output latency (frames). 
+(default: 0)
 
 .TP
 \fB\-l, \-\-list\-devices \fR
-Display available CoreAudio devices (default: false)
+Display available CoreAudio devices. 
+(default: false)
 
 .TP
 \fB\-H, \-\-hog \fR
-Take exclusive access of the audio device (default: false)
+Take exclusive access of the audio device. 
+(default: false)
 
 .TP
 \fB\-L, \-\-async\-latency \fR
-Extra output latency in asynchronous mode (percent) (default: 100)
+Extra output latency in asynchronous mode (percent). 
+(default: 100)
 
 .TP
 \fB\-G, \-\-grain \fR
-Computation grain in RT thread (percent) (default: 100)
+Computation grain in RT thread (percent). 
+(default: 100)
 
 .TP
 \fB\-s, \-\-clock\-drift \fR
-Whether to compensate clock drift in dynamically created aggregate device (default: false)
+Whether or not to compensate clock drift in dynamically created aggregate device. 
+(default: false)
+
+
 .SS DUMMY BACKEND PARAMETERS
 
 .TP
 \fB\-C, \-\-capture \fIint\fR
-Specify number of capture ports. The default value is 2.
+Specify number of capture ports. 
+(default: 2)
 
 .TP
 \fB\-P, \-\-playback \fIint\fR
-Specify number of playback ports. The default value is 2.
+Specify number of playback ports. 
+(default: 2)
 
 .TP
 \fB\-r, \-\-rate \fIint\fR
-Specify sample rate. The default value is 48000.
+Specify sample rate. 
+(default: 48000)
 
 .TP
 \fB\-p, \-\-period \fIint\fR
 Specify the number of frames between JACK \fBprocess()\fR calls. This
-value must be a power of 2, and the default is 1024. If you need low 
+value must be a power of 2. If you need low 
 latency, set \fB\-p\fR as low as you can go without seeing xruns. A larger 
 period size yields higher latency, but makes xruns less likely. The JACK 
 capture latency in seconds is \fB\-\-period\fR divided by \fB\-\-rate\fR.
+(default: 1024)
 
 .TP
 \fB\-w, \-\-wait \fIint\fR 
 Specify number of usecs to wait between engine processes. 
-The default value is 21333.
+(default: 21333)
 
 
 .SS NETONE BACKEND PARAMETERS
 
 .TP
 \fB\-i, \-\-audio\-ins \fIint\fR
-Number of capture channels (default: 2)
+Number of capture channels. 
+(default: 2)
 
 .TP
 \fB\-o, \-\-audio\-outs \fIint\fR
-Number of playback channels (default: 2)
+Number of playback channels. 
+(default: 2)
 
 .TP
 \fB\-I, \-\-midi\-ins \fIint\fR
-Number of midi capture channels (default: 1)
+Number of midi capture channels. 
+(default: 1)
 
 .TP 
 \fB\-O, \-\-midi\-outs \fIint\fR
-Number of midi playback channels (default: 1)
+Number of midi playback channels. 
+(default: 1)
 
 .TP
 \fB\-r, \-\-rate \fIint\fR
-Sample rate (default: 48000)
+Sample rate. 
+(default: 48000)
 
 .TP 
 \fB\-p, \-\-period \fIint\fR
-Frames per period (default: 1024)
+Frames per period. 
+(default: 1024)
 
 .TP 
 \fB\-n, \-\-num\-periods \fIint\fR
-Network latency setting in no. of periods (default: 5)
+Network latency setting in no. of periods. 
+(default: 5)
 
 .TP 
 \fB\-l, \-\-listen\-port \fIint\fR
-The socket port we are listening on for sync packets (default: 3000)
+The socket port we are listening on for sync packets. 
+(default: 3000)
 
 .TP 
 \fB\-f, \-\-factor \fIint\fR
-Factor for sample rate reduction (default: 1)
+Factor for sample rate reduction. 
+(default: 1)
 
 .TP 
 \fB\-u, \-\-upstream\-factor \fIint\fR
-Factor for sample rate reduction on the upstream (default: 0)
+Factor for sample rate reduction on the upstream. 
+(default: 0)
 
 .TP 
 \fB\-c, \-\-celt \fIint\fR
-sets celt encoding and number of kbits per channel (default: 0)
+Sets celt encoding and number of kbits per channel. 
+(default: 0)
 
 .TP 
 \fB\-b, \-\-bit\-depth \fIint\fR
-Sample bit\-depth (0 for float, 8 for 8bit and 16 for 16bit) (default: 0)
+Sample bit\-depth (0 for float, 8 for 8bit and 16 for 16bit). 
+(default: 0)
 
 .TP 
 \fB\-t, \-\-transport\-sync \fIint\fR
-Whether to slave the transport to the master transport (default: true)
+Whether or not to slave the transport to the master transport. 
+(default: true)
 
 .TP 
 \fB\-a, \-\-autoconf \fIint\fR
-Whether to use Autoconfig, or just start. (default: true)
+Whether or not to use Autoconfig, or just start. 
+(default: true)
 
 .TP 
 \fB\-R, \-\-redundancy \fIint\fR
-Send packets N times (default: 1)
+Send packets N times. 
+(default: 1)
 
 .TP 
 \fB\-e, \-\-native\-endian \fIint\fR
-Dont convert samples to network byte order. (default: false)
+Don't convert samples to network byte order. 
+(default: false)
 
 .TP 
 \fB\-J, \-\-jitterval \fIint\fR
-attempted jitterbuffer microseconds on master (default: 0)
+Attempted jitterbuffer microseconds on master. 
+(default: 0)
 
 .TP 
 \fB\-D, \-\-always\-deadline \fIint\fR
-always use deadline (default: false)
+Always use deadline. 
+(default: false)
 
 
 .SS OSS BACKEND PARAMETERS
 
 .TP
 \fB\-r, \-\-rate \fIint\fR
-Specify the sample rate. The default is 48000.
+Specify the sample rate. 
+(default: 48000)
 
 .TP
 \fB\-p, \-\-period \fIint\fR
 Specify the number of frames between JACK \fBprocess()\fR calls. This
-value must be a power of 2, and the default is 1024. If you need low 
+value must be a power of 2. If you need low 
 latency, set \fB\-p\fR as low as you can go without seeing xruns. A larger 
 period size yields higher latency, but makes xruns less likely. The JACK 
-capture latency in seconds is \fB\-\-period\fR divided by \fB\-\-rate\fR.
+capture latency in seconds is \fB\-\-period\fR divided by \fB\-\-rate\fR. 
+(default: 1024)
 
 .TP
 \fB\-n, \-\-nperiods \fIint\fR
-Specify the number of periods in the hardware buffer. The default is
-2. The period size (\fB\-p\fR) times \fB\-\-nperiods\fR times four is
+Specify the number of periods in the hardware buffer. 
+The period size (\fB\-p\fR) times \fB\-\-nperiods\fR times four is
 the JACK buffer size in bytes. The JACK output latency in seconds is
-\fB\-\-nperiods\fR times \fB\-\-period\fR divided by \fB\-\-rate\fR.
+\fB\-\-nperiods\fR times \fB\-\-period\fR divided by \fB\-\-rate\fR. 
+(default: 2)
 
 .TP
 \fB\-w, \-\-wordlength \fIint\fR
-Specify the sample size in bits. The default is 16.
+Specify the sample size in bits. 
+(default: 16)
 
 .TP
 \fB\-i, \-\-inchannels \fIint\fR
-Specify how many channels to capture (default: 2)
+Specify how many channels to capture. 
+(default: 2)
 
 .TP
 \fB\-o, \-\-outchannels \fIint\fR
-Specify number of playback channels (default: 2)
+Specify number of playback channels. 
+(default: 2)
 
 .TP
 \fB\-C, \-\-capture \fIdevice_file\fR
-Specify input device for capture (default: /dev/dsp)
+Specify input device for capture. 
+(default: /dev/dsp)
 
 .TP
 \fB\-P, \-\-playback \fIdevice_file\fR
-Specify output device for playback (default: /dev/dsp)
+Specify output device for playback. 
+(default: /dev/dsp)
 
 .TP
 \fB\-b, \-\-ignorehwbuf \fIboolean\fR
-Specify, whether to ignore hardware period size (default: false)
+Specify whether or not to ignore hardware period size. 
+(default: false)
 
 .TP
 \fB\-I, \-\-input\-latency\fR
-Extra input latency (frames) (default: 0)
+Extra input latency (frames). 
+(default: 0)
 
 .TP
 \fB\-O, \-\-output\-latency\fR
-Extra output latency (frames) (default: 0)
+Extra output latency (frames). 
+(default: 0)
+
+
 .SS SUN BACKEND PARAMETERS
 
 .TP
 \fB\-r, \-\-rate \fIint\fR
-Specify the sample rate. The default is 48000.
+Specify the sample rate. 
+(default: 48000)
 
 .TP
 \fB\-p, \-\-period \fIint\fR
 Specify the number of frames between JACK \fBprocess()\fR calls. This
-value must be a power of 2, and the default is 1024. If you need low 
+value must be a power of 2. If you need low 
 latency, set \fB\-p\fR as low as you can go without seeing xruns. A larger 
 period size yields higher latency, but makes xruns less likely. The JACK 
-capture latency in seconds is \fB\-\-period\fR divided by \fB\-\-rate\fR.
+capture latency in seconds is \fB\-\-period\fR divided by \fB\-\-rate\fR. 
+(default: 1024)
 
 .TP
 \fB\-n, \-\-nperiods \fIint\fR
-Specify the number of periods in the hardware buffer. The default is
-2. The period size (\fB\-p\fR) times \fB\-\-nperiods\fR times four
+Specify the number of periods in the hardware buffer. 
+The period size (\fB\-p\fR) times \fB\-\-nperiods\fR times four
 (assuming 2 channels 16-bit samples) is the JACK buffer size in bytes.
 The JACK output latency in seconds is \fB\-\-nperiods\fR times
 \fB\-\-period\fR divided by \fB\-\-rate\fR.
+(default: 2)
 
 .TP
 \fB\-w, \-\-wordlength \fIint\fR
-Specify the sample size in bits. The default is 16.
+Specify the sample size in bits. 
+(default: 16)
 
 .TP
 \fB\-i, \-\-inchannels \fIint\fR
-Specify how many channels to capture (default: 2)
+Specify how many channels to capture. 
+(default: 2)
 
 .TP
 \fB\-o, \-\-outchannels \fIint\fR
-Specify number of playback channels (default: 2)
+Specify number of playback channels. 
+(default: 2)
 
 .TP
 \fB\-C, \-\-capture \fIdevice_file\fR
-Specify input device for capture (default: /dev/audio)
+Specify input device for capture. 
+(default: /dev/audio)
 
 .TP
 \fB\-P, \-\-playback \fIdevice_file\fR
-Specify output device for playback (default: /dev/audio)
+Specify output device for playback. 
+(default: /dev/audio)
 
 .TP
 \fB\-b, \-\-ignorehwbuf \fIboolean\fR
-Specify, whether to ignore hardware period size (default: false)
+Specify whether or not to ignore hardware period size.
+(default: false)
+
+
 .SS PORTAUDIO BACKEND PARAMETERS
 
 .TP
 \fB\-c, \-\-channel\fR
-Maximum number of channels (default: all available hardware channels)
+Maximum number of channels. 
+(default: all available hardware channels)
 
 .TP
 \fB\-i, \-\-channelin\fR
-Maximum number of input channels (default: all available hardware channels)
+Maximum number of input channels. 
+(default: all available hardware channels)
 
 .TP
 \fB\-I, \-\-input\-latency\fR
-Extra input latency (frames) (default: 0)
+Extra input latency (frames). 
+(default: 0)
 
 .TP
 \fB\-o, \-\-channelout\fR
-Maximum number of output channels (default: all available hardware channels)
+Maximum number of output channels. 
+(default: all available hardware channels)
 
 .TP
 \fB\-O, \-\-output\-latency\fR
-Extra output latency (frames) (default: 0)
+Extra output latency (frames). 
+(default: 0)
 
 .TP
 \fB\-C, \-\-capture\fR
-Whether or not to capture (default: true)
+Whether or not to capture. 
+(default: true)
 
 .TP
 \fB\-P, \-\-playback\fR
-Whether or not to playback (default: true)
+Whether or not to playback. 
+(default: true)
 
 .TP
 \fB\-D, \-\-duplex\fR
-Capture and playback (default: true)
+Capture and playback. 
+(default: true)
 
 .TP
 \fB\-r, \-\-rate\fR
-Sample rate (default: 48000)
+Sample rate. 
+(default: 48000)
 
 .TP
 \fB\-p, \-\-period\fR
-Frames per period (default: 1024). Must be a power of 2.
+Frames per period, must be a power of 2. 
+(default: 1024)
 
 .TP
 \fB\-n, \-\-name\fR
-Driver name (default: none)
+Driver name. 
+(default: none)
 
 .TP
 \fB\-z, \-\-dither\fR
-Dithering mode (default: none)
+Dithering mode. 
+(default: none)
 
 
 .SS FIREWIRE BACKEND PARAMETERS
@@ -671,24 +759,24 @@ and can normally be omitted.
 
 .TP
 \fB\-I, \-\-input\-latency\fR
-Extra input latency (frames)
+Extra input latency (frames). 
 (default: 0)
 
 .TP
 \fB\-O, \-\-output\-latency\fR
-Extra output latency (frames)
+Extra output latency (frames). 
 (default: 0)
 
 .TP
 \fB\-v, \-\-verbose
 .br
-libffado verbose level
+libffado verbose level. 
 (default: 3)
 
 .TP
 \fB\-X, \-\-snoop\fR 
 .br
-Snoop Firewire traffic
+Snoop Firewire traffic. 
 (default: false)
 
 .TP
