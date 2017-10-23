@@ -28,7 +28,7 @@ synchronous execution of all clients and low latency operation.
 
 The name JACK makes a reference to the classical way of patching audio 
 connections with pyhsical audio jack cables.
-JACK is also a recursive acronym, that is an abbreviation whis is part 
+JACK is also a recursive acronym, that is an abbreviation which is part 
 of itself. \fIJ\fRACK \fIA\fRudio \fIC\fRonnection \fIK\fRit.
 
 For the latest JACK information, please consult the web site,
