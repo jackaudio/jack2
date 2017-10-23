@@ -163,6 +163,8 @@ Select a specific wall clock (HPET timer, System timer).
 .TP
 \fB\-V, \-\-version\fR
 Print the current JACK version number and exit.
+
+
 .SS ALSA BACKEND OPTIONS
 
 .TP
@@ -233,7 +235,7 @@ Extra input latency (frames).
 .TP
 \fB\-n, \-\-nperiods \fIint\fR
 .br
-Specify the number of periods of playback latency. In seconds, this
+Number of periods of playback latency. In seconds, this
 corresponds to \fB\-\-nperiods\fR times \fB\-\-period\fR divided by
 \fB\-\-rate\fR. The default is 2, the minimum allowed. For most
 devices, there is no need for any other value with the
@@ -271,7 +273,7 @@ playback device name.
 .TP
 \fB\-p, \-\-period \fIint\fR
 .br
-Specify the number of frames between JACK \fBprocess()\fR calls. This
+Number of frames between JACK \fBprocess()\fR calls. This
 value must be a power of 2. If you need low 
 latency, set \fB\-p\fR as low as you can go without seeing xruns. A larger 
 period size yields higher latency, but makes xruns less likely. The JACK 
@@ -280,7 +282,7 @@ capture latency in seconds is \fB\-\-period\fR divided by \fB\-\-rate\fR.
 
 .TP
 \fB\-r, \-\-rate \fIint\fR
-Specify the sample rate. 
+Sample rate. 
 (default: 48000)
 
 .TP
@@ -299,13 +301,15 @@ to disconnect unresponsive ports when running without \fB\-\-realtime\fR.
 .TP
 \fB\-X, \-\-midi \fR[\fIseq\fR|\fIraw\fR]
 .br
-Specify which ALSA MIDI system to provide access to. Using \fBraw\fR
+Which ALSA MIDI system to provide access to. Using \fBraw\fR
 will provide a set of JACK MIDI ports that correspond to each raw ALSA
 device on the machine. Using \fBseq\fR will provide a set of JACK MIDI
 ports that correspond to each ALSA "sequencer" client (which includes
 each hardware MIDI port on the machine). \fBraw\fR provides slightly
 better performance but does not permit JACK MIDI communication with
 software written to use the ALSA "sequencer" API.
+
+
 .SS COREAUDIO BACKEND PARAMETERS
 
 .TP
@@ -398,22 +402,22 @@ Whether or not to compensate clock drift in dynamically created aggregate device
 
 .TP
 \fB\-C, \-\-capture \fIint\fR
-Specify number of capture ports. 
+Number of capture ports. 
 (default: 2)
 
 .TP
 \fB\-P, \-\-playback \fIint\fR
-Specify number of playback ports. 
+Number of playback ports. 
 (default: 2)
 
 .TP
 \fB\-r, \-\-rate \fIint\fR
-Specify sample rate. 
+Sample rate. 
 (default: 48000)
 
 .TP
 \fB\-p, \-\-period \fIint\fR
-Specify the number of frames between JACK \fBprocess()\fR calls. This
+Number of frames between JACK \fBprocess()\fR calls. This
 value must be a power of 2. If you need low 
 latency, set \fB\-p\fR as low as you can go without seeing xruns. A larger 
 period size yields higher latency, but makes xruns less likely. The JACK 
@@ -422,7 +426,7 @@ capture latency in seconds is \fB\-\-period\fR divided by \fB\-\-rate\fR.
 
 .TP
 \fB\-w, \-\-wait \fIint\fR 
-Specify number of usecs to wait between engine processes. 
+Number of usecs to wait between engine processes. 
 (default: 21333)
 
 
@@ -523,12 +527,12 @@ Always use deadline.
 
 .TP
 \fB\-r, \-\-rate \fIint\fR
-Specify the sample rate. 
+Sample rate. 
 (default: 48000)
 
 .TP
 \fB\-p, \-\-period \fIint\fR
-Specify the number of frames between JACK \fBprocess()\fR calls. This
+Number of frames between JACK \fBprocess()\fR calls. This
 value must be a power of 2. If you need low 
 latency, set \fB\-p\fR as low as you can go without seeing xruns. A larger 
 period size yields higher latency, but makes xruns less likely. The JACK 
@@ -537,7 +541,7 @@ capture latency in seconds is \fB\-\-period\fR divided by \fB\-\-rate\fR.
 
 .TP
 \fB\-n, \-\-nperiods \fIint\fR
-Specify the number of periods in the hardware buffer. 
+Number of periods in the hardware buffer. 
 The period size (\fB\-p\fR) times \fB\-\-nperiods\fR times four is
 the JACK buffer size in bytes. The JACK output latency in seconds is
 \fB\-\-nperiods\fR times \fB\-\-period\fR divided by \fB\-\-rate\fR. 
@@ -545,32 +549,32 @@ the JACK buffer size in bytes. The JACK output latency in seconds is
 
 .TP
 \fB\-w, \-\-wordlength \fIint\fR
-Specify the sample size in bits. 
+Sample size in bits. 
 (default: 16)
 
 .TP
 \fB\-i, \-\-inchannels \fIint\fR
-Specify how many channels to capture. 
+Number of capture channels.
 (default: 2)
 
 .TP
 \fB\-o, \-\-outchannels \fIint\fR
-Specify number of playback channels. 
+Number of playback channels. 
 (default: 2)
 
 .TP
 \fB\-C, \-\-capture \fIdevice_file\fR
-Specify input device for capture. 
+Input device for capture. 
 (default: /dev/dsp)
 
 .TP
 \fB\-P, \-\-playback \fIdevice_file\fR
-Specify output device for playback. 
+Output device for playback. 
 (default: /dev/dsp)
 
 .TP
 \fB\-b, \-\-ignorehwbuf \fIboolean\fR
-Specify whether or not to ignore hardware period size. 
+Whether or not to ignore hardware period size. 
 (default: false)
 
 .TP
@@ -588,12 +592,12 @@ Extra output latency (frames).
 
 .TP
 \fB\-r, \-\-rate \fIint\fR
-Specify the sample rate. 
+Sample rate. 
 (default: 48000)
 
 .TP
 \fB\-p, \-\-period \fIint\fR
-Specify the number of frames between JACK \fBprocess()\fR calls. This
+Number of frames between JACK \fBprocess()\fR calls. This
 value must be a power of 2. If you need low 
 latency, set \fB\-p\fR as low as you can go without seeing xruns. A larger 
 period size yields higher latency, but makes xruns less likely. The JACK 
@@ -602,7 +606,7 @@ capture latency in seconds is \fB\-\-period\fR divided by \fB\-\-rate\fR.
 
 .TP
 \fB\-n, \-\-nperiods \fIint\fR
-Specify the number of periods in the hardware buffer. 
+Number of periods in the hardware buffer. 
 The period size (\fB\-p\fR) times \fB\-\-nperiods\fR times four
 (assuming 2 channels 16-bit samples) is the JACK buffer size in bytes.
 The JACK output latency in seconds is \fB\-\-nperiods\fR times
@@ -611,32 +615,32 @@ The JACK output latency in seconds is \fB\-\-nperiods\fR times
 
 .TP
 \fB\-w, \-\-wordlength \fIint\fR
-Specify the sample size in bits. 
+Sample size in bits. 
 (default: 16)
 
 .TP
 \fB\-i, \-\-inchannels \fIint\fR
-Specify how many channels to capture. 
+Number of capture channels.
 (default: 2)
 
 .TP
 \fB\-o, \-\-outchannels \fIint\fR
-Specify number of playback channels. 
+Number of playback channels. 
 (default: 2)
 
 .TP
 \fB\-C, \-\-capture \fIdevice_file\fR
-Specify input device for capture. 
+Input device for capture. 
 (default: /dev/audio)
 
 .TP
 \fB\-P, \-\-playback \fIdevice_file\fR
-Specify output device for playback. 
+Output device for playback. 
 (default: /dev/audio)
 
 .TP
 \fB\-b, \-\-ignorehwbuf \fIboolean\fR
-Specify whether or not to ignore hardware period size.
+Whether or not to ignore hardware period size.
 (default: false)
 
 
@@ -721,7 +725,7 @@ there is any problem.
 .TP
 \fB\-p, \-\-period \fIint\fR
 .br
-Specify the number of frames between JACK \fBprocess()\fR calls. This
+Number of frames between JACK \fBprocess()\fR calls. This
 value must be a power of 2. If you need low latency, set \fB\-p\fR as 
 low as you can go without seeing xruns. A larger period size yields higher 
 latency, but makes xruns less likely. The JACK capture latency in seconds 
@@ -731,14 +735,14 @@ is \fB\-\-period\fR divided by \fB\-\-rate\fR.
 .TP
 \fB\-n, \-\-nperiods \fIint\fR
 .br
-Specify the number of periods of playback latency. Value must be greater or 
+Number of periods of playback latency. Value must be greater or 
 equal 2. In seconds, this corresponds to \fB\-\-nperiods\fR times \fB\-\-period\fR 
 divided by \fB\-\-rate\fR.
 (default: 3)
 
 .TP
 \fB\-r, \-\-rate \fIint\fR
-Specify the sample rate.
+Sample rate.
 (default: 48000)
 
 .TP
@@ -833,8 +837,8 @@ defined in ~/.asoundrc. Apply shaped dithering to playback audio.
 .PP
 Run \fBjackd\fR with no special privileges using the second ALSA
 hardware card defined in \fB/etc/modules.conf\fR. Any xruns reported
-by the ALSA backend will be ignored.  The larger buffer helps reduce
-data loss.  Rectangular dithering will be used for playback.
+by the ALSA backend will be ignored. The larger buffer helps reduce
+data loss. Rectangular dithering will be used for playback.
 
 .IP
 \fBjackd \-d alsa \-d hw:1 \-p2048 \-n3 \-\-softmode \-zr\fR
@@ -854,15 +858,15 @@ Run \fBjackd\fR in playback\-only mode using the ALSA hw:0,0 device.
 .SH "ENVIRONMENT"
 .br
 JACK is evolving a mechanism for automatically starting the server
-when needed.  Any client started without a running JACK server will
+when needed. Any client started without a running JACK server will
 attempt to start one itself using the command line found in the first
 line of \fB$HOME/.jackdrc\fR if it exists, or \fB/etc/jackdrc\fR if it
-does not.  If neither file exists, a built\-in default command will be
+does not. If neither file exists, a built\-in default command will be
 used, including the \fB\-T\fR flag, which causes the server to shut
 down when all clients have exited.
 
 As a transition, this only happens when \fB$JACK_START_SERVER\fR is
-defined in the environment of the calling process.  In the future this
+defined in the environment of the calling process. In the future this
 will become normal behavior. In either case, defining
 \fB$JACK_NO_START_SERVER\fR disables this feature.
 
