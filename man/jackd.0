@@ -221,7 +221,7 @@ imposing the basic JACK system latency determined by the
 Number of capture channels. Default is maximum supported by hardware.
 
 .TP
-\fB\-I \-\-input\-latency\fR
+\fB\-I, \-\-input\-latency\fR
 Extra input latency (frames) (default: 0)
 
 .TP
@@ -252,7 +252,7 @@ devices supported by FFADO (formerly Freebob) are configured with
 Number of playback channels. Default is maximum supported by hardware.
 
 .TP
-\fB\-O \-\-output\-latency\fR
+\fB\-O, \-\-output\-latency\fR
 Extra output latency (frames) (default: 0)
 
 .TP
@@ -298,71 +298,71 @@ software written to use the ALSA "sequencer" API.
 .SS COREAUDIO BACKEND PARAMETERS
 
 .TP
-\fB\-c \-\-channels\fR
+\fB\-c, \-\-channels\fR
 Maximum number of channels (default: 2)
 
 .TP
-\fB\-i \-\-inchannels\fR
+\fB\-i, \-\-inchannels\fR
 Maximum number of input channels (default: 2)
 
 .TP
-\fB\-o \-\-outchannels\fR
+\fB\-o, \-\-outchannels\fR
 Maximum number of output channels (default: 2)
 
 .TP
-\fB\-C \-\-capture\fR
+\fB\-C, \-\-capture\fR
 Whether or not to capture (default: true)
 
 .TP
-\fB\-P \-\-playback\fR
+\fB\-P, \-\-playback\fR
 Whether or not to playback (default: true)
 
 .TP
-\fB\-D \-\-monitor\fR
+\fB\-D, \-\-monitor\fR
 Provide monitor ports for the output (default: false)
 
 .TP
-\fB\-D \-\-duplex\fR
+\fB\-D, \-\-duplex\fR
 Capture and playback (default: true)
 
 .TP
-\fB\-r \-\-rate\fR
+\fB\-r, \-\-rate\fR
 Sample rate (default: 44100)
 
 .TP
-\fB\-p \-\-period\fR
+\fB\-p, \-\-period\fR
 Frames per period (default: 128). Must be a power of 2.
 
 .TP
-\fB\-d \-\-device\fR
+\fB\-d, \-\-device\fR
 CoreAudio device name (default: none)
 
 .TP
-\fB\-I \-\-input\-latency\fR
+\fB\-I, \-\-input\-latency\fR
 Extra input latency (frames) (default: 0)
 
 .TP
-\fB\-O \-\-output\-latency\fR
+\fB\-O, \-\-output\-latency\fR
 Extra output latency (frames) (default: 0)
 
 .TP
-\fB\-l \-\-list\-devices \fR
+\fB\-l, \-\-list\-devices \fR
 Display available CoreAudio devices (default: false)
 
 .TP
-\fB\-H \-\-hog \fR
+\fB\-H, \-\-hog \fR
 Take exclusive access of the audio device (default: false)
 
 .TP
-\fB\-L \-\-async\-latency \fR
+\fB\-L, \-\-async\-latency \fR
 Extra output latency in asynchronous mode (percent) (default: 100)
 
 .TP
-\fB\-G \-\-grain \fR
+\fB\-G, \-\-grain \fR
 Computation grain in RT thread (percent) (default: 100)
 
 .TP
-\fB\-s \-\-clock\-drift \fR
+\fB\-s, \-\-clock\-drift \fR
 Whether to compensate clock drift in dynamically created aggregate device (default: false)
 .SS DUMMY BACKEND PARAMETERS
 
@@ -395,15 +395,15 @@ The default value is 21333.
 .SS NETONE BACKEND PARAMETERS
 
 .TP
- \fB\-i, \-\-audio\-ins \fIint\fR
+\fB\-i, \-\-audio\-ins \fIint\fR
 Number of capture channels (default: 2)
 
 .TP
- \fB\-o, \-\-audio\-outs \fIint\fR
+\fB\-o, \-\-audio\-outs \fIint\fR
 Number of playback channels (default: 2)
 
 .TP
- \fB\-I, \-\-midi\-ins \fIint\fR
+\fB\-I, \-\-midi\-ins \fIint\fR
 Number of midi capture channels (default: 1)
 
 .TP 
@@ -411,7 +411,7 @@ Number of midi capture channels (default: 1)
 Number of midi playback channels (default: 1)
 
 .TP
- \fB\-r, \-\-rate \fIint\fR
+\fB\-r, \-\-rate \fIint\fR
 Sample rate (default: 48000)
 
 .TP 
@@ -513,11 +513,11 @@ Specify output device for playback (default: /dev/dsp)
 Specify, whether to ignore hardware period size (default: false)
 
 .TP
-\fB\-I \-\-input\-latency\fR
+\fB\-I, \-\-input\-latency\fR
 Extra input latency (frames) (default: 0)
 
 .TP
-\fB\-O \-\-output\-latency\fR
+\fB\-O, \-\-output\-latency\fR
 Extra output latency (frames) (default: 0)
 .SS SUN BACKEND PARAMETERS
 
@@ -567,51 +567,51 @@ Specify, whether to ignore hardware period size (default: false)
 .SS PORTAUDIO BACKEND PARAMETERS
 
 .TP
-\fB\-c \-\-channel\fR
+\fB\-c, \-\-channel\fR
 Maximum number of channels (default: all available hardware channels)
 
 .TP
-\fB\-i \-\-channelin\fR
+\fB\-i, \-\-channelin\fR
 Maximum number of input channels (default: all available hardware channels)
 
 .TP
-\fB\-I \-\-input\-latency\fR
+\fB\-I, \-\-input\-latency\fR
 Extra input latency (frames) (default: 0)
 
 .TP
-\fB\-o \-\-channelout\fR
+\fB\-o, \-\-channelout\fR
 Maximum number of output channels (default: all available hardware channels)
 
 .TP
-\fB\-O \-\-output\-latency\fR
+\fB\-O, \-\-output\-latency\fR
 Extra output latency (frames) (default: 0)
 
 .TP
-\fB\-C \-\-capture\fR
+\fB\-C, \-\-capture\fR
 Whether or not to capture (default: true)
 
 .TP
-\fB\-P \-\-playback\fR
+\fB\-P, \-\-playback\fR
 Whether or not to playback (default: true)
 
 .TP
-\fB\-D \-\-duplex\fR
+\fB\-D, \-\-duplex\fR
 Capture and playback (default: true)
 
 .TP
-\fB\-r \-\-rate\fR
+\fB\-r, \-\-rate\fR
 Sample rate (default: 48000)
 
 .TP
-\fB\-p \-\-period\fR
+\fB\-p, \-\-period\fR
 Frames per period (default: 1024). Must be a power of 2.
 
 .TP
-\fB\-n \-\-name\fR
+\fB\-n, \-\-name\fR
 Driver name (default: none)
 
 .TP
-\fB\-z \-\-dither\fR
+\fB\-z, \-\-dither\fR
 Dithering mode (default: none)
 
 
@@ -670,12 +670,12 @@ and can normally be omitted.
 \-D can not be combined with \-P or \-C.
 
 .TP
-\fB\-I \-\-input\-latency\fR
+\fB\-I, \-\-input\-latency\fR
 Extra input latency (frames)
 (default: 0)
 
 .TP
-\fB\-O \-\-output\-latency\fR
+\fB\-O, \-\-output\-latency\fR
 Extra output latency (frames)
 (default: 0)
 
@@ -794,33 +794,33 @@ was compiled with DBus support but should run on a headless system.
 
 .SH "SEE ALSO:"
 .PP
-.I <\fBhttp://www.jackaudio.org/\fR>
+<\fBhttp://www.jackaudio.org/\fR>
 .br
 The official JACK website with news, docs and a list of JACK clients.
 .PP
-.I <\fBhttp://www.github.com/jackaudio/\fR>
+<\fBhttp://www.github.com/jackaudio/\fR>
 .br
 The official JACK github code repository. Pull requests are welcome.
 .PP
-.I <\fBhttp://lists.jackaudio.org/listinfo.cgi/jack-devel-jackaudio.org\fR>
+<\fBhttp://lists.jackaudio.org/listinfo.cgi/jack-devel-jackaudio.org\fR>
 .br
 The JACK developers' mailing list. Subscribe to take part in
 development of JACK or JACK clients. User questions are also welcome,
 there is no user-specific mailing list.
 .PP
-.I <\fBhttp://www.jackosx.com/\fR>
+<\fBhttp://www.jackosx.com/\fR>
 .br
 Tools specific to the Mac OS X version of JACK.
 .PP
-.I <\fBhttp://www.alsa\-project.org/\fR>
+<\fBhttp://www.alsa\-project.org/\fR>
 .br
 The Advanced Linux Sound Architecture.
 .PP
-.I <\fBhttp://www.ffado.org/\fR>
+<\fBhttp://www.ffado.org/\fR>
 .br
 The Free Firewire Audio Drivers (FFADO) Site.
 .PP
-.I <\fBirc.freenode.net#jack\fR>
+<\fBirc.freenode.net#jack\fR>
 .br
 Join the JACK community with your favourite IRC client.
 
@@ -828,7 +828,7 @@ Join the JACK community with your favourite IRC client.
 .SH "BUGS"
 Please report bugs as issues to the corresponding repository:
 .br
-.I <\fBhttp://www.github.com/jackaudio/\fR>
+<\fBhttp://www.github.com/jackaudio/\fR>
 
 
 .SH "AUTHORS"
