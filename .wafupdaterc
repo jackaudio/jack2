@@ -1,5 +1,5 @@
 # This file is sourced by wafupdate when waf is updated.
-# wafupdate home page: https://gitlab.com/lilrc/wafupdate
+# wafupdate home page: https://gitlab.com/karllinden/wafupdate
 
 WAFLIB_STRIP_TOOLS="
     asm

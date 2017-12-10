@@ -754,7 +754,7 @@ def create_driver_obj(bld, **kw):
     if bld.env['IS_MACOSX'] or bld.env['IS_WINDOWS']:
         # On MacOSX this is necessary.
         # I do not know if this is necessary on Windows.
-        # Note added on 2015-12-13 by lilrc.
+        # Note added on 2015-12-13 by karllinden.
         if 'use' in kw:
             kw['use'] += ['serverlib']
         else:
