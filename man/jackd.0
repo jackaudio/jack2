@@ -883,6 +883,15 @@ Defining \fB$JACK_NO_AUDIO_RESERVATION\fR will bypass audio device
 reservation via session bus (DBus). This can be useful if JACK
 was compiled with DBus support but should run on a headless system.
 
+\fB$JACK_PROMISCUOUS_SERVER\fR enables an alternate way of handling the various
+shared resources (Unix sockets, semaphores, ...). In this mode, the generated
+names will not contain the user id anymore, and the permissions of those
+resources will be relaxed, allowing clients from different users to talk with
+the same server. Moreover, on platforms that support it (all POSIX variants),
+if set to a valid Unix group name or id, the permissions will be restricted to
+that group, so only members of that group will be able to launch clients that
+talk to this server. Important note: it must be set with the same value for
+both server and clients to work as expected.
 
 .SH "SEE ALSO:"
 .PP
