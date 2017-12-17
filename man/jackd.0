@@ -54,6 +54,12 @@ the \fB\-\-help\fR option for each specific backend. Examples below
 show how to list them.
 
 .TP
+\fB\-a, \-\-autoconnect\fR \fImodechar\fR
+Select how to handle self connect requests. They can be ignore or fail, 
+on all port or just external ones. Use the \fB\-\-help\fR option to know 
+your system specific options. The default is to not restrict self connect 
+requests.".
+.TP
 \fB\-m, \-\-no\-mlock\fR
 Do not attempt to lock memory, even if \fB\-\-realtime\fR.
 
