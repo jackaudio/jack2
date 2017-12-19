@@ -723,7 +723,7 @@ int JackClient::PortConnect(const char* src, const char* dst)
         return -1; 
     }
     if (strlen(dst) >= REAL_JACK_PORT_NAME_SIZE) {
-        jack_error("\"%s\" is too long to be used as a JACK port name.\n", src);
+        jack_error("\"%s\" is too long to be used as a JACK port name.\n", dst);
         return -1; 
     }
     int result = -1;
@@ -739,7 +739,7 @@ int JackClient::PortDisconnect(const char* src, const char* dst)
         return -1; 
     }
     if (strlen(dst) >= REAL_JACK_PORT_NAME_SIZE) {
-        jack_error("\"%s\" is too long to be used as a JACK port name.\n", src);
+        jack_error("\"%s\" is too long to be used as a JACK port name.\n", dst);
         return -1; 
     }
     int result = -1;
