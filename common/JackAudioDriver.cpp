@@ -371,7 +371,7 @@ jack_default_audio_sample_t* JackAudioDriver::GetOutputBuffer(int port_index)
 
 jack_default_audio_sample_t* JackAudioDriver::GetMonitorBuffer(int port_index)
 {
-    return fPlaybackPortList[port_index]
+    return fMonitorPortList[port_index]
         ? (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fMonitorPortList[port_index], fEngineControl->fBufferSize)
         : NULL;
 }
