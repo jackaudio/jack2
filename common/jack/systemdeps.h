@@ -68,7 +68,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
     #ifdef _MSC_VER     /* Microsoft compiler */
         #define __inline__ inline
-        #if (!defined(int8_t) && !defined(_STDINT_H))
+        #if _MSC_VER >= 1600
+            #include <stdint.h>
+            #include <sys/types.h>
+        #elif (!defined(int8_t) && !defined(_STDINT_H))
             #define __int8_t_defined
             typedef char int8_t;
             typedef unsigned char uint8_t;
