@@ -32,6 +32,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <dirent.h>
 #endif
 
+#ifdef _MSC_VER
+#define strcasecmp _stricmp
+#endif
+
 #ifdef WIN32
 
 static char* locate_dll_driver_dir()
