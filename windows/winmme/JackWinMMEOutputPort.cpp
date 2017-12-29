@@ -26,6 +26,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackGlobals.h"
 #include "JackEngineControl.h"
 
+using Jack::JackMidiBuffer;
 using Jack::JackWinMMEOutputPort;
 
 ///////////////////////////////////////////////////////////////////////////////

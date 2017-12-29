@@ -24,6 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackMidiRawOutputWriteQueue.h"
 #include "JackMidiUtil.h"
 
+using Jack::JackMidiSendQueue;
 using Jack::JackMidiRawOutputWriteQueue;
 
 #define STILL_TIME(c, b) ((! (b)) || ((c) < (b)))

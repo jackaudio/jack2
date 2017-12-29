@@ -24,6 +24,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackWinMMEDriver.h"
 #include "driver_interface.h"
 
+using Jack::JackLockedEngine;
+using Jack::JackSynchro;
 using Jack::JackWinMMEDriver;
 
 JackWinMMEDriver::JackWinMMEDriver(const char *name, const char *alias,
