@@ -27,6 +27,10 @@
 #include <jack/jack.h>
 #include <jack/control.h>
 
+#ifdef _MSC_VER
+#define alloca _alloca
+#endif
+
 static jackctl_driver_t * jackctl_server_get_driver(jackctl_server_t *server, const char *driver_name)
 {
     const JSList * node_ptr = jackctl_server_get_drivers_list(server);

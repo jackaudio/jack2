@@ -26,6 +26,10 @@
 #include <jack/jack.h>
 #include <jack/transport.h>
 
+#ifdef _MSC_VER
+#define alloca _alloca
+#endif
+
 jack_client_t *client;
 
 static void

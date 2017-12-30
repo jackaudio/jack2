@@ -63,6 +63,10 @@ $Id: net_driver.c,v 1.17 2006/04/16 20:16:10 torbenh Exp $
 
 #define MIN(x,y) ((x)<(y) ? (x) : (y))
 
+#ifdef _MSC_VER
+#define alloca _alloca
+#endif
+
 static int sync_state = 1;
 static jack_transport_state_t last_transport_state;
 
