@@ -52,7 +52,7 @@ extern "C"
 
     using namespace Jack;
 
-    SERVER_EXPORT int jack_internal_initialize(jack_client_t* jack_client, const JSList* params)
+    LIB_EXPORT int jack_internal_initialize(jack_client_t* jack_client, const JSList* params)
     {
         jack_log("Loading audioadapter");
 
@@ -78,7 +78,7 @@ extern "C"
         }
     }
 
-    SERVER_EXPORT int jack_initialize(jack_client_t* jack_client, const char* load_init)
+    LIB_EXPORT int jack_initialize(jack_client_t* jack_client, const char* load_init)
     {
         JSList* params = NULL;
         bool parse_params = true;
@@ -97,7 +97,7 @@ extern "C"
         return res;
     }
 
-    SERVER_EXPORT void jack_finish(void* arg)
+    LIB_EXPORT void jack_finish(void* arg)
     {
         Jack::JackAudioAdapter* adapter = static_cast<Jack::JackAudioAdapter*>(arg);
 

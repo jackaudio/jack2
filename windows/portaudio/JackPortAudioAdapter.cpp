@@ -202,7 +202,7 @@ extern "C"
 {
 #endif
 
-    SERVER_EXPORT jack_driver_desc_t* jack_get_descriptor()
+    LIB_EXPORT jack_driver_desc_t* jack_get_descriptor()
     {
         jack_driver_desc_t * desc;
         jack_driver_desc_filler_t filler;

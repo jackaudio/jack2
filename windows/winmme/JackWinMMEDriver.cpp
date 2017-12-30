@@ -360,12 +360,12 @@ extern "C"
     // singleton kind of driver
     static Jack::JackWinMMEDriver* driver = NULL;
 
-    SERVER_EXPORT jack_driver_desc_t * driver_get_descriptor()
+    LIB_EXPORT jack_driver_desc_t * driver_get_descriptor()
     {
         return jack_driver_descriptor_construct("winmme", JackDriverSlave, "WinMME API based MIDI backend", NULL);
     }
 
-    SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)
+    LIB_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)
     {
         /*
         unsigned int capture_ports = 2;
