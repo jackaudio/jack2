@@ -477,6 +477,7 @@ def configure(conf):
     if conf.env['IS_WINDOWS']:
         conf.env.append_unique('CCDEFINES', '_POSIX')
         conf.env.append_unique('CXXDEFINES', '_POSIX')
+        conf.env.append_unique('DEFINES', ['_WINSOCKAPI_'])
 
     conf.env.append_unique('CXXFLAGS', '-Wall')
     conf.env.append_unique('CFLAGS', '-Wall')

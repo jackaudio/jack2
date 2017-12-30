@@ -54,7 +54,6 @@
 
 #ifdef WIN32
 #include <winsock2.h>
-#define socklen_t int
 #include <malloc.h>
 #define socklen_t int
 #else
