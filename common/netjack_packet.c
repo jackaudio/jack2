@@ -87,6 +87,10 @@
 #define jack_error printf
 #endif
 
+#ifdef _MSC_VER
+#define alloca _alloca
+#endif
+
 int fraggo = 0;
 
 void

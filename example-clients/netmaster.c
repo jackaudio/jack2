@@ -31,6 +31,10 @@
 
 #include <jack/net.h>
 
+#ifdef _MSC_VER
+#define alloca _alloca
+#endif
+
 jack_net_master_t* net;
 
 #define BUFFER_SIZE 512

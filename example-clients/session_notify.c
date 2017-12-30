@@ -33,6 +33,10 @@
 #include <jack/transport.h>
 #include <jack/session.h>
 
+#ifdef _MSC_VER
+#define alloca _alloca
+#endif
+
 char *package;				/* program name */
 jack_client_t *client;
 

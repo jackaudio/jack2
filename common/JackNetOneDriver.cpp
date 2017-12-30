@@ -43,6 +43,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <opus/opus_custom.h>
 #endif
 
+#ifdef _MSC_VER
+#define alloca _alloca
+#endif
+
 #define MIN(x,y) ((x)<(y) ? (x) : (y))
 
 using namespace std;

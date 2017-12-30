@@ -100,7 +100,11 @@ static void MidiBufferMixdown(void* mixbuffer, void** src_buffers, int src_count
     }
     mix->Reset(nframes);
 
+#if _MSC_VER
+    uint32_t* mix_index = (uint32_t*)_alloca(sizeof(uint32_t) * src_count);
+#else
     uint32_t mix_index[src_count];
+#endif
     int event_count = 0;
     for (int i = 0; i < src_count; ++i) {
         JackMidiBuffer* buf = static_cast<JackMidiBuffer*>(src_buffers[i]);
