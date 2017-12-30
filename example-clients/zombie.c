@@ -20,7 +20,9 @@
 
 #include <stdio.h>
 #include <errno.h>
+#ifndef WIN32
 #include <unistd.h>
+#endif
 #include <string.h>
 #include <stdlib.h>
 #include <jack/jack.h>

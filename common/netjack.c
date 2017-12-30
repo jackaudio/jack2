@@ -30,7 +30,9 @@ $Id: net_driver.c,v 1.17 2006/04/16 20:16:10 torbenh Exp $
 #include <math.h>
 #include <stdio.h>
 #include <memory.h>
+#ifndef WIN32
 #include <unistd.h>
+#endif
 #include <stdlib.h>
 #include <errno.h>
 #include <stdarg.h>

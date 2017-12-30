@@ -23,7 +23,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackTime.h"
 #include "JackCompilerDeps.h"
 #include <iostream>
+#ifndef WIN32
 #include <unistd.h>
+#endif
 #include <math.h>
 
 namespace Jack

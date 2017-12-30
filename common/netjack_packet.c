@@ -43,7 +43,9 @@
 #include <math.h>
 #include <stdio.h>
 #include <memory.h>
+#ifndef WIN32
 #include <unistd.h>
+#endif
 #include <stdlib.h>
 #include <errno.h>
 #include <stdarg.h>

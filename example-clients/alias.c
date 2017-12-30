@@ -16,7 +16,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#ifndef WIN32
 #include <unistd.h>
+#endif
 #include <string.h>
 #include <getopt.h>
 #include <jack/jack.h>
