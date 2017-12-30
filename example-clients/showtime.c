@@ -16,7 +16,9 @@
 
 #include <stdio.h>
 #include <errno.h>
+#ifndef WIN32
 #include <unistd.h>
+#endif
 #include <signal.h>
 #include <stdlib.h>
 #include <inttypes.h>

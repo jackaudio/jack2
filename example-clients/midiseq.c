@@ -21,7 +21,9 @@
 #include <stdio.h>
 #include <signal.h>
 #include <stdlib.h>
+#ifndef WIN32
 #include <unistd.h>
+#endif
 
 jack_client_t *client;
 jack_port_t *output_port;

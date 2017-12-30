@@ -7,7 +7,9 @@
 
 #include <stdio.h>
 #include <errno.h>
+#ifndef WIN32
 #include <unistd.h>
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
