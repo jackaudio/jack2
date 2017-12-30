@@ -908,7 +908,7 @@ extern "C"
 {
 #endif
 
-    SERVER_EXPORT jack_driver_desc_t* driver_get_descriptor ()
+    LIB_EXPORT jack_driver_desc_t* driver_get_descriptor ()
     {
         jack_driver_desc_t * desc;
         jack_driver_desc_filler_t filler;
@@ -974,7 +974,7 @@ extern "C"
         return desc;
     }
 
-    SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)
+    LIB_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)
     {
         jack_nframes_t sample_rate = 48000;
         jack_nframes_t resample_factor = 1;

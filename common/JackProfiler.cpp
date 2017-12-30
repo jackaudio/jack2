@@ -204,7 +204,7 @@ extern "C"
     
     static Jack::JackProfiler* profiler = NULL;
 
-    SERVER_EXPORT jack_driver_desc_t* jack_get_descriptor()
+    LIB_EXPORT jack_driver_desc_t* jack_get_descriptor()
     {
         jack_driver_desc_t * desc;
         jack_driver_desc_filler_t filler;
@@ -220,7 +220,7 @@ extern "C"
         return desc;
     }
 
-    SERVER_EXPORT int jack_internal_initialize(jack_client_t* jack_client, const JSList* params)
+    LIB_EXPORT int jack_internal_initialize(jack_client_t* jack_client, const JSList* params)
     {
         if (profiler) {
             jack_info("profiler already loaded");
@@ -237,7 +237,7 @@ extern "C"
         }
     }
 
-    SERVER_EXPORT int jack_initialize(jack_client_t* jack_client, const char* load_init)
+    LIB_EXPORT int jack_initialize(jack_client_t* jack_client, const char* load_init)
     {
         JSList* params = NULL;
         bool parse_params = true;
@@ -255,7 +255,7 @@ extern "C"
         return res;
     }
 
-    SERVER_EXPORT void jack_finish(void* arg)
+    LIB_EXPORT void jack_finish(void* arg)
     {
         Jack::JackProfiler* profiler = static_cast<Jack::JackProfiler*>(arg);
 

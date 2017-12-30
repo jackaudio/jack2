@@ -483,7 +483,7 @@ namespace Jack
     {
 #endif
 
-        SERVER_EXPORT jack_driver_desc_t* driver_get_descriptor()
+        LIB_EXPORT jack_driver_desc_t* driver_get_descriptor()
         {
             jack_driver_desc_t * desc;
             jack_driver_desc_filler_t filler;
@@ -516,7 +516,7 @@ namespace Jack
             return desc;
         }
 
-        SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)
+        LIB_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)
         {
             char upstream[JACK_CLIENT_NAME_SIZE + 1];
             char promiscuous[JACK_CLIENT_NAME_SIZE + 1] = {0};
