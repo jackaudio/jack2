@@ -25,8 +25,10 @@
 
 #ifdef SERVER_SIDE
     #define	SERVER_EXPORT __declspec(dllexport)
-#else
+#elif SERVER_STATIC
     #define	SERVER_EXPORT
+#else
+    #define	SERVER_EXPORT __declspec(dllimport)
 #endif
 
 #if __GNUC__

@@ -1412,6 +1412,7 @@ jack_time_t jack_get_time(void) JACK_OPTIONAL_WEAK_EXPORT;
  */
 /*@{*/
 
+#if !defined(WIN32)
 /**
  * Display JACK error message.
  *
@@ -1421,6 +1422,7 @@ jack_time_t jack_get_time(void) JACK_OPTIONAL_WEAK_EXPORT;
  * @param msg error message text (no newline at end).
  */
 extern void (*jack_error_callback)(const char *msg) JACK_OPTIONAL_WEAK_EXPORT;
+#endif
 
 /**
  * Set the @ref jack_error_callback for error message display.
@@ -1431,6 +1433,7 @@ extern void (*jack_error_callback)(const char *msg) JACK_OPTIONAL_WEAK_EXPORT;
  */
 void jack_set_error_function (void (*func)(const char *)) JACK_OPTIONAL_WEAK_EXPORT;
 
+#if !defined(WIN32)
 /**
  * Display JACK info message.
  *
@@ -1440,6 +1443,7 @@ void jack_set_error_function (void (*func)(const char *)) JACK_OPTIONAL_WEAK_EXP
  * @param msg info message text (no newline at end).
  */
 extern void (*jack_info_callback)(const char *msg) JACK_OPTIONAL_WEAK_EXPORT;
+#endif
 
 /**
  * Set the @ref jack_info_callback for info message display.

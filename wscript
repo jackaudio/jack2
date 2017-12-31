@@ -185,7 +185,7 @@ def detect_platform(conf):
         ('IS_LINUX',   'Linux',   ['gnu0', 'gnukfreebsd', 'linux', 'posix']),
         ('IS_MACOSX',  'MacOS X', ['darwin']),
         ('IS_SUN',     'SunOS',   ['sunos']),
-        ('IS_WINDOWS', 'Windows', ['cygwin', 'msys', 'win32'])
+        ('IS_WINDOWS', 'Windows', ['cygwin', 'msys', 'win32', 'Windows'])
     ]
 
     for key,name,strings in platforms:
@@ -209,7 +209,8 @@ def configure(conf):
     if conf.env['IS_WINDOWS']:
         conf.env.append_unique('CCDEFINES', '_POSIX')
         conf.env.append_unique('CXXDEFINES', '_POSIX')
-        conf.env.append_unique('DEFINES', ['_WINSOCKAPI_'])
+        conf.env.append_unique('CXXFLAGS', ['/EHsc'])
+        conf.env.append_unique('DEFINES', ['WIN32', '_WINSOCKAPI_', '_ALLOW_KEYWORD_MACROS', '_CRT_SECURE_NO_WARNINGS', 'NOMINMAX', '_USE_MATH_DEFINES', '__STDC__'])
 
     conf.env.append_unique('CXXFLAGS', '-Wall')
     conf.env.append_unique('CXXFLAGS', '-std=gnu++11')
@@ -271,7 +272,11 @@ def configure(conf):
     conf.env['LIB_DL'] = ['dl']
     conf.env['LIB_RT'] = ['rt']
     conf.env['LIB_M'] = ['m']
-    conf.env['LIB_STDC++'] = ['stdc++']
+    if not conf.env['IS_WINDOWS']:
+        conf.env['LIB_STDC++'] = ['stdc++']
+    else:
+        conf.env['LIB_ADVAPI32'] = ['advapi32']
+        conf.env['LIB_SHELL32'] = ['shell32']
     conf.env['JACK_API_VERSION'] = JACK_API_VERSION
     conf.env['JACK_VERSION'] = VERSION
 
@@ -463,15 +468,15 @@ def obj_add_includes(bld, obj):
     if bld.env['IS_WINDOWS']:
         obj.includes += ['windows']
 
-# FIXME: Is SERVER_SIDE needed?
 def build_jackd(bld):
     jackd = bld(
         features = ['cxx', 'cxxprogram'],
-        defines = ['HAVE_CONFIG_H','SERVER_SIDE'],
+        defines = ['HAVE_CONFIG_H'],
         includes = ['.', 'common', 'common/jack'],
         target = 'jackd',
         source = ['common/Jackdmp.cpp'],
-        use = ['serverlib', 'SYSTEMD']
+        use = ['serverlib', 'SYSTEMD'],
+        idx = 2000
     )
 
     if bld.env['BUILD_JACKDBUS']:
@@ -487,6 +492,9 @@ def build_jackd(bld):
 
     if bld.env['IS_SUN']:
         jackd.use += ['DL', 'PTHREAD']
+
+    if bld.env['IS_WINDOWS']:
+        jackd.source += [ '../windows/getopt1.c', '../windows/getopt.c' ]
 
     obj_add_includes(bld, jackd)
 
@@ -505,7 +513,7 @@ def create_driver_obj(bld, **kw):
 
     driver = bld(
         features = ['c', 'cxx', 'cshlib', 'cxxshlib'],
-        defines = ['HAVE_CONFIG_H', 'SERVER_SIDE'],
+        defines = ['HAVE_CONFIG_H'],
         includes = ['.', 'common', 'common/jack'],
         install_path = '${ADDON_DIR}/',
         **kw)

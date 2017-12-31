@@ -80,6 +80,8 @@ def build(bld):
             prog.use += ['M']
         #prog.cflags = ['-Wno-deprecated-declarations', '-Wno-misleading-indentation']
         #prog.cxxflags = ['-Wno-deprecated-declarations', '-Wno-misleading-indentation']
+        if bld.env['IS_WINDOWS']:
+            prog.source = [prog.source, '../windows/getopt1.c', '../windows/getopt.c']
 
         prog.target = example_program
 

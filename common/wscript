@@ -17,11 +17,13 @@ def configure(conf):
         conf.check(function_name='timeGetDevCaps', header_name=['windows.h', 'mmsystem.h'], lib='winmm', uselib_store='WINMM', define_name='HAVE_MMSYSTEM_H')
         conf.check(function_name='EnumProcesses', header_name=['windows.h', 'psapi.h'], lib='psapi', uselib_store='PSAPI', define_name='HAVE_PSAPI_H')
 
-def create_jack_process_obj(bld, target, sources, uselib = None, framework = None):
+def create_jack_process_obj(bld, target, sources, uselib = None, framework = None, idx = None):
     process = bld(features = ['cxx', 'cxxshlib'])
+    if idx != None:
+        process.idx = idx
     if not bld.env['IS_WINDOWS']:
         process.env['cxxshlib_PATTERN'] = '%s.so'
-    process.defines  = ['HAVE_CONFIG_H','SERVER_SIDE']
+    process.defines  = ['HAVE_CONFIG_H']
     if bld.env['IS_MACOSX']:
         if framework:
             process.framework = framework
@@ -125,6 +127,7 @@ def build(bld):
 
     if bld.env['IS_WINDOWS']:
         common_libsources += [
+            'JackDebugClient.cpp',
             '../windows/JackWinMutex.cpp',
             '../windows/JackWinProcessSync.cpp',
             '../windows/JackWinSemaphore.cpp',
@@ -136,11 +139,13 @@ def build(bld):
         uselib.append('WS2_32')
         uselib.append('PSAPI')
         uselib.append('WINMM')
+        uselib.append('SHELL32')
+        uselib.append('ADVAPI32')
 
     clientlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
     if bld.env['IS_MACOSX']:
         clientlib.framework = ['CoreAudio', 'Accelerate']
-    clientlib.defines = 'HAVE_CONFIG_H'
+    clientlib.defines = ['HAVE_CONFIG_H', 'SERVER_STATIC']
     clientlib.use = uselib
     if bld.env['IS_WINDOWS']:
          clientlib.env['cxxshlib_PATTERN'] = 'lib%s.dll'
@@ -202,7 +207,7 @@ def build(bld):
         # we don't want to build other stuff in this variant
         return
 
-    serverlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'])
+    serverlib = bld(features = ['c', 'cxx', 'cxxshlib', 'cshlib'], idx = 3000)
     if bld.env['IS_MACOSX']:
         serverlib.framework = ['CoreAudio', 'CoreFoundation', 'Accelerate']
     serverlib.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
@@ -284,6 +289,8 @@ def build(bld):
             '../windows/JackWinNamedPipeServerNotifyChannel.cpp',
             '../windows/JackWinNamedPipeNotifyChannel.cpp',
             '../windows/JackNetWinSocket.cpp',
+            '../windows/getopt1.c',
+            '../windows/getopt.c'
             ]
 
     serverlib.vnum = bld.env['JACK_API_VERSION']
@@ -396,7 +403,7 @@ def build(bld):
 
     if bld.env['BUILD_ADAPTER'] and bld.env['IS_WINDOWS']:
          audio_adapter_sources += ['../windows/portaudio/JackPortAudioAdapter.cpp', '../windows/portaudio/JackPortAudioDevices.cpp']
-         process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
+         process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib, idx = 1000)
          process.use += ['SAMPLERATE', 'PORTAUDIO']
 
 
