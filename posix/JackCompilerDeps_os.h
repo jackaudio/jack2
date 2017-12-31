@@ -32,8 +32,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
         #else
             #define SERVER_EXPORT __attribute__((visibility("default")))
         #endif
-    #else
+    #elif SERVER_CLIENT
         #define SERVER_EXPORT __attribute__((visibility("hidden")))
+    #else
+        #define SERVER_EXPORT
     #endif
     
 #else
