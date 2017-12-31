@@ -209,12 +209,13 @@ def configure(conf):
     if conf.env['IS_WINDOWS']:
         conf.env.append_unique('CCDEFINES', '_POSIX')
         conf.env.append_unique('CXXDEFINES', '_POSIX')
-        conf.env.append_unique('CXXFLAGS', ['/EHsc'])
+        conf.env.append_unique('CXXFLAGS', ['/EHsc', '/W3'])
+        conf.env.append_unique('CFLAGS', '/W3')
         conf.env.append_unique('DEFINES', ['WIN32', '_WINSOCKAPI_', '_ALLOW_KEYWORD_MACROS', '_CRT_SECURE_NO_WARNINGS', 'NOMINMAX', '_USE_MATH_DEFINES', '__STDC__'])
-
-    conf.env.append_unique('CXXFLAGS', '-Wall')
-    conf.env.append_unique('CXXFLAGS', '-std=gnu++11')
-    conf.env.append_unique('CFLAGS', '-Wall')
+    else:
+        conf.env.append_unique('CXXFLAGS', '-Wall')
+        conf.env.append_unique('CXXFLAGS', '-std=gnu++11')
+        conf.env.append_unique('CFLAGS', '-Wall')
 
     if conf.env['IS_MACOSX']:
         conf.check(lib='aften', uselib='AFTEN', define_name='AFTEN')
