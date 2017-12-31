@@ -11,7 +11,7 @@
 #include <jack/midiport.h>
 #include <jack/ringbuffer.h>
 
-#ifdef __MINGW32__
+#ifdef WIN32
 #include <pthread.h>
 #endif
 
