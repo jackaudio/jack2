@@ -1,0 +1,57 @@
+#!/usr/bin/env python
+# encoding: utf-8
+#
+# Copyright (C) 2018 Karl Linden <karl.j.linden@gmail.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+
+import os
+
+def get_subdirs(ctx):
+    """
+    Get the compatibility module subirectories.
+
+    The compat modules are found dynamically so that this script does
+    not have to be modified if more modules are added.
+
+    :param ctx: the waf context
+    :type ctx: waflib.Context.Context
+    :returns: list of str -- the subdirectories
+    """
+    subdirs = []
+    for entry in ctx.path.listdir():
+        path = os.path.join(ctx.path.abspath(), entry)
+        if os.path.isdir(path) and not entry.startswith('.'):
+            subdirs.append(entry)
+    return subdirs
+
+def recurse_into_subdirs(ctx):
+    """
+    Recurse into compatibility module subdirectories.
+
+    :param ctx: the waf context
+    :type ctx: waflib.Context.Context
+    """
+    for x in get_subdirs(ctx):
+        ctx.recurse(x)
+
+def options(opt):
+    recurse_into_subdirs(opt)
+
+def configure(conf):
+    recurse_into_subdirs(conf)
+
+def build(bld):
+    recurse_into_subdirs(bld)
