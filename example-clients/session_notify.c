@@ -1,6 +1,7 @@
 /*
  *  session_notify.c -- ultra minimal session manager
  *
+ *  Copyright (C) 2018 Karl Linden <karl.j.linden@gmail.com>
  *  Copyright (C) 2010 Torben Hohn.
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -18,6 +19,7 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <alloca.h>
 #include <stdio.h>
 #include <errno.h>
 #include <unistd.h>
