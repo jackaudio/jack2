@@ -1,0 +1,18 @@
+JACK2 distributed under the following licenses:
+
+ - GPL-2
+ - LGPL-2.1
+ - BSD-3
+
+For each of these licenses see the corresponding files in the toplevel
+source directory.
+
+The programs and libraries are distributed under the GPL-2 and LGPL-2.1
+licenses. Each file should contain a copyright header describing which
+license that applies to it.
+
+The upstream waf build system, which includes the following files:
+ - the toplevel waf script,
+ - all files under waflib/
+are distributed under the BSD-3 license. The wscript files are
+distributed under the GPL-2.
