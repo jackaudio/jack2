@@ -3,6 +3,7 @@
 /*
 NetJack Abstraction.
 
+Copyright (C) 2018 Karl Linden <karl.j.linden@gmail.com>
 Copyright (C) 2008 Pieter Palmers <pieterpalmers@users.sourceforge.net>
 Copyright (C) 2006 Torben Hohn <torbenh@gmx.de>
 Copyright (C) 2003 Robert Ham <rah@bash.sh>
@@ -25,6 +26,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 $Id: net_driver.c,v 1.17 2006/04/16 20:16:10 torbenh Exp $
 */
 
+#include <alloca.h>
 #include <math.h>
 #include <stdio.h>
 #include <memory.h>

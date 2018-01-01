@@ -1,4 +1,5 @@
 /*
+Copyright (C) 2018 Karl Linden <karl.j.linden@gmail.com>
 Copyright (C) 2008-2011 Torben Horn
 
 This program is free software; you can redistribute it and/or modify
@@ -16,9 +17,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifdef WIN32
-#include <malloc.h>
-#endif
+#include <alloca.h>
 
 #include "JackNetOneDriver.h"
 #include "JackEngineControl.h"
