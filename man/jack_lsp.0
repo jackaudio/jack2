@@ -1,6 +1,6 @@
 .TH JACK_LSP "1" "!DATE!" "!VERSION!"
 .SH NAME
-jack_lsp \- JACK toolkit client to list informtion on ports
+jack_lsp \- JACK toolkit client to list information on ports
 .SH SYNOPSIS
 \fBjack_lsp\fR [ \fI-s\fR | \fI--server\fR servername ] [ \fI-AclLptvh\fR ]
 .SH DESCRIPTION
