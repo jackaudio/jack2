@@ -145,13 +145,13 @@ static port_type_t port_type[2] = {
 	{
 		SND_SEQ_PORT_CAP_SUBS_READ,
 		JackPortIsOutput,
-		"playback",
+		"capture",
 		do_jack_input
 	},
 	{
 		SND_SEQ_PORT_CAP_SUBS_WRITE,
 		JackPortIsInput,
-		"capture",
+		"playback",
 		do_jack_output
 	}
 };
@@ -466,6 +466,8 @@ port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const s
 	int err;
 	int jack_caps;
         char name[128];
+				char port_suffix[9];
+				char client_name[64];
 
 	port = calloc(1, sizeof(port_t));
 	if (!port)
@@ -475,15 +477,7 @@ port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const s
 
 	snd_seq_client_info_alloca (&client_info);
 	snd_seq_get_any_client_info (self->seq, addr.client, client_info);
-
-	snprintf(port->name, sizeof(port->name), "alsa_pcm:%s/midi_%s_%d",
-		 snd_seq_client_info_get_name(client_info), port_type[type].name, addr.port+1);
-
-	// replace all offending characters by -
-	for (c = port->name; *c; ++c)
-		if (!isalnum(*c) && *c != '/' && *c != '_' && *c != ':' && *c != '(' && *c != ')')
-			*c = '-';
-
+	
 	jack_caps = port_type[type].jack_caps;
 
 	/* mark anything that looks like a hardware port as physical&terminal */
@@ -491,23 +485,58 @@ port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const s
 	if (snd_seq_port_info_get_type (info) & (SND_SEQ_PORT_TYPE_HARDWARE|SND_SEQ_PORT_TYPE_PORT|SND_SEQ_PORT_TYPE_SPECIFIC)) {
 		jack_caps |= (JackPortIsPhysical | JackPortIsTerminal);
 	}
-
-	if (jack_caps & JackPortIsOutput)
-		snprintf(name, sizeof(name), "system:midi_capture_%d", ++self->midi_in_cnt);
-	else
-		snprintf(name, sizeof(name), "system:midi_playback_%d", ++self->midi_out_cnt);
-
-	port->jack_port = jack_port_register(self->jack,
+	
+	/*define the port_suffix differently if port is phisical or not, input or output */
+	if (jack_caps & (JackPortIsPhysical | JackPortIsTerminal)){
+		if (jack_caps & JackPortIsInput)
+			snprintf(port_suffix, sizeof(port_suffix), "playback");
+		else
+			snprintf(port_suffix, sizeof(port_suffix), "capture");
+	} else {
+		if (jack_caps & JackPortIsInput)
+			snprintf(port_suffix, sizeof(port_suffix), "in");
+		else
+			snprintf(port_suffix, sizeof(port_suffix), "out");
+	}
+	
+  /* define the client name to use in port name and aliases */
+	snprintf(client_name , sizeof(client_name), snd_seq_client_info_get_name(client_info));
+	
+	for (int i=1; i <= 1; i++){
+		snprintf(name, sizeof(name), "system:%s/midi_%s_%d", client_name, port_suffix, i);
+		
+		jack_port_t* existing_port = jack_port_by_name(self->jack, name);
+		if (!existing_port)
+			break;
+		
+// 		if (i == 1){
+// 			if (jack_caps & JackPortIsInput)
+// 				snprintf(name, sizeof(name), "system:midi_%s_%d", client_name, port_suffix, ++self->midi_in_cnt);
+// 			else
+// 				snprintf(name, sizeof(name), "system:midi_%s_%d", client_name, port_suffix, ++self->midi_out_cnt);
+// 		}
+	}
+	
+	/* generate first alias */
+	
+	snprintf(port->name, sizeof(port->name), "alsa_pcm:%s/midi_%s_%d", client_name, port_suffix, addr.port+1);
+	
+	// replace all offending characters by -
+	for (c = port->name; *c; ++c)
+		if (!isalnum(*c) && *c != '/' && *c != '_' && *c != ':' && *c != '(' && *c != ')')
+			*c = '-';
+	
+		port->jack_port = jack_port_register(self->jack,
 		name, JACK_DEFAULT_MIDI_TYPE, jack_caps, 0);
 	if (!port->jack_port)
 		goto failed;
 
 	jack_port_set_alias (port->jack_port, port->name);
 
-	/* generate an alias */
+	
+	/* generate second alias */
 
-	snprintf(port->name, sizeof(port->name), "%s:midi/%s_%d",
-		 snd_seq_client_info_get_name (client_info), port_type[type].name, addr.port+1);
+	snprintf(port->name, sizeof(port->name), "%s:midi/%s_%d", client_name, port_suffix, addr.port+1);
 
 	// replace all offending characters by -
 	for (c = port->name; *c; ++c)
