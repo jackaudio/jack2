@@ -666,8 +666,7 @@ LIB_EXPORT int jack_port_rename(jack_client_t* ext_client, jack_port_t* port, co
         jack_error("jack_port_rename called with a NULL port name");
         return -1;
     } else {
-        return 0;
-//         return client->PortRename(myport, name);
+        return client->PortRename(myport, name);
     }
 }
 

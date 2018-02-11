@@ -49,7 +49,7 @@ JackALSARawMidiPort::JackALSARawMidiPort(snd_rawmidi_info_t *info,
     } else {
         alias_suffix = "in";
         in = &rawmidi;
-        name_prefix = "system:midi_capturzerfe_";
+        name_prefix = "system:midi_capture_";
         out = 0;
     }
     const char *func;
