@@ -502,19 +502,20 @@ port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const s
   /* define the client name to use in port name and aliases */
 	snprintf(client_name , sizeof(client_name), snd_seq_client_info_get_name(client_info));
 	
-	for (int i=1; i <= 1; i++){
+	for (int i=1; i <= 16; i++){
 		snprintf(name, sizeof(name), "system:%s/midi_%s_%d", client_name, port_suffix, i);
 		
 		jack_port_t* existing_port = jack_port_by_name(self->jack, name);
 		if (!existing_port)
 			break;
 		
-// 		if (i == 1){
-// 			if (jack_caps & JackPortIsInput)
-// 				snprintf(name, sizeof(name), "system:midi_%s_%d", client_name, port_suffix, ++self->midi_in_cnt);
-// 			else
-// 				snprintf(name, sizeof(name), "system:midi_%s_%d", client_name, port_suffix, ++self->midi_out_cnt);
-// 		}
+		/* Use a rescue name if 16 ports already use this name */
+		if (i == 16){
+			if (jack_caps & JackPortIsInput)
+				snprintf(name, sizeof(name), "system:midi_%s_%d", port_suffix, ++self->midi_in_cnt);
+			else
+				snprintf(name, sizeof(name), "system:midi_%s_%d", port_suffix, ++self->midi_out_cnt);
+		}
 	}
 	
 	/* generate first alias */
