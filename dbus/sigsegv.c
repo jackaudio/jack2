@@ -94,7 +94,7 @@ static void signal_segv(int signum, siginfo_t* info, void*ptr) {
     }
     else
     {
-        jack_error("Unknown bad signal catched!");
+        jack_error("Unknown bad signal caught!");
     }
 
     if (info->si_code >= 0 && info->si_code < 3) 

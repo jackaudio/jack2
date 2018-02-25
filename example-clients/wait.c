@@ -19,7 +19,7 @@ show_usage(void)
 	fprintf(stderr, "        -s, --server <name>   Connect to the jack server named <name>\n");
 	fprintf(stderr, "        -w, --wait            Wait for server to become available\n");
 	fprintf(stderr, "        -q, --quit            Wait until server is quit\n");
-	fprintf(stderr, "        -c, --check           Check wether server is running\n");
+	fprintf(stderr, "        -c, --check           Check whether server is running\n");
 	fprintf(stderr, "        -t, --timeout         Wait timeout in seconds\n");
 	fprintf(stderr, "        -h, --help            Display this help message\n");
 	fprintf(stderr, "For more information see http://jackaudio.org/\n");

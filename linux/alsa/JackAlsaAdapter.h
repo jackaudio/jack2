@@ -421,7 +421,7 @@ namespace Jack
                         }
                         break;
                     default :
-                        check_error_msg ( -10000, "unknow access mode" );
+                        check_error_msg ( -10000, "unknown access mode" );
                         break;
                 }
                 return 0;
@@ -507,7 +507,7 @@ namespace Jack
                         }
                         break;
                     default :
-                        check_error_msg ( -10000, "unknow access mode" );
+                        check_error_msg ( -10000, "unknown access mode" );
                         break;
                 }
                 return 0;
