@@ -106,7 +106,7 @@ alsa_format_t formats[] = {
 #define NUMFORMATS (sizeof(formats)/sizeof(formats[0]))
 int format=0;
 
-// Alsa stuff... i dont want to touch this bullshit in the next years.... please...
+// Alsa stuff... i don't want to touch this bullshit in the next years.... please...
 
 static int xrun_recovery(snd_pcm_t *handle, int err) {
 //    printf( "xrun !!!.... %d\n", err );

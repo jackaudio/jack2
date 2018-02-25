@@ -244,7 +244,7 @@ alloc_ports (int n_capture_audio, int n_playback_audio, int n_capture_midi, int 
 /**
  * The Sync callback... sync state is set elsewhere...
  * we will see if this is working correctly.
- * i dont really believe in it yet.
+ * i don't really believe in it yet.
  */
 int
 sync_cb (jack_transport_state_t state, jack_position_t *pos, void *arg)

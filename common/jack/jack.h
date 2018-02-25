@@ -1082,7 +1082,7 @@ size_t jack_port_type_get_buffer_size (jack_client_t *client, const char *port_t
  * expressed a min/max pair.
  *
  * In most common setups, the minimum and maximum latency
- * are the same, but this design accomodates more complex
+ * are the same, but this design accommodates more complex
  * routing, and allows applications (and thus users) to
  * detect cases where routing is creating an anomalous
  * situation that may either need fixing or more

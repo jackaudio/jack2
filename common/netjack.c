@@ -199,7 +199,7 @@ int netjack_wait( netjack_driver_state_t *netj )
             //XXX: hmm... i need to remember why resync_threshold wasnt right.
             //if( offset < netj->resync_threshold )
             if( offset < 10 ) {
-                // ok. dont do nothing. we will run without data.
+                // ok. don't do nothing. we will run without data.
                 // this seems to be one or 2 lost packets.
                 //
                 // this can also be reordered packet jitter.
@@ -283,7 +283,7 @@ int netjack_wait( netjack_driver_state_t *netj )
 
                     netj->running_free = 1;
 
-                    // when we really dont see packets.
+                    // when we really don't see packets.
                     // reset source address. and open possibility for new master.
                     // maybe dsl reconnect. Also restart of netsource without fix
                     // reply address changes port.
@@ -597,7 +597,7 @@ netjack_driver_state_t *netjack_init (netjack_driver_state_t *netj,
 
     // Fill in netj values.
     // might be subject to autoconfig...
-    // so dont calculate anything with them...
+    // so don't calculate anything with them...
 
     netj->sample_rate = sample_rate;
     netj->period_size = period_size;
@@ -697,7 +697,7 @@ netjack_startup( netjack_driver_state_t *netj )
         socklen_t address_size = sizeof (struct sockaddr_in);
 #endif
         //jack_info ("Waiting for an incoming packet !!!");
-        //jack_info ("*** IMPORTANT *** Dont connect a client to jackd until the driver is attached to a clock source !!!");
+        //jack_info ("*** IMPORTANT *** Don't connect a client to jackd until the driver is attached to a clock source !!!");
 
         while(1) {
             if( ! netjack_poll( netj->sockfd, 1000 ) ) {
@@ -788,7 +788,7 @@ netjack_startup( netjack_driver_state_t *netj )
 
     if( netj->bitdepth == CELT_MODE ) {
         // celt mode.
-        // TODO: this is a hack. But i dont want to change the packet header.
+        // TODO: this is a hack. But i don't want to change the packet header.
         netj->resample_factor = (netj->resample_factor * netj->period_size * 1024 / netj->sample_rate / 8) & (~1);
         netj->resample_factor_up = (netj->resample_factor_up * netj->period_size * 1024 / netj->sample_rate / 8) & (~1);
 
@@ -796,7 +796,7 @@ netjack_startup( netjack_driver_state_t *netj )
         netj->net_period_up = netj->resample_factor_up;
     } else if( netj->bitdepth == OPUS_MODE ) {
         // Opus mode.
-        // TODO: this is a hack. But i dont want to change the packet header, either
+        // TODO: this is a hack. But i don't want to change the packet header, either
         netj->net_period_down = (netj->resample_factor * netj->period_size * 1024 / netj->sample_rate / 8) & (~1);
         netj->net_period_up = (netj->resample_factor_up * netj->period_size * 1024 / netj->sample_rate / 8) & (~1);
     } else {

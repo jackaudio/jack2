@@ -83,7 +83,7 @@ JackMidiRawInputWriteQueue::HandleEventLoss(jack_midi_event_t *event)
 {
     jack_error("JackMidiRawInputWriteQueue::HandleEventLoss - A %d byte MIDI "
                "event scheduled for frame '%d' could not be processed because "
-               "the write queue cannot accomodate an event of that size.  The "
+               "the write queue cannot accommodate an event of that size.  The "
                "event has been discarded.", event->size, event->time);
 }
 

@@ -370,7 +370,7 @@ Whether to use Autoconfig, or just start. (default: true)
 Send packets N times (default: 1)
 .TP 
 \fB\-e, \-\-native\-endian \fIint\fR
-Dont convert samples to network byte order. (default: false)
+Don't convert samples to network byte order. (default: false)
 .TP 
 \fB\-J, \-\-jitterval \fIint\fR
 attempted jitterbuffer microseconds on master (default: 0)

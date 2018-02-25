@@ -1528,7 +1528,7 @@ jack_controller_graph_order_callback(
     if (patchbay_ptr->graph.version == 1)
     {
         /* we have empty initial graph, increment graph version,
-           so we dont do jack_get_ports() again,
+           so we don't do jack_get_ports() again,
            on next next graph change */
         patchbay_ptr->graph.version++;
     }

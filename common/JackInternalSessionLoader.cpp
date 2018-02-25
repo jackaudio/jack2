@@ -71,7 +71,7 @@ int JackInternalSessionLoader::Load(const char* file)
              * Therefore only compare the first letter of the command.
              */
         } else {
-            jack_error("JACK internal session file %s line %u contains unkown command '%s'. Ignoring the line!", file, linenr, line.c_str());
+            jack_error("JACK internal session file %s line %u contains unknown command '%s'. Ignoring the line!", file, linenr, line.c_str());
         }
     }
 
