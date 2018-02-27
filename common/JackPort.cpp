@@ -97,7 +97,7 @@ void JackPort::SetLatency(jack_nframes_t nframes)
     fLatency = nframes;
 
     /* setup the new latency values here,
-	 * so we dont need to change the backend codes.
+	 * so we don't need to change the backend codes.
 	 */
 	if (fFlags & JackPortIsOutput) {
 		fCaptureLatency.min = nframes;

@@ -286,7 +286,7 @@ cache_packet_reset (cache_packet *pack)
     int i;
     pack->valid = 0;
 
-    // XXX: i dont think this is necessary here...
+    // XXX: i don't think this is necessary here...
     //      fragement array is cleared in _set_framecnt()
 
     for (i = 0; i < pack->num_fragments; i++)
@@ -318,7 +318,7 @@ cache_packet_add_fragment (cache_packet *pack, char *packet_buf, int rcv_len)
     jack_nframes_t framecnt    = ntohl (pkthdr->framecnt);
 
     if (framecnt != pack->framecnt) {
-        jack_error ("errror. framecnts dont match");
+        jack_error ("error. framecnts don't match");
         return;
     }
 

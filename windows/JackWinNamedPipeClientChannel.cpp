@@ -152,7 +152,7 @@ bool JackWinNamedPipeClientChannel::Execute()
     return true;
 
 error:
-    // Close the pipes, server wont be able to create them otherwise.
+    // Close the pipes, server won't be able to create them otherwise.
     fNotificationListenPipe.Close();
     fRequest->Close();
     fClient->ShutDown(jack_status_t(JackFailure | JackServerError), JACK_SERVER_FAILURE);

@@ -511,7 +511,6 @@ Send packets N times.
 \fB\-e, \-\-native\-endian \fIint\fR
 Don't convert samples to network byte order. 
 (default: false)
-
 .TP 
 \fB\-J, \-\-jitterval \fIint\fR
 Attempted jitterbuffer microseconds on master. 

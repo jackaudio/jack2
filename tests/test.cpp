@@ -1576,15 +1576,15 @@ int main (int argc, char *argv[])
      * (This mode seems to be problematic in standard jack version 0.100. It seems that nobody
      * is used to apply this mode because the tie mode doesn't work at all. A patch seems difficult to produce
      * in this version of jack. Tie mode work well in MP version.)
-     * Test some basic thinks (tie with 2 differents client, tie non-owned ports...)
+     * Test some basic thinks (tie with 2 different client, tie non-owned ports...)
      * Tie client1.in1 and client1.out1 ports, and make some data test to check the validity of the tie.
      *
      */
     Log("Testing tie mode...\n");
     if (jack_port_tie(input_port1, output_port2) != 0) {
-        Log("not possible to tie two ports from two differents clients... ok\n");
+        Log("not possible to tie two ports from two different clients... ok\n");
     } else {
-        printf("!!! ERROR !!! port_tie has allowed a connexion between two differents clients !\n");
+        printf("!!! ERROR !!! port_tie has allowed a connexion between two different clients !\n");
         jack_port_untie(output_port2);
     }
     Log("Testing connections datas in tie mode...\n");
