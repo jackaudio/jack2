@@ -439,6 +439,9 @@ def options(opt):
     readline = add_auto_option(opt, 'readline', help='Build with readline')
     readline.add_library('readline')
     readline.set_check_hook(check_for_readline, check_for_readline_error)
+    sd = add_auto_option(opt, 'systemd', help='Use systemd notify')
+    sd.add_header('systemd/sd-daemon.h')
+    sd.add_library('systemd')
 
     # dbus options
     opt.recurse('dbus')
@@ -728,7 +731,7 @@ def build_jackd(bld):
         includes = ['.', 'common', 'common/jack'],
         target = 'jackd',
         source = ['common/Jackdmp.cpp'],
-        use = ['serverlib']
+        use = ['serverlib', 'SYSTEMD']
     )
 
     if bld.env['BUILD_JACKDBUS']:

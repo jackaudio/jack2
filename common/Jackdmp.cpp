@@ -43,6 +43,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "audio_reserve.h"
 #endif
 
+#if HAVE_SYSTEMD
+#include <systemd/sd-daemon.h>
+#endif
+
 /*
 This is a simple port of the old jackdmp.cpp file to use the new jack2 control API. Available options for the server
 are "hard-coded" in the source. A much better approach would be to use the control API to:
@@ -624,6 +628,10 @@ int main(int argc, char** argv)
     notify_sent = true;
     return_value = 0;
 
+#if HAVE_SYSTEMD
+    sd_notify(0, "READY=1");
+#endif
+
     // Waits for signal
 #ifdef __ANDROID__
     //reserve SIGUSR2 signal for switching master driver
@@ -637,6 +645,10 @@ int main(int argc, char** argv)
     }
 #else
     jackctl_wait_signals(sigmask);
+#endif
+
+#if HAVE_SYSTEMD
+    sd_notify(0, "STOPPING=1");
 #endif
 
  stop_server:
