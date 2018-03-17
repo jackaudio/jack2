@@ -185,7 +185,7 @@ static int set_hwparams(snd_pcm_t *handle, snd_pcm_hw_params_t *params, snd_pcm_
 		return err;
 	}
 	if (rchannels != channels) {
-		printf("WARNING: chennel count does not match (requested %d got %d)\n", channels, rchannels);
+		printf("WARNING: channel count does not match (requested %d got %d)\n", channels, rchannels);
 		num_channels = rchannels;
 	}
 	/* set the stream rate */
