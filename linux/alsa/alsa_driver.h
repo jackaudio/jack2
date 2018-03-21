@@ -124,6 +124,7 @@ typedef struct _alsa_driver {
     char has_hw_monitoring;
     char has_hw_metering;
     char quirk_bswap;
+    char hw_timestamping;
 
     ReadCopyFunction read_via_copy;
     WriteCopyFunction write_via_copy;
@@ -248,7 +249,8 @@ alsa_driver_new (char *name, char *playback_alsa_device,
 		 int shorts_first,
 		 jack_nframes_t capture_latency,
 		 jack_nframes_t playback_latency,
-		 alsa_midi_t *midi_driver
+		 alsa_midi_t *midi_driver,
+		 int hw_timestamping
 		 );
 void
 alsa_driver_delete (alsa_driver_t *driver);
