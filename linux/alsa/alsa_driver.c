@@ -589,6 +589,21 @@ alsa_driver_configure_stream (alsa_driver_t *driver, char *device_name,
 		return -1;
 	}
 
+	if (driver->hw_timestamping) {
+		err = snd_pcm_sw_params_set_tstamp_mode(handle, sw_params,
+							SND_PCM_TSTAMP_ENABLE);
+		if (err < 0) {
+			jack_info("Could not enable ALSA time stamp mode for %s (err %d)",
+				  stream_name, err);
+		}
+		err = snd_pcm_sw_params_set_tstamp_type(handle, sw_params,
+							SND_PCM_TSTAMP_TYPE_MONOTONIC);
+		if (err < 0) {
+			jack_info("Could not use monotonic ALSA time stamps for %s (err %d)",
+				  stream_name, err);
+		}
+	}
+
 	if ((err = snd_pcm_sw_params (handle, sw_params)) < 0) {
 		jack_error ("ALSA: cannot set software parameters for %s\n",
 			    stream_name);
@@ -1942,7 +1957,8 @@ alsa_driver_new (char *name, char *playback_alsa_device,
 		 int shorts_first,
 		 jack_nframes_t capture_latency,
 		 jack_nframes_t playback_latency,
-		 alsa_midi_t *midi_driver
+		 alsa_midi_t *midi_driver,
+		 int hw_timestamping
 		 )
 {
 	int err;
@@ -2028,6 +2044,7 @@ alsa_driver_new (char *name, char *playback_alsa_device,
 	driver->alsa_name_capture = strdup (capture_alsa_device);
 
 	driver->midi = midi_driver;
+	driver->hw_timestamping = hw_timestamping;
 	driver->xrun_recovery = 0;
 
 	if (alsa_driver_check_card_type (driver)) {

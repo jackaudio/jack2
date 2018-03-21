@@ -67,7 +67,8 @@ class JackAlsaDriver : public JackAudioDriver
                  const char* playback_driver_name,
                  jack_nframes_t capture_latency,
                  jack_nframes_t playback_latency,
-                 const char* midi_driver_name);
+                 const char* midi_driver_name,
+                 int hw_timestamping);
 
         int Close();
         int Attach();
