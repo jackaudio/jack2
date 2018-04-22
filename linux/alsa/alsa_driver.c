@@ -1196,7 +1196,8 @@ alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs)
 			    < 0) {
 				jack_error("error preparing after suspend: %s", snd_strerror(res));
 			}
-		} else {
+		} 
+		if (driver->playback_handle) {
 			if ((res = snd_pcm_prepare(driver->playback_handle))
 			    < 0) {
 				jack_error("error preparing after suspend: %s", snd_strerror(res));
@@ -1213,6 +1214,18 @@ alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs)
 		timersub(&now, &tstamp, &diff);
 		*delayed_usecs = diff.tv_sec * 1000000.0 + diff.tv_usec;
 		jack_log("**** alsa_pcm: xrun of at least %.3f msecs",*delayed_usecs / 1000.0);
+		if (driver->capture_handle) {
+			jack_log("Repreparing capture");
+			if ((res = snd_pcm_prepare(driver->capture_handle)) < 0) {
+				jack_error("error preparing after xrun: %s", snd_strerror(res));
+			}
+		}
+		if (driver->playback_handle) {
+			jack_log("Repreparing playback");
+			if ((res = snd_pcm_prepare(driver->playback_handle)) < 0) {
+				jack_error("error preparing after xrun: %s", snd_strerror(res));
+			}
+		}
 	}
 
 	if (alsa_driver_restart (driver)) {
