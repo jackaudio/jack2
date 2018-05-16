@@ -1401,6 +1401,12 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 				return 0;
 			}
 
+                        if (revents & POLLNVAL) {
+                                jack_error ("ALSA: playback device disconnected");
+                                *status = -7;
+                                return 0;
+                        }
+
 			if (revents & POLLERR) {
 				xrun_detected = TRUE;
 			}
@@ -1423,6 +1429,12 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 				*status = -6;
 				return 0;
 			}
+
+                        if (revents & POLLNVAL) {
+                                jack_error ("ALSA: capture device disconnected");
+                                *status = -7;
+                                return 0;
+                        }
 
 			if (revents & POLLERR) {
 				xrun_detected = TRUE;
