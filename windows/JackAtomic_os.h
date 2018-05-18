@@ -32,27 +32,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef inline
 	#define inline __inline
 #endif
-
-//----------------------------------------------------------------
-// CAS functions
-//----------------------------------------------------------------
 inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void * addr)
 {
-    register char c;
-    __asm {
-        push	ebx
-        push	esi
-        mov	esi, addr
-        mov	eax, value
-        mov	ebx, newvalue
-        LOCK cmpxchg dword ptr [esi], ebx
-        sete	c
-        pop	esi
-        pop	ebx
-    }
-    return c;
+	return InterlockedCompareExchange((UInt32*)addr, newvalue, value) == value;
 }
-
 #else
 
 #define LOCK "lock ; "

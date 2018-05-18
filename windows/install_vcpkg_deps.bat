@@ -52,18 +52,25 @@ IF NOT EXIST "%~dp0\deps\include" MKDIR "%~dp0\deps\include"
 IF NOT EXIST "%~dp0\deps\lib_x86" MKDIR "%~dp0\deps\lib_x86"
 IF NOT EXIST "%~dp0\deps\lib_x64" MKDIR "%~dp0\deps\lib_x64"
 
-COPY /Y "%VCPKG_ROOT%\installed\x86-windows\lib\portaudio.lib" "%~dp0\deps\lib_x86\portaudio_x86.lib"
+REM Independent
+
 COPY /Y "%VCPKG_ROOT%\installed\x86-windows\include\portaudio.h" "%~dp0\deps\include"
-
-COPY /Y "%VCPKG_ROOT%\installed\x86-windows-static\lib\libsamplerate-0.lib" "%~dp0\deps\lib_x86"
 COPY /Y "%VCPKG_ROOT%\installed\x86-windows-static\include\samplerate.h" "%~dp0\deps\include"
-
-COPY /Y "%VCPKG_ROOT%\installed\x86-windows-static\lib\pthreadsVC2.lib" "%~dp0\deps\lib_x86\pthread.lib"
 COPY /Y "%VCPKG_ROOT%\installed\x86-windows-static\include\pthread.h" "%~dp0\deps\include"
 COPY /Y "%VCPKG_ROOT%\installed\x86-windows-static\include\semaphore.h" "%~dp0\deps\include"
 COPY /Y "%VCPKG_ROOT%\installed\x86-windows-static\include\sched.h" "%~dp0\deps\include"
-
-COPY /Y "%VCPKG_ROOT%\installed\x86-windows-static\lib\tre.lib" "%~dp0\deps\lib_x86"
 COPY /Y "%VCPKG_ROOT%\installed\x86-windows-static\include\tre\tre.h" "%~dp0\deps\include"
 COPY /Y "%VCPKG_ROOT%\installed\x86-windows-static\include\tre\tre-config.h" "%~dp0\deps\include"
 COPY /Y "%VCPKG_ROOT%\installed\x86-windows-static\include\tre\regex.h" "%~dp0\deps\include"
+
+REM 32bit
+COPY /Y "%VCPKG_ROOT%\installed\x86-windows\lib\portaudio.lib" "%~dp0\deps\lib_x86\portaudio_pure.lib"
+COPY /Y "%VCPKG_ROOT%\installed\x86-windows-static\lib\libsamplerate-0.lib" "%~dp0\deps\lib_x86"
+COPY /Y "%VCPKG_ROOT%\installed\x86-windows-static\lib\pthreadsVC2.lib" "%~dp0\deps\lib_x86\pthread.lib"
+COPY /Y "%VCPKG_ROOT%\installed\x86-windows-static\lib\tre.lib" "%~dp0\deps\lib_x86"
+
+REM 64Bit
+COPY /Y "%VCPKG_ROOT%\installed\x64-windows\lib\portaudio.lib" "%~dp0\deps\lib_x64\portaudio_pure.lib"
+COPY /Y "%VCPKG_ROOT%\installed\x64-windows-static\lib\libsamplerate-0.lib" "%~dp0\deps\lib_x64"
+COPY /Y "%VCPKG_ROOT%\installed\x64-windows-static\lib\pthreadsVC2.lib" "%~dp0\deps\lib_x64\pthread.lib"
+COPY /Y "%VCPKG_ROOT%\installed\x64-windows-static\lib\tre.lib" "%~dp0\deps\lib_x64"

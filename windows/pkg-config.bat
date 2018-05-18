@@ -18,7 +18,7 @@ EXIT /b 1
 
 :PortAudio
 if "%HAS_LIBS%"=="true" (
-	ECHO -lportaudio_x86
+	ECHO -lportaudio_pure
 )
 GOTO Continue
 
