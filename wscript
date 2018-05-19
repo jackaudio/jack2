@@ -311,9 +311,15 @@ def configure(conf):
         conf.env['MANDIR'] = conf.env['PREFIX'] + '/share/man/man1'
 
     if conf.env['BUILD_DEBUG']:
-        conf.env.append_unique('CXXFLAGS', '-g')
-        conf.env.append_unique('CFLAGS', '-g')
-        conf.env.append_unique('LINKFLAGS', '-g')
+        if conf.env['IS_WINDOWS']:
+            #pdb would be better but don't know enough about waf
+            conf.env.append_unique('CXXFLAGS', '/Z7')
+            conf.env.append_unique('CFLAGS', '/Z7')
+            conf.env.append_unique('LINKFLAGS', '/DEBUG')
+        else:
+            conf.env.append_unique('CXXFLAGS', '-g')
+            conf.env.append_unique('CFLAGS', '-g')
+            conf.env.append_unique('LINKFLAGS', '-g')
 
     if not Options.options.autostart in ['default', 'classic', 'dbus', 'none']:
         conf.fatal('Invalid autostart value "' + Options.options.autostart + '"')
