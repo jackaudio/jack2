@@ -134,6 +134,9 @@ int JackPosixThread::StartImp(jack_native_thread_t* thread, int priority, int re
 
     } else {
         jack_log("JackPosixThread::StartImp : create non RT thread");
+        if ((res = pthread_attr_setinheritsched(&attributes, PTHREAD_EXPLICIT_SCHED))) {
+            jack_log("Cannot request explicit scheduling for non RT thread res = %d", res);
+        }
     }
 
     if ((res = pthread_attr_setstacksize(&attributes, THREAD_STACK))) {
