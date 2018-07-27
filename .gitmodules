@@ -1,0 +1,3 @@
+[submodule "autooptions"]
+	path = autooptions
+	url = https://gitlab.com/karllinden/waf-autooptions.git
