@@ -1,5 +1,6 @@
 /*
 Copyright (C) 2007 Dmitry Baikov
+Copyright (C) 2018 Filipe Coelho
 Original JACK MIDI implementation Copyright (C) 2004 Ian Esten
 
 This program is free software; you can redistribute it and/or modify
@@ -130,7 +131,10 @@ static void MidiBufferMixdown(void* mixbuffer, void** src_buffers, int src_count
                 next_buf_index = i;
             }
         }
-        assert(next_event != 0);
+        if (next_event == 0) {
+            jack_error("Jack::MidiBufferMixdown - got invalid next event");
+            break;
+        }
 
         // write the event
         jack_midi_data_t* dest = mix->ReserveEvent(next_event->time, next_event->size);
