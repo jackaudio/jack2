@@ -47,10 +47,10 @@ c_compiler = {
 'osf1V':  ['gcc'],
 'gnu':    ['gcc', 'clang'],
 'java':   ['gcc', 'msvc', 'clang', 'icc'],
-'default':['gcc', 'clang'],
+'default':['clang', 'gcc'],
 }
 """
-Dict mapping the platform names to Waf tools finding specific C compilers::
+Dict mapping platform names to Waf tools finding specific C compilers::
 
 	from waflib.Tools.compiler_c import c_compiler
 	c_compiler['linux'] = ['gcc', 'icc', 'suncc']
@@ -63,10 +63,14 @@ def default_compilers():
 
 def configure(conf):
 	"""
-	Try to find a suitable C compiler or raise a :py:class:`waflib.Errors.ConfigurationError`.
+	Detects a suitable C compiler
+
+	:raises: :py:class:`waflib.Errors.ConfigurationError` when no suitable compiler is found
 	"""
-	try: test_for_compiler = conf.options.check_c_compiler or default_compilers()
-	except AttributeError: conf.fatal("Add options(opt): opt.load('compiler_c')")
+	try:
+		test_for_compiler = conf.options.check_c_compiler or default_compilers()
+	except AttributeError:
+		conf.fatal("Add options(opt): opt.load('compiler_c')")
 
 	for compiler in re.split('[ ,]+', test_for_compiler):
 		conf.env.stash()
@@ -76,19 +80,21 @@ def configure(conf):
 		except conf.errors.ConfigurationError as e:
 			conf.env.revert()
 			conf.end_msg(False)
-			debug('compiler_c: %r' % e)
+			debug('compiler_c: %r', e)
 		else:
-			if conf.env['CC']:
+			if conf.env.CC:
 				conf.end_msg(conf.env.get_flat('CC'))
-				conf.env['COMPILER_CC'] = compiler
+				conf.env.COMPILER_CC = compiler
+				conf.env.commit()
 				break
+			conf.env.revert()
 			conf.end_msg(False)
 	else:
 		conf.fatal('could not configure a C compiler!')
 
 def options(opt):
 	"""
-	Restrict the compiler detection from the command-line::
+	This is how to provide compiler preferences on the command-line::
 
 		$ waf configure --check-c-compiler=gcc
 	"""

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf-8
-# Thomas Nagy, 2006-2010 (ita)
+# Thomas Nagy, 2006-2018 (ita)
 # Ralf Habacker, 2006 (rh)
 # Yinon Ehrlich, 2009
 
@@ -27,54 +27,51 @@ def gcc_common_flags(conf):
 	"""
 	v = conf.env
 
-	v['CC_SRC_F']            = []
-	v['CC_TGT_F']            = ['-c', '-o']
+	v.CC_SRC_F            = []
+	v.CC_TGT_F            = ['-c', '-o']
 
-	# linker
-	if not v['LINK_CC']: v['LINK_CC'] = v['CC']
-	v['CCLNK_SRC_F']         = []
-	v['CCLNK_TGT_F']         = ['-o']
-	v['CPPPATH_ST']          = '-I%s'
-	v['DEFINES_ST']          = '-D%s'
+	if not v.LINK_CC:
+		v.LINK_CC = v.CC
 
-	v['LIB_ST']              = '-l%s' # template for adding libs
-	v['LIBPATH_ST']          = '-L%s' # template for adding libpaths
-	v['STLIB_ST']            = '-l%s'
-	v['STLIBPATH_ST']        = '-L%s'
-	v['RPATH_ST']            = '-Wl,-rpath,%s'
+	v.CCLNK_SRC_F         = []
+	v.CCLNK_TGT_F         = ['-o']
+	v.CPPPATH_ST          = '-I%s'
+	v.DEFINES_ST          = '-D%s'
 
-	v['SONAME_ST']           = '-Wl,-h,%s'
-	v['SHLIB_MARKER']        = '-Wl,-Bdynamic'
-	v['STLIB_MARKER']        = '-Wl,-Bstatic'
+	v.LIB_ST              = '-l%s' # template for adding libs
+	v.LIBPATH_ST          = '-L%s' # template for adding libpaths
+	v.STLIB_ST            = '-l%s'
+	v.STLIBPATH_ST        = '-L%s'
+	v.RPATH_ST            = '-Wl,-rpath,%s'
 
-	# program
-	v['cprogram_PATTERN']    = '%s'
+	v.SONAME_ST           = '-Wl,-h,%s'
+	v.SHLIB_MARKER        = '-Wl,-Bdynamic'
+	v.STLIB_MARKER        = '-Wl,-Bstatic'
 
-	# shared librar
-	v['CFLAGS_cshlib']       = ['-fPIC']
-	v['LINKFLAGS_cshlib']    = ['-shared']
-	v['cshlib_PATTERN']      = 'lib%s.so'
+	v.cprogram_PATTERN    = '%s'
 
-	# static lib
-	v['LINKFLAGS_cstlib']    = ['-Wl,-Bstatic']
-	v['cstlib_PATTERN']      = 'lib%s.a'
+	v.CFLAGS_cshlib       = ['-fPIC']
+	v.LINKFLAGS_cshlib    = ['-shared']
+	v.cshlib_PATTERN      = 'lib%s.so'
 
-	# osx stuff
-	v['LINKFLAGS_MACBUNDLE'] = ['-bundle', '-undefined', 'dynamic_lookup']
-	v['CFLAGS_MACBUNDLE']    = ['-fPIC']
-	v['macbundle_PATTERN']   = '%s.bundle'
+	v.LINKFLAGS_cstlib    = ['-Wl,-Bstatic']
+	v.cstlib_PATTERN      = 'lib%s.a'
+
+	v.LINKFLAGS_MACBUNDLE = ['-bundle', '-undefined', 'dynamic_lookup']
+	v.CFLAGS_MACBUNDLE    = ['-fPIC']
+	v.macbundle_PATTERN   = '%s.bundle'
 
 @conf
 def gcc_modifier_win32(conf):
 	"""Configuration flags for executing gcc on Windows"""
 	v = conf.env
-	v['cprogram_PATTERN']    = '%s.exe'
+	v.cprogram_PATTERN    = '%s.exe'
 
-	v['cshlib_PATTERN']      = '%s.dll'
-	v['implib_PATTERN']      = 'lib%s.dll.a'
-	v['IMPLIB_ST']           = '-Wl,--out-implib,%s'
+	v.cshlib_PATTERN      = '%s.dll'
+	v.implib_PATTERN      = '%s.dll.a'
+	v.IMPLIB_ST           = '-Wl,--out-implib,%s'
 
-	v['CFLAGS_cshlib']       = []
+	v.CFLAGS_cshlib       = []
 
 	# Auto-import is enabled by default even without this option,
 	# but enabling it explicitly has the nice effect of suppressing the rather boring, debug-level messages
@@ -86,42 +83,42 @@ def gcc_modifier_cygwin(conf):
 	"""Configuration flags for executing gcc on Cygwin"""
 	gcc_modifier_win32(conf)
 	v = conf.env
-	v['cshlib_PATTERN'] = 'cyg%s.dll'
+	v.cshlib_PATTERN = 'cyg%s.dll'
 	v.append_value('LINKFLAGS_cshlib', ['-Wl,--enable-auto-image-base'])
-	v['CFLAGS_cshlib'] = []
+	v.CFLAGS_cshlib = []
 
 @conf
 def gcc_modifier_darwin(conf):
 	"""Configuration flags for executing gcc on MacOS"""
 	v = conf.env
-	v['CFLAGS_cshlib']       = ['-fPIC']
-	v['LINKFLAGS_cshlib']    = ['-dynamiclib']
-	v['cshlib_PATTERN']      = 'lib%s.dylib'
-	v['FRAMEWORKPATH_ST']    = '-F%s'
-	v['FRAMEWORK_ST']        = ['-framework']
-	v['ARCH_ST']             = ['-arch']
+	v.CFLAGS_cshlib       = ['-fPIC']
+	v.LINKFLAGS_cshlib    = ['-dynamiclib']
+	v.cshlib_PATTERN      = 'lib%s.dylib'
+	v.FRAMEWORKPATH_ST    = '-F%s'
+	v.FRAMEWORK_ST        = ['-framework']
+	v.ARCH_ST             = ['-arch']
 
-	v['LINKFLAGS_cstlib']    = []
+	v.LINKFLAGS_cstlib    = []
 
-	v['SHLIB_MARKER']        = []
-	v['STLIB_MARKER']        = []
-	v['SONAME_ST']           = []
+	v.SHLIB_MARKER        = []
+	v.STLIB_MARKER        = []
+	v.SONAME_ST           = []
 
 @conf
 def gcc_modifier_aix(conf):
 	"""Configuration flags for executing gcc on AIX"""
 	v = conf.env
-	v['LINKFLAGS_cprogram']  = ['-Wl,-brtl']
-	v['LINKFLAGS_cshlib']    = ['-shared','-Wl,-brtl,-bexpfull']
-	v['SHLIB_MARKER']        = []
+	v.LINKFLAGS_cprogram  = ['-Wl,-brtl']
+	v.LINKFLAGS_cshlib    = ['-shared','-Wl,-brtl,-bexpfull']
+	v.SHLIB_MARKER        = []
 
 @conf
 def gcc_modifier_hpux(conf):
 	v = conf.env
-	v['SHLIB_MARKER']        = []
-	v['STLIB_MARKER']        = []
-	v['CFLAGS_cshlib']       = ['-fPIC','-DPIC']
-	v['cshlib_PATTERN']      = 'lib%s.sl'
+	v.SHLIB_MARKER        = []
+	v.STLIB_MARKER        = []
+	v.CFLAGS_cshlib       = ['-fPIC','-DPIC']
+	v.cshlib_PATTERN      = 'lib%s.sl'
 
 @conf
 def gcc_modifier_openbsd(conf):
@@ -130,9 +127,9 @@ def gcc_modifier_openbsd(conf):
 @conf
 def gcc_modifier_osf1V(conf):
 	v = conf.env
-	v['SHLIB_MARKER']        = []
-	v['STLIB_MARKER']        = []
-	v['SONAME_ST']           = []
+	v.SHLIB_MARKER        = []
+	v.STLIB_MARKER        = []
+	v.SONAME_ST           = []
 
 @conf
 def gcc_modifier_platform(conf):
@@ -155,5 +152,5 @@ def configure(conf):
 	conf.cc_load_tools()
 	conf.cc_add_flags()
 	conf.link_add_flags()
-
+	conf.check_gcc_o_space()
 
