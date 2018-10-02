@@ -265,8 +265,8 @@ extern "C"
         jack_nframes_t period_size = 64;
         unsigned int capture_ports = 1;
         int num_periods = 2;
-        char sid[23];
-        char dmac[17];
+        char sid[25];
+        char dmac[19];
         char eth_dev[32];
 
 
@@ -275,6 +275,8 @@ extern "C"
         int jitter_val = 0;
         const JSList * node;
         const jack_driver_param_t * param;
+
+        printf("foo bar\n");fflush(stdout);
 
         for (node = params; node; node = jack_slist_next(node)) {
             param = (const jack_driver_param_t*) node->data;
@@ -297,17 +299,17 @@ extern "C"
 
                 case 'e':
                     sprintf(eth_dev, "%s", param->value.str);
-                    printf("Eth Dev: %s %s\n", param->value.str, eth_dev);
+                    printf("Eth Dev: %s %s\n", param->value.str, eth_dev);fflush(stdout);
                     break;
 
                 case 's':
                     sprintf(sid,  "%s", param->value.str);
-                    printf("Stream ID: %s %s\n", param->value.str, sid);
+                    printf("Stream ID: %s %s\n", param->value.str, sid);fflush(stdout);
                     break;
 
                 case 'm':
                     sprintf(dmac, "%s", param->value.str);
-                    printf("D MAC: %s %s\n", param->value.str, dmac);
+                    printf("D MAC: %s %s\n", param->value.str, dmac);fflush(stdout);
                     break;
 
             }
