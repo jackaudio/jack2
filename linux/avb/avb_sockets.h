@@ -8,6 +8,12 @@
 #ifndef AVBSOCKET_H_
 #define AVBSOCKET_H_
 
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #define _GNU_SOURCE
 
 #include <stdint.h>
@@ -62,4 +68,7 @@
 int enable_1722avtp_filter( FILE* filepointer, int raw_transport_socket, unsigned char *destinationMacAddress);
 int create_RAW_AVB_Transport_Socket( FILE* filepointer, int* raw_transport_socket, char* eth_dev);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* UDPSOCKET_H_ */

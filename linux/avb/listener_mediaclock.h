@@ -2,6 +2,12 @@
 #ifndef MEDIACLOCKLISTENER_H
 #define MEDIACLOCKLISTENER_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+
 
 #define _GNU_SOURCE
 
@@ -46,4 +52,7 @@ int mediaclock_listener_wait_recv( FILE* filepointer, ieee1722_avtp_driver_state
 int mediaclock_listener_poll_recv( FILE* filepointer, ieee1722_avtp_driver_state **ieee1722mc,
                                         struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds );
 
+#ifdef __cplusplus
+}
+#endif
 #endif //MEDIACLOCKLISTENER_H

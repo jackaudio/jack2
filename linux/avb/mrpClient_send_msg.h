@@ -2,6 +2,12 @@
 #ifndef _MRP_SEND_MSG_H_
 #define _MRP_SEND_MSG_H_
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+
 #define _GNU_SOURCE
 
 #include <stdio.h>
@@ -22,6 +28,8 @@
 
 int mrpClient_send_mrp_msg(FILE* filepointer, int control_socket, char *notify_data, int notify_len);
 
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _MRP_SEND_MSG_H_ */

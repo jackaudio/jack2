@@ -1,6 +1,12 @@
 #ifndef _MRP_CONTROL_SOCKET_H_
 #define _MRP_CONTROL_SOCKET_H_
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -23,4 +29,7 @@ int mrpClient_get_Control_socket( );
 int mrpClient_init_Control_socket( FILE* filepointer );
 
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* _MRP_CONTROL_SOCKET_H_ */

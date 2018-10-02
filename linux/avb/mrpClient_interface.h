@@ -1,6 +1,12 @@
 #ifndef _MRP_CL_IF_H_
 #define _MRP_CL_IF_H_
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+
 #define _GNU_SOURCE
 
 #include <stdio.h>
@@ -28,4 +34,7 @@ int mrpClient_listener_send_ready(FILE* filepointer,ieee1722_avtp_driver_state *
 int mrpClient_listener_send_leave(FILE* filepointer,ieee1722_avtp_driver_state **ieee1722mc, mrp_ctx_t *mrp_ctx);
 
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* _MRP_CL_IF_H_ */

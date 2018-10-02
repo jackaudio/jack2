@@ -8,6 +8,12 @@
 #ifndef SRC_GLOBAL_DEFINITIONS_H_
 #define SRC_GLOBAL_DEFINITIONS_H_
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+
 #define _GNU_SOURCE
 
 #include <jack/types.h>
@@ -204,5 +210,8 @@ struct _ieee1722_avtp_driver_state {
 
 
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SRC_GLOBAL_DEFINITIONS_H_ */
