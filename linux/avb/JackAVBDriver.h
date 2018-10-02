@@ -36,9 +36,6 @@ class JackAVBPDriver : public JackWaiterDriver
 
         ieee1722_avtp_driver_state ieee1722mc;
 
-        void
-        render_payload_to_jack_ports_float(void *packet_payload, jack_nframes_t net_period_down, JSList *capture_ports, JSList *capture_srcs, jack_nframes_t nframes);
-
     public:
 
         JackAVBPDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
@@ -62,8 +59,6 @@ class JackAVBPDriver : public JackWaiterDriver
         int SetBufferSize(jack_nframes_t buffer_size){return -1;}
         int SetSampleRate(jack_nframes_t sample_rate){return -1;}
 
-
-        unsigned int ieee1722mc_wait( ieee1722_avtp_driver_state *ieee1722mc );
 };
 
 }
