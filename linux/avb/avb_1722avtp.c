@@ -462,6 +462,27 @@ int init_1722_driver( ieee1722_avtp_driver_state *ieee1722mc, const char* name,
         fprintf(filepointer,  "Success creating thread\n");fflush(filepointer);
     }
 
+    fprintf(filepointer, "JackAVBPDriver::JackAVBPDriver Ethernet Device %s", name);
+
+     fprintf(filepointer, "Stream ID: %02x %02x %02x %02x %02x %02x %02x %02x",
+                                        (uint8_t) stream_id[0],
+                                        (uint8_t) stream_id[1],
+                                        (uint8_t) stream_id[2],
+                                        (uint8_t) stream_id[3],
+                                        (uint8_t) stream_id[4],
+                                        (uint8_t) stream_id[5],
+                                        (uint8_t) stream_id[6],
+                                        (uint8_t) stream_id[7]);
+
+     fprintf(filepointer, "Destination MAC Address: %02x:%02x:%02x:%02x:%02x:%02x",
+                                        (uint8_t) destination_mac[0],
+                                        (uint8_t) destination_mac[1],
+                                        (uint8_t) destination_mac[2],
+                                        (uint8_t) destination_mac[3],
+                                        (uint8_t) destination_mac[4],
+                                        (uint8_t) destination_mac[5]);
+
+
     if( RETURN_VALUE_FAILURE == create_avb_Mediaclock_Listener(filepointer, &ieee1722mc, name,
                                    stream_id, destination_mac,
                                    &si_other_avb, &avtp_transport_socket_fds)){

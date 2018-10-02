@@ -294,7 +294,7 @@ extern "C"
 
         try {
             Jack::JackDriverClientInterface* driver = new Jack::JackWaitThreadedDriver (
-                new Jack::JackAVBPDriver("system", "net_pcm", engine, table, sid, dmac, eth_dev,
+                new Jack::JackAVBPDriver("system", "avb_mc", engine, table, sid, dmac, eth_dev,
                                              sample_rate, period_size, num_periods));
 
             if (driver->Open(period_size, sample_rate, 1, 1, capture_ports, 0,
