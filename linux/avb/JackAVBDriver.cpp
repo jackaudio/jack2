@@ -41,7 +41,7 @@ JackAVBPDriver::JackAVBPDriver(const char* name, const char* alias, JackLockedEn
                                        int sample_rate, int period_size, int num_periods)
     : JackWaiterDriver(name, alias, engine, table)
 {
-    jack_log("Jack1722AVTPDriver::Jack1722AVTPDriver Ethernet Device %s", eth_dev);
+    jack_log("JackAVBPDriver::JackAVBPDriver Ethernet Device %s", eth_dev);
 
     jack_log("Stream ID: %02x %02x %02x %02x %02x %02x %02x %02x",
                                         (uint8_t) stream_id[0],
@@ -111,13 +111,13 @@ int JackAVBPDriver::AllocPorts()
 //init and restart--------------------------------------------------------------------
 bool JackAVBPDriver::Initialize()
 {
-    jack_log("Jack1722AVTPDriver::Init");
+    jack_log("JackAVBDriver::Init");
 
     FreePorts();
 
 
     //display some additional infos
-    jack_info("IEEE1722 AVTP driver started");
+    jack_info("AVB IEEE1722 AVTP driver started");
 
     if (startup_1722_driver(&ieee1722mc)) {
 
