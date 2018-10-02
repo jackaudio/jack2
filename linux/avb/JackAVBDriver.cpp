@@ -227,6 +227,36 @@ extern "C"
 {
 #endif
 
+    inline void charToHex(char c, char *hex)
+    {
+        hex[0] = hexDigit(c / 0x10);
+        hex[1] = hexDigit(c % 0x10);
+    }
+
+    inline int argumentsSplitDelimiters(char* inputString, char* outputArray, int array_len)
+    {
+        int tokenCnt=0;
+        char *token;
+        char *der_string = strdup(inputString);
+
+        for(int m=0;m<array_len;m++){
+    //		printf("m=%d\t %s.",m,command[m]);fflush(stdout);
+            if(( token = strsep(&der_string, ";")) != NULL ){
+    //			printf("m=%d\t %s.",m,command[m]);fflush(stdout);
+
+                charToHex( outputArray[m], strdup(token) );
+    //			printf("%s\n", command[m]);fflush(stdout);
+            } else {
+                tokenCnt = m;
+                break;
+            }
+        }
+        free(token);
+        free(der_string);
+        return tokenCnt;
+    }
+
+
     SERVER_EXPORT jack_driver_desc_t* driver_get_descriptor ()
     {
         jack_driver_desc_t * desc;
@@ -265,8 +295,8 @@ extern "C"
         jack_nframes_t period_size = 64;
         unsigned int capture_ports = 1;
         int num_periods = 2;
-        char sid[25];
-        char dmac[19];
+        char sid[8];
+        char dmac[6];
         char eth_dev[32];
 
 
@@ -303,13 +333,30 @@ extern "C"
                     break;
 
                 case 's':
-                    sprintf(sid,  "%s", param->value.str);
-                    printf("Stream ID: %s %s\n", param->value.str, sid);fflush(stdout);
+
+                    // split stream ID
+
+                    argumentsSplitDelimiters(param->value.str, sid, 8);
+
+
+
+
+                    printf("Stream ID: %s %02x %02x %02x %02x %02x %02x %02x %02x \n", param->value.str,
+                                                            sid[0], sid[1], sid[2], sid[3], sid[4], sid[5], sid[6], sid[7]);fflush(stdout);
                     break;
 
                 case 'm':
-                    sprintf(dmac, "%s", param->value.str);
-                    printf("D MAC: %s %s\n", param->value.str, dmac);fflush(stdout);
+
+                    // split destination mac address
+
+
+                    argumentsSplitDelimiters(param->value.str, dmac, 6);
+
+
+
+
+                    printf("Stream ID: %s %02x %02x %02x %02x %02x %02x \n", param->value.str,
+                                                            dmac[0], dmac[1], dmac[2], dmac[3], dmac[4], dmac[5]);fflush(stdout);
                     break;
 
             }
