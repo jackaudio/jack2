@@ -295,19 +295,19 @@ extern "C"
                     num_periods = param->value.ui;
                     break;
 
-                case 'd':
+                case 'e':
                     sprintf(eth_dev, "%s", param->value.str);
-                    printf("%s %s\n", param->value.str, eth_dev);
+                    printf("Eth Dev: %s %s\n", param->value.str, eth_dev);
                     break;
 
                 case 's':
                     sprintf(sid,  "%s", param->value.str);
-                    printf("%s %s\n", param->value.str, sid);
+                    printf("Stream ID: %s %s\n", param->value.str, sid);
                     break;
 
                 case 'm':
                     sprintf(dmac, "%s", param->value.str);
-                    printf("%s %s\n", param->value.str, dmac);
+                    printf("D MAC: %s %s\n", param->value.str, dmac);
                     break;
 
             }
