@@ -250,7 +250,7 @@ extern "C"
 
         for(int m=0;m<array_len;m++){
 //    		printf("m=%d\t %s.",m,outputArray[m]);fflush(stdout);
-            if(( token = strsep(&der_string, ";")) != NULL ){
+            if(( token = strsep(&der_string, ":")) != NULL ){
 //    			printf("m=%d\t %s. ",m,outputArray[m]);fflush(stdout);
 
 //                outputArray[m] = strdup(token);
