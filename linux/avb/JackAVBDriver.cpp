@@ -345,7 +345,7 @@ extern "C"
 
                     // split stream ID
 
-                    argumentsSplitDelimiters(param->value.str, sid, 8);
+                    argumentsSplitDelimiters((char *)param->value.str, sid, 8);
 
 
 
@@ -359,7 +359,7 @@ extern "C"
                     // split destination mac address
 
 
-                    argumentsSplitDelimiters(param->value.str, dmac, 6);
+                    argumentsSplitDelimiters((char *)param->value.str, dmac, 6);
 
 
 
