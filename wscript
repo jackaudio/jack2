@@ -804,7 +804,7 @@ def build_drivers(bld):
 
 
     avb_src = [
-        'common/JackAVBDriver.cpp',
+        'linux/avb/JackAVBDriver.cpp',
         'linux/avb/avb_1722avtp.c',
         'linux/avb/avb_sockets.c',
         'linux/avb/listener_mediaclock.c',

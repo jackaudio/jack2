@@ -16,9 +16,9 @@
 #include "jack/jslist.h"
 
 
-#include "Open-AVB/daemons/mrpd/mrpd.h"
-#include "Open-AVB/daemons/mrpd/mrp.h"
-#include "Open-AVB/daemons/mrpd/msrp.h" // spurious dep daemons/mrpd/msrp.h:50:#define MSRP_LISTENER_ASKFAILED
+#include "OpenAvnu/daemons/mrpd/mrpd.h"
+#include "OpenAvnu/daemons/mrpd/mrp.h"
+#include "OpenAvnu/daemons/mrpd/msrp.h" // spurious dep daemons/mrpd/msrp.h:50:#define MSRP_LISTENER_ASKFAILED
 
 #include <stdlib.h>
 #include <stdint.h>
