@@ -254,7 +254,7 @@ extern "C"
         jack_driver_descriptor_add_parameter(desc, &filler, "stream-id", 's', JackDriverParamString, &value, NULL, "Stream ID for listening", NULL);
 
         sprintf( value.str, "91:e0:f0:11:11:11");
-        jack_driver_descriptor_add_parameter(desc, &filler, "destination-mac", 'm', JackDriverParamUInt, &value, NULL, "Multicast Destination MAC Address for listening", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "destination-mac", 'm', JackDriverParamString, &value, NULL, "Multicast Destination MAC Address for listening", NULL);
 
         return desc;
     }
