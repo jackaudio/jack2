@@ -253,8 +253,8 @@ extern "C"
             if(( token = strsep(&der_string, ";")) != NULL ){
     			printf("m=%d\t %s.",m,outputArray[m]);fflush(stdout);
 
-                outputArray[m] = strdup(token);
-    			printf("%s\n", outputArray[m]);fflush(stdout);
+//                outputArray[m] = strdup(token);
+    			printf("%s\n", strdup(token));fflush(stdout);
             } else {
                 tokenCnt = m;
                 break;
