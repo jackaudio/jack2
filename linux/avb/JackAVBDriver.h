@@ -34,7 +34,7 @@ class JackAVBPDriver : public JackWaiterDriver
 {
     private:
 
-        ieee1722_avtp_driver_state ieee1722mc;
+        ieee1722_avtp_driver_state_t ieee1722mc;
 
     public:
 

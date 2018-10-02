@@ -36,7 +36,33 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
-		<Unit filename="main.cpp" />
+		<Unit filename="../JackAVBDriver.cpp" />
+		<Unit filename="../JackAVBDriver.h" />
+		<Unit filename="../avb_1722avtp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../avb_1722avtp.h" />
+		<Unit filename="../avb_sockets.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../avb_sockets.h" />
+		<Unit filename="../global_definitions.h" />
+		<Unit filename="../listener_mediaclock.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../listener_mediaclock.h" />
+		<Unit filename="../mrpClient_control_socket.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../mrpClient_control_socket.h" />
+		<Unit filename="../mrpClient_interface.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../mrpClient_interface.h" />
+		<Unit filename="../mrpClient_send_msg.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../mrpClient_send_msg.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

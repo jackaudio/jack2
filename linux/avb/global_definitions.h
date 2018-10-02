@@ -136,7 +136,7 @@ typedef enum mrpStatus{
  *
  */
 
-typedef struct _ieee1722_avtp_driver_state ieee1722_avtp_driver_state;
+typedef struct _ieee1722_avtp_driver_state ieee1722_avtp_driver_state_t;
 
 struct _ieee1722_avtp_driver_state {
 

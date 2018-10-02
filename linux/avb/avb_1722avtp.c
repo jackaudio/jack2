@@ -95,7 +95,7 @@ int mrp_shm_close(int _remove)
 /*
  *       MRP Client Functions
  */
-int check_stream_id(FILE* filepointer2, ieee1722_avtp_driver_state **ieee1722mc, int *buf_offset, char *buf)
+int check_stream_id(FILE* filepointer2, ieee1722_avtp_driver_state_t **ieee1722mc, int *buf_offset, char *buf)
 {
 	unsigned int streamid[8];
 	int hit;
@@ -127,7 +127,7 @@ int check_stream_id(FILE* filepointer2, ieee1722_avtp_driver_state **ieee1722mc,
 }
 
 
-int check_listener_dst_mac(FILE* filepointer2, ieee1722_avtp_driver_state **ieee1722mc, int *buf_offset, char *buf)
+int check_listener_dst_mac(FILE* filepointer2, ieee1722_avtp_driver_state_t **ieee1722mc, int *buf_offset, char *buf)
 {
     unsigned int mac_addr[6];
     int hit = 0;
@@ -165,7 +165,7 @@ int find_next_line(FILE* filepointer2, char* buf, int* buf_offset, int buflen, i
 }
 
 
-int process_mrp_msg(FILE* filepointer2, ieee1722_avtp_driver_state **ieee1722mc, char *buf, int buflen)
+int process_mrp_msg(FILE* filepointer2, ieee1722_avtp_driver_state_t **ieee1722mc, char *buf, int buflen)
 {
 	/*
 	 * 1st character indicates application
@@ -267,7 +267,7 @@ next_line_listener:
 
 
 
-int mrp_thread(ieee1722_avtp_driver_state **ieee1722mc)
+int mrp_thread(ieee1722_avtp_driver_state_t **ieee1722mc)
 {
 	char *msgbuf;
 	struct sockaddr_in client_addr;
@@ -416,7 +416,7 @@ int mrp_thread(ieee1722_avtp_driver_state **ieee1722mc)
 
 void *worker_thread_mrp(void* v_ieee1722mc)
 {
-	ieee1722_avtp_driver_state *t_ieee1722mc = (ieee1722_avtp_driver_state *) v_ieee1722mc;
+	ieee1722_avtp_driver_state_t *t_ieee1722mc = (ieee1722_avtp_driver_state_t *) v_ieee1722mc;
     mrp_thread( &t_ieee1722mc );
 
 }
@@ -431,7 +431,7 @@ void *worker_thread_mrp(void* v_ieee1722mc)
 
 
 
-int init_1722_driver( ieee1722_avtp_driver_state *ieee1722mc, const char* name,
+int init_1722_driver( ieee1722_avtp_driver_state_t *ieee1722mc, const char* name,
                         char* stream_id, char* destination_mac,
                         int sample_rate, int period_size, int num_periods)
 {
@@ -448,37 +448,13 @@ int init_1722_driver( ieee1722_avtp_driver_state *ieee1722mc, const char* name,
     }
 
 
-    fprintf(filepointer, "JackAVBPDriver::JackAVBPDriver %x\n", ieee1722mc);fflush(filepointer);
-
-    fprintf(filepointer, "JackAVBPDriver::JackAVBPDriver %d\n", ieee1722mc->capture_channels);fflush(filepointer);
-
-    fprintf(filepointer, "JackAVBPDriver::JackAVBPDriver Ethernet Device %s\n", name);fflush(filepointer);
-
-     fprintf(filepointer, "Stream ID: %02x %02x %02x %02x %02x %02x %02x %02x\n",
-                                        (uint8_t) stream_id[0],
-                                        (uint8_t) stream_id[1],
-                                        (uint8_t) stream_id[2],
-                                        (uint8_t) stream_id[3],
-                                        (uint8_t) stream_id[4],
-                                        (uint8_t) stream_id[5],
-                                        (uint8_t) stream_id[6],
-                                        (uint8_t) stream_id[7]);fflush(filepointer);
-
-     fprintf(filepointer, "Destination MAC Address: %02x:%02x:%02x:%02x:%02x:%02x\n",
-                                        (uint8_t) destination_mac[0],
-                                        (uint8_t) destination_mac[1],
-                                        (uint8_t) destination_mac[2],
-                                        (uint8_t) destination_mac[3],
-                                        (uint8_t) destination_mac[4],
-                                        (uint8_t) destination_mac[5]);fflush(filepointer);
-
     if( mrpClient_init_Control_socket( filepointer ) == RETURN_VALUE_FAILURE ) {
         fprintf(filepointer,  "Error initializing MRP socket\n");fflush(filepointer);
         fclose(filepointer);
         return /*EXIT_FAILURE*/ -1;
     }
 
-    if( pthread_create( &ieee1722mc->thread, NULL, (&worker_thread_mrp), ieee1722mc ) != 0 ) {
+    if( pthread_create( &ieee1722mc->thread, NULL, (&worker_thread_mrp), (void*) ieee1722mc ) != 0 ) {
         fprintf(filepointer,  "Error creating thread\n");fflush(filepointer);
         fclose(filepointer);
         return /*EXIT_FAILURE*/ -1;
@@ -538,7 +514,7 @@ int init_1722_driver( ieee1722_avtp_driver_state *ieee1722mc, const char* name,
     return 0;
 }
 
-int startup_1722_driver( ieee1722_avtp_driver_state *ieee1722mc )
+int startup_1722_driver( ieee1722_avtp_driver_state_t *ieee1722mc )
 {
     if( RETURN_VALUE_FAILURE == mrpClient_listener_await_talker( filepointer, &ieee1722mc, mrp_ctx)){
         fprintf(filepointer,  "mrpClient_listener_await_talker failed\n");fflush(filepointer);
@@ -549,23 +525,23 @@ int startup_1722_driver( ieee1722_avtp_driver_state *ieee1722mc )
     }
 }
 
-int poll_recv_1722_mediaclockstream( ieee1722_avtp_driver_state *ieee1722mc )
+int poll_recv_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc )
 {
     return mediaclock_listener_poll_recv( filepointer, &ieee1722mc, &si_other_avb, &avtp_transport_socket_fds );
 }
 
-int wait_recv_1722_mediaclockstream( ieee1722_avtp_driver_state *ieee1722mc )
+int wait_recv_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc )
 {
     return mediaclock_listener_wait_recv( filepointer, &ieee1722mc, &si_other_avb, &avtp_transport_socket_fds );
 }
 
-int wait_recv_ts_1722_mediaclockstream( ieee1722_avtp_driver_state *ieee1722mc )
+int wait_recv_ts_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc )
 {
     return mediaclock_listener_wait_recv_ts( filepointer, &ieee1722mc, &si_other_avb, &avtp_transport_socket_fds );
 }
 
 
-int shutdown_1722_driver( ieee1722_avtp_driver_state *ieee1722mc )
+int shutdown_1722_driver( ieee1722_avtp_driver_state_t *ieee1722mc )
 {
 
     if( RETURN_VALUE_FAILURE == mrpClient_listener_send_leave(filepointer, &ieee1722mc, mrp_ctx )){

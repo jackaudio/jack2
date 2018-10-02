@@ -27,11 +27,11 @@ extern "C"
 #include "mrpClient_send_msg.h"
 
 
-int mrpClient_getDomain_joinVLAN(FILE* filepointer, ieee1722_avtp_driver_state **ieee1722mc, mrp_ctx_t *mrp_ctx);
+int mrpClient_getDomain_joinVLAN(FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc, mrp_ctx_t *mrp_ctx);
 
-int mrpClient_listener_await_talker(FILE* filepointer,ieee1722_avtp_driver_state **ieee1722mc, mrp_ctx_t *mrp_ctx);
-int mrpClient_listener_send_ready(FILE* filepointer,ieee1722_avtp_driver_state **ieee1722mc, mrp_ctx_t *mrp_ctx);
-int mrpClient_listener_send_leave(FILE* filepointer,ieee1722_avtp_driver_state **ieee1722mc, mrp_ctx_t *mrp_ctx);
+int mrpClient_listener_await_talker(FILE* filepointer,ieee1722_avtp_driver_state_t **ieee1722mc, mrp_ctx_t *mrp_ctx);
+int mrpClient_listener_send_ready(FILE* filepointer,ieee1722_avtp_driver_state_t **ieee1722mc, mrp_ctx_t *mrp_ctx);
+int mrpClient_listener_send_leave(FILE* filepointer,ieee1722_avtp_driver_state_t **ieee1722mc, mrp_ctx_t *mrp_ctx);
 
 
 #ifdef __cplusplus
