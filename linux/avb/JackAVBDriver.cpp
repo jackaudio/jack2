@@ -249,9 +249,9 @@ extern "C"
         char *der_string = strdup(inputString);
 
         for(int m=0;m<array_len;m++){
-    		printf("m=%d\t %s.",m,outputArray[m]);fflush(stdout);
+//    		printf("m=%d\t %s.",m,outputArray[m]);fflush(stdout);
             if(( token = strsep(&der_string, ";")) != NULL ){
-    			printf("m=%d\t %s.",m,outputArray[m]);fflush(stdout);
+//    			printf("m=%d\t %s. ",m,outputArray[m]);fflush(stdout);
 
 //                outputArray[m] = strdup(token);
     			printf("%s\n", strdup(token));fflush(stdout);
