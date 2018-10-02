@@ -111,11 +111,9 @@ int JackAVBPDriver::AllocPorts()
 {
     jack_port_id_t port_index;
     char buf[64];
-    jack_info("AVB IEEE1722 AVTP driver started 3");
 
     snprintf (buf, sizeof(buf) - 1, "system:capture_1");
 
-    jack_info("AVB IEEE1722 AVTP driver started 4");
 
     if (fEngine->PortRegister(fClientControl.fRefNum, buf, JACK_DEFAULT_AUDIO_TYPE,
                                     CaptureDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
@@ -124,11 +122,9 @@ int JackAVBPDriver::AllocPorts()
     }
     //port = fGraphManager->GetPort(port_index);
 
-    jack_info("AVB IEEE1722 AVTP driver started 5");
 
     ieee1722mc.capture_ports = jack_slist_append (ieee1722mc.capture_ports, (void *)(intptr_t)port_index);
 
-    jack_info("AVB IEEE1722 AVTP driver started 6");
     return 0;
 }
 
@@ -141,7 +137,7 @@ bool JackAVBPDriver::Initialize()
 
 
     //display some additional infos
-    jack_info("AVB IEEE1722 AVTP driver started 1");
+    printf("AVB IEEE1722 AVTP driver started\n");
 
     if (startup_1722_driver(&ieee1722mc)) {
 
@@ -153,7 +149,6 @@ bool JackAVBPDriver::Initialize()
         jack_error("Can't allocate ports.");
         return false;
     }
-    jack_info("AVB IEEE1722 AVTP driver started 2");
 
     //monitor
     //driver parametering

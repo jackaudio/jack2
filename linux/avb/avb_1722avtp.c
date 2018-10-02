@@ -462,11 +462,6 @@ int init_1722_driver( ieee1722_avtp_driver_state_t *ieee1722mc, const char* name
         fprintf(filepointer,  "Success creating thread\n");fflush(filepointer);
     }
 
-
-    fprintf(filepointer, "JackAVBPDriver::JackAVBPDriver %x\n", ieee1722mc);fflush(filepointer);
-
-    fprintf(filepointer, "JackAVBPDriver::JackAVBPDriver %d\n", ieee1722mc->capture_channels);fflush(filepointer);
-
     fprintf(filepointer, "JackAVBPDriver::JackAVBPDriver Ethernet Device %s\n", name);fflush(filepointer);
 
     fprintf(filepointer, "Stream ID: %02x %02x %02x %02x %02x %02x %02x %02x\n",
