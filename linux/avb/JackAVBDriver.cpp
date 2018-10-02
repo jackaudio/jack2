@@ -245,7 +245,7 @@ extern "C"
                 break;
             }
         }
-        free(token);
+        //free(token);
         free(der_string);
         return tokenCnt;
     }
