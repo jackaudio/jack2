@@ -226,6 +226,15 @@ JackAVBPDriver::FreePorts ()
 extern "C"
 {
 #endif
+    inline char hexDigit(unsigned n)
+    {
+        if (n < 10) {
+            return n + '0';
+        } else {
+            return (n - 10) + 'A';
+        }
+    }
+
 
     inline void charToHex(char c, char *hex)
     {
