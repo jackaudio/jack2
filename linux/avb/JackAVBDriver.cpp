@@ -151,7 +151,7 @@ int JackAVBPDriver::Read()
     JSList *node = ieee1722mc.capture_ports;
 
     int delay;
-    delay = wait_recv_1722_mediaclockstream( &ieee1722mc );
+    delay = poll_recv_1722_mediaclockstream( &ieee1722mc );
 
     if (-1 != delay) {
         NotifyXRun(fBeginDateUst, (float) delay);
