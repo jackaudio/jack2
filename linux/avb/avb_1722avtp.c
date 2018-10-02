@@ -462,9 +462,9 @@ int init_1722_driver( ieee1722_avtp_driver_state *ieee1722mc, const char* name,
         fprintf(filepointer,  "Success creating thread\n");fflush(filepointer);
     }
 
-    fprintf(filepointer, "JackAVBPDriver::JackAVBPDriver Ethernet Device %s", name);
+    fprintf(filepointer, "JackAVBPDriver::JackAVBPDriver Ethernet Device %s\n", name);
 
-     fprintf(filepointer, "Stream ID: %02x %02x %02x %02x %02x %02x %02x %02x",
+     fprintf(filepointer, "Stream ID: %02x %02x %02x %02x %02x %02x %02x %02x\n",
                                         (uint8_t) stream_id[0],
                                         (uint8_t) stream_id[1],
                                         (uint8_t) stream_id[2],
@@ -474,7 +474,7 @@ int init_1722_driver( ieee1722_avtp_driver_state *ieee1722mc, const char* name,
                                         (uint8_t) stream_id[6],
                                         (uint8_t) stream_id[7]);
 
-     fprintf(filepointer, "Destination MAC Address: %02x:%02x:%02x:%02x:%02x:%02x",
+     fprintf(filepointer, "Destination MAC Address: %02x:%02x:%02x:%02x:%02x:%02x\n",
                                         (uint8_t) destination_mac[0],
                                         (uint8_t) destination_mac[1],
                                         (uint8_t) destination_mac[2],

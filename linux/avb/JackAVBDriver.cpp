@@ -230,7 +230,7 @@ extern "C"
         jack_driver_descriptor_add_parameter(desc, &filler, "num-periods", 'n', JackDriverParamUInt, &value, NULL, "Network latency setting in no. of periods", NULL);
 
         sprintf( value.str, "enp4s0");
-        jack_driver_descriptor_add_parameter(desc, &filler, "ethernet-dev", 'd', JackDriverParamString, &value, NULL, "AVB Ethernet Device", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "ethernet-dev", 'e', JackDriverParamString, &value, NULL, "AVB Ethernet Device", NULL);
 
         sprintf( value.str, "00:22:97:00:41:2c:00:00");
         jack_driver_descriptor_add_parameter(desc, &filler, "stream-id", 's', JackDriverParamString, &value, NULL, "Stream ID for listening", NULL);
