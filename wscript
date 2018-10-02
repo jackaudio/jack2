@@ -796,6 +796,30 @@ def build_drivers(bld):
         'common/netjack_packet.c'
     ]
 
+
+
+
+
+
+
+
+    avb_src = [
+        'common/JackAVBDriver.cpp',
+        'linux/avb/avb_1722avtp.c',
+        'linux/avb/avb_sockets.c',
+        'linux/avb/listener_mediaclock.c',
+        'linux/avb/mrpClient_control_socket.c',
+        'linux/avb/mrpClient_interface.c',
+        'linux/avb/mrpClient_send_msg.c'
+    ]
+
+
+
+
+
+
+
+
     proxy_src = [
         'common/JackProxyDriver.cpp'
     ]
@@ -900,6 +924,19 @@ def build_drivers(bld):
         target = 'netone',
         source = netone_src,
         use = ['SAMPLERATE', 'CELT'])
+
+
+
+
+
+    create_driver_obj(
+        bld,
+        target = 'avb',
+        source = avb_src)
+
+
+
+
 
     create_driver_obj(
         bld,
