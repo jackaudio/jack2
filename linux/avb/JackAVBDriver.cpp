@@ -226,21 +226,6 @@ JackAVBPDriver::FreePorts ()
 extern "C"
 {
 #endif
-    inline char hexDigit(unsigned n)
-    {
-        if (n < 10) {
-            return n + '0';
-        } else {
-            return (n - 10) + 'A';
-        }
-    }
-
-
-    inline void charToHex(char c, char *hex)
-    {
-        hex[0] = hexDigit(c / 0x10);
-        hex[1] = hexDigit(c % 0x10);
-    }
 
     inline int argumentsSplitDelimiters(char* inputString, char* outputArray, int array_len)
     {
@@ -254,7 +239,7 @@ extern "C"
 //    			printf("m=%d\t %s. ",m,outputArray[m]);fflush(stdout);
 
 //                outputArray[m] = strdup(token);
-    			printf("%s\n", strdup(token));fflush(stdout);
+    			printf("%d\n", (int)strtol(strdup(token), NULL, 16);       // number base 16 );fflush(stdout);
             } else {
                 tokenCnt = m;
                 break;
