@@ -61,7 +61,7 @@ JackAVBPDriver::JackAVBPDriver(const char* name, const char* alias, JackLockedEn
                                         (uint8_t) destination_mac[4],
                                         (uint8_t) destination_mac[5]);
 
-    init_1722_driver(&this->ieee1722mc,
+    init_1722_driver(&(this->ieee1722mc),
                   eth_dev,
                   stream_id,
                   destination_mac,
