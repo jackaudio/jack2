@@ -239,7 +239,7 @@ extern "C"
 //    			printf("m=%d\t %s. ",m,outputArray[m]);fflush(stdout);
 
 //                outputArray[m] = strdup(token);
-    			printf("%d\n", (int)strtol(strdup(token), NULL, 16));       // number base 16 );fflush(stdout);
+    			outputArray[m] = (char)strtol(strdup(token), NULL, 16));       // number base 16
             } else {
                 tokenCnt = m;
                 break;
