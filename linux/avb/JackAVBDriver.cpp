@@ -61,7 +61,25 @@ JackAVBPDriver::JackAVBPDriver(const char* name, const char* alias, JackLockedEn
                                         (uint8_t) destination_mac[4],
                                         (uint8_t) destination_mac[5]);
 
-    init_1722_driver(&(this->ieee1722mc),
+    printf("JackAVBPDriver::JackAVBPDriver Ethernet Device %s\n", eth_dev);
+    printf("Stream ID: %02x %02x %02x %02x %02x %02x %02x %02x\n",
+                                                                (uint8_t) stream_id[0],
+                                                                (uint8_t) stream_id[1],
+                                                                (uint8_t) stream_id[2],
+                                                                (uint8_t) stream_id[3],
+                                                                (uint8_t) stream_id[4],
+                                                                (uint8_t) stream_id[5],
+                                                                (uint8_t) stream_id[6],
+                                                                (uint8_t) stream_id[7]);
+
+    printf("Destination MAC Address: %02x:%02x:%02x:%02x:%02x:%02x\n",
+                                                                (uint8_t) destination_mac[0],
+                                                                (uint8_t) destination_mac[1],
+                                                                (uint8_t) destination_mac[2],
+                                                                (uint8_t) destination_mac[3],
+                                                                (uint8_t) destination_mac[4],
+                                                                (uint8_t) destination_mac[5]);
+    init_1722_driver( &(this->ieee1722mc),
                   eth_dev,
                   stream_id,
                   destination_mac,
