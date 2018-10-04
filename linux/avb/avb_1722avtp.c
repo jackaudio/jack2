@@ -520,17 +520,17 @@ int startup_1722_driver( ieee1722_avtp_driver_state_t *ieee1722mc )
     }
 }
 
-int poll_recv_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc )
+uint64_t poll_recv_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc )
 {
     return mediaclock_listener_poll_recv( filepointer, &ieee1722mc, &si_other_avb, &avtp_transport_socket_fds );
 }
 
-int wait_recv_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc )
+uint64_t wait_recv_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc )
 {
     return mediaclock_listener_wait_recv( filepointer, &ieee1722mc, &si_other_avb, &avtp_transport_socket_fds );
 }
 
-int wait_recv_ts_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc )
+uint64_t wait_recv_ts_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc )
 {
     return mediaclock_listener_wait_recv_ts( filepointer, &ieee1722mc, &si_other_avb, &avtp_transport_socket_fds );
 }

@@ -43,13 +43,13 @@ int create_avb_Mediaclock_Listener( FILE* filepointer, ieee1722_avtp_driver_stat
                                     struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds);
 void delete_avb_Mediaclock_Listener( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc);
 
-int mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc,
+uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc,
                                         struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds );
 
-int mediaclock_listener_wait_recv( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc,
+uint64_t mediaclock_listener_wait_recv( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc,
                                         struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds );
 
-int mediaclock_listener_poll_recv( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc,
+uint64_t mediaclock_listener_poll_recv( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc,
                                         struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds );
 
 #ifdef __cplusplus

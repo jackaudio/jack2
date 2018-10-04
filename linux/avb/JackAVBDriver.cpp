@@ -175,11 +175,17 @@ int JackAVBPDriver::Read()
     int ret = 0;
     JSList *node = ieee1722mc.capture_ports;
 
-    num_packets_even_odd ? num_packets_even_odd = 0 : num_packets_even_odd = 1;  // even = 0, odd = 1
-    int num_packets = (int)( ieee1722mc->period_size / 6 ) + num_packets_even_odd;
+
+    /*
+     *
+     *      Even Odd Calc will cause xruns. cumulative_delay_ns must be calculated sample accurate in mediaclock listener
+     *
+     */
+    //num_packets_even_odd ? num_packets_even_odd = 0 : num_packets_even_odd = 1;  // even = 0, odd = 1
+    int num_packets = (int)( ieee1722mc->period_size / 6 ) + 1; // + num_packets_even_odd;
 
 
-    int cumulative_delay_ns = 0;
+    uint64_t cumulative_delay_ns = 0;
     for(int n=0; n<num_packets; n++){
         cumulative_delay_ns += wait_recv_1722_mediaclockstream( &ieee1722mc );
     }

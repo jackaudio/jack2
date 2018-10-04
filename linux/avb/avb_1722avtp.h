@@ -47,9 +47,9 @@ int init_1722_driver(   ieee1722_avtp_driver_state_t *ieee1722mc, const char* na
                         char* stream_id, char* destination_mac,
                         int sample_rate, int period_size, int num_periods);
 int startup_1722_driver( ieee1722_avtp_driver_state_t *ieee1722mc);
-int poll_recv_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc );
-int wait_recv_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc );
-int wait_recv_ts_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc );
+uint64_t poll_recv_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc );
+uint64_t wait_recv_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc );
+uint64_t wait_recv_ts_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc );
 int shutdown_1722_driver( ieee1722_avtp_driver_state_t *ieee1722mc);
 
 

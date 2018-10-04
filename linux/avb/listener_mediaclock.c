@@ -45,7 +45,7 @@ void delete_avb_Mediaclock_Listener( FILE* filepointer, ieee1722_avtp_driver_sta
 {
 }
 
-int mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc, struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds )
+uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc, struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds )
 {
     socklen_t slen_avb = sizeof(struct sockaddr_in);
     char stream_packet[BUFLEN];
@@ -100,6 +100,40 @@ int mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driver_st
         ((*ieee1722mc)->streamid8[6] == (uint8_t) stream_packet[24]) &&
         ((*ieee1722mc)->streamid8[7] == (uint8_t) stream_packet[25])
     ){
+
+
+        /*
+         *
+         *      6 or less samples per packet? =>
+         *
+         */
+        int samples_in_packet = 0;
+        uint64_t adjust_packet_time_ns = 0;
+
+        int bytes_per_stereo_channel = 12 /*CHANNEL_COUNT_STEREO * AVTP_SAMPLES_PER_CHANNEL_PER_PACKET = 2*6 */ * sizeof(uint32_t);
+        int avtp_hdr_len = ETHERNET_HDR_LENGTH + 32 /*AVB_HEADER_LENGTH*/;
+
+        for( int s = avtp_hdr_len; s < avtp_hdr_len + bytes_per_stereo_channel; s += sizeof(uint32_t) ){
+
+            if(stream_packet[ s ] != 0x00){
+    //                                fprintf(filepointer,  "avb sample %d %x %x %x %x \n", s, avb_packet[ s ],
+    //                                                                                        avb_packet[ s + 1 ],
+    //                                                                                        avb_packet[ s + 2 ],
+    //                                                                                        avb_packet[ s + 3 ] );fflush(filepointer);
+                samples_in_packet++;
+            }
+        }
+
+
+
+
+        if( samples_in_packet < 6 ){
+            adjust_packet_time_ns = samples_in_packet / ieee1722mc->sample_rate * 1000000000;
+        }
+
+
+
+
 //        struct cmsghdr *cmsg = (struct cmsghdr *)malloc(sizeof(struct cmsghdr));
 //        cmsg = CMSG_FIRSTHDR(&msg);
 //        fprintf(filepointer, "stream packet! %d %d %d\n", cmsg->cmsg_len, cmsg->cmsg_level, cmsg->cmsg_type);fflush(filepointer);
@@ -127,13 +161,13 @@ int mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driver_st
             fprintf(filepointer, " Clockrealtime Error\n");fflush(filepointer);
         }
 
-        return (int)(sys_time.tv_usec * 1000);
+        return (uint64_t)(sys_time.tv_usec * 1000) - adjust_packet_time_ns;
     }
     return -1;
 
 }
 
-uint mediaclock_listener_wait_recv( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc, struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds )
+uint64_t mediaclock_listener_wait_recv( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc, struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds )
 {
 	int recv_len=0;
 	int rc;
@@ -161,14 +195,22 @@ uint mediaclock_listener_wait_recv( FILE* filepointer, ieee1722_avtp_driver_stat
                 fprintf(filepointer, " Clockrealtime Error\n");fflush(filepointer);
             }
 
-            return (int)(sys_time.tv_usec * 1000);
+
+            /*
+             *
+             *      6 or less samples per packet? =>
+             *
+             */
+
+
+            return (uint64_t)(sys_time.tv_usec * 1000);
         }
     }
     return -1;
 
 }
 
-int mediaclock_listener_poll_recv( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc, struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds )
+uint64_t mediaclock_listener_poll_recv( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc, struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds )
 {
 	int recv_len=0;
 	int rc;
@@ -198,7 +240,7 @@ int mediaclock_listener_poll_recv( FILE* filepointer, ieee1722_avtp_driver_state
                     fprintf(filepointer, " Clockrealtime Error\n");fflush(filepointer);
                 }
 
-                return (int)(sys_time.tv_usec * 1000);
+                return (uint64_t)(sys_time.tv_usec * 1000);
             }
         }
     }
