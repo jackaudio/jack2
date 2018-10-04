@@ -35,6 +35,7 @@ class JackAVBPDriver : public JackWaiterDriver
     private:
 
         ieee1722_avtp_driver_state_t ieee1722mc;
+        int num_packets_even_odd;
 
     public:
 

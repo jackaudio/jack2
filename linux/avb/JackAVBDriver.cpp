@@ -79,6 +79,8 @@ JackAVBPDriver::JackAVBPDriver(const char* name, const char* alias, JackLockedEn
                                                                 (uint8_t) destination_mac[3],
                                                                 (uint8_t) destination_mac[4],
                                                                 (uint8_t) destination_mac[5]);
+    num_packets_even_odd = 0; // even = 0, odd = 1
+
     init_1722_driver( &(this->ieee1722mc),
                   eth_dev,
                   stream_id,
@@ -87,6 +89,8 @@ JackAVBPDriver::JackAVBPDriver(const char* name, const char* alias, JackLockedEn
                   period_size,
                   num_periods
                  );
+
+                 ieee1722mc->period_usecs = period_size / sample_rate * 1000000;
 }
 
 JackAVBPDriver::~JackAVBPDriver()
@@ -168,20 +172,32 @@ bool JackAVBPDriver::Initialize()
 
 int JackAVBPDriver::Read()
 {
+    int ret = 0;
     JSList *node = ieee1722mc.capture_ports;
 
-    int delay;
-    delay = wait_recv_1722_mediaclockstream( &ieee1722mc );
+    num_packets_even_odd ? num_packets_even_odd = 0 : num_packets_even_odd = 1;  // even = 0, odd = 1
+    int num_packets = (int)( ieee1722mc->period_size / 6 ) + num_packets_even_odd;
 
-    if (-1 != delay) {
-        NotifyXRun(fBeginDateUst, (float) delay);
-        jack_error("netxruns... duration: %dms", delay / 1000);
+
+    int cumulative_delay_ns = 0;
+    for(int n=0; n<num_packets; n++){
+        cumulative_delay_ns += wait_recv_1722_mediaclockstream( &ieee1722mc );
+    }
+
+
+    float cumulative_delay_us = cumulative_delay_ns / 1000;
+    jack_log("netxruns... duration: %fus", cumulative_delay_us);
+    if ( cumulative_delay_us >= ieee1722mc->period_usecs) {
+        ret = 1;
+        NotifyXRun(fBeginDateUst, cumulative_delay_us);
+        jack_error("netxruns... duration: %fms", cumulative_delay_us / 1000);
     }
 
     JackDriver::CycleTakeBeginTime();
 
-    if (-1 == delay)
+    if ( ret ) {
         return -1;
+    }
 
     while (node != NULL) {
         jack_port_id_t port_index = (jack_port_id_t)(intptr_t) node->data;
@@ -229,18 +245,13 @@ extern "C"
         char *der_string = strdup(inputString);
 
         for(int m=0;m<array_len;m++){
-//    		printf("m=%d\t %s.",m,outputArray[m]);fflush(stdout);
             if(( token = strsep(&der_string, ":")) != NULL ){
-//    			printf("m=%d\t %s. ",m,outputArray[m]);fflush(stdout);
-
-//                outputArray[m] = strdup(token);
     			outputArray[m] = (char)strtol(strdup(token), NULL, 16);       // number base 16
             } else {
                 tokenCnt = m;
                 break;
             }
         }
-        //free(token);
         free(der_string);
         return tokenCnt;
     }
