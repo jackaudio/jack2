@@ -25,13 +25,13 @@ WAFLIB_STRIP_TOOLS="
     ifort
     intltool
     javaw
-    kde4
     ldc2
     lua
+    md5_tstamp
     nasm
+    nobuild
     perl
     python
-    qt4
     qt5
     ruby
     tex
@@ -40,17 +40,16 @@ WAFLIB_STRIP_TOOLS="
 "
 
 WAFLIB_STRIP_EXTRAS="
-    add_objects
     biber
     bjam
     blender
     boo
     boost
+    buildcopy
     c_dumbpreproc
     c_emscripten
     cabal
     cfg_altoptions
-    cfg_cross_gnu
     clang_compilation_database
     codelite
     compat15
@@ -58,6 +57,7 @@ WAFLIB_STRIP_EXTRAS="
     color_rvct
     cppcheck
     cpplint
+    cross_gnu
     cython
     dcc
     distnet
@@ -65,6 +65,7 @@ WAFLIB_STRIP_EXTRAS="
     dpapi
     eclipse
     erlang
+    fast_partial
     fc_bgxlf
     fc_cray
     fc_nag
@@ -79,19 +80,17 @@ WAFLIB_STRIP_EXTRAS="
     fsb
     fsc
     gccdeps
-    go
+    gdbus
     gob2
     halide
+    javatest
+    kde4
     local_rpath
     make
-    md5_tstamp
-    mem_reducer
     midl
-    misc
     msvcdeps
     msvs
     netcache_client
-    nobuild
     objcopy
     ocaml
     package
@@ -100,13 +99,12 @@ WAFLIB_STRIP_EXTRAS="
     pep8
     pgicc
     pgicxx
-    prefork
-    preforkjava
-    preforkunix
-    print_commands
     proc
     protoc
+    pyqt5
+    pytest
     qnxnto
+    qt4
     relocation
     remote
     resx
@@ -120,18 +118,16 @@ WAFLIB_STRIP_EXTRAS="
     satellite_assembly
     scala
     slow_qt4
-    smart_continue
     softlink_libs
     stale
     stracedeps
     swig
     syms
-    sync_exec
     ticgt
-    unc
     unity
     use_config
     valadoc
+    waf_xattr
     why
     win32_opts
     wix

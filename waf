@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-# encoding: ISO8859-1
-# Thomas Nagy, 2005-2016
-
+# encoding: latin-1
+# Thomas Nagy, 2005-2018
+#
 """
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -32,7 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 import os, sys, inspect
 
-VERSION="1.8.22"
+VERSION="2.0.11"
 REVISION="x"
 GIT="x"
 INSTALL="x"

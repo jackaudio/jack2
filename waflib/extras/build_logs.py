@@ -17,7 +17,7 @@ try:
 	up = os.path.dirname(Context.g_module.__file__)
 except AttributeError:
 	up = '.'
-LOGFILE = os.path.join(up, 'logs', '%s.log' % time.strftime('%Y_%m_%d_%H_%M'))
+LOGFILE = os.path.join(up, 'logs', time.strftime('%Y_%m_%d_%H_%M.log'))
 
 wlock = threading.Lock()
 class log_to_file(object):
@@ -28,7 +28,7 @@ class log_to_file(object):
 		self.filename = filename
 		self.is_valid = True
 	def replace_colors(self, data):
-		for x in Logs.colors_lst.values(): 
+		for x in Logs.colors_lst.values():
 			if isinstance(x, str):
 				data = data.replace(x, '')
 		return data
@@ -96,7 +96,7 @@ def exit_cleanup():
 		fileobj.close()
 		filename = sys.stdout.filename
 
-		Logs.info('Output logged to %r' % filename)
+		Logs.info('Output logged to %r', filename)
 
 		# then copy the log file to "latest.log" if possible
 		up = os.path.dirname(os.path.abspath(filename))
@@ -104,7 +104,6 @@ def exit_cleanup():
 			shutil.copy(filename, os.path.join(up, 'latest.log'))
 		except OSError:
 			# this may fail on windows due to processes spawned
-			# 
 			pass
 
 atexit.register(exit_cleanup)

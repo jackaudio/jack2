@@ -3,21 +3,22 @@
 # Thomas Nagy, 2006-2015 (ita)
 
 """
-Build as batches.
-
 Instead of compiling object files one by one, c/c++ compilers are often able to compile at once:
 cc -c ../file1.c ../file2.c ../file3.c
 
 Files are output on the directory where the compiler is called, and dependencies are more difficult
 to track (do not run the command on all source files if only one file changes)
-
 As such, we do as if the files were compiled one by one, but no command is actually run:
 replace each cc/cpp Task by a TaskSlave. A new task called TaskMaster collects the
 signatures from each slave and finds out the command-line to run.
 
-Just import this module in the configuration (no other change required).
-This is provided as an example, for performance unity builds are recommended (fewer tasks and
-fewer jobs to execute). See waflib/extras/unity.py.
+Just import this module to start using it:
+def build(bld):
+	bld.load('batched_cc')
+
+Note that this is provided as an example, unity builds are recommended
+for best performance results (fewer tasks and fewer jobs to execute).
+See waflib/extras/unity.py.
 """
 
 from waflib import Task, Utils
@@ -26,24 +27,21 @@ from waflib.Tools import c, cxx
 
 MAX_BATCH = 50
 
-c_str = '${CC} ${CFLAGS} ${CPPFLAGS} ${FRAMEWORKPATH_ST:FRAMEWORKPATH} ${CPPPATH_ST:INCPATHS} ${DEFINES_ST:DEFINES} -c ${SRCLST} ${CXX_TGT_F_BATCHED}'
+c_str = '${CC} ${ARCH_ST:ARCH} ${CFLAGS} ${FRAMEWORKPATH_ST:FRAMEWORKPATH} ${tsk.batch_incpaths()} ${DEFINES_ST:DEFINES} -c ${SRCLST} ${CXX_TGT_F_BATCHED} ${CPPFLAGS}'
 c_fun, _ = Task.compile_fun_noshell(c_str)
 
-cxx_str = '${CXX} ${CXXFLAGS} ${CPPFLAGS} ${FRAMEWORKPATH_ST:FRAMEWORKPATH} ${CPPPATH_ST:INCPATHS} ${DEFINES_ST:DEFINES} -c ${SRCLST} ${CXX_TGT_F_BATCHED}'
+cxx_str = '${CXX} ${ARCH_ST:ARCH} ${CXXFLAGS} ${FRAMEWORKPATH_ST:FRAMEWORKPATH} ${tsk.batch_incpaths()} ${DEFINES_ST:DEFINES} -c ${SRCLST} ${CXX_TGT_F_BATCHED} ${CPPFLAGS}'
 cxx_fun, _ = Task.compile_fun_noshell(cxx_str)
 
 count = 70000
-class batch_task(Task.Task):
+class batch(Task.Task):
 	color = 'PINK'
 
 	after = ['c', 'cxx']
 	before = ['cprogram', 'cshlib', 'cstlib', 'cxxprogram', 'cxxshlib', 'cxxstlib']
 
 	def uid(self):
-		m = Utils.md5()
-		m.update(Task.Task.uid(self))
-		m.update(str(self.generator.idx).encode())
-		return m.digest()
+		return Utils.h_list([Task.Task.uid(self), self.generator.idx, self.generator.path.abspath(), self.generator.target])
 
 	def __str__(self):
 		return 'Batch compilation for %d slaves' % len(self.slaves)
@@ -74,6 +72,13 @@ class batch_task(Task.Task):
 
 		return Task.SKIP_ME
 
+	def get_cwd(self):
+		return self.slaves[0].outputs[0].parent
+
+	def batch_incpaths(self):
+		st = self.env.CPPPATH_ST
+		return [st % node.abspath() for node in self.generator.includes_nodes]
+
 	def run(self):
 		self.outputs = []
 
@@ -85,7 +90,6 @@ class batch_task(Task.Task):
 				srclst.append(t.inputs[0].abspath())
 
 		self.env.SRCLST = srclst
-		self.cwd = slaves[0].outputs[0].parent.abspath()
 
 		if self.slaves[0].__class__.__name__ == 'c':
 			ret = c_fun(self)

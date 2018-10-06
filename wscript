@@ -34,7 +34,9 @@ def check_for_celt(conf):
         define = 'HAVE_CELT_API_0_' + version
         if not found:
             try:
-                conf.check_cfg(package='celt', atleast_version='0.' + version + '.0', args='--cflags --libs')
+                conf.check_cfg(
+                        package='celt >= 0.%s.0' % version,
+                        args='--cflags --libs')
                 found = True
                 conf.define(define, 1)
                 continue
@@ -75,7 +77,6 @@ def options(opt):
     opt.load('compiler_c')
     opt.load('autooptions');
 
-    opt.load('xcode')
     opt.load('xcode6')
 
     # install directories
@@ -111,35 +112,30 @@ def options(opt):
             help='Enable ALSA driver',
             conf_dest='BUILD_DRIVER_ALSA')
     alsa.check_cfg(
-            package='alsa',
-            atleast_version='1.0.18',
+            package='alsa >= 1.0.18',
             args='--cflags --libs')
     firewire = opt.add_auto_option(
             'firewire',
             help='Enable FireWire driver (FFADO)',
             conf_dest='BUILD_DRIVER_FFADO')
     firewire.check_cfg(
-            package='libffado',
-            atleast_version='1.999.17',
+            package='libffado >= 1.999.17',
             args='--cflags --libs')
     freebob = opt.add_auto_option(
             'freebob',
             help='Enable FreeBob driver')
     freebob.check_cfg(
-            package='libfreebob',
-            atleast_version='1.0.0',
+            package='libfreebob >= 1.0.0',
             args='--cflags --libs')
     iio = opt.add_auto_option(
             'iio',
             help='Enable IIO driver',
             conf_dest='BUILD_DRIVER_IIO')
     iio.check_cfg(
-            package='gtkIOStream',
-            atleast_version='1.4.0',
+            package='gtkIOStream >= 1.4.0',
             args='--cflags --libs')
     iio.check_cfg(
-            package='eigen3',
-            atleast_version='3.1.2',
+            package='eigen3 >= 3.1.2',
             args='--cflags --libs')
     portaudio = opt.add_auto_option(
             'portaudio',
@@ -147,9 +143,8 @@ def options(opt):
             conf_dest='BUILD_DRIVER_PORTAUDIO')
     portaudio.check(header_name='windows.h') # only build portaudio on windows
     portaudio.check_cfg(
-            package='portaudio-2.0',
+            package='portaudio-2.0 >= 19',
             uselib_store='PORTAUDIO',
-            atleast_version='19',
             args='--cflags --libs')
     winmme = opt.add_auto_option(
             'winmme',
@@ -166,8 +161,7 @@ def options(opt):
             help='Build Opus netjack2')
     opus.check(header_name='opus/opus_custom.h')
     opus.check_cfg(
-            package='opus',
-            atleast_version='0.9.0',
+            package='opus >= 0.9.0',
             args='--cflags --libs')
     samplerate = opt.add_auto_option(
             'samplerate',
@@ -240,10 +234,19 @@ def configure(conf):
 
     # Check for functions.
     conf.check(
-        function_name='ppoll',
-        header_name=['poll.h', 'signal.h'],
-        defines=['_GNU_SOURCE'],
-        mandatory=False)
+            fragment=''
+                + '#define _GNU_SOURCE\n'
+                + '#include <poll.h>\n'
+                + '#include <signal.h>\n'
+                + '#include <stddef.h>\n'
+                + 'int\n'
+                + 'main(void)\n'
+                + '{\n'
+                + '   ppoll(NULL, 0, NULL, NULL);\n'
+                + '}\n',
+            msg='Checking for ppoll',
+            define_name='HAVE_PPOLL',
+            mandatory=False)
 
     # Check for backtrace support
     conf.check(
