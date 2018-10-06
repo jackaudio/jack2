@@ -135,13 +135,17 @@ def options(opt):
             'celt',
             help='Build with CELT')
     celt.add_function(check_for_celt)
+
+    # Suffix _PKG to not collide with HAVE_OPUS defined by the option.
     opus = opt.add_auto_option(
             'opus',
             help='Build Opus netjack2')
     opus.check(header_name='opus/opus_custom.h')
     opus.check_cfg(
             package='opus >= 0.9.0',
-            args='--cflags --libs')
+            args='--cflags --libs',
+            define_name='HAVE_OPUS_PKG')
+
     samplerate = opt.add_auto_option(
             'samplerate',
             help='Build with libsamplerate')
