@@ -81,7 +81,8 @@ def options(opt):
     doxygen = opt.add_auto_option(
             'doxygen',
             help='Build doxygen documentation',
-            conf_dest='BUILD_DOXYGEN_DOCS')
+            conf_dest='BUILD_DOXYGEN_DOCS',
+            default=False)
     doxygen.find_program('doxygen')
     alsa = opt.add_auto_option(
             'alsa',
