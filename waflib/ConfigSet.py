@@ -335,6 +335,12 @@ class ConfigSet(object):
 			tbl[x] = copy.deepcopy(tbl[x])
 		self.undo_stack = self.undo_stack + [orig]
 
+	def commit(self):
+		"""
+		Commits transactional changes. See :py:meth:`ConfigSet.stash`
+		"""
+		self.undo_stack.pop(-1)
+
 	def revert(self):
 		"""
 		Reverts the object to a previous state. See :py:meth:`ConfigSet.stash`

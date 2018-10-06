@@ -417,7 +417,7 @@ class PBXProject(XCodeNode):
 
 		self.buildConfigurationList = XCConfigurationList(configurations)
 		self.compatibilityVersion = version[0]
-		self.hasScannedForEncodings = 1;
+		self.hasScannedForEncodings = 1
 		self.mainGroup = PBXGroup(name)
 		self.projectRoot = ""
 		self.projectDirPath = ""

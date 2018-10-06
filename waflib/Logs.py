@@ -169,7 +169,7 @@ class log_handler(logging.StreamHandler):
 				else:
 					stream.write(fs % msg)
 			except UnicodeError:
-				stream.write((fs % msg).encode("UTF-8"))
+				stream.write((fs % msg).encode('utf-8'))
 		else:
 			logging.StreamHandler.emit(self, record)
 
@@ -200,8 +200,9 @@ class formatter(logging.Formatter):
 			c2 = getattr(rec, 'c2', colors.NORMAL)
 			msg = '%s%s%s' % (c1, msg, c2)
 		else:
-			msg = msg.replace('\r', '\n')
-			msg = re.sub(r'\x1B\[(K|.*?(m|h|l))', '', msg)
+			# remove single \r that make long lines in text files
+			# and other terminal commands
+			msg = re.sub(r'\r(?!\n)|\x1B\[(K|.*?(m|h|l))', '', msg)
 
 		if rec.levelno >= logging.INFO: # ??
 			return msg

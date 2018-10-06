@@ -213,7 +213,7 @@ class PBXProject(XCodeNode):
 		XCodeNode.__init__(self)
 		self.buildConfigurationList = XCConfigurationList([XCBuildConfiguration('waf', {})])
 		self.compatibilityVersion = version[0]
-		self.hasScannedForEncodings = 1;
+		self.hasScannedForEncodings = 1
 		self.mainGroup = PBXGroup(name)
 		self.projectRoot = ""
 		self.projectDirPath = ""

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf-8
-# Thomas Nagy, 2010 (ita)
+# Thomas Nagy, 2010-2016 (ita)
 
 """
 Classes and functions required for waf commands
@@ -11,13 +11,13 @@ from waflib import Utils, Errors, Logs
 import waflib.Node
 
 # the following 3 constants are updated on each new release (do not touch)
-HEXVERSION=0x1081100
+HEXVERSION=0x1081600
 """Constant updated on new releases"""
 
-WAFVERSION="1.8.17"
+WAFVERSION="1.8.22"
 """Constant updated on new releases"""
 
-WAFREVISION="cd7579a727d1b390bf9cbf111c1b20e811370bc0"
+WAFREVISION="17d4d4faa52c454eb3580e482df69b2a80e19fa7"
 """Git revision when the waf version is updated"""
 
 ABI = 98
@@ -352,7 +352,7 @@ class Context(ctx):
 		if 'input' in kw:
 			if kw['input']:
 				wargs['input'] = kw['input']
-				kw['stdin'] = Utils.subprocess.PIPE
+				kw['stdin'] = subprocess.PIPE
 			del kw['input']
 
 		try:
@@ -432,7 +432,7 @@ class Context(ctx):
 		if 'input' in kw:
 			if kw['input']:
 				wargs['input'] = kw['input']
-				kw['stdin'] = Utils.subprocess.PIPE
+				kw['stdin'] = subprocess.PIPE
 			del kw['input']
 
 		try:

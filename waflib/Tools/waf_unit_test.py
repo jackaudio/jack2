@@ -127,17 +127,22 @@ class utest(Task.Task):
 
 		testcmd = getattr(self.generator, 'ut_cmd', False) or getattr(Options.options, 'testcmd', False)
 		if testcmd:
-			self.ut_exec = (testcmd % self.ut_exec[0]).split(' ')
+			self.ut_exec = (testcmd % " ".join(self.ut_exec)).split(' ')
 
 		proc = Utils.subprocess.Popen(self.ut_exec, cwd=cwd, env=self.get_test_env(), stderr=Utils.subprocess.PIPE, stdout=Utils.subprocess.PIPE)
 		(stdout, stderr) = proc.communicate()
 
-		tup = (filename, proc.returncode, stdout, stderr)
+		self.waf_unit_test_results = tup = (filename, proc.returncode, stdout, stderr)
 		testlock.acquire()
 		try:
 			return self.generator.add_test_results(tup)
 		finally:
 			testlock.release()
+
+	def post_run(self):
+		super(utest, self).post_run()
+		if getattr(Options.options, 'clear_failed_tests', False) and self.waf_unit_test_results[1]:
+			self.generator.bld.task_sigs[self.uid()] = None
 
 def summary(bld):
 	"""
@@ -194,6 +199,7 @@ def options(opt):
 	"""
 	opt.add_option('--notests', action='store_true', default=False, help='Exec no unit tests', dest='no_tests')
 	opt.add_option('--alltests', action='store_true', default=False, help='Exec all unit tests', dest='all_tests')
+	opt.add_option('--clear-failed', action='store_true', default=False, help='Force failed unit tests to run again next time', dest='clear_failed_tests')
 	opt.add_option('--testcmd', action='store', default=False,
 	 help = 'Run the unit tests using the test-cmd string'
 	 ' example "--test-cmd="valgrind --error-exitcode=1'

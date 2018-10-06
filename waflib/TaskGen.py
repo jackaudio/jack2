@@ -216,7 +216,8 @@ class task_gen(object):
 						tmp.append(x)
 
 		if prec:
-			raise Errors.WafError('Cycle detected in the method execution %r' % prec)
+			txt = '\n'.join(['- %s after %s' % (k, repr(v)) for k, v in prec.items()])
+			raise Errors.WafError('Cycle detected in the method execution\n%s' % txt)
 		out.reverse()
 		self.meths = out
 

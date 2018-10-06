@@ -100,6 +100,7 @@ MACRO_TO_DEST_CPU = {
 '__s390x__'   : 's390x',
 '__s390__'    : 's390',
 '__sh__'      : 'sh',
+'__xtensa__'  : 'xtensa',
 }
 
 @conf
@@ -167,7 +168,12 @@ def parse_flags(self, line, uselib_store, env=None, force_static=False, posix=No
 		elif x.startswith('/LIBPATH:'):
 			prefix = (force_static or static) and 'STLIBPATH_' or 'LIBPATH_'
 			appu(prefix + uselib, [x.replace('/LIBPATH:', '')])
-		elif x == '-pthread' or x.startswith('+') or x.startswith('-std'):
+		elif x.startswith('-std='):
+			if '++' in x:
+				app('CXXFLAGS_' + uselib, [x])
+			else:
+				app('CFLAGS_' + uselib, [x])
+		elif x == '-pthread' or x.startswith('+'):
 			app('CFLAGS_' + uselib, [x])
 			app('CXXFLAGS_' + uselib, [x])
 			app('LINKFLAGS_' + uselib, [x])
@@ -342,13 +348,13 @@ def exec_cfg(self, kw):
 
 	# retrieving variables of a module
 	if 'variables' in kw:
-		v = kw.get('env', self.env)
+		v_env = kw.get('env', self.env)
 		uselib = kw.get('uselib_store', kw['package'].upper())
 		vars = Utils.to_list(kw['variables'])
 		for v in vars:
 			val = self.cmd_and_log(lst + ['--variable=' + v], env=env).strip()
 			var = '%s_%s' % (uselib, v)
-			v[var] = val
+			v_env[var] = val
 		if not 'okmsg' in kw:
 			kw['okmsg'] = 'yes'
 		return
@@ -635,13 +641,15 @@ def post_check(self, *k, **kw):
 
 	if 'define_name' in kw:
 		# TODO simplify!
+		comment = kw.get('comment', '')
+		define_name = kw['define_name']
 		if 'header_name' in kw or 'function_name' in kw or 'type_name' in kw or 'fragment' in kw:
 			if kw['execute'] and kw.get('define_ret', None) and isinstance(is_success, str):
-				self.define(kw['define_name'], is_success, quote=kw.get('quote', 1))
+				self.define(define_name, is_success, quote=kw.get('quote', 1), comment=comment)
 			else:
-				self.define_cond(kw['define_name'], is_success)
+				self.define_cond(define_name, is_success, comment=comment)
 		else:
-			self.define_cond(kw['define_name'], is_success)
+			self.define_cond(define_name, is_success, comment=comment)
 
 		# consistency with check_cfg
 		if kw.get('global_define', None):
@@ -757,7 +765,20 @@ def check_cc(self, *k, **kw):
 	return self.check(*k, **kw)
 
 @conf
-def define(self, key, val, quote=True):
+def set_define_comment(self, key, comment):
+	# comments that appear in get_config_header
+	coms = self.env.DEFINE_COMMENTS
+	if not coms:
+		coms = self.env.DEFINE_COMMENTS = {}
+	coms[key] = comment or ''
+
+@conf
+def get_define_comment(self, key):
+	coms = self.env.DEFINE_COMMENTS or {}
+	return coms.get(key, '')
+
+@conf
+def define(self, key, val, quote=True, comment=''):
 	"""
 	Store a single define and its state into conf.env.DEFINES. If the value is True, False or None it is cast to 1 or 0.
 
@@ -791,9 +812,10 @@ def define(self, key, val, quote=True):
 		self.env.append_value('DEFINES', app)
 
 	self.env.append_unique(DEFKEYS, key)
+	self.set_define_comment(key, comment)
 
 @conf
-def undefine(self, key):
+def undefine(self, key, comment=''):
 	"""
 	Remove a define from conf.env.DEFINES
 
@@ -806,9 +828,10 @@ def undefine(self, key):
 	lst = [x for x in self.env['DEFINES'] if not x.startswith(ban)]
 	self.env['DEFINES'] = lst
 	self.env.append_unique(DEFKEYS, key)
+	self.set_define_comment(key, comment)
 
 @conf
-def define_cond(self, key, val):
+def define_cond(self, key, val, comment=''):
 	"""
 	Conditionally define a name::
 
@@ -826,9 +849,9 @@ def define_cond(self, key, val):
 	assert key and isinstance(key, str)
 
 	if val:
-		self.define(key, 1)
+		self.define(key, 1, comment=comment)
 	else:
-		self.undefine(key)
+		self.undefine(key, comment=comment)
 
 @conf
 def is_defined(self, key):
@@ -958,10 +981,13 @@ def get_config_header(self, defines=True, headers=False, define_prefix=''):
 			tbl[a] = b
 
 		for k in self.env[DEFKEYS]:
+			caption = self.get_define_comment(k)
+			if caption:
+				caption = ' /* %s */' % caption
 			try:
-				txt = '#define %s%s %s' % (define_prefix, k, tbl[k])
+				txt = '#define %s%s %s%s' % (define_prefix, k, tbl[k], caption)
 			except KeyError:
-				txt = '/* #undef %s%s */' % (define_prefix, k)
+				txt = '/* #undef %s%s */%s' % (define_prefix, k, caption)
 			lst.append(txt)
 	return "\n".join(lst)
 
@@ -1129,7 +1155,10 @@ def get_suncc_version(conf, cc):
 	version = (out or err)
 	version = version.splitlines()[0]
 
-	version_re = re.compile(r'cc:\s+sun\s+(c\+\+|c)\s+(?P<major>\d*)\.(?P<minor>\d*)', re.I).search
+	# cc: Sun C 5.10 SunOS_i386 2009/06/03
+	# cc: Studio 12.5 Sun C++ 5.14 SunOS_sparc Beta 2015/11/17
+	# cc: WorkShop Compilers 5.0 98/12/15 C 5.0
+	version_re = re.compile(r'cc: (studio.*?|\s+)?(sun\s+(c\+\+|c)|(WorkShop\s+Compilers))?\s+(?P<major>\d*)\.(?P<minor>\d*)', re.I).search
 	match = version_re(version)
 	if match:
 		k = match.groupdict()
