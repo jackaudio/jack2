@@ -135,6 +135,7 @@ main (int argc, char *argv[])
 	int attack_percent = 1, decay_percent = 10, dur_arg = 100;
 	char *client_name = 0;
 	char *bpm_string = "bpm";
+	int verbose = 0;
 	jack_status_t status;
 
 	const char *options = "f:A:D:a:d:b:n:thv";
@@ -149,6 +150,7 @@ main (int argc, char *argv[])
 		{"name", 1, 0, 'n'},
 		{"transport", 0, 0, 't'},
 		{"help", 0, 0, 'h'},
+		{"verbose", 0, 0, 'v'},
 		{0, 0, 0, 0}
 	};
 
@@ -195,6 +197,9 @@ main (int argc, char *argv[])
 		case 'n':
 			client_name = (char *) malloc ((strlen (optarg) + 1) * sizeof (char));
 			strcpy (client_name, optarg);
+			break;
+		case 'v':
+			verbose = 1;
 			break;
 		case 't':
 			transport_aware = 1;

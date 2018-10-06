@@ -111,6 +111,8 @@ namespace Jack
             StrError(NET_ERROR_CODE);
         }
         
+        int tos = 0;       /* see <netinet/in.h> */
+        
         /*
         DSCP Field Hex/Bin/Dec	Layer 2 Prio	Traffic Type	Acronym	WMM Access Category
         0x38 / 111000 / 56	7	Network Control	NC	AC_VO

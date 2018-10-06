@@ -494,6 +494,8 @@ int process5(jack_nframes_t nframes, void *arg)
     static jack_nframes_t first_current_frames;
     static jack_time_t first_current_usecs;
     static jack_time_t first_next_usecs;
+    static float first_period_usecs;
+	static int res1 = jack_get_cycle_times(client, &first_current_frames, &first_current_usecs, &first_next_usecs, &first_period_usecs);
 	   
     jack_nframes_t current_frames;
     jack_time_t current_usecs;

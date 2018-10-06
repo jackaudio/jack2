@@ -78,9 +78,10 @@ int update_buffer_size(jack_nframes_t nframes, void *arg)
 
 int process(jack_nframes_t nframes, void *arg)
 {
-	jack_default_audio_sample_t *out;
+	jack_default_audio_sample_t *in, *out;
 	jack_nframes_t start_frame = jack_frame_time(client);
 
+	in = (jack_default_audio_sample_t *) jack_port_get_buffer (input_port, nframes);
 	out = (jack_default_audio_sample_t *) jack_port_get_buffer (output_port, nframes);
 	memset(out, 0, sizeof (jack_default_audio_sample_t) * nframes);
 

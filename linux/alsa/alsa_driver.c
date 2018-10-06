@@ -625,6 +625,7 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 	channel_t chn;
 	unsigned int pr = 0;
 	unsigned int cr = 0;
+	int err;
 
 	driver->frame_rate = rate;
 	driver->frames_per_cycle = frames_per_cycle;
@@ -716,14 +717,14 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 	if (driver->playback_handle) {
  		snd_pcm_access_t access;
 
-		snd_pcm_hw_params_get_period_size (
-			driver->playback_hw_params, &p_period_size, &dir);
-		snd_pcm_hw_params_get_format (
-			driver->playback_hw_params,
-			&(driver->playback_sample_format))
-		snd_pcm_hw_params_get_access (driver->playback_hw_params,
+ 		err = snd_pcm_hw_params_get_period_size (
+ 			driver->playback_hw_params, &p_period_size, &dir);
+ 		err = snd_pcm_hw_params_get_format (
+ 			driver->playback_hw_params,
+			&(driver->playback_sample_format));
+ 		err = snd_pcm_hw_params_get_access (driver->playback_hw_params,
 						    &access);
-		driver->playback_interleaved =
+ 		driver->playback_interleaved =
 			(access == SND_PCM_ACCESS_MMAP_INTERLEAVED)
 			|| (access == SND_PCM_ACCESS_MMAP_COMPLEX);
 
@@ -739,14 +740,14 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 	if (driver->capture_handle) {
  		snd_pcm_access_t access;
 
-		snd_pcm_hw_params_get_period_size (
-			driver->capture_hw_params, &c_period_size, &dir);
-		snd_pcm_hw_params_get_format (
-			driver->capture_hw_params,
+ 		err = snd_pcm_hw_params_get_period_size (
+ 			driver->capture_hw_params, &c_period_size, &dir);
+ 		err = snd_pcm_hw_params_get_format (
+ 			driver->capture_hw_params,
 			&(driver->capture_sample_format));
-		snd_pcm_hw_params_get_access (driver->capture_hw_params,
+ 		err = snd_pcm_hw_params_get_access (driver->capture_hw_params,
 						    &access);
-		driver->capture_interleaved =
+ 		driver->capture_interleaved =
 			(access == SND_PCM_ACCESS_MMAP_INTERLEAVED)
 			|| (access == SND_PCM_ACCESS_MMAP_COMPLEX);
 

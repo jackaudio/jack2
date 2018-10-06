@@ -82,6 +82,7 @@ static int process(jack_nframes_t nframes, void *arg)
 int main(int narg, char **args)
 {
 	int i;
+	jack_nframes_t nframes;
 	if ((narg<6) || ((narg-3)%3 != 0)) {
 		usage();
 		exit(1);
@@ -92,6 +93,7 @@ int main(int narg, char **args)
 	}
 	jack_set_process_callback (client, process, 0);
 	output_port = jack_port_register (client, "out", JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0);
+	nframes = jack_get_buffer_size(client);
 	loop_index = 0;
 	num_notes = (narg - 3)/3;
 	note_frqs = malloc(num_notes*sizeof(unsigned char));

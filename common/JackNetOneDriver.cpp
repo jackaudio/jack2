@@ -986,6 +986,9 @@ extern "C"
         unsigned int latency = 5;
         unsigned int redundancy = 1;
         unsigned int mtu = 1400;
+#if HAVE_SAMPLERATE
+        unsigned int resample_factor_up = 1;
+#endif
         int dont_htonl_floats = 0;
         int always_deadline = 0;
         int jitter_val = 0;
@@ -1026,6 +1029,15 @@ extern "C"
                 case 'f':
 #if HAVE_SAMPLERATE
                     resample_factor = param->value.ui;
+#else
+                    jack_error("not built with libsamplerate support");
+                    return NULL;
+#endif
+                    break;
+
+                case 'u':
+#if HAVE_SAMPLERATE
+                    resample_factor_up = param->value.ui;
 #else
                     jack_error("not built with libsamplerate support");
                     return NULL;
