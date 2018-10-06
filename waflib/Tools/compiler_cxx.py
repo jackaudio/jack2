@@ -48,7 +48,7 @@ cxx_compiler = {
 'osf1V':  ['g++'],
 'gnu':    ['g++', 'clang++'],
 'java':   ['g++', 'msvc', 'clang++', 'icpc'],
-'default': ['clang++', 'g++']
+'default': ['g++', 'clang++']
 }
 """
 Dict mapping the platform names to Waf tools finding specific C++ compilers::
@@ -64,14 +64,10 @@ def default_compilers():
 
 def configure(conf):
 	"""
-	Detects a suitable C++ compiler
-
-	:raises: :py:class:`waflib.Errors.ConfigurationError` when no suitable compiler is found
+	Try to find a suitable C++ compiler or raise a :py:class:`waflib.Errors.ConfigurationError`.
 	"""
-	try:
-		test_for_compiler = conf.options.check_cxx_compiler or default_compilers()
-	except AttributeError:
-		conf.fatal("Add options(opt): opt.load('compiler_cxx')")
+	try: test_for_compiler = conf.options.check_cxx_compiler or default_compilers()
+	except AttributeError: conf.fatal("Add options(opt): opt.load('compiler_cxx')")
 
 	for compiler in re.split('[ ,]+', test_for_compiler):
 		conf.env.stash()
@@ -81,21 +77,19 @@ def configure(conf):
 		except conf.errors.ConfigurationError as e:
 			conf.env.revert()
 			conf.end_msg(False)
-			debug('compiler_cxx: %r', e)
+			debug('compiler_cxx: %r' % e)
 		else:
-			if conf.env.CXX:
+			if conf.env['CXX']:
 				conf.end_msg(conf.env.get_flat('CXX'))
-				conf.env.COMPILER_CXX = compiler
-				conf.env.commit()
+				conf.env['COMPILER_CXX'] = compiler
 				break
-			conf.env.revert()
 			conf.end_msg(False)
 	else:
 		conf.fatal('could not configure a C++ compiler!')
 
 def options(opt):
 	"""
-	This is how to provide compiler preferences on the command-line::
+	Restrict the compiler detection from the command-line::
 
 		$ waf configure --check-cxx-compiler=gxx
 	"""

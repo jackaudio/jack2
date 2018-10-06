@@ -9,8 +9,6 @@ from waflib.Configure import conf
 
 def get_extensions(lst):
 	"""
-	Returns the file extensions for the list of files given as input
-
 	:param lst: files to process
 	:list lst: list of string or :py:class:`waflib.Node.Node`
 	:return: list of file extensions
@@ -18,15 +16,17 @@ def get_extensions(lst):
 	"""
 	ret = []
 	for x in Utils.to_list(lst):
-		if not isinstance(x, str):
-			x = x.name
-		ret.append(x[x.rfind('.') + 1:])
+		try:
+			if not isinstance(x, str):
+				x = x.name
+			ret.append(x[x.rfind('.') + 1:])
+		except Exception:
+			pass
 	return ret
 
 def sniff_features(**kw):
 	"""
-	Computes and returns the features required for a task generator by
-	looking at the file extensions. This aimed for C/C++ mainly::
+	Look at the source files and return the features for a task generator (mainly cc and cxx)::
 
 		snif_features(source=['foo.c', 'foo.cxx'], type='shlib')
 		# returns  ['cxx', 'c', 'cxxshlib', 'cshlib']
@@ -39,7 +39,7 @@ def sniff_features(**kw):
 	:rtype: list of string
 	"""
 	exts = get_extensions(kw['source'])
-	typ = kw['typ']
+	type = kw['_type']
 	feats = []
 
 	# watch the order, cxx will have the precedence
@@ -63,27 +63,18 @@ def sniff_features(**kw):
 		feats.append('java')
 		return 'java'
 
-	if typ in ('program', 'shlib', 'stlib'):
+	if type in ('program', 'shlib', 'stlib'):
 		will_link = False
 		for x in feats:
 			if x in ('cxx', 'd', 'fc', 'c'):
-				feats.append(x + typ)
+				feats.append(x + type)
 				will_link = True
 		if not will_link and not kw.get('features', []):
 			raise Errors.WafError('Cannot link from %r, try passing eg: features="c cprogram"?' % kw)
 	return feats
 
-def set_features(kw, typ):
-	"""
-	Inserts data in the input dict *kw* based on existing data and on the type of target
-	required (typ).
-
-	:param kw: task generator parameters
-	:type kw: dict
-	:param typ: type of target
-	:type typ: string
-	"""
-	kw['typ'] = typ
+def set_features(kw, _type):
+	kw['_type'] = _type
 	kw['features'] = Utils.to_list(kw.get('features', [])) + Utils.to_list(sniff_features(**kw))
 
 @conf

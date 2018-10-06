@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf-8
-# Thomas Nagy, 2010-2018 (ita)
+# Thomas Nagy, 2010 (ita)
 
 """
 Exceptions used in the Waf code
@@ -17,7 +17,6 @@ class WafError(Exception):
 		:param ex: exception causing this error (optional)
 		:type ex: exception
 		"""
-		Exception.__init__(self)
 		self.msg = msg
 		assert not isinstance(msg, Exception)
 
@@ -36,7 +35,9 @@ class WafError(Exception):
 		return str(self.msg)
 
 class BuildError(WafError):
-	"""Error raised during the build and install phases"""
+	"""
+	Errors raised during the build and install phases
+	"""
 	def __init__(self, error_tasks=[]):
 		"""
 		:param error_tasks: tasks that could not complete normally
@@ -46,23 +47,24 @@ class BuildError(WafError):
 		WafError.__init__(self, self.format_error())
 
 	def format_error(self):
-		"""Formats the error messages from the tasks that failed"""
+		"""format the error messages from the tasks that failed"""
 		lst = ['Build failed']
 		for tsk in self.tasks:
 			txt = tsk.format_error()
-			if txt:
-				lst.append(txt)
+			if txt: lst.append(txt)
 		return '\n'.join(lst)
 
 class ConfigurationError(WafError):
-	"""Configuration exception raised in particular by :py:meth:`waflib.Context.Context.fatal`"""
+	"""
+	Configuration exception raised in particular by :py:meth:`waflib.Context.Context.fatal`
+	"""
 	pass
 
 class TaskRescan(WafError):
-	"""Task-specific exception type signalling required signature recalculations"""
+	"""task-specific exception type, trigger a signature recomputation"""
 	pass
 
 class TaskNotReady(WafError):
-	"""Task-specific exception type signalling that task signatures cannot be computed"""
+	"""task-specific exception type, raised when the task signature cannot be computed"""
 	pass
 

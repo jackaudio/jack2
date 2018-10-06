@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf-8
-# Thomas Nagy 2009-2018 (ita)
+# Thomas Nagy 2009-2010 (ita)
 
 """
 Detect the Clang++ C++ compiler
@@ -12,7 +12,7 @@ from waflib.Configure import conf
 @conf
 def find_clangxx(conf):
 	"""
-	Finds the program clang++, and executes it to ensure it really is clang++
+	Find the program clang++, and execute it to ensure it really is clang++
 	"""
 	cxx = conf.find_program('clang++', var='CXX')
 	conf.get_cc_version(cxx, clang=True)

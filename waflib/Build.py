@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf-8
-# Thomas Nagy, 2005-2018 (ita)
+# Thomas Nagy, 2005-2010 (ita)
 
 """
 Classes related to the build phase (build, clean, install, step, etc)
@@ -14,13 +14,14 @@ try:
 	import cPickle
 except ImportError:
 	import pickle as cPickle
-from waflib import Node, Runner, TaskGen, Utils, ConfigSet, Task, Logs, Options, Context, Errors
+from waflib import Runner, TaskGen, Utils, ConfigSet, Task, Logs, Options, Context, Errors
+import waflib.Node
 
 CACHE_DIR = 'c4che'
-"""Name of the cache directory"""
+"""Location of the cache files"""
 
 CACHE_SUFFIX = '_cache.py'
-"""ConfigSet cache files for variants are written under :py:attr:´waflib.Build.CACHE_DIR´ in the form ´variant_name´_cache.py"""
+"""Suffix for the cache files"""
 
 INSTALL = 1337
 """Positive value '->' install, see :py:attr:`waflib.Build.BuildContext.is_install`"""
@@ -28,19 +29,20 @@ INSTALL = 1337
 UNINSTALL = -1337
 """Negative value '<-' uninstall, see :py:attr:`waflib.Build.BuildContext.is_install`"""
 
-SAVED_ATTRS = 'root node_sigs task_sigs imp_sigs raw_deps node_deps'.split()
-"""Build class members to save between the runs; these should be all dicts
-except for `root` which represents a :py:class:`waflib.Node.Node` instance
-"""
+SAVED_ATTRS = 'root node_deps raw_deps task_sigs'.split()
+"""Build class members to save between the runs (root, node_deps, raw_deps, task_sigs)"""
 
 CFG_FILES = 'cfg_files'
 """Files from the build directory to hash before starting the build (``config.h`` written during the configuration)"""
 
 POST_AT_ONCE = 0
-"""Post mode: all task generators are posted before any task executed"""
+"""Post mode: all task generators are posted before the build really starts"""
 
 POST_LAZY = 1
-"""Post mode: post the task generators group after group, the tasks in the next group are created when the tasks in the previous groups are done"""
+"""Post mode: post the task generators group after group"""
+
+POST_BOTH = 2
+"""Post mode: post the task generators at once, then re-check them for each group"""
 
 PROTOCOL = -1
 if sys.platform == 'cli':
@@ -59,65 +61,48 @@ class BuildContext(Context.Context):
 		"""Non-zero value when installing or uninstalling file"""
 
 		self.top_dir = kw.get('top_dir', Context.top_dir)
-		"""See :py:attr:`waflib.Context.top_dir`; prefer :py:attr:`waflib.Build.BuildContext.srcnode`"""
-
-		self.out_dir = kw.get('out_dir', Context.out_dir)
-		"""See :py:attr:`waflib.Context.out_dir`; prefer :py:attr:`waflib.Build.BuildContext.bldnode`"""
 
 		self.run_dir = kw.get('run_dir', Context.run_dir)
-		"""See :py:attr:`waflib.Context.run_dir`"""
 
-		self.launch_dir = Context.launch_dir
-		"""See :py:attr:`waflib.Context.out_dir`; prefer :py:meth:`waflib.Build.BuildContext.launch_node`"""
+		self.post_mode = POST_AT_ONCE
+		"""post the task generators at once, group-by-group, or both"""
 
-		self.post_mode = POST_LAZY
-		"""Whether to post the task generators at once or group-by-group (default is group-by-group)"""
+		# output directory - may be set until the nodes are considered
+		self.out_dir = kw.get('out_dir', Context.out_dir)
 
-		self.cache_dir = kw.get('cache_dir')
+		self.cache_dir = kw.get('cache_dir', None)
 		if not self.cache_dir:
 			self.cache_dir = os.path.join(self.out_dir, CACHE_DIR)
 
+		# map names to environments, the '' must be defined
 		self.all_envs = {}
-		"""Map names to :py:class:`waflib.ConfigSet.ConfigSet`, the empty string must map to the default environment"""
 
 		# ======================================= #
 		# cache variables
 
-		self.node_sigs = {}
-		"""Dict mapping build nodes to task identifier (uid), it indicates whether a task created a particular file (persists across builds)"""
-
 		self.task_sigs = {}
-		"""Dict mapping task identifiers (uid) to task signatures (persists across builds)"""
-
-		self.imp_sigs = {}
-		"""Dict mapping task identifiers (uid) to implicit task dependencies used for scanning targets (persists across builds)"""
+		"""Signatures of the tasks (persists between build executions)"""
 
 		self.node_deps = {}
-		"""Dict mapping task identifiers (uid) to node dependencies found by :py:meth:`waflib.Task.Task.scan` (persists across builds)"""
+		"""Dict of node dependencies found by :py:meth:`waflib.Task.Task.scan` (persists between build executions)"""
 
 		self.raw_deps = {}
-		"""Dict mapping task identifiers (uid) to custom data returned by :py:meth:`waflib.Task.Task.scan` (persists across builds)"""
+		"""Dict of custom data returned by :py:meth:`waflib.Task.Task.scan` (persists between build executions)"""
+
+		# list of folders that are already scanned
+		# so that we do not need to stat them one more time
+		self.cache_dir_contents = {}
 
 		self.task_gen_cache_names = {}
 
+		self.launch_dir = Context.launch_dir
+
 		self.jobs = Options.options.jobs
-		"""Amount of jobs to run in parallel"""
-
 		self.targets = Options.options.targets
-		"""List of targets to build (default: \*)"""
-
 		self.keep = Options.options.keep
-		"""Whether the build should continue past errors"""
-
 		self.progress_bar = Options.options.progress_bar
-		"""
-		Level of progress status:
 
-		0. normal output
-		1. progress bar
-		2. IDE output
-		3. No output at all
-		"""
+		############ stuff below has not been reviewed
 
 		# Manual dependencies.
 		self.deps_man = Utils.defaultdict(list)
@@ -133,21 +118,16 @@ class BuildContext(Context.Context):
 		"""
 		List containing lists of task generators
 		"""
-
 		self.group_names = {}
 		"""
 		Map group names to the group lists. See :py:meth:`waflib.Build.BuildContext.add_group`
 		"""
 
-		for v in SAVED_ATTRS:
-			if not hasattr(self, v):
-				setattr(self, v, {})
-
 	def get_variant_dir(self):
 		"""Getter for the variant_dir attribute"""
 		if not self.variant:
 			return self.out_dir
-		return os.path.join(self.out_dir, os.path.normpath(self.variant))
+		return os.path.join(self.out_dir, self.variant)
 	variant_dir = property(get_variant_dir, None)
 
 	def __call__(self, *k, **kw):
@@ -172,22 +152,56 @@ class BuildContext(Context.Context):
 		kw['bld'] = self
 		ret = TaskGen.task_gen(*k, **kw)
 		self.task_gen_cache_names = {} # reset the cache, each time
-		self.add_to_group(ret, group=kw.get('group'))
+		self.add_to_group(ret, group=kw.get('group', None))
 		return ret
 
-	def __copy__(self):
+	def rule(self, *k, **kw):
 		"""
-		Build contexts cannot be copied
+		Wrapper for creating a task generator using the decorator notation. The following code::
 
-		:raises: :py:class:`waflib.Errors.WafError`
+			@bld.rule(
+				target = "foo"
+			)
+			def _(tsk):
+				print("bar")
+
+		is equivalent to::
+
+			def bar(tsk):
+				print("bar")
+
+			bld(
+				target = "foo",
+				rule = bar,
+			)
 		"""
-		raise Errors.WafError('build contexts cannot be copied')
+		def f(rule):
+			ret = self(*k, **kw)
+			ret.rule = rule
+			return ret
+		return f
+
+	def __copy__(self):
+		"""Implemented to prevents copies of build contexts (raises an exception)"""
+		raise Errors.WafError('build contexts are not supposed to be copied')
+
+	def install_files(self, *k, **kw):
+		"""Actual implementation provided by :py:meth:`waflib.Build.InstallContext.install_files`"""
+		pass
+
+	def install_as(self, *k, **kw):
+		"""Actual implementation provided by :py:meth:`waflib.Build.InstallContext.install_as`"""
+		pass
+
+	def symlink_as(self, *k, **kw):
+		"""Actual implementation provided by :py:meth:`waflib.Build.InstallContext.symlink_as`"""
+		pass
 
 	def load_envs(self):
 		"""
 		The configuration command creates files of the form ``build/c4che/NAMEcache.py``. This method
 		creates a :py:class:`waflib.ConfigSet.ConfigSet` instance for each ``NAME`` by reading those
-		files and stores them in :py:attr:`waflib.Build.BuildContext.allenvs`.
+		files. The config sets are then stored in the dict :py:attr:`waflib.Build.BuildContext.allenvs`.
 		"""
 		node = self.root.find_node(self.cache_dir)
 		if not node:
@@ -203,16 +217,21 @@ class BuildContext(Context.Context):
 			self.all_envs[name] = env
 			for f in env[CFG_FILES]:
 				newnode = self.root.find_resource(f)
-				if not newnode or not newnode.exists():
-					raise Errors.WafError('Missing configuration file %r, reconfigure the project!' % f)
+				try:
+					h = Utils.h_file(newnode.abspath())
+				except (IOError, AttributeError):
+					Logs.error('cannot find %r' % f)
+					h = Utils.SIG_NIL
+				newnode.sig = h
 
 	def init_dirs(self):
 		"""
 		Initialize the project directory and the build directory by creating the nodes
 		:py:attr:`waflib.Build.BuildContext.srcnode` and :py:attr:`waflib.Build.BuildContext.bldnode`
-		corresponding to ``top_dir`` and ``variant_dir`` respectively. The ``bldnode`` directory is
-		created if necessary.
+		corresponding to ``top_dir`` and ``variant_dir`` respectively. The ``bldnode`` directory will be
+		created if it does not exist.
 		"""
+
 		if not (os.path.isabs(self.top_dir) and os.path.isabs(self.out_dir)):
 			raise Errors.WafError('The project was not configured: run "waf configure" first!')
 
@@ -222,12 +241,12 @@ class BuildContext(Context.Context):
 
 	def execute(self):
 		"""
-		Restore data from previous builds and call :py:meth:`waflib.Build.BuildContext.execute_build`.
-		Overrides from :py:func:`waflib.Context.Context.execute`
+		Restore the data from previous builds and call :py:meth:`waflib.Build.BuildContext.execute_build`. Overrides from :py:func:`waflib.Context.Context.execute`
 		"""
 		self.restore()
 		if not self.all_envs:
 			self.load_envs()
+
 		self.execute_build()
 
 	def execute_build(self):
@@ -240,7 +259,7 @@ class BuildContext(Context.Context):
 		* calling :py:meth:`waflib.Build.BuildContext.post_build` to call user build functions
 		"""
 
-		Logs.info("Waf: Entering directory `%s'", self.variant_dir)
+		Logs.info("Waf: Entering directory `%s'" % self.variant_dir)
 		self.recurse([self.run_dir])
 		self.pre_build()
 
@@ -251,70 +270,65 @@ class BuildContext(Context.Context):
 			self.compile()
 		finally:
 			if self.progress_bar == 1 and sys.stderr.isatty():
-				c = self.producer.processed or 1
+				c = len(self.returned_tasks) or 1
 				m = self.progress_line(c, c, Logs.colors.BLUE, Logs.colors.NORMAL)
 				Logs.info(m, extra={'stream': sys.stderr, 'c1': Logs.colors.cursor_off, 'c2' : Logs.colors.cursor_on})
-			Logs.info("Waf: Leaving directory `%s'", self.variant_dir)
-		try:
-			self.producer.bld = None
-			del self.producer
-		except AttributeError:
-			pass
+			Logs.info("Waf: Leaving directory `%s'" % self.variant_dir)
 		self.post_build()
 
 	def restore(self):
 		"""
-		Load data from a previous run, sets the attributes listed in :py:const:`waflib.Build.SAVED_ATTRS`
+		Load the data from a previous run, sets the attributes listed in :py:const:`waflib.Build.SAVED_ATTRS`
 		"""
 		try:
 			env = ConfigSet.ConfigSet(os.path.join(self.cache_dir, 'build.config.py'))
 		except EnvironmentError:
 			pass
 		else:
-			if env.version < Context.HEXVERSION:
-				raise Errors.WafError('Project was configured with a different version of Waf, please reconfigure it')
-
-			for t in env.tools:
+			if env['version'] < Context.HEXVERSION:
+				raise Errors.WafError('Version mismatch! reconfigure the project')
+			for t in env['tools']:
 				self.setup(**t)
 
 		dbfn = os.path.join(self.variant_dir, Context.DBFILE)
 		try:
 			data = Utils.readf(dbfn, 'rb')
-		except (EnvironmentError, EOFError):
+		except (IOError, EOFError):
 			# handle missing file/empty file
-			Logs.debug('build: Could not load the build cache %s (missing)', dbfn)
+			Logs.debug('build: Could not load the build cache %s (missing)' % dbfn)
 		else:
 			try:
-				Node.pickle_lock.acquire()
-				Node.Nod3 = self.node_class
+				waflib.Node.pickle_lock.acquire()
+				waflib.Node.Nod3 = self.node_class
 				try:
 					data = cPickle.loads(data)
 				except Exception as e:
-					Logs.debug('build: Could not pickle the build cache %s: %r', dbfn, e)
+					Logs.debug('build: Could not pickle the build cache %s: %r' % (dbfn, e))
 				else:
 					for x in SAVED_ATTRS:
-						setattr(self, x, data.get(x, {}))
+						setattr(self, x, data[x])
 			finally:
-				Node.pickle_lock.release()
+				waflib.Node.pickle_lock.release()
 
 		self.init_dirs()
 
 	def store(self):
 		"""
-		Store data for next runs, set the attributes listed in :py:const:`waflib.Build.SAVED_ATTRS`. Uses a temporary
+		Store the data for next runs, sets the attributes listed in :py:const:`waflib.Build.SAVED_ATTRS`. Uses a temporary
 		file to avoid problems on ctrl+c.
 		"""
+
 		data = {}
 		for x in SAVED_ATTRS:
 			data[x] = getattr(self, x)
 		db = os.path.join(self.variant_dir, Context.DBFILE)
 
 		try:
-			Node.pickle_lock.acquire()
-			Node.Nod3 = self.node_class
+			waflib.Node.pickle_lock.acquire()
+			waflib.Node.Nod3 = self.node_class
 			x = cPickle.dumps(data, PROTOCOL)
 		finally:
-			Node.pickle_lock.release()
+			waflib.Node.pickle_lock.release()
 
 		Utils.writef(db + '.tmp', x, m='wb')
 
@@ -332,34 +346,29 @@ class BuildContext(Context.Context):
 	def compile(self):
 		"""
 		Run the build by creating an instance of :py:class:`waflib.Runner.Parallel`
-		The cache file is written when at least a task was executed.
-
-		:raises: :py:class:`waflib.Errors.BuildError` in case the build fails
+		The cache file is not written if the build is up to date (no task executed).
 		"""
 		Logs.debug('build: compile()')
 
-		# delegate the producer-consumer logic to another object to reduce the complexity
+		# use another object to perform the producer-consumer logic (reduce the complexity)
 		self.producer = Runner.Parallel(self, self.jobs)
 		self.producer.biter = self.get_build_iterator()
+		self.returned_tasks = [] # not part of the API yet
 		try:
 			self.producer.start()
 		except KeyboardInterrupt:
-			if self.is_dirty():
-				self.store()
+			self.store()
 			raise
 		else:
-			if self.is_dirty():
+			if self.producer.dirty:
 				self.store()
 
 		if self.producer.error:
 			raise Errors.BuildError(self.producer.error)
 
-	def is_dirty(self):
-		return self.producer.dirty
-
 	def setup(self, tool, tooldir=None, funs=None):
 		"""
-		Import waf tools defined during the configuration::
+		Import waf tools, used to import those accessed during the configuration::
 
 			def configure(conf):
 				conf.load('glib2')
@@ -374,13 +383,11 @@ class BuildContext(Context.Context):
 		:param funs: unused variable
 		"""
 		if isinstance(tool, list):
-			for i in tool:
-				self.setup(i, tooldir)
+			for i in tool: self.setup(i, tooldir)
 			return
 
 		module = Context.load_tool(tool, tooldir)
-		if hasattr(module, "setup"):
-			module.setup(self)
+		if hasattr(module, "setup"): module.setup(self)
 
 	def get_env(self):
 		"""Getter for the env property"""
@@ -405,28 +412,26 @@ class BuildContext(Context.Context):
 
 		:param path: file path
 		:type path: string or :py:class:`waflib.Node.Node`
-		:param value: value to depend
-		:type value: :py:class:`waflib.Node.Node`, byte object, or function returning a byte object
+		:param value: value to depend on
+		:type value: :py:class:`waflib.Node.Node`, string, or function returning a string
 		"""
-		if not path:
-			raise ValueError('Invalid input path %r' % path)
+		if path is None:
+			raise ValueError('Invalid input')
 
-		if isinstance(path, Node.Node):
+		if isinstance(path, waflib.Node.Node):
 			node = path
 		elif os.path.isabs(path):
 			node = self.root.find_resource(path)
 		else:
 			node = self.path.find_resource(path)
-		if not node:
-			raise ValueError('Could not find the path %r' % path)
 
 		if isinstance(value, list):
-			self.deps_man[node].extend(value)
+			self.deps_man[id(node)].extend(value)
 		else:
-			self.deps_man[node].append(value)
+			self.deps_man[id(node)].append(value)
 
 	def launch_node(self):
-		"""Returns the launch directory as a :py:class:`waflib.Node.Node` object (cached)"""
+		"""Returns the launch directory as a :py:class:`waflib.Node.Node` object"""
 		try:
 			# private cache
 			return self.p_ln
@@ -436,12 +441,10 @@ class BuildContext(Context.Context):
 
 	def hash_env_vars(self, env, vars_lst):
 		"""
-		Hashes configuration set variables::
+		Hash configuration set variables::
 
 			def build(bld):
 				bld.hash_env_vars(bld.env, ['CXX', 'CC'])
-
-		This method uses an internal cache.
 
 		:param env: Configuration Set
 		:type env: :py:class:`waflib.ConfigSet.ConfigSet`
@@ -466,23 +469,21 @@ class BuildContext(Context.Context):
 				pass
 
 		lst = [env[a] for a in vars_lst]
-		cache[idx] = ret = Utils.h_list(lst)
+		ret = Utils.h_list(lst)
 		Logs.debug('envhash: %s %r', Utils.to_hex(ret), lst)
+
+		cache[idx] = ret
+
 		return ret
 
 	def get_tgen_by_name(self, name):
 		"""
-		Fetches a task generator by its name or its target attribute;
-		the name must be unique in a build::
+		Retrieves a task generator from its name or its target name
+		the name must be unique::
 
 			def build(bld):
 				tg = bld(name='foo')
 				tg == bld.get_tgen_by_name('foo')
-
-		This method use a private internal cache.
-
-		:param name: Task generator name
-		:raises: :py:class:`waflib.Errors.WafError` in case there is no task genenerator by that name
 		"""
 		cache = self.task_gen_cache_names
 		if not cache:
@@ -499,12 +500,9 @@ class BuildContext(Context.Context):
 		except KeyError:
 			raise Errors.WafError('Could not find a task generator for the name %r' % name)
 
-	def progress_line(self, idx, total, col1, col2):
+	def progress_line(self, state, total, col1, col2):
 		"""
-		Computes a progress bar line displayed when running ``waf -p``
-
-		:returns: progress bar line
-		:rtype: string
+		Compute the progress bar used by ``waf -p``
 		"""
 		if not sys.stderr.isatty():
 			return ''
@@ -514,16 +512,16 @@ class BuildContext(Context.Context):
 		Utils.rot_idx += 1
 		ind = Utils.rot_chr[Utils.rot_idx % 4]
 
-		pc = (100. * idx)/total
-		fs = "[%%%dd/%%d][%%s%%2d%%%%%%s][%s][" % (n, ind)
-		left = fs % (idx, total, col1, pc, col2)
-		right = '][%s%s%s]' % (col1, self.timer, col2)
+		pc = (100.*state)/total
+		eta = str(self.timer)
+		fs = "[%%%dd/%%%dd][%%s%%2d%%%%%%s][%s][" % (n, n, ind)
+		left = fs % (state, total, col1, pc, col2)
+		right = '][%s%s%s]' % (col1, eta, col2)
 
 		cols = Logs.get_term_cols() - len(left) - len(right) + 2*len(col1) + 2*len(col2)
-		if cols < 7:
-			cols = 7
+		if cols < 7: cols = 7
 
-		ratio = ((cols * idx)//total) - 1
+		ratio = ((cols*state)//total) - 1
 
 		bar = ('='*ratio+'>').ljust(cols)
 		msg = Logs.indicator % (left, bar, right)
@@ -532,23 +530,23 @@ class BuildContext(Context.Context):
 
 	def declare_chain(self, *k, **kw):
 		"""
-		Wraps :py:func:`waflib.TaskGen.declare_chain` for convenience
+		Wrapper for :py:func:`waflib.TaskGen.declare_chain` provided for convenience
 		"""
 		return TaskGen.declare_chain(*k, **kw)
 
 	def pre_build(self):
-		"""Executes user-defined methods before the build starts, see :py:meth:`waflib.Build.BuildContext.add_pre_fun`"""
+		"""Execute user-defined methods before the build starts, see :py:meth:`waflib.Build.BuildContext.add_pre_fun`"""
 		for m in getattr(self, 'pre_funs', []):
 			m(self)
 
 	def post_build(self):
-		"""Executes user-defined methods after the build is successful, see :py:meth:`waflib.Build.BuildContext.add_post_fun`"""
+		"""Executes the user-defined methods after the build is successful, see :py:meth:`waflib.Build.BuildContext.add_post_fun`"""
 		for m in getattr(self, 'post_funs', []):
 			m(self)
 
 	def add_pre_fun(self, meth):
 		"""
-		Binds a callback method to execute after the scripts are read and before the build starts::
+		Bind a method to execute after the scripts are read and before the build starts::
 
 			def mycallback(bld):
 				print("Hello, world!")
@@ -563,7 +561,7 @@ class BuildContext(Context.Context):
 
 	def add_post_fun(self, meth):
 		"""
-		Binds a callback method to execute immediately after the build is successful::
+		Bind a method to execute immediately after the build is successful::
 
 			def call_ldconfig(bld):
 				bld.exec_command('/sbin/ldconfig')
@@ -579,7 +577,7 @@ class BuildContext(Context.Context):
 
 	def get_group(self, x):
 		"""
-		Returns the build group named `x`, or the current group if `x` is None
+		Get the group x, or return the current group if x is None
 
 		:param x: name or number or None
 		:type x: string, int or None
@@ -593,20 +591,14 @@ class BuildContext(Context.Context):
 		return self.groups[x]
 
 	def add_to_group(self, tgen, group=None):
-		"""Adds a task or a task generator to the build; there is no attempt to remove it if it was already added."""
-		assert(isinstance(tgen, TaskGen.task_gen) or isinstance(tgen, Task.Task))
+		"""add a task or a task generator for the build"""
+		# paranoid
+		assert(isinstance(tgen, TaskGen.task_gen) or isinstance(tgen, Task.TaskBase))
 		tgen.bld = self
 		self.get_group(group).append(tgen)
 
 	def get_group_name(self, g):
-		"""
-		Returns the name of the input build group
-
-		:param g: build group object or build group index
-		:type g: integer or list
-		:return: name
-		:rtype: string
-		"""
+		"""name for the group g (utility)"""
 		if not isinstance(g, list):
 			g = self.groups[g]
 		for x in self.group_names:
@@ -616,7 +608,7 @@ class BuildContext(Context.Context):
 
 	def get_group_idx(self, tg):
 		"""
-		Returns the index of the group containing the task generator given as argument::
+		Index of the group containing the task generator given as argument::
 
 			def build(bld):
 				tg = bld(name='nada')
@@ -624,28 +616,27 @@ class BuildContext(Context.Context):
 
 		:param tg: Task generator object
 		:type tg: :py:class:`waflib.TaskGen.task_gen`
-		:rtype: int
 		"""
 		se = id(tg)
-		for i, tmp in enumerate(self.groups):
-			for t in tmp:
+		for i in range(len(self.groups)):
+			for t in self.groups[i]:
 				if id(t) == se:
 					return i
 		return None
 
 	def add_group(self, name=None, move=True):
 		"""
-		Adds a new group of tasks/task generators. By default the new group becomes
-		the default group for new task generators (make sure to create build groups in order).
+		Add a new group of tasks/task generators. By default the new group becomes the default group for new task generators.
 
 		:param name: name for this group
 		:type name: string
-		:param move: set this new group as default group (True by default)
+		:param move: set the group created as default group (True by default)
 		:type move: bool
-		:raises: :py:class:`waflib.Errors.WafError` if a group by the name given already exists
 		"""
+		#if self.groups and not self.groups[0].tasks:
+		#	error('add_group: an empty group is already present')
 		if name and name in self.group_names:
-			raise Errors.WafError('add_group: name %s already present', name)
+			Logs.error('add_group: name %s already present' % name)
 		g = []
 		self.group_names[name] = g
 		self.groups.append(g)
@@ -654,8 +645,7 @@ class BuildContext(Context.Context):
 
 	def set_group(self, idx):
 		"""
-		Sets the build group at position idx as current so that newly added
-		task generators are added to this one by default::
+		Set the current group to be idx: now new task generators will be added to this group by default::
 
 			def build(bld):
 				bld(rule='touch ${TGT}', target='foo.txt')
@@ -669,8 +659,8 @@ class BuildContext(Context.Context):
 		"""
 		if isinstance(idx, str):
 			g = self.group_names[idx]
-			for i, tmp in enumerate(self.groups):
-				if id(g) == id(tmp):
+			for i in range(len(self.groups)):
+				if id(g) == id(self.groups[i]):
 					self.current_group = i
 					break
 		else:
@@ -678,11 +668,8 @@ class BuildContext(Context.Context):
 
 	def total(self):
 		"""
-		Approximate task count: this value may be inaccurate if task generators
-		are posted lazily (see :py:attr:`waflib.Build.BuildContext.post_mode`).
+		Approximate task count: this value may be inaccurate if task generators are posted lazily (see :py:attr:`waflib.Build.BuildContext.post_mode`).
 		The value :py:attr:`waflib.Runner.Parallel.total` is updated during the task execution.
-
-		:rtype: int
 		"""
 		total = 0
 		for group in self.groups:
@@ -695,16 +682,9 @@ class BuildContext(Context.Context):
 
 	def get_targets(self):
 		"""
-		This method returns a pair containing the index of the last build group to post,
-		and the list of task generator objects corresponding to the target names.
-
-		This is used internally by :py:meth:`waflib.Build.BuildContext.get_build_iterator`
-		to perform partial builds::
+		Return the task generator corresponding to the 'targets' list, used by :py:meth:`waflib.Build.BuildContext.get_build_iterator`::
 
 			$ waf --targets=myprogram,myshlib
-
-		:return: the minimum build group index, and list of task generators
-		:rtype: tuple
 		"""
 		to_post = []
 		min_grp = 0
@@ -720,7 +700,7 @@ class BuildContext(Context.Context):
 
 	def get_all_task_gen(self):
 		"""
-		Returns a list of all task generators for troubleshooting purposes.
+		Utility method, returns a list of all task generators - if you need something more complicated, implement your own
 		"""
 		lst = []
 		for g in self.groups:
@@ -729,24 +709,25 @@ class BuildContext(Context.Context):
 
 	def post_group(self):
 		"""
-		Post task generators from the group indexed by self.current_group; used internally
-		by :py:meth:`waflib.Build.BuildContext.get_build_iterator`
+		Post the task generators from the group indexed by self.cur, used by :py:meth:`waflib.Build.BuildContext.get_build_iterator`
 		"""
-		def tgpost(tg):
-			try:
-				f = tg.post
-			except AttributeError:
-				pass
-			else:
-				f()
-
 		if self.targets == '*':
-			for tg in self.groups[self.current_group]:
-				tgpost(tg)
+			for tg in self.groups[self.cur]:
+				try:
+					f = tg.post
+				except AttributeError:
+					pass
+				else:
+					f()
 		elif self.targets:
-			if self.current_group < self._min_grp:
-				for tg in self.groups[self.current_group]:
-					tgpost(tg)
+			if self.cur < self._min_grp:
+				for tg in self.groups[self.cur]:
+					try:
+						f = tg.post
+					except AttributeError:
+						pass
+					else:
+						f()
 			else:
 				for tg in self._exact_tg:
 					tg.post()
@@ -756,71 +737,55 @@ class BuildContext(Context.Context):
 				Logs.warn('Building from the build directory, forcing --targets=*')
 				ln = self.srcnode
 			elif not ln.is_child_of(self.srcnode):
-				Logs.warn('CWD %s is not under %s, forcing --targets=* (run distclean?)', ln.abspath(), self.srcnode.abspath())
+				Logs.warn('CWD %s is not under %s, forcing --targets=* (run distclean?)' % (ln.abspath(), self.srcnode.abspath()))
 				ln = self.srcnode
-
-			def is_post(tg, ln):
+			for tg in self.groups[self.cur]:
 				try:
-					p = tg.path
+					f = tg.post
 				except AttributeError:
 					pass
 				else:
-					if p.is_child_of(ln):
-						return True
-
-			def is_post_group():
-				for i, g in enumerate(self.groups):
-					if i > self.current_group:
-						for tg in g:
-							if is_post(tg, ln):
-								return True
-
-			if self.post_mode == POST_LAZY and ln != self.srcnode:
-				# partial folder builds require all targets from a previous build group
-				if is_post_group():
-					ln = self.srcnode
-
-			for tg in self.groups[self.current_group]:
-				if is_post(tg, ln):
-					tgpost(tg)
+					if tg.path.is_child_of(ln):
+						f()
 
 	def get_tasks_group(self, idx):
 		"""
-		Returns all task instances for the build group at position idx,
-		used internally by :py:meth:`waflib.Build.BuildContext.get_build_iterator`
-
-		:rtype: list of :py:class:`waflib.Task.Task`
+		Return all the tasks for the group of num idx, used by :py:meth:`waflib.Build.BuildContext.get_build_iterator`
 		"""
 		tasks = []
 		for tg in self.groups[idx]:
 			try:
 				tasks.extend(tg.tasks)
-			except AttributeError: # not a task generator
+			except AttributeError: # not a task generator, can be the case for installation tasks
 				tasks.append(tg)
 		return tasks
 
 	def get_build_iterator(self):
 		"""
-		Creates a Python generator object that returns lists of tasks that may be processed in parallel.
+		Creates a generator object that returns lists of tasks executable in parallel (yield)
 
-		:return: tasks which can be executed immediately
-		:rtype: generator returning lists of :py:class:`waflib.Task.Task`
+		:return: tasks which can be executed immediatly
+		:rtype: list of :py:class:`waflib.Task.TaskBase`
 		"""
+		self.cur = 0
+
 		if self.targets and self.targets != '*':
 			(self._min_grp, self._exact_tg) = self.get_targets()
 
+		global lazy_post
 		if self.post_mode != POST_LAZY:
-			for self.current_group, _ in enumerate(self.groups):
+			while self.cur < len(self.groups):
 				self.post_group()
+				self.cur += 1
+			self.cur = 0
 
-		for self.current_group, _ in enumerate(self.groups):
+		while self.cur < len(self.groups):
 			# first post the task generators for the group
 			if self.post_mode != POST_AT_ONCE:
 				self.post_group()
 
 			# then extract the tasks
-			tasks = self.get_tasks_group(self.current_group)
-
+			tasks = self.get_tasks_group(self.cur)
 			# if the constraints are set properly (ext_in/ext_out, before/after)
 			# the call to set_file_constraints may be removed (can be a 15% penalty on no-op rebuilds)
 			# (but leave set_file_constraints for the installation step)
@@ -831,320 +796,141 @@ class BuildContext(Context.Context):
 			Task.set_precedence_constraints(tasks)
 
 			self.cur_tasks = tasks
-			if tasks:
-				yield tasks
-
+			self.cur += 1
+			if not tasks: # return something else the build will stop
+				continue
+			yield tasks
 		while 1:
-			# the build stops once there are no tasks to process
 			yield []
 
-	def install_files(self, dest, files, **kw):
-		"""
-		Creates a task generator to install files on the system::
-
-			def build(bld):
-				bld.install_files('${DATADIR}', self.path.find_resource('wscript'))
-
-		:param dest: path representing the destination directory
-		:type dest: :py:class:`waflib.Node.Node` or string (absolute path)
-		:param files: input files
-		:type files: list of strings or list of :py:class:`waflib.Node.Node`
-		:param env: configuration set to expand *dest*
-		:type env: :py:class:`waflib.ConfigSet.ConfigSet`
-		:param relative_trick: preserve the folder hierarchy when installing whole folders
-		:type relative_trick: bool
-		:param cwd: parent node for searching srcfile, when srcfile is not an instance of :py:class:`waflib.Node.Node`
-		:type cwd: :py:class:`waflib.Node.Node`
-		:param postpone: execute the task immediately to perform the installation (False by default)
-		:type postpone: bool
-		"""
-		assert(dest)
-		tg = self(features='install_task', install_to=dest, install_from=files, **kw)
-		tg.dest = tg.install_to
-		tg.type = 'install_files'
-		if not kw.get('postpone', True):
-			tg.post()
-		return tg
-
-	def install_as(self, dest, srcfile, **kw):
-		"""
-		Creates a task generator to install a file on the system with a different name::
-
-			def build(bld):
-				bld.install_as('${PREFIX}/bin', 'myapp', chmod=Utils.O755)
-
-		:param dest: destination file
-		:type dest: :py:class:`waflib.Node.Node` or string (absolute path)
-		:param srcfile: input file
-		:type srcfile: string or :py:class:`waflib.Node.Node`
-		:param cwd: parent node for searching srcfile, when srcfile is not an instance of :py:class:`waflib.Node.Node`
-		:type cwd: :py:class:`waflib.Node.Node`
-		:param env: configuration set for performing substitutions in dest
-		:type env: :py:class:`waflib.ConfigSet.ConfigSet`
-		:param postpone: execute the task immediately to perform the installation (False by default)
-		:type postpone: bool
-		"""
-		assert(dest)
-		tg = self(features='install_task', install_to=dest, install_from=srcfile, **kw)
-		tg.dest = tg.install_to
-		tg.type = 'install_as'
-		if not kw.get('postpone', True):
-			tg.post()
-		return tg
-
-	def symlink_as(self, dest, src, **kw):
-		"""
-		Creates a task generator to install a symlink::
-
-			def build(bld):
-				bld.symlink_as('${PREFIX}/lib/libfoo.so', 'libfoo.so.1.2.3')
-
-		:param dest: absolute path of the symlink
-		:type dest: :py:class:`waflib.Node.Node` or string (absolute path)
-		:param src: link contents, which is a relative or absolute path which may exist or not
-		:type src: string
-		:param env: configuration set for performing substitutions in dest
-		:type env: :py:class:`waflib.ConfigSet.ConfigSet`
-		:param add: add the task created to a build group - set ``False`` only if the installation task is created after the build has started
-		:type add: bool
-		:param postpone: execute the task immediately to perform the installation
-		:type postpone: bool
-		:param relative_trick: make the symlink relative (default: ``False``)
-		:type relative_trick: bool
-		"""
-		assert(dest)
-		tg = self(features='install_task', install_to=dest, install_from=src, **kw)
-		tg.dest = tg.install_to
-		tg.type = 'symlink_as'
-		tg.link = src
-		# TODO if add: self.add_to_group(tsk)
-		if not kw.get('postpone', True):
-			tg.post()
-		return tg
-
-@TaskGen.feature('install_task')
-@TaskGen.before_method('process_rule', 'process_source')
-def process_install_task(self):
-	"""Creates the installation task for the current task generator; uses :py:func:`waflib.Build.add_install_task` internally."""
-	self.add_install_task(**self.__dict__)
-
-@TaskGen.taskgen_method
-def add_install_task(self, **kw):
-	"""
-	Creates the installation task for the current task generator, and executes it immediately if necessary
-
-	:returns: An installation task
-	:rtype: :py:class:`waflib.Build.inst`
-	"""
-	if not self.bld.is_install:
-		return
-	if not kw['install_to']:
-		return
-
-	if kw['type'] == 'symlink_as' and Utils.is_win32:
-		if kw.get('win32_install'):
-			kw['type'] = 'install_as'
-		else:
-			# just exit
-			return
-
-	tsk = self.install_task = self.create_task('inst')
-	tsk.chmod = kw.get('chmod', Utils.O644)
-	tsk.link = kw.get('link', '') or kw.get('install_from', '')
-	tsk.relative_trick = kw.get('relative_trick', False)
-	tsk.type = kw['type']
-	tsk.install_to = tsk.dest = kw['install_to']
-	tsk.install_from = kw['install_from']
-	tsk.relative_base = kw.get('cwd') or kw.get('relative_base', self.path)
-	tsk.install_user = kw.get('install_user')
-	tsk.install_group = kw.get('install_group')
-	tsk.init_files()
-	if not kw.get('postpone', True):
-		tsk.run_now()
-	return tsk
-
-@TaskGen.taskgen_method
-def add_install_files(self, **kw):
-	"""
-	Creates an installation task for files
-
-	:returns: An installation task
-	:rtype: :py:class:`waflib.Build.inst`
-	"""
-	kw['type'] = 'install_files'
-	return self.add_install_task(**kw)
-
-@TaskGen.taskgen_method
-def add_install_as(self, **kw):
-	"""
-	Creates an installation task for a single file
-
-	:returns: An installation task
-	:rtype: :py:class:`waflib.Build.inst`
-	"""
-	kw['type'] = 'install_as'
-	return self.add_install_task(**kw)
-
-@TaskGen.taskgen_method
-def add_symlink_as(self, **kw):
-	"""
-	Creates an installation task for a symbolic link
-
-	:returns: An installation task
-	:rtype: :py:class:`waflib.Build.inst`
-	"""
-	kw['type'] = 'symlink_as'
-	return self.add_install_task(**kw)
-
 class inst(Task.Task):
-	"""Task that installs files or symlinks; it is typically executed by :py:class:`waflib.Build.InstallContext` and :py:class:`waflib.Build.UnInstallContext`"""
-	def __str__(self):
-		"""Returns an empty string to disable the standard task display"""
-		return ''
+	"""
+	Special task used for installing files and symlinks, it behaves both like a task
+	and like a task generator
+	"""
+	color = 'CYAN'
 
 	def uid(self):
-		"""Returns a unique identifier for the task"""
-		lst = self.inputs + self.outputs + [self.link, self.generator.path.abspath()]
-		return Utils.h_list(lst)
+		lst = [self.dest, self.path] + self.source
+		return Utils.h_list(repr(lst))
 
-	def init_files(self):
+	def post(self):
 		"""
-		Initializes the task input and output nodes
+		Same interface as in :py:meth:`waflib.TaskGen.task_gen.post`
 		"""
-		if self.type == 'symlink_as':
-			inputs = []
-		else:
-			inputs = self.generator.to_nodes(self.install_from)
-			if self.type == 'install_as':
-				assert len(inputs) == 1
-		self.set_inputs(inputs)
-
-		dest = self.get_install_path()
-		outputs = []
-		if self.type == 'symlink_as':
-			if self.relative_trick:
-				self.link = os.path.relpath(self.link, os.path.dirname(dest))
-			outputs.append(self.generator.bld.root.make_node(dest))
-		elif self.type == 'install_as':
-			outputs.append(self.generator.bld.root.make_node(dest))
-		else:
-			for y in inputs:
-				if self.relative_trick:
-					destfile = os.path.join(dest, y.path_from(self.relative_base))
-				else:
-					destfile = os.path.join(dest, y.name)
-				outputs.append(self.generator.bld.root.make_node(destfile))
-		self.set_outputs(outputs)
+		buf = []
+		for x in self.source:
+			if isinstance(x, waflib.Node.Node):
+				y = x
+			else:
+				y = self.path.find_resource(x)
+				if not y:
+					if os.path.isabs(x):
+						y = self.bld.root.make_node(x)
+					else:
+						y = self.path.make_node(x)
+			buf.append(y)
+		self.inputs = buf
 
 	def runnable_status(self):
 		"""
 		Installation tasks are always executed, so this method returns either :py:const:`waflib.Task.ASK_LATER` or :py:const:`waflib.Task.RUN_ME`.
 		"""
 		ret = super(inst, self).runnable_status()
-		if ret == Task.SKIP_ME and self.generator.bld.is_install:
+		if ret == Task.SKIP_ME:
 			return Task.RUN_ME
 		return ret
 
-	def post_run(self):
-		"""
-		Disables any post-run operations
-		"""
-		pass
+	def __str__(self):
+		"""Return an empty string to disable the display"""
+		return ''
+
+	def run(self):
+		"""The attribute 'exec_task' holds the method to execute"""
+		return self.generator.exec_task()
 
 	def get_install_path(self, destdir=True):
 		"""
-		Returns the destination path where files will be installed, pre-pending `destdir`.
-
-		:rtype: string
+		Installation path obtained from ``self.dest`` and prefixed by the destdir.
+		The variables such as '${PREFIX}/bin' are substituted.
 		"""
-		if isinstance(self.install_to, Node.Node):
-			dest = self.install_to.abspath()
-		else:
-			dest = Utils.subst_vars(self.install_to, self.env)
+		dest = Utils.subst_vars(self.dest, self.env)
+		dest = dest.replace('/', os.sep)
 		if destdir and Options.options.destdir:
 			dest = os.path.join(Options.options.destdir, os.path.splitdrive(dest)[1].lstrip(os.sep))
 		return dest
 
-	def copy_fun(self, src, tgt):
+	def exec_install_files(self):
 		"""
-		Copies a file from src to tgt, preserving permissions and trying to work
-		around path limitations on Windows platforms. On Unix-like platforms,
-		the owner/group of the target file may be set through install_user/install_group
+		Predefined method for installing files
+		"""
+		destpath = self.get_install_path()
+		if not destpath:
+			raise Errors.WafError('unknown installation path %r' % self.generator)
+		for x, y in zip(self.source, self.inputs):
+			if self.relative_trick:
+				destfile = os.path.join(destpath, y.path_from(self.path))
+			else:
+				destfile = os.path.join(destpath, y.name)
+			self.generator.bld.do_install(y.abspath(), destfile, chmod=self.chmod, tsk=self)
 
-		:param src: absolute path
-		:type src: string
-		:param tgt: absolute path
-		:type tgt: string
+	def exec_install_as(self):
 		"""
+		Predefined method for installing one file with a given name
+		"""
+		destfile = self.get_install_path()
+		self.generator.bld.do_install(self.inputs[0].abspath(), destfile, chmod=self.chmod, tsk=self)
+
+	def exec_symlink_as(self):
+		"""
+		Predefined method for installing a symlink
+		"""
+		destfile = self.get_install_path()
+		src = self.link
+		if self.relative_trick:
+			src = os.path.relpath(src, os.path.dirname(destfile))
+		self.generator.bld.do_link(src, destfile, tsk=self)
+
+class InstallContext(BuildContext):
+	'''installs the targets on the system'''
+	cmd = 'install'
+
+	def __init__(self, **kw):
+		super(InstallContext, self).__init__(**kw)
+
+		# list of targets to uninstall for removing the empty folders after uninstalling
+		self.uninstall = []
+		self.is_install = INSTALL
+
+	def copy_fun(self, src, tgt, **kw):
 		# override this if you want to strip executables
 		# kw['tsk'].source is the task that created the files in the build
 		if Utils.is_win32 and len(tgt) > 259 and not tgt.startswith('\\\\?\\'):
 			tgt = '\\\\?\\' + tgt
 		shutil.copy2(src, tgt)
-		self.fix_perms(tgt)
+		os.chmod(tgt, kw.get('chmod', Utils.O644))
 
-	def rm_empty_dirs(self, tgt):
+	def do_install(self, src, tgt, **kw):
 		"""
-		Removes empty folders recursively when uninstalling.
+		Copy a file from src to tgt with given file permissions. The actual copy is not performed
+		if the source and target file have the same size and the same timestamps. When the copy occurs,
+		the file is first removed and then copied (prevent stale inodes).
 
-		:param tgt: absolute path
-		:type tgt: string
-		"""
-		while tgt:
-			tgt = os.path.dirname(tgt)
-			try:
-				os.rmdir(tgt)
-			except OSError:
-				break
-
-	def run(self):
-		"""
-		Performs file or symlink installation
-		"""
-		is_install = self.generator.bld.is_install
-		if not is_install: # unnecessary?
-			return
-
-		for x in self.outputs:
-			if is_install == INSTALL:
-				x.parent.mkdir()
-		if self.type == 'symlink_as':
-			fun = is_install == INSTALL and self.do_link or self.do_unlink
-			fun(self.link, self.outputs[0].abspath())
-		else:
-			fun = is_install == INSTALL and self.do_install or self.do_uninstall
-			launch_node = self.generator.bld.launch_node()
-			for x, y in zip(self.inputs, self.outputs):
-				fun(x.abspath(), y.abspath(), x.path_from(launch_node))
-
-	def run_now(self):
-		"""
-		Try executing the installation task right now
-
-		:raises: :py:class:`waflib.Errors.TaskNotReady`
-		"""
-		status = self.runnable_status()
-		if status not in (Task.RUN_ME, Task.SKIP_ME):
-			raise Errors.TaskNotReady('Could not process %r: status %r' % (self, status))
-		self.run()
-		self.hasrun = Task.SUCCESS
-
-	def do_install(self, src, tgt, lbl, **kw):
-		"""
-		Copies a file from src to tgt with given file permissions. The actual copy is only performed
-		if the source and target file sizes or timestamps differ. When the copy occurs,
-		the file is always first removed and then copied so as to prevent stale inodes.
+		This method is overridden in :py:meth:`waflib.Build.UninstallContext.do_install` to remove the file.
 
 		:param src: file name as absolute path
 		:type src: string
 		:param tgt: file destination, as absolute path
 		:type tgt: string
-		:param lbl: file source description
-		:type lbl: string
 		:param chmod: installation mode
 		:type chmod: int
-		:raises: :py:class:`waflib.Errors.WafError` if the file cannot be written
 		"""
+		d, _ = os.path.split(tgt)
+		if not d:
+			raise Errors.WafError('Invalid installation given %r->%r' % (src, tgt))
+		Utils.check_dir(d)
+
+		srclbl = src.replace(self.srcnode.abspath() + os.sep, '')
 		if not Options.options.force:
 			# check if the file is already there to avoid a copy
 			try:
@@ -1155,12 +941,12 @@ class inst(Task.Task):
 			else:
 				# same size and identical timestamps -> make no copy
 				if st1.st_mtime + 2 >= st2.st_mtime and st1.st_size == st2.st_size:
-					if not self.generator.bld.progress_bar:
-						Logs.info('- install %s (from %s)', tgt, lbl)
+					if not self.progress_bar:
+						Logs.info('- install %s (from %s)' % (tgt, srclbl))
 					return False
 
-		if not self.generator.bld.progress_bar:
-			Logs.info('+ install %s (from %s)', tgt, lbl)
+		if not self.progress_bar:
+			Logs.info('+ install %s (from %s)' % (tgt, srclbl))
 
 		# Give best attempt at making destination overwritable,
 		# like the 'install' utility used by 'make install' does.
@@ -1176,96 +962,167 @@ class inst(Task.Task):
 			pass
 
 		try:
-			self.copy_fun(src, tgt)
-		except EnvironmentError as e:
-			if not os.path.exists(src):
-				Logs.error('File %r does not exist', src)
-			elif not os.path.isfile(src):
-				Logs.error('Input %r is not a file', src)
-			raise Errors.WafError('Could not install the file %r' % tgt, e)
-
-	def fix_perms(self, tgt):
-		"""
-		Change the ownership of the file/folder/link pointed by the given path
-		This looks up for `install_user` or `install_group` attributes
-		on the task or on the task generator::
-
-			def build(bld):
-				bld.install_as('${PREFIX}/wscript',
-					'wscript',
-					install_user='nobody', install_group='nogroup')
-				bld.symlink_as('${PREFIX}/wscript_link',
-					Utils.subst_vars('${PREFIX}/wscript', bld.env),
-					install_user='nobody', install_group='nogroup')
-		"""
-		if not Utils.is_win32:
-			user = getattr(self, 'install_user', None) or getattr(self.generator, 'install_user', None)
-			group = getattr(self, 'install_group', None) or getattr(self.generator, 'install_group', None)
-			if user or group:
-				Utils.lchown(tgt, user or -1, group or -1)
-		if not os.path.islink(tgt):
-			os.chmod(tgt, self.chmod)
+			self.copy_fun(src, tgt, **kw)
+		except IOError:
+			try:
+				os.stat(src)
+			except EnvironmentError:
+				Logs.error('File %r does not exist' % src)
+			raise Errors.WafError('Could not install the file %r' % tgt)
 
 	def do_link(self, src, tgt, **kw):
 		"""
-		Creates a symlink from tgt to src.
+		Create a symlink from tgt to src.
+
+		This method is overridden in :py:meth:`waflib.Build.UninstallContext.do_link` to remove the symlink.
 
 		:param src: file name as absolute path
 		:type src: string
 		:param tgt: file destination, as absolute path
 		:type tgt: string
 		"""
-		if os.path.islink(tgt) and os.readlink(tgt) == src:
-			if not self.generator.bld.progress_bar:
-				Logs.info('- symlink %s (to %s)', tgt, src)
-		else:
-			try:
-				os.remove(tgt)
-			except OSError:
-				pass
-			if not self.generator.bld.progress_bar:
-				Logs.info('+ symlink %s (to %s)', tgt, src)
+		d, _ = os.path.split(tgt)
+		Utils.check_dir(d)
+
+		link = False
+		if not os.path.islink(tgt):
+			link = True
+		elif os.readlink(tgt) != src:
+			link = True
+
+		if link:
+			try: os.remove(tgt)
+			except OSError: pass
+			if not self.progress_bar:
+				Logs.info('+ symlink %s (to %s)' % (tgt, src))
 			os.symlink(src, tgt)
-			self.fix_perms(tgt)
+		else:
+			if not self.progress_bar:
+				Logs.info('- symlink %s (to %s)' % (tgt, src))
 
-	def do_uninstall(self, src, tgt, lbl, **kw):
+	def run_task_now(self, tsk, postpone):
 		"""
-		See :py:meth:`waflib.Build.inst.do_install`
+		This method is called by :py:meth:`waflib.Build.InstallContext.install_files`,
+		:py:meth:`waflib.Build.InstallContext.install_as` and :py:meth:`waflib.Build.InstallContext.symlink_as` immediately
+		after the installation task is created. Its role is to force the immediate execution if necessary, that is when
+		``postpone=False`` was given.
 		"""
-		if not self.generator.bld.progress_bar:
-			Logs.info('- remove %s', tgt)
+		tsk.post()
+		if not postpone:
+			if tsk.runnable_status() == Task.ASK_LATER:
+				raise self.WafError('cannot post the task %r' % tsk)
+			tsk.run()
+			tsk.hasrun = True
 
-		#self.uninstall.append(tgt)
-		try:
-			os.remove(tgt)
-		except OSError as e:
-			if e.errno != errno.ENOENT:
-				if not getattr(self, 'uninstall_error', None):
-					self.uninstall_error = True
-					Logs.warn('build: some files could not be uninstalled (retry with -vv to list them)')
-				if Logs.verbose > 1:
-					Logs.warn('Could not remove %s (error code %r)', e.filename, e.errno)
-		self.rm_empty_dirs(tgt)
-
-	def do_unlink(self, src, tgt, **kw):
+	def install_files(self, dest, files, env=None, chmod=Utils.O644, relative_trick=False, cwd=None, add=True, postpone=True, task=None):
 		"""
-		See :py:meth:`waflib.Build.inst.do_link`
+		Create a task to install files on the system::
+
+			def build(bld):
+				bld.install_files('${DATADIR}', self.path.find_resource('wscript'))
+
+		:param dest: absolute path of the destination directory
+		:type dest: string
+		:param files: input files
+		:type files: list of strings or list of nodes
+		:param env: configuration set for performing substitutions in dest
+		:type env: Configuration set
+		:param relative_trick: preserve the folder hierarchy when installing whole folders
+		:type relative_trick: bool
+		:param cwd: parent node for searching srcfile, when srcfile is not a :py:class:`waflib.Node.Node`
+		:type cwd: :py:class:`waflib.Node.Node`
+		:param add: add the task created to a build group - set ``False`` only if the installation task is created after the build has started
+		:type add: bool
+		:param postpone: execute the task immediately to perform the installation
+		:type postpone: bool
 		"""
-		try:
-			if not self.generator.bld.progress_bar:
-				Logs.info('- remove %s', tgt)
-			os.remove(tgt)
-		except OSError:
-			pass
-		self.rm_empty_dirs(tgt)
+		assert(dest)
+		tsk = inst(env=env or self.env)
+		tsk.bld = self
+		tsk.path = cwd or self.path
+		tsk.chmod = chmod
+		tsk.task = task
+		if isinstance(files, waflib.Node.Node):
+			tsk.source =  [files]
+		else:
+			tsk.source = Utils.to_list(files)
+		tsk.dest = dest
+		tsk.exec_task = tsk.exec_install_files
+		tsk.relative_trick = relative_trick
+		if add: self.add_to_group(tsk)
+		self.run_task_now(tsk, postpone)
+		return tsk
 
-class InstallContext(BuildContext):
-	'''installs the targets on the system'''
-	cmd = 'install'
+	def install_as(self, dest, srcfile, env=None, chmod=Utils.O644, cwd=None, add=True, postpone=True, task=None):
+		"""
+		Create a task to install a file on the system with a different name::
 
-	def __init__(self, **kw):
-		super(InstallContext, self).__init__(**kw)
-		self.is_install = INSTALL
+			def build(bld):
+				bld.install_as('${PREFIX}/bin', 'myapp', chmod=Utils.O755)
+
+		:param dest: absolute path of the destination file
+		:type dest: string
+		:param srcfile: input file
+		:type srcfile: string or node
+		:param cwd: parent node for searching srcfile, when srcfile is not a :py:class:`waflib.Node.Node`
+		:type cwd: :py:class:`waflib.Node.Node`
+		:param env: configuration set for performing substitutions in dest
+		:type env: Configuration set
+		:param add: add the task created to a build group - set ``False`` only if the installation task is created after the build has started
+		:type add: bool
+		:param postpone: execute the task immediately to perform the installation
+		:type postpone: bool
+		"""
+		assert(dest)
+		tsk = inst(env=env or self.env)
+		tsk.bld = self
+		tsk.path = cwd or self.path
+		tsk.chmod = chmod
+		tsk.source = [srcfile]
+		tsk.task = task
+		tsk.dest = dest
+		tsk.exec_task = tsk.exec_install_as
+		if add: self.add_to_group(tsk)
+		self.run_task_now(tsk, postpone)
+		return tsk
+
+	def symlink_as(self, dest, src, env=None, cwd=None, add=True, postpone=True, relative_trick=False, task=None):
+		"""
+		Create a task to install a symlink::
+
+			def build(bld):
+				bld.symlink_as('${PREFIX}/lib/libfoo.so', 'libfoo.so.1.2.3')
+
+		:param dest: absolute path of the symlink
+		:type dest: string
+		:param src: absolute or relative path of the link
+		:type src: string
+		:param env: configuration set for performing substitutions in dest
+		:type env: Configuration set
+		:param add: add the task created to a build group - set ``False`` only if the installation task is created after the build has started
+		:type add: bool
+		:param postpone: execute the task immediately to perform the installation
+		:type postpone: bool
+		:param relative_trick: make the symlink relative (default: ``False``)
+		:type relative_trick: bool
+		"""
+		if Utils.is_win32:
+			# symlinks *cannot* work on that platform
+			# TODO waf 1.9 - replace by install_as
+			return
+		assert(dest)
+		tsk = inst(env=env or self.env)
+		tsk.bld = self
+		tsk.dest = dest
+		tsk.path = cwd or self.path
+		tsk.source = []
+		tsk.task = task
+		tsk.link = src
+		tsk.relative_trick = relative_trick
+		tsk.exec_task = tsk.exec_symlink_as
+		if add: self.add_to_group(tsk)
+		self.run_task_now(tsk, postpone)
+		return tsk
 
 class UninstallContext(InstallContext):
 	'''removes the targets installed'''
@@ -1275,12 +1132,64 @@ class UninstallContext(InstallContext):
 		super(UninstallContext, self).__init__(**kw)
 		self.is_install = UNINSTALL
 
+	def rm_empty_dirs(self, tgt):
+		while tgt:
+			tgt = os.path.dirname(tgt)
+			try:
+				os.rmdir(tgt)
+			except OSError:
+				break
+
+	def do_install(self, src, tgt, **kw):
+		"""See :py:meth:`waflib.Build.InstallContext.do_install`"""
+		if not self.progress_bar:
+			Logs.info('- remove %s' % tgt)
+
+		self.uninstall.append(tgt)
+		try:
+			os.remove(tgt)
+		except OSError as e:
+			if e.errno != errno.ENOENT:
+				if not getattr(self, 'uninstall_error', None):
+					self.uninstall_error = True
+					Logs.warn('build: some files could not be uninstalled (retry with -vv to list them)')
+				if Logs.verbose > 1:
+					Logs.warn('Could not remove %s (error code %r)' % (e.filename, e.errno))
+
+		self.rm_empty_dirs(tgt)
+
+	def do_link(self, src, tgt, **kw):
+		"""See :py:meth:`waflib.Build.InstallContext.do_link`"""
+		try:
+			if not self.progress_bar:
+				Logs.info('- remove %s' % tgt)
+			os.remove(tgt)
+		except OSError:
+			pass
+
+		self.rm_empty_dirs(tgt)
+
+	def execute(self):
+		"""
+		See :py:func:`waflib.Context.Context.execute`
+		"""
+		try:
+			# do not execute any tasks
+			def runnable_status(self):
+				return Task.SKIP_ME
+			setattr(Task.Task, 'runnable_status_back', Task.Task.runnable_status)
+			setattr(Task.Task, 'runnable_status', runnable_status)
+
+			super(UninstallContext, self).execute()
+		finally:
+			setattr(Task.Task, 'runnable_status', Task.Task.runnable_status_back)
+
 class CleanContext(BuildContext):
 	'''cleans the project'''
 	cmd = 'clean'
 	def execute(self):
 		"""
-		See :py:func:`waflib.Build.BuildContext.execute`.
+		See :py:func:`waflib.Context.Context.execute`
 		"""
 		self.restore()
 		if not self.all_envs:
@@ -1293,49 +1202,30 @@ class CleanContext(BuildContext):
 			self.store()
 
 	def clean(self):
-		"""
-		Remove most files from the build directory, and reset all caches.
-
-		Custom lists of files to clean can be declared as `bld.clean_files`.
-		For example, exclude `build/program/myprogram` from getting removed::
-
-			def build(bld):
-				bld.clean_files = bld.bldnode.ant_glob('**',
-					excl='.lock* config.log c4che/* config.h program/myprogram',
-					quiet=True, generator=True)
-		"""
+		"""Remove files from the build directory if possible, and reset the caches"""
 		Logs.debug('build: clean called')
 
-		if hasattr(self, 'clean_files'):
-			for n in self.clean_files:
-				n.delete()
-		elif self.bldnode != self.srcnode:
+		if self.bldnode != self.srcnode:
 			# would lead to a disaster if top == out
-			lst = []
-			for env in self.all_envs.values():
-				lst.extend(self.root.find_or_declare(f) for f in env[CFG_FILES])
+			lst=[]
+			for e in self.all_envs.values():
+				lst.extend(self.root.find_or_declare(f) for f in e[CFG_FILES])
 			for n in self.bldnode.ant_glob('**/*', excl='.lock* *conf_check_*/** config.log c4che/*', quiet=True):
 				if n in lst:
 					continue
 				n.delete()
 		self.root.children = {}
 
-		for v in SAVED_ATTRS:
-			if v == 'root':
-				continue
+		for v in 'node_deps task_sigs raw_deps'.split():
 			setattr(self, v, {})
 
 class ListContext(BuildContext):
 	'''lists the targets to execute'''
-	cmd = 'list'
 
+	cmd = 'list'
 	def execute(self):
 		"""
-		In addition to printing the name of each build target,
-		a description column will include text for each task
-		generator which has a "description" field set.
-
-		See :py:func:`waflib.Build.BuildContext.execute`.
+		See :py:func:`waflib.Context.Context.execute`.
 		"""
 		self.restore()
 		if not self.all_envs:
@@ -1359,25 +1249,12 @@ class ListContext(BuildContext):
 		try:
 			# force the cache initialization
 			self.get_tgen_by_name('')
-		except Errors.WafError:
+		except Exception:
 			pass
-
-		targets = sorted(self.task_gen_cache_names)
-
-		# figure out how much to left-justify, for largest target name
-		line_just = max(len(t) for t in targets) if targets else 0
-
-		for target in targets:
-			tgen = self.task_gen_cache_names[target]
-
-			# Support displaying the description for the target
-			# if it was set on the tgen
-			descript = getattr(tgen, 'description', '')
-			if descript:
-				target = target.ljust(line_just)
-				descript = ': %s' % descript
-
-			Logs.pprint('GREEN', target, label=descript)
+		lst = list(self.task_gen_cache_names.keys())
+		lst.sort()
+		for k in lst:
+			Logs.pprint('GREEN', k)
 
 class StepContext(BuildContext):
 	'''executes tasks in a step-by-step fashion, for debugging'''
@@ -1389,8 +1266,7 @@ class StepContext(BuildContext):
 
 	def compile(self):
 		"""
-		Overrides :py:meth:`waflib.Build.BuildContext.compile` to perform a partial build
-		on tasks matching the input/output pattern given (regular expression matching)::
+		Compile the tasks matching the input/output files given (regular expression matching). Derived from :py:meth:`waflib.Build.BuildContext.compile`::
 
 			$ waf step --files=foo.c,bar.c,in:truc.c,out:bar.o
 			$ waf step --files=in:foo.cpp.1.o # link task only
@@ -1401,7 +1277,7 @@ class StepContext(BuildContext):
 			BuildContext.compile(self)
 			return
 
-		targets = []
+		targets = None
 		if self.targets and self.targets != '*':
 			targets = self.targets.split(',')
 
@@ -1420,32 +1296,25 @@ class StepContext(BuildContext):
 			for pat in self.files.split(','):
 				matcher = self.get_matcher(pat)
 				for tg in g:
-					if isinstance(tg, Task.Task):
+					if isinstance(tg, Task.TaskBase):
 						lst = [tg]
 					else:
 						lst = tg.tasks
 					for tsk in lst:
 						do_exec = False
-						for node in tsk.inputs:
+						for node in getattr(tsk, 'inputs', []):
 							if matcher(node, output=False):
 								do_exec = True
 								break
-						for node in tsk.outputs:
+						for node in getattr(tsk, 'outputs', []):
 							if matcher(node, output=True):
 								do_exec = True
 								break
 						if do_exec:
 							ret = tsk.run()
-							Logs.info('%s -> exit %r', tsk, ret)
+							Logs.info('%s -> exit %r' % (str(tsk), ret))
 
 	def get_matcher(self, pat):
-		"""
-		Converts a step pattern into a function
-
-		:param: pat: pattern of the form in:truc.c,out:bar.o
-		:returns: Python function that uses Node objects as inputs and returns matches
-		:rtype: function
-		"""
 		# this returns a function
 		inn = True
 		out = True
@@ -1466,9 +1335,9 @@ class StepContext(BuildContext):
 			pattern = re.compile(pat)
 
 		def match(node, output):
-			if output and not out:
+			if output == True and not out:
 				return False
-			if not output and not inn:
+			if output == False and not inn:
 				return False
 
 			if anode:
@@ -1476,16 +1345,4 @@ class StepContext(BuildContext):
 			else:
 				return pattern.match(node.abspath())
 		return match
-
-class EnvContext(BuildContext):
-	"""Subclass EnvContext to create commands that require configuration data in 'env'"""
-	fun = cmd = None
-	def execute(self):
-		"""
-		See :py:func:`waflib.Build.BuildContext.execute`.
-		"""
-		self.restore()
-		if not self.all_envs:
-			self.load_envs()
-		self.recurse([self.run_dir])
 

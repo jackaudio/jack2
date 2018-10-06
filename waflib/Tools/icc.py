@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # encoding: utf-8
 # Stian Selnes 2008
-# Thomas Nagy 2009-2018 (ita)
+# Thomas Nagy 2009-2010 (ita)
 
 """
-Detects the Intel C compiler
+Detect the Intel C compiler
 """
 
 import sys
@@ -14,8 +14,11 @@ from waflib.Configure import conf
 @conf
 def find_icc(conf):
 	"""
-	Finds the program icc and execute it to ensure it really is icc
+	Find the program icc and execute it to ensure it really is icc
 	"""
+	if sys.platform == 'cygwin':
+		conf.fatal('The Intel compiler does not work on Cygwin')
+
 	cc = conf.find_program(['icc', 'ICL'], var='CC')
 	conf.get_cc_version(cc, icc=True)
 	conf.env.CC_NAME = 'icc'

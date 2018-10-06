@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # encoding: utf-8
-# Thomas Nagy 2009-2018 (ita)
+# Thomas Nagy 2009-2010 (ita)
 
 """
-Detects the Intel C++ compiler
+Detect the Intel C++ compiler
 """
 
 import sys
@@ -13,8 +13,11 @@ from waflib.Configure import conf
 @conf
 def find_icpc(conf):
 	"""
-	Finds the program icpc, and execute it to ensure it really is icpc
+	Find the program icpc, and execute it to ensure it really is icpc
 	"""
+	if sys.platform == 'cygwin':
+		conf.fatal('The Intel compiler does not work on Cygwin')
+
 	cxx = conf.find_program('icpc', var='CXX')
 	conf.get_cc_version(cxx, icc=True)
 	conf.env.CXX_NAME = 'icc'
