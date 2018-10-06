@@ -410,36 +410,68 @@ def options(opt):
     opt.add_option('--ports-per-application', default=768, type='int', dest='application_ports', help='Maximum number of ports per application')
 
     # options with third party dependencies
-    doxygen = add_auto_option(opt, 'doxygen', help='Build doxygen documentation', conf_dest='BUILD_DOXYGEN_DOCS')
+    doxygen = add_auto_option(opt,
+            'doxygen',
+            help='Build doxygen documentation',
+            conf_dest='BUILD_DOXYGEN_DOCS')
     doxygen.add_program('doxygen')
-    alsa = add_auto_option(opt, 'alsa', help='Enable ALSA driver', conf_dest='BUILD_DRIVER_ALSA')
+    alsa = add_auto_option(opt,
+            'alsa',
+            help='Enable ALSA driver',
+            conf_dest='BUILD_DRIVER_ALSA')
     alsa.add_package('alsa', atleast_version='1.0.18')
-    firewire = add_auto_option(opt, 'firewire', help='Enable FireWire driver (FFADO)', conf_dest='BUILD_DRIVER_FFADO')
+    firewire = add_auto_option(opt,
+            'firewire',
+            help='Enable FireWire driver (FFADO)',
+            conf_dest='BUILD_DRIVER_FFADO')
     firewire.add_package('libffado', atleast_version='1.999.17')
-    freebob = add_auto_option(opt, 'freebob', help='Enable FreeBob driver')
+    freebob = add_auto_option(opt,
+            'freebob',
+            help='Enable FreeBob driver')
     freebob.add_package('libfreebob', atleast_version='1.0.0')
-    iio = add_auto_option(opt, 'iio', help='Enable IIO driver', conf_dest='BUILD_DRIVER_IIO')
+    iio = add_auto_option(opt,
+            'iio',
+            help='Enable IIO driver',
+            conf_dest='BUILD_DRIVER_IIO')
     iio.add_package('gtkIOStream', atleast_version='1.4.0')
     iio.add_package('eigen3', atleast_version='3.1.2')
-    portaudio = add_auto_option(opt, 'portaudio', help='Enable Portaudio driver', conf_dest='BUILD_DRIVER_PORTAUDIO')
+    portaudio = add_auto_option(opt,
+            'portaudio',
+            help='Enable Portaudio driver',
+            conf_dest='BUILD_DRIVER_PORTAUDIO')
     portaudio.add_header('windows.h') # only build portaudio on windows
     portaudio.add_package('portaudio-2.0', uselib_store='PORTAUDIO', atleast_version='19')
-    winmme = add_auto_option(opt, 'winmme', help='Enable WinMME driver', conf_dest='BUILD_DRIVER_WINMME')
+    winmme = add_auto_option(opt,
+            'winmme',
+            help='Enable WinMME driver',
+            conf_dest='BUILD_DRIVER_WINMME')
     winmme.set_check_hook(check_for_mmsystem, check_for_mmsystem_error)
 
-    celt = add_auto_option(opt, 'celt', help='Build with CELT')
+    celt = add_auto_option(opt,
+            'celt',
+            help='Build with CELT')
     celt.set_check_hook(check_for_celt, check_for_celt_error)
-    opus = add_auto_option(opt, 'opus', help='Build Opus netjack2')
+    opus = add_auto_option(opt,
+            'opus',
+            help='Build Opus netjack2')
     opus.add_header('opus/opus_custom.h')
     opus.add_package('opus', atleast_version='0.9.0')
-    samplerate = add_auto_option(opt, 'samplerate', help='Build with libsamplerate')
+    samplerate = add_auto_option(opt,
+            'samplerate',
+            help='Build with libsamplerate')
     samplerate.add_package('samplerate')
-    sndfile = add_auto_option(opt, 'sndfile', help='Build with libsndfile')
+    sndfile = add_auto_option(opt,
+            'sndfile',
+            help='Build with libsndfile')
     sndfile.add_package('sndfile')
-    readline = add_auto_option(opt, 'readline', help='Build with readline')
+    readline = add_auto_option(opt,
+            'readline',
+            help='Build with readline')
     readline.add_library('readline')
     readline.set_check_hook(check_for_readline, check_for_readline_error)
-    sd = add_auto_option(opt, 'systemd', help='Use systemd notify')
+    sd = add_auto_option(opt,
+            'systemd',
+            help='Use systemd notify')
     sd.add_header('systemd/sd-daemon.h')
     sd.add_library('systemd')
 
