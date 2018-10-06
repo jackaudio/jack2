@@ -47,30 +47,6 @@ def check_for_celt(conf):
     if not found:
         raise conf.errors.ConfigurationError
 
-# The readline/readline.h header does not work if stdio.h is not included
-# before. Thus a fragment with both stdio.h and readline/readline.h need to be
-# test-compiled to find out whether readline is available.
-def check_for_readline(conf):
-    # FIXME: This check can be incorporated into the AutoOptions class by
-    #        passing header_name=['stdio.h', 'readline/readline.h'] to check.
-    conf.check(fragment='''
-               #include <stdio.h>
-               #include <readline/readline.h>
-               int main(void) { return 0; }''',
-               execute=False,
-               msg='Checking for header readline/readline.h',
-               errmsg='not found')
-
-def check_for_mmsystem(conf):
-    # FIXME: See comment in check_for_readline.
-    conf.check(fragment='''
-               #include <windows.h>
-               #include <mmsystem.h>
-               int main(void) { return 0; }''',
-               execute=False,
-               msg='Checking for header mmsystem.h',
-               errmsg='not found')
-
 def options(opt):
     # options provided by the modules
     opt.load('compiler_cxx')
@@ -150,7 +126,9 @@ def options(opt):
             'winmme',
             help='Enable WinMME driver',
             conf_dest='BUILD_DRIVER_WINMME')
-    winmme.add_function(check_for_mmsystem)
+    winmme.check(
+            header_name=['windows.h', 'mmsystem.h'],
+            msg='Checking for header mmsystem.h')
 
     celt = opt.add_auto_option(
             'celt',
@@ -179,7 +157,9 @@ def options(opt):
             'readline',
             help='Build with readline')
     readline.check(lib='readline')
-    readline.add_function(check_for_readline)
+    readline.check(
+            header_name=['stdio.h', 'readline/readline.h'],
+            msg='Checking for header readline/readline.h')
     sd = opt.add_auto_option(
             'systemd',
             help='Use systemd notify')
