@@ -91,7 +91,7 @@ int JackMetadata::PropertyInit(const char* server_name)
     return 0;
 
 #else // !HAVE_DB
-	return -1;
+    return -1;
 #endif
 }
 
@@ -203,7 +203,7 @@ int JackMetadata::SetProperty(JackClient* client, jack_uuid_t subject, const cha
     return 0;
 
 #else // !HAVE_DB
-	return -1;
+    return -1;
 #endif
 }
 
@@ -285,7 +285,7 @@ int JackMetadata::GetProperty(jack_uuid_t subject, const char* key, char** value
     return 0;
 
 #else // !HAVE_DB
-	return -1;
+    return -1;
 #endif
 }
 
@@ -413,7 +413,7 @@ int JackMetadata::GetProperties(jack_uuid_t subject, jack_description_t* desc)
     return cnt;
 
 #else // !HAVE_DB
-	return -1;
+    return -1;
 #endif
 }
 
@@ -551,7 +551,7 @@ int JackMetadata::GetAllProperties(jack_description_t** descriptions)
     return dcnt;
 
 #else // !HAVE_DB
-	return -1;
+    return -1;
 #endif
 }
 
@@ -613,7 +613,7 @@ int JackMetadata::RemoveProperty(JackClient* client, jack_uuid_t subject, const 
     return 0;
 
 #else // !HAVE_DB
-	return -1;
+    return -1;
 #endif
 }
 
@@ -696,7 +696,7 @@ int JackMetadata::RemoveProperties(JackClient* client, jack_uuid_t subject)
     return cnt;
 
 #else // !HAVE_DB
-	return -1;
+    return -1;
 #endif
 }
 
@@ -721,7 +721,7 @@ int JackMetadata::RemoveAllProperties(JackClient* client)
     return 0;
 
 #else // !HAVE_DB
-	return -1;
+    return -1;
 #endif
 }
 
