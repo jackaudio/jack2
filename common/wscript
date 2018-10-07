@@ -47,7 +47,7 @@ def build(bld):
         'JackActivationCount.cpp',
         'JackAPI.cpp',
         'JackClient.cpp',
-		'JackMetadata.cpp',
+        'JackMetadata.cpp',
         'JackConnectionManager.cpp',
         'ringbuffer.c',
         'JackError.cpp',

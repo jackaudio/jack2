@@ -58,6 +58,9 @@ typedef void (*JackPropertyChangeCallback)(jack_uuid_t            subject,
 }
 #endif
 
+
+#include "JackShmMem.h"
+
 namespace Jack
 {
 
@@ -67,12 +70,13 @@ class JackClient;
 \brief Metadata base.
 */
 
-class JackMetadata
+PRE_PACKED_STRUCTURE
+class SERVER_EXPORT JackMetadata : public JackShmMem
 {
     private:
 
-        DB* db;
-        DB_ENV* db_env;
+        DB* fDB;
+        DB_ENV* fDBenv;
 
         int PropertyInit(const char* server_name);
         int PropertyChangeNotify(JackClient* client, jack_uuid_t subject, const char* key, jack_property_change_t change);
@@ -96,7 +100,8 @@ class JackMetadata
         int RemoveProperty(JackClient* client, jack_uuid_t subject, const char* key);
         int RemoveProperties(JackClient* client, jack_uuid_t subject);
         int RemoveAllProperties(JackClient* client);
-};
+
+} POST_PACKED_STRUCTURE;
 
 } // end of namespace
 

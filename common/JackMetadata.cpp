@@ -29,20 +29,20 @@
 namespace Jack
 {
 
-JackMetadata::JackMetadata(const char* server_name) : db(NULL), db_env(NULL)
+JackMetadata::JackMetadata(const char* server_name) : fDB(NULL), fDBenv(NULL)
 {
     PropertyInit(server_name);
 }
 
 JackMetadata::~JackMetadata()
 {
-    if (db) {
-        db->close (db, 0);
-        db = NULL;
+    if (fDB) {
+        fDB->close (fDB, 0);
+        fDB = NULL;
     }
-    if (db_env) {
-        db_env->close (db_env, 0);
-        db_env = 0;
+    if (fDBenv) {
+        fDBenv->close (fDBenv, 0);
+        fDBenv = 0;
     }
 }
 
@@ -50,35 +50,34 @@ int JackMetadata::PropertyInit(const char* server_name)
 {
     int ret;
     char dbpath[PATH_MAX + 1];
-    char server_dir[PATH_MAX + 1];
 
     /* idempotent */
 
-    if (db_env) {
+    if (fDBenv) {
         return 0;
     }
 
-    if ((ret = db_env_create (&db_env, 0)) != 0) {
+    if ((ret = db_env_create (&fDBenv, 0)) != 0) {
         jack_error ("cannot initialize DB environment: %s\n", db_strerror (ret));
         return -1;
     }
 
-    if ((ret = db_env->open (db_env, jack_server_dir /*FIXME:(server_name, server_dir)*/, DB_CREATE | DB_INIT_LOCK | DB_INIT_MPOOL | DB_THREAD, 0)) != 0) {
+    if ((ret = fDBenv->open (fDBenv, jack_server_dir /*FIXME:(server_name, server_dir)*/, DB_CREATE | DB_INIT_LOCK | DB_INIT_MPOOL | DB_THREAD, 0)) != 0) {
         jack_error ("cannot open DB environment: %s", db_strerror (ret));
         return -1;
     }
 
-    if ((ret = db_create (&db, db_env, 0)) != 0) {
+    if ((ret = db_create (&fDB, fDBenv, 0)) != 0) {
         jack_error ("Cannot initialize metadata DB (%s)", db_strerror (ret));
         return -1;
     }
 
     snprintf (dbpath, sizeof(dbpath), "%s/%s", jack_server_dir /*FIXME:(server_name, server_dir)*/, "metadata.db");
 
-    if ((ret = db->open (db, NULL, dbpath, NULL, DB_HASH, DB_CREATE | DB_THREAD, 0666)) != 0) {
+    if ((ret = fDB->open (fDB, NULL, dbpath, NULL, DB_HASH, DB_CREATE | DB_THREAD, 0666)) != 0) {
         jack_error ("Cannot open metadata DB at %s: %s", dbpath, db_strerror (ret));
-        db->close (db, 0);
-        db = NULL;
+        fDB->close (fDB, 0);
+        fDB = NULL;
         return -1;
     }
 
@@ -129,7 +128,7 @@ void JackMetadata::MakeKeyDbt(DBT* dbt, jack_uuid_t subject, const char* key)
     dbt->size = len1 + len2;
     dbt->data = malloc (dbt->size);
     memcpy (dbt->data, ustr, len1);         // copy subject+null
-    memcpy (dbt->data + len1, key, len2);   // copy key+null
+    memcpy ((char *)dbt->data + len1, key, len2);   // copy key+null
 }
 
 
@@ -175,16 +174,16 @@ int JackMetadata::SetProperty(JackClient* client, jack_uuid_t subject, const cha
     memcpy (data.data, value, len1);
 
     if (len2) {
-        memcpy (data.data + len1, type, len2);
+        memcpy ((char *)data.data + len1, type, len2);
     }
 
-    if (db->exists (db, NULL, &d_key, 0) == DB_NOTFOUND) {
+    if (fDB->exists (fDB, NULL, &d_key, 0) == DB_NOTFOUND) {
         change = PropertyCreated;
     } else {
         change = PropertyChanged;
     }
 
-    if ((ret = db->put (db, NULL, &d_key, &data, 0)) != 0) {
+    if ((ret = fDB->put (fDB, NULL, &d_key, &data, 0)) != 0) {
         char ustr[JACK_UUID_STRING_SIZE];
         jack_uuid_unparse (subject, ustr);
         jack_error ("Cannot store metadata for %s/%s (%s)", ustr, key, db_strerror (ret));
@@ -233,7 +232,7 @@ int JackMetadata::GetProperty(jack_uuid_t subject, const char* key, char** value
     memset (&data, 0, sizeof(data));
     data.flags = DB_DBT_MALLOC;
 
-    if ((ret = db->get (db, NULL, &d_key, &data, 0)) != 0) {
+    if ((ret = fDB->get (fDB, NULL, &d_key, &data, 0)) != 0) {
         if (ret != DB_NOTFOUND) {
             char ustr[JACK_UUID_STRING_SIZE];
             jack_uuid_unparse (subject, ustr);
@@ -269,7 +268,7 @@ int JackMetadata::GetProperty(jack_uuid_t subject, const char* key, char** value
         len2 = strlen ((const char*)data.data + len1) + 1;
 
         (*type) = (char*)malloc (len2);
-        memcpy (*type, data.data + len1, len2);
+        memcpy (*type, (const char *)data.data + len1, len2);
     } else {
         /* no type specified, assume default */
         *type = NULL;
@@ -308,7 +307,7 @@ int JackMetadata::GetProperties(jack_uuid_t subject, jack_description_t* desc)
     }
 
 
-    if ((ret = db->cursor (db, NULL, &cursor, 0)) != 0) {
+    if ((ret = fDB->cursor (fDB, NULL, &cursor, 0)) != 0) {
         jack_error ("Cannot create cursor for metadata search (%s)", db_strerror (ret));
         return -1;
     }
@@ -373,7 +372,7 @@ int JackMetadata::GetProperties(jack_uuid_t subject, jack_description_t* desc)
 
         len1 = key.size - JACK_UUID_STRING_SIZE;
         prop->key = (char*)malloc (len1);
-        memcpy ((char*)prop->key, key.data + JACK_UUID_STRING_SIZE, len1);
+        memcpy ((char*)prop->key, (const char *)key.data + JACK_UUID_STRING_SIZE, len1);
 
         /* copy data (which contains 1 or 2 null terminated strings, the value
            and optionally a MIME type.
@@ -387,7 +386,7 @@ int JackMetadata::GetProperties(jack_uuid_t subject, jack_description_t* desc)
             len2 = strlen ((const char *)data.data + len1) + 1;
 
             prop->type = (char*)malloc (len2);
-            memcpy ((char*)prop->type, data.data + len1, len2);
+            memcpy ((char*)prop->type, (const char *)data.data + len1, len2);
         } else {
             /* no type specified, assume default */
             prop->type = NULL;
@@ -426,7 +425,7 @@ int JackMetadata::GetAllProperties(jack_description_t** descriptions)
         return -1;
     }
 
-    if ((ret = db->cursor (db, NULL, &cursor, 0)) != 0) {
+    if ((ret = fDB->cursor (fDB, NULL, &cursor, 0)) != 0) {
         jack_error ("Cannot create cursor for metadata search (%s)", db_strerror (ret));
         return -1;
     }
@@ -506,7 +505,7 @@ int JackMetadata::GetAllProperties(jack_description_t** descriptions)
 
         len1 = key.size - JACK_UUID_STRING_SIZE;
         current_prop->key = (char*)malloc (len1);
-        memcpy ((char*)current_prop->key, key.data + JACK_UUID_STRING_SIZE, len1);
+        memcpy ((char*)current_prop->key, (const char *)key.data + JACK_UUID_STRING_SIZE, len1);
 
         /* copy data (which contains 1 or 2 null terminated strings, the value
            and optionally a MIME type.
@@ -520,7 +519,7 @@ int JackMetadata::GetAllProperties(jack_description_t** descriptions)
             len2 = strlen ((const char *)data.data + len1) + 1;
 
             current_prop->type = (char*)malloc (len2);
-            memcpy ((char*)current_prop->type, data.data + len1, len2);
+            memcpy ((char*)current_prop->type, (const char *)data.data + len1, len2);
         } else {
             /* no type specified, assume default */
             current_prop->type = NULL;
@@ -559,7 +558,7 @@ int JackMetadata::RemoveProperty(JackClient* client, jack_uuid_t subject, const 
     }
 
     MakeKeyDbt(&d_key, subject, key);
-    if ((ret = db->del (db, NULL, &d_key, 0)) != 0) {
+    if ((ret = fDB->del (fDB, NULL, &d_key, 0)) != 0) {
         jack_error ("Cannot delete key %s (%s)", key, db_strerror (ret));
         if (d_key.size > 0) {
             free (d_key.data);
@@ -593,7 +592,7 @@ int JackMetadata::RemoveProperties(JackClient* client, jack_uuid_t subject)
         return -1;
     }
 
-    if ((ret = db->cursor (db, NULL, &cursor, 0)) != 0) {
+    if ((ret = fDB->cursor (fDB, NULL, &cursor, 0)) != 0) {
         jack_error ("Cannot create cursor for metadata search (%s)", db_strerror (ret));
         return -1;
     }
@@ -662,7 +661,7 @@ int JackMetadata::RemoveAllProperties(JackClient* client)
         return -1;
     }
 
-    if ((ret = db->truncate (db, NULL, NULL, 0)) != 0) {
+    if ((ret = fDB->truncate (fDB, NULL, NULL, 0)) != 0) {
         jack_error ("Cannot clear properties (%s)", db_strerror (ret));
         return -1;
     }

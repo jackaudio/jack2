@@ -1637,18 +1637,17 @@ struct JackPropertyChangeNotifyRequest : public JackRequest
     char fKey[JACK_UUID_STRING_SIZE];
     jack_property_change_t fChange;
 
-    JackPropertyChangeNotifyRequest()
+    JackPropertyChangeNotifyRequest() : fChange((jack_property_change_t)0)
     {
         jack_uuid_clear(&fSubject);
         memset(fKey, 0, sizeof(fKey));
     }
     JackPropertyChangeNotifyRequest(jack_uuid_t subject, const char* key, jack_property_change_t change)
-        : JackRequest(JackRequest::kPropertyChangeNotify)
+        : JackRequest(JackRequest::kPropertyChangeNotify), fChange(change)
     {
         jack_uuid_copy(&fSubject, subject);
         memset(fKey, 0, sizeof(fKey));
         strncpy(fKey, key, sizeof(fKey)-1);
-        fChange = change;
     }
 
     int Read(detail::JackChannelTransactionInterface* trans)

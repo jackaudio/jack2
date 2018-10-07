@@ -55,8 +55,8 @@ struct JackLibGlobals
 {
     JackShmReadWritePtr<JackGraphManager> fGraphManager;	/*! Shared memory Port manager */
     JackShmReadWritePtr<JackEngineControl> fEngineControl;	/*! Shared engine control */  // transport engine has to be writable
+    JackShmReadWritePtr<JackMetadata> fMetadata;            /*! Shared metadata base */
     JackSynchro fSynchroTable[CLIENT_NUM];                  /*! Shared synchro table */
-    JackMetadata fMetadata;                                 /*! Shared metadata base */
     sigset_t fProcessSignals;
 
     static int fClientCount;
@@ -70,6 +70,7 @@ struct JackLibGlobals
         }
         fGraphManager = -1;
         fEngineControl = -1;
+		fMetadata = -1;
 
         // Filter SIGPIPE to avoid having client get a SIGPIPE when trying to access a died server.
     #ifdef WIN32
