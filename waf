@@ -33,15 +33,17 @@ POSSIBILITY OF SUCH DAMAGE.
 import os, sys, inspect
 
 VERSION="2.0.11"
-REVISION="4af5f6d4e441ea5db7e393d841ce352c"
-GIT="fe03c6fa470f0bc3c086baafed8c6b4b6d28a245"
-INSTALL=''
-C1='#4'
-C2='#/'
-C3='#&'
+REVISION="x"
+GIT="x"
+INSTALL="x"
+C1='x'
+C2='x'
+C3='x'
 cwd = os.getcwd()
 join = os.path.join
 
+if sys.hexversion<0x206000f:
+	raise ImportError('Python >= 2.6 is required to create the waf file')
 
 WAF='waf'
 def b(x):
@@ -160,6 +162,7 @@ wafdir = find_lib()
 sys.path.insert(0, wafdir)
 
 if __name__ == '__main__':
-
+	#import waflib.extras.compat15#PRELUDE
 	from waflib import Scripting
 	Scripting.waf_entry_point(cwd, VERSION, wafdir)
+

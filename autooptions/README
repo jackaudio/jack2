@@ -1,0 +1,6 @@
+Do not modify the code in this directory. It has been copied from its upstream
+git repo [1]. When submodules are introduced this directory can be made a
+submodule, but until then a verbatim copy is better than inlining the code in
+the toplevel wscript.
+
+[1] https://gitlab.com/karllinden/waf-autooptions
