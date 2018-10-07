@@ -22,7 +22,9 @@
 
 #include <stdint.h>
 
+#if HAVE_DB
 #include <db.h>
+#endif
 
 #include <jack/uuid.h>
 
@@ -75,12 +77,17 @@ class SERVER_EXPORT JackMetadata : public JackShmMem
 {
     private:
 
+    #if HAVE_DB
         DB* fDB;
         DB_ENV* fDBenv;
+    #endif
 
         int PropertyInit(const char* server_name);
         int PropertyChangeNotify(JackClient* client, jack_uuid_t subject, const char* key, jack_property_change_t change);
+
+    #if HAVE_DB
         void MakeKeyDbt(DBT* dbt, jack_uuid_t subject, const char* key);
+    #endif
 
     public:
 

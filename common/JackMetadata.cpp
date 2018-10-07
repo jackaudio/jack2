@@ -29,13 +29,17 @@
 namespace Jack
 {
 
-JackMetadata::JackMetadata(const char* server_name) : fDB(NULL), fDBenv(NULL)
+JackMetadata::JackMetadata(const char* server_name)
+#if HAVE_DB
+    : fDB(NULL), fDBenv(NULL)
+#endif
 {
     PropertyInit(server_name);
 }
 
 JackMetadata::~JackMetadata()
 {
+#if HAVE_DB
     if (fDB) {
         fDB->close (fDB, 0);
         fDB = NULL;
@@ -44,10 +48,13 @@ JackMetadata::~JackMetadata()
         fDBenv->close (fDBenv, 0);
         fDBenv = 0;
     }
+#endif
 }
 
 int JackMetadata::PropertyInit(const char* server_name)
 {
+#if HAVE_DB
+
     int ret;
     char dbpath[PATH_MAX + 1];
 
@@ -82,25 +89,10 @@ int JackMetadata::PropertyInit(const char* server_name)
     }
 
     return 0;
-}
 
-void JackMetadata::FreeDescription(jack_description_t* desc, int free_actual_description_too)
-{
-    uint32_t n;
-
-    for (n = 0; n < desc->property_cnt; ++n) {
-        free ((char*)desc->properties[n].key);
-        free ((char*)desc->properties[n].data);
-        if (desc->properties[n].type) {
-            free ((char*)desc->properties[n].type);
-        }
-    }
-
-    free (desc->properties);
-
-    if (free_actual_description_too) {
-        free (desc);
-    }
+#else // !HAVE_DB
+	return -1;
+#endif
 }
 
 int JackMetadata::PropertyChangeNotify(JackClient* client, jack_uuid_t subject, const char* key, jack_property_change_t change)
@@ -115,6 +107,7 @@ int JackMetadata::PropertyChangeNotify(JackClient* client, jack_uuid_t subject, 
     return client->NotifyPropertyChange(subject, key, change);
 }
 
+#if HAVE_DB
 void JackMetadata::MakeKeyDbt(DBT* dbt, jack_uuid_t subject, const char* key)
 {
     char ustr[JACK_UUID_STRING_SIZE];
@@ -130,10 +123,12 @@ void JackMetadata::MakeKeyDbt(DBT* dbt, jack_uuid_t subject, const char* key)
     memcpy (dbt->data, ustr, len1);         // copy subject+null
     memcpy ((char *)dbt->data + len1, key, len2);   // copy key+null
 }
-
+#endif
 
 int JackMetadata::SetProperty(JackClient* client, jack_uuid_t subject, const char* key, const char* value, const char* type)
 {
+#if HAVE_DB
+
     DBT d_key;
     DBT data;
     int ret;
@@ -206,10 +201,16 @@ int JackMetadata::SetProperty(JackClient* client, jack_uuid_t subject, const cha
     }
 
     return 0;
+
+#else // !HAVE_DB
+	return -1;
+#endif
 }
 
 int JackMetadata::GetProperty(jack_uuid_t subject, const char* key, char** value, char** type)
 {
+#if HAVE_DB
+
     DBT d_key;
     DBT data;
     int ret;
@@ -282,10 +283,16 @@ int JackMetadata::GetProperty(jack_uuid_t subject, const char* key, char** value
     }
 
     return 0;
+
+#else // !HAVE_DB
+	return -1;
+#endif
 }
 
 int JackMetadata::GetProperties(jack_uuid_t subject, jack_description_t* desc)
 {
+#if HAVE_DB
+
     DBT key;
     DBT data;
     DBC* cursor;
@@ -404,10 +411,16 @@ int JackMetadata::GetProperties(jack_uuid_t subject, jack_description_t* desc)
     desc->property_cnt = cnt;
 
     return cnt;
+
+#else // !HAVE_DB
+	return -1;
+#endif
 }
 
 int JackMetadata::GetAllProperties(jack_description_t** descriptions)
 {
+#if HAVE_DB
+
     DBT key;
     DBT data;
     DBC* cursor;
@@ -536,6 +549,10 @@ int JackMetadata::GetAllProperties(jack_description_t** descriptions)
     (*descriptions) = desc;
 
     return dcnt;
+
+#else // !HAVE_DB
+	return -1;
+#endif
 }
 
 int JackMetadata::GetDescription(jack_uuid_t subject, jack_description_t* desc)
@@ -548,8 +565,29 @@ int JackMetadata::GetAllDescriptions(jack_description_t** descs)
     return 0;
 }
 
+void JackMetadata::FreeDescription(jack_description_t* desc, int free_actual_description_too)
+{
+    uint32_t n;
+
+    for (n = 0; n < desc->property_cnt; ++n) {
+        free ((char*)desc->properties[n].key);
+        free ((char*)desc->properties[n].data);
+        if (desc->properties[n].type) {
+            free ((char*)desc->properties[n].type);
+        }
+    }
+
+    free (desc->properties);
+
+    if (free_actual_description_too) {
+        free (desc);
+    }
+}
+
 int JackMetadata::RemoveProperty(JackClient* client, jack_uuid_t subject, const char* key)
 {
+#if HAVE_DB
+
     DBT d_key;
     int ret;
 
@@ -573,10 +611,16 @@ int JackMetadata::RemoveProperty(JackClient* client, jack_uuid_t subject, const 
     }
 
     return 0;
+
+#else // !HAVE_DB
+	return -1;
+#endif
 }
 
 int JackMetadata::RemoveProperties(JackClient* client, jack_uuid_t subject)
 {
+#if HAVE_DB
+
     DBT key;
     DBT data;
     DBC* cursor;
@@ -650,10 +694,16 @@ int JackMetadata::RemoveProperties(JackClient* client, jack_uuid_t subject)
     }
 
     return cnt;
+
+#else // !HAVE_DB
+	return -1;
+#endif
 }
 
 int JackMetadata::RemoveAllProperties(JackClient* client)
 {
+#if HAVE_DB
+
     int ret;
     jack_uuid_t empty_uuid = JACK_UUID_EMPTY_INITIALIZER;
 
@@ -669,6 +719,10 @@ int JackMetadata::RemoveAllProperties(JackClient* client)
     PropertyChangeNotify(client, empty_uuid, NULL, PropertyDeleted);
 
     return 0;
+
+#else // !HAVE_DB
+	return -1;
+#endif
 }
 
 } // end of namespace
