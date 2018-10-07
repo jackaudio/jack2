@@ -361,6 +361,7 @@ class SERVER_EXPORT JackLockedEngine
             return fEngine.GetUUIDForClientName(client_name, uuid_res);
             CATCH_EXCEPTION_RETURN
         }
+
         int GetClientNameForUUID(const char *uuid, char *name_res)
         {
             TRY_CALL
@@ -382,6 +383,14 @@ class SERVER_EXPORT JackLockedEngine
             JackLock lock(&fEngine);
             return fEngine.ClientHasSessionCallback(name);
             CATCH_EXCEPTION_RETURN
+        }
+
+        void NotifyPropertyChange(jack_uuid_t subject, const char* key, jack_property_change_t change)
+        {
+            TRY_CALL
+            JackLock lock(&fEngine);
+            fEngine.NotifyPropertyChange(subject, key, change);
+            CATCH_EXCEPTION
         }
 };
 

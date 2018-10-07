@@ -28,6 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackMessageBuffer.h"
 #include "JackTime.h"
 #include "JackClient.h"
+#include "JackMetadata.h"
 #include "JackError.h"
 #include <assert.h>
 #include <signal.h>
@@ -55,6 +56,7 @@ struct JackLibGlobals
     JackShmReadWritePtr<JackGraphManager> fGraphManager;	/*! Shared memory Port manager */
     JackShmReadWritePtr<JackEngineControl> fEngineControl;	/*! Shared engine control */  // transport engine has to be writable
     JackSynchro fSynchroTable[CLIENT_NUM];                  /*! Shared synchro table */
+    JackMetadata fMetadata;                                 /*! Shared metadata base */
     sigset_t fProcessSignals;
 
     static int fClientCount;

@@ -93,6 +93,8 @@ class JackGenericClientChannel : public detail::JackClientChannelInterface
         void GetClientNameForUUID(int refnum, const char* uuid, char* name_res, int* result);
         void ReserveClientName(int refnum, const char* client_name, const char *uuid, int* result);
         void ClientHasSessionCallback(const char* client_name, int* result);
+
+        void PropertyChangeNotify(jack_uuid_t subject, const char* key, jack_property_change_t change, int* result);
 };
 
 } // end of namespace

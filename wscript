@@ -439,6 +439,9 @@ def options(opt):
     sd = add_auto_option(opt, 'systemd', help='Use systemd notify')
     sd.add_header('systemd/sd-daemon.h')
     sd.add_library('systemd')
+    db = add_auto_option(opt, 'db', help='Use Berkeley DB (metadata)')
+    db.add_header('db.h')
+    db.add_library('db')
 
     # dbus options
     opt.recurse('dbus')

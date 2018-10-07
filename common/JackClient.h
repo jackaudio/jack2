@@ -28,6 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackPlatformPlug.h"
 #include "JackChannel.h"
 #include "JackRequest.h"
+#include "JackMetadata.h"
 #include "varargs.h"
 #include <list>
 
@@ -68,6 +69,7 @@ class SERVER_EXPORT JackClient : public JackClientInterface, public JackRunnable
         JackThreadCallback fThreadFun;
         JackSessionCallback fSession;
         JackLatencyCallback fLatency;
+        JackPropertyChangeCallback fPropertyChange;
 
         void* fProcessArg;
         void* fGraphOrderArg;
@@ -87,6 +89,8 @@ class SERVER_EXPORT JackClient : public JackClientInterface, public JackRunnable
         void* fThreadFunArg;
         void* fSessionArg;
         void* fLatencyArg;
+        void* fPropertyChangeArg;
+
         char fServerName[JACK_SERVER_NAME_SIZE+1];
 
         JackThread fThread;    /*! Thread to execute the Process function */
@@ -185,6 +189,7 @@ class SERVER_EXPORT JackClient : public JackClientInterface, public JackRunnable
         virtual int SetPortRenameCallback(JackPortRenameCallback callback, void *arg);
         virtual int SetSessionCallback(JackSessionCallback callback, void *arg);
         virtual int SetLatencyCallback(JackLatencyCallback callback, void *arg);
+        virtual int SetPropertyChangeCallback(JackPropertyChangeCallback callback, void* arg);
 
         // Internal clients
         virtual char* GetInternalClientName(int ref);
@@ -204,6 +209,9 @@ class SERVER_EXPORT JackClient : public JackClientInterface, public JackRunnable
         virtual char* GetClientNameByUUID(const char* uuid);
         virtual int ReserveClientName(const char* client_name, const char* uuid);
         virtual int ClientHasSessionCallback(const char* client_name);
+
+        // Metadata API
+        virtual int NotifyPropertyChange(jack_uuid_t subject, const char* key, jack_property_change_t change);
 
         // JackRunnableInterface interface
         bool Init();

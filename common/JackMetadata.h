@@ -17,10 +17,14 @@
   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#ifndef __jack_metadata_int_h__
-#define __jack_metadata_int_h__
+#ifndef __JackMetadata__
+#define __JackMetadata__
 
 #include <stdint.h>
+
+#include <db.h>
+
+#include <jack/uuid.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,4 +57,47 @@ typedef void (*JackPropertyChangeCallback)(jack_uuid_t            subject,
 #ifdef __cplusplus
 }
 #endif
+
+namespace Jack
+{
+
+class JackClient;
+
+/*!
+\brief Metadata base.
+*/
+
+class JackMetadata
+{
+    private:
+
+        DB* db;
+        DB_ENV* db_env;
+
+        int PropertyInit(const char* server_name);
+        int PropertyChangeNotify(JackClient* client, jack_uuid_t subject, const char* key, jack_property_change_t change);
+        void MakeKeyDbt(DBT* dbt, jack_uuid_t subject, const char* key);
+
+    public:
+
+        JackMetadata(const char* server_name = NULL);
+        ~JackMetadata();
+
+        int GetProperty(jack_uuid_t subject, const char* key, char** value, char** type);
+        int GetProperties(jack_uuid_t subject, jack_description_t* desc);
+        int GetAllProperties(jack_description_t** descriptions);
+
+        int GetDescription(jack_uuid_t subject, jack_description_t* desc);
+        int GetAllDescriptions(jack_description_t** descs);
+        void FreeDescription(jack_description_t* desc, int free_actual_description_too);
+
+        int SetProperty(JackClient* client, jack_uuid_t subject, const char* key, const char* value, const char* type);
+
+        int RemoveProperty(JackClient* client, jack_uuid_t subject, const char* key);
+        int RemoveProperties(JackClient* client, jack_uuid_t subject);
+        int RemoveAllProperties(JackClient* client);
+};
+
+} // end of namespace
+
 #endif

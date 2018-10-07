@@ -89,7 +89,8 @@ struct JackRequest
         kReserveClientName = 36,
         kGetUUIDByClient = 37,
         kClientHasSessionCallback = 38,
-        kComputeTotalLatencies = 39
+        kComputeTotalLatencies = 39,
+        kPropertyChangeNotify = 40
     };
 
     RequestType fType;
@@ -1627,6 +1628,48 @@ struct JackClientHasSessionCallbackRequest : public JackRequest
 
     int Size() { return sizeof(fName); }
     
+};
+
+
+struct JackPropertyChangeNotifyRequest : public JackRequest
+{
+    jack_uuid_t fSubject;
+    char fKey[JACK_UUID_STRING_SIZE];
+    jack_property_change_t fChange;
+
+    JackPropertyChangeNotifyRequest()
+    {
+        jack_uuid_clear(&fSubject);
+        memset(fKey, 0, sizeof(fKey));
+    }
+    JackPropertyChangeNotifyRequest(jack_uuid_t subject, const char* key, jack_property_change_t change)
+        : JackRequest(JackRequest::kPropertyChangeNotify)
+    {
+        jack_uuid_copy(&fSubject, subject);
+        memset(fKey, 0, sizeof(fKey));
+        strncpy(fKey, key, sizeof(fKey)-1);
+        fChange = change;
+    }
+
+    int Read(detail::JackChannelTransactionInterface* trans)
+    {
+        CheckSize();
+        CheckRes(trans->Read(&fSubject, sizeof(fSubject)));
+        CheckRes(trans->Read(&fKey, sizeof(fKey)));
+        CheckRes(trans->Read(&fChange, sizeof(fChange)));
+        return 0;
+    }
+
+    int Write(detail::JackChannelTransactionInterface* trans)
+    {
+        CheckRes(JackRequest::Write(trans, Size()));
+        CheckRes(trans->Write(&fSubject, sizeof(fSubject)));
+        CheckRes(trans->Write(&fKey, sizeof(fKey)));
+        CheckRes(trans->Write(&fChange, sizeof(fChange)));
+        return 0;
+    }
+
+    int Size() { return sizeof(fSubject) + sizeof(fKey) + sizeof(fChange); }
 };
 
 /*!

@@ -154,6 +154,8 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         void NotifyFreewheel(bool onoff);
         void NotifyQuit();
 
+        void NotifyPropertyChange(jack_uuid_t subject, const char* key,jack_property_change_t change);
+
         // Session management
         void SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, detail::JackChannelTransactionInterface *socket, JackSessionNotifyResult** result);
         int SessionReply(int refnum);

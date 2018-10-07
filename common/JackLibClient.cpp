@@ -51,6 +51,15 @@ JackSynchro* GetSynchroTable()
     return (JackLibGlobals::fGlobals ? JackLibGlobals::fGlobals->fSynchroTable : 0);
 }
 
+JackMetadata* GetMetadata()
+{
+    if (JackLibGlobals::fGlobals) {
+        return &JackLibGlobals::fGlobals->fMetadata;
+    } else {
+        return NULL;
+    }
+}
+
 //-------------------
 // Client management
 //-------------------

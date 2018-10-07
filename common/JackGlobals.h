@@ -33,6 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 namespace Jack
 {
+    class JackMetadata;
 
 // Globals used for client management on server or library side.
 struct JackGlobals {
@@ -59,6 +60,7 @@ struct JackGlobals {
 extern SERVER_EXPORT JackGraphManager* GetGraphManager();
 extern SERVER_EXPORT JackEngineControl* GetEngineControl();
 extern SERVER_EXPORT JackSynchro* GetSynchroTable();
+extern SERVER_EXPORT JackMetadata* GetMetadata();
 
 } // end of namespace
 

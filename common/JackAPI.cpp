@@ -2080,88 +2080,177 @@ LIB_EXPORT int jack_client_has_session_callback(jack_client_t* ext_client, const
     }
 }
 
-LIB_EXPORT int jack_set_property(jack_client_t*, jack_uuid_t, const char*, const char*, const char*)
+LIB_EXPORT int jack_set_property(jack_client_t* ext_client, jack_uuid_t subject, const char* key, const char* value, const char* type)
 {
-    return -1;
+    JackGlobals::CheckContext("jack_set_property");
+
+    JackClient* client = (JackClient*)ext_client;
+    jack_log("jack_set_property ext_client %x client %x ", ext_client, client);
+    if (client == NULL) {
+        jack_error("jack_set_property called with a NULL client");
+        return -1;
+    } else {
+        JackMetadata* metadata = GetMetadata();
+        return (metadata ? metadata->SetProperty(client, subject, key, value, type) : -1);
+    }
 }
 
-LIB_EXPORT int jack_get_property(jack_uuid_t, const char*, char**, char**)
+LIB_EXPORT int jack_get_property(jack_uuid_t subject, const char* key, char** value, char** type)
 {
-    return -1;
+    JackGlobals::CheckContext("jack_get_property");
+
+    JackMetadata* metadata = GetMetadata();
+    return (metadata ? metadata->GetProperty(subject, key, value, type) : -1);
 }
 
-LIB_EXPORT void jack_free_description(jack_description_t*, int)
+LIB_EXPORT void jack_free_description(jack_description_t* desc, int free_actual_description_too)
 {
+    JackGlobals::CheckContext("jack_free_description");
+
+    JackMetadata* metadata = GetMetadata();
+    if (metadata)
+        metadata->FreeDescription(desc, free_actual_description_too);
 }
 
-LIB_EXPORT int jack_get_properties(jack_uuid_t, jack_description_t*)
+LIB_EXPORT int jack_get_properties(jack_uuid_t subject, jack_description_t* desc)
 {
-    return -1;
+    JackGlobals::CheckContext("jack_get_properties");
+
+    JackMetadata* metadata = GetMetadata();
+    return (metadata ? metadata->GetProperties(subject, desc) : -1);
 }
 
-LIB_EXPORT int jack_get_all_properties(jack_description_t**)
+LIB_EXPORT int jack_get_all_properties(jack_description_t** descriptions)
 {
-    return -1;
+    JackGlobals::CheckContext("jack_get_all_properties");
+
+    JackMetadata* metadata = GetMetadata();
+    return (metadata ? metadata->GetAllProperties(descriptions) : -1);
 }
 
-LIB_EXPORT int jack_remove_property(jack_client_t*, jack_uuid_t, const char*)
+LIB_EXPORT int jack_remove_property(jack_client_t* ext_client, jack_uuid_t subject, const char* key)
 {
-    return -1;
+    JackGlobals::CheckContext("jack_remove_property");
+
+    JackClient* client = (JackClient*)ext_client;
+    jack_log("jack_remove_property ext_client %x client %x ", ext_client, client);
+    if (client == NULL) {
+        jack_error("jack_remove_property called with a NULL client");
+        return -1;
+    } else {
+        JackMetadata* metadata = GetMetadata();
+        return (metadata ? metadata->RemoveProperty(client, subject, key) : -1);
+    }
 }
 
-LIB_EXPORT int jack_remove_properties(jack_client_t*, jack_uuid_t)
+LIB_EXPORT int jack_remove_properties(jack_client_t* ext_client, jack_uuid_t subject)
 {
-    return -1;
+    JackGlobals::CheckContext("jack_remove_properties");
+
+    JackClient* client = (JackClient*)ext_client;
+    jack_log("jack_remove_properties ext_client %x client %x ", ext_client, client);
+    if (client == NULL) {
+        jack_error("jack_remove_properties called with a NULL client");
+        return -1;
+    } else {
+        JackMetadata* metadata = GetMetadata();
+        return (metadata ? metadata->RemoveProperties(client, subject) : -1);
+    }
 }
 
-LIB_EXPORT int jack_remove_all_properties(jack_client_t*)
+LIB_EXPORT int jack_remove_all_properties(jack_client_t* ext_client)
 {
-    return -1;
+    JackGlobals::CheckContext("jack_remove_all_properties");
+
+    JackClient* client = (JackClient*)ext_client;
+    jack_log("jack_remove_all_properties ext_client %x client %x ", ext_client, client);
+    if (client == NULL) {
+        jack_error("jack_remove_all_properties called with a NULL client");
+        return -1;
+    } else {
+        JackMetadata* metadata = GetMetadata();
+        return (metadata ? metadata->RemoveAllProperties(client) : -1);
+    }
 }
 
-LIB_EXPORT int jack_set_property_change_callback(jack_client_t*, JackPropertyChangeCallback, void*)
+LIB_EXPORT int jack_set_property_change_callback(jack_client_t* ext_client, JackPropertyChangeCallback callback, void* arg)
 {
-    return -1;
+    JackGlobals::CheckContext("jack_set_property_change_callback");
+
+    JackClient* client = (JackClient*)ext_client;
+    jack_log("jack_set_property_change_callback ext_client %x client %x ", ext_client, client);
+    if (client == NULL) {
+        jack_error("jack_set_property_change_callback called with a NULL client");
+        return -1;
+    } else {
+        return client->SetPropertyChangeCallback(callback, arg);
+    }
 }
 
 LIB_EXPORT jack_uuid_t jack_client_uuid_generate()
 {
-    return 0;
+    static uint32_t uuid_cnt = 0;
+    jack_uuid_t uuid = 0x2; /* JackUUIDClient */;
+    uuid = (uuid << 32) | ++uuid_cnt;
+    return uuid;
 }
 
-LIB_EXPORT jack_uuid_t jack_port_uuid_generate(uint32_t)
+LIB_EXPORT jack_uuid_t jack_port_uuid_generate(uint32_t port_id)
 {
-    return 0;
+    jack_uuid_t uuid = 0x1; /* JackUUIDPort */
+    uuid = (uuid << 32) | (port_id + 1);
+    return uuid;
 }
 
-LIB_EXPORT uint32_t jack_uuid_to_index(jack_uuid_t)
+LIB_EXPORT uint32_t jack_uuid_to_index(jack_uuid_t u)
 {
-    return 0;
+    return (u & 0xffff) - 1;
 }
 
-LIB_EXPORT int jack_uuid_compare(jack_uuid_t, jack_uuid_t)
+LIB_EXPORT int jack_uuid_compare(jack_uuid_t a, jack_uuid_t b)
 {
-    return 0;
+    if (a == b) {
+        return 0;
+    }
+
+    if (a < b) {
+        return -1;
+    }
+
+    return 1;
 }
 
-LIB_EXPORT void jack_uuid_copy(jack_uuid_t*, jack_uuid_t)
+LIB_EXPORT void jack_uuid_copy(jack_uuid_t* dst, jack_uuid_t src)
 {
+    *dst = src;
 }
 
-LIB_EXPORT void jack_uuid_clear(jack_uuid_t*)
+LIB_EXPORT void jack_uuid_clear(jack_uuid_t* u)
 {
+    *u = 0;
 }
 
-LIB_EXPORT int jack_uuid_parse(const char*, jack_uuid_t*)
+LIB_EXPORT int jack_uuid_parse(const char* b, jack_uuid_t* u)
 {
-    return 0;
+    if (sscanf (b, "%" PRIu64, u) == 1) {
+
+        if (*u < (0x1LL << 32)) {
+            /* has not type bits set - not legal */
+            return -1;
+        }
+
+        return 0;
+    }
+
+    return -1;
 }
 
-LIB_EXPORT void jack_uuid_unparse(jack_uuid_t, char buf[JACK_UUID_STRING_SIZE])
+LIB_EXPORT void jack_uuid_unparse(jack_uuid_t u, char b[JACK_UUID_STRING_SIZE])
 {
+    snprintf (b, JACK_UUID_STRING_SIZE, "%" PRIu64, u);
 }
 
-LIB_EXPORT int jack_uuid_empty(jack_uuid_t)
+LIB_EXPORT int jack_uuid_empty(jack_uuid_t u)
 {
-    return 0;
+    return u == 0;
 }

@@ -53,6 +53,11 @@ SERVER_EXPORT JackSynchro* GetSynchroTable()
     return JackServerGlobals::fInstance->GetSynchroTable();
 }
 
+SERVER_EXPORT JackMetadata* GetMetadata()
+{
+    return JackServerGlobals::fInstance->GetMetadata();
+}
+
 JackInternalClient::JackInternalClient(JackServer* server, JackSynchro* table): JackClient(table)
 {
     fChannel = new JackInternalClientChannel(server);
