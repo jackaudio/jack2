@@ -70,7 +70,7 @@ struct JackLibGlobals
         }
         fGraphManager = -1;
         fEngineControl = -1;
-		fMetadata = -1;
+        fMetadata = -1;
 
         // Filter SIGPIPE to avoid having client get a SIGPIPE when trying to access a died server.
     #ifdef WIN32
