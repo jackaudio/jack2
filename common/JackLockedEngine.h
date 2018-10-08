@@ -83,8 +83,8 @@ class SERVER_EXPORT JackLockedEngine
 
     public:
 
-        JackLockedEngine(JackGraphManager* manager, JackSynchro* table, JackEngineControl* controler, char self_connect_mode):
-            fEngine(manager, table, controler, self_connect_mode)
+        JackLockedEngine(JackGraphManager* manager, JackSynchro* table, JackEngineControl* controler, JackMetadata* metadata, char self_connect_mode):
+            fEngine(manager, table, controler, metadata, self_connect_mode)
         {}
         ~JackLockedEngine()
         {}
@@ -116,11 +116,11 @@ class SERVER_EXPORT JackLockedEngine
             return fEngine.ClientCheck(name, uuid, name_res, protocol, options, status);
             CATCH_EXCEPTION_RETURN
         }
-        int ClientExternalOpen(const char* name, int pid, int uuid, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager)
+        int ClientExternalOpen(const char* name, int pid, int uuid, int* ref, int* shared_engine, int* shared_client, int* shared_graph, int* shared_metadata)
         {
             TRY_CALL
             JackLock lock(&fEngine);
-            return fEngine.ClientExternalOpen(name, pid, uuid, ref, shared_engine, shared_client, shared_graph_manager);
+            return fEngine.ClientExternalOpen(name, pid, uuid, ref, shared_engine, shared_client, shared_graph, shared_metadata);
             CATCH_EXCEPTION_RETURN
         }
         int ClientInternalOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, bool wait)

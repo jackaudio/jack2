@@ -92,7 +92,7 @@ JackLibClient::~JackLibClient()
 
 int JackLibClient::Open(const char* server_name, const char* name, int uuid, jack_options_t options, jack_status_t* status)
 {
-    int shared_engine, shared_client, shared_graph, result;
+    int shared_engine, shared_client, shared_graph, shared_metadata, result;
     bool res;
     jack_log("JackLibClient::Open name = %s", name);
     
@@ -120,7 +120,7 @@ int JackLibClient::Open(const char* server_name, const char* name, int uuid, jac
     }
 
     // Require new client
-    fChannel->ClientOpen(name_res, JackTools::GetPID(), uuid, &shared_engine, &shared_client, &shared_graph, &result);
+    fChannel->ClientOpen(name_res, JackTools::GetPID(), uuid, &shared_engine, &shared_client, &shared_graph, &shared_metadata, &result);
     if (result < 0) {
         jack_error("Cannot open %s client", name_res);
         goto error;
@@ -130,6 +130,7 @@ int JackLibClient::Open(const char* server_name, const char* name, int uuid, jac
         // Map shared memory segments
         JackLibGlobals::fGlobals->fEngineControl.SetShmIndex(shared_engine, fServerName);
         JackLibGlobals::fGlobals->fGraphManager.SetShmIndex(shared_graph, fServerName);
+        JackLibGlobals::fGlobals->fMetadata.SetShmIndex(shared_metadata, fServerName);
         fClientControl.SetShmIndex(shared_client, fServerName);
         JackGlobals::fVerbose = GetEngineControl()->fVerbose;
     } catch (...) {

@@ -106,7 +106,7 @@ void JackGenericClientChannel::ClientCheck(const char* name, int uuid, char* nam
     strcpy(name_res, res.fName);
 }
 
-void JackGenericClientChannel::ClientOpen(const char* name, int pid, int uuid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
+void JackGenericClientChannel::ClientOpen(const char* name, int pid, int uuid, int* shared_engine, int* shared_client, int* shared_graph, int* shared_metadata, int* result)
 {
     JackClientOpenRequest req(name, pid, uuid);
     JackClientOpenResult res;
@@ -114,6 +114,7 @@ void JackGenericClientChannel::ClientOpen(const char* name, int pid, int uuid, i
     *shared_engine = res.fSharedEngine;
     *shared_client = res.fSharedClient;
     *shared_graph = res.fSharedGraph;
+    *shared_metadata = res.fSharedMetadata;
 }
 
 void JackGenericClientChannel::ClientClose(int refnum, int* result)

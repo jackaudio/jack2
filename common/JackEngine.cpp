@@ -40,6 +40,7 @@ namespace Jack
 JackEngine::JackEngine(JackGraphManager* manager,
                        JackSynchro* table,
                        JackEngineControl* control,
+                       JackMetadata *metadata,
                        char self_connect_mode)
                     : JackLockAble(control->fServerName), 
                     fSignal(control->fServerName)
@@ -47,6 +48,7 @@ JackEngine::JackEngine(JackGraphManager* manager,
     fGraphManager = manager;
     fSynchroTable = table;
     fEngineControl = control;
+    fMetadata = metadata;
     fSelfConnectMode = self_connect_mode;
     for (int i = 0; i < CLIENT_NUM; i++) {
         fClientTable[i] = NULL;
@@ -603,7 +605,7 @@ int JackEngine::GetClientRefNum(const char* name)
 }
 
 // Used for external clients
-int JackEngine::ClientExternalOpen(const char* name, int pid, int uuid, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager)
+int JackEngine::ClientExternalOpen(const char* name, int pid, int uuid, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager, int* shared_metadata)
 {
     char real_name[JACK_CLIENT_NAME_SIZE + 1];
 
@@ -658,6 +660,7 @@ int JackEngine::ClientExternalOpen(const char* name, int pid, int uuid, int* ref
     fEngineControl->ResetRollingUsecs();
     *shared_engine = fEngineControl->GetShmIndex();
     *shared_graph_manager = fGraphManager->GetShmIndex();
+    *shared_metadata = fMetadata->GetShmIndex();
     *ref = refnum;
     return 0;
 

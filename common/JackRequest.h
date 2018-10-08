@@ -291,12 +291,13 @@ struct JackClientOpenResult : public JackResult
     int fSharedEngine;
     int fSharedClient;
     int fSharedGraph;
+    int fSharedMetadata;
 
     JackClientOpenResult()
-            : JackResult(), fSharedEngine(-1), fSharedClient(-1), fSharedGraph(-1)
+            : JackResult(), fSharedEngine(-1), fSharedClient(-1), fSharedGraph(-1), fSharedMetadata(-1)
     {}
-    JackClientOpenResult(int32_t result, int index1, int index2, int index3)
-            : JackResult(result), fSharedEngine(index1), fSharedClient(index2), fSharedGraph(index3)
+    JackClientOpenResult(int32_t result, int index1, int index2, int index3, int index4)
+            : JackResult(result), fSharedEngine(index1), fSharedClient(index2), fSharedGraph(index3), fSharedMetadata(index4)
     {}
 
     int Read(detail::JackChannelTransactionInterface* trans)
@@ -305,6 +306,7 @@ struct JackClientOpenResult : public JackResult
         CheckRes(trans->Read(&fSharedEngine, sizeof(int)));
         CheckRes(trans->Read(&fSharedClient, sizeof(int)));
         CheckRes(trans->Read(&fSharedGraph, sizeof(int)));
+        CheckRes(trans->Read(&fSharedMetadata, sizeof(int)));
         return 0;
     }
 
@@ -314,6 +316,7 @@ struct JackClientOpenResult : public JackResult
         CheckRes(trans->Write(&fSharedEngine, sizeof(int)));
         CheckRes(trans->Write(&fSharedClient, sizeof(int)));
         CheckRes(trans->Write(&fSharedGraph, sizeof(int)));
+        CheckRes(trans->Write(&fSharedMetadata, sizeof(int)));
         return 0;
     }
 
