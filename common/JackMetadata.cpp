@@ -20,7 +20,6 @@
 #include "JackMetadata.h"
 
 #include "JackClient.h"
-#include "JackRequest.h"
 
 #include <string.h>
 #include <limits.h>
@@ -237,7 +236,7 @@ int JackMetadata::GetProperty(jack_uuid_t subject, const char* key, char** value
         if (ret != DB_NOTFOUND) {
             char ustr[JACK_UUID_STRING_SIZE];
             jack_uuid_unparse (subject, ustr);
-            jack_error ("Cannot  metadata for %s/%s (%s)", ustr, key, db_strerror (ret));
+            jack_error ("Cannot retrieve metadata for %s/%s (%s)", ustr, key, db_strerror (ret));
         }
         if (d_key.size > 0) {
             free (d_key.data);

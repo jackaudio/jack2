@@ -118,7 +118,7 @@ void JackClientPipeThread::ClientAdd(detail::JackChannelTransactionInterface* so
 {
     jack_log("JackClientPipeThread::ClientAdd %x %s", this, req->fName);
     fRefNum = -1;
-    res->fResult = fServer->GetEngine()->ClientExternalOpen(req->fName, req->fPID, req->fUUID, &fRefNum, &res->fSharedEngine, &res->fSharedClient, &res->fSharedGraph, &res->fSharedMetadata);
+    res->fResult = fServer->GetEngine()->ClientExternalOpen(req->fName, req->fPID, req->fUUID, &fRefNum, &res->fSharedEngine, &res->fSharedClient, &res->fSharedGraph);
 }
 
 void JackClientPipeThread::ClientRemove(detail::JackChannelTransactionInterface* socket_aux, int refnum)

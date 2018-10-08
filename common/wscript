@@ -47,7 +47,6 @@ def build(bld):
         'JackActivationCount.cpp',
         'JackAPI.cpp',
         'JackClient.cpp',
-        'JackMetadata.cpp',
         'JackConnectionManager.cpp',
         'ringbuffer.c',
         'JackError.cpp',
@@ -157,6 +156,7 @@ def build(bld):
     clientlib.source += [
         'JackLibClient.cpp',
         'JackLibAPI.cpp',
+        'JackMetadata.cpp',
         ]
 
     if bld.env['IS_LINUX']:

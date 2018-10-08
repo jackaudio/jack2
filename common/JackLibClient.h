@@ -54,6 +54,8 @@ class JackLibClient : public JackClient
         JackClientControl* GetClientControl() const;
 };
 
+// Used for client-side Metadata API (JackLibAPI.cpp)
+JackMetadata* GetMetadata();
 
 } // end of namespace
 
