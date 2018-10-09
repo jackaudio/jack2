@@ -91,10 +91,12 @@ jack_midi_clear_buffer(void *port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
  * @ref jack_midi_event_reserve or @ref jack_midi_event_write. This
  * function may not be called on an input port's buffer.
  *
+ * @deprecated Please use jack_midi_clear_buffer().
+ *
  * @param port_buffer Port buffer to resetted.
  */
 void
-jack_midi_reset_buffer(void *port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
+jack_midi_reset_buffer(void *port_buffer) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
 
 
 /** Get the size of the largest event that can be stored by the port.
