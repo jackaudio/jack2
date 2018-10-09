@@ -357,9 +357,18 @@ LIB_EXPORT void* jack_port_get_buffer(jack_port_t* port, jack_nframes_t frames)
     }
 }
 
-LIB_EXPORT jack_uuid_t jack_port_uuid(const jack_port_t*)
+LIB_EXPORT jack_uuid_t jack_port_uuid(const jack_port_t* port)
 {
-    return 0;
+    JackGlobals::CheckContext("jack_port_uuid");
+
+    uintptr_t port_aux = (uintptr_t)port;
+    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    if (!CheckPort(myport)) {
+        jack_error("jack_port_uuid called with an incorrect port %ld", myport);
+        return 0;
+    } else {
+        return jack_port_uuid_generate(myport);
+    }
 }
 
 LIB_EXPORT const char* jack_port_name(const jack_port_t* port)
