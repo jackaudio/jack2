@@ -211,7 +211,7 @@ class SERVER_EXPORT JackClient : public JackClientInterface, public JackRunnable
         virtual int ClientHasSessionCallback(const char* client_name);
 
         // Metadata API
-        virtual int NotifyPropertyChange(jack_uuid_t subject, const char* key, jack_property_change_t change);
+        virtual int PropertyChangeNotify(jack_uuid_t subject, const char* key, jack_property_change_t change);
 
         // JackRunnableInterface interface
         bool Init();

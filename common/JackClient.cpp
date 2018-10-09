@@ -1338,7 +1338,7 @@ int JackClient::ClientHasSessionCallback(const char* client_name)
 // Metadata API
 //------------------
 
-int JackClient::NotifyPropertyChange(jack_uuid_t subject, const char* key, jack_property_change_t change)
+int JackClient::PropertyChangeNotify(jack_uuid_t subject, const char* key, jack_property_change_t change)
 {
     int result = -1;
     fChannel->PropertyChangeNotify(subject, key, change, &result);

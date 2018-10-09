@@ -103,7 +103,7 @@ int JackMetadata::PropertyChangeNotify(JackClient* client, jack_uuid_t subject, 
         return 0;
     }
 
-    return client->NotifyPropertyChange(subject, key, change);
+    return client->PropertyChangeNotify(subject, key, change);
 }
 
 #if HAVE_DB
