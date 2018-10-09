@@ -83,13 +83,6 @@ matrix:
     - os: osx
       compiler: clang
 
-      addons:
-    apt:
-        packages:
-            - libsamplerate-dev
-            - libsndfile-dev
-            - libasound2-dev
-
 before_install:
   - eval "${MATRIX_EVAL}"
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
@@ -107,6 +100,10 @@ script:
     - if [ "$TRAVIS_OS_NAME" == "osx" ]; then ./waf configure --opus=no --readline=no; fi
     - ./waf build
     - ./waf install
+
+branches:
+  only:
+    - /.*/
 
 notifications:
   email: false
