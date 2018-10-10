@@ -64,17 +64,17 @@ matrix:
     - os: osx
       compiler: gcc
       env:
-        - MATRIX_EVAL="brew install gcc6 && CC=gcc-6 && CXX=g++-7"
+        - MATRIX_EVAL="CC=gcc-6 CXX=g++-7"
     # osx with gcc7
     - os: osx
       compiler: gcc
       env:
-        - MATRIX_EVAL="brew install gcc7 && CC=gcc-7 && CXX=g++-7"
+        - MATRIX_EVAL="CC=gcc-7 CXX=g++-7"
     # osx with gcc8
     - os: osx
       compiler: gcc
       env:
-        - MATRIX_EVAL="brew install gcc8 && CC=gcc-8 && CXX=g++-8"
+        - MATRIX_EVAL="CC=gcc-8 CXX=g++-8"
     # osx with xcode8.3/clang
     - os: osx
       osx_image: xcode8.3
