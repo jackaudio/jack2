@@ -595,12 +595,13 @@ alsa_driver_configure_stream (alsa_driver_t *driver, char *device_name,
 			  stream_name, err);
 	}
 
-	// TODO check if SND_PCM_TSTAMP_TYPE_MONOTONIC is valid
+#if SND_LIB_MAJOR >= 1 && SND_LIB_MINOR >= 1
 	err = snd_pcm_sw_params_set_tstamp_type(handle, sw_params, SND_PCM_TSTAMP_TYPE_MONOTONIC);
 	if (err < 0) {
 		jack_info("Could not use monotonic ALSA time stamps for %s (err %d)",
 			  stream_name, err);
 	}
+#endif
 
 	if ((err = snd_pcm_sw_params (handle, sw_params)) < 0) {
 		jack_error ("ALSA: cannot set software parameters for %s\n",
