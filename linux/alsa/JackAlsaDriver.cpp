@@ -279,8 +279,7 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
                          const char* playback_driver_name,
                          jack_nframes_t capture_latency,
                          jack_nframes_t playback_latency,
-                         const char* midi_driver_name,
-                         int hw_timestamping)
+                         const char* midi_driver_name)
 {
     // Generic JackAudioDriver Open
     if (JackAudioDriver::Open(nframes, samplerate, capturing, playing,
@@ -340,8 +339,7 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
                                shorts_first,
                                capture_latency,
                                playback_latency,
-                               midi,
-                               hw_timestamping);
+                               midi);
     if (fDriver) {
         // ALSA driver may have changed the in/out values
         fCaptureChannels = ((alsa_driver_t *)fDriver)->capture_nchannels;
@@ -752,9 +750,6 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
         "ALSA MIDI driver",
         NULL);
 
-    value.i = 0;
-    jack_driver_descriptor_add_parameter(desc, &filler, "htstamps", 't', JackDriverParamBool, &value, NULL, "Enable htimestamping for the ALSA devices", NULL);
-
     return desc;
 }
 
@@ -782,7 +777,6 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
     const JSList * node;
     const jack_driver_param_t * param;
     const char *midi_driver = "none";
-    int hw_timestamping = FALSE;
 
     for (node = params; node; node = jack_slist_next (node)) {
         param = (const jack_driver_param_t *) node->data;
@@ -881,10 +875,6 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
             case 'X':
                 midi_driver = strdup(param->value.str);
                 break;
-
-            case 't':
-                hw_timestamping = param->value.i;
-                break;
         }
     }
 
@@ -899,7 +889,7 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
     // Special open for ALSA driver...
     if (g_alsa_driver->Open(frames_per_interrupt, user_nperiods, srate, hw_monitoring, hw_metering, capture, playback, dither, soft_mode, monitor,
                           user_capture_nchnls, user_playback_nchnls, shorts_first, capture_pcm_name, playback_pcm_name,
-                          systemic_input_latency, systemic_output_latency, midi_driver, hw_timestamping) == 0) {
+                          systemic_input_latency, systemic_output_latency, midi_driver) == 0) {
         return threaded_driver;
     } else {
         delete threaded_driver; // Delete the decorated driver
