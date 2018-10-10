@@ -16,15 +16,14 @@ fi
 if [ "$TRAVIS_OS_NAME" == "linux" ]; then
   # autotools, automake, make are present in the trusty image
   sudo apt-get install -y \
-    celt \
     doxygen \
     libffado-dev \
     libsamplerate-dev \
     libsndfile-dev \
     libasound2-dev \
-    libsystemd-dev \
-    opus \
-    portaudio-dev
+    libsystemd-daemon-dev \
+    opus-tools \
+    libportaudio-dev
   # force installation of gcc-6 if required
   if [ "${CC}" == "gcc-6" ]; then
     sudo apt-get install gcc-6 g++-6
