@@ -32,7 +32,7 @@ if [ "$TRAVIS_OS_NAME" == "linux" ]; then
     libdbus-1-dev \
     libeigen3-dev \
     libopus-dev \
-    libportaudio2
+    portaudio19-dev
   # force installation of gcc-6 if required
   if [ "${CC}" == "gcc-6" ]; then
     sudo apt-get install gcc-6 g++-6
