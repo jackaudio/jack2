@@ -11,6 +11,18 @@ if [ "$TRAVIS_OS_NAME" == "osx" ]; then
     opus \
     readline \
     doxygen
+  # force installation of gcc-6 if required
+  if [ "${CC}" == "gcc-6" ]; then
+    brew install gcc6
+  fi
+  # force installation of gcc-7 if required
+  if [ "${CC}" == "gcc-7" ]; then
+    brew install gcc7
+  fi
+  # force installation of gcc-8 if required
+  if [ "${CC}" == "gcc-8" ]; then
+    brew install gcc8
+  fi
 fi
 
 if [ "$TRAVIS_OS_NAME" == "linux" ]; then
