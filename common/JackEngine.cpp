@@ -103,21 +103,6 @@ void JackEngine::NotifyQuit()
 }
 
 
-void JackEngine::NotifyPropertyChange(jack_uuid_t subject, const char* key, jack_property_change_t change)
-{
-    jack_log("JackEngine::PropertyChangeNotify: subject = %x key = %s change = %x", subject, key, change);
-
-    for (int i = 0; i < CLIENT_NUM; i++) {
-        JackClientInterface* client = fClientTable[i];
-        if (client) {
-            char buf[JACK_UUID_STRING_SIZE];
-            jack_uuid_unparse(subject, buf);
-            client->ClientNotify(i, buf, kPropertyChangeCallback, false, key, change, 0);
-        }
-    }
-}
-
-
 //-----------------------------
 // Client ressource management
 //-----------------------------
@@ -266,6 +251,26 @@ int JackEngine::ComputeTotalLatencies()
      */
     for (rit = sorted.rbegin(); rit != sorted.rend(); rit++) {
         NotifyClient(*rit, kLatencyCallback, true, "", 1, 0);
+    }
+
+    return 0;
+}
+
+//--------------
+// Metadata API
+//--------------
+
+int JackEngine::PropertyChangeNotify(jack_uuid_t subject, const char* key, jack_property_change_t change)
+{
+    jack_log("JackEngine::PropertyChangeNotify: subject = %x key = %s change = %x", subject, key, change);
+
+    for (int i = 0; i < CLIENT_NUM; i++) {
+        JackClientInterface* client = fClientTable[i];
+        if (client) {
+            char buf[JACK_UUID_STRING_SIZE];
+            jack_uuid_unparse(subject, buf);
+            client->ClientNotify(i, buf, kPropertyChangeCallback, false, key, change, 0);
+        }
     }
 
     return 0;

@@ -306,7 +306,7 @@ void JackGenericClientChannel::PropertyChangeNotify(jack_uuid_t subject, const c
 {
     JackPropertyChangeNotifyRequest req(subject, key, change);
     JackResult res;
-    ServerSyncCall(&req, &res, result);
+    ServerAsyncCall(&req, &res, result);
 }
 
 } // end of namespace

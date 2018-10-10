@@ -341,9 +341,8 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
         case JackRequest::kPropertyChangeNotify: {
             jack_log("JackRequest::PropertyChangeNotify");
             JackPropertyChangeNotifyRequest req;
-            JackResult res;
             CheckRead(req, socket);
-            fServer->GetEngine()->NotifyPropertyChange(req.fSubject, req.fKey, req.fChange);
+            fServer->GetEngine()->PropertyChangeNotify(req.fSubject, req.fKey, req.fChange);
             break;
         }
 

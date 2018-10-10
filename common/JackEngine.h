@@ -141,6 +141,8 @@ class SERVER_EXPORT JackEngine : public JackLockAble
 
         int ComputeTotalLatencies();
 
+        int PropertyChangeNotify(jack_uuid_t subject, const char* key,jack_property_change_t change);
+
         // Graph
         bool Process(jack_time_t cur_cycle_begin, jack_time_t prev_cycle_end);
 
@@ -153,8 +155,6 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         void NotifySampleRate(jack_nframes_t sample_rate);
         void NotifyFreewheel(bool onoff);
         void NotifyQuit();
-
-        void NotifyPropertyChange(jack_uuid_t subject, const char* key,jack_property_change_t change);
 
         // Session management
         void SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, detail::JackChannelTransactionInterface *socket, JackSessionNotifyResult** result);

@@ -385,12 +385,12 @@ class SERVER_EXPORT JackLockedEngine
             CATCH_EXCEPTION_RETURN
         }
 
-        void NotifyPropertyChange(jack_uuid_t subject, const char* key, jack_property_change_t change)
+        int PropertyChangeNotify(jack_uuid_t subject, const char* key, jack_property_change_t change)
         {
             TRY_CALL
             JackLock lock(&fEngine);
-            fEngine.NotifyPropertyChange(subject, key, change);
-            CATCH_EXCEPTION
+            return fEngine.PropertyChangeNotify(subject, key, change);
+            CATCH_EXCEPTION_RETURN
         }
 };
 
