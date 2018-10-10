@@ -21,7 +21,10 @@ if [ "$TRAVIS_OS_NAME" == "linux" ]; then
     libsamplerate-dev \
     libsndfile-dev \
     libasound2-dev \
+    systemd \
     libsystemd-daemon-dev \
+    libdbus-1-dev \
+    libeigen3-dev \
     opus-tools \
     libportaudio-dev
   # force installation of gcc-6 if required
