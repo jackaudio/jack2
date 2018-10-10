@@ -21,6 +21,7 @@ if [ "$TRAVIS_OS_NAME" == "linux" ]; then
     libsamplerate-dev \
     libsndfile-dev \
     libasound2-dev \
+    libdb-dev \
     systemd-services \
     systemd \
     libsystemd-journal-dev \
