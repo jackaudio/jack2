@@ -40,11 +40,11 @@ matrix:
       env:
         - MATRIX_EVAL="CC=gcc-6 CXX=g++-6"
       compiler: gcc
-    # linux with gcc (default)
+    # linux with gcc default (4.8)
     - os: linux
       dist: trusty
       compiler: gcc
-    # linux with clang (default)
+    # linux with clang default (3.5)
     - os: linux
       dist: trusty
       compiler: clang
@@ -89,8 +89,7 @@ matrix:
 
 before_install:
   - eval "${MATRIX_EVAL}"
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo rm /usr/local/include/c++; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && sudo rm /usr/local/include/c++; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update; fi
 
 install:
