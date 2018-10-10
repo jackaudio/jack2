@@ -98,8 +98,8 @@ before_script:
 script:
     - if [ "$TRAVIS_OS_NAME" == "linux" ]; then ./waf configure --prefix=/usr --alsa --classic --dbus; fi
     - if [ "$TRAVIS_OS_NAME" == "osx" ]; then ./waf configure --opus=no --readline=no; fi
-    - ./waf build
-    - ./waf install
+    - ./waf -v build
+    - ./waf -v install
 
 branches:
   only:
