@@ -338,6 +338,14 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             break;
         }
 
+        case JackRequest::kPropertyChangeNotify: {
+            jack_log("JackRequest::PropertyChangeNotify");
+            JackPropertyChangeNotifyRequest req;
+            CheckRead(req, socket);
+            fServer->GetEngine()->PropertyChangeNotify(req.fSubject, req.fKey, req.fChange);
+            break;
+        }
+
         default:
             jack_error("Unknown request %ld", type);
             return -1;

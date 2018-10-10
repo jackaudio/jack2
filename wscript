@@ -172,6 +172,11 @@ def options(opt):
             help='Use systemd notify')
     sd.check(header_name='systemd/sd-daemon.h')
     sd.check(lib='systemd')
+    db = opt.add_auto_option(
+            'db',
+            help='Use Berkeley DB (metadata)')
+    db.check(header_name='db.h')
+    db.check(lib='db')
 
     # dbus options
     opt.recurse('dbus')

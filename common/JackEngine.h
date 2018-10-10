@@ -141,6 +141,8 @@ class SERVER_EXPORT JackEngine : public JackLockAble
 
         int ComputeTotalLatencies();
 
+        int PropertyChangeNotify(jack_uuid_t subject, const char* key,jack_property_change_t change);
+
         // Graph
         bool Process(jack_time_t cur_cycle_begin, jack_time_t prev_cycle_end);
 

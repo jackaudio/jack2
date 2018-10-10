@@ -302,6 +302,13 @@ void JackGenericClientChannel::InternalClientUnload(int refnum, int int_ref, int
     *status = res.fStatus;
 }
 
+void JackGenericClientChannel::PropertyChangeNotify(jack_uuid_t subject, const char* key, jack_property_change_t change, int* result)
+{
+    JackPropertyChangeNotifyRequest req(subject, key, change);
+    JackResult res;
+    ServerAsyncCall(&req, &res, result);
+}
+
 } // end of namespace
 
 

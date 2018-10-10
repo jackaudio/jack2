@@ -74,7 +74,7 @@ def build(bld):
         includes.append('..')
     else:
         includes.append('../..')
-    uselib = ['PTHREAD', 'CELT', 'OPUS']
+    uselib = ['PTHREAD', 'CELT', 'OPUS', 'DB']
 
     if bld.env['IS_LINUX']:
         common_libsources += [
@@ -156,6 +156,7 @@ def build(bld):
     clientlib.source += [
         'JackLibClient.cpp',
         'JackLibAPI.cpp',
+        'JackMetadata.cpp',
         ]
 
     if bld.env['IS_LINUX']:
