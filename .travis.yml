@@ -90,7 +90,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update; fi
 
 install:
-  - .ci/install-deps.sh
+  - ./.ci/install-deps.sh
 
 before_script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig; fi
