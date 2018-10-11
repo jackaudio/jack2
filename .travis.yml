@@ -105,11 +105,9 @@ before_script:
 script:
     - if [ "$TRAVIS_OS_NAME" == "linux" ]; then ./waf configure --prefix=/usr --alsa --classic --dbus; fi
     - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-      ./waf configure
-      # force installation of gcc-6 if required
-      if [[ "${CC}" == "gcc-"* ]]; then
-        sudo rm /usr/local/Cellar/gcc@*/*/lib/gcc/*/gcc/x86_64*/*/include-fixed/stdio.h
-      fi
+      ./waf configure;
+      # force removal of include-fixed stdio.h
+      if [[ "${CC}" == "gcc-"* ]]; then sudo rm /usr/local/Cellar/gcc@*/*/lib/gcc/*/gcc/x86_64*/*/include-fixed/stdio.h; fi
       fi
     - ./waf -v build
     - sudo ./waf -v install
