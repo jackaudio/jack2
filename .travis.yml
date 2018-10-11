@@ -89,7 +89,7 @@ matrix:
 
 before_install:
   - eval "${MATRIX_EVAL}"
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && sudo rm /usr/local/include/c++; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && ls -lah /usr/local/include/c++ && sudo rm /usr/local/include/c++; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update; fi
 
 install:
