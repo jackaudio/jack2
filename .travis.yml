@@ -106,9 +106,14 @@ before_script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig; fi
 
 script:
-    - if [ "$TRAVIS_OS_NAME" == "linux" ]; then ./waf configure --prefix=/usr --alsa --classic --dbus; fi
-    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then ./waf configure; fi
-    - ./waf -v build
+    - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+        ./waf configure --prefix=/usr --alsa --classic --dbus;
+        ./waf -v build;
+      fi
+    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+        CXXFLAGS="${CXXFLAGS} -flax-vector-conversions" ./waf configure;
+        CXXFLAGS="${CXXFLAGS} -flax-vector-conversions" ./waf -v build;
+      fi
     - sudo ./waf -v install
 
 branches:
