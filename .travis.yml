@@ -89,7 +89,11 @@ matrix:
 
 before_install:
   - eval "${MATRIX_EVAL}"
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && ls -lah /usr/local/include/c++ && sudo rm /usr/local/include/c++; fi
+    # uninstalling oclint, as it's preinstalled and conflicts with all versions of gcc
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    brew cask uninstall oclint || true
+    brew update;
+    fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update; fi
 
 install:
