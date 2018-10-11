@@ -62,19 +62,19 @@ matrix:
       compiler: clang
     # osx with gcc6
     - os: osx
-      osx_image: xcode9.2
+      osx_image: xcode8.3
       compiler: gcc
       env:
         - MATRIX_EVAL="CC=gcc-6 CXX=g++-6"
     # osx with gcc7
     - os: osx
-      osx_image: xcode9.2
+      osx_image: xcode8.3
       compiler: gcc
       env:
         - MATRIX_EVAL="CC=gcc-7 CXX=g++-7"
     # osx with gcc8
     - os: osx
-      osx_image: xcode9.2
+      osx_image: xcode8.3
       compiler: gcc
       env:
         - MATRIX_EVAL="CC=gcc-8 CXX=g++-8"
