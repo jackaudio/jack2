@@ -100,7 +100,7 @@ before_script:
 
 script:
     - if [ "$TRAVIS_OS_NAME" == "linux" ]; then ./waf configure --prefix=/usr --alsa --classic --dbus; fi
-    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then ./waf configure --opus=no --readline=no; fi
+    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then ./waf configure; fi
     - ./waf -v build
     - sudo ./waf -v install
 
