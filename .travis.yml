@@ -64,7 +64,7 @@ matrix:
     - os: osx
       compiler: gcc
       env:
-        - MATRIX_EVAL="CC=gcc-6 CXX=g++-7"
+        - MATRIX_EVAL="CC=gcc-6 CXX=g++-6"
     # osx with gcc7
     - os: osx
       compiler: gcc
