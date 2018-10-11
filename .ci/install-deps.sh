@@ -13,15 +13,15 @@ if [ "$TRAVIS_OS_NAME" == "osx" ]; then
     doxygen
   # force installation of gcc-6 if required
   if [ "${CC}" == "gcc-6" ]; then
-    brew install gcc6
+    brew install gcc@6
   fi
   # force installation of gcc-7 if required
   if [ "${CC}" == "gcc-7" ]; then
-    brew install gcc7
+    brew install gcc@7
   fi
   # force installation of gcc-8 if required
   if [ "${CC}" == "gcc-8" ]; then
-    brew install gcc8
+    brew install gcc@8
   fi
 fi
 
