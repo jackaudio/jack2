@@ -486,7 +486,7 @@ int init_1722_driver( ieee1722_avtp_driver_state_t *ieee1722mc, const char* name
     ieee1722mc->period_size = period_size;
     ieee1722mc->period_usecs = (uint64_t) (period_size / sample_rate * 1000000);
 
-    printf("sample_rate: %d, period size: %d, period usec: %d\n",ieee1722mc->sample_rate, ieee1722mc->period_size, ieee1722mc->period_usecs);fflush(filepointer);
+    fprintf(filepointer,"sample_rate: %d, period size: %d, period usec: %lld\n",ieee1722mc->sample_rate, ieee1722mc->period_size, ieee1722mc->period_usecs);fflush(filepointer);
 
     if( RETURN_VALUE_FAILURE == create_avb_Mediaclock_Listener(filepointer, &ieee1722mc, name,
                                    stream_id, destination_mac,

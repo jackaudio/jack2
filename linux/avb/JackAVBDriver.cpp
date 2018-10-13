@@ -176,16 +176,7 @@ int JackAVBPDriver::Read()
     int ret = 0;
     JSList *node = ieee1722mc.capture_ports;
 
-
-    /*
-     *
-     *      Even Odd Calc will cause xruns. cumulative_delay_ns must be calculated sample accurate in mediaclock listener
-     *
-     */
-
-    //num_packets_even_odd ? num_packets_even_odd = 0 : num_packets_even_odd = 1;  // even = 0, odd = 1
-    int num_packets = (int)( ieee1722mc.period_size / 6 ) + 1; // + num_packets_even_odd;
-
+    int num_packets = (int)( ieee1722mc.period_size / 6 ) + 1;
 
     uint64_t cumulative_ipg_ns = 0;
 
@@ -194,7 +185,7 @@ int JackAVBPDriver::Read()
     }
 
 
-    printf("ipg: %lld ns\n", cumulative_ipg_ns );fflush(stdout);
+    printf("ipg: %lld ns, period_usec: %lld\n", cumulative_ipg_ns, ieee1722mc.period_usecs );fflush(stdout);
     float cumulative_ipg_us = cumulative_ipg_ns / 1000;
     if ( cumulative_ipg_us > ieee1722mc.period_usecs) {
         ret = 1;
