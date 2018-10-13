@@ -120,6 +120,9 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
         packet_arrival_time_ns = (sys_time.tv_sec*1000000000LL + sys_time.tv_usec*1000);
         ipg_to_last_packet_ns = packet_arrival_time_ns - last_packet_time_ns;
         last_packet_time_ns = packet_arrival_time_ns;
+		fprintf(filepointer, "packet arrival time %lld ns\n", packet_arrival_time_ns);fflush(filepointer);
+
+
 
         /*
          *
@@ -140,6 +143,7 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
         if( samples_in_packet < 6){
             adjust_packet_time_ns = samples_in_packet / (*ieee1722mc)->sample_rate * 1000000000;
         }
+		fprintf(filepointer, "adjust time %lld ns\n", adjust_packet_time_ns);fflush(filepointer);
 
 
 
