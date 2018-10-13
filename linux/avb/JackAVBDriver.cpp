@@ -197,7 +197,7 @@ int JackAVBPDriver::Read()
     if ( cumulative_ipg_us > ieee1722mc.period_usecs) {
         ret = 1;
         NotifyXRun(fBeginDateUst, cumulative_ipg_us);
-        //jack_error("netxruns... duration: %fms", cumulative_ipg_us / 1000);
+        jack_error("netxruns... duration: %fms", cumulative_ipg_us / 1000);
     }
 
     JackDriver::CycleTakeBeginTime();
