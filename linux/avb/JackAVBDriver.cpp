@@ -192,12 +192,12 @@ int JackAVBPDriver::Read()
     }
 
 
-    jack_log("netxruns... duration: %lld ns", cumulative_ipg_ns );
+    jack_log("ipg: %lld ns", cumulative_ipg_ns );
     float cumulative_ipg_us = cumulative_ipg_ns / 1000;
-    if ( cumulative_ipg_us >= ieee1722mc.period_usecs) {
+    if ( cumulative_ipg_us > ieee1722mc.period_usecs) {
         ret = 1;
         NotifyXRun(fBeginDateUst, cumulative_ipg_us);
-        jack_error("netxruns... duration: %fms", cumulative_ipg_us / 1000);
+        //jack_error("netxruns... duration: %fms", cumulative_ipg_us / 1000);
     }
 
     JackDriver::CycleTakeBeginTime();
