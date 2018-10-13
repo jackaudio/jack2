@@ -205,7 +205,7 @@ class utest(Task.Task):
 		return self.exec_command(self.ut_exec)
 
 	def exec_command(self, cmd, **kw):
-		Logs.debug('runner: %r', cmd)
+		self.generator.bld.log_command(cmd, kw)
 		if getattr(Options.options, 'dump_test_scripts', False):
 			script_code = SCRIPT_TEMPLATE % {
 				'python': sys.executable,

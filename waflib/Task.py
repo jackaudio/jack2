@@ -50,6 +50,9 @@ def f(tsk):
 	bld = gen.bld
 	cwdx = tsk.get_cwd()
 	p = env.get_flat
+	def to_list(xx):
+		if isinstance(xx, str): return [xx]
+		return xx
 	tsk.last_cmd = cmd = \'\'\' %s \'\'\' % s
 	return tsk.exec_command(cmd, cwd=cwdx, env=env.env or None)
 '''
@@ -77,7 +80,8 @@ def f(tsk):
 
 COMPILE_TEMPLATE_SIG_VARS = '''
 def f(tsk):
-	super(tsk.__class__, tsk).sig_vars()
+	sig = tsk.generator.bld.hash_env_vars(tsk.env, tsk.vars)
+	tsk.m.update(sig)
 	env = tsk.env
 	gen = tsk.generator
 	bld = gen.bld
@@ -776,6 +780,8 @@ class Task(evil):
 		Used by :py:meth:`waflib.Task.Task.signature`; it hashes :py:attr:`waflib.Task.Task.env` variables/values
 		When overriding this method, and if scriptlet expressions are used, make sure to follow
 		the code in :py:meth:`waflib.Task.Task.compile_sig_vars` to enable dependencies on scriptlet results.
+
+		This method may be replaced on subclasses by the metaclass to force dependencies on scriptlet code.
 		"""
 		sig = self.generator.bld.hash_env_vars(self.env, self.vars)
 		self.m.update(sig)
@@ -1193,7 +1199,7 @@ def compile_fun_noshell(line):
 					# plain code such as ${tsk.inputs[0].abspath()}
 					call = '%s%s' % (var, code)
 					add_dvar(call)
-					app('gen.to_list(%s)' % call)
+					app('to_list(%s)' % call)
 			else:
 				# a plain variable such as # a plain variable like ${AR}
 				app('to_list(env[%r])' % var)

@@ -1054,6 +1054,8 @@ class inst(Task.Task):
 	def get_install_path(self, destdir=True):
 		"""
 		Returns the destination path where files will be installed, pre-pending `destdir`.
+		
+		Relative paths will be interpreted relative to `PREFIX` if no `destdir` is given.
 
 		:rtype: string
 		"""
@@ -1061,6 +1063,8 @@ class inst(Task.Task):
 			dest = self.install_to.abspath()
 		else:
 			dest = Utils.subst_vars(self.install_to, self.env)
+		if not os.path.isabs(dest):
+		    dest = os.path.join(self.env.PREFIX, dest)
 		if destdir and Options.options.destdir:
 			dest = os.path.join(Options.options.destdir, os.path.splitdrive(dest)[1].lstrip(os.sep))
 		return dest
