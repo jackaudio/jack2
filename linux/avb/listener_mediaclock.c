@@ -221,7 +221,7 @@ uint64_t mediaclock_listener_wait_recv( FILE* filepointer, ieee1722_avtp_driver_
 
 
             if( samples_in_packet < 6 ){
-                adjust_packet_time_ns = samples_in_packet / ieee1722mc->sample_rate * 1000000000;
+                adjust_packet_time_ns = samples_in_packet / (*ieee1722mc)->sample_rate * 1000000000;
             }
 
 
@@ -289,7 +289,7 @@ uint64_t mediaclock_listener_poll_recv( FILE* filepointer, ieee1722_avtp_driver_
 
 
                 if( samples_in_packet < 6 ){
-                    adjust_packet_time_ns = samples_in_packet / ieee1722mc->sample_rate * 1000000000;
+                    adjust_packet_time_ns = samples_in_packet / (*ieee1722mc)->sample_rate * 1000000000;
                 }
 
 
