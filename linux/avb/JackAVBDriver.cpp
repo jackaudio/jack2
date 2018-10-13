@@ -181,6 +181,7 @@ int JackAVBPDriver::Read()
      *      Even Odd Calc will cause xruns. cumulative_delay_ns must be calculated sample accurate in mediaclock listener
      *
      */
+
     //num_packets_even_odd ? num_packets_even_odd = 0 : num_packets_even_odd = 1;  // even = 0, odd = 1
     int num_packets = (int)( ieee1722mc.period_size / 6 ) + 1; // + num_packets_even_odd;
 
