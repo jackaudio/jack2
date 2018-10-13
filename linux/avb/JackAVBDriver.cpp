@@ -178,13 +178,13 @@ int JackAVBPDriver::Read()
 
 
     uint64_t cumulative_ipg_ns = 0;
-
-    for(int n=0; n<ieee1722mc.num_packets; n++){
+    int n = 0;
+    for(n=0; n<ieee1722mc.num_packets; n++){
         cumulative_ipg_ns += wait_recv_ts_1722_mediaclockstream( &ieee1722mc, n );
     }
 
 
-    printf("ipg: %lld ns, period_usec: %lld\n", cumulative_ipg_ns, ieee1722mc.period_usecs );fflush(stdout);
+    printf("no: %d ipg: %lld ns, period_usec: %lld\n", n, cumulative_ipg_ns, ieee1722mc.period_usecs );fflush(stdout);
     float cumulative_ipg_us = cumulative_ipg_ns / 1000;
     if ( cumulative_ipg_us > ieee1722mc.period_usecs) {
         ret = 1;
