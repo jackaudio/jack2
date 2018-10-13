@@ -133,7 +133,7 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
 
         if( packet_num == (*ieee1722mc)->num_packets -1){
 
-            adjust_packet_time_ns = samples_in_packet / (*ieee1722mc)->sample_rate * 1000000000;
+            adjust_packet_time_ns = (uint64_t)( (float)samples_in_packet / (float)(*ieee1722mc)->sample_rate ) * 1000000000LL;
             fprintf(filepointer, "adjust time %lld ns\n", adjust_packet_time_ns);fflush(filepointer);
         }
 
