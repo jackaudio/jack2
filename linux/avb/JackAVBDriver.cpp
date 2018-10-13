@@ -182,7 +182,7 @@ int JackAVBPDriver::Read()
      *
      */
     //num_packets_even_odd ? num_packets_even_odd = 0 : num_packets_even_odd = 1;  // even = 0, odd = 1
-    int num_packets = (int)( ieee1722mc->period_size / 6 ) + 1; // + num_packets_even_odd;
+    int num_packets = (int)( ieee1722mc.period_size / 6 ) + 1; // + num_packets_even_odd;
 
 
     uint64_t cumulative_ipg_ns = 0;
@@ -193,9 +193,9 @@ int JackAVBPDriver::Read()
 
 
     jack_log("netxruns... duration: %lld ns", cumulative_ipg_ns );
+    float cumulative_ipg_us = cumulative_ipg_ns / 1000;
     if ( cumulative_ipg_us >= ieee1722mc.period_usecs) {
         ret = 1;
-        float cumulative_ipg_us = cumulative_ipg_ns / 1000;
         NotifyXRun(fBeginDateUst, cumulative_ipg_us);
         jack_error("netxruns... duration: %fms", cumulative_ipg_us / 1000);
     }
