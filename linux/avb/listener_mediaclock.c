@@ -117,7 +117,7 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
         if (clock_gettime(CLOCK_REALTIME, &sys_time)) {
             fprintf(filepointer, " Clockrealtime Error\n");fflush(filepointer);
         }
-        packet_arrival_time_ns = (sys_time.tv_sec*1000000000LL + sys_time.tv_usec*1000);
+        packet_arrival_time_ns = (sys_time.tv_sec*1000000000LL + sys_time.tv_usec);
         ipg_to_last_packet_ns = packet_arrival_time_ns - last_packet_time_ns;
         last_packet_time_ns = packet_arrival_time_ns;
 		fprintf(filepointer, "packet arrival time %lld ns\n", packet_arrival_time_ns);fflush(filepointer);
@@ -185,7 +185,7 @@ uint64_t mediaclock_listener_wait_recv( FILE* filepointer, ieee1722_avtp_driver_
     socklen_t slen_avb;
     char stream_packet[BUFLEN];
     if ((recv_len = recvfrom((*avtp_transport_socket_fds)->fd, stream_packet, BUFLEN, 0, (struct sockaddr *)(*si_other_avb), &slen_avb )) == -1){
-        fprintf(filepointer, "recvfrom %s", strerror(errno));fflush(filepointer);
+        fprintf(filepointer, "recvfrom %s\n", strerror(errno));fflush(filepointer);
     } else {
         if(
                 ((*ieee1722mc)->streamid8[0] == (uint8_t) stream_packet[18]) &&
