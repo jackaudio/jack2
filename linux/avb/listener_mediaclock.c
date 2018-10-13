@@ -48,7 +48,7 @@ void delete_avb_Mediaclock_Listener( FILE* filepointer, ieee1722_avtp_driver_sta
 {
 }
 
-uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc, struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds )
+uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc, struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds, int packet_num )
 {
     socklen_t slen_avb = sizeof(struct sockaddr_in);
     char stream_packet[BUFLEN];
@@ -130,20 +130,27 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
          *      6 or less samples per packet? =>
          *
          */
-        for( int s = avtp_hdr_len; s < avtp_hdr_len + bytes_per_stereo_channel; s += sizeof(uint32_t) ){
 
-            if(stream_packet[ s ] != 0x00){
-    //                                fprintf(filepointer,  "avb sample %d %x %x %x %x \n", s, avb_packet[ s ],
-    //                                                                                        avb_packet[ s + 1 ],
-    //                                                                                        avb_packet[ s + 2 ],
-    //                                                                                        avb_packet[ s + 3 ] );fflush(filepointer);
-                samples_in_packet++;
-            }
-        }
-
-        if( samples_in_packet < 6){
+        if( packet_num == (*ieee1722mc)->num_packets -1){
             adjust_packet_time_ns = samples_in_packet / (*ieee1722mc)->sample_rate * 1000000000;
         }
+
+
+//        for( int s = avtp_hdr_len; s < avtp_hdr_len + bytes_per_stereo_channel; s += sizeof(uint32_t) ){
+//
+//            if(stream_packet[ s ] != 0x00){
+//                                    fprintf(filepointer,  "avb sample %d %x %x %x %x \n", s, avb_packet[ s ],
+//                                                                                            avb_packet[ s + 1 ],
+//                                                                                            avb_packet[ s + 2 ],
+//                                                                                            avb_packet[ s + 3 ] );fflush(filepointer);
+//                samples_in_packet++;
+//            }
+//        }
+//
+//        if( samples_in_packet < 6){
+//            adjust_packet_time_ns = samples_in_packet / (*ieee1722mc)->sample_rate * 1000000000;
+//        }
+
 		fprintf(filepointer, "adjust time %lld ns\n", adjust_packet_time_ns);fflush(filepointer);
 
 
@@ -177,7 +184,7 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
 
 }
 
-uint64_t mediaclock_listener_wait_recv( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc, struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds )
+uint64_t mediaclock_listener_wait_recv( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc, struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds, int packet_num  )
 {
 	int recv_len=0;
 	int rc;
@@ -245,7 +252,7 @@ uint64_t mediaclock_listener_wait_recv( FILE* filepointer, ieee1722_avtp_driver_
 
 }
 
-uint64_t mediaclock_listener_poll_recv( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc, struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds )
+uint64_t mediaclock_listener_poll_recv( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc, struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds, int packet_num  )
 {
 	int recv_len=0;
 	int rc;

@@ -176,12 +176,11 @@ int JackAVBPDriver::Read()
     int ret = 0;
     JSList *node = ieee1722mc.capture_ports;
 
-    int num_packets = (int)( ieee1722mc.period_size / 6 ) + 1;
 
     uint64_t cumulative_ipg_ns = 0;
 
-    for(int n=0; n<num_packets; n++){
-        cumulative_ipg_ns += wait_recv_ts_1722_mediaclockstream( &ieee1722mc );
+    for(int n=0; n<ieee1722mc.num_packets; n++){
+        cumulative_ipg_ns += wait_recv_ts_1722_mediaclockstream( &ieee1722mc, n );
     }
 
 

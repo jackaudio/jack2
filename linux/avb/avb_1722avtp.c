@@ -486,7 +486,9 @@ int init_1722_driver( ieee1722_avtp_driver_state_t *ieee1722mc, const char* name
     ieee1722mc->period_size = period_size;
     ieee1722mc->period_usecs = (uint64_t) ((float)period_size / (float)sample_rate * 1000000);
 
-    fprintf(filepointer,"sample_rate: %d, period size: %d, period usec: %lld\n",ieee1722mc->sample_rate, ieee1722mc->period_size, ieee1722mc->period_usecs);fflush(filepointer);
+    ieee1722mc->num_packets = (int)( ieee1722mc->period_size / 6 ) + 1;
+
+    fprintf(filepointer,"sample_rate: %d, period size: %d, period usec: %lld, num_packets: %d\n",ieee1722mc->sample_rate, ieee1722mc->period_size, ieee1722mc->period_usecs, ieee1722mc->num_packets);fflush(filepointer);
 
     if( RETURN_VALUE_FAILURE == create_avb_Mediaclock_Listener(filepointer, &ieee1722mc, name,
                                    stream_id, destination_mac,
@@ -525,19 +527,19 @@ int startup_1722_driver( ieee1722_avtp_driver_state_t *ieee1722mc )
     }
 }
 
-uint64_t poll_recv_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc )
+uint64_t poll_recv_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc, int packet_num  )
 {
-    return mediaclock_listener_poll_recv( filepointer, &ieee1722mc, &si_other_avb, &avtp_transport_socket_fds );
+    return mediaclock_listener_poll_recv( filepointer, &ieee1722mc, &si_other_avb, &avtp_transport_socket_fds, packet_num  );
 }
 
-uint64_t wait_recv_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc )
+uint64_t wait_recv_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc, int packet_num  )
 {
-    return mediaclock_listener_wait_recv( filepointer, &ieee1722mc, &si_other_avb, &avtp_transport_socket_fds );
+    return mediaclock_listener_wait_recv( filepointer, &ieee1722mc, &si_other_avb, &avtp_transport_socket_fds, packet_num  );
 }
 
-uint64_t wait_recv_ts_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc )
+uint64_t wait_recv_ts_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc, int packet_num  )
 {
-    return mediaclock_listener_wait_recv_ts( filepointer, &ieee1722mc, &si_other_avb, &avtp_transport_socket_fds );
+    return mediaclock_listener_wait_recv_ts( filepointer, &ieee1722mc, &si_other_avb, &avtp_transport_socket_fds, packet_num  );
 }
 
 

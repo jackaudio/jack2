@@ -161,6 +161,7 @@ struct _ieee1722_avtp_driver_state {
 
     jack_nframes_t  period_size;
     jack_time_t	    period_usecs;
+    int             num_packets;
     int		    dont_htonl_floats;
     int		    always_deadline;
 
