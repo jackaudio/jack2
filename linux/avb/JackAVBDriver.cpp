@@ -90,7 +90,8 @@ JackAVBPDriver::JackAVBPDriver(const char* name, const char* alias, JackLockedEn
                   num_periods
                  );
 
-                 this->ieee1722mc.period_usecs = period_size / sample_rate * 1000000;
+
+
 }
 
 JackAVBPDriver::~JackAVBPDriver()
