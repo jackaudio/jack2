@@ -185,18 +185,19 @@ int JackAVBPDriver::Read()
     int num_packets = (int)( ieee1722mc->period_size / 6 ) + 1; // + num_packets_even_odd;
 
 
-    uint64_t cumulative_delay_ns = 0;
+    uint64_t cumulative_ipg_ns = 0;
+
     for(int n=0; n<num_packets; n++){
-        cumulative_delay_ns += wait_recv_1722_mediaclockstream( &ieee1722mc );
+        cumulative_ipg_ns += wait_recv_1722_mediaclockstream( &ieee1722mc );
     }
 
 
-    float cumulative_delay_us = cumulative_delay_ns / 1000;
-    jack_log("netxruns... duration: %fus", cumulative_delay_us);
-    if ( cumulative_delay_us >= ieee1722mc->period_usecs) {
+    jack_log("netxruns... duration: %lld ns", cumulative_ipg_ns );
+    if ( cumulative_ipg_us >= ieee1722mc->period_usecs) {
         ret = 1;
-        NotifyXRun(fBeginDateUst, cumulative_delay_us);
-        jack_error("netxruns... duration: %fms", cumulative_delay_us / 1000);
+        float cumulative_ipg_us = cumulative_ipg_ns / 1000;
+        NotifyXRun(fBeginDateUst, cumulative_ipg_us);
+        jack_error("netxruns... duration: %fms", cumulative_ipg_us / 1000);
     }
 
     JackDriver::CycleTakeBeginTime();
