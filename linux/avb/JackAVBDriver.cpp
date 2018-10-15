@@ -288,7 +288,8 @@ extern "C"
         desc = jack_driver_descriptor_construct("avb", JackDriverMaster, "IEEE 1722 AVTP slave backend component", &filler);
 
         value.ui = 1U;
-        jack_driver_descriptor_add_parameter(desc, &filler, "audio-ins", 'i', JackDriverParamUInt, &value, NULL, "Number of capture channels (defaults to 2)", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "audio-ins", 'i', JackDriverParamUInt, &value, NULL, "Number of capture channels (defaults to 1)", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "audio-outs", 'o', JackDriverParamUInt, &value, NULL, "Number of playback channels (defaults to 1)", NULL);
 
         value.ui = 48000U;
         jack_driver_descriptor_add_parameter(desc, &filler, "rate", 'r', JackDriverParamUInt, &value, NULL, "Sample rate", NULL);
