@@ -184,7 +184,7 @@ int JackAVBPDriver::Read()
     }
 
 
-    printf("no: %d ipg: %lld ns, period_usec: %lld\n", n, cumulative_ipg_ns, ieee1722mc.period_usecs );fflush(stdout);
+    //printf("no: %d ipg: %lld ns, period_usec: %lld\n", n, cumulative_ipg_ns, ieee1722mc.period_usecs );fflush(stdout);
     float cumulative_ipg_us = cumulative_ipg_ns / 1000;
     if ( cumulative_ipg_us > ieee1722mc.period_usecs) {
         ret = 1;
@@ -354,7 +354,7 @@ extern "C"
 
 
 
-                    printf("Stream ID: %s %02x %02x %02x %02x %02x %02x \n", param->value.str,
+                    printf("Destination MAC Address: %s %02x %02x %02x %02x %02x %02x \n", param->value.str,
                                                             dmac[0], dmac[1], dmac[2], dmac[3], dmac[4], dmac[5]);fflush(stdout);
                     break;
 
