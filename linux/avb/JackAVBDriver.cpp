@@ -241,7 +241,7 @@ JackAVBDriver::FreePorts ()
     }
     ieee1722mc.capture_ports = NULL;
 
-    JSList *node = ieee1722mc.playback_ports;
+    *node = ieee1722mc.playback_ports;
 
     while (node != NULL) {
         JSList *this_node = node;
