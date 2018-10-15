@@ -36,12 +36,12 @@ using namespace std;
  */
 namespace Jack
 {
-JackAVBPDriver::JackAVBPDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
+JackAVBDriver::JackAVBDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
                                        char* stream_id, char* destination_mac, char* eth_dev,
                                        int sample_rate, int period_size, int num_periods)
     : JackWaiterDriver(name, alias, engine, table)
 {
-    jack_log("JackAVBPDriver::JackAVBPDriver Ethernet Device %s", eth_dev);
+    jack_log("JackAVBDriver::JackAVBPDriver Ethernet Device %s", eth_dev);
 
     jack_log("Stream ID: %02x %02x %02x %02x %02x %02x %02x %02x",
                                         (uint8_t) stream_id[0],
@@ -61,7 +61,7 @@ JackAVBPDriver::JackAVBPDriver(const char* name, const char* alias, JackLockedEn
                                         (uint8_t) destination_mac[4],
                                         (uint8_t) destination_mac[5]);
 
-    printf("JackAVBPDriver::JackAVBPDriver Ethernet Device %s\n", eth_dev);
+    printf("JackAVBDriver::JackAVBPDriver Ethernet Device %s\n", eth_dev);
     printf("Stream ID: %02x %02x %02x %02x %02x %02x %02x %02x\n",
                                                                 (uint8_t) stream_id[0],
                                                                 (uint8_t) stream_id[1],
@@ -101,7 +101,7 @@ JackAVBPDriver::~JackAVBPDriver()
 
 //open, close, attach and detach------------------------------------------------------
 
-int JackAVBPDriver::Close()
+int JackAVBDriver::Close()
 {
     // Generic audio driver close
     int res = JackWaiterDriver::Close();
@@ -112,7 +112,7 @@ int JackAVBPDriver::Close()
 }
 
 
-int JackAVBPDriver::AllocPorts()
+int JackAVBDriver::AllocPorts()
 {
     jack_port_id_t port_index;
     char buf[64];
@@ -125,16 +125,29 @@ int JackAVBPDriver::AllocPorts()
         jack_error("driver: cannot register port for %s", buf);
         return -1;
     }
+
+    ieee1722mc.capture_ports = jack_slist_append (ieee1722mc.capture_ports, (void *)(intptr_t)port_index);
+
+    memset(buf, 0, sizeof(buf));
+    snprintf (buf, sizeof(buf) - 1, "system:playback_1");
+
+    if (fEngine->PortRegister(fClientControl.fRefNum, buf, JACK_DEFAULT_AUDIO_TYPE,
+                                    PlaybackDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
+        jack_error("driver: cannot register port for %s", buf);
+        return -1;
+    }
+
+    ieee1722mc.playback_ports = jack_slist_append (ieee1722mc.playback_ports, (void *)(intptr_t)port_index);
+
     //port = fGraphManager->GetPort(port_index);
 
 
-    ieee1722mc.capture_ports = jack_slist_append (ieee1722mc.capture_ports, (void *)(intptr_t)port_index);
 
     return 0;
 }
 
 //init and restart--------------------------------------------------------------------
-bool JackAVBPDriver::Initialize()
+bool JackAVBDriver::Initialize()
 {
     jack_log("JackAVBDriver::Init");
 
@@ -171,7 +184,7 @@ bool JackAVBPDriver::Initialize()
 
 //driver processes--------------------------------------------------------------------
 
-int JackAVBPDriver::Read()
+int JackAVBDriver::Read()
 {
     int ret = 0;
     JSList *node = ieee1722mc.capture_ports;
@@ -209,13 +222,13 @@ int JackAVBPDriver::Read()
     return 0;
 }
 
-int JackAVBPDriver::Write()
+int JackAVBDriver::Write()
 {
     return 0;
 }
 
 void
-JackAVBPDriver::FreePorts ()
+JackAVBDriver::FreePorts ()
 {
     JSList *node = ieee1722mc.capture_ports;
 
@@ -228,6 +241,16 @@ JackAVBPDriver::FreePorts ()
     }
     ieee1722mc.capture_ports = NULL;
 
+    JSList *node = ieee1722mc.playback_ports;
+
+    while (node != NULL) {
+        JSList *this_node = node;
+        jack_port_id_t port_index = (jack_port_id_t)(intptr_t) node->data;
+        node = jack_slist_remove_link(node, this_node);
+        jack_slist_free_1(this_node);
+        fEngine->PortUnRegister(fClientControl.fRefNum, port_index);
+    }
+    ieee1722mc.playback_ports = NULL;
 }
 
 //driver loader-----------------------------------------------------------------------
@@ -290,7 +313,7 @@ extern "C"
 
     SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)
     {
-        jack_nframes_t sample_rate = 48000;
+        unsigned int sample_rate = 48000;
         jack_nframes_t period_size = 64;
         unsigned int capture_ports = 1;
         int num_periods = 2;
@@ -363,7 +386,7 @@ extern "C"
 
         try {
             Jack::JackDriverClientInterface* driver = new Jack::JackWaitThreadedDriver (
-                new Jack::JackAVBPDriver("system", "avb_mc", engine, table, sid, dmac, eth_dev,
+                new Jack::JackAVBDriver("system", "avb_mc", engine, table, sid, dmac, eth_dev,
                                              sample_rate, period_size, num_periods));
 
             if (driver->Open(period_size, sample_rate, 1, 1, capture_ports, 0,

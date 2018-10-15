@@ -30,7 +30,7 @@ namespace Jack
 \Brief This class describes the Net Backend
 */
 
-class JackAVBPDriver : public JackWaiterDriver
+class JackAVBDriver : public JackWaiterDriver
 {
     private:
 
@@ -39,10 +39,10 @@ class JackAVBPDriver : public JackWaiterDriver
 
     public:
 
-        JackAVBPDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
+        JackAVBDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
                            char* stream_id, char* destination_mac, char* eth_dev,
                            int sample_rate, int period_size, int num_periods);
-        virtual ~JackAVBPDriver();
+        virtual ~JackAVBDriver();
 
         int Close();
         int Attach(){return 0;}
