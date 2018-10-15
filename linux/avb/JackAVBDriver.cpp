@@ -94,7 +94,7 @@ JackAVBDriver::JackAVBDriver(const char* name, const char* alias, JackLockedEngi
 
 }
 
-JackAVBPDriver::~JackAVBPDriver()
+JackAVBDriver::~JackAVBDriver()
 {
     // No destructor yet.
 }
