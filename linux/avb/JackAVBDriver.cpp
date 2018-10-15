@@ -224,6 +224,14 @@ int JackAVBDriver::Read()
 
 int JackAVBDriver::Write()
 {
+    JSList *node = ieee1722mc.playback_ports;
+    while (node != NULL) {
+        jack_port_id_t port_index = (jack_port_id_t)(intptr_t) node->data;
+        JackPort *port = fGraphManager->GetPort(port_index);
+        jack_default_audio_sample_t* buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(port_index, fEngineControl->fBufferSize);
+        //memcpy(buf, 0, ieee1722mc.period_size * sizeof(jack_default_audio_sample_t));
+        node = jack_slist_next (node);
+    }
     return 0;
 }
 
