@@ -128,14 +128,6 @@ main ( int argc, char *argv[] )
 
     jack_on_shutdown ( client, jack_shutdown, 0 );
 
-	jack_position_t	pos;
-	jack_transport_state_t jstate;
-	jstate = jack_transport_query ( client, &pos );
-
-	printf("no transport %d", (int)jstate);
-	
-
-
     /* create two ports pairs*/
     input_ports = ( jack_port_t** ) calloc ( 2, sizeof ( jack_port_t* ) );
     output_ports = ( jack_port_t** ) calloc ( 2, sizeof ( jack_port_t* ) );
