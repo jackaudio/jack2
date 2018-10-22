@@ -129,12 +129,9 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
         int bytes_per_stereo_channel = 12 /*CHANNEL_COUNT_STEREO * AVTP_SAMPLES_PER_CHANNEL_PER_PACKET = 2*6 */ * sizeof(uint32_t);
         int avtp_hdr_len = ETHERNET_HDR_LENGTH + 32 /*AVB_HEADER_LENGTH*/;
 
-
-
-
 //        fprintf(filepointer, "stream packet!\n");fflush(filepointer);
 
-        /* Packet Arrival Time */
+        /* Packet Arrival Time from Device */
         cmsg = CMSG_FIRSTHDR(&msg);
         while( cmsg != NULL ) {
             if( cmsg->cmsg_level == SOL_SOCKET && cmsg->cmsg_type == SO_TIMESTAMPING ) {
@@ -150,15 +147,15 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
             cmsg = CMSG_NXTHDR(&msg,cmsg);
         }
 
+        /* fallback to system time */
+        if( packet_arrival_time_ns == 0 ){
+            struct timeval sys_time;
 
-//        struct timeval sys_time;
-//
-//        if (clock_gettime(CLOCK_REALTIME, &sys_time)) {
-//            fprintf(filepointer, " Clockrealtime Error\n");fflush(filepointer);
-//        }
-//        packet_arrival_time_ns = (sys_time.tv_sec*1000000000LL + sys_time.tv_usec);
-
-
+            if (clock_gettime(CLOCK_REALTIME, &sys_time)) {
+                fprintf(filepointer, " Clockrealtime Error\n");fflush(filepointer);
+            }
+            packet_arrival_time_ns = (sys_time.tv_sec*1000000000LL + sys_time.tv_usec);
+        }
 
 
         ipg_to_last_packet_ns = packet_arrival_time_ns - last_packet_time_ns;
@@ -166,40 +163,11 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
 		fprintf(filepointer, "packet arrival time %lld ns, ipg %lld ns\n", packet_arrival_time_ns, ipg_to_last_packet_ns);fflush(filepointer);
 
 
-
-        /*
-         *
-         *      6 or less samples per packet? =>
-         *
-         */
-
         if( packet_num == (*ieee1722mc)->num_packets -1){
 
             adjust_packet_time_ns = (uint64_t) ( ( (float)((*ieee1722mc)->period_size % 6 ) / (float)(*ieee1722mc)->sample_rate ) * 1000000000LL);
 //            fprintf(filepointer, "adjust time %lld ns\n", adjust_packet_time_ns);fflush(filepointer);
         }
-
-
-//        for( int s = avtp_hdr_len; s < avtp_hdr_len + bytes_per_stereo_channel; s += sizeof(uint32_t) ){
-//
-//            if(stream_packet[ s ] != 0x00){
-//                                    fprintf(filepointer,  "avb sample %d %x %x %x %x \n", s, avb_packet[ s ],
-//                                                                                            avb_packet[ s + 1 ],
-//                                                                                            avb_packet[ s + 2 ],
-//                                                                                            avb_packet[ s + 3 ] );fflush(filepointer);
-//                samples_in_packet++;
-//            }
-//        }
-//
-//        if( samples_in_packet < 6){
-//            adjust_packet_time_ns = samples_in_packet / (*ieee1722mc)->sample_rate * 1000000000;
-//        }
-
-
-
-
-
-
 
         return ipg_to_last_packet_ns - adjust_packet_time_ns;
     }
