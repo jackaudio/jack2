@@ -70,7 +70,6 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
 //        int           msg_flags;      /* flags on received message */
 //    };
 
-
 	struct msghdr msg;
 	struct cmsghdr *cmsg;
 	struct sockaddr_ll remote;
@@ -80,12 +79,9 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
 		char control[256];
 	} control;
 
-
 	memset( &msg, 0, sizeof( msg ));
-
 	msg.msg_iov = &sgentry;
 	msg.msg_iovlen = 1;
-
 	sgentry.iov_base = stream_packet;
 	sgentry.iov_len = BUFLEN;
 
@@ -94,10 +90,6 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
 	msg.msg_namelen = sizeof( remote );
 	msg.msg_control = &control;
 	msg.msg_controllen = sizeof(control);
-
-
-
-
 
 //	struct iovec iov = { stream_packet, BUFLEN };
 //	struct msghdr msg = { (void*)((struct sockaddr *)(*si_other_avb)), slen_avb, &iov, 1, NULL, 0, 0 };
@@ -173,7 +165,8 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
                 struct timespec *ts_device, *ts_system;
                 ts_system = ((struct timespec *) CMSG_DATA(cmsg)) + 1;
                 ts_device = ts_system + 1;
-                fprintf(filepointer, "Timestamp %ld sec %ld nanosec\n", ts_system->tv_sec, ts_system->tv_nsec);fflush(filepointer);
+                fprintf(filepointer, "System %lld sec %lld nanosec\n", ts_system->tv_sec, ts_system->tv_nsec);fflush(filepointer);
+                fprintf(filepointer, "Device %lld sec %lld nanosec\n", ts_device->tv_sec, ts_device->tv_nsec);fflush(filepointer);
 
                 break;
             }
