@@ -235,14 +235,14 @@ bool JackSocketServerChannel::Execute()
                 } else if (fPollTable[i].revents & POLLIN) {
                     JackClientSocket* socket = fSocketTable[fd].second;
                     // Decode header
-                    JackRequest header;
-                    if (header.Read(socket) < 0) {
+                    JackRequest::RequestType type;
+                    if (JackRequest::ReadType(socket, type) < 0) {
                         jack_log("JackSocketServerChannel::Execute : cannot decode header");
                         ClientKill(fd);
                     // Decode request
                     } else {
                         // Result is not needed here
-                        fDecoder->HandleRequest(socket, header.fType);
+                        fDecoder->HandleRequest(socket, type);
                     }
                 }
             }
