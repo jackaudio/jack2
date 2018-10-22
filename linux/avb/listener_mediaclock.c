@@ -148,7 +148,7 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
         }
 
         /* fallback to system time */
-        if( packet_arrival_time_ns == 0 ){
+        if( 0 == packet_arrival_time_ns ){
             struct timeval sys_time;
 
             if (clock_gettime(CLOCK_REALTIME, &sys_time)) {
@@ -160,7 +160,7 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
 
         ipg_to_last_packet_ns = packet_arrival_time_ns - last_packet_time_ns;
         last_packet_time_ns = packet_arrival_time_ns;
-		fprintf(filepointer, "packet arrival time %lld ns, ipg %lld ns\n", packet_arrival_time_ns, ipg_to_last_packet_ns);fflush(filepointer);
+//		fprintf(filepointer, "packet arrival time %lld ns, ipg %lld ns\n", packet_arrival_time_ns, ipg_to_last_packet_ns);fflush(filepointer);
 
 
         if( packet_num == (*ieee1722mc)->num_packets -1){
