@@ -105,9 +105,11 @@ struct JackRequest
     virtual ~JackRequest()
     {}
 
-    virtual int Read(detail::JackChannelTransactionInterface* trans)
+    static int ReadType(detail::JackChannelTransactionInterface* trans, RequestType& type)
     {
-        return trans->Read(&fType, sizeof(RequestType));
+        type = (RequestType)0;
+        CheckRes(trans->Read(&type, sizeof(fType)));
+        return 0;
     }
 
     virtual int Write(detail::JackChannelTransactionInterface* trans) { return -1; }

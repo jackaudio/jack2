@@ -83,8 +83,8 @@ bool JackClientPipeThread::Execute()
     try {
 
         jack_log("JackClientPipeThread::Execute %x", this);
-        JackRequest header;
-        int res = header.Read(fPipe);
+        JackRequest::RequestType type;
+        int res = JackRequest::ReadType(fPipe, type);
         bool ret = true;
 
         // Lock the global mutex
@@ -98,7 +98,7 @@ bool JackClientPipeThread::Execute()
             ClientKill();
             ret = false;
         // Decode request
-        } else if (fDecoder->HandleRequest(fPipe, header.fType) < 0) {
+        } else if (fDecoder->HandleRequest(fPipe, type) < 0) {
             ret = false;
         }
 
