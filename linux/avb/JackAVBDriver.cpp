@@ -305,7 +305,7 @@ extern "C"
 
         desc = jack_driver_descriptor_construct("avb", JackDriverMaster, "IEEE 1722 AVTP slave backend component", &filler);
 
-        value.ui = 1U;
+        value.ui = 2U;
         jack_driver_descriptor_add_parameter(desc, &filler, "audio-ins", 'i', JackDriverParamUInt, &value, NULL, "Number of capture channels (defaults to 1)", NULL);
         jack_driver_descriptor_add_parameter(desc, &filler, "audio-outs", 'o', JackDriverParamUInt, &value, NULL, "Number of playback channels (defaults to 1)", NULL);
 
@@ -334,7 +334,8 @@ extern "C"
     {
         unsigned int sample_rate = 48000;
         jack_nframes_t period_size = 64;
-        unsigned int capture_ports = 1;
+        unsigned int capture_ports = 2;
+        unsigned int playback_ports = 2;
         int num_periods = 2;
         char sid[8];
         char dmac[6];
@@ -354,6 +355,9 @@ extern "C"
             switch (param->character) {
                 case 'i':
                     capture_ports = param->value.ui;
+                    break;
+                case 'o':
+                    playback_ports = param->value.ui;
                     break;
 
                 case 'r':
@@ -408,7 +412,7 @@ extern "C"
                 new Jack::JackAVBDriver("system", "avb_mc", engine, table, sid, dmac, eth_dev,
                                              sample_rate, period_size, num_periods));
 
-            if (driver->Open(period_size, sample_rate, 1, 1, 1, 1,
+            if (driver->Open(period_size, sample_rate, 1, 1, capture_ports, playback_ports,
                                 0, "from_master", "to_master", 0, 0) == 0) {
                 return driver;
             } else {
