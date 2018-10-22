@@ -115,7 +115,7 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
 
 
 
-        struct cmsghdr *cmsg = (struct cmsghdr *)malloc(sizeof(struct cmsghdr));
+        struct cmsghdr *cmsg;// = (struct cmsghdr *)malloc(sizeof(struct cmsghdr));
         cmsg = CMSG_FIRSTHDR(&msg);
         fprintf(filepointer, "stream packet! %d %d %d\n", cmsg->cmsg_len, cmsg->cmsg_level, cmsg->cmsg_type);fflush(filepointer);
         for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL; cmsg = CMSG_NXTHDR(&msg, cmsg)){
