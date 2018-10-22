@@ -71,12 +71,38 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
 //    };
 
 
-    fprintf(filepointer, "test 1\n");fflush(filepointer);
-	struct iovec iov = { stream_packet, BUFLEN };
-    fprintf(filepointer, "test 2\n");fflush(filepointer);
-	struct msghdr msg = { (void*)((struct sockaddr *)(*si_other_avb)), slen_avb, &iov, 1, NULL, 0, 0 };
+	struct msghdr msg;
+	struct cmsghdr *cmsg;
+	struct sockaddr_ll remote;
+	struct iovec sgentry;
+	struct {
+		struct cmsghdr cm;
+		char control[256];
+	} control;
 
-    fprintf(filepointer, "test 3\n");fflush(filepointer);
+
+	memset( &msg, 0, sizeof( msg ));
+
+	msg.msg_iov = &sgentry;
+	msg.msg_iovlen = 1;
+
+	sgentry.iov_base = stream_packet;
+	sgentry.iov_len = BUFLEN;
+
+	memset( &remote, 0, sizeof(remote));
+	msg.msg_name = (caddr_t) &remote;
+	msg.msg_namelen = sizeof( remote );
+	msg.msg_control = &control;
+	msg.msg_controllen = sizeof(control);
+
+
+
+
+
+//	struct iovec iov = { stream_packet, BUFLEN };
+//	struct msghdr msg = { (void*)((struct sockaddr *)(*si_other_avb)), slen_avb, &iov, 1, NULL, 0, 0 };
+
+
 	int status = recvmsg((*avtp_transport_socket_fds)->fd, &msg, NULL);
 
 	if (status == 0) {
@@ -119,27 +145,40 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
 
 
         fprintf(filepointer, "stream packet!\n");fflush(filepointer);
-        struct cmsghdr *cmsg;// = (struct cmsghdr *)malloc(sizeof(struct cmsghdr));
+//        struct cmsghdr *cmsg;// = (struct cmsghdr *)malloc(sizeof(struct cmsghdr));
+//        cmsg = CMSG_FIRSTHDR(&msg);
+//        fprintf(filepointer, "%d %d %d\n", cmsg->cmsg_len, cmsg->cmsg_level, cmsg->cmsg_type);fflush(filepointer);
+//        for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL; cmsg = CMSG_NXTHDR(&msg, cmsg)){
+//            fprintf(filepointer, "stream packet!: %d %d\n", cmsg->cmsg_level, cmsg->cmsg_type);fflush(filepointer);
+//            if (cmsg->cmsg_level != SOL_SOCKET)
+//                continue;
+//            switch (cmsg->cmsg_type){
+//                case SO_TIMESTAMPING:{
+//                        struct timespec* stamp = (struct timespec*)CMSG_DATA(cmsg); // timestamp is found
+//                        fprintf(filepointer, "Timestamp %ld sec %ld nanosec\n", stamp->tv_sec, stamp->tv_nsec);fflush(filepointer);
+//                        return 0;
+//                    break;
+//                }
+//                default:
+//                        fprintf(filepointer, "no timestamp\n");fflush(filepointer);
+//                    break;
+//            }
+//        }
+
+
+        // Retrieve the timestamp
         cmsg = CMSG_FIRSTHDR(&msg);
-        fprintf(filepointer, "%d %d %d\n", cmsg->cmsg_len, cmsg->cmsg_level, cmsg->cmsg_type);fflush(filepointer);
-        for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL; cmsg = CMSG_NXTHDR(&msg, cmsg)){
-            fprintf(filepointer, "stream packet!: %d %d\n", cmsg->cmsg_level, cmsg->cmsg_type);fflush(filepointer);
-            if (cmsg->cmsg_level != SOL_SOCKET)
-                continue;
-            switch (cmsg->cmsg_type){
-                case SO_TIMESTAMPING:{
-                        struct timespec* stamp = (struct timespec*)CMSG_DATA(cmsg); // timestamp is found
-                        fprintf(filepointer, "Timestamp %ld sec %ld nanosec\n", stamp->tv_sec, stamp->tv_nsec);fflush(filepointer);
-                        return 0;
-                    break;
-                }
-                default:
-                        fprintf(filepointer, "no timestamp\n");fflush(filepointer);
-                    break;
+        while( cmsg != NULL ) {
+            if( cmsg->cmsg_level == SOL_SOCKET && cmsg->cmsg_type == SO_TIMESTAMPING ) {
+                struct timespec *ts_device, *ts_system;
+                ts_system = ((struct timespec *) CMSG_DATA(cmsg)) + 1;
+                ts_device = ts_system + 1;
+                fprintf(filepointer, "Timestamp %ld sec %ld nanosec\n", ts_system->tv_sec, ts_system->tv_nsec);fflush(filepointer);
+
+                break;
             }
+            cmsg = CMSG_NXTHDR(&msg,cmsg);
         }
-
-
 
 
         struct timeval sys_time;
