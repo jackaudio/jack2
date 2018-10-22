@@ -91,10 +91,6 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
 	msg.msg_control = &control;
 	msg.msg_controllen = sizeof(control);
 
-//	struct iovec iov = { stream_packet, BUFLEN };
-//	struct msghdr msg = { (void*)((struct sockaddr *)(*si_other_avb)), slen_avb, &iov, 1, NULL, 0, 0 };
-
-
 	int status = recvmsg((*avtp_transport_socket_fds)->fd, &msg, NULL);
 
 	if (status == 0) {
@@ -137,36 +133,17 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
 
 
         fprintf(filepointer, "stream packet!\n");fflush(filepointer);
-//        struct cmsghdr *cmsg;// = (struct cmsghdr *)malloc(sizeof(struct cmsghdr));
-//        cmsg = CMSG_FIRSTHDR(&msg);
-//        fprintf(filepointer, "%d %d %d\n", cmsg->cmsg_len, cmsg->cmsg_level, cmsg->cmsg_type);fflush(filepointer);
-//        for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL; cmsg = CMSG_NXTHDR(&msg, cmsg)){
-//            fprintf(filepointer, "stream packet!: %d %d\n", cmsg->cmsg_level, cmsg->cmsg_type);fflush(filepointer);
-//            if (cmsg->cmsg_level != SOL_SOCKET)
-//                continue;
-//            switch (cmsg->cmsg_type){
-//                case SO_TIMESTAMPING:{
-//                        struct timespec* stamp = (struct timespec*)CMSG_DATA(cmsg); // timestamp is found
-//                        fprintf(filepointer, "Timestamp %ld sec %ld nanosec\n", stamp->tv_sec, stamp->tv_nsec);fflush(filepointer);
-//                        return 0;
-//                    break;
-//                }
-//                default:
-//                        fprintf(filepointer, "no timestamp\n");fflush(filepointer);
-//                    break;
-//            }
-//        }
 
-
-        // Retrieve the timestamp
+        /* Packet Arrival Time */
         cmsg = CMSG_FIRSTHDR(&msg);
         while( cmsg != NULL ) {
             if( cmsg->cmsg_level == SOL_SOCKET && cmsg->cmsg_type == SO_TIMESTAMPING ) {
                 struct timespec *ts_device, *ts_system;
                 ts_system = ((struct timespec *) CMSG_DATA(cmsg)) + 1;
                 ts_device = ts_system + 1;
-                fprintf(filepointer, "System %lld sec %lld nanosec\n", ts_system->tv_sec, ts_system->tv_nsec);fflush(filepointer);
-                fprintf(filepointer, "Device %lld sec %lld nanosec\n", ts_device->tv_sec, ts_device->tv_nsec);fflush(filepointer);
+//                fprintf(filepointer, "Device %lld sec %lld nanosec\n", ts_device->tv_sec, ts_device->tv_nsec);fflush(filepointer);
+
+                packet_arrival_time_ns =  (ts_device->tv_sec*1000000000LL + ts_device->tv_nsec);
 
                 break;
             }
@@ -174,12 +151,16 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
         }
 
 
-        struct timeval sys_time;
+//        struct timeval sys_time;
+//
+//        if (clock_gettime(CLOCK_REALTIME, &sys_time)) {
+//            fprintf(filepointer, " Clockrealtime Error\n");fflush(filepointer);
+//        }
+//        packet_arrival_time_ns = (sys_time.tv_sec*1000000000LL + sys_time.tv_usec);
 
-        if (clock_gettime(CLOCK_REALTIME, &sys_time)) {
-            fprintf(filepointer, " Clockrealtime Error\n");fflush(filepointer);
-        }
-        packet_arrival_time_ns = (sys_time.tv_sec*1000000000LL + sys_time.tv_usec);
+
+
+
         ipg_to_last_packet_ns = packet_arrival_time_ns - last_packet_time_ns;
         last_packet_time_ns = packet_arrival_time_ns;
 //		fprintf(filepointer, "packet arrival time %lld ns, ipg %lld ns\n", packet_arrival_time_ns, ipg_to_last_packet_ns);fflush(filepointer);
