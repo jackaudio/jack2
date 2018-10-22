@@ -71,9 +71,12 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
 //    };
 
 
+    fprintf(filepointer, "test 1\n");fflush(filepointer);
 	struct iovec iov = { stream_packet, BUFLEN };
+    fprintf(filepointer, "test 2\n");fflush(filepointer);
 	struct msghdr msg = { (void*)((struct sockaddr *)(*si_other_avb)), slen_avb, &iov, 1, NULL, 0, 0 };
 
+    fprintf(filepointer, "test 3\n");fflush(filepointer);
 	int status = recvmsg((*avtp_transport_socket_fds)->fd, &msg, NULL);
 
 	if (status == 0) {
@@ -115,9 +118,10 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
 
 
 
+        fprintf(filepointer, "stream packet!\n");fflush(filepointer);
         struct cmsghdr *cmsg;// = (struct cmsghdr *)malloc(sizeof(struct cmsghdr));
         cmsg = CMSG_FIRSTHDR(&msg);
-        fprintf(filepointer, "stream packet! %d %d %d\n", cmsg->cmsg_len, cmsg->cmsg_level, cmsg->cmsg_type);fflush(filepointer);
+        fprintf(filepointer, "%d %d %d\n", cmsg->cmsg_len, cmsg->cmsg_level, cmsg->cmsg_type);fflush(filepointer);
         for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL; cmsg = CMSG_NXTHDR(&msg, cmsg)){
             fprintf(filepointer, "stream packet!: %d %d\n", cmsg->cmsg_level, cmsg->cmsg_type);fflush(filepointer);
             if (cmsg->cmsg_level != SOL_SOCKET)
