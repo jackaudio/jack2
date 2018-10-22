@@ -112,6 +112,32 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
         int bytes_per_stereo_channel = 12 /*CHANNEL_COUNT_STEREO * AVTP_SAMPLES_PER_CHANNEL_PER_PACKET = 2*6 */ * sizeof(uint32_t);
         int avtp_hdr_len = ETHERNET_HDR_LENGTH + 32 /*AVB_HEADER_LENGTH*/;
 
+
+
+
+        struct cmsghdr *cmsg = (struct cmsghdr *)malloc(sizeof(struct cmsghdr));
+        cmsg = CMSG_FIRSTHDR(&msg);
+        fprintf(filepointer, "stream packet! %d %d %d\n", cmsg->cmsg_len, cmsg->cmsg_level, cmsg->cmsg_type);fflush(filepointer);
+        for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL; cmsg = CMSG_NXTHDR(&msg, cmsg)){
+            fprintf(filepointer, "stream packet!: %d %d\n", cmsg->cmsg_level, cmsg->cmsg_type);fflush(filepointer);
+            if (cmsg->cmsg_level != SOL_SOCKET)
+                continue;
+            switch (cmsg->cmsg_type){
+                case SO_TIMESTAMPING:{
+                        struct timespec* stamp = (struct timespec*)CMSG_DATA(cmsg); // timestamp is found
+                        fprintf(filepointer, "Timestamp %ld sec %ld nanosec\n", stamp->tv_sec, stamp->tv_nsec);fflush(filepointer);
+                        return 0;
+                    break;
+                }
+                default:
+                        fprintf(filepointer, "no timestamp\n");fflush(filepointer);
+                    break;
+            }
+        }
+
+
+
+
         struct timeval sys_time;
 
         if (clock_gettime(CLOCK_REALTIME, &sys_time)) {
@@ -155,26 +181,6 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
 
 
 
-
-//        struct cmsghdr *cmsg = (struct cmsghdr *)malloc(sizeof(struct cmsghdr));
-//        cmsg = CMSG_FIRSTHDR(&msg);
-//        fprintf(filepointer, "stream packet! %d %d %d\n", cmsg->cmsg_len, cmsg->cmsg_level, cmsg->cmsg_type);fflush(filepointer);
-//        for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL; cmsg = CMSG_NXTHDR(&msg, cmsg)){
-//            fprintf(filepointer, "stream packet!: %d %d\n", cmsg->cmsg_level, cmsg->cmsg_type);fflush(filepointer);
-//            if (cmsg->cmsg_level != SOL_SOCKET)
-//                continue;
-//            switch (cmsg->cmsg_type){
-//                case SO_TIMESTAMPING:{
-//                        struct timespec* stamp = (struct timespec*)CMSG_DATA(cmsg); // timestamp is found
-//                        fprintf(filepointer, "Timestamp %ld sec %ld nanosec\n", stamp->tv_sec, stamp->tv_nsec);fflush(filepointer);
-//                        return 0;
-//                    break;
-//                }
-//                default:
-//                        fprintf(filepointer, "no timestamp\n");fflush(filepointer);
-//                    break;
-//            }
-//        }
 
 
 
