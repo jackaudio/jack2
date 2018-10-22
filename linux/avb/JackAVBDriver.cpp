@@ -408,7 +408,7 @@ extern "C"
                 new Jack::JackAVBDriver("system", "avb_mc", engine, table, sid, dmac, eth_dev,
                                              sample_rate, period_size, num_periods));
 
-            if (driver->Open(period_size, sample_rate, 1, 1, capture_ports, 0,
+            if (driver->Open(period_size, sample_rate, 1, 1, 1, 1,
                                 0, "from_master", "to_master", 0, 0) == 0) {
                 return driver;
             } else {
