@@ -109,7 +109,7 @@ int create_RAW_AVB_Transport_Socket( FILE* filepointer, int* raw_transport_socke
 	/* Set Timestamping Option => requires recvmsg to be used => timestamp in ancillary data */
     int timestamp_flags = 0;
 
-//	timestamp_flags |= SOF_TIMESTAMPING_TX_HARDWARE;
+	timestamp_flags |= SOF_TIMESTAMPING_TX_HARDWARE;
 	timestamp_flags |= SOF_TIMESTAMPING_RX_HARDWARE;
 	timestamp_flags |= SOF_TIMESTAMPING_SYS_HARDWARE;
 	timestamp_flags |= SOF_TIMESTAMPING_RAW_HARDWARE;
