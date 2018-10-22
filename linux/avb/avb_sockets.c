@@ -106,37 +106,41 @@ int create_RAW_AVB_Transport_Socket( FILE* filepointer, int* raw_transport_socke
 	}
 
 
-//	/* Set Timestamping Option => requires recvmsg to be used => timestamp in ancillary data */
-//    int timestamp_flags = 0;
-//	timestamp_flags |= SOF_TIMESTAMPING_RX_HARDWARE;
-//	timestamp_flags |= SOF_TIMESTAMPING_SYS_HARDWARE;
-//	timestamp_flags |= SOF_TIMESTAMPING_RAW_HARDWARE;
-//
-//
-//	struct hwtstamp_config hwconfig;
-//	memset( &hwconfig, 0, sizeof( hwconfig ));
-//	hwconfig.rx_filter = HWTSTAMP_FILTER_ALL;
-//	hwconfig.tx_type = HWTSTAMP_TX_OFF;
-//
-//	struct ifreq hwtstamp;
-//	memset((char*)&hwtstamp, 0, sizeof(struct ifreq));
-//	strncpy(hwtstamp.ifr_name, ifr.ifr_name, IFNAMSIZ-1);
-//	hwtstamp.ifr_data = (void *) &hwconfig;
-//
-//	if( ioctl( *raw_transport_socket, SIOCSHWTSTAMP, &hwtstamp ) == -1 ) {
-//        fprintf(filepointer,  "[RAW TRANSPORT] ioctl timestamping failed %d %s \n", errno, strerror(errno));fflush(filepointer);
-//		close(*raw_transport_socket);
-//		return RETURN_VALUE_FAILURE;
-//	}
-//
-//
-//	if (setsockopt(*raw_transport_socket, SOL_SOCKET, SO_TIMESTAMPING, &timestamp_flags, sizeof(timestamp_flags) ) == -1) {
-//		fprintf(filepointer,  "[RAW TRANSPORT] setsockopt timestamping failed %d %s \n", errno, strerror(errno));fflush(filepointer);
-//		close(*raw_transport_socket);
-//		return RETURN_VALUE_FAILURE;
-//	} else {
-//		fprintf(filepointer,  "[RAW TRANSPORT] Timestamp Socket \n");fflush(filepointer);
-//	}
+	/* Set Timestamping Option => requires recvmsg to be used => timestamp in ancillary data */
+    int timestamp_flags = 0;
+
+//	timestamp_flags |= SOF_TIMESTAMPING_TX_HARDWARE;
+	timestamp_flags |= SOF_TIMESTAMPING_RX_HARDWARE;
+	timestamp_flags |= SOF_TIMESTAMPING_SYS_HARDWARE;
+	timestamp_flags |= SOF_TIMESTAMPING_RAW_HARDWARE;
+
+
+	struct hwtstamp_config hwconfig;
+	memset( &hwconfig, 0, sizeof( hwconfig ));
+	hwconfig.rx_filter = HWTSTAMP_FILTER_ALL;
+	hwconfig.tx_type = HWTSTAMP_TX_OFF;
+//	hwconfig.tx_type = HWTSTAMP_TX_ON;
+
+
+	struct ifreq hwtstamp;
+	memset((char*)&hwtstamp, 0, sizeof(struct ifreq));
+	strncpy(hwtstamp.ifr_name, ifr.ifr_name, IFNAMSIZ-1);
+	hwtstamp.ifr_data = (void *) &hwconfig;
+
+	if( ioctl( *raw_transport_socket, SIOCSHWTSTAMP, &hwtstamp ) == -1 ) {
+        fprintf(filepointer,  "[RAW TRANSPORT] ioctl timestamping failed %d %s \n", errno, strerror(errno));fflush(filepointer);
+		close(*raw_transport_socket);
+		return RETURN_VALUE_FAILURE;
+	}
+
+
+	if (setsockopt(*raw_transport_socket, SOL_SOCKET, SO_TIMESTAMPING, &timestamp_flags, sizeof(timestamp_flags) ) == -1) {
+		fprintf(filepointer,  "[RAW TRANSPORT] setsockopt timestamping failed %d %s \n", errno, strerror(errno));fflush(filepointer);
+		close(*raw_transport_socket);
+		return RETURN_VALUE_FAILURE;
+	} else {
+		fprintf(filepointer,  "[RAW TRANSPORT] Timestamp Socket \n");fflush(filepointer);
+	}
 
 
 	/*  Bind Socket to Device */
