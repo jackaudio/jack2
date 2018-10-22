@@ -128,11 +128,6 @@ main ( int argc, char *argv[] )
 
     jack_on_shutdown ( client, jack_shutdown, 0 );
 
-	jack_position_t	pos;
-	jack_transport_state_t jstate;
-	jstate = jack_transport_query ( client, &pos );
-
-	printf("no transport %d", (int)jstate);
 	
 
 
@@ -163,6 +158,14 @@ main ( int argc, char *argv[] )
         exit ( 1 );
     }
 
+
+	jack_position_t	pos;
+	jack_transport_state_t jstate;
+	jstate = jack_transport_query ( client, &pos );
+
+	printf("no transport %d", (int)jstate);fflush(stdout);
+	
+	
     /* Connect the ports.  You can't do this before the client is
      * activated, because we can't make connections to clients
      * that aren't running.  Note the confusing (but necessary)
