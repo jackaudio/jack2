@@ -109,7 +109,7 @@ int create_RAW_AVB_Transport_Socket( FILE* filepointer, int* raw_transport_socke
 	/* Set Timestamping Option => requires recvmsg to be used => timestamp in ancillary data */
     int timestamp_flags = 0;
 
-	timestamp_flags |= SOF_TIMESTAMPING_TX_HARDWARE;
+//	timestamp_flags |= SOF_TIMESTAMPING_TX_HARDWARE;
 	timestamp_flags |= SOF_TIMESTAMPING_RX_HARDWARE;
 	timestamp_flags |= SOF_TIMESTAMPING_SYS_HARDWARE;
 	timestamp_flags |= SOF_TIMESTAMPING_RAW_HARDWARE;
@@ -118,8 +118,8 @@ int create_RAW_AVB_Transport_Socket( FILE* filepointer, int* raw_transport_socke
 	struct hwtstamp_config hwconfig;
 	memset( &hwconfig, 0, sizeof( hwconfig ));
 	hwconfig.rx_filter = HWTSTAMP_FILTER_ALL;
-	hwconfig.tx_type = HWTSTAMP_TX_OFF;
-//	hwconfig.tx_type = HWTSTAMP_TX_ON;
+//	hwconfig.tx_type = HWTSTAMP_TX_OFF;
+	hwconfig.tx_type = HWTSTAMP_TX_ON;
 
 
 	struct ifreq hwtstamp;
