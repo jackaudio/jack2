@@ -132,7 +132,7 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
 
 
 
-        fprintf(filepointer, "stream packet!\n");fflush(filepointer);
+//        fprintf(filepointer, "stream packet!\n");fflush(filepointer);
 
         /* Packet Arrival Time */
         cmsg = CMSG_FIRSTHDR(&msg);
@@ -163,7 +163,7 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
 
         ipg_to_last_packet_ns = packet_arrival_time_ns - last_packet_time_ns;
         last_packet_time_ns = packet_arrival_time_ns;
-//		fprintf(filepointer, "packet arrival time %lld ns, ipg %lld ns\n", packet_arrival_time_ns, ipg_to_last_packet_ns);fflush(filepointer);
+		fprintf(filepointer, "packet arrival time %lld ns, ipg %lld ns\n", packet_arrival_time_ns, ipg_to_last_packet_ns);fflush(filepointer);
 
 
 
