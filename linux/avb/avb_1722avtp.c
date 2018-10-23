@@ -433,7 +433,7 @@ void *worker_thread_mrp(void* v_ieee1722mc)
 
 int init_1722_driver( ieee1722_avtp_driver_state_t *ieee1722mc, const char* name,
                         char* stream_id, char* destination_mac,
-                        int sample_rate, int period_size, int num_periods)
+                        int sample_rate, int period_size, int num_periods, int capture_ports, int playback_ports)
 {
 	char filename[100];
     sprintf(filename, "jack1722driver.log");
@@ -482,6 +482,8 @@ int init_1722_driver( ieee1722_avtp_driver_state_t *ieee1722mc, const char* name
                                                                 (uint8_t) destination_mac[4],
                                                                 (uint8_t) destination_mac[5]);fflush(filepointer);
 
+    ieee1722mc->playback_channels = playback_ports;
+    ieee1722mc->capture_channels = capture_ports;
     ieee1722mc->sample_rate = sample_rate;
     ieee1722mc->period_size = period_size;
     ieee1722mc->period_usecs = (uint64_t) ((float)period_size / (float)sample_rate * 1000000);

@@ -45,7 +45,7 @@ extern "C"
 
 int init_1722_driver(   ieee1722_avtp_driver_state_t *ieee1722mc, const char* name,
                         char* stream_id, char* destination_mac,
-                        int sample_rate, int period_size, int num_periods);
+                        int sample_rate, int period_size, int num_periods, int capture_ports, int playback_ports);
 int startup_1722_driver( ieee1722_avtp_driver_state_t *ieee1722mc);
 uint64_t poll_recv_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc, int packet_num  );
 uint64_t wait_recv_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc, int packet_num  );

@@ -130,16 +130,10 @@ typedef enum mrpStatus{
 	LISTENER_FAILED
 } mrpStatus_t;
 
-/*
- *
- *          Merge Data Structures
- *
- */
 
 typedef struct _ieee1722_avtp_driver_state ieee1722_avtp_driver_state_t;
 
 struct _ieee1722_avtp_driver_state {
-
 
 	uint8_t streamid8[8];
 	uint8_t destination_mac_address[6];
@@ -154,19 +148,14 @@ struct _ieee1722_avtp_driver_state {
     pthread_mutex_t threadLock;
     pthread_cond_t dataReady;
 
-    jack_nframes_t  net_period_up;
-    jack_nframes_t  net_period_down;
-
     jack_nframes_t  sample_rate;
 
     jack_nframes_t  period_size;
     jack_time_t	    period_usecs;
     int             num_packets;
-    int		    dont_htonl_floats;
-    int		    always_deadline;
 
     unsigned int    capture_channels;
-    unsigned int    capture_channels_audio;
+    unsigned int    playback_channels;
 
     JSList	    *capture_ports;
     JSList	    *playback_ports;
@@ -174,27 +163,7 @@ struct _ieee1722_avtp_driver_state {
     JSList	    *capture_srcs;
 
     jack_client_t   *client;
-
-    jack_nframes_t expected_framecnt;
-    int		   expected_framecnt_valid;
-    unsigned int   num_lost_packets;
-    jack_time_t	   next_deadline;
-    jack_time_t	   deadline_offset;
-    int		   next_deadline_valid;
-    int		   packet_data_valid;
-    int		   resync_threshold;
-    int		   running_free;
-    int		   deadline_goodness;
-    jack_time_t	   time_to_deadline;
-    struct _packet_cache * packcache;
 };
-
-/*
- *
- *          Merge Data Structures
- *
- */
-
 
 
 /*

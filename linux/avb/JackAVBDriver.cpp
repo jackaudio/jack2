@@ -38,7 +38,7 @@ namespace Jack
 {
 JackAVBDriver::JackAVBDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
                                        char* stream_id, char* destination_mac, char* eth_dev,
-                                       int sample_rate, int period_size, int num_periods)
+                                       int sample_rate, int period_size, int num_periods, int capture_ports, int playback_ports)
     : JackWaiterDriver(name, alias, engine, table)
 {
     jack_log("JackAVBDriver::JackAVBPDriver Ethernet Device %s", eth_dev);
@@ -87,7 +87,9 @@ JackAVBDriver::JackAVBDriver(const char* name, const char* alias, JackLockedEngi
                   destination_mac,
                   sample_rate,
                   period_size,
-                  num_periods
+                  num_periods,
+                  capture_ports,
+                  playback_ports
                  );
 
 
@@ -116,29 +118,32 @@ int JackAVBDriver::AllocPorts()
 {
     jack_port_id_t port_index;
     char buf[64];
+    int chn = 0;
 
-    snprintf (buf, sizeof(buf) - 1, "system:capture_1");
+    for (chn = 0; chn < ieee1722mc.capture_channels; chn++) {
+        memset(buf, 0, sizeof(buf));
+        snprintf (buf, sizeof(buf) - 1, "system:capture_%u", chn + 1);
+        if (fEngine->PortRegister(fClientControl.fRefNum, buf, JACK_DEFAULT_AUDIO_TYPE,
+                                        CaptureDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
+            jack_error("driver: cannot register port for %s", buf);
+            return -1;
+        }
 
-
-    if (fEngine->PortRegister(fClientControl.fRefNum, buf, JACK_DEFAULT_AUDIO_TYPE,
-                                    CaptureDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
-        jack_error("driver: cannot register port for %s", buf);
-        return -1;
+        ieee1722mc.capture_ports = jack_slist_append (ieee1722mc.capture_ports, (void *)(intptr_t)port_index);
     }
 
-    ieee1722mc.capture_ports = jack_slist_append (ieee1722mc.capture_ports, (void *)(intptr_t)port_index);
+    for (chn = 0; chn < ieee1722mc.playback_channels; chn++) {
+        memset(buf, 0, sizeof(buf));
+        snprintf (buf, sizeof(buf) - 1, "system:playback_%u", chn + 1);
 
-    memset(buf, 0, sizeof(buf));
-    snprintf (buf, sizeof(buf) - 1, "system:playback_1");
+        if (fEngine->PortRegister(fClientControl.fRefNum, buf, JACK_DEFAULT_AUDIO_TYPE,
+                                        PlaybackDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
+            jack_error("driver: cannot register port for %s", buf);
+            return -1;
+        }
 
-    if (fEngine->PortRegister(fClientControl.fRefNum, buf, JACK_DEFAULT_AUDIO_TYPE,
-                                    PlaybackDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
-        jack_error("driver: cannot register port for %s", buf);
-        return -1;
+        ieee1722mc.playback_ports = jack_slist_append (ieee1722mc.playback_ports, (void *)(intptr_t)port_index);
     }
-
-    ieee1722mc.playback_ports = jack_slist_append (ieee1722mc.playback_ports, (void *)(intptr_t)port_index);
-
     //port = fGraphManager->GetPort(port_index);
 
 
@@ -195,17 +200,6 @@ int JackAVBDriver::Read()
     for(n=0; n<ieee1722mc.num_packets; n++){
         cumulative_ipg_ns += wait_recv_ts_1722_mediaclockstream( &ieee1722mc, n );
     }
-
-
-    /*
-     *
-     *
-     *       Handle Jack Transport ???
-     *
-     *
-     *
-     */
-
 
     //printf("no: %d ipg: %lld ns, period_usec: %lld\n", n, cumulative_ipg_ns, ieee1722mc.period_usecs );fflush(stdout);
     float cumulative_ipg_us = cumulative_ipg_ns / 1000;
@@ -410,7 +404,7 @@ extern "C"
         try {
             Jack::JackDriverClientInterface* driver = new Jack::JackWaitThreadedDriver (
                 new Jack::JackAVBDriver("system", "avb_mc", engine, table, sid, dmac, eth_dev,
-                                             sample_rate, period_size, num_periods));
+                                             sample_rate, period_size, num_periods, capture_ports, playback_ports));
 
             if (driver->Open(period_size, sample_rate, 1, 1, capture_ports, playback_ports,
                                 0, "from_master", "to_master", 0, 0) == 0) {
