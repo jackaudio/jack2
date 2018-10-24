@@ -93,9 +93,27 @@ struct JackRequest
         kPropertyChangeNotify = 40
     };
 
+    static const int StartMarker = 'R' | ('e' << 8) | ('q' << 16) | ('S' << 24);
+
     static int ReadType(detail::JackChannelTransactionInterface* trans, RequestType& type)
     {
         type = (RequestType)0;
+
+        do {
+            PRE_PACKED_STRUCTURE_ALWAYS
+            union {
+                int i;
+                uint8_t b[sizeof(i)];
+            } POST_PACKED_STRUCTURE_ALWAYS start;
+
+            CheckRes(trans->Read(&start.i, sizeof(StartMarker)));
+            if (start.i != StartMarker) {
+                jack_error("Request start marker not found. Ignoring %02x %02x %02x %02x ",
+                           start.b[0], start.b[1], start.b[2], start.b[3]);
+                continue;
+            }
+        } while (false);
+
         CheckRes(trans->Read(&type, sizeof(RequestType)));
         return 0;
     }
@@ -112,6 +130,7 @@ template<class DATA>
 struct JackRequestMessage
 {
 protected:
+    const int fStart = JackRequest::StartMarker;
     const JackRequest::RequestType fType;
     const int fSize;
 public:
@@ -119,7 +138,7 @@ public:
 protected:
     template<typename... Args>
         JackRequestMessage(Args&... args) : fType(DATA::Type()),
-            fSize(sizeof(JackRequestMessage<DATA>) - sizeof(fType) - sizeof(fSize)),
+            fSize(sizeof(JackRequestMessage<DATA>) - sizeof(fStart) - sizeof(fType) - sizeof(fSize)),
             d(args...)
         {}
 
