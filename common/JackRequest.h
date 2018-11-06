@@ -122,6 +122,67 @@ struct JackRequest
 
 };
 
+
+PRE_PACKED_STRUCTURE_ALWAYS
+template<class DATA>
+struct JackRequestMessage
+{
+protected:
+    const JackRequest::RequestType fType;
+    const int fSize;
+public:
+    DATA d;
+protected:
+    template<typename... Args>
+        JackRequestMessage(Args&... args) : fType(DATA::Type()),
+            fSize(sizeof(JackRequestMessage<DATA>) - sizeof(fType) - sizeof(fSize)),
+            d(args...)
+        {}
+
+        int ReadMessage(detail::JackChannelTransactionInterface* trans)
+        {
+            int size = 0;
+            CheckRes(trans->Read(&size, sizeof(fSize)));
+            if (size != fSize) {
+                jack_error("CheckSize error expected %d actual %d", fSize, size);
+                return -1;
+            }
+
+            CheckRes(trans->Read(&d, fSize));
+            return 0;
+        }
+
+        int WriteMessage(detail::JackChannelTransactionInterface* trans)
+        {
+            CheckRes(trans->Write(this, sizeof(JackRequestMessage<DATA>)));
+            return 0;
+        }
+} POST_PACKED_STRUCTURE_ALWAYS;
+
+
+template<class DATA>
+struct JackRequestTemplate : public JackRequest, public JackRequestMessage<DATA>
+{
+    template<typename... Args>
+        JackRequestTemplate(Args&... args) : JackRequestMessage<DATA>(args...)
+        {}
+
+    int Read(detail::JackChannelTransactionInterface* trans)
+    {
+        return JackRequestMessage<DATA>::ReadMessage(trans);
+    }
+
+    int Write(detail::JackChannelTransactionInterface* trans)
+    {
+        return JackRequestMessage<DATA>::WriteMessage(trans);
+    }
+
+    JackRequest::RequestType getType()
+    {
+        return JackRequestMessage<DATA>::fType;
+    }
+};
+
 /*!
 \brief Result from the server.
 */
