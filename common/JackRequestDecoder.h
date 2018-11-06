@@ -26,7 +26,9 @@ namespace Jack
 {
 
 class JackServer;
-struct JackClientOpenRequest;
+template<class DATA> struct JackRequestTemplate;
+struct JackClientOpenRequestData;
+typedef JackRequestTemplate<JackClientOpenRequestData> JackClientOpenRequest;
 struct JackClientOpenResult;
 
 struct JackClientHandlerInterface {
