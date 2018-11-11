@@ -1647,7 +1647,8 @@ struct JackPropertyChangeNotifyRequest : public JackRequest
     {
         jack_uuid_copy(&fSubject, subject);
         memset(fKey, 0, sizeof(fKey));
-        strncpy(fKey, key, sizeof(fKey)-1);
+        if (key)
+            strncpy(fKey, key, sizeof(fKey)-1);
     }
 
     int Read(detail::JackChannelTransactionInterface* trans)
