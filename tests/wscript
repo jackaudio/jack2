@@ -27,3 +27,4 @@ def build(bld):
             prog.uselib = 'RT'
         prog.use = 'clientlib'
         prog.target = test_program
+        #prog.cxxflags = ['-Wno-deprecated-declarations']

@@ -912,6 +912,9 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 */
 
 	return 0;
+
+	// may be unused
+	(void)err;
 }
 
 int

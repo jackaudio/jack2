@@ -31,7 +31,7 @@ JackMidiRawInputWriteQueue(JackMidiWriteQueue *write_queue,
                            size_t max_packet_data, size_t max_packets)
 {
     packet_queue = new JackMidiAsyncQueue(max_packet_data, max_packets);
-    std::auto_ptr<JackMidiAsyncQueue> packet_queue_ptr(packet_queue);
+    std::unique_ptr<JackMidiAsyncQueue> packet_queue_ptr(packet_queue);
     input_buffer = new jack_midi_data_t[max_packet_data];
     Clear();
     expected_bytes = 0;

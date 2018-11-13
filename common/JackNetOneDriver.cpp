@@ -1117,6 +1117,11 @@ extern "C"
         } catch (...) {
             return NULL;
         }
+
+#if HAVE_SAMPLERATE
+        // unused
+        (void)resample_factor_up;
+#endif
     }
 
 #ifdef __cplusplus

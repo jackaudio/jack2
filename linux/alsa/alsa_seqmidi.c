@@ -849,14 +849,13 @@ void do_jack_output(alsa_seqmidi_t *self, port_t *port, struct process_info* inf
 {
 	stream_t *str = &self->stream[info->dir];
 	int nevents = jack_midi_get_event_count(port->jack_buf);
-	int i;
+	int i, err;
 	for (i=0; i<nevents; ++i) {
 		jack_midi_event_t jack_event;
 		snd_seq_event_t alsa_event;
 		int64_t frame_offset;
 		int64_t out_time;
 		snd_seq_real_time_t out_rt;
-		int err;
 
 		jack_midi_event_get(&jack_event, port->jack_buf, i);
 
@@ -899,6 +898,10 @@ void do_jack_output(alsa_seqmidi_t *self, port_t *port, struct process_info* inf
 		err = snd_seq_event_output(self->seq, &alsa_event);
 		debug_log("alsa_out: written %d bytes to %s at %+d (%lld): %d", (int)jack_event.size, port->name, (int)frame_offset, out_time, err);
 	}
+	return;
+
+	// may be unused
+	(void)err;
 }
 
 static

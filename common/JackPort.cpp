@@ -254,12 +254,12 @@ int JackPort::GetAliases(char* const aliases[2])
     int cnt = 0;
 
     if (fAlias1[0] != '\0') {
-        snprintf(aliases[0], REAL_JACK_PORT_NAME_SIZE, "%s", fAlias1);
+        strncpy(aliases[0], fAlias1, REAL_JACK_PORT_NAME_SIZE);
         cnt++;
     }
 
     if (fAlias2[0] != '\0') {
-        snprintf(aliases[1], REAL_JACK_PORT_NAME_SIZE, "%s", fAlias2);
+        strncpy(aliases[1], fAlias2, REAL_JACK_PORT_NAME_SIZE);
         cnt++;
     }
 
@@ -269,9 +269,9 @@ int JackPort::GetAliases(char* const aliases[2])
 int JackPort::SetAlias(const char* alias)
 {
     if (fAlias1[0] == '\0') {
-        snprintf(fAlias1, sizeof(fAlias1), "%s", alias);
+        strncpy(fAlias1, alias, sizeof(fAlias1));
     } else if (fAlias2[0] == '\0') {
-        snprintf(fAlias2, sizeof(fAlias2), "%s", alias);
+        strncpy(fAlias2, alias, sizeof(fAlias2));
     } else {
         return -1;
     }

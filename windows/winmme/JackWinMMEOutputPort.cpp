@@ -52,11 +52,11 @@ JackWinMMEOutputPort::JackWinMMEOutputPort(const char *alias_name,
                                            size_t max_messages)
 {
     read_queue = new JackMidiBufferReadQueue();
-    std::auto_ptr<JackMidiBufferReadQueue> read_queue_ptr(read_queue);
+    std::unique_ptr<JackMidiBufferReadQueue> read_queue_ptr(read_queue);
     thread_queue = new JackMidiAsyncQueue(max_bytes, max_messages);
-    std::auto_ptr<JackMidiAsyncQueue> thread_queue_ptr(thread_queue);
+    std::unique_ptr<JackMidiAsyncQueue> thread_queue_ptr(thread_queue);
     thread = new JackThread(this);
-    std::auto_ptr<JackThread> thread_ptr(thread);
+    std::unique_ptr<JackThread> thread_ptr(thread);
     char error_message[MAXERRORLENGTH];
     MMRESULT result = midiOutOpen(&handle, index, (DWORD_PTR)HandleMessageEvent,
                                   (DWORD_PTR)this, CALLBACK_FUNCTION);
