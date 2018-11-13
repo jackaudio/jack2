@@ -76,7 +76,7 @@ namespace Jack {
         return  _getpid();
         //#error "No getuid function available"
 #else
-        return getuid();
+        return geteuid();
 #endif
     }
 
