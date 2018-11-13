@@ -44,7 +44,11 @@ Filipe Coelho
 
 2017-12-13 Filipe Coelho <falktx@falktx.com>
 
-        * Version 1.9.12
+	* Version 1.9.12
+	* Fix Windows build issues.
+	* Fix build with gcc-7.
+	* Show hint when DBus device reservation fails.
+	* Add support for internal session files.
 
 2017-06-13 Filipe Coelho <falktx@falktx.com>
 
