@@ -60,24 +60,10 @@ matrix:
       env:
         - MATRIX_EVAL="CC=clang-3.8 CXX=clang++-3.8"
       compiler: clang
-    # osx with gcc6
+    # osx with xcode7.3/clang
     - os: osx
-      osx_image: xcode8.3
-      compiler: gcc
-      env:
-        - MATRIX_EVAL="CC=gcc-6 CXX=g++-6"
-    # osx with gcc7
-    - os: osx
-      osx_image: xcode8.3
-      compiler: gcc
-      env:
-        - MATRIX_EVAL="CC=gcc-7 CXX=g++-7"
-    # osx with gcc8
-    - os: osx
-      osx_image: xcode8.3
-      compiler: gcc
-      env:
-        - MATRIX_EVAL="CC=gcc-8 CXX=g++-8"
+      osx_image: xcode7.3
+      compiler: clang
     # osx with xcode8.3/clang
     - os: osx
       osx_image: xcode8.3
@@ -85,6 +71,14 @@ matrix:
     # osx with xcode9.2/clang
     - os: osx
       osx_image: xcode9.2
+      compiler: clang
+    # osx with xcode10.0/clang
+    - os: osx
+      osx_image: xcode10
+      compiler: clang
+    # osx with xcode10.1/clang
+    - os: osx
+      osx_image: xcode10.1
       compiler: clang
     # osx with xcode/clang (default)
     - os: osx
