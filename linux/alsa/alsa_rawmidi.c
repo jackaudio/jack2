@@ -467,7 +467,7 @@ int midi_port_open(alsa_rawmidi_t *midi, midi_port_t *port)
 	if (midi_port_open_jack(midi, port, type, name)) {
 		int num;
 		num = port->id.id[3] ? port->id.id[3] : port->id.id[1];
-		snprintf(name, 20, "%s %d", port->name, num);
+		snprintf(name, sizeof(name), "%s %d", port->name, num);
 		if (midi_port_open_jack(midi, port, type, name))
 			return 2;
 	}
