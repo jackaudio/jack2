@@ -217,6 +217,7 @@ def configure(conf):
         conf.env.append_unique('CXXDEFINES', '_POSIX')
 
     conf.env.append_unique('CXXFLAGS', '-Wall')
+    conf.env.append_unique('CXXFLAGS', '-std=gnu++11')
     conf.env.append_unique('CFLAGS', '-Wall')
 
     if conf.env['IS_MACOSX']:
