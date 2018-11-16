@@ -137,17 +137,6 @@
 		(d) = f_round ((s) * SAMPLE_24BIT_SCALING);\
 	}
 
-/* call this when "s" has already been scaled (e.g. when dithering)
- */
-
-#define float_24u32_scaled(s, d)\
-        if ((s) <= SAMPLE_24BIT_MIN_F) {\
-		(d) = SAMPLE_24BIT_MIN << 8;\
-	} else if ((s) >= SAMPLE_24BIT_MAX_F) {	\
-		(d) = SAMPLE_24BIT_MAX << 8;		\
-	} else {\
-		(d) = f_round ((s)) << 8; \
-	}
 
 #define float_24(s, d) \
 	if ((s) <= NORMALIZED_FLOAT_MIN) {\
@@ -156,18 +145,6 @@
 		(d) = SAMPLE_24BIT_MAX;\
 	} else {\
 		(d) = f_round ((s) * SAMPLE_24BIT_SCALING);\
-	}
-
-/* call this when "s" has already been scaled (e.g. when dithering)
- */
-
-#define float_24_scaled(s, d)\
-        if ((s) <= SAMPLE_24BIT_MIN_F) {\
-		(d) = SAMPLE_24BIT_MIN;\
-	} else if ((s) >= SAMPLE_24BIT_MAX_F) {	\
-		(d) = SAMPLE_24BIT_MAX;		\
-	} else {\
-		(d) = f_round ((s)); \
 	}
 
 
