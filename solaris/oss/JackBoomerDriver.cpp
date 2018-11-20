@@ -87,7 +87,7 @@ static inline void CopyAndConvertIn(jack_sample_t *dst, void *src, size_t nframe
 		case 32: {
 			signed int *s32src = (signed int*)src;
             s32src += channel;
-            sample_move_dS_s32u24(dst, (char*)s32src, nframes, byte_skip);
+            sample_move_dS_s32(dst, (char*)s32src, nframes, byte_skip);
 			break;
         }
 	}
@@ -112,7 +112,7 @@ static inline void CopyAndConvertOut(void *dst, jack_sample_t *src, size_t nfram
 		case 32: {
             signed int *s32dst = (signed int*)dst;
             s32dst += channel;
-            sample_move_d32u24_sS((char*)s32dst, src, nframes, byte_skip, NULL);
+            sample_move_d32_sS((char*)s32dst, src, nframes, byte_skip, NULL);
 			break;
         }
 	}
