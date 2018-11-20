@@ -73,6 +73,7 @@
    So, for now (October 2008) we use 2^(N-1)-1 as the scaling factor.
 */
 
+#define SAMPLE_32BIT_SCALING  0x7FFFFFFF
 #define SAMPLE_24BIT_SCALING  8388607
 #define SAMPLE_16BIT_SCALING  32767
 
@@ -240,6 +241,8 @@ void sample_move_dS_floatLE (char *dst, jack_default_audio_sample_t *src, unsign
    
    S      - sample is a jack_default_audio_sample_t, currently (October 2008) a 32 bit floating point value
    Ss     - like S but reverse endian from the host CPU
+   32     - sample is an signed 32 bit integer value
+   32s    - like 32 but reverse endian from the host CPU
    32u24  - sample is an signed 32 bit integer value, but data is in lower 24 bits only
    32u24s - like 32u24 but reverse endian from the host CPU
    24     - sample is an signed 24 bit integer value
@@ -306,6 +309,11 @@ static inline void sample_move_d32scal_sSs (char *dst, jack_default_audio_sample
 void sample_move_d32u24_sSs (char *dst, jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state)
 {
 	sample_move_d32scal_sSs (dst, src, nsamples, dst_skip, state, SAMPLE_24BIT_SCALING);
+}
+
+void sample_move_d32_sSs (char *dst, jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state)
+{
+	sample_move_d32scal_sSs (dst, src, nsamples, dst_skip, state, SAMPLE_32BIT_SCALING);
 }
 
 
@@ -396,6 +404,11 @@ static inline void sample_move_d32scal_sS (char *dst, jack_default_audio_sample_
 void sample_move_d32u24_sS (char *dst, jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state)
 {
 	sample_move_d32scal_sS (dst, src, nsamples, dst_skip, state, SAMPLE_24BIT_SCALING);
+}
+
+void sample_move_d32_sS (char *dst, jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state)
+{
+	sample_move_d32scal_sS (dst, src, nsamples, dst_skip, state, SAMPLE_32BIT_SCALING);
 }
 
 
