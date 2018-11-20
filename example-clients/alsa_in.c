@@ -95,9 +95,9 @@ typedef struct alsa_format {
 
 alsa_format_t formats[] = {
 	{ SND_PCM_FORMAT_FLOAT_LE, 4, sample_move_dS_floatLE, sample_move_floatLE_sSs, "float" },
-	{ SND_PCM_FORMAT_S32, 4, sample_move_d32u24_sS, sample_move_dS_s32u24, "32bit" },
+	{ SND_PCM_FORMAT_S32, 4, sample_move_d32_sS, sample_move_dS_s32, "32bit" },
 	{ SND_PCM_FORMAT_S24_3LE, 3, sample_move_d24_sS, sample_move_dS_s24, "24bit - real" },
-	{ SND_PCM_FORMAT_S24, 4, sample_move_d24_sS, sample_move_dS_s24, "24bit" },
+	{ SND_PCM_FORMAT_S24, 4, sample_move_d32u24_sS, sample_move_dS_s32u24, "24bit" },
 	{ SND_PCM_FORMAT_S16, 2, sample_move_d16_sS, sample_move_dS_s16, "16bit" }
 #ifdef __ANDROID__
 	,{ SND_PCM_FORMAT_S16_LE, 2, sample_move_d16_sS, sample_move_dS_s16, "16bit little-endian" }
