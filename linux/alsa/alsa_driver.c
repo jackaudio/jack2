@@ -318,10 +318,12 @@ alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 				{
 					case SND_PCM_FORMAT_S24_LE:
 					case SND_PCM_FORMAT_S24_BE:
-				driver->write_via_copy = driver->quirk_bswap?
-					sample_move_d32l24_sSs:
-					sample_move_d32l24_sS;
-				break;
+					{
+						driver->write_via_copy = driver->quirk_bswap?
+							sample_move_d32u24_sSs:
+							sample_move_d32u24_sS;
+						break;
+					}
 					case SND_PCM_FORMAT_S32_LE:
 					case SND_PCM_FORMAT_S32_BE:
 					{
@@ -382,10 +384,12 @@ alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 				{
 					case SND_PCM_FORMAT_S24_LE:
 					case SND_PCM_FORMAT_S24_BE:
-				driver->read_via_copy = driver->quirk_bswap?
-					sample_move_dS_s32l24s:
-					sample_move_dS_s32l24;
-				break;
+					{
+						driver->read_via_copy = driver->quirk_bswap?
+							sample_move_dS_s32u24s:
+							sample_move_dS_s32u24;
+						break;
+					}
 					case SND_PCM_FORMAT_S32_LE:
 					case SND_PCM_FORMAT_S32_BE:
 					{
