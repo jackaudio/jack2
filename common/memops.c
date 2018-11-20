@@ -489,6 +489,11 @@ void sample_move_dS_s32u24s (jack_default_audio_sample_t *dst, char *src, unsign
 	sample_move_dS_s32s_signext (dst, src, nsamples, src_skip, true);
 }
 
+void sample_move_dS_s32s (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip)
+{
+	sample_move_dS_s32s_signext (dst, src, nsamples, src_skip, false);
+}
+
 
 static inline void sample_move_dS_s32_signext (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip, const bool do_signext)
 {
@@ -572,6 +577,11 @@ static inline void sample_move_dS_s32_signext (jack_default_audio_sample_t *dst,
 void sample_move_dS_s32u24 (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip)
 {
 	sample_move_dS_s32_signext (dst, src, nsamples, src_skip, true);
+}
+
+void sample_move_dS_s32 (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip)
+{
+	sample_move_dS_s32_signext (dst, src, nsamples, src_skip, false);
 }
 
 
