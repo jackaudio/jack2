@@ -42,7 +42,7 @@
 #endif
 #endif
 
-#ifdef __ARM_NEON__
+#if defined (__ARM_NEON__) || defined (__ARM_NEON)
 #include <arm_neon.h>
 #endif
 
@@ -198,7 +198,7 @@ static inline __m128i float_24_sse(__m128 s)
 #endif
 
 
-#ifdef __ARM_NEON__
+#if defined (__ARM_NEON__) || defined (__ARM_NEON)
 
 static inline float32x4_t clip(float32x4_t s, float32x4_t min, float32x4_t max)
 {
@@ -281,7 +281,7 @@ void sample_move_dS_floatLE (char *dst, jack_default_audio_sample_t *src, unsign
 
 void sample_move_d32u24_sSs (char *dst, jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state)
 {
-#ifdef __ARM_NEON__
+#if defined (__ARM_NEON__) || defined (__ARM_NEON)
 	unsigned long unrolled = nsamples / 4;
 	nsamples = nsamples & 3;
 
@@ -380,7 +380,7 @@ void sample_move_d32u24_sS (char *dst, jack_default_audio_sample_t *src, unsigne
 		src++;
 	}
 
-#elif defined(__ARM_NEON__)
+#elif defined (__ARM_NEON__) || defined (__ARM_NEON)
 	unsigned long unrolled = nsamples / 4;
 	nsamples = nsamples & 3;
 
@@ -417,7 +417,7 @@ void sample_move_d32u24_sS (char *dst, jack_default_audio_sample_t *src, unsigne
 
 void sample_move_dS_s32u24s (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip)
 {
-#ifdef __ARM_NEON__
+#if defined (__ARM_NEON__) || defined (__ARM_NEON)
 	float32x4_t factor = vdupq_n_f32(1.0 / SAMPLE_24BIT_SCALING);
 	unsigned long unrolled = nsamples / 4;
 	while (unrolled--) {
@@ -506,7 +506,7 @@ void sample_move_dS_s32u24 (jack_default_audio_sample_t *dst, char *src, unsigne
 		dst += 4;
 	}
 	nsamples = nsamples & 3;
-#elif defined(__ARM_NEON__)
+#elif defined (__ARM_NEON__) || defined (__ARM_NEON)
 	unsigned long unrolled = nsamples / 4;
 	float32x4_t factor = vdupq_n_f32(1.0 / SAMPLE_24BIT_SCALING);
 	while (unrolled--) {
@@ -548,7 +548,7 @@ void sample_move_dS_s32u24 (jack_default_audio_sample_t *dst, char *src, unsigne
 
 void sample_move_d24_sSs (char *dst, jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state)
 {
-#ifdef __ARM_NEON__
+#if defined (__ARM_NEON__) || defined (__ARM_NEON)
 	unsigned long unrolled = nsamples / 4;
 	while (unrolled--) {
 		int i;
@@ -619,7 +619,7 @@ void sample_move_d24_sS (char *dst, jack_default_audio_sample_t *src, unsigned l
 		nsamples -= 4;
 		src += 4;
 	}
-#elif defined(__ARM_NEON__)
+#elif defined (__ARM_NEON__) || defined (__ARM_NEON)
 	unsigned long unrolled = nsamples / 4;
 	while (unrolled--) {
 		int i;
@@ -655,7 +655,7 @@ void sample_move_dS_s24s (jack_default_audio_sample_t *dst, char *src, unsigned 
 {
 	const jack_default_audio_sample_t scaling = 1.0/SAMPLE_24BIT_SCALING;
 
-#ifdef __ARM_NEON__
+#if defined (__ARM_NEON__) || defined (__ARM_NEON)
 	// we shift 8 to the right by dividing by 256.0 -> no sign extra handling
 	const float32x4_t vscaling = vdupq_n_f32(scaling/256.0);
 	int32_t x[4];
@@ -740,7 +740,7 @@ void sample_move_dS_s24 (jack_default_audio_sample_t *dst, char *src, unsigned l
 		dst += 4;
 		nsamples -= 4;
 	}
-#elif defined(__ARM_NEON__)
+#elif defined (__ARM_NEON__) || defined (__ARM_NEON)
 	// we shift 8 to the right by dividing by 256.0 -> no sign extra handling
 	const float32x4_t vscaling = vdupq_n_f32(scaling/256.0);
 	int32_t x[4];
@@ -787,7 +787,7 @@ void sample_move_dS_s24 (jack_default_audio_sample_t *dst, char *src, unsigned l
 
 void sample_move_d16_sSs (char *dst,  jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state)	
 {
-#ifdef __ARM_NEON__
+#if defined (__ARM_NEON__) || defined (__ARM_NEON)
 	unsigned long unrolled = nsamples / 4;
 	nsamples = nsamples & 3;
 
@@ -838,7 +838,7 @@ void sample_move_d16_sSs (char *dst,  jack_default_audio_sample_t *src, unsigned
 
 void sample_move_d16_sS (char *dst,  jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state)	
 {
-#ifdef __ARM_NEON__
+#if defined (__ARM_NEON__) || defined (__ARM_NEON)
 	unsigned long unrolled = nsamples / 4;
 	nsamples = nsamples & 3;
 
@@ -1017,7 +1017,7 @@ void sample_move_dS_s16s (jack_default_audio_sample_t *dst, char *src, unsigned 
 {
 	short z;
 	const jack_default_audio_sample_t scaling = 1.0/SAMPLE_16BIT_SCALING;
-#ifdef __ARM_NEON__
+#if defined (__ARM_NEON__) || defined (__ARM_NEON)
 	const float32x4_t vscaling = vdupq_n_f32(scaling);
 	unsigned long unrolled = nsamples / 4;
 	while (unrolled--) {
@@ -1069,7 +1069,7 @@ void sample_move_dS_s16 (jack_default_audio_sample_t *dst, char *src, unsigned l
 {
 	/* ALERT: signed sign-extension portability !!! */
 	const jack_default_audio_sample_t scaling = 1.0/SAMPLE_16BIT_SCALING;
-#ifdef __ARM_NEON__
+#if defined (__ARM_NEON__) || defined (__ARM_NEON)
 	const float32x4_t vscaling = vdupq_n_f32(scaling);
 	unsigned long unrolled = nsamples / 4;
 	while (unrolled--) {
