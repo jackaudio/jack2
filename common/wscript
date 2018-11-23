@@ -105,8 +105,8 @@ def build(bld):
             '../posix/JackPosixMutex.cpp',
             '../posix/JackPosixSemaphore.cpp',
             '../posix/JackSocket.cpp',
-            '../freebsd/JackFreeBSDTime.c',
-        ]
+            '../posix/JackPosixTime.c',
+            ]
         includes = ['../freebsd', '../posix'] + includes
 
     if bld.env['IS_SUN']:
