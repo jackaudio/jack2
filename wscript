@@ -709,7 +709,8 @@ def build_drivers(bld):
     create_driver_obj(
         bld,
         target = 'net',
-        source = net_src)
+        source = net_src,
+        use = ['CELT'])
 
     create_driver_obj(
         bld,
