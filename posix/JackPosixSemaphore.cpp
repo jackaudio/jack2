@@ -30,6 +30,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "promiscuous.h"
 #endif
 
+#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+#define JACK_SEM_PREFIX "/jack_sem"
+#else
+#define JACK_SEM_PREFIX "jack_sem"
+#endif
+
 namespace Jack
 {
 
@@ -50,9 +56,9 @@ void JackPosixSemaphore::BuildName(const char* client_name, const char* server_n
     snprintf(res, 32, "js_%s", ext_client_name); 
 #else
     if (fPromiscuous) {
-        snprintf(res, size, "jack_sem.%s_%s", server_name, ext_client_name);
+        snprintf(res, size, JACK_SEM_PREFIX ".%s_%s", server_name, ext_client_name);
     } else {
-        snprintf(res, size, "jack_sem.%d_%s_%s", JackTools::GetUID(), server_name, ext_client_name);
+        snprintf(res, size, JACK_SEM_PREFIX ".%d_%s_%s", JackTools::GetUID(), server_name, ext_client_name);
     }
 #endif
 }
