@@ -57,25 +57,13 @@ SERVER_EXPORT void EndTime()
 
 void SetClockSource(jack_timer_type_t source)
 {
-    jack_log("Clock source : %s", ClockSourceName(source));
-
-	switch (source)
-	{
-	case JACK_TIMER_SYSTEM_CLOCK:
-	    default:
-	    _jack_get_microseconds = jack_get_microseconds_from_system;
-	    break;
-	}
+	jack_log("Clock source : %s", ClockSourceName(source));
+	_jack_get_microseconds = jack_get_microseconds_from_system;
 }
 
 const char* ClockSourceName(jack_timer_type_t source)
 {
-	switch (source) {
-	case JACK_TIMER_SYSTEM_CLOCK:
-	    return "system clock via clock_gettime";
-	}
-
-	return "unknown";
+	return "system clock via clock_gettime";
 }
 
 SERVER_EXPORT jack_time_t GetMicroSeconds()
