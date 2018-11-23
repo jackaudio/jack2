@@ -47,6 +47,8 @@ def configure(conf):
 def build(bld):
     if bld.env['IS_LINUX']:
         os_incdir = ['../linux', '../posix']
+    if bld.env['IS_FREEBSD']:
+        os_incdir = ['../freebsd', '../posix']
     if bld.env['IS_MACOSX']:
         os_incdir = ['../macosx', '../posix']
     if bld.env['IS_SUN']:
@@ -78,6 +80,8 @@ def build(bld):
             prog.use += ['RT', 'M']
         if bld.env['IS_SUN']:
             prog.use += ['M']
+        if bld.env['IS_FREEBSD']:
+            prog.use += ['M']
         #prog.cflags = ['-Wno-deprecated-declarations', '-Wno-misleading-indentation']
         #prog.cxxflags = ['-Wno-deprecated-declarations', '-Wno-misleading-indentation']
 
@@ -90,6 +94,8 @@ def build(bld):
         prog.use = ['clientlib']
         if bld.env['IS_LINUX']:
             prog.use += ['RT', 'READLINE']
+        if bld.env['IS_FREEBSD']:
+            prog.use += ['READLINE']
         if bld.env['IS_MACOSX']:
             prog.use += ['READLINE']
         if bld.env['IS_WINDOWS']:
@@ -105,13 +111,15 @@ def build(bld):
             prog.use += ['SNDFILE']
         if bld.env['IS_LINUX']:
             prog.use += ['RT', 'SNDFILE']
+        if bld.env['IS_FREEBSD']:
+            prog.use += ['SNDFILE']
         if bld.env['IS_SUN']:
             prog.use += ['RT', 'SNDFILE']
         if bld.env['IS_WINDOWS']:
             prog.uselib = ['SNDFILE']
         prog.target = 'jack_rec'
 
-    if bld.env['IS_LINUX'] or bld.env['IS_MACOSX']:
+    if bld.env['IS_LINUX'] or bld.env['IS_MACOSX'] or bld.env['IS_FREEBSD']:
         prog = bld(features = 'c cprogram')
         prog.includes = os_incdir + ['.', '..', '../common/jack', '../common']
         prog.source = ['netsource.c', '../common/netjack_packet.c']
