@@ -199,7 +199,7 @@ int JackAVBDriver::Read()
     int n = 0;
     for(n=0; n<ieee1722mc.num_packets; n++){
         cumulative_ipg_ns += wait_recv_ts_1722_mediaclockstream( &ieee1722mc, n );
-        jack_log("duration: %lld", cumulative_ipg_ns);
+//        jack_log("duration: %lld", cumulative_ipg_ns);
     }
 
     //printf("no: %d ipg: %lld ns, period_usec: %lld\n", n, cumulative_ipg_ns, ieee1722mc.period_usecs );fflush(stdout);
