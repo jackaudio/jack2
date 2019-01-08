@@ -167,6 +167,7 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
         } else {
              adjust_packet_time_ns = 125000;//ipg_to_last_packet_ns;
         }
+        fprintf(filepointer, "adjust time %lld ns\n", adjust_packet_time_ns);fflush(filepointer);
 
         return adjust_packet_time_ns;
     }
