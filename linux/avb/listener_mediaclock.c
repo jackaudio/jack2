@@ -126,9 +126,6 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
         uint64_t packet_arrival_time_ns = 0;
         uint64_t ipg_to_last_packet_ns = 0;
 
-        int bytes_per_stereo_channel = 12 /*CHANNEL_COUNT_STEREO * AVTP_SAMPLES_PER_CHANNEL_PER_PACKET = 2*6 */ * sizeof(uint32_t);
-        int avtp_hdr_len = ETHERNET_HDR_LENGTH + 32 /*AVB_HEADER_LENGTH*/;
-
 //        fprintf(filepointer, "stream packet!\n");fflush(filepointer);
 
         /* Packet Arrival Time from Device */
@@ -167,9 +164,11 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
 
             adjust_packet_time_ns = (uint64_t) ( ( (float)((*ieee1722mc)->period_size % 6 ) / (float)(*ieee1722mc)->sample_rate ) * 1000000000LL);
 //            fprintf(filepointer, "adjust time %lld ns\n", adjust_packet_time_ns);fflush(filepointer);
+        } else {
+             adjust_packet_time_ns = ipg_to_last_packet_ns;
         }
 
-        return ipg_to_last_packet_ns - adjust_packet_time_ns;
+        return adjust_packet_time_ns;
     }
     return -1;
 
