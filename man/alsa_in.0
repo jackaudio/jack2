@@ -51,8 +51,8 @@ Set Number of channels.
 \fB\-r \fI sample_rate\fR  
 .br
 Set sample_rate. The program resamples as necessary.
-So you can connect a 44k1 jackd to a soundcard only supporting
-48k. (default is jack sample_rate)
+So you can connect a 44100 jackd to a soundcard only supporting
+48000. (default is jack sample_rate)
 .TP
 \fB\-p \fI period_size\fR  
 .br
