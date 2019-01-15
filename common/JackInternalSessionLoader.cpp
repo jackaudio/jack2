@@ -60,6 +60,8 @@ int JackInternalSessionLoader::Load(const char* file)
             ConnectPorts(iss, linenr);
         } else if ( (command.compare("l") == 0) || (command.compare("load") == 0) ) {
             LoadClient(iss, linenr);
+        } else if ( (command.compare("a") == 0) || (command.compare("alias") == 0) ) {
+            SetAlias(iss, linenr);
 #if 0
         /* NOTE: c++11 only */
         } else if (command.front() == '#') {
@@ -171,6 +173,43 @@ void JackInternalSessionLoader::ConnectPorts(std::istringstream& iss, const int 
     }
 
     jack_info("Ports connected: %s -> %s", src_port.c_str(), dst_port.c_str());
+}
+
+void JackInternalSessionLoader::SetAlias(std::istringstream& iss, const int linenr)
+{
+    std::string alias;
+    if ( !(iss >> alias) ) {
+        jack_error("Cannot read alias name from internal session file line %u '%s'. Ignoring the line!",
+                   linenr, iss.str().c_str());
+        return;
+    }
+
+    bool ports_available = false;
+    std::string port;
+    while ( (iss >> port) ) {
+        ports_available = true;
+
+        const jack_port_id_t port_index = fServer->GetGraphManager()->GetPort(port.c_str());
+        if (port_index >= NO_PORT) {
+            jack_error("Port %s does not exist! Ignoring internal session file line %u '%s'.",
+                       port.c_str(), linenr, iss.str().c_str());
+            return;
+        }
+
+        if (fServer->GetGraphManager()->GetPort(port_index)->SetAlias(alias.c_str()) < 0) {
+            jack_error("Setting alias for port %s fails! Too many alias already defined for this port. Ignoring internal session file line %u '%s'.",
+                       port.c_str(), linenr, iss.str().c_str());
+            return;
+        }
+    }
+
+    if (!ports_available) {
+        jack_error("Cannot read port from internal session file line %u '%s'. Ignoring the line!",
+                   linenr, iss.str().c_str());
+        return;
+    }
+
+    jack_info("Alias %s set for all specified ports", alias.c_str());
 }
 
 }

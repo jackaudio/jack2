@@ -144,6 +144,11 @@ sent to the client library.
 With this command a source port will be connected to a destination port.
 \fIsource-port\fR and \fIdestination-port\fR cannot contain spaces.
 .br
+\fBa(lias)\fR \fIalias-name port1\fR [\fIport2\fR [...]]
+.br
+With this command an alias can be set to a port. Multiple ports can be specified to set the same alias to these ports. This makes sense if one application should connect to multible ports. Therefore only the alias name has to be specified in the connect command.
+\fIalias-name\fR and \fIport*\fR cannot contain spaces.
+.br
 Comments are allowed, they start with \fB#\fR.
 .br
 An example configuration could look like the following:
@@ -151,7 +156,9 @@ An example configuration could look like the following:
  l inprocess1 inprocess
  l amp1 jalv http://lv2plug.in/plugins/eg-amp
 .br
- c amp:out system:playback_1
+ c amp1:out system:playback_1
+.br
+ a alias:media amp1:in system:playback_2
 
 .TP
 \fB\-u, \-\-unlock\fR

@@ -37,6 +37,7 @@ public:
 private:
     void LoadClient(std::istringstream& iss, const int linenr);
     void ConnectPorts(std::istringstream& iss, const int linenr);
+    void SetAlias(std::istringstream& iss, const int linenr);
 
     JackServer* const fServer;
 };
