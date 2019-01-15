@@ -49,6 +49,7 @@ class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState
         void AssertPort(jack_port_id_t port_index);
         jack_port_id_t AllocatePortAux(int refnum, const char* port_name, const char* port_type, JackPortFlags flags);
         void GetConnectionsAux(JackConnectionManager* manager, const char** res, jack_port_id_t port_index);
+        jack_port_id_t GetPortAux(const char* const name, const jack_port_id_t current);
         void GetPortsAux(const char** matching_ports, const char* port_name_pattern, const char* type_name_pattern, unsigned long flags);
         jack_default_audio_sample_t* GetBuffer(jack_port_id_t port_index);
         void* GetBufferAux(JackConnectionManager* manager, jack_port_id_t port_index, jack_nframes_t frames);
@@ -72,7 +73,8 @@ class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState
         void DisconnectAllPorts(int refnum);
 
         JackPort* GetPort(jack_port_id_t index);
-        jack_port_id_t GetPort(const char* name);
+        jack_port_id_t GetPort(const char* const name);
+        jack_port_id_t GetNextPort(const char* const name, const jack_port_id_t current);
 
         int ComputeTotalLatency(jack_port_id_t port_index);
         int ComputeTotalLatencies();

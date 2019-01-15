@@ -742,15 +742,25 @@ int JackGraphManager::GetTwoPorts(const char* src_name, const char* dst_name, ja
 }
 
 // Client : port array
-jack_port_id_t JackGraphManager::GetPort(const char* name)
+jack_port_id_t JackGraphManager::GetPortAux(const char* const name, const jack_port_id_t current)
 {
-    for (unsigned int i = 0; i < fPortMax; i++) {
+    for (unsigned int i = current; i < fPortMax; i++) {
         JackPort* port = GetPort(i);
         if (port->IsUsed() && port->NameEquals(name)) {
             return i;
         }
     }
     return NO_PORT;
+}
+
+jack_port_id_t JackGraphManager::GetPort(const char* const name)
+{
+    return GetPortAux(name, 0);
+}
+
+jack_port_id_t JackGraphManager::GetNextPort(const char* const name, const jack_port_id_t current)
+{
+    return GetPortAux(name, current+1);
 }
 
 /*!

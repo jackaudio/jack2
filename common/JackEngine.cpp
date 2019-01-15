@@ -955,11 +955,30 @@ int JackEngine::CheckPortsConnect(int refnum, jack_port_id_t src, jack_port_id_t
 int JackEngine::PortConnect(int refnum, const char* src, const char* dst)
 {
     jack_log("JackEngine::PortConnect ref = %d src = %s dst = %s", refnum, src, dst);
-    jack_port_id_t port_src, port_dst;
+    jack_port_id_t port_src, first_port_dst;
 
-    return (fGraphManager->GetTwoPorts(src, dst, &port_src, &port_dst) < 0)
-           ? -1
-           : PortConnect(refnum, port_src, port_dst);
+    if (fGraphManager->GetTwoPorts(src, dst, &port_src, &first_port_dst) < 0) {
+        return -1;
+    }
+
+    int ret = 1;
+    /* connect all ports if there are multiple ports with the same alias */
+    for (; port_src != NO_PORT; port_src = fGraphManager->GetNextPort(src, port_src)) {
+        for (jack_port_id_t port_dst = first_port_dst; port_dst != NO_PORT; port_dst = fGraphManager->GetNextPort(dst, port_dst)) {
+            const int res = PortConnect(refnum, port_src, port_dst);
+            if (res < 0) {
+                const char* const src_name = fGraphManager->GetPort(port_src)->GetName();
+                const char* const dst_name = fGraphManager->GetPort(port_dst)->GetName();
+                jack_error("Connecting src_name [%s] (alias [%s]) and dst_name [%s] (alias [%s]) failed!",
+                           src_name, src, dst_name, dst);
+            }
+            if (res < ret) {
+                ret = res;
+            }
+        }
+    }
+
+    return ret;
 }
 
 int JackEngine::PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
