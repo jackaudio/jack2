@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "JackPosixProcessSync.h"
 #include "JackError.h"
+#include "JackPosixCommon.h"
 
 namespace Jack
 {
@@ -106,38 +107,91 @@ void JackPosixProcessSync::LockedWait()
 // TO DO : check thread consistency?
 bool JackPosixProcessSync::LockedTimedWait(long usec)
 {
-    struct timeval T0, T1;
-    timespec time;
-    struct timeval now;
-    int res1, res2;
+    int res1, res2, res3;
+    struct timespec rel_timeout, now_mono, end_mono, now_real, end_real;
+    struct timespec diff_mono, final_time;
+    int old_errno;
+    bool mono_available = true;
+    double delta;
 
     res1 = pthread_mutex_lock(&fMutex);
     if (res1 != 0) {
-        jack_error("JackPosixProcessSync::LockedTimedWait error err = %s", usec, strerror(res1));
+        jack_error("JackPosixProcessSync::LockedTimedWait error err = %s",
+            usec, strerror(res1));
     }
 
-    jack_log("JackPosixProcessSync::TimedWait time out = %ld", usec);
-    gettimeofday(&T0, 0);
+    jack_log("JackPosixProcessSync::LockedTimedWait time out = %ld", usec);
+    /* Convert usec argument to timespec */
+    rel_timeout.tv_sec = usec / 1000000;
+    rel_timeout.tv_nsec = (usec % 1000000) * 1000;
 
-    gettimeofday(&now, 0);
-    unsigned int next_date_usec = now.tv_usec + usec;
-    time.tv_sec = now.tv_sec + (next_date_usec / 1000000);
-    time.tv_nsec = (next_date_usec % 1000000) * 1000;
-    res2 = pthread_cond_timedwait(&fCond, &fMutex, &time);
-    if (res2 != 0) {
-        jack_error("JackPosixProcessSync::LockedTimedWait error usec = %ld err = %s", usec, strerror(res2));
+    /* Calculate absolute monotonic timeout */
+    res3 = clock_gettime(CLOCK_MONOTONIC, &now_mono);
+    if (res3 != 0) {
+        mono_available = false;
+    }
+    JackPosixTools::TimespecAdd(&now_mono, &rel_timeout, &end_mono);
+
+    /* pthread_cond_timedwait() is affected by abrupt time jumps, i.e. when the
+     * system time is changed. To protect against this, measure the time
+     * difference between and after the sem_timedwait() call and if it suggests
+     * that there has been a time jump, restart the call. */
+    if (mono_available) {
+        for (;;) {
+            /* Calculate absolute realtime timeout, assuming no steps */
+            res3 = clock_gettime(CLOCK_REALTIME, &now_real);
+            assert(res3 == 0);
+            JackPosixTools::TimespecSub(&end_mono, &now_mono, &diff_mono);
+            JackPosixTools::TimespecAdd(&now_real, &diff_mono, &end_real);
+
+            res2 = pthread_cond_timedwait(&fCond, &fMutex, &end_real);
+            if (res2 != ETIMEDOUT) {
+                break;
+            }
+
+            /* Compare with monotonic timeout, in case a step happened */
+            old_errno = errno;
+            res3 = clock_gettime(CLOCK_MONOTONIC, &now_mono);
+            assert(res3 == 0);
+            errno = old_errno;
+            if (JackPosixTools::TimespecCmp(&now_mono, &end_mono) >= 0) {
+                break;
+            }
+        }
+    } else {
+        /* CLOCK_MONOTONIC is not supported, do not check for time skips. */
+        res3 = clock_gettime(CLOCK_REALTIME, &now_real);
+        assert(res3 == 0);
+        JackPosixTools::TimespecAdd(&now_real, &rel_timeout, &end_real);
+        res2 = pthread_cond_timedwait(&fCond, &fMutex, &end_real);
     }
 
-    gettimeofday(&T1, 0);
     res1 = pthread_mutex_unlock(&fMutex);
     if (res1 != 0) {
-        jack_error("JackPosixProcessSync::LockedTimedWait error err = %s", usec, strerror(res1));
+        jack_error("JackPosixProcessSync::LockedTimedWait error err = %s",
+            strerror(res1));
     }
 
-    jack_log("JackPosixProcessSync::TimedWait finished delta = %5.1lf",
-             (1e6 * T1.tv_sec - 1e6 * T0.tv_sec + T1.tv_usec - T0.tv_usec));
+    if (res2 != 0) {
+        jack_error("JackPosixProcessSync::LockedTimedWait error usec = %ld err = %s",
+            usec, strerror(res2));
+    }
 
-    return (res2 == 0);
+    old_errno = errno;
+    if (mono_available) {
+        res3 = clock_gettime(CLOCK_MONOTONIC, &final_time);
+        assert(res3 == 0);
+        delta = 1e6 * final_time.tv_sec - 1e6 * now_mono.tv_sec +
+            (final_time.tv_nsec - now_mono.tv_nsec) / 1000;
+    } else {
+        res3 = clock_gettime(CLOCK_REALTIME, &final_time);
+        assert(res3 == 0);
+        delta = 1e6 * final_time.tv_sec - 1e6 * now_real.tv_sec +
+            (final_time.tv_nsec - now_real.tv_nsec) / 1000;
+    }
+    errno = old_errno;
+    jack_log("JackPosixProcessSync::LockedTimedWait finished delta = %5.1lf", delta);
+    return res2 == 0;
 }
 
 
