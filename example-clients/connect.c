@@ -68,8 +68,8 @@ main (int argc, char *argv[])
 	int option_index;
 	jack_options_t options = JackNoStartServer;
 	char *my_name = strrchr(argv[0], '/');
-	jack_port_t *src_port = 0;
-	jack_port_t *dst_port = 0;
+	const char *src_port = 0;
+	const char *dst_port = 0;
 	jack_port_t *port1 = 0;
 	jack_port_t *port2 = 0;
 	char portA[300];
@@ -194,13 +194,13 @@ main (int argc, char *argv[])
 
 	if (port1_flags & JackPortIsInput) {
 		if (port2_flags & JackPortIsOutput) {
-			src_port = port2;
-			dst_port = port1;
+			src_port = portB;
+			dst_port = portA;
 		}
 	} else {
 		if (port2_flags & JackPortIsInput) {
-			src_port = port1;
-			dst_port = port2;
+			src_port = portA;
+			dst_port = portB;
 		}
 	}
 
@@ -220,13 +220,13 @@ main (int argc, char *argv[])
 	*/
 
 	if (connecting) {
-		if (jack_connect(client, jack_port_name(src_port), jack_port_name(dst_port))) {
+		if (jack_connect(client, src_port, dst_port)) {
             fprintf (stderr, "cannot connect client, already connected?\n");
 			goto exit;
 		}
 	}
 	if (disconnecting) {
-		if (jack_disconnect(client, jack_port_name(src_port), jack_port_name(dst_port))) {
+		if (jack_disconnect(client, src_port, dst_port)) {
             fprintf (stderr, "cannot disconnect client, already disconnected?\n");
 			goto exit;
 		}
