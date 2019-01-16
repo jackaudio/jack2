@@ -52,7 +52,6 @@ class JackPosixProcessSync : public JackBasePosixMutex
             pthread_cond_destroy(&fCond);
         }
 
-        bool TimedWait(long usec);
         bool LockedTimedWait(long usec);
 
         void Wait();
