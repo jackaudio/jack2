@@ -40,7 +40,7 @@
 #endif
 #endif
 
-#ifdef __ARM_NEON__
+#if defined (__ARM_NEON__) || defined (__ARM_NEON)
 #include <arm_neon.h>
 #endif
 
@@ -61,6 +61,10 @@ namespace origerated {
 
 #ifdef __ARM_NEON__
 #undef __ARM_NEON__
+#endif
+
+#ifdef __ARM_NEON
+#undef __ARM_NEON
 #endif
 
 #include "../common/memops.c"
