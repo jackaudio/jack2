@@ -686,10 +686,10 @@ int main (int argc, char *argv[]) {
 	    case 's':
 		smooth_size = atoi(optarg);
 		break;
-		case 'S':
-			server_name = optarg;
-			jack_opts |= JackServerName;
-			break;
+	    case 'S':
+		server_name = optarg;
+		jack_opts |= JackServerName;
+		break;
 	    case ':':
 		fprintf(stderr,
 			"Option -%c requires an operand\n", optopt);

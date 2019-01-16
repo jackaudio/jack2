@@ -689,7 +689,7 @@ int main (int argc, char *argv[]) {
 	    case 's':
 		smooth_size = atoi(optarg);
 		break;
-		case 'S':
+	    case 'S':
 		server_name = optarg;
 		jack_opts |= JackServerName;
 		break;
