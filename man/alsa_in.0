@@ -91,7 +91,10 @@ If you have a PCI card, then the default value (15) of this parameter is too hig
 Be aware that setting this parameter too low, lets the hf noise on the delay measurement come through onto the resamplerate, so this
 might degrade the quality of the output. (but its a threshold value, and it has been chosen, to mask the noise of a USB card,
 which has an amplitude which is 50 times higher than that of a PCI card, so 5 won't lose you any quality on a PCI card)
+.TP
+\fB\-S \fI server_name\fR 
+.br
+Server to connect to. This option permits to attach to a named jack2 server.
 
 .SH AUTHOR
 Torben Hohn
-
