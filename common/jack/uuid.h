@@ -21,6 +21,7 @@
 #define __jack_uuid_h__
 
 #include <jack/types.h>
+#include "JackCompilerDeps.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,17 +31,17 @@ extern "C" {
 #define JACK_UUID_STRING_SIZE (JACK_UUID_SIZE+1) /* includes trailing null */
 #define JACK_UUID_EMPTY_INITIALIZER 0
 
-extern jack_uuid_t jack_client_uuid_generate ();
-extern jack_uuid_t jack_port_uuid_generate (uint32_t port_id);
+extern LIB_EXPORT jack_uuid_t jack_client_uuid_generate ();
+extern LIB_EXPORT jack_uuid_t jack_port_uuid_generate (uint32_t port_id);
 
-extern uint32_t jack_uuid_to_index (jack_uuid_t);
+extern LIB_EXPORT uint32_t jack_uuid_to_index (jack_uuid_t);
 
-extern int  jack_uuid_compare (jack_uuid_t, jack_uuid_t);
-extern void jack_uuid_copy (jack_uuid_t* dst, jack_uuid_t src);
-extern void jack_uuid_clear (jack_uuid_t*);
-extern int  jack_uuid_parse (const char *buf, jack_uuid_t*);
-extern void jack_uuid_unparse (jack_uuid_t, char buf[JACK_UUID_STRING_SIZE]);
-extern int  jack_uuid_empty (jack_uuid_t);
+extern LIB_EXPORT int  jack_uuid_compare (jack_uuid_t, jack_uuid_t);
+extern LIB_EXPORT void jack_uuid_copy (jack_uuid_t* dst, jack_uuid_t src);
+extern LIB_EXPORT void jack_uuid_clear (jack_uuid_t*);
+extern LIB_EXPORT int  jack_uuid_parse (const char *buf, jack_uuid_t*);
+extern LIB_EXPORT void jack_uuid_unparse (jack_uuid_t, char buf[JACK_UUID_STRING_SIZE]);
+extern LIB_EXPORT int  jack_uuid_empty (jack_uuid_t);
 
 #ifdef __cplusplus
 } /* namespace */
