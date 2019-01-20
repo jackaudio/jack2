@@ -342,8 +342,8 @@ namespace Jack
             int fPacketSize;
 
             void UpdateParams(int active_ports);
-        
-        
+
+
             void RenderFromNetwork(char* net_buffer, int active_port, int sub_cycle);
             void RenderToNetwork(char* net_buffer, int active_port, int sub_cycle);
 
@@ -379,7 +379,7 @@ namespace Jack
 
             int fCompressedSizeByte;
             unsigned char** fCompressedBuffer;
-   
+
             size_t fLastSubPeriodBytesSize;
 
             void FreeCelt();
@@ -422,7 +422,7 @@ namespace Jack
 
             int fCompressedMaxSizeByte;
             unsigned short* fCompressedSizesByte;
-   
+
             size_t fLastSubPeriodBytesSize;
 
             unsigned char** fCompressedBuffer;
@@ -456,7 +456,7 @@ namespace Jack
         private:
 
             int fCompressedSizeByte;
- 
+
             size_t fLastSubPeriodBytesSize;
 
             short** fIntBuffer;

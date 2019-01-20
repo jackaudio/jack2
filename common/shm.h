@@ -71,7 +71,7 @@ extern "C"
     typedef char shm_name_t[SHM_NAME_MAX];
     typedef shm_name_t jack_shm_id_t;
 
-#elif WIN32  
+#elif WIN32
 #define NAME_MAX 255
 #ifndef SHM_NAME_MAX
 #define SHM_NAME_MAX NAME_MAX
@@ -178,10 +178,10 @@ extern "C"
             char ptr_size[8];
         } ptr;  /* a "pointer" that has the same 8 bytes size when compling in 32 or 64 bits */
     } POST_PACKED_STRUCTURE;
-    
+
     typedef struct _jack_shm_info jack_shm_info_t;
-    
-	/* utility functions used only within JACK */
+
+    /* utility functions used only within JACK */
 
     void jack_shm_copy_from_registry (jack_shm_info_t*,
                 jack_shm_registry_index_t);
@@ -190,7 +190,7 @@ extern "C"
     int jack_release_shm_info (jack_shm_registry_index_t);
     char* jack_shm_addr (jack_shm_info_t* si);
 
-    // here begin the API
+    /* here begin the API */
     int jack_register_server (const char *server_name, int new_registry);
     int jack_unregister_server (const char *server_name);
 

@@ -38,7 +38,7 @@ namespace Jack
 #define SLAVE_INIT_TIMEOUT      1000000 * 1   // in usec
 #define PACKET_TIMEOUT          1000000       // in usec
 
-#define NETWORK_DEFAULT_LATENCY     2  
+#define NETWORK_DEFAULT_LATENCY     2
 #define NETWORK_MAX_LATENCY         30  // maximum possible latency in network master/slave loop
 
     /**
@@ -49,9 +49,9 @@ namespace Jack
     {
 
         friend class JackNetExt;
-        
+
         protected:
-        
+
             bool fSetTimeOut;
             int fPacketTimeOut;
 
@@ -115,7 +115,7 @@ namespace Jack
             int AudioRecv(packet_header_t* rx_head, NetAudioBuffer* buffer);
 
             int FinishRecv(NetAudioBuffer* buffer);
-            
+
             void SetRcvTimeOut();
             void SetPacketTimeOut(int time_out)
             {
@@ -149,7 +149,7 @@ namespace Jack
             int fCurrentCycleOffset;
             int fMaxCycleOffset;
             bool fSynched;
-       
+
             bool Init();
             bool SetParams();
 
@@ -207,7 +207,7 @@ namespace Jack
             bool InitConnection(int time_out_sec);
             bool InitRendering();
 
-            net_status_t SendAvailableToMaster(int count = INT_MAX); 
+            net_status_t SendAvailableToMaster(int count = INT_MAX);
             net_status_t SendStartToMaster();
 
             bool SetParams();

@@ -40,21 +40,21 @@ struct JackProfilerClient {
     jack_client_t* fClient;
     jack_port_t* fSchedulingPort;
     jack_port_t* fDurationPort;
-    
+
     JackProfilerClient(jack_client_t* client, const char* name);
     ~JackProfilerClient();
-    
+
 };
 
 /*!
 \brief Server real-time monitoring
 */
 
-class JackProfiler 
+class JackProfiler
 {
 
     private:
-    
+
         jack_client_t* fClient;
         jack_port_t* fCPULoadPort;
         jack_port_t* fDriverPeriodPort;
@@ -64,7 +64,7 @@ class JackProfiler
         std::map<std::string, JackProfilerClient*> fClientTable;
         JackMutex fMutex;
     #endif
- 
+
     public:
 
         JackProfiler(jack_client_t* jack_client, const JSList* params);

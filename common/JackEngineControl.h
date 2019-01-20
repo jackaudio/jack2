@@ -104,7 +104,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
         fRealTime = rt;
         fSavedRealTime = false;
         fServerPriority = priority;
-        
+
     #ifdef WIN32
         fClientPriority = (rt) ? priority - 3 : 0;
     #else
@@ -130,7 +130,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
 
     ~JackEngineControl()
     {}
-    
+
     void UpdateTimeOut()
     {
         fPeriodUsecs = jack_time_t(1000000.f / fSampleRate * fBufferSize); // In microsec

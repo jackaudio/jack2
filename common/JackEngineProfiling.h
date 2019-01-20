@@ -45,7 +45,7 @@ struct JackTimingMeasureClient
     jack_time_t	fAwakeAt;
     jack_time_t	fFinishedAt;
     jack_client_state_t fStatus;
-    
+
     JackTimingMeasureClient() 
         :fRefNum(-1),
         fSignaledAt(0),
@@ -53,7 +53,7 @@ struct JackTimingMeasureClient
         fFinishedAt(0),
         fStatus((jack_client_state_t)0)
     {}
-    
+
 } POST_PACKED_STRUCTURE;
 
 /*!
@@ -67,13 +67,13 @@ struct JackTimingClientInterval
     char fName[JACK_CLIENT_NAME_SIZE + 1];
     int fBeginInterval;
     int fEndInterval;
-    
+
     JackTimingClientInterval()
          :fRefNum(-1),
          fBeginInterval(-1),
          fEndInterval(-1)
     {}
-    
+
 } POST_PACKED_STRUCTURE;
 
 /*!
@@ -88,14 +88,14 @@ struct JackTimingMeasure
     jack_time_t fCurCycleBegin;
     jack_time_t fPrevCycleEnd;
     JackTimingMeasureClient fClientTable[CLIENT_NUM];
-    
+
     JackTimingMeasure()
         :fAudioCycle(0), 
         fPeriodUsecs(0),
         fCurCycleBegin(0),
         fPrevCycleEnd(0)
     {}
-    
+
 } POST_PACKED_STRUCTURE;
 
 /*!
@@ -110,20 +110,20 @@ class SERVER_EXPORT JackEngineProfiling
 {
 
     private:
-    
+
         JackTimingMeasure fProfileTable[TIME_POINTS];
         JackTimingClientInterval fIntervalTable[MEASURED_CLIENTS];
-         
+
         unsigned int fAudioCycle;
         unsigned int fMeasuredClient;
-        
+
         bool CheckClient(const char* name, int cur_point);
-        
+
     public:
-    
+
         JackEngineProfiling();
         ~JackEngineProfiling();
-   
+
         void Profile(JackClientInterface** table, 
                     JackGraphManager* manager, 
                     jack_time_t period_usecs,

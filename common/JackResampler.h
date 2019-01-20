@@ -82,7 +82,7 @@ class JackResampler : public JackRingBuffer
     protected:
 
         double fRatio;
-  
+
     public:
 
         JackResampler():JackRingBuffer(),fRatio(1)

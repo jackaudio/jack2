@@ -78,7 +78,7 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         void ReleaseRefnum(int refnum);
 
         int ClientNotify(JackClientInterface* client, int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2);
-        
+
         void NotifyClient(int refnum, int event, int sync, const char*  message, int value1, int value2);
         void NotifyClients(int event, int sync, const char*  message,  int value1, int value2);
 
@@ -104,10 +104,10 @@ class SERVER_EXPORT JackEngine : public JackLockAble
 
         int Open();
         int Close();
-      
+
         // Client management
         int ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status);
-        
+
         int ClientExternalOpen(const char* name, int pid, int uuid, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager);
         int ClientInternalOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, bool wait);
 
@@ -116,7 +116,7 @@ class SERVER_EXPORT JackEngine : public JackLockAble
 
         int ClientActivate(int refnum, bool is_real_time);
         int ClientDeactivate(int refnum);
-        
+
         void ClientKill(int refnum);
 
         int GetClientPID(const char* name);
