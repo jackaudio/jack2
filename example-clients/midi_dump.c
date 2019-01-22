@@ -31,10 +31,10 @@ static pthread_cond_t data_ready = PTHREAD_COND_INITIALIZER;
 static int keeprunning = 1;
 static uint64_t monotonic_cnt = 0;
 
-#define RBSIZE 512
+#define RBSIZE 100000
 
 typedef struct {
-	uint8_t  buffer[128];
+	uint8_t  buffer[4096];
 	uint32_t size;
 	uint32_t tme_rel;
 	uint64_t tme_mon;
