@@ -79,13 +79,14 @@ process (jack_nframes_t frames, void* arg)
 	for (i = 0; i < N; ++i) {
 		jack_midi_event_t event;
 		int r;
-
 		r = jack_midi_event_get (&event, buffer, i);
 
-		if(event.size>MSG_BUFFER_SIZE) {
+		if (r != 0) {continue;}
+
+		if (event.size > MSG_BUFFER_SIZE) {
 			fprintf(stderr, "Error: MIDI message was too large, skipping event. Max. allowed size: %d bytes\n", MSG_BUFFER_SIZE);
 		}
-		else if (r == 0 && jack_ringbuffer_write_space (rb) >= sizeof(midimsg)) {
+		else if (jack_ringbuffer_write_space (rb) >= sizeof(midimsg)) {
 			midimsg m;
 			m.tme_mon = monotonic_cnt;
 			m.tme_rel = event.time;
@@ -94,7 +95,7 @@ process (jack_nframes_t frames, void* arg)
 			jack_ringbuffer_write (rb, (void *) &m, sizeof(midimsg));
 		}
 		else {
-			fprintf(stderr, "Error: ringbuffer was full, skipping event.\n");
+			fprintf (stderr, "Error: ringbuffer was full, skipping event.\n");
 		}
 	}
 
