@@ -1625,9 +1625,6 @@
 		4B05A0640DF72BC000840F4C /* usx2y.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = usx2y.c; path = ../linux/alsa/usx2y.c; sourceTree = SOURCE_ROOT; };
 		4B05A0650DF72BC000840F4C /* usx2y.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = usx2y.h; path = ../linux/alsa/usx2y.h; sourceTree = SOURCE_ROOT; };
 		4B05A07D0DF72BC000840F4C /* driver.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = driver.h; path = ../linux/driver.h; sourceTree = SOURCE_ROOT; };
-		4B05A0830DF72BC000840F4C /* freebob_driver.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = freebob_driver.h; path = ../linux/freebob/freebob_driver.h; sourceTree = SOURCE_ROOT; };
-		4B05A0840DF72BC000840F4C /* JackFreebobDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackFreebobDriver.cpp; path = ../linux/freebob/JackFreebobDriver.cpp; sourceTree = SOURCE_ROOT; };
-		4B05A0850DF72BC000840F4C /* JackFreebobDriver.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackFreebobDriver.h; path = ../linux/freebob/JackFreebobDriver.h; sourceTree = SOURCE_ROOT; };
 		4B0A28E60D52073D002EFF74 /* jack_thread_wait */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_thread_wait; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B0A28EC0D520852002EFF74 /* tw.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tw.c; path = "../example-clients/tw.c"; sourceTree = SOURCE_ROOT; };
 		4B0A292D0D52108E002EFF74 /* jack_thread_wait */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_thread_wait; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2908,7 +2905,6 @@
 				4B349837133A6B6F00D130AB /* firewire */,
 				4B349825133A6AF500D130AB /* alsarawmidi */,
 				4B05A04C0DF72BC000840F4C /* alsa */,
-				4B05A0820DF72BC000840F4C /* freebob */,
 			);
 			name = Linux;
 			sourceTree = "<group>";
@@ -2943,17 +2939,6 @@
 			);
 			name = alsa;
 			path = ../linux/alsa;
-			sourceTree = SOURCE_ROOT;
-		};
-		4B05A0820DF72BC000840F4C /* freebob */ = {
-			isa = PBXGroup;
-			children = (
-				4B05A0830DF72BC000840F4C /* freebob_driver.h */,
-				4B05A0840DF72BC000840F4C /* JackFreebobDriver.cpp */,
-				4B05A0850DF72BC000840F4C /* JackFreebobDriver.h */,
-			);
-			name = freebob;
-			path = ../linux/freebob;
 			sourceTree = SOURCE_ROOT;
 		};
 		4B05A08A0DF72BF600840F4C /* Windows */ = {
