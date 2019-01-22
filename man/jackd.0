@@ -41,7 +41,7 @@ For the latest JACK information please consult the web site:
 \fB\-d, \-\-driver \fIbackend\fR [\fIbackend\-parameters\fR ]
 .br
 Select the audio interface backend. The current list of supported
-backends is: \fBalsa\fR, \fBcoreaudio\fR, \fBdummy\fR, \fBfreebob\fR,
+backends is: \fBalsa\fR, \fBcoreaudio\fR, \fBdummy\fR, 
 \fBfirewire\fR, \fBoss\fR \fBsun\fR and \fBportaudio\fR. They are 
 not all available on all platforms. All \fIbackend\-parameters\fR are optional.
 
@@ -257,7 +257,7 @@ containing at least \fB\-\-nperiods\fR, but the playback latency does
 not increase.
 
 For USB audio devices it is recommended to use \fB\-n 3\fR. Firewire
-devices supported by FFADO (formerly Freebob) are configured with
+devices supported by FFADO (formerly FreeBoB) are configured with
 \fB\-n 3\fR by default.
 
 .TP
@@ -808,8 +808,6 @@ Print usage message for the parameters specific to each backend.
 \fBjackd \-d dummy \-\-help\fR
 .br
 \fBjackd \-d firewire \-\-help\fR
-.br
-\fBjackd \-d freebob \-\-help\fR
 .br
 \fBjackd \-d oss \-\-help\fR
 .br

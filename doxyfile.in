@@ -583,7 +583,6 @@ INPUT                  = @SRCDIR@/common \
                          @SRCDIR@/linux/alsa \
                          @SRCDIR@/linux/alsarawmidi \
                          @SRCDIR@/linux/firewire \
-                         @SRCDIR@/linux/freebob \
                          @SRCDIR@/windows \
                          @SRCDIR@/windows/portaudio \
                          @SRCDIR@/windows/winmme \

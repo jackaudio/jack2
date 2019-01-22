@@ -100,12 +100,6 @@ def options(opt):
     firewire.check_cfg(
             package='libffado >= 1.999.17',
             args='--cflags --libs')
-    freebob = opt.add_auto_option(
-            'freebob',
-            help='Enable FreeBob driver')
-    freebob.check_cfg(
-            package='libfreebob >= 1.0.0',
-            args='--cflags --libs')
     iio = opt.add_auto_option(
             'iio',
             help='Enable IIO driver',
@@ -602,10 +596,6 @@ def build_drivers(bld):
         'linux/firewire/JackFFADOMidiSendQueue.cpp'
     ]
 
-    freebob_src = [
-        'linux/freebob/JackFreebobDriver.cpp'
-    ]
-
     iio_driver_src = [
         'linux/iio/JackIIODriver.cpp'
     ]
@@ -667,13 +657,6 @@ def build_drivers(bld):
             target = 'alsarawmidi',
             source = alsarawmidi_src,
             use = ['ALSA'])
-
-    if bld.env['BUILD_DRIVER_FREEBOB']:
-        create_driver_obj(
-            bld,
-            target = 'freebob',
-            source = freebob_src,
-            use = ['LIBFREEBOB'])
 
     if bld.env['BUILD_DRIVER_FFADO']:
         create_driver_obj(
