@@ -5,10 +5,12 @@ Authors
 Adrian Knoth
 Alba Mendez
 Alexander Graf
+Alexandre Prokoudine
 Alexandru Tofan
 Andreas Müller
 Andrew Kelley
 Andrzej Szombierski
+Andy Wingo
 Arnaud Rebillout
 Arnold Krille
 Bernhard M. Wiedemann
@@ -31,13 +33,18 @@ Gaël Portay
 Holger Dehnhardt
 Hunter L. Allen
 Jacek Konieczny
+Jack O'Quin
 James Cowgill
 James P. Thomas
 Jan Engelhardt
+Jeremy Hall
 John Emmas
+Johnny Petrantoni
 Josh Green
 Joshua Moyerman
 Julien Acroute
+Jussi Laako
+Kai Vehmanen
 Karl Lindén
 Kim Jeong Yeon
 Kjetil S. Matheussen
@@ -48,6 +55,7 @@ Mario Lang
 Markus Seeber
 Matt Flax
 Maxim Grishin
+Melanie Thielker
 Michael Voigt
 Michał Szymański
 Nedko Arnaudov
@@ -61,12 +69,16 @@ Robin Gareus
 Romain Moret
 Rui Nuno Capela
 Samuel Martin
+Stefan Schwandter
 Stéphane Letz <letz@grame.fr>
+Steve Harris
 Steven Chamberlain
+Taybin Rutkin
 Thibault LeMeur
 Thomas Brand <tom@trellis.ch>
 Thomas Petazzoni
 Thom Johansen
+Tilman Linneweh
 Tim Blechmann
 Timo Wischer
 Tom Szilagyi
