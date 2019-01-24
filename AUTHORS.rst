@@ -1,39 +1,77 @@
 Authors
 #######
+(Alphabetically ordered)
 
-Dmitry Baikov
-Gabriel M. Beddingfield
-Steven Chamberlain
-Thom Johansen
-Thibault LeMeur
-Tom Szilagyi
+Adrian Knoth
+Alba Mendez
+Alexander Graf
+Alexandru Tofan
+Andreas Müller
+Andrew Kelley
 Andrzej Szombierski
-Kjetil S.Matheussen
-Pieter Palmers
-Tim Blechmann
-Marc-Olivier Barre
-Nedko Arnaudov
+Arnaud Rebillout
+Arnold Krille
+Bernhard M. Wiedemann
+Bruno Vernay
+Cédric Schieli
+Chris Caudle
+David Garcia Garzon
+David Runge
+Deven Lahoti
+Devin Anderson
+Dmitry Baikov
+Edward Betts
+Eliot Blennerhassett
 Fernando Lopez-Lezcano
-Romain Moret
+Filipe Coelho <falktx@falktx.com>
 Florian Faber
+Francis Pinteric
+Gabriel M. Beddingfield
+Gaël Portay
+Holger Dehnhardt
+Hunter L. Allen
+Jacek Konieczny
+James Cowgill
+James P. Thomas
+Jan Engelhardt
+John Emmas
+Josh Green
+Joshua Moyerman
+Julien Acroute
+Karl Lindén
+Kim Jeong Yeon
+Kjetil S. Matheussen
+Lars-Peter Clausen
+Maks Naumov
+Marc-Olivier Barre
+Mario Lang
+Markus Seeber
+Matt Flax
+Maxim Grishin
 Michael Voigt
-Torben Hohn
+Michał Szymański
+Nedko Arnaudov
+Olaf Hering
+Olivier Humbert
 Paul Davis
 Peter L Jones
-Devin Anderson
-Josh Green
-Mario Lang
-Arnold Krille
-Jan Engelhardt
-Adrian Knoth
-David Garcia Garzon
-Valerio Pilo
-Chris Caudle
-John Emmas
+Pieter Palmers
+Ricardo Crudo
 Robin Gareus
-Matt Flax
-Lars-Peter Clausen
-Alexandru Tofan
-Kim Jeong Yeon
-Filipe Coelho <falktx@falktx.com>
-Stephane Letz <letz@grame.fr>
+Romain Moret
+Rui Nuno Capela
+Samuel Martin
+Stéphane Letz <letz@grame.fr>
+Steven Chamberlain
+Thibault LeMeur
+Thomas Brand <tom@trellis.ch>
+Thomas Petazzoni
+Thom Johansen
+Tim Blechmann
+Timo Wischer
+Tom Szilagyi
+Torben Hohn
+Valentin David
+Valerio Pilo
+Yasuhiro Fujii
+Youri Westerman
