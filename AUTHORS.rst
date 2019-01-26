@@ -1,6 +1,6 @@
 Authors
 #######
-(Alphabetically ordered)
+(Ordered alphabetically)
 
 Adrian Knoth
 Alba Mendez
@@ -11,6 +11,7 @@ Andreas Müller
 Andrew Kelley
 Andrzej Szombierski
 Andy Wingo
+Anthony Van Groningen
 Arnaud Rebillout
 Arnold Krille
 Bernhard M. Wiedemann
@@ -18,6 +19,7 @@ Bruno Vernay
 Cédric Schieli
 Chris Caudle
 David Garcia Garzon
+David Robillard
 David Runge
 Deven Lahoti
 Devin Anderson
@@ -32,23 +34,29 @@ Gabriel M. Beddingfield
 Gaël Portay
 Holger Dehnhardt
 Hunter L. Allen
+Ian Esten
 Jacek Konieczny
 Jack O'Quin
 James Cowgill
 James P. Thomas
 Jan Engelhardt
+Jaroslav Kysela
 Jeremy Hall
 John Emmas
 Johnny Petrantoni
+Jonathan Woithe
 Josh Green
 Joshua Moyerman
 Julien Acroute
 Jussi Laako
+Juuso Alasuutari
 Kai Vehmanen
 Karl Lindén
+Karsten Wiese
 Kim Jeong Yeon
 Kjetil S. Matheussen
 Lars-Peter Clausen
+Lee Revell
 Maks Naumov
 Marc-Olivier Barre
 Mario Lang
@@ -65,10 +73,13 @@ Paul Davis
 Peter L Jones
 Pieter Palmers
 Ricardo Crudo
+Robert Ham
 Robin Gareus
+Rohan Drape
 Romain Moret
 Rui Nuno Capela
 Samuel Martin
+Samuel Tracol
 Stefan Schwandter
 Stéphane Letz <letz@grame.fr>
 Steve Harris
