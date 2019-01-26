@@ -749,9 +749,9 @@ int main (int argc, char *argv[])
      */
     char client_name3[jack_client_name_size()];
     // "jack_client_name_size" - 1 effective characters
-    for (int i = 0; i < jack_client_name_size() - 1; i++) {
-        client_name3[i] = 'A';
-    }
+    memset(client_name3, 'A', sizeof(client_name3));
+    // set last expected printable to 'X'
+    client_name3[jack_client_name_size()-2] = 'X';
     // And last one is the terminating '0'
     client_name3[jack_client_name_size()-1] = 0;
     Log("trying to register a new jackd client with maximum possible client name size...\n", client_name3);
