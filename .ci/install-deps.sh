@@ -44,7 +44,26 @@ if [ "$TRAVIS_OS_NAME" == "linux" ]; then
     libdbus-1-dev \
     libeigen3-dev \
     libopus-dev \
-    portaudio19-dev
+    portaudio19-dev \
+    locate
+
+# remove everything that jack will provide
+# (it can not be a dependency for the build)
+# these files were dragged in by the above apt-get install of dependency packages
+  sudo rm -rf /usr/lib/x86_64-linux-gnu/libjack*
+  sudo rm -rf /usr/include/jack*
+  sudo rm -rf /usr/share/doc/libjack*
+  sudo rm -rf /var/lib/dpkg/info/libjack*
+  sudo rm -rf /usr/lib/x86_64-linux-gnu/pkgconfig/jack.pc
+# when these files aren't deleted: jackd will behave strange after install.
+# one symptom: unknown option character l
+
+  sudo updatedb
+  echo "found these files with 'jack' in name after installing dependencies and clean up:"
+  echo "========================================================================="
+  locate jack | grep -v /home/travis/build
+  echo "========================================================================="
+
   # force installation of gcc-6 if required
   if [ "${CC}" == "gcc-6" ]; then
     sudo apt-get install gcc-6 g++-6
