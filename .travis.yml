@@ -105,6 +105,8 @@ script:
         CXXFLAGS="${CXXFLAGS} -flax-vector-conversions" ./waf -v build;
       fi
     - sudo ./waf -v install
+# run very basic tests
+    - sudo .ci/test_run.sh
 
 branches:
   only:
