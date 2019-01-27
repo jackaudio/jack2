@@ -38,6 +38,7 @@
 #include <jack/intclient.h>
 #include <jack/transport.h>
 
+#define TEST_EXCLUDE_DEPRECATED 1
 
 #if defined(WIN32) && !defined(M_PI)
 #define M_PI 3.151592653
@@ -496,6 +497,7 @@ int process5(jack_nframes_t nframes, void *arg)
     static jack_time_t first_next_usecs;
     static float first_period_usecs;
     static int res1 = jack_get_cycle_times(client, &first_current_frames, &first_current_usecs, &first_next_usecs, &first_period_usecs);
+    if(res1==0){}
 
     jack_nframes_t current_frames;
     jack_time_t current_usecs;
@@ -721,6 +723,7 @@ int main (int argc, char *argv[])
      * try to register another one with the same name...
      *
      */
+#ifndef TEST_EXCLUDE_DEPRECATED
     Log("trying to register a new jackd client with name %s using jack_client_new()...\n", client_name1);
     client2 = jack_client_new(client_name1);
     if (client2 == NULL) {
@@ -729,6 +732,7 @@ int main (int argc, char *argv[])
         printf("!!! ERROR !!! Jackd server has accepted multiples client with the same name !\n");
         jack_client_close(client2);
     }
+#endif
 
     /**
      * try to register another one with the same name using jack_client_open ==> since JackUseExactName is not used, an new client should be opened...
@@ -942,6 +946,7 @@ int main (int argc, char *argv[])
      * Verify the function port_set_name
      *
      */
+#ifndef TEST_EXCLUDE_DEPRECATED
     if (jack_port_set_name (output_port1, "renamed-port#") == 0 ) {
         if (strcmp(jack_port_name(output_port1), "renamed-port#") == 0) {
             printf("!!! ERROR !!! functions jack_port_set_name seems to be invalid !\n");
@@ -953,7 +958,7 @@ int main (int argc, char *argv[])
     } else {
         printf("error : port_set_name function can't be tested...\n");
     }
-
+#endif
     /**
      * Verify if a port can be registered with maximum port name size (that is "short name")
      *
@@ -992,12 +997,14 @@ int main (int argc, char *argv[])
      * Test if port rename callback have been called.
      *
      */
+#ifndef TEST_EXCLUDE_DEPRECATED
     jack_port_set_name (output_port1, "renamed-port#");
     jack_sleep(1 * 1000);
 
     if (port_rename_clbk == 0) {
         printf("!!! ERROR !!! Jack_Port_Rename_Callback was not called !!.\n");
     }
+#endif
 
     /**
      * Test if port registration callback have been called.
@@ -1362,15 +1369,16 @@ int main (int argc, char *argv[])
     /* open a client connection to the JACK server */
     client_name2 = "jack_test_#2";
     linecl2 = linecount; // reminders for graph analysis
-    client2 = jack_client_new(client_name2);
-
+//  client2 = jack_client_new(client_name2);
+    Log("Register a client using jack_client_open()...\n");
+    client2 = jack_client_open(client_name2, jack_options, &status, server_name);
     if (client2 == NULL) {
-        fprintf(stderr, "jack_client_new() failed for %s.\n"
-                "status = 0x%2.0x\n", client_name2, status);
+        fprintf (stderr, "jack_client_open() failed, "
+                 "status = 0x%2.0x\n", status);
         if (status & JackServerFailed) {
-            fprintf(stderr, "Unable to connect client2 to JACK server\n");
+            fprintf(stderr, "Unable to connect to JACK server\n");
         }
-        exit(1);
+        exit (1);
     }
 
     // Check client registration callback after jack_client_new
@@ -1387,7 +1395,17 @@ int main (int argc, char *argv[])
     }
 
     // Open client2 again...
-    client2 = jack_client_new(client_name2);
+//  client2 = jack_client_new(client_name2);
+    Log("Register a client using jack_client_open() AGAIN...\n");
+    client2 = jack_client_open(client_name2, jack_options, &status, server_name);
+    if (client2 == NULL) {
+        fprintf (stderr, "jack_client_open() failed, "
+                 "status = 0x%2.0x\n", status);
+        if (status & JackServerFailed) {
+            fprintf(stderr, "Unable to connect to JACK server\n");
+        }
+        exit (1);
+    }
 
     /**
      * Register callback for this client.
@@ -1601,6 +1619,7 @@ int main (int argc, char *argv[])
      * Tie client1.in1 and client1.out1 ports, and make some data test to check the validity of the tie.
      *
      */
+#ifndef TEST_EXCLUDE_DEPRECATED
     Log("Testing tie mode...\n");
     if (jack_port_tie(input_port1, output_port2) != 0) {
         Log("not possible to tie two ports from two different clients... ok\n");
@@ -1682,7 +1701,7 @@ int main (int argc, char *argv[])
         jack_port_disconnect(client1, output_port1);
 
     } //end of tie
-
+#endif
 
     /**
      * Testing SUMMATION CAPABILITIES OF JACK CONNECTIONS
@@ -1704,8 +1723,9 @@ int main (int argc, char *argv[])
 
     process1_activated = 3;
     process2_activated = -1;
-    for (g = 0; g < 96000; g++)
-        signal2[g] = 0.0;
+    int h;
+    for (h = 0; h < 96000; h++)
+        signal2[h] = 0.0;
     index1 = 0;
     index2 = 0;
 
@@ -1753,17 +1773,21 @@ int main (int argc, char *argv[])
         Log("Checking jack_port_name() with a non valid port... ok\n");
     }
 
+#ifndef TEST_EXCLUDE_DEPRECATED
     if (jack_port_set_name(output_port1b, "new_name") == 0 ) {
         printf("!!! WARNING !!! An unregistered port can be renamed successfully !\n");
     } else {
         Log("Checking renaming of an unregistered port... ok\n");
     }
+#endif
     inports = jack_get_ports(client1, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
+#ifndef TEST_EXCLUDE_DEPRECATED
     if (inports && jack_port_set_name(jack_port_by_name(client1, inports[0]), "new_name") == 0 ) {
         printf("!!! WARNING !!! A PHYSICAL port can be renamed successfully !\n");
     } else {
         Log("Checking renaming of an unregistered port... ok\n");
     }
+#endif
     jack_free (inports);
 
 
@@ -1777,6 +1801,8 @@ int main (int argc, char *argv[])
      *
      * 3 test are done : one with no connections between client, one with a serial connection, and one with parallel connection
      */
+
+#ifndef TEST_EXCLUDE_DEPRECATED
     Log("Checking about latency functions...\n");
     t_error = 0;
     jack_recompute_total_latencies(client1);
@@ -1872,6 +1898,7 @@ int main (int argc, char *argv[])
 
     jack_free(inports);
     jack_free(outports);
+#endif
 
     /**
      * Checking transport API.
