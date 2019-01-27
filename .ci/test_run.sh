@@ -1,19 +1,20 @@
 #!/bin/sh
 
 echo "`date`"
+echo "$TRAVIS_OS_NAME"
 echo "========================================================================="
-sudo updatedb
-locate jack | grep -e "/usr/bin" -e "/usr/lib" -e "/usr/share/man" -e "/usr/include"
+if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+	sudo updatedb
+	locate jack | grep -e "/usr/bin" -e "/usr/lib" -e "/usr/share/man" -e "/usr/include"
+	ls -l /usr/bin/jackd
+	locate jack | grep /usr/share/man | grep "\.1" | while read line; do
+		man -P cat "$line"; done
+fi
 echo "========================================================================="
-ls -l /usr/bin/jackd
 jackd --version
-echo "========================================================================="
 
 #echo "/usr/bin/jackd --verbose -p512 -t5000 -ddummy -r44100"> ~/.jackdrc
 #sudo jack_bufsize
-
-locate jack | grep /usr/share/man | grep "\.1" | while read line; do
-	man -P cat "$line"; done
 
 echo "========================================================================="
 sudo jackd -ddummy &
