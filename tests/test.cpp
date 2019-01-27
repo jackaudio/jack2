@@ -180,10 +180,10 @@ void Jack_Freewheel_Callback(int starting, void *arg)
 void Jack_Client_Registration_Callback(const char* name, int val, void *arg)
 {
     Log("Client registration callback name = %s has been successfully called with value %i. (msg from callback)\n", name, val);
-	if (val)
-		client_register++;
-	else
-		client_register--;
+    if (val)
+        client_register++;
+    else
+        client_register--;
 }
 
 void Jack_Port_Rename_Callback(jack_port_id_t port, const char* old_name, const char* new_name, void *arg)
@@ -245,7 +245,7 @@ void Jack_Port_Register(jack_port_id_t port, int mode, void *arg)
 
 void Jack_Port_Connect(jack_port_id_t a, jack_port_id_t b, int connect, void* arg)
 {
-	Log("PortConnect src = %ld dst = %ld  onoff = %ld (msg from callback)\n", a, b, connect);
+    Log("PortConnect src = %ld dst = %ld  onoff = %ld (msg from callback)\n", a, b, connect);
 }
 
 int Jack_Sync_Callback(jack_transport_state_t state, jack_position_t *pos, void *arg)
@@ -489,14 +489,14 @@ int process4(jack_nframes_t nframes, void *arg)
 
 int process5(jack_nframes_t nframes, void *arg)
 {
-	jack_client_t* client = (jack_client_t*) arg;
-    
+    jack_client_t* client = (jack_client_t*) arg;
+
     static jack_nframes_t first_current_frames;
     static jack_time_t first_current_usecs;
     static jack_time_t first_next_usecs;
     static float first_period_usecs;
-	static int res1 = jack_get_cycle_times(client, &first_current_frames, &first_current_usecs, &first_next_usecs, &first_period_usecs);
-	   
+    static int res1 = jack_get_cycle_times(client, &first_current_frames, &first_current_usecs, &first_next_usecs, &first_period_usecs);
+
     jack_nframes_t current_frames;
     jack_time_t current_usecs;
     jack_time_t next_usecs;
@@ -507,14 +507,14 @@ int process5(jack_nframes_t nframes, void *arg)
         printf("!!! ERROR !!! jack_get_cycle_times fails...\n");
         return 0;
     }
-    
-	Log("calling process5 callback : jack_get_cycle_times delta current_frames = %ld delta current_usecs = %ld delta next_usecs = %ld period_usecs = %f\n", 
-        current_frames - first_current_frames, current_usecs - first_current_usecs, next_usecs - first_next_usecs, period_usecs);
- 
+
+    Log("calling process5 callback : jack_get_cycle_times delta current_frames = %ld delta current_usecs = %ld delta next_usecs = %ld period_usecs = %f\n", 
+    current_frames - first_current_frames, current_usecs - first_current_usecs, next_usecs - first_next_usecs, period_usecs);
+
     first_current_frames = current_frames;
     first_current_usecs = current_usecs;
     first_next_usecs = next_usecs;
-	return 0;
+    return 0;
 }
 
 static void display_transport_state()
@@ -558,7 +558,7 @@ int main (int argc, char *argv[])
     const char **inports; // array of PHY input/output
     const char **outports; // array of PHY input/outputs
     const char *server_name = NULL;
-	const char **connexions1;
+    const char **connexions1;
     const char **connexions2;
     jack_status_t status;
     char portname[128] = "port";
@@ -573,7 +573,7 @@ int main (int argc, char *argv[])
     const char *options = "kRnqvt:";
     float ratio;		// for speed calculation in freewheel mode
     jack_options_t jack_options = JackNullOption;
-	struct option long_options[] = {
+    struct option long_options[] = {
                                        {"realtime", 0, 0, 'R'},
                                        {"non-realtime", 0, 0, 'n'},
                                        {"time", 0, 0, 't'},
@@ -654,7 +654,7 @@ int main (int argc, char *argv[])
      * Register a client...
      *
      */
-	Log("Register a client using jack_client_open()...\n");
+    Log("Register a client using jack_client_open()...\n");
     client1 = jack_client_open(client_name1, jack_options, &status, server_name);
     if (client1 == NULL) {
         fprintf (stderr, "jack_client_open() failed, "
@@ -682,7 +682,7 @@ int main (int argc, char *argv[])
 
     if (intclient == 0 || status & JackFailure) {
         printf("!!! ERROR !!! cannot load internal client \"inprocess\" intclient 0x%llX status 0x%2.0x !\n", (unsigned long long)intclient, status);
-	} else {
+    } else {
 
         Log("\"inprocess\" server internal client loaded\n");
 
@@ -730,7 +730,7 @@ int main (int argc, char *argv[])
         jack_client_close(client2);
     }
 
-	/**
+    /**
      * try to register another one with the same name using jack_client_open ==> since JackUseExactName is not used, an new client should be opened...
      *
      */
@@ -738,11 +738,11 @@ int main (int argc, char *argv[])
     client2 = jack_client_open(client_name1, jack_options, &status, server_name);
     if (client2 != NULL) {
         Log ("valid : a second client with the same name can be registered (client automatic renaming)\n");
-		jack_client_close(client2);
+        jack_client_close(client2);
     } else {
         printf("!!! ERROR !!! Jackd server automatic renaming feature does not work!\n");
     }
-    
+
     /**
      * try to register a client with maximum possible client name size
      *
@@ -758,7 +758,7 @@ int main (int argc, char *argv[])
     client2 = jack_client_open(client_name3, jack_options, &status, server_name);
     if (client2 != NULL) {
         Log ("valid : a client with maximum possible client name size can be opened\n");
-		jack_client_close(client2);
+        jack_client_close(client2);
     } else {
         printf("!!! ERROR !!! opening a client with maximum possible client name size does not work!\n");
     }
@@ -834,9 +834,9 @@ int main (int argc, char *argv[])
         printf("Error when calling jack_set_port_connect_callback() !\n");
     }
 
-	if (jack_set_client_registration_callback(client1, Jack_Client_Registration_Callback, 0) != 0) {
-		printf("Error when calling jack_set_client_registration_callback() !\n");
-	}
+    if (jack_set_client_registration_callback(client1, Jack_Client_Registration_Callback, 0) != 0) {
+        printf("Error when calling jack_set_client_registration_callback() !\n");
+    }
 
     jack_set_error_function(Jack_Error_Callback);
 
@@ -884,9 +884,9 @@ int main (int argc, char *argv[])
      */
     if (strcmp(jack_port_type(output_port1), JACK_DEFAULT_AUDIO_TYPE) != 0) {
         printf("!!! ERROR !!! jack_port_type returns an incorrect value!\n");
-	} else {
-		Log("Checking jack_port_type()... ok.\n");
-	}
+    } else {
+        Log("Checking jack_port_type()... ok.\n");
+    }
 
     /**
      * Try to register another port with the same name...
@@ -932,7 +932,7 @@ int main (int argc, char *argv[])
     } else {
         printf("error : port_set_name function can't be tested...\n");
     }
-    
+
     /**
      * Verify if a port can be registered with maximum port name size (that is "short name")
      *
@@ -948,10 +948,10 @@ int main (int argc, char *argv[])
     jack_port_t * test_max_port = jack_port_register(client1, port_name3,
                                       JACK_DEFAULT_AUDIO_TYPE,
                                       JackPortIsOutput, 0);
-   
+
     if (test_max_port != NULL) {
         Log ("valid : a port with maximum possible port name size can be registered\n");
-		jack_port_unregister(client1, test_max_port);
+        jack_port_unregister(client1, test_max_port);
     } else {
         printf("!!! ERROR !!! registering a port with maximum possible port name size does not work!\n");
     }
@@ -1031,7 +1031,7 @@ int main (int argc, char *argv[])
     jack_set_freewheel(client1, 0);
     jack_sleep(7 * 1000);
 
-	if (jack_is_realtime(client1) == 1) {
+    if (jack_is_realtime(client1) == 1) {
     } else {
         printf("\n!!! ERROR !!! freewheel mode fail to reactivate RT mode when exiting !\n");
         t_error = 1;
@@ -1316,7 +1316,7 @@ int main (int argc, char *argv[])
         }
         a++;
     }
-    
+
     jack_sleep(1 * 1000); // To hope all port registration and reorder callback have been received...
 
     // Check port registration callback again
@@ -1357,14 +1357,14 @@ int main (int argc, char *argv[])
     if (client_register == 0) {
         printf("!!! ERROR !!! Client registration callback not called for an opened client !\n");
     }
-        
+
     // Check client registration callback after jack_client_close
     jack_client_close(client2);
     jack_sleep(2000);
     if (client_register == 1) {
         printf("!!! ERROR !!! Client registration callback not called for a closed client!\n");
     }
-    
+
     // Open client2 again...
     client2 = jack_client_new(client_name2);
 
@@ -1515,7 +1515,7 @@ int main (int argc, char *argv[])
         printf("!!! ERROR !!! while checking jack_port_get_connections() Vs jack_port_get_all_connections() on PHY port...\n");
     }
 
-	if (jack_disconnect(client1, jack_port_name(output_port1), jack_port_name(input_port1)) != 0) {
+    if (jack_disconnect(client1, jack_port_name(output_port1), jack_port_name(input_port1)) != 0) {
         printf("!!! ERROR !!! while client1 intenting to disconnect ports...\n");
     }
     if (jack_disconnect(client1, jack_port_name(output_port2), jack_port_name(input_port1)) != 0) {
@@ -1770,7 +1770,7 @@ int main (int argc, char *argv[])
     outports = jack_get_ports(client1, NULL, NULL, JackPortIsPhysical | JackPortIsOutput);
     if (inports && outports && inports[0] != NULL &&  outports[0] != NULL) {
         output_ext_latency = jack_port_get_latency (jack_port_by_name(client1, inports[0]));  // from client to out driver (which has "inputs" ports..)
-		input_ext_latency = jack_port_get_latency (jack_port_by_name(client1, outports[0]));  // from in driver (which has "output" ports..) to client
+        input_ext_latency = jack_port_get_latency (jack_port_by_name(client1, outports[0]));  // from in driver (which has "output" ports..) to client
         if (output_ext_latency != jack_port_get_total_latency(client1, jack_port_by_name(client1, inports[0]))) {
             t_error = 1;
             printf("!!! ERROR !!! get_latency & get_all_latency for a PHY device (unconnected) didn't return the same value !\n");
@@ -1809,10 +1809,10 @@ int main (int argc, char *argv[])
         }
 
         jack_port_disconnect(client1, output_port1);
-	    jack_port_disconnect(client1, output_port2);
-		jack_port_disconnect(client1, input_port1);
-	    jack_port_disconnect(client1, input_port2);
-	    Log("Checking a parallel model with 2 clients...\n");
+        jack_port_disconnect(client1, output_port2);
+        jack_port_disconnect(client1, input_port1);
+        jack_port_disconnect(client1, input_port2);
+        Log("Checking a parallel model with 2 clients...\n");
         jack_connect(client2, outports[0], jack_port_name(input_port1));
         jack_connect(client2, outports[0], jack_port_name(input_port2));
         jack_connect(client2, jack_port_name(output_port1), inports[0]);
@@ -1847,7 +1847,7 @@ int main (int argc, char *argv[])
     jack_port_disconnect(client1, output_port1);
     jack_port_disconnect(client1, output_port2);
 
-	jack_sleep(1000);
+    jack_sleep(1000);
 
     jack_free(inports);
     jack_free(outports);
@@ -1858,7 +1858,7 @@ int main (int argc, char *argv[])
      * Check a transport start with a "slow" client, simulating a delay around 1 sec before becoming ready.
      *
      */
-	Log("-----------------------------------------------------------\n");
+    Log("-----------------------------------------------------------\n");
     Log("---------------------------TRANSPORT-----------------------\n");
     Log("-----------------------------------------------------------\n");
 
@@ -2044,49 +2044,49 @@ int main (int argc, char *argv[])
         time_before_exit--;
     }
 
-	if (jack_deactivate(client2) != 0) {
+    if (jack_deactivate(client2) != 0) {
         printf("!!! ERROR !!! jack_deactivate does not return 0 for client2 !\n");
     }
     if (jack_deactivate(client1) != 0) {
         printf("!!! ERROR !!! jack_deactivate does not return 0 for client1 !\n");
     }
 
-	/**
+    /**
      * Checking jack_frame_time.
     */
-	Log("Testing jack_frame_time...\n");
-	jack_set_process_callback(client1, process4, client1);
-	jack_activate(client1);
-	jack_sleep(2 * 1000);
-    
+    Log("Testing jack_frame_time...\n");
+    jack_set_process_callback(client1, process4, client1);
+    jack_activate(client1);
+    jack_sleep(2 * 1000);
+
     /**
      * Checking jack_get_cycle_times.
     */
     Log("Testing jack_get_cycle_times...\n");
     jack_deactivate(client1);
-	jack_set_process_callback(client1, process5, client1);
-	jack_activate(client1);
-	jack_sleep(3 * 1000);
+    jack_set_process_callback(client1, process5, client1);
+    jack_activate(client1);
+    jack_sleep(3 * 1000);
 
-	/**
+    /**
      * Checking alternate thread model
     */
-	Log("Testing alternate thread model...\n");
-	jack_deactivate(client1);
-	jack_set_process_callback(client1, NULL, NULL);  // remove callback
-	jack_set_process_thread(client1, jack_thread, client1);
-	jack_activate(client1);
-	jack_sleep(2 * 1000);
+    Log("Testing alternate thread model...\n");
+    jack_deactivate(client1);
+    jack_set_process_callback(client1, NULL, NULL);  // remove callback
+    jack_set_process_thread(client1, jack_thread, client1);
+    jack_activate(client1);
+    jack_sleep(2 * 1000);
 
-	/**
+    /**
      * Checking callback exiting : when the return code is != 0, the client is desactivated.
     */
-	Log("Testing callback exiting...\n");
-	jack_deactivate(client1);
-	jack_set_process_thread(client1, NULL, NULL); // remove thread callback
-	jack_set_process_callback(client1, process3, 0);
-	jack_activate(client1);
-	jack_sleep(3 * 1000);
+    Log("Testing callback exiting...\n");
+    jack_deactivate(client1);
+    jack_set_process_thread(client1, NULL, NULL); // remove thread callback
+    jack_set_process_callback(client1, process3, 0);
+    jack_activate(client1);
+    jack_sleep(3 * 1000);
 
     /**
      *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
