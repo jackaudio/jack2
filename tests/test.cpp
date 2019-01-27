@@ -750,8 +750,8 @@ int main (int argc, char *argv[])
     char client_name3[jack_client_name_size()];
     // "jack_client_name_size" - 1 effective characters
     memset(client_name3, 'A', sizeof(client_name3));
-    // set last expected printable to 'X'
-    client_name3[jack_client_name_size()-2] = 'X';
+    // set last expected printable to '4'
+    client_name3[jack_client_name_size()-2] = '4';
     // And last one is the terminating '0'
     client_name3[jack_client_name_size()-1] = 0;
     Log("trying to register a new jackd client with maximum possible client name size...\n", client_name3);
@@ -761,6 +761,27 @@ int main (int argc, char *argv[])
         jack_client_close(client2);
     } else {
         printf("!!! ERROR !!! opening a client with maximum possible client name size does not work!\n");
+    }
+
+    // test with one less:
+    // set last expected printable to '3'
+    client_name3[jack_client_name_size()-3] = '3';
+    // And (second) last one is the terminating '0'
+    client_name3[jack_client_name_size()-2] = 0;
+    Log("trying to register a new jackd client with maximum possible client name size -1...\n", client_name3);
+    client2 = jack_client_open(client_name3, jack_options, &status, server_name);
+    if (client2 != NULL) {
+        Log ("valid : a client with maximum possible client name size -1 can be opened\n");
+        Log("Testing long name...");
+	client_name2 = jack_get_client_name(client2);
+	if (strcmp(client_name2, client_name3) == 0) {
+		Log(" ok\n");
+	} else {
+		printf("\n!!! ERROR !!! name returned different from the one given : %s\n", client_name2);
+	}
+        jack_client_close(client2);
+    } else {
+        printf("!!! ERROR !!! opening a client with maximum possible client name size -1 does not work!\n");
     }
 
     /**
