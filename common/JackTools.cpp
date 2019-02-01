@@ -94,12 +94,12 @@ namespace Jack {
 
     char* JackTools::UserDir()
     {
-        return "";
+        return '\0';
     }
 
     char* JackTools::ServerDir(const char* server_name, char* server_dir)
     {
-        return "";
+        return '\0';
     }
 
     void JackTools::CleanupFiles(const char* server_name) {}
@@ -112,7 +112,7 @@ namespace Jack {
 #else
     char* JackTools::UserDir()
     {
-        static char user_dir[JACK_PATH_MAX + 1] = "";
+        static char user_dir[JACK_PATH_MAX + 1] = '\0';
 
         /* format the path name on the first call */
         if (user_dir[0] == '\0') {
@@ -140,7 +140,7 @@ namespace Jack {
     {
         DIR* dir;
         struct dirent *dirent;
-        char dir_name[JACK_PATH_MAX + 1] = "";
+        char dir_name[JACK_PATH_MAX + 1] = '\0';
         ServerDir(server_name, dir_name);
 
         /* On termination, we remove all files that jackd creates so
