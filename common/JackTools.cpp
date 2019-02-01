@@ -268,7 +268,7 @@ void PrintLoadError(const char* so_name)
     lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
         (lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)so_name) + 40) * sizeof(TCHAR));
     _snprintf((LPTSTR)lpDisplayBuf, LocalSize(lpDisplayBuf) / sizeof(TCHAR),
-        TEXT("error loading %s err = %s"), so_name, lpMsgBuf);
+        TEXT("error loading %s err = %s"), so_name, (void*)lpMsgBuf);
 
     jack_error((LPCTSTR)lpDisplayBuf);
 
