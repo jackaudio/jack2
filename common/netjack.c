@@ -41,7 +41,7 @@ $Id: net_driver.c,v 1.17 2006/04/16 20:16:10 torbenh Exp $
 #include <sys/types.h>
 
 #ifdef WIN32
-#include <winsock.h>
+#include <winsock2.h>
 #include <malloc.h>
 #define socklen_t int
 #else
