@@ -116,7 +116,7 @@ def options(opt):
             conf_dest='BUILD_DRIVER_PORTAUDIO')
     portaudio.check(header_name='windows.h') # only build portaudio on windows
     portaudio.check_cfg(
-            package='portaudio-2.0 >= 19',
+            package='portaudio-2.0',
             uselib_store='PORTAUDIO',
             args='--cflags --libs')
     winmme = opt.add_auto_option(
