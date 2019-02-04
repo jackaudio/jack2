@@ -312,9 +312,8 @@ def configure(conf):
 
     if conf.env['BUILD_DEBUG']:
         if conf.env['IS_WINDOWS']:
-            #pdb would be better but don't know enough about waf
-            conf.env.append_unique('CXXFLAGS', '/Z7')
-            conf.env.append_unique('CFLAGS', '/Z7')
+            conf.env.append_unique('CXXFLAGS', ['/Z7', '/MDd'])
+            conf.env.append_unique('CFLAGS', ['/Z7', '/MDd'])
             conf.env.append_unique('LINKFLAGS', '/DEBUG')
         else:
             conf.env.append_unique('CXXFLAGS', '-g')
