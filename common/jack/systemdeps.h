@@ -58,6 +58,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #endif
 
+#ifdef _MSC_VER
+#define strcasecmp _stricmp
+#endif
+
 #if defined(_WIN32) && !defined(__CYGWIN__) && !defined(GNU_WIN32)
 
     #ifdef __MINGW32__
