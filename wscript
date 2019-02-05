@@ -745,19 +745,34 @@ def build(bld):
             #print sg.encode('hex')
             Build.bld.node_sigs[self.env.variant()][self.outputs[0].id] = sg
 
-        script = bld.path.find_resource('svnversion_regenerate.sh')
-        script = script.abspath()
+        if not bld.env['IS_WINDOWS']:
+            script = bld.path.find_resource('svnversion_regenerate.sh')
+            script = script.abspath()
 
-        bld(
-                rule = '%s ${TGT}' % script,
-                name = 'svnversion',
-                runnable_status = Task.RUN_ME,
-                before = 'c cxx',
-                color = 'BLUE',
-                post_run = post_run,
-                source = ['svnversion_regenerate.sh'],
-                target = [bld.path.find_or_declare('svnversion.h')]
-        )
+            bld(
+                    rule = '%s ${TGT}' % script,
+                    name = 'svnversion',
+                    runnable_status = Task.RUN_ME,
+                    before = 'c cxx',
+                    color = 'BLUE',
+                    post_run = post_run,
+                    source = ['svnversion_regenerate.sh'],
+                    target = [bld.path.find_or_declare('svnversion.h')]
+            )
+        else:
+            script = bld.path.find_resource('svnversion_regenerate.py')
+            script = script.abspath()
+
+            bld(
+                    rule = '%s ${TGT}' % script,
+                    name = 'svnversion',
+                    runnable_status = Task.RUN_ME,
+                    before = 'c cxx',
+                    color = 'BLUE',
+                    post_run = post_run,
+                    source = ['svnversion_regenerate.py'],
+                    target = [bld.path.find_or_declare('svnversion.h')]
+            )
 
     if bld.env['BUILD_JACKD']:
         build_jackd(bld)
