@@ -89,7 +89,6 @@ int main (int argc, char* argv[])
         int set = 1;
         int delete = 0;
         int delete_all = 0;
-        int list_all = 0;
         int c;
 	int option_index;
 	extern int optind;
@@ -98,7 +97,6 @@ int main (int argc, char* argv[])
 		{ "delete", 0, 0, 'd' },
 		{ "delete-all", 0, 0, 'D' },
 		{ "list", 0, 0, 'l' },
-		{ "all", 0, 0, 'a' },
                 { "client", 0, 0, 'c' },
                 { "port", 0, 0, 'p' },
 		{ 0, 0, 0, 0 }
@@ -134,13 +132,6 @@ int main (int argc, char* argv[])
                         break;
 
                 case 'l':
-                        set = 0;
-                        delete = 0;
-                        delete_all = 0;
-                        break;
-
-                case 'a':
-                        list_all = 1;
                         set = 0;
                         delete = 0;
                         delete_all = 0;
