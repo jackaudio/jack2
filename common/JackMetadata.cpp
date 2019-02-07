@@ -247,10 +247,13 @@ int JackMetadata::GetProperty(jack_uuid_t subject, const char* key, char** value
         return -1;
     }
 
-    /* result must have at least 2 chars plus 2 nulls to be valid
+    /* result must have at least 1 char plus 1 null to be valid
+       (old rule was:
+         result must have at least 2 chars plus 2 nulls to be valid
+       )
      */
 
-    if (data.size < 4) {
+    if (data.size < 2) {
         if (d_key.size > 0) {
             free (d_key.data);
         }
@@ -345,10 +348,13 @@ int JackMetadata::GetProperties(jack_uuid_t subject, jack_description_t* desc)
             continue;
         }
 
-        /* result must have at least 2 chars plus 2 nulls to be valid
-         */
+        /* result must have at least 1 char plus 1 null to be valid
+           (old rule was:
+             result must have at least 2 chars plus 2 nulls to be valid
+           )
+        */
 
-        if (data.size < 4) {
+        if (data.size < 2) {
             /* if (key.size  > 0) free(key.data); */
             if (data.size > 0) {
                 free (data.data);
