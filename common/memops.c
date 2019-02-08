@@ -29,7 +29,6 @@
 #include <memory.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <stdbool.h>
 #include <limits.h>
 #ifdef __linux__
 #include <endian.h>
@@ -413,10 +412,9 @@ void sample_move_d32_sS (char *dst, jack_default_audio_sample_t *src, unsigned l
 }
 
 
-static inline void sample_move_dS_s32s_signext (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip, const bool do_signext)
+void sample_move_dS_s32u24s (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip)
 {
-	const jack_default_audio_sample_t scaling_divisor = do_signext ? (SAMPLE_24BIT_SCALING << 8) : SAMPLE_32BIT_SCALING;
-	const jack_default_audio_sample_t scaling = 1.0 / scaling_divisor;
+	const jack_default_audio_sample_t scaling = 1.0 / (SAMPLE_24BIT_SCALING << 8);
 
 #if defined (__ARM_NEON__) || defined (__ARM_NEON)
 	float32x4_t factor = vdupq_n_f32(scaling);
@@ -439,11 +437,9 @@ static inline void sample_move_dS_s32s_signext (jack_default_audio_sample_t *dst
 				break;
 		}
 		src128 = vreinterpretq_s32_u8(vrev32q_u8(vreinterpretq_u8_s32(src128)));
-		if (do_signext) {
-			/* sign extension - left shift will be reverted by scaling */
-			src128 = vshlq_n_s32(src128, 8);
-		}
-		float32x4_t as_float = vcvtq_f32_s32(src128);
+		/* sign extension - left shift will be reverted by scaling */
+		int32x4_t shifted = vshlq_n_s32(src128, 8);
+		float32x4_t as_float = vcvtq_f32_s32(shifted);
 		float32x4_t divided = vmulq_f32(as_float, factor);
 		vst1q_f32(dst, divided);
 
@@ -474,26 +470,16 @@ static inline void sample_move_dS_s32s_signext (jack_default_audio_sample_t *dst
 		x <<= 8;
 		x |= (unsigned char)(src[0]);
 #endif
-		if (do_signext) {
-			/* sign extension - left shift will be reverted by scaling */
-			x <<= 8;
-		}
-		*dst = x * scaling;
+		/* sign extension - left shift will be reverted by scaling */
+		*dst = (x << 8) * scaling;
 		dst++;
 		src += src_skip;
 	}
 }	
 
-void sample_move_dS_s32u24s (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip)
+void sample_move_dS_s32u24 (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip)
 {
-	sample_move_dS_s32s_signext (dst, src, nsamples, src_skip, true);
-}
-
-
-static inline void sample_move_dS_s32_signext (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip, const bool do_signext)
-{
-	const jack_default_audio_sample_t scaling_divisor = do_signext ? (SAMPLE_24BIT_SCALING << 8) : SAMPLE_32BIT_SCALING;
-	const jack_default_audio_sample_t scaling = 1.0 / scaling_divisor;
+	const jack_default_audio_sample_t scaling = 1.0 / (SAMPLE_24BIT_SCALING << 8);
 
 #if defined (__SSE2__) && !defined (__sun__)
 	unsigned long unrolled = nsamples / 4;
@@ -509,12 +495,11 @@ static inline void sample_move_dS_s32_signext (jack_default_audio_sample_t *dst,
 		int i4 = *((int *) src);
 		src+= src_skip;
 
-		__m128i src128 = _mm_set_epi32(i4, i3, i2, i1);
-		if (do_signext) {
-			/* sign extension - left shift will be reverted by scaling */
-			src128 = _mm_slli_epi32(src128, 8);
-		}
-		__m128 as_float = _mm_cvtepi32_ps(src128);
+		__m128i src = _mm_set_epi32(i4, i3, i2, i1);
+		/* sign extension - left shift will be reverted by scaling */
+		__m128i shifted = _mm_slli_epi32(src, 8);
+
+		__m128 as_float = _mm_cvtepi32_ps(shifted);
 		__m128 divided = _mm_mul_ps(as_float, factor);
 
 		_mm_storeu_ps(dst, divided);
@@ -541,11 +526,9 @@ static inline void sample_move_dS_s32_signext (jack_default_audio_sample_t *dst,
 				src128 = vld1q_lane_s32((int32_t*)(src+3*src_skip), src128, 3);
 				break;
 		}
-		if (do_signext) {
-			/* sign extension  - left shift will be reverted by scaling */
-			src128 = vshlq_n_s32(src128, 8);
-		}
-		float32x4_t as_float = vcvtq_f32_s32(src128);
+		/* sign extension  - left shift will be reverted by scaling */
+		int32x4_t shifted = vshlq_n_s32(src128, 8);
+		float32x4_t as_float = vcvtq_f32_s32(shifted);
 		float32x4_t divided = vmulq_f32(as_float, factor);
 		vst1q_f32(dst, divided);
 
@@ -558,22 +541,12 @@ static inline void sample_move_dS_s32_signext (jack_default_audio_sample_t *dst,
 	/* ALERT: signed sign-extension portability !!! */
 
 	while (nsamples--) {
-		int src32 = *((int *) src);
-		if (do_signext) {
-			/* sign extension  - left shift will be reverted by scaling */
-			src32 <<= 8;
-		}
-		*dst = src32 * scaling;
+		/* sign extension  - left shift will be reverted by scaling */
+		*dst = (*((int *) src) << 8) * scaling;
 		dst++;
 		src += src_skip;
 	}
 }	
-
-void sample_move_dS_s32u24 (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip)
-{
-	sample_move_dS_s32_signext (dst, src, nsamples, src_skip, true);
-}
-
 
 void sample_move_d24_sSs (char *dst, jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state)
 {
