@@ -27,6 +27,14 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <unistd.h>
 #include <fcntl.h>
 
+// define IPV6_ADD_MEMBERSHIP for Mac OS X
+#ifndef IPV6_ADD_MEMBERSHIP
+#define IPV6_ADD_MEMBERSHIP IPV6_JOIN_GROUP
+#endif
+#ifndef IPV6_DROP_MEMBERSHIP
+#define IPV6_DROP_MEMBERSHIP IPV6_LEAVE_GROUP
+#endif
+
 using namespace std;
 
 // See RFC 3493; The Open Group Base Specifications Issue 6 IEEE Std 1003.1, 2004 Edition
