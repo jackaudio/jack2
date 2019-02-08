@@ -81,8 +81,6 @@ void sample_move_dither_tri_d16_sS        (char *dst, jack_default_audio_sample_
 void sample_move_dither_shaped_d16_sSs    (char *dst, jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state);
 void sample_move_dither_shaped_d16_sS     (char *dst, jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state);
 
-void sample_move_dS_s32s             (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip);
-void sample_move_dS_s32              (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip);
 void sample_move_dS_s32u24s          (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip);
 void sample_move_dS_s32u24           (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip);
 void sample_move_dS_s24s             (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip);
