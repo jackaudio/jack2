@@ -130,11 +130,11 @@
 
 #define float_24u32(s, d) \
 	if ((s) <= NORMALIZED_FLOAT_MIN) {\
-		(d) = SAMPLE_24BIT_MIN;\
+		(d) = SAMPLE_24BIT_MIN << 8;\
 	} else if ((s) >= NORMALIZED_FLOAT_MAX) {\
-		(d) = SAMPLE_24BIT_MAX;\
+		(d) = SAMPLE_24BIT_MAX << 8;\
 	} else {\
-		(d) = f_round ((s) * SAMPLE_24BIT_SCALING);\
+		(d) = f_round ((s) * SAMPLE_24BIT_SCALING) << 8;\
 	}
 
 /* call this when "s" has already been scaled (e.g. when dithering)
@@ -265,7 +265,7 @@ void sample_move_dS_floatLE (char *dst, jack_default_audio_sample_t *src, unsign
    
    S      - sample is a jack_default_audio_sample_t, currently (October 2008) a 32 bit floating point value
    Ss     - like S but reverse endian from the host CPU
-   32u24  - sample is an signed 32 bit integer value, but data is in lower 24 bits only
+   32u24  - sample is an signed 32 bit integer value, but data is in upper 24 bits only
    32u24s - like 32u24 but reverse endian from the host CPU
    24     - sample is an signed 24 bit integer value
    24s    - like 24 but reverse endian from the host CPU
@@ -288,17 +288,18 @@ void sample_move_d32u24_sSs (char *dst, jack_default_audio_sample_t *src, unsign
 	while (unrolled--) {
 		float32x4_t samples = vld1q_f32(src);
 		int32x4_t converted = float_24_neon(samples);
-		converted = vreinterpretq_s32_u8(vrev32q_u8(vreinterpretq_u8_s32(converted)));
+		int32x4_t shifted = vshlq_n_s32(converted, 8);
+		shifted = vreinterpretq_s32_u8(vrev32q_u8(vreinterpretq_u8_s32(shifted)));
 
 		switch(dst_skip) {
 			case 4:
-				vst1q_s32((int32_t*)dst, converted);
+				vst1q_s32((int32_t*)dst, shifted);
 				break;
 			default:
-				vst1q_lane_s32((int32_t*)(dst),            converted, 0);
-				vst1q_lane_s32((int32_t*)(dst+dst_skip),   converted, 1);
-				vst1q_lane_s32((int32_t*)(dst+2*dst_skip), converted, 2);
-				vst1q_lane_s32((int32_t*)(dst+3*dst_skip), converted, 3);
+				vst1q_lane_s32((int32_t*)(dst),            shifted, 0);
+				vst1q_lane_s32((int32_t*)(dst+dst_skip),   shifted, 1);
+				vst1q_lane_s32((int32_t*)(dst+2*dst_skip), shifted, 2);
+                vst1q_lane_s32((int32_t*)(dst+3*dst_skip), shifted, 3);
 				break;
 		}
 		dst += 4*dst_skip;
@@ -344,18 +345,19 @@ void sample_move_d32u24_sS (char *dst, jack_default_audio_sample_t *src, unsigne
 		__m128 clipped = clip(scaled, int_min, int_max);
 
 		__m128i y = _mm_cvttps_epi32(clipped);
+		__m128i shifted = _mm_slli_epi32(y, 8);
 
 #ifdef __SSE4_1__
-		*(int32_t*)dst              = _mm_extract_epi32(y, 0);
-		*(int32_t*)(dst+dst_skip)   = _mm_extract_epi32(y, 1);
-		*(int32_t*)(dst+2*dst_skip) = _mm_extract_epi32(y, 2);
-		*(int32_t*)(dst+3*dst_skip) = _mm_extract_epi32(y, 3);
+		*(int32_t*)dst              = _mm_extract_epi32(shifted, 0);
+		*(int32_t*)(dst+dst_skip)   = _mm_extract_epi32(shifted, 1);
+		*(int32_t*)(dst+2*dst_skip) = _mm_extract_epi32(shifted, 2);
+		*(int32_t*)(dst+3*dst_skip) = _mm_extract_epi32(shifted, 3);
 #else
-		__m128i shuffled1 = _mm_shuffle_epi32(y, _MM_SHUFFLE(0, 3, 2, 1));
-		__m128i shuffled2 = _mm_shuffle_epi32(y, _MM_SHUFFLE(1, 0, 3, 2));
-		__m128i shuffled3 = _mm_shuffle_epi32(y, _MM_SHUFFLE(2, 1, 0, 3));
+		__m128i shuffled1 = _mm_shuffle_epi32(shifted, _MM_SHUFFLE(0, 3, 2, 1));
+		__m128i shuffled2 = _mm_shuffle_epi32(shifted, _MM_SHUFFLE(1, 0, 3, 2));
+		__m128i shuffled3 = _mm_shuffle_epi32(shifted, _MM_SHUFFLE(2, 1, 0, 3));
 
-		_mm_store_ss((float*)dst, (__m128)y);
+		_mm_store_ss((float*)dst, (__m128)shifted);
 
 		_mm_store_ss((float*)(dst+dst_skip), (__m128)shuffled1);
 		_mm_store_ss((float*)(dst+2*dst_skip), (__m128)shuffled2);
@@ -372,7 +374,7 @@ void sample_move_d32u24_sS (char *dst, jack_default_audio_sample_t *src, unsigne
 		__m128 clipped = _mm_min_ss(int_max, _mm_max_ss(scaled, int_min));
 
 		int y = _mm_cvttss_si32(clipped);
-		*((int *) dst) = y;
+		*((int *) dst) = y<<8;
 
 		dst += dst_skip;
 		src++;
@@ -385,16 +387,17 @@ void sample_move_d32u24_sS (char *dst, jack_default_audio_sample_t *src, unsigne
 	while (unrolled--) {
 		float32x4_t samples = vld1q_f32(src);
 		int32x4_t converted = float_24_neon(samples);
+		int32x4_t shifted = vshlq_n_s32(converted, 8);
 
 		switch(dst_skip) {
 			case 4:
-				vst1q_s32((int32_t*)dst, converted);
+				vst1q_s32((int32_t*)dst, shifted);
 				break;
 			default:
-				vst1q_lane_s32((int32_t*)(dst),            converted, 0);
-				vst1q_lane_s32((int32_t*)(dst+dst_skip),   converted, 1);
-				vst1q_lane_s32((int32_t*)(dst+2*dst_skip), converted, 2);
-				vst1q_lane_s32((int32_t*)(dst+3*dst_skip), converted, 3);
+				vst1q_lane_s32((int32_t*)(dst),            shifted, 0);
+				vst1q_lane_s32((int32_t*)(dst+dst_skip),   shifted, 1);
+				vst1q_lane_s32((int32_t*)(dst+2*dst_skip), shifted, 2);
+                vst1q_lane_s32((int32_t*)(dst+3*dst_skip), shifted, 3);
 				break;
 		}
 		dst += 4*dst_skip;
