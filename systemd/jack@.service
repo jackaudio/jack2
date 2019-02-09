@@ -4,7 +4,7 @@ Documentation=man:jackd(1)
 After=sound.target local-fs.target
 
 [Service]
-Type=dbus
+Type=notify
 EnvironmentFile=-/etc/jack/%i.conf
 EnvironmentFile=-%h/.config/jack/%i.conf
 ExecStart=/usr/bin/jackd $JACK_OPTIONS -d $DRIVER -d $DEVICE $DRIVER_SETTINGS
