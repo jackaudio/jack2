@@ -35,8 +35,8 @@ def check_for_celt(conf):
         if not found:
             try:
                 conf.check_cfg(
-                        package='celt >= 0.%s.0' % version,
-                        args='--cflags --libs')
+                        package='celt',
+                        args=['--cflags', '--libs', 'celt >= 0.%s.0' % version])
                 found = True
                 conf.define(define, 1)
                 continue
@@ -91,25 +91,25 @@ def options(opt):
             help='Enable ALSA driver',
             conf_dest='BUILD_DRIVER_ALSA')
     alsa.check_cfg(
-            package='alsa >= 1.0.18',
-            args='--cflags --libs')
+            package='alsa',
+            args=['--cflags', '--libs', 'alsa >= 1.0.18'])
     firewire = opt.add_auto_option(
             'firewire',
             help='Enable FireWire driver (FFADO)',
             conf_dest='BUILD_DRIVER_FFADO')
     firewire.check_cfg(
-            package='libffado >= 1.999.17',
-            args='--cflags --libs')
+            package='libffado',
+            args=['--cflags', '--libs', 'libffado >= 1.999.17'])
     iio = opt.add_auto_option(
             'iio',
             help='Enable IIO driver',
             conf_dest='BUILD_DRIVER_IIO')
     iio.check_cfg(
-            package='gtkIOStream >= 1.4.0',
-            args='--cflags --libs')
+            package='gtkIOStream',
+            args=['--cflags', '--libs', 'gtkIOStream >= 1.4.0'])
     iio.check_cfg(
-            package='eigen3 >= 3.1.2',
-            args='--cflags --libs')
+            package='eigen3',
+            args=['--cflags', '--libs', 'eigen3 >= 3.1.2'])
     portaudio = opt.add_auto_option(
             'portaudio',
             help='Enable Portaudio driver',
@@ -118,7 +118,7 @@ def options(opt):
     portaudio.check_cfg(
             package='portaudio-2.0',
             uselib_store='PORTAUDIO',
-            args='--cflags --libs')
+            args=['--cflags', '--libs', 'portaudio-2.0 >= 19'])
     winmme = opt.add_auto_option(
             'winmme',
             help='Enable WinMME driver',
@@ -138,8 +138,8 @@ def options(opt):
             help='Build Opus netjack2')
     opus.check(header_name='opus/opus_custom.h')
     opus.check_cfg(
-            package='opus >= 0.9.0',
-            args='--cflags --libs',
+            package='opus',
+            args=['--cflags', '--libs', 'opus >= 0.9.0'],
             define_name='HAVE_OPUS_PKG')
 
     samplerate = opt.add_auto_option(

@@ -4,12 +4,12 @@ REM after bootstrapping with install_vcpkg_deps.bat.
 
 SET HAS_LIBS=false
 :Loop
-IF "%1"=="" GOTO Fail
-IF "%1"=="--libs" (
+IF "%~1"=="" GOTO Fail
+IF "%~1"=="--libs" (
 	SET HAS_LIBS=true
 )
-IF "%1"=="portaudio-2.0" GOTO PortAudio
-IF "%1"=="samplerate" GOTO SampleRate
+IF "%~1"=="portaudio-2.0" GOTO PortAudio
+IF "%~1"=="samplerate" GOTO SampleRate
 SHIFT
 GOTO Loop
 
