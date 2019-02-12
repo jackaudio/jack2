@@ -112,6 +112,13 @@ process (jack_nframes_t nframes, void *arg)
 	paTestData *data = (paTestData*)arg;
 	int i;
 
+    struct timespec sys_time;
+	memset((void*)&sys_time, 0, sizeof(struct timespec));
+
+    if (clock_gettime(CLOCK_REALTIME, &sys_time)) {
+//        fprintf(filepointer, " Clockrealtime Error\n");fflush(filepointer);
+    }
+
 	out1 = (jack_default_audio_sample_t*)jack_port_get_buffer (output_port1, nframes);
 	out2 = (jack_default_audio_sample_t*)jack_port_get_buffer (output_port2, nframes);
 
