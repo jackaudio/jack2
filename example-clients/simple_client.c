@@ -281,6 +281,8 @@ main (int argc, char *argv[])
 	 * it.
 	 */
 
+	 printf("%s\n",jack_port_name (output_port1));
+	 printf("%s\n",jack_port_name (output_port2));
 	if (jack_connect (client, jack_port_name (output_port1), "meter:in")) {
 		fprintf (stderr, "cannot connect output ports\n");
 	}
