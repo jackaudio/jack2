@@ -41,7 +41,7 @@ class JackAVBDriver : public JackWaiterDriver
 
         JackAVBDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
                            char* stream_id, char* destination_mac, char* eth_dev,
-                           int sample_rate, int period_size, int num_periods, int capture_ports, int playback_ports);
+                           int sample_rate, int period_size, int num_periods, int adjust, int capture_ports, int playback_ports);
         virtual ~JackAVBDriver();
 
         int Close();

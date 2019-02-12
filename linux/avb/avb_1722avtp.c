@@ -433,7 +433,7 @@ void *worker_thread_mrp(void* v_ieee1722mc)
 
 int init_1722_driver( ieee1722_avtp_driver_state_t *ieee1722mc, const char* name,
                         char* stream_id, char* destination_mac,
-                        int sample_rate, int period_size, int num_periods, int capture_ports, int playback_ports)
+                        int sample_rate, int period_size, int num_periods, int adjust, int capture_ports, int playback_ports)
 {
 	char filename[100];
     sprintf(filename, "jack1722driver.log");
@@ -484,6 +484,7 @@ int init_1722_driver( ieee1722_avtp_driver_state_t *ieee1722mc, const char* name
 
     ieee1722mc->playback_channels = playback_ports;
     ieee1722mc->capture_channels = capture_ports;
+    ieee1722mc->adjust = adjust;
     ieee1722mc->sample_rate = sample_rate;
     ieee1722mc->period_size = period_size;
     ieee1722mc->period_usecs = (uint64_t) ((float)period_size / (float)sample_rate * 1000000);
@@ -529,19 +530,9 @@ int startup_1722_driver( ieee1722_avtp_driver_state_t *ieee1722mc )
     }
 }
 
-uint64_t poll_recv_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc, int packet_num  )
+uint64_t wait_recv_ts_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc, int packet_num )
 {
-    return mediaclock_listener_poll_recv( filepointer, &ieee1722mc, &si_other_avb, &avtp_transport_socket_fds, packet_num  );
-}
-
-uint64_t wait_recv_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc, int packet_num  )
-{
-    return mediaclock_listener_wait_recv( filepointer, &ieee1722mc, &si_other_avb, &avtp_transport_socket_fds, packet_num  );
-}
-
-uint64_t wait_recv_ts_1722_mediaclockstream( ieee1722_avtp_driver_state_t *ieee1722mc, int packet_num  )
-{
-    return mediaclock_listener_wait_recv_ts( filepointer, &ieee1722mc, &si_other_avb, &avtp_transport_socket_fds, packet_num  );
+    return mediaclock_listener_wait_recv_ts( filepointer, &ieee1722mc, &si_other_avb, &avtp_transport_socket_fds, packet_num );
 }
 
 

@@ -48,7 +48,9 @@ void delete_avb_Mediaclock_Listener( FILE* filepointer, ieee1722_avtp_driver_sta
 {
 }
 
-uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc, struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds, int packet_num )
+uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc,
+                                            struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds,
+                                            int packet_num )
 {
     socklen_t slen_avb = sizeof(struct sockaddr_in);
     char stream_packet[BUFLEN];
@@ -100,16 +102,6 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
 		fprintf(filepointer, "Error recvmsg: %d %d %s\n", status, errno, strerror(errno));fflush(filepointer);
 		return -1;
 	}
-
-//	fprintf(filepointer, "Stream Packet: %02x %02x %02x %02x %02x %02x %02x %02x \n",
-//                                            (uint8_t) stream_packet[18],
-//                                            (uint8_t) stream_packet[19],
-//                                            (uint8_t) stream_packet[20],
-//                                            (uint8_t) stream_packet[21],
-//                                            (uint8_t) stream_packet[22],
-//                                            (uint8_t) stream_packet[23],
-//                                            (uint8_t) stream_packet[24],
-//                                            (uint8_t) stream_packet[25]);fflush(filepointer);
     if(
         ((*ieee1722mc)->streamid8[0] == (uint8_t) stream_packet[18]) &&
         ((*ieee1722mc)->streamid8[1] == (uint8_t) stream_packet[19]) &&
@@ -126,8 +118,6 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
         uint64_t packet_arrival_time_ns = 0;
         uint64_t ipg_to_last_packet_ns = 0;
 
-//        fprintf(filepointer, "stream packet!\n");fflush(filepointer);
-
         /* Packet Arrival Time from Device */
         cmsg = CMSG_FIRSTHDR(&msg);
         while( cmsg != NULL ) {
@@ -138,22 +128,11 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
 //                fprintf(filepointer, "Device %lld sec %lld nanosec\n", ts_device->tv_sec, ts_device->tv_nsec);fflush(filepointer);
 
                 packet_arrival_time_ns =  (ts_device->tv_sec*1000000000LL + ts_device->tv_nsec);
-
+                fprintf(filepointer, "%lld\n", packet_arrival_time_ns);fflush(filepointer);
                 break;
             }
             cmsg = CMSG_NXTHDR(&msg,cmsg);
         }
-
-        /* fallback to system time */
-        if( 0 == packet_arrival_time_ns ){
-            struct timeval sys_time;
-
-            if (clock_gettime(CLOCK_REALTIME, &sys_time)) {
-                fprintf(filepointer, " Clockrealtime Error\n");fflush(filepointer);
-            }
-            packet_arrival_time_ns = (sys_time.tv_sec*1000000000LL + sys_time.tv_usec);
-        }
-
 
         ipg_to_last_packet_ns = packet_arrival_time_ns - last_packet_time_ns;
         last_packet_time_ns = packet_arrival_time_ns;
@@ -165,147 +144,11 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
             adjust_packet_time_ns = (uint64_t) ( ( (float)((*ieee1722mc)->period_size % 6 ) / (float)(*ieee1722mc)->sample_rate ) * 1000000000LL);
 //            fprintf(filepointer, "adjust time %lld ns\n", adjust_packet_time_ns);fflush(filepointer);
         } else {
-             adjust_packet_time_ns = 125000;//ipg_to_last_packet_ns;
+            adjust_packet_time_ns = (*ieee1722mc)->adjust ? ipg_to_last_packet_ns : 125000;
         }
 //        fprintf(filepointer, "adjust time %lld ns\n", adjust_packet_time_ns);fflush(filepointer);
 
         return adjust_packet_time_ns;
-    }
-    return -1;
-
-}
-
-uint64_t mediaclock_listener_wait_recv( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc, struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds, int packet_num  )
-{
-	int recv_len=0;
-	int rc;
-
-
-    socklen_t slen_avb;
-    char stream_packet[BUFLEN];
-    if ((recv_len = recvfrom((*avtp_transport_socket_fds)->fd, stream_packet, BUFLEN, 0, (struct sockaddr *)(*si_other_avb), &slen_avb )) == -1){
-        fprintf(filepointer, "recvfrom %s\n", strerror(errno));fflush(filepointer);
-    } else {
-        if(
-                ((*ieee1722mc)->streamid8[0] == (uint8_t) stream_packet[18]) &&
-                ((*ieee1722mc)->streamid8[1] == (uint8_t) stream_packet[19]) &&
-                ((*ieee1722mc)->streamid8[2] == (uint8_t) stream_packet[20]) &&
-                ((*ieee1722mc)->streamid8[3] == (uint8_t) stream_packet[21]) &&
-                ((*ieee1722mc)->streamid8[4] == (uint8_t) stream_packet[22]) &&
-                ((*ieee1722mc)->streamid8[5] == (uint8_t) stream_packet[23]) &&
-                ((*ieee1722mc)->streamid8[6] == (uint8_t) stream_packet[24]) &&
-                ((*ieee1722mc)->streamid8[7] == (uint8_t) stream_packet[25])
-        ){
-
-
-            /*
-             *
-             *      6 or less samples per packet? =>
-             *
-             */
-            int samples_in_packet = 0;
-            uint64_t adjust_packet_time_ns = 0;
-
-            int bytes_per_stereo_channel = 12 /*CHANNEL_COUNT_STEREO * AVTP_SAMPLES_PER_CHANNEL_PER_PACKET = 2*6 */ * sizeof(uint32_t);
-            int avtp_hdr_len = ETHERNET_HDR_LENGTH + 32 /*AVB_HEADER_LENGTH*/;
-
-            for( int s = avtp_hdr_len; s < avtp_hdr_len + bytes_per_stereo_channel; s += sizeof(uint32_t) ){
-
-                if(stream_packet[ s ] != 0x00){
-        //                                fprintf(filepointer,  "avb sample %d %x %x %x %x \n", s, avb_packet[ s ],
-        //                                                                                        avb_packet[ s + 1 ],
-        //                                                                                        avb_packet[ s + 2 ],
-        //                                                                                        avb_packet[ s + 3 ] );fflush(filepointer);
-                    samples_in_packet++;
-                }
-            }
-
-
-
-
-            if( samples_in_packet < 6 ){
-                adjust_packet_time_ns = samples_in_packet / (*ieee1722mc)->sample_rate * 1000000000;
-            }
-
-
-            /* inaccurate */
-            struct timeval sys_time;
-
-            if (clock_gettime(CLOCK_REALTIME, &sys_time)) {
-                fprintf(filepointer, " Clockrealtime Error\n");fflush(filepointer);
-            }
-
-
-            return (uint64_t)(sys_time.tv_usec * 1000) - adjust_packet_time_ns;
-        }
-    }
-    return -1;
-
-}
-
-uint64_t mediaclock_listener_poll_recv( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc, struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds, int packet_num  )
-{
-	int recv_len=0;
-	int rc;
-
-    if( (rc = poll((*avtp_transport_socket_fds), 1, 0)) > 0 ){
-
-        socklen_t slen_avb;
-        char stream_packet[BUFLEN];
-        if ((recv_len = recvfrom((*avtp_transport_socket_fds)->fd, stream_packet, BUFLEN, 0, (struct sockaddr *)(*si_other_avb), &slen_avb )) == -1){
-            fprintf(filepointer, "recvfrom %s", strerror(errno));fflush(filepointer);
-
-        } else {
-            if(
-                    ((*ieee1722mc)->streamid8[0] == (uint8_t) stream_packet[18]) &&
-                    ((*ieee1722mc)->streamid8[1] == (uint8_t) stream_packet[19]) &&
-                    ((*ieee1722mc)->streamid8[2] == (uint8_t) stream_packet[20]) &&
-                    ((*ieee1722mc)->streamid8[3] == (uint8_t) stream_packet[21]) &&
-                    ((*ieee1722mc)->streamid8[4] == (uint8_t) stream_packet[22]) &&
-                    ((*ieee1722mc)->streamid8[5] == (uint8_t) stream_packet[23]) &&
-                    ((*ieee1722mc)->streamid8[6] == (uint8_t) stream_packet[24]) &&
-                    ((*ieee1722mc)->streamid8[7] == (uint8_t) stream_packet[25])
-            ){
-                /*
-                 *
-                 *      6 or less samples per packet? =>
-                 *
-                 */
-                int samples_in_packet = 0;
-                uint64_t adjust_packet_time_ns = 0;
-
-                int bytes_per_stereo_channel = 12 /*CHANNEL_COUNT_STEREO * AVTP_SAMPLES_PER_CHANNEL_PER_PACKET = 2*6 */ * sizeof(uint32_t);
-                int avtp_hdr_len = ETHERNET_HDR_LENGTH + 32 /*AVB_HEADER_LENGTH*/;
-
-                for( int s = avtp_hdr_len; s < avtp_hdr_len + bytes_per_stereo_channel; s += sizeof(uint32_t) ){
-
-                    if(stream_packet[ s ] != 0x00){
-            //                                fprintf(filepointer,  "avb sample %d %x %x %x %x \n", s, avb_packet[ s ],
-            //                                                                                        avb_packet[ s + 1 ],
-            //                                                                                        avb_packet[ s + 2 ],
-            //                                                                                        avb_packet[ s + 3 ] );fflush(filepointer);
-                        samples_in_packet++;
-                    }
-                }
-
-
-
-
-                if( samples_in_packet < 6 ){
-                    adjust_packet_time_ns = samples_in_packet / (*ieee1722mc)->sample_rate * 1000000000;
-                }
-
-
-                /* inaccurate */
-                struct timeval sys_time;
-
-                if (clock_gettime(CLOCK_REALTIME, &sys_time)) {
-                    fprintf(filepointer, " Clockrealtime Error\n");fflush(filepointer);
-                }
-
-                return (uint64_t)(sys_time.tv_usec * 1000) - adjust_packet_time_ns;
-            }
-        }
     }
     return -1;
 

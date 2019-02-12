@@ -38,7 +38,7 @@ namespace Jack
 {
 JackAVBDriver::JackAVBDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
                                        char* stream_id, char* destination_mac, char* eth_dev,
-                                       int sample_rate, int period_size, int num_periods, int capture_ports, int playback_ports)
+                                       int sample_rate, int period_size, int adjust, int num_periods, int capture_ports, int playback_ports)
     : JackWaiterDriver(name, alias, engine, table)
 {
     jack_log("JackAVBDriver::JackAVBPDriver Ethernet Device %s", eth_dev);
@@ -88,6 +88,7 @@ JackAVBDriver::JackAVBDriver(const char* name, const char* alias, JackLockedEngi
                   sample_rate,
                   period_size,
                   num_periods,
+                  adjust,
                   capture_ports,
                   playback_ports
                  );
@@ -313,6 +314,10 @@ extern "C"
         value.ui = 1U;
         jack_driver_descriptor_add_parameter(desc, &filler, "num-periods", 'n', JackDriverParamUInt, &value, NULL, "Network latency setting in no. of periods", NULL);
 
+        value.ui = 0U;
+        jack_driver_descriptor_add_parameter(desc, &filler, "adjust", 'a', JackDriverParamUInt, &value, NULL, "Adjust Timestamps", NULL);
+
+
         sprintf( value.str, "enp4s0");
         jack_driver_descriptor_add_parameter(desc, &filler, "eth-dev", 'e', JackDriverParamString, &value, NULL, "AVB Ethernet Device", NULL);
 
@@ -332,6 +337,7 @@ extern "C"
         unsigned int capture_ports = 2;
         unsigned int playback_ports = 2;
         int num_periods = 2;
+        int adjust = 0;
         char sid[8];
         char dmac[6];
         char eth_dev[32];
@@ -365,6 +371,10 @@ extern "C"
 
                 case 'n':
                     num_periods = param->value.ui;
+                    break;
+
+                case 'a':
+                    adjust = param->value.ui;
                     break;
 
                 case 'e':
@@ -405,7 +415,7 @@ extern "C"
         try {
             Jack::JackDriverClientInterface* driver = new Jack::JackWaitThreadedDriver (
                 new Jack::JackAVBDriver("system", "avb_mc", engine, table, sid, dmac, eth_dev,
-                                             sample_rate, period_size, num_periods, capture_ports, playback_ports));
+                                             sample_rate, period_size, num_periods, adjust, capture_ports, playback_ports));
 
             if (driver->Open(period_size, sample_rate, 1, 1, capture_ports, playback_ports,
                                 0, "from_master", "to_master", 0, 0) == 0) {
