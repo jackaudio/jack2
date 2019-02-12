@@ -32,8 +32,6 @@
 jack_port_t *output_port1, *output_port2;
 jack_client_t *client;
 pthread_t writerThread;
-mqd_t tsq;
-char msg_send[Q_MSG_SIZE];
 
 #ifndef M_PI
 #define M_PI  (3.14159265)
@@ -45,6 +43,7 @@ typedef struct
 	float sine[TABLE_SIZE];
 	int left_phase;
 	int right_phase;
+    mqd_t tsq;
 }
 paTestData;
 
@@ -133,10 +132,11 @@ process (jack_nframes_t nframes, void *arg)
 	}
 
 
+    char msg_send[Q_MSG_SIZE];
 	memset(msg_send, 0, Q_MSG_SIZE);
 	sprintf (msg_send, "%llx", (sys_time.tv_sec*1000000000ULL + sys_time.tv_nsec));
 
-	if (mq_send(tsq, msg_send, Q_MSG_SIZE, 0) < 0) {
+	if (mq_send(data.tsq, msg_send, Q_MSG_SIZE, 0) < 0) {
 //		fprintf(filepointer, "send error %d %s %s\n", errno, strerror(errno), msg_send);fflush(filepointer);
 	}
 
@@ -179,6 +179,30 @@ main (int argc, char *argv[])
 			client_name++;
 		}
 	}
+
+	struct mq_attr attr;
+	attr.mq_flags = 0;
+	attr.mq_maxmsg = 1000;
+	attr.mq_msgsize = Q_MSG_SIZE;
+	attr.mq_curmsgs = 0;
+
+
+    if( mq_unlink(Q_NAME) < 0) {
+        printf("unlink %s error %d %s\n", Q_NAME, errno, strerror(errno));fflush(stdout);
+    } else {
+         printf("unlink %s success\n", Q_NAME );fflush(stdout);
+    }
+
+	if ((data.tsq = mq_open(Q_NAME, O_RDWR | O_CREAT | O_NONBLOCK | O_EXCL, 0666, &attr)) == -1)  {
+		printf("create error %s %d %s\n", Q_NAME, errno, strerror(errno));fflush(stdout);
+	} else {
+        printf("create success %s\n", Q_NAME);fflush(stdout);
+	}
+
+    if( pthread_create( &writerThread, NULL, (&worker_thread_listener_fileWriter), NULL) != 0 ) {
+        printf("Error creating thread\n");fflush(stdout);
+    }
+
 
 
 	for( i=0; i<TABLE_SIZE; i++ )
