@@ -2,24 +2,9 @@
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Debug" />
-	<File name="../mrpClient_interface.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="../avb_1722avtp.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="920" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="../global_definitions.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2626" topLine="72" />
-		</Cursor>
-	</File>
-	<File name="../JackAVBDriver.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1345" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="../mrpClient_interface.c" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="6250" topLine="132" />
+			<Cursor1 position="1134" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="../listener_mediaclock.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -27,29 +12,44 @@
 			<Cursor1 position="1569" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="../JackAVBDriver.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="5" zoom_2="0">
+	<File name="../avb_1722avtp.c" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="2" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="7751" topLine="179" />
+			<Cursor1 position="19536" topLine="486" />
 		</Cursor>
 	</File>
-	<File name="../avb_1722avtp.c" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="2" zoom_2="0">
+	<File name="../avb_sockets.c" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="13867" topLine="469" />
+			<Cursor1 position="3794" topLine="15" />
 		</Cursor>
 	</File>
-	<File name="../avb_sockets.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="../JackAVBDriver.cpp" open="1" top="1" tabpos="2" split="0" active="1" splitpos="0" zoom_1="5" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="3794" topLine="60" />
+			<Cursor1 position="7359" topLine="167" />
 		</Cursor>
 	</File>
-	<File name="../avb_1722avtp.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="../global_definitions.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1134" topLine="0" />
+			<Cursor1 position="2626" topLine="72" />
 		</Cursor>
 	</File>
-	<File name="../listener_mediaclock.c" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="../mrpClient_interface.c" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="7276" topLine="0" />
+			<Cursor1 position="6250" topLine="132" />
+		</Cursor>
+	</File>
+	<File name="../JackAVBDriver.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1345" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="../listener_mediaclock.c" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="5" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="6887" topLine="126" />
+		</Cursor>
+	</File>
+	<File name="../mrpClient_interface.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="920" topLine="0" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>
