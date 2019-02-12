@@ -88,7 +88,7 @@ void *worker_thread_listener_fileWriter()
 
     while(1){
 
-        if ( (rc  = mq_receive(tsq, msg_recv, Q_MSG_SIZE, NULL) ) > 0) {
+        if ( mq_receive(tsq, msg_recv, Q_MSG_SIZE, NULL) > 0) {
     		fprintf(filepointer, "%s\n",msg_recv);fflush(filepointer);
         } else {
             if(errno != EAGAIN){
@@ -179,7 +179,7 @@ main (int argc, char *argv[])
 
 	if( ! (filepointer = fopen("client_ts.log", "a")) ){
 		printf("Error Opening file %d\n", errno);
-		return RETURN_VALUE_FAILURE;
+		return -1;
 	}
 
 	struct mq_attr attr;
