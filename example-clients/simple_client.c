@@ -86,7 +86,7 @@ void *worker_thread_listener_fileWriter()
 
 	if( ! (filepointer = fopen("client_ts.log", "a")) ){
 		printf("Error Opening file %d\n", errno);
-		return -1;
+		pthread_exit((void*)-1);
 	}
 
 	mqd_t tsq2 = mq_open(Q_NAME, O_RDWR | O_NONBLOCK);
