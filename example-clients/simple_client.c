@@ -111,7 +111,7 @@ process (jack_nframes_t nframes, void *arg)
 
 
     struct timespec sys_time;
-	memset(sys_time, 0, sizeof(struct timespec));
+	memset((void*)&sys_time, 0, sizeof(struct timespec));
 
     if (clock_gettime(CLOCK_REALTIME, &sys_time)) {
 //        fprintf(filepointer, " Clockrealtime Error\n");fflush(filepointer);
