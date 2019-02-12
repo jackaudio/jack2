@@ -10,6 +10,9 @@ EnvironmentFile=-%h/.config/jack/%i.conf
 ExecStart=/usr/bin/jackd $JACK_OPTIONS -d $DRIVER -d $DEVICE $DRIVER_SETTINGS
 LimitRTPRIO=95
 LimitRTTIME=infinity
+LimitMEMLOCK=infinity
+# Caution: use on memory-limited devices only
+# OOMScoreAdjust=-1000
 
 [Install]
 WantedBy=default.target
