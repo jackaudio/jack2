@@ -87,7 +87,7 @@ void *worker_thread_listener_fileWriter()
 	}
 
 
-    fprintf(filepointer, "Started Filewriter Thread\n");//fflush(filepointer);
+    fprintf(filepointer, "Started Filewriter Thread\n");fflush(filepointer);
 
 	mqd_t tsq2 = mq_open(Q_NAME, O_RDWR | O_NONBLOCK);
     char msg_recv[Q_MSG_SIZE];
@@ -279,13 +279,6 @@ main (int argc, char *argv[])
 	 * it.
 	 */
 
-//	ports = jack_get_ports (client, NULL, NULL, JackPortIsInput);
-//	if (ports == NULL) {
-//		fprintf(stderr, "no physical playback ports\n");
-//		exit (1);
-//	}
-
-
 	if (jack_connect (client, jack_port_name (output_port1), "meter:in")) {
 		fprintf (stderr, "cannot connect output ports\n");
 	}
@@ -293,8 +286,6 @@ main (int argc, char *argv[])
 	if (jack_connect (client, jack_port_name (output_port2), "meter:in")) {
 		fprintf (stderr, "cannot connect output ports\n");
 	}
-
-//	jack_free (ports);
 
 	signal(SIGQUIT, signal_handler);
 	signal(SIGTERM, signal_handler);
