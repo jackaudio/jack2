@@ -14,23 +14,14 @@
 #include <unistd.h>
 #endif
 #include <jack/jack.h>
-#include <errno.h>
-#include <pthread.h>
-#include <time.h>
 
 jack_port_t *output_port1, *output_port2;
 jack_client_t *client;
-pthread_t writerThread;
-FILE* filepointer;
-mqd_t *tsq;
-char msg_send[Q_MSG_SIZE];
 
 #ifndef M_PI
 #define M_PI  (3.14159265)
 #endif
 
-#define Q_NAME "/tsq"
-#define Q_MSG_SIZE 10
 #define TABLE_SIZE   (200)
 typedef struct
 {
@@ -47,13 +38,6 @@ static void signal_handler(int sig)
 	jack_client_close(client);
 	fprintf(stderr, "signal received, exiting ...\n");
 
-	pthread_kill(writerThread, -9);
-
-	if( mq_close(tsq) < 0) {
-		fprintf(filepointer, "[Q %d] close error %d %s\n", (int)*tsq, errno, strerror(errno));fflush(filepointer);
-	} else {
-		 fprintf(filepointer, "[Q %d] close success\n", *tsq );fflush(filepointer);
-	}
 	exit(0);
 }
 
@@ -65,28 +49,6 @@ static void signal_handler(int sig)
  * running, copy the input port to the output.  When it stops, exit.
  */
 
-void *worker_thread_listener_fileWriter()
-{
-	struct timespec tim;
-
-	tim.tv_sec = 0;
-	tim.tv_nsec = 300000;
-
-	*tsq = mq_open(Q_NAME, O_RDWR | O_NONBLOCK);
-    char msg_recv[Q_MSG_SIZE];
-
-    while(1){
-
-        if ( (rc  = mq_receive(tsq, msg_recv, Q_MSG_SIZE, NULL) ) > 0) {
-    		fprintf(filepointer, "%s\n",msg_recv);fflush(filepointer);
-        } else {
-            if(errno != EAGAIN){
-                fprintf(filepointer, "[Q %d] recv error %d %s %s\n", q, errno, strerror(errno), msg_recv);fflush(filepointer);
-            }
-        }
-        nanosleep(&tim , NULL);
-    }
-}
 
 
 int
@@ -96,20 +58,6 @@ process (jack_nframes_t nframes, void *arg)
 	jack_default_audio_sample_t *out1, *out2;
 	paTestData *data = (paTestData*)arg;
 	int i;
-
-
-    struct timespec sys_time;
-
-    if (clock_gettime(CLOCK_REALTIME, &sys_time)) {
-        fprintf(filepointer, " Clockrealtime Error\n");fflush(filepointer);
-    }
-
-	memset(msg_send, 0, Q_MSG_SIZE);
-	sprintf (msg_send, "%x", (sys_time.tv_sec*1000000000ULL + sys_time.tv_nsec));
-
-	if (mq_send(tsq, msg_send, Q_MSG_SIZE, NULL) < 0) {
-		fprintf(filepointer, "[Q %d] send error %d %s %s\n", *tsq, errno, strerror(errno), msg_send);fflush(filepointer);
-	}
 
 	out1 = (jack_default_audio_sample_t*)jack_port_get_buffer (output_port1, nframes);
 	out2 = (jack_default_audio_sample_t*)jack_port_get_buffer (output_port2, nframes);
@@ -164,35 +112,6 @@ main (int argc, char *argv[])
 		}
 	}
 
-
-
-	if( ! (filepointer = fopen("client_ts.log", "a")) ){
-		printf("Error Opening file %d\n", errno);
-		return RETURN_VALUE_FAILURE;
-	}
-
-	struct mq_attr attr;
-	attr.mq_flags = 0;
-	attr.mq_maxmsg = 1000;
-	attr.mq_msgsize = Q_MSG_SIZE;
-	attr.mq_curmsgs = 0;
-
-
-    if( mq_unlink(Q_NAME) < 0) {
-        fprintf(filepointer, "[Q %d] unlink %s error %d %s\n", *tsq, Q_NAME, errno, strerror(errno));fflush(filepointer);
-    } else {
-         fprintf(filepointer, "[Q %d] unlink %s success\n", *tsq, Q_NAME );fflush(filepointer);
-    }
-
-	if ((*tsq = mq_open(Q_NAME, O_RDWR | O_CREAT | O_NONBLOCK | O_EXCL, 0666, &attr)) == -1)  {
-		fprintf(filepointer, "[Q %d] create error %s %d %s\n", *tsq, Q_NAME, errno, strerror(errno));fflush(filepointer);
-	} else {
-        fprintf(filepointer, "[Q %d] create success %s\n", *tsq, Q_NAME);fflush(filepointer);
-	}
-
-    if( pthread_create( &writerThread, NULL, (&worker_thread_listener_fileWriter), NULL) != 0 ) {
-        fprintf(filepointer,  "Error creating thread\n");fflush(filepointer);
-    }
 
 	for( i=0; i<TABLE_SIZE; i++ )
 	{
@@ -271,11 +190,11 @@ main (int argc, char *argv[])
 		exit (1);
 	}
 
-	if (jack_connect (client, jack_port_name (output_port1), ports[0])) {
+	if (jack_connect (client, jack_port_name (output_port1), "meter:in")) {
 		fprintf (stderr, "cannot connect output ports\n");
 	}
 
-	if (jack_connect (client, jack_port_name (output_port2), ports[1])) {
+	if (jack_connect (client, jack_port_name (output_port2), "meter:in")) {
 		fprintf (stderr, "cannot connect output ports\n");
 	}
 
