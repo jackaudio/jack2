@@ -15,8 +15,25 @@
 #endif
 #include <jack/jack.h>
 
+
+#include <pthread.h>
+#include <time.h>
+#include <mqueue.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <sys/errno.h>
+
+#define Q_NAME "/tsq"
+#define Q_MSG_SIZE 10
+
 jack_port_t *output_port1, *output_port2;
 jack_client_t *client;
+pthread_t writerThread;
+mqd_t tsq;
+char msg_send[Q_MSG_SIZE];
 
 #ifndef M_PI
 #define M_PI  (3.14159265)
