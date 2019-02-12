@@ -96,10 +96,10 @@ void *worker_thread_listener_fileWriter()
     while(1){
 
         if ( mq_receive(tsq2, msg_recv, Q_MSG_SIZE, NULL) > 0) {
-    		fprintf(filepointer, "%s\n",msg_recv);//fflush(filepointer);
+    		fprintf(filepointer, "%s\n",msg_recv);fflush(filepointer);
         } else {
             if(errno != EAGAIN){
-                fprintf(filepointer, "recv error %d %s %s\n", errno, strerror(errno), msg_recv);//fflush(filepointer);
+                fprintf(filepointer, "recv error %d %s %s\n", errno, strerror(errno), msg_recv);fflush(filepointer);
             }
         }
         nanosleep(&tim , NULL);
