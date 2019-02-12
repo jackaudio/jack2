@@ -71,7 +71,7 @@ void *worker_thread_listener_fileWriter()
 	}
 
 
-    fprintf(filepointer, "Started Filewriter Thread\n");fflush(filepointer);
+    fprintf(filepointer, "Started Filewriter Thread %d\n", sizeof(uint64_t));fflush(filepointer);
 
 	mqd_t tsq2 = mq_open(Q_NAME, O_RDWR | O_NONBLOCK);
     char msg_recv[Q_MSG_SIZE];
