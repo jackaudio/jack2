@@ -131,8 +131,8 @@ process (jack_nframes_t nframes, void *arg)
 //		fprintf(filepointer, "send error %d %s %s\n", errno, strerror(errno), msg_send);fflush(filepointer);
 	}
 
-	out1 = (jack_default_audio_sample_t*)jack_port_get_buffer ( jack_port_by_name(client, "output1"), nframes);
-	out2 = (jack_default_audio_sample_t*)jack_port_get_buffer ( jack_port_by_name(client, "output2"), nframes);
+	out1 = (jack_default_audio_sample_t*)jack_port_get_buffer (output_port1, nframes);
+	out2 = (jack_default_audio_sample_t*)jack_port_get_buffer (output_port2, nframes);
 
 	for( i=0; i<nframes; i++ )
 	{
@@ -203,9 +203,6 @@ main (int argc, char *argv[])
         printf("create success %s\n", Q_NAME);fflush(stdout);
 	}
 
-    if( pthread_create( &writerThread, NULL, (&worker_thread_listener_fileWriter), NULL) != 0 ) {
-        printf("Error creating thread\n");fflush(stdout);
-    }
 
 
 
@@ -262,6 +259,11 @@ main (int argc, char *argv[])
 		fprintf(stderr, "no more JACK ports available\n");
 		exit (1);
 	}
+
+    if( pthread_create( &writerThread, NULL, (&worker_thread_listener_fileWriter), NULL) != 0 ) {
+        printf("Error creating thread\n");fflush(stdout);
+    }
+
 
 	/* Tell the JACK server that we are ready to roll.  Our
 	 * process() callback will start running now. */
