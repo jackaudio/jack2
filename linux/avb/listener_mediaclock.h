@@ -30,12 +30,20 @@ extern "C"
 #include <sys/errno.h>
 #include <sys/types.h>
 #include <sys/ipc.h>
+#include <mqueue.h>
+#include <sys/msg.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
 
 #include "avb_sockets.h"
 
 #include "mrpClient_interface.h"
 #include "mrpClient_control_socket.h"
 #include "global_definitions.h"
+
+
+#define Q_NAME "/tsq_mc"
+#define Q_MSG_SIZE 32
 
 
 int create_avb_Mediaclock_Listener( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc, char* avb_dev_name,

@@ -3,12 +3,73 @@ extern int errno;
 
 static uint64_t last_packet_time_ns = 0;
 
+pthread_t writerThread;
+mqd_t tsq_tx;
+
+void *worker_thread_listener_fileWriter()
+{
+	struct timespec tim;
+    FILE* filepointer;
+
+	tim.tv_sec = 0;
+	tim.tv_nsec = 300000;
+
+	if( ! (filepointer = fopen("mcs_ts.log", "w")) ){
+		printf("Error Opening file %d\n", errno);
+		pthread_exit((void*)-1);
+	}
+
+
+    fprintf(filepointer, "Started Filewriter Thread %d\n", sizeof(uint64_t));fflush(filepointer);
+
+	mqd_t tsq_rx = mq_open(Q_NAME, O_RDWR | O_NONBLOCK);
+    char msg_recv[Q_MSG_SIZE];
+
+
+    while(1){
+
+        if ( mq_receive(tsq_rx, msg_recv, Q_MSG_SIZE, NULL) > 0) {
+    		fprintf(filepointer, "%s\n",msg_recv);fflush(filepointer);
+        } else {
+            if(errno != EAGAIN){
+                fprintf(filepointer, "recv error %d %s %s\n", errno, strerror(errno), msg_recv);fflush(filepointer);
+            }
+        }
+        nanosleep(&tim , NULL);
+    }
+    fclose(filepointer);
+}
+
 
 int create_avb_Mediaclock_Listener( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc, char* avb_dev_name,
                                     char* stream_id, char* destination_mac,
                                     struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds)
 {
 	fprintf(filepointer,  "Create Mediaclock Listener\n");fflush(filepointer);
+
+	struct mq_attr attr;
+	attr.mq_flags = 0;
+	attr.mq_maxmsg = 1000;
+	attr.mq_msgsize = Q_MSG_SIZE;
+	attr.mq_curmsgs = 0;
+
+
+    if( mq_unlink(Q_NAME) < 0) {
+        printf("unlink %s error %d %s\n", Q_NAME, errno, strerror(errno));fflush(stdout);
+    } else {
+         printf("unlink %s success\n", Q_NAME );fflush(stdout);
+    }
+
+	if ((tsq_tx = mq_open(Q_NAME, O_RDWR | O_CREAT | O_NONBLOCK | O_EXCL, 0666, &attr)) == -1)  {
+		printf("create error %s %d %s\n", Q_NAME, errno, strerror(errno));fflush(stdout);
+	} else {
+        printf("create success %s\n", Q_NAME);fflush(stdout);
+	}
+
+    if( pthread_create( &writerThread, NULL, (&worker_thread_listener_fileWriter), NULL) != 0 ) {
+        printf("Error creating thread\n");fflush(stdout);
+    }
+
 
 
 	//00:22:97:00:41:2c:00:00  91:e0:f0:11:11:11
@@ -20,6 +81,7 @@ int create_avb_Mediaclock_Listener( FILE* filepointer, ieee1722_avtp_driver_stat
 	memset((*avtp_transport_socket_fds), 0, sizeof(struct sockaddr_in));
 	(*si_other_avb) = (struct sockaddr_in*)malloc(sizeof(struct sockaddr_in));
 	memset((*si_other_avb), 0, sizeof(struct sockaddr_in));
+
 
 	if( create_RAW_AVB_Transport_Socket(filepointer, &((*avtp_transport_socket_fds)->fd), avb_dev_name) > RETURN_VALUE_FAILURE ){
         fprintf(filepointer,  "enable IEEE1722 AVTP MAC filter %x:%x:%x:%x:%x:%x  \n",
@@ -128,7 +190,15 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
 //                fprintf(filepointer, "Device %lld sec %lld nanosec\n", ts_device->tv_sec, ts_device->tv_nsec);fflush(filepointer);
 
                 packet_arrival_time_ns =  (ts_device->tv_sec*1000000000LL + ts_device->tv_nsec);
-                fprintf(filepointer, "%lld\n", packet_arrival_time_ns);fflush(filepointer);
+
+                char msg_send[Q_MSG_SIZE];
+                memset(msg_send, 0, Q_MSG_SIZE);
+                sprintf (msg_send, "%lld", packet_arrival_time_ns);
+
+                if (mq_send(tsq_tx, msg_send, Q_MSG_SIZE, 0) < 0) {
+            //		fprintf(filepointer, "send error %d %s %s\n", errno, strerror(errno), msg_send);fflush(filepointer);
+                }
+
                 break;
             }
             cmsg = CMSG_NXTHDR(&msg,cmsg);
