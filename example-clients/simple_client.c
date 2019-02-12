@@ -277,17 +277,26 @@ main (int argc, char *argv[])
 	 * it.
 	 */
 
-	ports = jack_get_ports (client, NULL, NULL,JackPortIsInput);
+	ports = jack_get_ports (client, NULL, NULL, JackPortIsInput);
 	if (ports == NULL) {
 		fprintf(stderr, "no physical playback ports\n");
 		exit (1);
 	}
 
-	if (jack_connect (client, jack_port_name (output_port1), ports[0])) {
+    char inputString[32];
+
+        for( int k=0; k<CHANNEL_COUNT_STEREO; k++){
+            int cnt2 = 0;
+            sprintf( inputString, , (*listener)->localId, k);
+            fprintf( filepointer, "talker JACK ports %s\n", inputString );fflush(filepointer);
+
+            while( jack_connect( jack_client_ctx, jack_port_name(listener_jack_output_ports[(*listener)->localId][k]), inputString ) ){
+
+	if (jack_connect (client, jack_port_name (output_port1), "meter:in")) {
 		fprintf (stderr, "cannot connect output ports\n");
 	}
 
-	if (jack_connect (client, jack_port_name (output_port2), ports[1])) {
+	if (jack_connect (client, jack_port_name (output_port2), "meter:in")) {
 		fprintf (stderr, "cannot connect output ports\n");
 	}
 
