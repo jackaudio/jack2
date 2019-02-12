@@ -131,8 +131,8 @@ process (jack_nframes_t nframes, void *arg)
 //		fprintf(filepointer, "send error %d %s %s\n", errno, strerror(errno), msg_send);fflush(filepointer);
 	}
 
-	out1 = (jack_default_audio_sample_t*)jack_port_get_buffer (output_port1, nframes);
-	out2 = (jack_default_audio_sample_t*)jack_port_get_buffer (output_port2, nframes);
+	out1 = (jack_default_audio_sample_t*)jack_port_get_buffer ( jack_port_by_name(client, "output1"), nframes);
+	out2 = (jack_default_audio_sample_t*)jack_port_get_buffer ( jack_port_by_name(client, "output2"), nframes);
 
 	for( i=0; i<nframes; i++ )
 	{
