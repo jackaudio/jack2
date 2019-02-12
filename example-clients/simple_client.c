@@ -35,7 +35,7 @@ jack_port_t *output_port1, *output_port2;
 jack_client_t *client;
 pthread_t writerThread;
 FILE* filepointer;
-mqd_t *tsq;
+mqd_t tsq;
 char msg_send[Q_MSG_SIZE];
 
 #ifndef M_PI
@@ -61,10 +61,11 @@ static void signal_handler(int sig)
 	pthread_kill(writerThread, -9);
 
 	if( mq_close(tsq) < 0) {
-		fprintf(filepointer, "[Q %d] close error %d %s\n", (int)*tsq, errno, strerror(errno));fflush(filepointer);
+		fprintf(filepointer, "close error %d %s\n", errno, strerror(errno));fflush(filepointer);
 	} else {
-		 fprintf(filepointer, "[Q %d] close success\n", *tsq );fflush(filepointer);
+		 fprintf(filepointer, "close success\n" );fflush(filepointer);
 	}
+    fclose(filepointer);
 	exit(0);
 }
 
@@ -83,12 +84,12 @@ void *worker_thread_listener_fileWriter()
 	tim.tv_sec = 0;
 	tim.tv_nsec = 300000;
 
-	mqd_t *tsq2 = mq_open(Q_NAME, O_RDWR | O_NONBLOCK);
+	mqd_t tsq2 = mq_open(Q_NAME, O_RDWR | O_NONBLOCK);
     char msg_recv[Q_MSG_SIZE];
 
     while(1){
 
-        if ( mq_receive(*tsq2, msg_recv, Q_MSG_SIZE, NULL) > 0) {
+        if ( mq_receive(tsq2, msg_recv, Q_MSG_SIZE, NULL) > 0) {
     		fprintf(filepointer, "%s\n",msg_recv);fflush(filepointer);
         } else {
             if(errno != EAGAIN){
@@ -195,7 +196,7 @@ main (int argc, char *argv[])
          fprintf(filepointer, "unlink %s success\n", Q_NAME );fflush(filepointer);
     }
 
-	if ((*tsq = mq_open(Q_NAME, O_RDWR | O_CREAT | O_NONBLOCK | O_EXCL, 0666, &attr)) == -1)  {
+	if ((tsq = mq_open(Q_NAME, O_RDWR | O_CREAT | O_NONBLOCK | O_EXCL, 0666, &attr)) == -1)  {
 		fprintf(filepointer, "create error %s %d %s\n", Q_NAME, errno, strerror(errno));fflush(filepointer);
 	} else {
         fprintf(filepointer, "create success %s\n", Q_NAME);fflush(filepointer);
