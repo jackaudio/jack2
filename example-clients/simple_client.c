@@ -60,10 +60,8 @@ static void signal_handler(int sig)
 	pthread_kill(writerThread, -9);
 
 	if( mq_close(tsq) < 0) {
-		fprintf(filepointer, "close error %d %s\n", errno, strerror(errno));fflush(filepointer);
-	} else {
-		 fprintf(filepointer, "close success\n" );fflush(filepointer);
 	}
+
 	exit(0);
 }
 
