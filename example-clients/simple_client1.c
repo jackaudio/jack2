@@ -27,7 +27,7 @@
 #include <sys/errno.h>
 
 #define Q_NAME "/tsq"
-#define Q_MSG_SIZE 10
+#define Q_MSG_SIZE 32
 
 jack_port_t *output_port1, *output_port2;
 jack_client_t *client;
