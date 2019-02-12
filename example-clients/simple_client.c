@@ -182,13 +182,6 @@ main (int argc, char *argv[])
 		}
 	}
 
-
-
-	if( ! (filepointer = fopen("client_ts.log", "a")) ){
-		printf("Error Opening file %d\n", errno);
-		return -1;
-	}
-
 	struct mq_attr attr;
 	attr.mq_flags = 0;
 	attr.mq_maxmsg = 1000;
@@ -197,22 +190,21 @@ main (int argc, char *argv[])
 
 
     if( mq_unlink(Q_NAME) < 0) {
-        fprintf(filepointer, "unlink %s error %d %s\n", Q_NAME, errno, strerror(errno));fflush(filepointer);
+        printf("unlink %s error %d %s\n", Q_NAME, errno, strerror(errno));fflush(stdout);
     } else {
-         fprintf(filepointer, "unlink %s success\n", Q_NAME );fflush(filepointer);
+         printf("unlink %s success\n", Q_NAME );fflush(stdout);
     }
 
 	if ((tsq = mq_open(Q_NAME, O_RDWR | O_CREAT | O_NONBLOCK | O_EXCL, 0666, &attr)) == -1)  {
-		fprintf(filepointer, "create error %s %d %s\n", Q_NAME, errno, strerror(errno));fflush(filepointer);
+		printf("create error %s %d %s\n", Q_NAME, errno, strerror(errno));fflush(stdout);
 	} else {
-        fprintf(filepointer, "create success %s\n", Q_NAME);fflush(filepointer);
+        printf("create success %s\n", Q_NAME);fflush(stdout);
 	}
 
     if( pthread_create( &writerThread, NULL, (&worker_thread_listener_fileWriter), NULL) != 0 ) {
-        fprintf(filepointer,  "Error creating thread\n");fflush(filepointer);
+        printf("Error creating thread\n");fflush(stdout);
     }
 
-    fclose(filepointer);
 
 
 	for( i=0; i<TABLE_SIZE; i++ )
