@@ -14,9 +14,17 @@
 #include <unistd.h>
 #endif
 #include <jack/jack.h>
-#include <errno.h>
+
+
 #include <pthread.h>
 #include <time.h>
+#include <mqueue.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <sys/errno.h>
 
 jack_port_t *output_port1, *output_port2;
 jack_client_t *client;
