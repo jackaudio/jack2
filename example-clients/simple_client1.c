@@ -136,7 +136,7 @@ process (jack_nframes_t nframes, void *arg)
 	memset(msg_send, 0, Q_MSG_SIZE);
 	sprintf (msg_send, "%llx", (sys_time.tv_sec*1000000000ULL + sys_time.tv_nsec));
 
-	if (mq_send(data.tsq, msg_send, Q_MSG_SIZE, 0) < 0) {
+	if (mq_send(data->tsq, msg_send, Q_MSG_SIZE, 0) < 0) {
 //		fprintf(filepointer, "send error %d %s %s\n", errno, strerror(errno), msg_send);fflush(filepointer);
 	}
 
