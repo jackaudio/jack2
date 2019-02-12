@@ -277,8 +277,7 @@ main (int argc, char *argv[])
 	 * it.
 	 */
 
-	ports = jack_get_ports (client, NULL, NULL,
-				JackPortIsPhysical|JackPortIsInput);
+	ports = jack_get_ports (client, NULL, NULL,JackPortIsInput);
 	if (ports == NULL) {
 		fprintf(stderr, "no physical playback ports\n");
 		exit (1);
