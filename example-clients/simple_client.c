@@ -83,16 +83,16 @@ void *worker_thread_listener_fileWriter()
 	tim.tv_sec = 0;
 	tim.tv_nsec = 300000;
 
-	*tsq = mq_open(Q_NAME, O_RDWR | O_NONBLOCK);
+	mqd_t *tsq2 = mq_open(Q_NAME, O_RDWR | O_NONBLOCK);
     char msg_recv[Q_MSG_SIZE];
 
     while(1){
 
-        if ( mq_receive(tsq, msg_recv, Q_MSG_SIZE, NULL) > 0) {
+        if ( mq_receive(*tsq2, msg_recv, Q_MSG_SIZE, NULL) > 0) {
     		fprintf(filepointer, "%s\n",msg_recv);fflush(filepointer);
         } else {
             if(errno != EAGAIN){
-                fprintf(filepointer, "[Q %d] recv error %d %s %s\n", tsq, errno, strerror(errno), msg_recv);fflush(filepointer);
+                fprintf(filepointer, "recv error %d %s %s\n", errno, strerror(errno), msg_recv);fflush(filepointer);
             }
         }
         nanosleep(&tim , NULL);
@@ -119,7 +119,7 @@ process (jack_nframes_t nframes, void *arg)
 	sprintf (msg_send, "%x", (sys_time.tv_sec*1000000000ULL + sys_time.tv_nsec));
 
 	if (mq_send(tsq, msg_send, Q_MSG_SIZE, NULL) < 0) {
-		fprintf(filepointer, "[Q %d] send error %d %s %s\n", *tsq, errno, strerror(errno), msg_send);fflush(filepointer);
+		fprintf(filepointer, "send error %d %s %s\n", errno, strerror(errno), msg_send);fflush(filepointer);
 	}
 
 	out1 = (jack_default_audio_sample_t*)jack_port_get_buffer (output_port1, nframes);
@@ -190,15 +190,15 @@ main (int argc, char *argv[])
 
 
     if( mq_unlink(Q_NAME) < 0) {
-        fprintf(filepointer, "[Q %d] unlink %s error %d %s\n", *tsq, Q_NAME, errno, strerror(errno));fflush(filepointer);
+        fprintf(filepointer, "unlink %s error %d %s\n", Q_NAME, errno, strerror(errno));fflush(filepointer);
     } else {
-         fprintf(filepointer, "[Q %d] unlink %s success\n", *tsq, Q_NAME );fflush(filepointer);
+         fprintf(filepointer, "unlink %s success\n", Q_NAME );fflush(filepointer);
     }
 
 	if ((*tsq = mq_open(Q_NAME, O_RDWR | O_CREAT | O_NONBLOCK | O_EXCL, 0666, &attr)) == -1)  {
-		fprintf(filepointer, "[Q %d] create error %s %d %s\n", *tsq, Q_NAME, errno, strerror(errno));fflush(filepointer);
+		fprintf(filepointer, "create error %s %d %s\n", Q_NAME, errno, strerror(errno));fflush(filepointer);
 	} else {
-        fprintf(filepointer, "[Q %d] create success %s\n", *tsq, Q_NAME);fflush(filepointer);
+        fprintf(filepointer, "create success %s\n", Q_NAME);fflush(filepointer);
 	}
 
     if( pthread_create( &writerThread, NULL, (&worker_thread_listener_fileWriter), NULL) != 0 ) {
