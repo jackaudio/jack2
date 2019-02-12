@@ -281,30 +281,15 @@ main (int argc, char *argv[])
 
 	jack_free (ports);
 
-    /* install a signal handler to properly quits jack client */
-#ifdef WIN32
-	signal(SIGINT, signal_handler);
-	signal(SIGABRT, signal_handler);
-	signal(SIGTERM, signal_handler);
-#else
 	signal(SIGQUIT, signal_handler);
 	signal(SIGTERM, signal_handler);
 	signal(SIGHUP, signal_handler);
 	signal(SIGINT, signal_handler);
-#endif
 
 	/* keep running until the Ctrl+C */
-
 	while (1) {
-	#ifdef WIN32
-		Sleep(1000);
-	#else
 		sleep (1);
-	#endif
 	}
-
 	jack_client_close (client);
-
-
 	exit (0);
 }
