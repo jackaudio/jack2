@@ -26,6 +26,11 @@
 #include <sys/wait.h>
 #include <sys/errno.h>
 
+#define Q_NAME "/tsq"
+#define Q_MSG_SIZE 10
+#define TABLE_SIZE   (200)
+
+
 jack_port_t *output_port1, *output_port2;
 jack_client_t *client;
 pthread_t writerThread;
@@ -37,9 +42,7 @@ char msg_send[Q_MSG_SIZE];
 #define M_PI  (3.14159265)
 #endif
 
-#define Q_NAME "/tsq"
-#define Q_MSG_SIZE 10
-#define TABLE_SIZE   (200)
+
 typedef struct
 {
 	float sine[TABLE_SIZE];
@@ -89,7 +92,7 @@ void *worker_thread_listener_fileWriter()
     		fprintf(filepointer, "%s\n",msg_recv);fflush(filepointer);
         } else {
             if(errno != EAGAIN){
-                fprintf(filepointer, "[Q %d] recv error %d %s %s\n", q, errno, strerror(errno), msg_recv);fflush(filepointer);
+                fprintf(filepointer, "[Q %d] recv error %d %s %s\n", tsq, errno, strerror(errno), msg_recv);fflush(filepointer);
             }
         }
         nanosleep(&tim , NULL);
