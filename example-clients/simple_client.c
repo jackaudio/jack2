@@ -124,12 +124,6 @@ process (jack_nframes_t nframes, void *arg)
 //        fprintf(filepointer, " Clockrealtime Error\n");fflush(filepointer);
     }
 
-	memset(msg_send, 0, Q_MSG_SIZE);
-	sprintf (msg_send, "%llx", (sys_time.tv_sec*1000000000ULL + sys_time.tv_nsec));
-
-	if (mq_send(tsq, msg_send, Q_MSG_SIZE, 0) < 0) {
-//		fprintf(filepointer, "send error %d %s %s\n", errno, strerror(errno), msg_send);fflush(filepointer);
-	}
 
 	out1 = (jack_default_audio_sample_t*)jack_port_get_buffer (output_port1, nframes);
 	out2 = (jack_default_audio_sample_t*)jack_port_get_buffer (output_port2, nframes);
@@ -142,6 +136,13 @@ process (jack_nframes_t nframes, void *arg)
 		if( data->left_phase >= TABLE_SIZE ) data->left_phase -= TABLE_SIZE;
 		data->right_phase += 3; /* higher pitch so we can distinguish left and right. */
 		if( data->right_phase >= TABLE_SIZE ) data->right_phase -= TABLE_SIZE;
+	}
+
+	memset(msg_send, 0, Q_MSG_SIZE);
+	sprintf (msg_send, "%llx", (sys_time.tv_sec*1000000000ULL + sys_time.tv_nsec));
+
+	if (mq_send(tsq, msg_send, Q_MSG_SIZE, 0) < 0) {
+//		fprintf(filepointer, "send error %d %s %s\n", errno, strerror(errno), msg_send);fflush(filepointer);
 	}
 
 	return 0;
