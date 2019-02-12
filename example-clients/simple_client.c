@@ -57,7 +57,7 @@ static void signal_handler(int sig)
 	jack_client_close(client);
 	fprintf(stderr, "signal received, exiting ...\n");
 
-	pthread_kill(writerThread, -9);
+//	pthread_kill(writerThread, -9);
 
 	if( mq_close(tsq) < 0) {
 	}
