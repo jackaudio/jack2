@@ -84,6 +84,11 @@ void *worker_thread_listener_fileWriter()
 	tim.tv_sec = 0;
 	tim.tv_nsec = 300000;
 
+	if( ! (filepointer = fopen("client_ts.log", "a")) ){
+		printf("Error Opening file %d\n", errno);
+		return -1;
+	}
+
 	mqd_t tsq2 = mq_open(Q_NAME, O_RDWR | O_NONBLOCK);
     char msg_recv[Q_MSG_SIZE];
 
@@ -206,6 +211,9 @@ main (int argc, char *argv[])
     if( pthread_create( &writerThread, NULL, (&worker_thread_listener_fileWriter), NULL) != 0 ) {
         fprintf(filepointer,  "Error creating thread\n");fflush(filepointer);
     }
+
+    fclose(filepointer);
+
 
 	for( i=0; i<TABLE_SIZE; i++ )
 	{
