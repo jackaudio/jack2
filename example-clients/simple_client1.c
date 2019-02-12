@@ -58,6 +58,42 @@ static void signal_handler(int sig)
 	exit(0);
 }
 
+void *worker_thread_listener_fileWriter()
+{
+	struct timespec tim;
+    FILE* filepointer;
+
+	tim.tv_sec = 0;
+	tim.tv_nsec = 300000;
+
+	if( ! (filepointer = fopen("client_ts.log", "w")) ){
+		printf("Error Opening file %d\n", errno);
+		pthread_exit((void*)-1);
+	}
+
+
+    fprintf(filepointer, "Started Filewriter Thread\n");fflush(filepointer);
+
+	mqd_t tsq2 = mq_open(Q_NAME, O_RDWR | O_NONBLOCK);
+    char msg_recv[Q_MSG_SIZE];
+
+
+    while(1){
+
+        if ( mq_receive(tsq2, msg_recv, Q_MSG_SIZE, NULL) > 0) {
+    		fprintf(filepointer, "%s\n",msg_recv);fflush(filepointer);
+        } else {
+            if(errno != EAGAIN){
+                fprintf(filepointer, "recv error %d %s %s\n", errno, strerror(errno), msg_recv);fflush(filepointer);
+            }
+        }
+        nanosleep(&tim , NULL);
+    }
+    fclose(filepointer);
+}
+
+
+
 /**
  * The process callback for this JACK application is called in a
  * special realtime thread once for each audio cycle.
