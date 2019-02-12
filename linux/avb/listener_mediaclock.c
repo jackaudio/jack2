@@ -191,13 +191,13 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
 
                 packet_arrival_time_ns =  (ts_device->tv_sec*1000000000LL + ts_device->tv_nsec);
 
-                char msg_send[Q_MSG_SIZE];
-                memset(msg_send, 0, Q_MSG_SIZE);
-                sprintf (msg_send, "%lld", packet_arrival_time_ns);
-
-                if (mq_send(tsq_tx, msg_send, Q_MSG_SIZE, 0) < 0) {
-            //		fprintf(filepointer, "send error %d %s %s\n", errno, strerror(errno), msg_send);fflush(filepointer);
-                }
+//                char msg_send[Q_MSG_SIZE];
+//                memset(msg_send, 0, Q_MSG_SIZE);
+//                sprintf (msg_send, "%lld", packet_arrival_time_ns);
+//
+//                if (mq_send(tsq_tx, msg_send, Q_MSG_SIZE, 0) < 0) {
+//            //		fprintf(filepointer, "send error %d %s %s\n", errno, strerror(errno), msg_send);fflush(filepointer);
+//                }
 
                 break;
             }
