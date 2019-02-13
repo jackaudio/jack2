@@ -6,39 +6,43 @@ static uint64_t last_packet_time_ns = 0;
 pthread_t writerThread;
 mqd_t tsq_tx;
 
-void *worker_thread_listener_fileWriter()
-{
-	struct timespec tim;
-    FILE* filepointer;
+#define NUM_TS 10000000
+uint64_t timestamps[NUM_TS];
+int ts_cnt =0;
 
-	tim.tv_sec = 0;
-	tim.tv_nsec = 300000;
-
-	if( ! (filepointer = fopen("mcs_ts.log", "w")) ){
-		printf("Error Opening file %d\n", errno);
-		pthread_exit((void*)-1);
-	}
-
-
-    fprintf(filepointer, "Started Filewriter Thread %d\n", sizeof(uint64_t));fflush(filepointer);
-
-	mqd_t tsq_rx = mq_open(Q_NAME, O_RDWR | O_NONBLOCK);
-    char msg_recv[Q_MSG_SIZE];
-
-
-    while(1){
-
-        if ( mq_receive(tsq_rx, msg_recv, Q_MSG_SIZE, NULL) > 0) {
-    		fprintf(filepointer, "%s\n",msg_recv);fflush(filepointer);
-        } else {
-            if(errno != EAGAIN){
-                fprintf(filepointer, "recv error %d %s %s\n", errno, strerror(errno), msg_recv);fflush(filepointer);
-            }
-        }
-        nanosleep(&tim , NULL);
-    }
-    fclose(filepointer);
-}
+//void *worker_thread_listener_fileWriter()
+//{
+//	struct timespec tim;
+//    FILE* filepointer;
+//
+//	tim.tv_sec = 0;
+//	tim.tv_nsec = 300000;
+//
+//	if( ! (filepointer = fopen("mcs_ts.log", "w")) ){
+//		printf("Error Opening file %d\n", errno);
+//		pthread_exit((void*)-1);
+//	}
+//
+//
+//    fprintf(filepointer, "Started Filewriter Thread %d\n", sizeof(uint64_t));fflush(filepointer);
+//
+//	mqd_t tsq_rx = mq_open(Q_NAME, O_RDWR | O_NONBLOCK);
+//    char msg_recv[Q_MSG_SIZE];
+//
+//
+//    while(1){
+//
+//        if ( mq_receive(tsq_rx, msg_recv, Q_MSG_SIZE, NULL) > 0) {
+//    		fprintf(filepointer, "%s\n",msg_recv);fflush(filepointer);
+//        } else {
+//            if(errno != EAGAIN){
+//                fprintf(filepointer, "recv error %d %s %s\n", errno, strerror(errno), msg_recv);fflush(filepointer);
+//            }
+//        }
+//        nanosleep(&tim , NULL);
+//    }
+//    fclose(filepointer);
+//}
 
 
 int create_avb_Mediaclock_Listener( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc, char* avb_dev_name,
@@ -47,41 +51,41 @@ int create_avb_Mediaclock_Listener( FILE* filepointer, ieee1722_avtp_driver_stat
 {
 	fprintf(filepointer,  "Create Mediaclock Listener\n");fflush(filepointer);
 
-    struct rlimit rlim;
-    rlim.rlim_cur = RLIM_INFINITY;
-    rlim.rlim_max = RLIM_INFINITY;
+//    struct rlimit rlim;
+//    rlim.rlim_cur = RLIM_INFINITY;
+//    rlim.rlim_max = RLIM_INFINITY;
+//
+//    if (setrlimit(RLIMIT_MSGQUEUE, &rlim) == -1) {
+//        perror("setrlimit");
+//        return -1;
+//    }
+//
+//
+//	struct mq_attr attr;
+//	attr.mq_flags = 0;
+//	attr.mq_maxmsg = 10000;
+//	attr.mq_msgsize = Q_MSG_SIZE;
+//	attr.mq_curmsgs = 0;
+//
+//
+//    if( mq_unlink(Q_NAME) < 0) {
+//        printf("unlink %s error %d %s\n", Q_NAME, errno, strerror(errno));fflush(stdout);
+//    } else {
+//         printf("unlink %s success\n", Q_NAME );fflush(stdout);
+//    }
+//
+//	if ((tsq_tx = mq_open(Q_NAME, O_RDWR | O_CREAT | O_NONBLOCK | O_EXCL, 0666, &attr)) == -1)  {
+//		printf("create error %s %d %s\n", Q_NAME, errno, strerror(errno));fflush(stdout);
+//	} else {
+//        printf("create success %s\n", Q_NAME);fflush(stdout);
+//	}
+//
+//    if( pthread_create( &writerThread, NULL, (&worker_thread_listener_fileWriter), NULL) != 0 ) {
+//        printf("Error creating thread\n");fflush(stdout);
+//    }
 
-    if (setrlimit(RLIMIT_MSGQUEUE, &rlim) == -1) {
-        perror("setrlimit");
-        return -1;
-    }
 
-
-	struct mq_attr attr;
-	attr.mq_flags = 0;
-	attr.mq_maxmsg = 10000;
-	attr.mq_msgsize = Q_MSG_SIZE;
-	attr.mq_curmsgs = 0;
-
-
-    if( mq_unlink(Q_NAME) < 0) {
-        printf("unlink %s error %d %s\n", Q_NAME, errno, strerror(errno));fflush(stdout);
-    } else {
-         printf("unlink %s success\n", Q_NAME );fflush(stdout);
-    }
-
-	if ((tsq_tx = mq_open(Q_NAME, O_RDWR | O_CREAT | O_NONBLOCK | O_EXCL, 0666, &attr)) == -1)  {
-		printf("create error %s %d %s\n", Q_NAME, errno, strerror(errno));fflush(stdout);
-	} else {
-        printf("create success %s\n", Q_NAME);fflush(stdout);
-	}
-
-    if( pthread_create( &writerThread, NULL, (&worker_thread_listener_fileWriter), NULL) != 0 ) {
-        printf("Error creating thread\n");fflush(stdout);
-    }
-
-
-
+    memset( timestamps, 0, NUM_TS);
 	//00:22:97:00:41:2c:00:00  91:e0:f0:11:11:11
     memcpy((*ieee1722mc)->streamid8, stream_id, 8);
     memcpy((*ieee1722mc)->destination_mac_address, destination_mac, 6);
@@ -118,6 +122,21 @@ int create_avb_Mediaclock_Listener( FILE* filepointer, ieee1722_avtp_driver_stat
 
 void delete_avb_Mediaclock_Listener( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc )
 {
+    FILE* filepointer;
+
+	if( ! (filepointer = fopen("mcs_ts.log", "w")) ){
+		printf("Error Opening file %d\n", errno);
+		return;
+	}
+
+    for(int i = 0; i < NUM_TS; i++){
+        if(timestamps[i] != 0 ){
+            fprintf(filepointer, "%lld\n",timestamps[i]);fflush(filepointer);
+        }
+    }
+
+    fclose(filepointer);
+
 }
 
 uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc,
@@ -201,13 +220,17 @@ uint64_t mediaclock_listener_wait_recv_ts( FILE* filepointer, ieee1722_avtp_driv
 
                 packet_arrival_time_ns =  (ts_device->tv_sec*1000000000LL + ts_device->tv_nsec);
 
-                char msg_send[Q_MSG_SIZE];
-                memset(msg_send, 0, Q_MSG_SIZE);
-                sprintf (msg_send, "%lld", packet_arrival_time_ns);
+                if( ts_cnt < NUM_TS )
+                    timestamps[ts_cnt++] = packet_arrival_time_ns;
 
-                if (mq_send(tsq_tx, msg_send, Q_MSG_SIZE, 0) < 0) {
-            //		fprintf(filepointer, "send error %d %s %s\n", errno, strerror(errno), msg_send);fflush(filepointer);
-                }
+
+//                char msg_send[Q_MSG_SIZE];
+//                memset(msg_send, 0, Q_MSG_SIZE);
+//                sprintf (msg_send, "%lld", packet_arrival_time_ns);
+//
+//                if (mq_send(tsq_tx, msg_send, Q_MSG_SIZE, 0) < 0) {
+//            //		fprintf(filepointer, "send error %d %s %s\n", errno, strerror(errno), msg_send);fflush(filepointer);
+//                }
 
                 break;
             }

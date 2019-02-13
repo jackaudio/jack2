@@ -30,6 +30,10 @@
 #define Q_NAME "/tsq"
 #define Q_MSG_SIZE 32
 
+#define NUM_TS 10000000
+uint64_t timestamps[NUM_TS];
+int ts_cnt =0;
+
 jack_port_t *output_port1, *output_port2;
 jack_client_t *client;
 pthread_t writerThread;
@@ -58,39 +62,39 @@ static void signal_handler(int sig)
 	exit(0);
 }
 
-void *worker_thread_listener_fileWriter()
-{
-	struct timespec tim;
-    FILE* filepointer;
-
-	tim.tv_sec = 0;
-	tim.tv_nsec = 300000;
-
-	if( ! (filepointer = fopen("client_ts.log", "w")) ){
-		printf("Error Opening file %d\n", errno);
-		pthread_exit((void*)-1);
-	}
-
-
-    fprintf(filepointer, "Started Filewriter Thread %d\n", sizeof(uint64_t));fflush(filepointer);
-
-	mqd_t tsq2 = mq_open(Q_NAME, O_RDWR | O_NONBLOCK);
-    char msg_recv[Q_MSG_SIZE];
-
-
-    while(1){
-
-        if ( mq_receive(tsq2, msg_recv, Q_MSG_SIZE, NULL) > 0) {
-    		fprintf(filepointer, "%s\n",msg_recv);fflush(filepointer);
-        } else {
-            if(errno != EAGAIN){
-                fprintf(filepointer, "recv error %d %s %s\n", errno, strerror(errno), msg_recv);fflush(filepointer);
-            }
-        }
-        nanosleep(&tim , NULL);
-    }
-    fclose(filepointer);
-}
+//void *worker_thread_listener_fileWriter()
+//{
+//	struct timespec tim;
+//    FILE* filepointer;
+//
+//	tim.tv_sec = 0;
+//	tim.tv_nsec = 300000;
+//
+//	if( ! (filepointer = fopen("client_ts.log", "w")) ){
+//		printf("Error Opening file %d\n", errno);
+//		pthread_exit((void*)-1);
+//	}
+//
+//
+//    fprintf(filepointer, "Started Filewriter Thread %d\n", sizeof(uint64_t));fflush(filepointer);
+//
+//	mqd_t tsq2 = mq_open(Q_NAME, O_RDWR | O_NONBLOCK);
+//    char msg_recv[Q_MSG_SIZE];
+//
+//
+//    while(1){
+//
+//        if ( mq_receive(tsq2, msg_recv, Q_MSG_SIZE, NULL) > 0) {
+//    		fprintf(filepointer, "%s\n",msg_recv);fflush(filepointer);
+//        } else {
+//            if(errno != EAGAIN){
+//                fprintf(filepointer, "recv error %d %s %s\n", errno, strerror(errno), msg_recv);fflush(filepointer);
+//            }
+//        }
+//        nanosleep(&tim , NULL);
+//    }
+//    fclose(filepointer);
+//}
 
 
 
@@ -132,14 +136,17 @@ process (jack_nframes_t nframes, void *arg)
 		if( data->right_phase >= TABLE_SIZE ) data->right_phase -= TABLE_SIZE;
 	}
 
+    if( ts_cnt < NUM_TS )
+        timestamps[ts_cnt++] = (sys_time.tv_sec*1000000000ULL + sys_time.tv_nsec);
 
-    char msg_send[Q_MSG_SIZE];
-	memset(msg_send, 0, Q_MSG_SIZE);
-	sprintf (msg_send, "%lld", (sys_time.tv_sec*1000000000ULL + sys_time.tv_nsec));
 
-	if (mq_send(data->tsq, msg_send, Q_MSG_SIZE, 0) < 0) {
-//		fprintf(filepointer, "send error %d %s %s\n", errno, strerror(errno), msg_send);fflush(filepointer);
-	}
+//    char msg_send[Q_MSG_SIZE];
+//	memset(msg_send, 0, Q_MSG_SIZE);
+//	sprintf (msg_send, "%lld", (sys_time.tv_sec*1000000000ULL + sys_time.tv_nsec));
+//
+//	if (mq_send(data->tsq, msg_send, Q_MSG_SIZE, 0) < 0) {
+////		fprintf(filepointer, "send error %d %s %s\n", errno, strerror(errno), msg_send);fflush(filepointer);
+//	}
 
 	return 0;
 }
@@ -151,6 +158,22 @@ process (jack_nframes_t nframes, void *arg)
 void
 jack_shutdown (void *arg)
 {
+
+    FILE* filepointer;
+
+	if( ! (filepointer = fopen("client_ts.log", "w")) ){
+		printf("Error Opening file %d\n", errno);
+		return;
+	}
+
+    for(int i = 0; i < NUM_TS; i++){
+        if(timestamps[i] != 0 ){
+            fprintf(filepointer, "%lld\n",timestamps[i]);fflush(filepointer);
+        }
+    }
+
+    fclose(filepointer);
+
 	exit (1);
 }
 
@@ -181,40 +204,41 @@ main (int argc, char *argv[])
 		}
 	}
 
-    struct rlimit rlim;
-    rlim.rlim_cur = RLIM_INFINITY;
-    rlim.rlim_max = RLIM_INFINITY;
+//    struct rlimit rlim;
+//    rlim.rlim_cur = RLIM_INFINITY;
+//    rlim.rlim_max = RLIM_INFINITY;
+//
+//    if (setrlimit(RLIMIT_MSGQUEUE, &rlim) == -1) {
+//        perror("setrlimit");
+//        return -1;
+//    }
+//
+//
+//	struct mq_attr attr;
+//	attr.mq_flags = 0;
+//	attr.mq_maxmsg = 10000;
+//	attr.mq_msgsize = Q_MSG_SIZE;
+//	attr.mq_curmsgs = 0;
+//
+//
+//    if( mq_unlink(Q_NAME) < 0) {
+//        printf("unlink %s error %d %s\n", Q_NAME, errno, strerror(errno));fflush(stdout);
+//    } else {
+//         printf("unlink %s success\n", Q_NAME );fflush(stdout);
+//    }
+//
+//	if ((data.tsq = mq_open(Q_NAME, O_RDWR | O_CREAT | O_NONBLOCK | O_EXCL, 0666, &attr)) == -1)  {
+//		printf("create error %s %d %s\n", Q_NAME, errno, strerror(errno));fflush(stdout);
+//	} else {
+//        printf("create success %s\n", Q_NAME);fflush(stdout);
+//	}
+//
+//    if( pthread_create( &writerThread, NULL, (&worker_thread_listener_fileWriter), NULL) != 0 ) {
+//        printf("Error creating thread\n");fflush(stdout);
+//    }
 
-    if (setrlimit(RLIMIT_MSGQUEUE, &rlim) == -1) {
-        perror("setrlimit");
-        return -1;
-    }
 
-
-	struct mq_attr attr;
-	attr.mq_flags = 0;
-	attr.mq_maxmsg = 10000;
-	attr.mq_msgsize = Q_MSG_SIZE;
-	attr.mq_curmsgs = 0;
-
-
-    if( mq_unlink(Q_NAME) < 0) {
-        printf("unlink %s error %d %s\n", Q_NAME, errno, strerror(errno));fflush(stdout);
-    } else {
-         printf("unlink %s success\n", Q_NAME );fflush(stdout);
-    }
-
-	if ((data.tsq = mq_open(Q_NAME, O_RDWR | O_CREAT | O_NONBLOCK | O_EXCL, 0666, &attr)) == -1)  {
-		printf("create error %s %d %s\n", Q_NAME, errno, strerror(errno));fflush(stdout);
-	} else {
-        printf("create success %s\n", Q_NAME);fflush(stdout);
-	}
-
-    if( pthread_create( &writerThread, NULL, (&worker_thread_listener_fileWriter), NULL) != 0 ) {
-        printf("Error creating thread\n");fflush(stdout);
-    }
-
-
+    memset( timestamps, 0, NUM_TS);
 
 	for( i=0; i<TABLE_SIZE; i++ )
 	{
