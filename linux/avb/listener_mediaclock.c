@@ -122,20 +122,20 @@ int create_avb_Mediaclock_Listener( FILE* filepointer, ieee1722_avtp_driver_stat
 
 void delete_avb_Mediaclock_Listener( FILE* filepointer, ieee1722_avtp_driver_state_t **ieee1722mc )
 {
-    FILE* filepointer;
+    FILE* filepointer2;
 
-	if( ! (filepointer = fopen("mcs_ts.log", "w")) ){
+	if( ! (filepointer2 = fopen("mcs_ts.log", "w")) ){
 		printf("Error Opening file %d\n", errno);
 		return;
 	}
 
     for(int i = 0; i < NUM_TS; i++){
         if(timestamps[i] != 0 ){
-            fprintf(filepointer, "%lld\n",timestamps[i]);fflush(filepointer);
+            fprintf(filepointer2, "%lld\n",timestamps[i]);fflush(filepointer2);
         }
     }
 
-    fclose(filepointer);
+    fclose(filepointer2);
 
 }
 
