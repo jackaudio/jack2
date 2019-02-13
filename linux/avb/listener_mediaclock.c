@@ -47,6 +47,16 @@ int create_avb_Mediaclock_Listener( FILE* filepointer, ieee1722_avtp_driver_stat
 {
 	fprintf(filepointer,  "Create Mediaclock Listener\n");fflush(filepointer);
 
+    struct rlimit rlim;
+    rlim.rlim_cur = RLIM_INFINITY;
+    rlim.rlim_max = RLIM_INFINITY;
+
+    if (setrlimit(RLIMIT_MSGQUEUE, &rlim) == -1) {
+        perror("setrlimit");
+        return -1;
+    }
+
+
 	struct mq_attr attr;
 	attr.mq_flags = 0;
 	attr.mq_maxmsg = 1000000;

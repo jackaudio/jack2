@@ -25,6 +25,7 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <sys/errno.h>
+#include <sys/resource.h>
 
 #define Q_NAME "/tsq"
 #define Q_MSG_SIZE 32
@@ -179,6 +180,16 @@ main (int argc, char *argv[])
 			client_name++;
 		}
 	}
+
+    struct rlimit rlim;
+    rlim.rlim_cur = RLIM_INFINITY;
+    rlim.rlim_max = RLIM_INFINITY;
+
+    if (setrlimit(RLIMIT_MSGQUEUE, &rlim) == -1) {
+        perror("setrlimit");
+        return -1;
+    }
+
 
 	struct mq_attr attr;
 	attr.mq_flags = 0;

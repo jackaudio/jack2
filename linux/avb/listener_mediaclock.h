@@ -34,6 +34,7 @@ extern "C"
 #include <sys/msg.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <sys/resource.h>
 
 #include "avb_sockets.h"
 
