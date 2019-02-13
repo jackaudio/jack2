@@ -59,7 +59,7 @@ int create_avb_Mediaclock_Listener( FILE* filepointer, ieee1722_avtp_driver_stat
 
 	struct mq_attr attr;
 	attr.mq_flags = 0;
-	attr.mq_maxmsg = 25000;
+	attr.mq_maxmsg = 10000;
 	attr.mq_msgsize = Q_MSG_SIZE;
 	attr.mq_curmsgs = 0;
 

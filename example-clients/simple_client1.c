@@ -193,7 +193,7 @@ main (int argc, char *argv[])
 
 	struct mq_attr attr;
 	attr.mq_flags = 0;
-	attr.mq_maxmsg = 25000;
+	attr.mq_maxmsg = 10000;
 	attr.mq_msgsize = Q_MSG_SIZE;
 	attr.mq_curmsgs = 0;
 
