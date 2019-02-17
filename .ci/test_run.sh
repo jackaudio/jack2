@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #stop here if ./waf install wasn't successful
-ls -l /usr/bin/jackd || exit 1
+ls -l /usr/bin/jackd || exit
 
 echo "`date`"
 echo "$TRAVIS_OS_NAME"
