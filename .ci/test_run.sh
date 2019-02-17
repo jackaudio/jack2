@@ -1,12 +1,11 @@
 #!/bin/bash
 
-#stop here if ./waf install wasn't successful
-ls -l /usr/bin/jackd || exit
-
 echo "`date`"
 echo "$TRAVIS_OS_NAME"
 echo "========================================================================="
 if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+	#stop here if ./waf install wasn't successful
+	ls -l /usr/bin/jackd || exit
 	#find installed files
 	sudo updatedb
 	locate jack | grep -e "/usr/bin" -e "/usr/lib" -e "/usr/share/man" -e "/usr/include"
@@ -16,6 +15,9 @@ if [ "$TRAVIS_OS_NAME" == "linux" ]; then
 	#check for unused dependencies
 	ls -1 /usr/bin/jack_*|while read line; do
 		echo "checking unused dependencies for ${line}:"; ldd -r -u "$line"; done
+elif [ "$TRAVIS_OS_NAME" == "osx" ]; then
+	#stop here if ./waf install wasn't successful
+	ls -l /usr/local/bin/jackd || exit
 fi
 echo "========================================================================="
 jackd --version
