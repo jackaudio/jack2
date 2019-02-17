@@ -101,7 +101,7 @@ script:
         ./waf -v build;
       fi
     - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-        CXXFLAGS="${CXXFLAGS} -flax-vector-conversions" ./waf configure;
+        CXXFLAGS="${CXXFLAGS} -flax-vector-conversions" ./waf configure --prefix=/usr;
         CXXFLAGS="${CXXFLAGS} -flax-vector-conversions" ./waf -v build;
       fi
     - sudo ./waf -v install
