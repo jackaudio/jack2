@@ -40,6 +40,11 @@ void port_connect_callback(jack_port_id_t a, jack_port_id_t b, int connect, void
 	done = 1;
 }
 
+void error_callback (const char *err)
+{
+	//fprintf (stderr, "%s\n", err);
+}
+
 void
 show_version (char *my_name)
 {
@@ -133,10 +138,17 @@ main (int argc, char *argv[])
 		return 1;
 	}
 
+	jack_set_error_function(error_callback);
+
 	/* try to become a client of the JACK server */
 
 	if ((client = jack_client_open (my_name, options, &status, server_name)) == 0) {
-		fprintf (stderr, "JACK server not running?\n");
+		fprintf (stderr, "Error: cannot connect to JACK, ");
+		if (status & JackServerFailed) {
+			fprintf (stderr, "server is not running.\n");
+		} else {
+			fprintf (stderr, "jack_client_open() failed, status = 0x%2.0x\n", status);
+		}
 		return 1;
 	}
 

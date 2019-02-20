@@ -26,6 +26,11 @@
 
 char * my_name;
 
+void error_callback (const char *err)
+{
+	//fprintf (stderr, "%s\n", err);
+}
+
 static void
 show_version (void)
 {
@@ -136,18 +141,19 @@ main (int argc, char *argv[])
 		}
 	}
 
+	jack_set_error_function(error_callback);
+
 	/* Open a client connection to the JACK server.  Starting a
 	 * new server only to list its ports seems pointless, so we
 	 * specify JackNoStartServer. */
 	//JOQ: need a new server name option
 
-	client = jack_client_open ("lsp", options, &status, server_name);
-	if (client == NULL) {
+	if ((client = jack_client_open ("lsp", options, &status, server_name)) == 0) {
+		fprintf (stderr, "Error: cannot connect to JACK, ");
 		if (status & JackServerFailed) {
-			fprintf (stderr, "JACK server not running\n");
+			fprintf (stderr, "server is not running.\n");
 		} else {
-			fprintf (stderr, "jack_client_open() failed, "
-				 "status = 0x%2.0x\n", status);
+			fprintf (stderr, "jack_client_open() failed, status = 0x%2.0x\n", status);
 		}
 		return 1;
 	}
