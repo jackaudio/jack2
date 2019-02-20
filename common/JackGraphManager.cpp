@@ -811,10 +811,18 @@ void JackGraphManager::GetPortsAux(const char** matching_ports, const char* port
     regex_t port_regex, type_regex;
 
     if (port_name_pattern && port_name_pattern[0]) {
-        regcomp(&port_regex, port_name_pattern, REG_EXTENDED | REG_NOSUB);
+        if(regcomp(&port_regex, port_name_pattern, REG_EXTENDED | REG_NOSUB)!=0)
+        {
+             jack_log("JackGraphManager::GetPortsAux could not compile regex for port_name_pattern '%s'", port_name_pattern);
+             return;
+        }
     }
     if (type_name_pattern && type_name_pattern[0]) {
-        regcomp(&type_regex, type_name_pattern, REG_EXTENDED | REG_NOSUB);
+        if(regcomp(&type_regex, type_name_pattern, REG_EXTENDED | REG_NOSUB)!=0)
+        {
+             jack_log("JackGraphManager::GetPortsAux could not compile regex for type_name_pattern '%s'", type_name_pattern);
+             return;
+        }
     }
 
     // Cleanup port array
