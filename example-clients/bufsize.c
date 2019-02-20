@@ -64,10 +64,10 @@ void parse_arguments(int argc, char *argv[])
 		exit(9);
 	}
 
-    if (strspn (argv[1], "0123456789") != strlen (argv[1])) {
+	if (strspn (argv[1], "0123456789") != strlen (argv[1])) {
 		fprintf(stderr, "usage: %s <bufsize>\n", package);
 		exit(8);
-    }
+	}
 
 	nframes = strtoul(argv[1], NULL, 0);
 	if (errno == ERANGE) {
@@ -76,11 +76,11 @@ void parse_arguments(int argc, char *argv[])
 		exit(2);
 	}
 
-    if (nframes < 1 || nframes > 8192) {
+	if (nframes < 1 || nframes > 8192) {
 		fprintf(stderr, "%s: invalid buffer size: %s (range is 1-8192)\n",
 			package, argv[1]);
 		exit(3);
-    }
+	}
 }
 
 int main(int argc, char *argv[])
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 	parse_arguments(argc, argv);
 
 	/* become a JACK client */
-    if ((client = jack_client_open(package, JackNullOption, NULL)) == 0) {
+	if ((client = jack_client_open(package, JackNullOption, NULL)) == 0) {
 		fprintf(stderr, "JACK server not running?\n");
 		exit(1);
 	}
