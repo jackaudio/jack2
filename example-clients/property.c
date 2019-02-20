@@ -44,7 +44,7 @@ get_subject (jack_client_t* client, char* argv[], int* optind)
                         fprintf (stderr, "cannot get UUID for client named %s\n", cstr);
                         return -1;
                 }
-                
+
                 if (jack_uuid_parse (ustr, &uuid)) {
                         fprintf (stderr, "cannot parse client UUID as UUID\n");
                         return -1;
@@ -61,13 +61,13 @@ get_subject (jack_client_t* client, char* argv[], int* optind)
                         fprintf (stderr, "cannot find port name %s\n", pstr);
                         return -1;
                 }
-                
+
                 uuid = jack_port_uuid (port);
                 subject = pstr;
 
         } else {
                 char* str = argv[(*optind)++];
-                
+
                 if (jack_uuid_parse (str, &uuid)) {
                         fprintf (stderr, "cannot parse subject as UUID\n");
                         return -1;
@@ -180,7 +180,7 @@ int main (int argc, char* argv[])
                 */
 
                 if (args_left >= 2) {
-                        
+
                         if (get_subject (client, argv, &optind)) {
                                 return 1;
                         }
@@ -193,11 +193,11 @@ int main (int argc, char* argv[])
                         }
 
                 } else {
-                        
+
                         if (get_subject (client, argv, &optind)) {
                                 return 1;
                         }
-                        
+
                         if (jack_remove_properties (client, uuid) < 0) {
                                 fprintf (stderr, "cannot remove properties for UUID %s\n", subject);
                                 exit (1);
@@ -225,11 +225,11 @@ int main (int argc, char* argv[])
                         fprintf (stderr, "cannot set value for key %s of %s\n", value, subject);
                         exit (1);
                 }
-                
+
         } else {
 
                 /* list properties */
-                
+
                 int args_left = argc - optind;
 
                 if (args_left >= 2) {
@@ -263,7 +263,7 @@ int main (int argc, char* argv[])
                         if (get_subject (client, argv, &optind)) {
                                 return -1;
                         }
-                        
+
                         if ((cnt = jack_get_properties (uuid, &description)) < 0) {
                                 fprintf (stderr, "could not retrieve properties for %s\n", subject);
                                 exit (1);
@@ -271,13 +271,13 @@ int main (int argc, char* argv[])
 
                         for (n = 0; n < cnt; ++n) {
                                 if (description.properties[n].type) {
-                                        printf ("key: %s value: %s type: %s\n", 
-                                                description.properties[n].key, 
+                                        printf ("key: %s value: %s type: %s\n",
+                                                description.properties[n].key,
                                                 description.properties[n].data,
                                                 description.properties[n].type);
                                 } else {
-                                        printf ("key: %s value: %s\n", 
-                                                description.properties[n].key, 
+                                        printf ("key: %s value: %s\n",
+                                                description.properties[n].key,
                                                 description.properties[n].data);
                                 }
                         }
@@ -304,13 +304,13 @@ int main (int argc, char* argv[])
                                 printf ("%s\n", buf);
                                 for (p = 0; p < description[n].property_cnt; ++p) {
                                         if (description[n].properties[p].type) {
-                                                printf ("key: %s value: %s type: %s\n", 
-                                                        description[n].properties[p].key, 
+                                                printf ("key: %s value: %s type: %s\n",
+                                                        description[n].properties[p].key,
                                                         description[n].properties[p].data,
                                                         description[n].properties[p].type);
                                         } else {
-                                                printf ("key: %s value: %s\n", 
-                                                        description[n].properties[p].key, 
+                                                printf ("key: %s value: %s\n",
+                                                        description[n].properties[p].key,
                                                         description[n].properties[p].data);
                                         }
                                 }
