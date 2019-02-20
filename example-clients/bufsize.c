@@ -86,11 +86,12 @@ void parse_arguments(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	int rc;
+	jack_options_t options = JackNoStartServer;
 
 	parse_arguments(argc, argv);
 
 	/* become a JACK client */
-	if ((client = jack_client_open(package, JackNullOption, NULL)) == 0) {
+	if ((client = jack_client_open(package, options, NULL)) == 0) {
 		fprintf(stderr, "JACK server not running?\n");
 		exit(1);
 	}
