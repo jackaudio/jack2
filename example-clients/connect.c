@@ -37,7 +37,7 @@ volatile int done = 0;
 
 void port_connect_callback(jack_port_id_t a, jack_port_id_t b, int connect, void* arg)
 {
-    done = 1;
+	done = 1;
 }
 
 void
@@ -80,11 +80,11 @@ main (int argc, char *argv[])
 	int rc = 1;
 
 	struct option long_options[] = {
-	    { "server", 1, 0, 's' },
-	    { "help", 0, 0, 'h' },
-	    { "version", 0, 0, 'v' },
-	    { "uuid", 0, 0, 'u' },
-	    { 0, 0, 0, 0 }
+		{ "server", 1, 0, 's' },
+		{ "help", 0, 0, 'h' },
+		{ "version", 0, 0, 'v' },
+		{ "uuid", 0, 0, 'u' },
+		{ 0, 0, 0, 0 }
 	};
 
 	while ((c = getopt_long (argc, argv, "s:hvu", long_options, &option_index)) >= 0) {
@@ -140,7 +140,7 @@ main (int argc, char *argv[])
 		return 1;
 	}
 
-    jack_set_port_connect_callback(client, port_connect_callback, NULL);
+	jack_set_port_connect_callback(client, port_connect_callback, NULL);
 
 	/* find the two ports */
 
@@ -183,11 +183,11 @@ main (int argc, char *argv[])
 	if ((port1 = jack_port_by_name(client, portA)) == 0) {
 		fprintf (stderr, "ERROR %s not a valid port\n", portA);
 		goto exit;
-    }
+	}
 	if ((port2 = jack_port_by_name(client, portB)) == 0) {
 		fprintf (stderr, "ERROR %s not a valid port\n", portB);
 		goto exit;
-    }
+	}
 
 	port1_flags = jack_port_flags (port1);
 	port2_flags = jack_port_flags (port2);
@@ -209,11 +209,11 @@ main (int argc, char *argv[])
 		goto exit;
 	}
 
-    /* tell the JACK server that we are ready to roll */
-    if (jack_activate (client)) {
-        fprintf (stderr, "cannot activate client");
-        goto exit;
-    }
+	/* tell the JACK server that we are ready to roll */
+	if (jack_activate (client)) {
+		fprintf (stderr, "cannot activate client");
+		goto exit;
+	}
 
 	/* connect the ports. Note: you can't do this before
 	   the client is activated (this may change in the future).
@@ -221,25 +221,25 @@ main (int argc, char *argv[])
 
 	if (connecting) {
 		if (jack_connect(client, jack_port_name(src_port), jack_port_name(dst_port))) {
-            fprintf (stderr, "cannot connect client, already connected?\n");
+			fprintf (stderr, "cannot connect client, already connected?\n");
 			goto exit;
 		}
 	}
 	if (disconnecting) {
 		if (jack_disconnect(client, jack_port_name(src_port), jack_port_name(dst_port))) {
-            fprintf (stderr, "cannot disconnect client, already disconnected?\n");
+			fprintf (stderr, "cannot disconnect client, already disconnected?\n");
 			goto exit;
 		}
 	}
 
-    // Wait for connection/disconnection to be effective
-    while(!done) {
-    #ifdef WIN32
-        Sleep(10);
-    #else
-        usleep(10000);
-    #endif
-    }
+	// Wait for connection/disconnection to be effective
+	while(!done) {
+#ifdef WIN32
+		Sleep(10);
+#else
+		usleep(10000);
+#endif
+	}
 
 	/* everything was ok, so setting exitcode to 0 */
 	rc = 0;

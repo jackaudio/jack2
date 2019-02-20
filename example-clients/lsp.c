@@ -58,7 +58,7 @@ main (int argc, char *argv[])
 {
 	jack_client_t *client;
 	jack_status_t status;
-    jack_options_t options = JackNoStartServer;
+	jack_options_t options = JackNoStartServer;
 	const char **ports, **connections;
 	unsigned int i, j, k;
 	int skip_port;
@@ -75,7 +75,7 @@ main (int argc, char *argv[])
 	jack_port_t *port;
 
 	struct option long_options[] = {
-	    { "server", 1, 0, 's' },
+		{ "server", 1, 0, 's' },
 		{ "aliases", 0, 0, 'A' },
 		{ "connections", 0, 0, 'c' },
 		{ "port-latency", 0, 0, 'l' },
@@ -97,10 +97,10 @@ main (int argc, char *argv[])
 	while ((c = getopt_long (argc, argv, "s:AclLphvt", long_options, &option_index)) >= 0) {
 		switch (c) {
 		case 's':
-            server_name = (char *) malloc (sizeof (char) * strlen(optarg));
-            strcpy (server_name, optarg);
-            options |= JackServerName;
-            break;
+			server_name = (char *) malloc (sizeof (char) * strlen(optarg));
+			strcpy (server_name, optarg);
+			options |= JackServerName;
+			break;
 		case 'A':
 			aliases[0] = (char *) malloc (jack_port_name_size());
 			aliases[1] = (char *) malloc (jack_port_name_size());
@@ -153,8 +153,8 @@ main (int argc, char *argv[])
 	}
 
 	ports = jack_get_ports (client, NULL, NULL, 0);
-    if (!ports)
-        goto error;
+	if (!ports)
+		goto error;
 
 	for (i = 0; ports && ports[i]; ++i) {
 		// skip over any that don't match ALL of the strings presented at command line
@@ -241,12 +241,12 @@ main (int argc, char *argv[])
 	}
 
 error:
-    if (show_aliases) {
-        free(aliases[0]);
-        free(aliases[1]);
-    }
-    if (ports)
-        jack_free (ports);
+	if (show_aliases) {
+		free(aliases[0]);
+		free(aliases[1]);
+	}
+	if (ports)
+		jack_free (ports);
 	jack_client_close (client);
 	exit (0);
 }
