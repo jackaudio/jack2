@@ -807,26 +807,24 @@ const char** JackGraphManager::GetConnections(jack_port_id_t port_index)
 // Client
 void JackGraphManager::GetPortsAux(const char** matching_ports, const char* port_name_pattern, const char* type_name_pattern, unsigned long flags)
 {
+    // Cleanup port array
+    memset(matching_ports, 0, sizeof(char*) * fPortMax);
+
     int match_cnt = 0;
     regex_t port_regex, type_regex;
 
     if (port_name_pattern && port_name_pattern[0]) {
-        if(regcomp(&port_regex, port_name_pattern, REG_EXTENDED | REG_NOSUB)!=0)
-        {
+        if (regcomp(&port_regex, port_name_pattern, REG_EXTENDED | REG_NOSUB)!=0) {
              jack_log("JackGraphManager::GetPortsAux could not compile regex for port_name_pattern '%s'", port_name_pattern);
              return;
         }
     }
     if (type_name_pattern && type_name_pattern[0]) {
-        if(regcomp(&type_regex, type_name_pattern, REG_EXTENDED | REG_NOSUB)!=0)
-        {
+        if (regcomp(&type_regex, type_name_pattern, REG_EXTENDED | REG_NOSUB)!=0) {
              jack_log("JackGraphManager::GetPortsAux could not compile regex for type_name_pattern '%s'", type_name_pattern);
              return;
         }
     }
-
-    // Cleanup port array
-    memset(matching_ports, 0, sizeof(char*) * fPortMax);
 
     for (unsigned int i = 0; i < fPortMax; i++) {
         bool matching = true;
