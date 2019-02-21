@@ -47,7 +47,6 @@ void signal_handler(int sig)
 
 void parse_arguments(int argc, char *argv[])
 {
-
 	/* basename $0 */
 	package = strrchr(argv[0], '/');
 	if (package == 0)
@@ -71,27 +70,31 @@ void parse_arguments(int argc, char *argv[])
 
 	nframes = strtoul(argv[1], NULL, 0);
 	if (errno == ERANGE) {
-		fprintf(stderr, "%s: invalid buffer size: %s (range is 1-8192)\n",
+		fprintf(stderr, "%s: invalid buffer size: %s (range is 1-16384)\n",
 			package, argv[1]);
 		exit(2);
 	}
-
-	if (nframes < 1 || nframes > 8192) {
-		fprintf(stderr, "%s: invalid buffer size: %s (range is 1-8192)\n",
+	if (nframes < 1 || nframes > 16384) {
+		fprintf(stderr, "%s: invalid buffer size: %s (range is 1-16384)\n",
 			package, argv[1]);
 		exit(3);
 	}
 }
 
+void silent_function( const char *ignore )
+{
+}
+
 int main(int argc, char *argv[])
 {
 	int rc;
-	jack_options_t options = JackNoStartServer;
-
 	parse_arguments(argc, argv);
 
+	if (just_print_bufsize)
+		jack_set_info_function( silent_function );
+
 	/* become a JACK client */
-	if ((client = jack_client_open(package, options, NULL)) == 0) {
+	if ((client = jack_client_open(package, JackNoStartServer, NULL)) == 0) {
 		fprintf(stderr, "JACK server not running?\n");
 		exit(1);
 	}
@@ -106,8 +109,8 @@ int main(int argc, char *argv[])
 	jack_on_shutdown(client, jack_shutdown, 0);
 
 	if (just_print_bufsize) {
-		fprintf(stdout, "buffer size = %d  sample rate = %d\n", jack_get_buffer_size(client), jack_get_sample_rate(client));
-		rc=0;
+		fprintf(stdout, "%d\n", jack_get_buffer_size( client ) );
+		rc = 0;
 	}
 	else
 	{
