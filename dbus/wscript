@@ -63,8 +63,14 @@ def build(bld):
         ]
     obj.use = ['serverlib']
     if bld.env['IS_LINUX']:
+        obj.source += [
+            '../linux/uptime.c',
+        ]
         obj.use += ['PTHREAD', 'DL', 'RT', 'DBUS-1', 'EXPAT', 'STDC++']
     if bld.env['IS_MACOSX']:
+        obj.source += [
+            '../macosx/uptime.c',
+        ]
         obj.use += ['PTHREAD', 'DL', 'DBUS-1', 'EXPAT']
     obj.target = 'jackdbus'
 
