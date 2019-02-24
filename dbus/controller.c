@@ -27,13 +27,13 @@
 #include <dbus/dbus.h>
 #include <assert.h>
 #include <unistd.h>
-#include <sys/sysinfo.h>
 #include <errno.h>
 
 #include "controller.h"
 #include "controller_internal.h"
 #include "xml.h"
 #include "reserve.h"
+#include "uptime.h"
 
 struct jack_dbus_interface_descriptor * g_jackcontroller_interfaces[] =
 {
@@ -787,18 +787,18 @@ void
 jack_controller_run(
     void * context)
 {
-    struct sysinfo si;
+    long ut;
 
     if (controller_ptr->pending_save == 0)
     {
         return;
     }
 
-    if (sysinfo(&si) != 0)
+    if ((ut = uptime()) < 0)
     {
         jack_error("sysinfo() failed with %d", errno);
     }
-    else if (si.uptime < controller_ptr->pending_save + 2) /* delay save by two seconds */
+    else if (ut < controller_ptr->pending_save + 2) /* delay save by two seconds */
     {
         return;
     }
@@ -813,15 +813,15 @@ void
 jack_controller_pending_save(
     struct jack_controller * controller_ptr)
 {
-    struct sysinfo si;
+    long ut;
 
-    if (sysinfo(&si) != 0)
+    if ((ut = uptime()) < 0)
     {
-        jack_error("sysinfo() failed with %d.", errno);
+        jack_error(UPTIME_FUNCTION_NAME "() failed with %d.", errno);
         controller_ptr->pending_save = 0;
         jack_controller_settings_save_auto(controller_ptr);
         return;
     }
 
-    controller_ptr->pending_save = si.uptime;
+    controller_ptr->pending_save = ut;
 }
