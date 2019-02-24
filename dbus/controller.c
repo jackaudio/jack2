@@ -796,7 +796,7 @@ jack_controller_run(
 
     if ((ut = uptime()) < 0)
     {
-        jack_error("sysinfo() failed with %d", errno);
+        jack_error(UPTIME_FUNCTION_NAME "() failed with %d", errno);
     }
     else if (ut < controller_ptr->pending_save + 2) /* delay save by two seconds */
     {
