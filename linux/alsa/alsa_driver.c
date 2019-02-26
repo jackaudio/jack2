@@ -1383,6 +1383,14 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 
 		poll_ret = jack_get_microseconds ();
 
+		if (poll_result == 0) {
+			jack_error ("ALSA: poll time out, polled for %" PRIu64
+				    " usecs",
+				    poll_ret - poll_enter);
+			*status = -5;
+			return 0;
+		}
+
         // JACK2
         SetTime(poll_ret);
 
@@ -1479,15 +1487,6 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 #endif
 			}
 		}
-
-		if (poll_result == 0) {
-			jack_error ("ALSA: poll time out, polled for %" PRIu64
-				    " usecs",
-				    poll_ret - poll_enter);
-			*status = -5;
-			return 0;
-		}
-
 	}
 
 	if (driver->capture_handle) {
