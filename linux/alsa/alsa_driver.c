@@ -56,6 +56,8 @@ char* strcasestr(const char* haystack, const char* needle);
 
 /* Delay (in process calls) before jackd will report an xrun */
 #define XRUN_REPORT_DELAY 0
+/* Max re-try count for Alsa poll timeout handling */
+#define MAX_RETRY_COUNT 5
 
 void
 jack_driver_init (jack_driver_t *driver)
@@ -1290,6 +1292,7 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 	int xrun_detected = FALSE;
 	int need_capture;
 	int need_playback;
+	int retry_cnt = 0;
 	unsigned int i;
 	jack_time_t poll_enter;
 	jack_time_t poll_ret = 0;
@@ -1384,11 +1387,22 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 		poll_ret = jack_get_microseconds ();
 
 		if (poll_result == 0) {
-			jack_error ("ALSA: poll time out, polled for %" PRIu64
-				    " usecs",
-				    poll_ret - poll_enter);
-			*status = -5;
-			return 0;
+			retry_cnt++;
+			if(retry_cnt > MAX_RETRY_COUNT) {
+				jack_error ("ALSA: poll time out, polled for %" PRIu64
+					    " usecs, Reached max retry cnt = %d, Exiting",
+					    poll_ret - poll_enter, MAX_RETRY_COUNT);
+				*status = -5;
+				return 0;
+			}
+			jack_log ("ALSA: poll time out, polled for %" PRIu64
+				  " usecs, Retrying with a recovery, retry cnt = %d",
+				  poll_ret - poll_enter, retry_cnt);
+			*status = alsa_driver_xrun_recovery (driver, delayed_usecs);
+			if(*status != 0) {
+				jack_error ("ALSA: poll time out, recovery failed with status = %d", *status);
+				return 0;
+			}
 		}
 
         // JACK2
