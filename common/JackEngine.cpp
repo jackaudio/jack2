@@ -42,7 +42,8 @@ JackEngine::JackEngine(JackGraphManager* manager,
                        JackEngineControl* control,
                        char self_connect_mode)
                     : JackLockAble(control->fServerName), 
-                    fSignal(control->fServerName)
+                    fSignal(control->fServerName),
+                    fMetadata(control->fServerName)
 {
     fGraphManager = manager;
     fSynchroTable = table;
@@ -563,15 +564,15 @@ bool JackEngine::ClientCheckName(const char* name)
     return false;
 }
 
-void JackEngine::EnsureUUID(int uuid)
+void JackEngine::EnsureUUID(jack_uuid_t uuid)
 {
-    if (uuid == 0)
+    if (jack_uuid_empty(uuid))
         return;
 
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
-        if (client && (client->GetClientControl()->fSessionID == uuid)) {
-            client->GetClientControl()->fSessionID = 0;
+        if (client && jack_uuid_compare(client->GetClientControl()->fSessionID, uuid) == 0) {
+            jack_uuid_clear (&uuid);
         }
     }
 }
@@ -737,6 +738,9 @@ int JackEngine::ClientCloseAux(int refnum, bool wait)
     JackClientInterface* client = fClientTable[refnum];
     fEngineControl->fTransport.ResetTimebase(refnum);
 
+    jack_uuid_t uuid = JACK_UUID_EMPTY_INITIALIZER;
+    jack_uuid_copy (&uuid, client->GetClientControl()->fSessionID);
+
     // Unregister all ports ==> notifications are sent
     jack_int_t ports[PORT_NUM_FOR_CLIENT];
     int i;
@@ -766,6 +770,12 @@ int JackEngine::ClientCloseAux(int refnum, bool wait)
 
     // Notify running clients
     NotifyRemoveClient(client->GetClientControl()->fName, refnum);
+
+    fMetadata.RemoveProperties(NULL, uuid);
+    /* have to do the notification ourselves, since the client argument
+       to fMetadata->RemoveProperties() was NULL
+     */
+    PropertyChangeNotify(uuid, NULL, PropertyDeleted);
 
     // Cleanup...
     fSynchroTable[refnum].Destroy();
@@ -1108,7 +1118,7 @@ void JackEngine::SessionNotify(int refnum, const char *target, jack_session_even
                 fSessionPendingReplies += 1;
             } else if (result == kImmediateSessionReply) {
                 char uuid_buf[JACK_UUID_SIZE];
-                snprintf(uuid_buf, sizeof(uuid_buf), "%d", client->GetClientControl()->fSessionID);
+                snprintf(uuid_buf, sizeof(uuid_buf), "%" PRIu64, client->GetClientControl()->fSessionID);
                 fSessionResult->fCommandList.push_back(JackSessionCommand(uuid_buf,
                                                                         client->GetClientControl()->fName,
                                                                         client->GetClientControl()->fSessionCommand,
@@ -1133,7 +1143,7 @@ int JackEngine::SessionReply(int refnum)
     JackClientInterface* client = fClientTable[refnum];
     assert(client);
     char uuid_buf[JACK_UUID_SIZE];
-    snprintf(uuid_buf, sizeof(uuid_buf), "%d", client->GetClientControl()->fSessionID);
+    snprintf(uuid_buf, sizeof(uuid_buf), "%" PRIu64, client->GetClientControl()->fSessionID);
     fSessionResult->fCommandList.push_back(JackSessionCommand(uuid_buf,
                                                             client->GetClientControl()->fName,
                                                             client->GetClientControl()->fSessionCommand,
@@ -1157,7 +1167,7 @@ int JackEngine::GetUUIDForClientName(const char *client_name, char *uuid_res)
         JackClientInterface* client = fClientTable[i];
 
         if (client && (strcmp(client_name, client->GetClientControl()->fName) == 0)) {
-            snprintf(uuid_res, JACK_UUID_SIZE, "%d", client->GetClientControl()->fSessionID);
+            snprintf(uuid_res, JACK_UUID_SIZE, "%" PRIu64, client->GetClientControl()->fSessionID);
             return 0;
         }
     }
@@ -1175,7 +1185,7 @@ int JackEngine::GetClientNameForUUID(const char *uuid, char *name_res)
         }
 
         char uuid_buf[JACK_UUID_SIZE];
-        snprintf(uuid_buf, JACK_UUID_SIZE, "%d", client->GetClientControl()->fSessionID);
+        snprintf(uuid_buf, JACK_UUID_SIZE, "%" PRIu64, client->GetClientControl()->fSessionID);
 
         if (strcmp(uuid,uuid_buf) == 0) {
             strncpy(name_res, client->GetClientControl()->fName, JACK_CLIENT_NAME_SIZE);

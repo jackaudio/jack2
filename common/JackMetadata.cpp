@@ -690,7 +690,7 @@ int JackMetadata::RemoveProperties(JackClient* client, jack_uuid_t subject)
 
     cursor->close (cursor);
 
-    if (cnt) {
+    if (cnt && client) {
         PropertyChangeNotify(client, subject, NULL, PropertyDeleted);
     }
 

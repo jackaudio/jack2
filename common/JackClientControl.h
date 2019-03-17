@@ -46,7 +46,7 @@ struct JackClientControl : public JackShmMemAble
     int fPID;
     bool fActive;
 
-    int fSessionID;
+    jack_uuid_t fSessionID;
     char fSessionCommand[JACK_SESSION_COMMAND_SIZE];
     jack_session_flags_t fSessionFlags;
 
@@ -57,12 +57,12 @@ struct JackClientControl : public JackShmMemAble
 
     JackClientControl(const char* name)
     {
-        Init(name, 0, -1, -1);
+        Init(name, 0, -1, 0);
     }
 
     JackClientControl()
     {
-        Init("", 0, -1, -1);
+        Init("", 0, -1, 0);
     }
 
     void Init(const char* name, int pid, int refnum, int uuid)

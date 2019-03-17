@@ -408,7 +408,7 @@ JackALSARawMidiDriver::Open(bool capturing, bool playing, int in_channels,
     if (potential_inputs) {
         try {
             input_ports = new JackALSARawMidiInputPort *[potential_inputs];
-        } catch (std::exception e) {
+        } catch (std::exception& e) {
             jack_error("JackALSARawMidiDriver::Open - while creating input "
                        "port array: %s", e.what());
             FreeDeviceInfo(&in_info_list, &out_info_list);
@@ -418,7 +418,7 @@ JackALSARawMidiDriver::Open(bool capturing, bool playing, int in_channels,
     if (potential_outputs) {
         try {
             output_ports = new JackALSARawMidiOutputPort *[potential_outputs];
-        } catch (std::exception e) {
+        } catch (std::exception& e) {
             jack_error("JackALSARawMidiDriver::Open - while creating output "
                        "port array: %s", e.what());
             FreeDeviceInfo(&in_info_list, &out_info_list);
@@ -430,7 +430,7 @@ JackALSARawMidiDriver::Open(bool capturing, bool playing, int in_channels,
         try {
             input_ports[num_inputs] = new JackALSARawMidiInputPort(info, i);
             num_inputs++;
-        } catch (std::exception e) {
+        } catch (std::exception& e) {
             jack_error("JackALSARawMidiDriver::Open - while creating new "
                        "JackALSARawMidiInputPort: %s", e.what());
         }
@@ -441,7 +441,7 @@ JackALSARawMidiDriver::Open(bool capturing, bool playing, int in_channels,
         try {
             output_ports[num_outputs] = new JackALSARawMidiOutputPort(info, i);
             num_outputs++;
-        } catch (std::exception e) {
+        } catch (std::exception& e) {
             jack_error("JackALSARawMidiDriver::Open - while creating new "
                        "JackALSARawMidiOutputPort: %s", e.what());
         }
@@ -504,7 +504,7 @@ JackALSARawMidiDriver::Start()
     }
     try {
         poll_fds = new pollfd[poll_fd_count];
-    } catch (std::exception e) {
+    } catch (std::exception& e) {
         jack_error("JackALSARawMidiDriver::Start - creating poll descriptor "
                    "structures failed: %s", e.what());
         return -1;
@@ -512,7 +512,7 @@ JackALSARawMidiDriver::Start()
     if (fPlaybackChannels) {
         try {
             output_port_timeouts = new jack_nframes_t[fPlaybackChannels];
-        } catch (std::exception e) {
+        } catch (std::exception& e) {
             jack_error("JackALSARawMidiDriver::Start - creating array for "
                        "output port timeout values failed: %s", e.what());
             goto free_poll_descriptors;
@@ -521,7 +521,7 @@ JackALSARawMidiDriver::Start()
     struct pollfd *poll_fd_iter;
     try {
         CreateNonBlockingPipe(fds);
-    } catch (std::exception e) {
+    } catch (std::exception& e) {
         jack_error("JackALSARawMidiDriver::Start - while creating wake pipe: "
                    "%s", e.what());
         goto free_output_port_timeouts;

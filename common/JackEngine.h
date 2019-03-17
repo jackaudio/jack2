@@ -55,6 +55,7 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         JackServerNotifyChannel fChannel;              /*! To communicate between the RT thread and server */
         JackProcessSync fSignal;
         jack_time_t fLastSwitchUsecs;
+        JackMetadata fMetadata;
 
         int fSessionPendingReplies;
         detail::JackChannelTransactionInterface* fSessionTransaction;
@@ -86,7 +87,7 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         void NotifyPortRename(jack_port_id_t src, const char* old_name);
         void NotifyActivate(int refnum);
 
-        void EnsureUUID(int uuid);
+        void EnsureUUID(jack_uuid_t uuid);
 
         bool CheckClient(int refnum)
         {
