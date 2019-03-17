@@ -44,7 +44,7 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
         virtual ~JackInternalClientChannel()
         {}
 
-        void ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status, int* result, int open)
+        void ClientCheck(const char* name, jack_uuid_t uuid, char* name_res, int protocol, int options, int* status, int* result, int open)
         {
             *result = fEngine->ClientCheck(name, uuid, name_res, protocol, options, status);
         }
@@ -128,7 +128,7 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
             *result = fEngine->InternalClientHandle(client_name, status, int_ref);
         }
 
-        void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int uuid, int* result)
+        void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, jack_uuid_t uuid, int* result)
         {
             *result = fServer->InternalClientLoad1(client_name, so_name, objet_data, options, int_ref, uuid, status);
         }

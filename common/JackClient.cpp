@@ -309,7 +309,7 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                     event->session_dir = strdup(message);
                     event->command_line = NULL;
                     event->flags = (jack_session_flags_t)0;
-                    snprintf(uuid_buf, sizeof(uuid_buf), "%d", GetClientControl()->fSessionID);
+                    snprintf(uuid_buf, sizeof(uuid_buf), "%" PRIu64, GetClientControl()->fSessionID);
                     event->client_uuid = strdup(uuid_buf);
                     fSessionReply = kPendingSessionReply;
                     // Session callback may change fSessionReply by directly using jack_session_reply

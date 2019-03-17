@@ -1647,7 +1647,7 @@ jack_controller_port_connect_callback(
     }
 }
 
-int jack_controller_port_rename_callback(jack_port_id_t port, const char * old_name, const char * new_name, void * context)
+void jack_controller_port_rename_callback(jack_port_id_t port, const char * old_name, const char * new_name, void * context)
 {
     struct jack_graph_port * port_ptr;
     const char * port_new_short_name;
@@ -1660,7 +1660,7 @@ int jack_controller_port_rename_callback(jack_port_id_t port, const char * old_n
     if (port_new_short_name == NULL)
     {
         jack_error("renamed port new name '%s' does not contain ':' separator char", new_name);
-        return -1;
+        return;
     }
 
     port_new_short_name++;      /* skip ':' separator char */
@@ -1669,7 +1669,7 @@ int jack_controller_port_rename_callback(jack_port_id_t port, const char * old_n
     if (port_old_short_name == NULL)
     {
         jack_error("renamed port old name '%s' does not contain ':' separator char", old_name);
-        return -1;
+        return;
     }
 
     port_old_short_name++;      /* skip ':' separator char */
@@ -1678,14 +1678,14 @@ int jack_controller_port_rename_callback(jack_port_id_t port, const char * old_n
     if (port_ptr == NULL)
     {
         jack_error("renamed port '%s' not found", old_name);
-        return -1;
+        return;
     }
 
     name_buffer = strdup(port_new_short_name);
     if (name_buffer == NULL)
     {
         jack_error("strdup() call for port name '%s' failed.", port_new_short_name);
-        return 1;
+        return;
     }
 
     free(port_ptr->name);
@@ -1702,8 +1702,6 @@ int jack_controller_port_rename_callback(jack_port_id_t port, const char * old_n
         port_ptr->name);
     jack_controller_patchbay_send_signal_graph_changed(patchbay_ptr->graph.version);
     pthread_mutex_unlock(&patchbay_ptr->lock);
-
-    return 0;
 }
 
 #undef controller_ptr

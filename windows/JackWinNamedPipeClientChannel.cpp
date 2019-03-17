@@ -38,7 +38,7 @@ JackWinNamedPipeClientChannel::~JackWinNamedPipeClientChannel()
     delete fRequest;
 }
 
-int JackWinNamedPipeClientChannel::Open(const char* server_name, const char* name, int uuid, char* name_res, JackClient* client, jack_options_t options, jack_status_t* status)
+int JackWinNamedPipeClientChannel::Open(const char* server_name, const char* name, jack_uuid_t uuid, char* name_res, JackClient* client, jack_options_t options, jack_status_t* status)
 {
     int result = 0;
     jack_log("JackWinNamedPipeClientChannel::Open name = %s", name);

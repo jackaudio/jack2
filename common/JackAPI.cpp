@@ -1983,7 +1983,7 @@ LIB_EXPORT char *jack_client_get_uuid(jack_client_t* ext_client)
         return NULL;
     } else {
         char retval[16];
-        snprintf(retval, sizeof(retval), "%d", client->GetClientControl()->fSessionID);
+        snprintf(retval, sizeof(retval), "%" PRIu64, client->GetClientControl()->fSessionID);
         return strdup(retval);
     }
 }

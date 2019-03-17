@@ -41,7 +41,7 @@ int JackExternalClient::ClientNotify(int refnum, const char* name, int notify, i
     return result;
 }
 
-int JackExternalClient::Open(const char* name, int pid, int refnum, int uuid, int* shared_client)
+int JackExternalClient::Open(const char* name, int pid, int refnum, jack_uuid_t uuid, int* shared_client)
 {
     try {
 

@@ -39,7 +39,7 @@ JackSocketClientChannel::~JackSocketClientChannel()
     delete fNotificationSocket;
 }
 
-int JackSocketClientChannel::Open(const char* server_name, const char* name, int uuid, char* name_res, JackClient* client, jack_options_t options, jack_status_t* status)
+int JackSocketClientChannel::Open(const char* server_name, const char* name, jack_uuid_t uuid, char* name_res, JackClient* client, jack_options_t options, jack_status_t* status)
 {
     int result = 0;
     jack_log("JackSocketClientChannel::Open name = %s", name);

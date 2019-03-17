@@ -168,7 +168,7 @@ struct JackClientCheckRequest : public JackRequest
     {
         memset(fName, 0, sizeof(fName));
     }
-    JackClientCheckRequest(const char* name, int protocol, int options, int uuid, int open = false)
+    JackClientCheckRequest(const char* name, int protocol, int options, jack_uuid_t uuid, int open = false)
         : JackRequest(JackRequest::kClientCheck), fProtocol(protocol), fOptions(options), fUUID(uuid), fOpen(open)
     {
         memset(fName, 0, sizeof(fName));
@@ -253,7 +253,7 @@ struct JackClientOpenRequest : public JackRequest
     {
         memset(fName, 0, sizeof(fName));
     }
-    JackClientOpenRequest(const char* name, int pid, int uuid): JackRequest(JackRequest::kClientOpen)
+    JackClientOpenRequest(const char* name, int pid, jack_uuid_t uuid): JackRequest(JackRequest::kClientOpen)
     {
         memset(fName, 0, sizeof(fName));
         snprintf(fName, sizeof(fName), "%s", name);
@@ -1056,7 +1056,7 @@ struct JackInternalClientLoadRequest : public JackRequest
         memset(fDllName, 0, sizeof(fDllName));
         memset(fLoadInitName, 0, sizeof(fLoadInitName));
     }
-    JackInternalClientLoadRequest(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int uuid )
+    JackInternalClientLoadRequest(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, jack_uuid_t uuid )
             : JackRequest(JackRequest::kInternalClientLoad), fRefNum(refnum), fOptions(options), fUUID(uuid)
     {
         memset(fName, 0, sizeof(fName));
