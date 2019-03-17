@@ -52,7 +52,6 @@ JackEngine::JackEngine(JackGraphManager* manager,
         fClientTable[i] = NULL;
     }
     fLastSwitchUsecs = 0;
-    fMaxUUID = 0;
     fSessionPendingReplies = 0;
     fSessionTransaction = NULL;
     fSessionResult = NULL;
@@ -564,21 +563,15 @@ bool JackEngine::ClientCheckName(const char* name)
     return false;
 }
 
-int JackEngine::GetNewUUID()
-{
-    return fMaxUUID++;
-}
-
 void JackEngine::EnsureUUID(int uuid)
 {
-    if (uuid > fMaxUUID) {
-        fMaxUUID = uuid + 1;
-    }
+    if (uuid == 0)
+        return;
 
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
         if (client && (client->GetClientControl()->fSessionID == uuid)) {
-            client->GetClientControl()->fSessionID = GetNewUUID();
+            client->GetClientControl()->fSessionID = 0;
         }
     }
 }
@@ -613,7 +606,7 @@ int JackEngine::ClientExternalOpen(const char* name, int pid, int uuid, int* ref
     char real_name[JACK_CLIENT_NAME_SIZE + 1];
 
     if (uuid < 0) {
-        uuid = GetNewUUID();
+        uuid = jack_client_uuid_generate();
         strncpy(real_name, name, JACK_CLIENT_NAME_SIZE);
     } else {
         std::map<int, std::string>::iterator res = fReservationMap.find(uuid);
@@ -1083,7 +1076,7 @@ void JackEngine::SessionNotify(int refnum, const char *target, jack_session_even
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
         if (client && (client->GetClientControl()->fSessionID < 0)) {
-            client->GetClientControl()->fSessionID = GetNewUUID();
+            client->GetClientControl()->fSessionID = jack_client_uuid_generate();
         }
     }
     fSessionResult = new JackSessionNotifyResult();

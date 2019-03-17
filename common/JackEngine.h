@@ -60,7 +60,6 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         detail::JackChannelTransactionInterface* fSessionTransaction;
         JackSessionNotifyResult* fSessionResult;
         std::map<int,std::string> fReservationMap;
-        int fMaxUUID;
 
         int ClientCloseAux(int refnum, bool wait);
         void CheckXRun(jack_time_t callback_usecs);
@@ -87,7 +86,6 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         void NotifyPortRename(jack_port_id_t src, const char* old_name);
         void NotifyActivate(int refnum);
 
-        int GetNewUUID();
         void EnsureUUID(int uuid);
 
         bool CheckClient(int refnum)
