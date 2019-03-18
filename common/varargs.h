@@ -35,7 +35,7 @@ extern "C"
         char *server_name;              /* server name */
         char *load_name;                /* load module name */
         char *load_init;                /* initialization string */
-        int   session_id;               /* requested session_id */
+        jack_uuid_t session_id;         /* requested session_id */
     }
     jack_varargs_t;
 
@@ -51,7 +51,6 @@ extern "C"
     {
         memset (va, 0, sizeof(jack_varargs_t));
         va->server_name = (char*)jack_default_server_name();
-        va->session_id = -1;
     }
 
     static inline void jack_varargs_parse (jack_options_t options, va_list ap, jack_varargs_t *va)
@@ -70,8 +69,11 @@ extern "C"
             va->load_init = va_arg(ap, char *);
         if ((options & JackSessionID)) {
             char *sid = va_arg(ap, char *);
-            if (sid)
-                va->session_id = atoi( sid );
+            if (sid) {
+                const long long id = atoll( sid );
+                if (id > 0)
+                    va->session_id = id;
+            }
         }
     }
 

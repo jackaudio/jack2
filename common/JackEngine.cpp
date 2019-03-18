@@ -43,7 +43,7 @@ JackEngine::JackEngine(JackGraphManager* manager,
                        char self_connect_mode)
                     : JackLockAble(control->fServerName), 
                     fSignal(control->fServerName),
-                    fMetadata(control->fServerName)
+                    fMetadata(NULL) // FIXME use control->fServerName?
 {
     fGraphManager = manager;
     fSynchroTable = table;
@@ -572,7 +572,9 @@ void JackEngine::EnsureUUID(jack_uuid_t uuid)
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
         if (client && jack_uuid_compare(client->GetClientControl()->fSessionID, uuid) == 0) {
+            // FIXME? this code does nothing, but jack1 has it like this too..
             jack_uuid_clear (&uuid);
+            // client->GetClientControl()->fSessionID = jack_client_uuid_generate();
         }
     }
 }
@@ -606,7 +608,7 @@ int JackEngine::ClientExternalOpen(const char* name, int pid, jack_uuid_t uuid, 
 {
     char real_name[JACK_CLIENT_NAME_SIZE + 1];
 
-    if (uuid < 0) {
+    if (jack_uuid_empty(uuid)) {
         uuid = jack_client_uuid_generate();
         strncpy(real_name, name, JACK_CLIENT_NAME_SIZE);
     } else {
@@ -1085,7 +1087,7 @@ void JackEngine::SessionNotify(int refnum, const char *target, jack_session_even
 
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
-        if (client && (client->GetClientControl()->fSessionID < 0)) {
+        if (client && jack_uuid_empty(client->GetClientControl()->fSessionID)) {
             client->GetClientControl()->fSessionID = jack_client_uuid_generate();
         }
     }
@@ -1117,8 +1119,8 @@ void JackEngine::SessionNotify(int refnum, const char *target, jack_session_even
             if (result == kPendingSessionReply) {
                 fSessionPendingReplies += 1;
             } else if (result == kImmediateSessionReply) {
-                char uuid_buf[JACK_UUID_SIZE];
-                snprintf(uuid_buf, sizeof(uuid_buf), "%" PRIu64, client->GetClientControl()->fSessionID);
+                char uuid_buf[JACK_UUID_STRING_SIZE];
+                jack_uuid_unparse(client->GetClientControl()->fSessionID, uuid_buf);
                 fSessionResult->fCommandList.push_back(JackSessionCommand(uuid_buf,
                                                                         client->GetClientControl()->fName,
                                                                         client->GetClientControl()->fSessionCommand,
@@ -1142,8 +1144,8 @@ int JackEngine::SessionReply(int refnum)
 {
     JackClientInterface* client = fClientTable[refnum];
     assert(client);
-    char uuid_buf[JACK_UUID_SIZE];
-    snprintf(uuid_buf, sizeof(uuid_buf), "%" PRIu64, client->GetClientControl()->fSessionID);
+    char uuid_buf[JACK_UUID_STRING_SIZE];
+    jack_uuid_unparse(client->GetClientControl()->fSessionID, uuid_buf);
     fSessionResult->fCommandList.push_back(JackSessionCommand(uuid_buf,
                                                             client->GetClientControl()->fName,
                                                             client->GetClientControl()->fSessionCommand,
@@ -1167,7 +1169,7 @@ int JackEngine::GetUUIDForClientName(const char *client_name, char *uuid_res)
         JackClientInterface* client = fClientTable[i];
 
         if (client && (strcmp(client_name, client->GetClientControl()->fName) == 0)) {
-            snprintf(uuid_res, JACK_UUID_SIZE, "%" PRIu64, client->GetClientControl()->fSessionID);
+            jack_uuid_unparse(client->GetClientControl()->fSessionID, uuid_res);
             return 0;
         }
     }
@@ -1175,8 +1177,12 @@ int JackEngine::GetUUIDForClientName(const char *client_name, char *uuid_res)
     return -1;
 }
 
-int JackEngine::GetClientNameForUUID(const char *uuid, char *name_res)
+int JackEngine::GetClientNameForUUID(const char *uuid_buf, char *name_res)
 {
+    jack_uuid_t uuid;
+    if (jack_uuid_parse(uuid_buf, &uuid) != 0)
+        return -1;
+
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
 
@@ -1184,10 +1190,7 @@ int JackEngine::GetClientNameForUUID(const char *uuid, char *name_res)
             continue;
         }
 
-        char uuid_buf[JACK_UUID_SIZE];
-        snprintf(uuid_buf, JACK_UUID_SIZE, "%" PRIu64, client->GetClientControl()->fSessionID);
-
-        if (strcmp(uuid,uuid_buf) == 0) {
+        if (jack_uuid_compare(client->GetClientControl()->fSessionID, uuid) == 0) {
             strncpy(name_res, client->GetClientControl()->fName, JACK_CLIENT_NAME_SIZE);
             return 0;
         }
@@ -1196,17 +1199,23 @@ int JackEngine::GetClientNameForUUID(const char *uuid, char *name_res)
     return -1;
 }
 
-int JackEngine::ReserveClientName(const char *name, const char *uuid)
+int JackEngine::ReserveClientName(const char *name, const char *uuidstr)
 {
-    jack_log("JackEngine::ReserveClientName ( name = %s, uuid = %s )", name, uuid);
+    jack_log("JackEngine::ReserveClientName ( name = %s, uuid = %s )", name, uuidstr);
 
     if (ClientCheckName(name)) {
         jack_log("name already taken");
         return -1;
     }
 
-    EnsureUUID(atoi(uuid));
-    fReservationMap[atoi(uuid)] = name;
+    jack_uuid_t uuid;
+    if (jack_uuid_parse(uuidstr, &uuid) != 0) {
+        jack_error("JackEngine::ReserveClientName invalid uuid %s", uuidstr);
+        return -1;
+    }
+
+    EnsureUUID(uuid);
+    fReservationMap[uuid] = name;
     return 0;
 }
 

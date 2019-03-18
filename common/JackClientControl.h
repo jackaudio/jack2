@@ -55,14 +55,14 @@ struct JackClientControl : public JackShmMemAble
         Init(name, pid, refnum, uuid);
     }
 
-    JackClientControl(const char* name)
+    JackClientControl(const char* name, jack_uuid_t uuid)
     {
-        Init(name, 0, -1, 0);
+        Init(name, 0, -1, uuid);
     }
 
     JackClientControl()
     {
-        Init("", 0, -1, 0);
+        Init("", 0, -1, JACK_UUID_EMPTY_INITIALIZER);
     }
 
     void Init(const char* name, int pid, int refnum, jack_uuid_t uuid)
