@@ -138,7 +138,10 @@ bool JackLinuxFutex::Allocate(const char* name, const char* server_name, int val
         return false;
     }
 
-    ftruncate(fSharedMem, sizeof(FutexData));
+    if (ftruncate(fSharedMem, sizeof(FutexData)) != 0) {
+        jack_error("Allocate: can't set shared memory size in named futex name = %s err = %s", fName, strerror(errno));
+        return false;
+    }
 
     if (fPromiscuous && (jack_promiscuous_perms(fSharedMem, fName, fPromiscuousGid) < 0)) {
         close(fSharedMem);

@@ -11,8 +11,8 @@
 
 static int subject_is_client = 0;
 static int subject_is_port = 0;
-static jack_uuid_t uuid;
-static char* subject;
+static jack_uuid_t uuid = JACK_UUID_EMPTY_INITIALIZER;
+static char* subject = NULL;
 
 static void
 show_usage (void)
@@ -46,7 +46,7 @@ get_subject (jack_client_t* client, char* argv[], int* optind)
                 }
 
                 if (jack_uuid_parse (ustr, &uuid)) {
-                        fprintf (stderr, "cannot parse client UUID as UUID\n");
+                        fprintf (stderr, "cannot parse client UUID as UUID '%s' '%s'\n", cstr, ustr);
                         return -1;
                 }
 
@@ -289,13 +289,13 @@ int main (int argc, char* argv[])
                         /* list all properties */
 
                         jack_description_t* description;
-                        size_t cnt;
+                        int cnt;
                         size_t p;
-                        size_t n;
+                        int n;
                         char buf[JACK_UUID_STRING_SIZE];
 
                         if ((cnt = jack_get_all_properties (&description)) < 0) {
-                                fprintf (stderr, "could not retrieve properties for %s\n", subject);
+                                fprintf (stderr, "could not retrieve all properties\n");
                                 exit (1);
                         }
 

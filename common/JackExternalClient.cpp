@@ -41,7 +41,7 @@ int JackExternalClient::ClientNotify(int refnum, const char* name, int notify, i
     return result;
 }
 
-int JackExternalClient::Open(const char* name, int pid, int refnum, int uuid, int* shared_client)
+int JackExternalClient::Open(const char* name, int pid, int refnum, jack_uuid_t uuid, int* shared_client)
 {
     try {
 
@@ -64,7 +64,7 @@ int JackExternalClient::Open(const char* name, int pid, int refnum, int uuid, in
         jack_log("JackExternalClient::Open name = %s index = %ld base = %x", name, shared_mem->GetShmIndex(), shared_mem->GetShmAddress());
         return 0;
 
-    } catch (std::exception e) {
+    } catch (std::exception&) {
         return -1;
     }
 }

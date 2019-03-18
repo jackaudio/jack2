@@ -60,7 +60,7 @@ class SERVER_EXPORT JackServer
         JackSynchro fSynchroTable[CLIENT_NUM];
         bool fFreewheel;
 
-        int InternalClientLoadAux(JackLoadableInternalClient* client, const char* so_name, const char* client_name, int options, int* int_ref, int uuid, int* status);
+        int InternalClientLoadAux(JackLoadableInternalClient* client, const char* so_name, const char* client_name, int options, int* int_ref, jack_uuid_t uuid, int* status);
 
     public:
 
@@ -84,8 +84,8 @@ class SERVER_EXPORT JackServer
         int SetFreewheel(bool onoff);
 
         // Internals clients
-        int InternalClientLoad1(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int uuid, int* status);
-        int InternalClientLoad2(const char* client_name, const char* so_name, const JSList * parameters, int options, int* int_ref, int uuid, int* status);
+        int InternalClientLoad1(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, jack_uuid_t uuid, int* status);
+        int InternalClientLoad2(const char* client_name, const char* so_name, const JSList * parameters, int options, int* int_ref, jack_uuid_t uuid, int* status);
 
         // Internal session file
         int LoadInternalSessionFile(const char* file);

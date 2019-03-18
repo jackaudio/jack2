@@ -1982,8 +1982,8 @@ LIB_EXPORT char *jack_client_get_uuid(jack_client_t* ext_client)
         jack_error("jack_client_get_uuid called with a NULL client");
         return NULL;
     } else {
-        char retval[16];
-        snprintf(retval, sizeof(retval), "%d", client->GetClientControl()->fSessionID);
+        char retval[JACK_UUID_STRING_SIZE];
+        jack_uuid_unparse(client->GetClientControl()->fSessionID, retval);
         return strdup(retval);
     }
 }

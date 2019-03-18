@@ -1070,7 +1070,7 @@ jackctl_server_open(
 
         return true;
 
-    } catch (std::exception e) {
+    } catch (std::exception&) {
         jack_error("jackctl_server_open error...");
         jackctl_destroy_param_list(paramlist);
     }
