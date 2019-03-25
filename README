@@ -1,3 +1,18 @@
+--------------
+AVTP Experimental Backend version
+--------------
+
+The IEEE 1722 AVTP media clock backend is located in linux/avb.
+It needs to update the OpenAvnu submodule. 
+PTP and MRP daemons have to be running for the backend to work.
+
+Start jackd2 with the following arguments:
+
+tbd...
+
+
+
+
 -----------------------------------------------------------
 jackdmp (aka JACK2) for Linux, MacOSX, Windows and Solaris
 -----------------------------------------------------------
