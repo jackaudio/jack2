@@ -96,5 +96,6 @@ Tom Szilagyi
 Torben Hohn
 Valentin David
 Valerio Pilo
+Viktor Wilhelmsson
 Yasuhiro Fujii
 Youri Westerman
