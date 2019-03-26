@@ -12,6 +12,7 @@ Andrew Kelley
 Andrzej Szombierski
 Andy Wingo
 Anthony Van Groningen
+Arnout Diels
 Arnaud Rebillout
 Arnold Krille
 Bernhard M. Wiedemann
