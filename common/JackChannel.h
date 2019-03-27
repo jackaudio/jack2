@@ -99,7 +99,7 @@ class JackClientChannelInterface
         {}
 
         // Open the Server/Client connection
-        virtual int Open(const char* server_name, const char* name, int uuid, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
+        virtual int Open(const char* server_name, const char* name, jack_uuid_t uuid, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
         {
             return 0;
         }
@@ -123,9 +123,9 @@ class JackClientChannelInterface
             return -1;
         }
 
-        virtual void ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status, int* result, int open)
+        virtual void ClientCheck(const char* name, jack_uuid_t uuid, char* name_res, int protocol, int options, int* status, int* result, int open)
         {}
-        virtual void ClientOpen(const char* name, int pid, int uuid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
+        virtual void ClientOpen(const char* name, int pid, jack_uuid_t uuid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
         {}
         virtual void ClientOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, int* result)
         {}
@@ -169,7 +169,7 @@ class JackClientChannelInterface
         {}
         virtual void InternalClientHandle(int refnum, const char* client_name, int* status, int* int_ref, int* result)
         {}
-        virtual void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int uuid, int* result)
+        virtual void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, jack_uuid_t uuid, int* result)
         {}
         virtual void InternalClientUnload(int refnum, int int_ref, int* status, int* result)
         {}

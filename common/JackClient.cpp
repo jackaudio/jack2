@@ -304,12 +304,12 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                 jack_log("JackClient::kSessionCallback");
                 if (fSession) {
                     jack_session_event_t* event = (jack_session_event_t*)malloc( sizeof(jack_session_event_t));
-                    char uuid_buf[JACK_UUID_SIZE];
+                    char uuid_buf[JACK_UUID_STRING_SIZE];
                     event->type = (jack_session_event_type_t)value1;
                     event->session_dir = strdup(message);
                     event->command_line = NULL;
                     event->flags = (jack_session_flags_t)0;
-                    snprintf(uuid_buf, sizeof(uuid_buf), "%d", GetClientControl()->fSessionID);
+                    jack_uuid_unparse(GetClientControl()->fSessionID, uuid_buf);
                     event->client_uuid = strdup(uuid_buf);
                     fSessionReply = kPendingSessionReply;
                     // Session callback may change fSessionReply by directly using jack_session_reply
@@ -1306,7 +1306,7 @@ int JackClient::SessionReply(jack_session_event_t* ev)
 
 char* JackClient::GetUUIDForClientName(const char* client_name)
 {
-    char uuid_res[JACK_UUID_SIZE];
+    char uuid_res[JACK_UUID_STRING_SIZE];
     int result = -1;
     fChannel->GetUUIDForClientName(GetClientControl()->fRefNum, client_name, uuid_res, &result);
     return (result) ? NULL : strdup(uuid_res);

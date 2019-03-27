@@ -40,8 +40,9 @@ namespace Jack
 JackDriver::JackDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
     :fCaptureChannels(0),
     fPlaybackChannels(0),
-    fClientControl(name),
-    fWithMonitorPorts(false){
+    fClientControl(name, jack_client_uuid_generate()),
+    fWithMonitorPorts(false)
+{
     assert(strlen(name) < JACK_CLIENT_NAME_SIZE);
     fSynchroTable = table;
     strcpy(fAliasName, alias);

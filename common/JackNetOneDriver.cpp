@@ -287,7 +287,7 @@ int JackNetOneDriver::Read()
     }
 
     if ((netj.num_lost_packets * netj.period_size / netj.sample_rate) > 2)
-        JackTools::ThrowJackNetException();
+        throw JackNetException();
 
     //netjack_read(&netj, netj.period_size);
     JackDriver::CycleTakeBeginTime();

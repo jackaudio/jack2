@@ -61,10 +61,12 @@ static void signal_segv(int signum, siginfo_t* info, void*ptr)
 static void signal_segv(int signum, siginfo_t* info, void*ptr) {
     static const char *si_codes[3] = {"", "SEGV_MAPERR", "SEGV_ACCERR"};
 
-    size_t i;
     const char *si_code_str;
     ucontext_t *ucontext = (ucontext_t*)ptr;
 
+#if defined(HAVE_UCONTEXT) && defined(HAVE_NGREG)
+    size_t i;
+#endif
 #if defined(SIGSEGV_STACK_X86) || defined(SIGSEGV_STACK_IA64)
     int f = 0;
     Dl_info dlinfo;
