@@ -19,10 +19,6 @@
 #include <sys/mman.h>
 #endif
 
-#ifndef MAX
-#define MAX(a,b) ( (a) < (b) ? (b) : (a) )
-#endif
-
 static jack_port_t* port;
 static jack_ringbuffer_t *rb = NULL;
 static pthread_mutex_t msg_thread_lock = PTHREAD_MUTEX_INITIALIZER;
@@ -31,10 +27,11 @@ static pthread_cond_t data_ready = PTHREAD_COND_INITIALIZER;
 static int keeprunning = 1;
 static uint64_t monotonic_cnt = 0;
 
-#define RBSIZE 512
+#define RBSIZE 100
+#define MSG_BUFFER_SIZE 4096
 
 typedef struct {
-	uint8_t  buffer[128];
+	uint8_t  buffer[MSG_BUFFER_SIZE];
 	uint32_t size;
 	uint32_t tme_rel;
 	uint64_t tme_mon;
@@ -82,17 +79,23 @@ process (jack_nframes_t frames, void* arg)
 	for (i = 0; i < N; ++i) {
 		jack_midi_event_t event;
 		int r;
-
 		r = jack_midi_event_get (&event, buffer, i);
 
-		if (r == 0 && jack_ringbuffer_write_space (rb) >= sizeof(midimsg)) {
+		if (r != 0) {continue;}
+
+		if (event.size > MSG_BUFFER_SIZE) {
+			fprintf(stderr, "Error: MIDI message was too large, skipping event. Max. allowed size: %d bytes\n", MSG_BUFFER_SIZE);
+		}
+		else if (jack_ringbuffer_write_space (rb) >= sizeof(midimsg)) {
 			midimsg m;
 			m.tme_mon = monotonic_cnt;
 			m.tme_rel = event.time;
 			m.size    = event.size;
-			memcpy (m.buffer, event.buffer, MAX(sizeof(m.buffer), event.size));
+			memcpy (m.buffer, event.buffer, event.size);
 			jack_ringbuffer_write (rb, (void *) &m, sizeof(midimsg));
-
+		}
+		else {
+			fprintf (stderr, "Error: ringbuffer was full, skipping event.\n");
 		}
 	}
 
@@ -107,6 +110,7 @@ process (jack_nframes_t frames, void* arg)
 }
 
 static void wearedone(int sig) {
+	fprintf(stderr, "Shutting down\n");
 	keeprunning = 0;
 }
 

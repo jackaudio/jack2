@@ -513,25 +513,6 @@ endif
 #
 #include $(BUILD_SHARED_LIBRARY)
 
-## LIBFREEBOB required
-## ========================================================
-## driver - freebob
-## ========================================================
-#include $(CLEAR_VARS)
-#
-#LOCAL_SRC_FILES := ../linux/freebob/JackFreebobDriver.cpp
-##'HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL', 'HAVE_TIMERFD
-#LOCAL_CFLAGS := $(common_cflags) -DSERVER_SIDE
-#LOCAL_CPPFLAGS := $(common_cppflags)
-#LOCAL_LDFLAGS := $(common_ldflags) $(JACK_STL_LDFLAGS)
-#LOCAL_C_INCLUDES := $(common_c_includes)
-#LOCAL_SHARED_LIBRARIES := libc libdl libcutils libjackserver
-#LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/jack
-#LOCAL_MODULE_TAGS := eng optional
-#LOCAL_MODULE := jack_freebob
-#
-#include $(BUILD_SHARED_LIBRARY)
-
 ## LIBFFADO required
 ## ========================================================
 ## driver - firewire

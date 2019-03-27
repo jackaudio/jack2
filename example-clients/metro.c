@@ -94,14 +94,14 @@ process_audio (jack_nframes_t nframes)
 		offset += frames_left;
 	}
 
-    /*
-    jack_nframes_t cur_time = jack_frame_time(client);
-    jack_time_t cur_micro_time = jack_get_time();
+	/*
+	jack_nframes_t cur_time = jack_frame_time(client);
+	jack_time_t cur_micro_time = jack_get_time();
 
-    printf("jack_frame_time %lld micro %lld delta %d\n", cur_time, (cur_micro_time - last_micro_time), cur_time - last_time);
-    last_time = cur_time;
-    last_micro_time = cur_micro_time;
-    */
+	printf("jack_frame_time %lld micro %lld delta %d\n", cur_time, (cur_micro_time - last_micro_time), cur_time - last_time);
+	last_time = cur_time;
+	last_micro_time = cur_micro_time;
+	*/
 }
 
 static int
@@ -272,10 +272,10 @@ main (int argc, char *argv[])
 		goto error;
 	}
 
-    /* install a signal handler to properly quits jack client */
+	/* install a signal handler to properly quits jack client */
 #ifdef WIN32
 	signal(SIGINT, signal_handler);
-    signal(SIGABRT, signal_handler);
+	signal(SIGABRT, signal_handler);
 	signal(SIGTERM, signal_handler);
 #else
 	signal(SIGQUIT, signal_handler);
@@ -284,19 +284,19 @@ main (int argc, char *argv[])
 	signal(SIGINT, signal_handler);
 #endif
 
-    /* run until interrupted */
+	/* run until interrupted */
 	while (1) {
-	#ifdef WIN32
+#ifdef WIN32
 		Sleep(1000);
-	#else
+#else
 		sleep(1);
-	#endif
+#endif
 	};
 
-    jack_client_close(client);
+	jack_client_close(client);
 
 error:
-    free(amp);
-    free(wave);
-    exit (0);
+	free(amp);
+	free(wave);
+	exit (0);
 }

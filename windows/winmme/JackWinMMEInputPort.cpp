@@ -51,9 +51,9 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
                                          size_t max_bytes, size_t max_messages)
 {
     thread_queue = new JackMidiAsyncQueue(max_bytes, max_messages);
-    std::auto_ptr<JackMidiAsyncQueue> thread_queue_ptr(thread_queue);
+    std::unique_ptr<JackMidiAsyncQueue> thread_queue_ptr(thread_queue);
     write_queue = new JackMidiBufferWriteQueue();
-    std::auto_ptr<JackMidiBufferWriteQueue> write_queue_ptr(write_queue);
+    std::unique_ptr<JackMidiBufferWriteQueue> write_queue_ptr(write_queue);
     sysex_buffer = new jack_midi_data_t[max_bytes];
     char error_message[MAXERRORLENGTH];
     MMRESULT result = midiInOpen(&handle, index,

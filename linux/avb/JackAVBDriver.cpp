@@ -81,7 +81,7 @@ JackAVBDriver::JackAVBDriver(const char* name, const char* alias, JackLockedEngi
                                                                 (uint8_t) destination_mac[5]);
     num_packets_even_odd = 0; // even = 0, odd = 1
 
-    init_1722_driver( &(this->ieee1722mc),
+    init_avb_driver( &(this->avb_ctx),
                   eth_dev,
                   stream_id,
                   destination_mac,
@@ -110,7 +110,7 @@ int JackAVBDriver::Close()
     int res = JackWaiterDriver::Close();
 
     FreePorts();
-    shutdown_1722_driver(&ieee1722mc);
+    shutdown_avb_driver(&avb_ctx);
     return res;
 }
 
@@ -121,7 +121,7 @@ int JackAVBDriver::AllocPorts()
     char buf[64];
     int chn = 0;
 
-    for (chn = 0; chn < ieee1722mc.capture_channels; chn++) {
+    for (chn = 0; chn < (int)avb_ctx.capture_channels; chn++) {
         memset(buf, 0, sizeof(buf));
         snprintf (buf, sizeof(buf) - 1, "system:capture_%u", chn + 1);
         if (fEngine->PortRegister(fClientControl.fRefNum, buf, JACK_DEFAULT_AUDIO_TYPE,
@@ -130,10 +130,10 @@ int JackAVBDriver::AllocPorts()
             return -1;
         }
 
-        ieee1722mc.capture_ports = jack_slist_append (ieee1722mc.capture_ports, (void *)(intptr_t)port_index);
+        avb_ctx.capture_ports = jack_slist_append (avb_ctx.capture_ports, (void *)(intptr_t)port_index);
     }
 
-    for (chn = 0; chn < ieee1722mc.playback_channels; chn++) {
+    for (chn = 0; chn < (int)avb_ctx.playback_channels; chn++) {
         memset(buf, 0, sizeof(buf));
         snprintf (buf, sizeof(buf) - 1, "system:playback_%u", chn + 1);
 
@@ -143,7 +143,7 @@ int JackAVBDriver::AllocPorts()
             return -1;
         }
 
-        ieee1722mc.playback_ports = jack_slist_append (ieee1722mc.playback_ports, (void *)(intptr_t)port_index);
+        avb_ctx.playback_ports = jack_slist_append (avb_ctx.playback_ports, (void *)(intptr_t)port_index);
     }
     //port = fGraphManager->GetPort(port_index);
 
@@ -161,9 +161,9 @@ bool JackAVBDriver::Initialize()
 
 
     //display some additional infos
-    printf("AVB IEEE1722 AVTP driver started\n");
+    printf("AVB driver started\n");
 
-    if (startup_1722_driver(&ieee1722mc)) {
+    if (startup_avb_driver(&avb_ctx)) {
 
         return false;
     }
@@ -176,11 +176,11 @@ bool JackAVBDriver::Initialize()
 
     //monitor
     //driver parametering
-    JackTimedDriver::SetBufferSize(ieee1722mc.period_size);
-    JackTimedDriver::SetSampleRate(ieee1722mc.sample_rate);
+    JackTimedDriver::SetBufferSize(avb_ctx.period_size);
+    JackTimedDriver::SetSampleRate(avb_ctx.sample_rate);
 
-    JackDriver::NotifyBufferSize(ieee1722mc.period_size);
-    JackDriver::NotifySampleRate(ieee1722mc.sample_rate);
+    JackDriver::NotifyBufferSize(avb_ctx.period_size);
+    JackDriver::NotifySampleRate(avb_ctx.sample_rate);
 
     return true;
 }
@@ -193,22 +193,21 @@ bool JackAVBDriver::Initialize()
 int JackAVBDriver::Read()
 {
     int ret = 0;
-    JSList *node = ieee1722mc.capture_ports;
+    JSList *node = avb_ctx.capture_ports;
 
 
-    uint64_t cumulative_ipg_ns = 0;
+    uint64_t cumulative_rx_int_ns = 0;
     int n = 0;
-    for(n=0; n<ieee1722mc.num_packets; n++){
-        cumulative_ipg_ns += wait_recv_ts_1722_mediaclockstream( &ieee1722mc, n );
-//        jack_log("duration: %lld", cumulative_ipg_ns);
+    for(n=0; n<avb_ctx.num_packets; n++){
+        cumulative_rx_int_ns += await_avtp_rx_ts( &avb_ctx, n );
+//        jack_log("duration: %lld", cumulative_rx_int_ns);
     }
 
-    //printf("no: %d ipg: %lld ns, period_usec: %lld\n", n, cumulative_ipg_ns, ieee1722mc.period_usecs );fflush(stdout);
-    float cumulative_ipg_us = cumulative_ipg_ns / 1000;
-    if ( cumulative_ipg_us > ieee1722mc.period_usecs) {
+    float cumulative_rx_int_us = cumulative_rx_int_ns / 1000;
+    if ( cumulative_rx_int_us > avb_ctx.period_usecs) {
         ret = 1;
-        NotifyXRun(fBeginDateUst, cumulative_ipg_us);
-        jack_error("netxruns... duration: %fms", cumulative_ipg_us / 1000);
+        NotifyXRun(fBeginDateUst, cumulative_rx_int_us);
+        jack_error("netxruns... duration: %fms", cumulative_rx_int_us / 1000);
     }
 
     JackDriver::CycleTakeBeginTime();
@@ -221,7 +220,7 @@ int JackAVBDriver::Read()
         jack_port_id_t port_index = (jack_port_id_t)(intptr_t) node->data;
         JackPort *port = fGraphManager->GetPort(port_index);
         jack_default_audio_sample_t* buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(port_index, fEngineControl->fBufferSize);
-        //memcpy(buf, 0, ieee1722mc.period_size * sizeof(jack_default_audio_sample_t));
+        //memcpy(buf, 0, avb_ctx.period_size * sizeof(jack_default_audio_sample_t));
         node = jack_slist_next (node);
     }
 
@@ -230,12 +229,12 @@ int JackAVBDriver::Read()
 
 int JackAVBDriver::Write()
 {
-    JSList *node = ieee1722mc.playback_ports;
+    JSList *node = avb_ctx.playback_ports;
     while (node != NULL) {
         jack_port_id_t port_index = (jack_port_id_t)(intptr_t) node->data;
         JackPort *port = fGraphManager->GetPort(port_index);
         jack_default_audio_sample_t* buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(port_index, fEngineControl->fBufferSize);
-        //memcpy(buf, 0, ieee1722mc.period_size * sizeof(jack_default_audio_sample_t));
+        //memcpy(buf, 0, avb_ctx.period_size * sizeof(jack_default_audio_sample_t));
         node = jack_slist_next (node);
     }
     return 0;
@@ -244,7 +243,7 @@ int JackAVBDriver::Write()
 void
 JackAVBDriver::FreePorts ()
 {
-    JSList *node = ieee1722mc.capture_ports;
+    JSList *node = avb_ctx.capture_ports;
 
     while (node != NULL) {
         JSList *this_node = node;
@@ -253,9 +252,9 @@ JackAVBDriver::FreePorts ()
         jack_slist_free_1(this_node);
         fEngine->PortUnRegister(fClientControl.fRefNum, port_index);
     }
-    ieee1722mc.capture_ports = NULL;
+    avb_ctx.capture_ports = NULL;
 
-    node = ieee1722mc.playback_ports;
+    node = avb_ctx.playback_ports;
 
     while (node != NULL) {
         JSList *this_node = node;
@@ -264,7 +263,7 @@ JackAVBDriver::FreePorts ()
         jack_slist_free_1(this_node);
         fEngine->PortUnRegister(fClientControl.fRefNum, port_index);
     }
-    ieee1722mc.playback_ports = NULL;
+    avb_ctx.playback_ports = NULL;
 }
 
 //driver loader-----------------------------------------------------------------------
@@ -341,11 +340,6 @@ extern "C"
         char sid[8];
         char dmac[6];
         char eth_dev[32];
-
-
-        int dont_htonl_floats = 0;
-        int always_deadline = 0;
-        int jitter_val = 0;
         const JSList * node;
         const jack_driver_param_t * param;
 

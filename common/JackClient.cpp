@@ -59,6 +59,7 @@ JackClient::JackClient(JackSynchro* table):fThread(this)
     fThreadFun = NULL;
     fSession = NULL;
     fLatency = NULL;
+    fPropertyChange = NULL;
 
     fProcessArg = NULL;
     fGraphOrderArg = NULL;
@@ -77,6 +78,7 @@ JackClient::JackClient(JackSynchro* table):fThread(this)
     fThreadFunArg = NULL;
     fSessionArg = NULL;
     fLatencyArg = NULL;
+    fPropertyChangeArg = NULL;
 
     fSessionReply = kPendingSessionReply;
 }
@@ -319,6 +321,17 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
             case kLatencyCallback:
                 res = HandleLatencyCallback(value1);
                 break;
+
+            case kPropertyChangeCallback: {
+                jack_uuid_t subject;
+                jack_uuid_parse(name, &subject);
+                const char* key = message;
+                jack_property_change_t change = (jack_property_change_t)value1;
+                jack_log("JackClient::kPropertyChangeCallback subject = %x key = %s change = %x", subject, key, change);
+                if (fPropertyChange)
+                    fPropertyChange(subject, key, change, fPropertyChangeArg);
+                break;
+            }
         }
     }
 
@@ -1186,6 +1199,18 @@ int JackClient::SetLatencyCallback(JackLatencyCallback callback, void *arg)
     }
 }
 
+int JackClient::SetPropertyChangeCallback(JackPropertyChangeCallback callback, void *arg)
+{
+    if (IsActive()) {
+        jack_error("You cannot set callbacks on an active client");
+        return -1;
+    } else {
+        fPropertyChangeArg = arg;
+        fPropertyChange = callback;
+        return 0;
+    }
+}
+
 //------------------
 // Internal clients
 //------------------
@@ -1308,6 +1333,18 @@ int JackClient::ClientHasSessionCallback(const char* client_name)
     fChannel->ClientHasSessionCallback(client_name, &result);
     return result;
 }
+
+//------------------
+// Metadata API
+//------------------
+
+int JackClient::PropertyChangeNotify(jack_uuid_t subject, const char* key, jack_property_change_t change)
+{
+    int result = -1;
+    fChannel->PropertyChangeNotify(subject, key, change, &result);
+    return result;
+}
+
 
 } // end of namespace
 

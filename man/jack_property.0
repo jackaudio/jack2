@@ -1,0 +1,64 @@
+.TH JACK_PROPERTY "1" "!DATE!" "!VERSION!"
+.SH NAME
+jack_property \- JACK client to list, set and delete metadata information
+.SH SYNOPSIS
+\fBjack_property\fR -l
+.br
+\fBjack_property\fR [ -c | -p ] -l \fIidentifier\fR 
+.br
+\fBjack_property\fR [ -c | -p ] -l \fIidentifier\fR \fIkey\fR
+.br
+\fBjack_property\fR [ -c | -p ] -s \fIidentifier\fR \fIkey\fR \fIvalue\fR [ \fItype\fR ]
+.br
+\fBjack_property\fR [ -c | -p ] -d \fIidentifier\fR 
+.br
+\fBjack_property\fR [ -c | -p ] -d \fIidentifier\fR \fIkey\fR
+.br
+\fBjack_property\fR -D 
+.SH DESCRIPTION
+\fBjack_property\fR can be used to list, set and delete any and all metadata associated with the ports
+and clients of a JACK server.
+.P
+There are three main ways to use the command. The \fB-l\fR option is used to list existing metadata. The \fB-s\fR option is used
+to set metadata. The \fB-d/-D\fR options are used to delete metadata.
+.P
+The \fIidentifier\fR is normally a UUID (UUIDs for ports and clients can be shown with jack_lsp(1)). If the \fB-c\fR option is used, then \fIidentifier\fR will
+be interpreted as a client name, and its UUID will be looked up internally and used for the relevant metadata operation. If the \fB-p\fR option is used, then \fIidentifier\fR will
+be interpreted as a port name and its UUID  will be looked up internally and used for the relevant metadata operation.
+.P
+The \fIkey\fR is an arbitary string that identifies the metadata to be operated upon.
+.P
+The \fIvalue\fR is an arbitrary string that defines the value of the metadata to be created.
+.P
+The \fItype\fR is an optional MIME type, given as a string. An empty type for a piece of metadata results in it being interpreted as "text/UTF-8". 
+.SH OPTIONS
+.TP 6
+-l
+list all metadata currently defined
+.TP
+-l identifier
+list all metadata currently defined for \fIidentifier\fR
+.TP
+-l identifier key
+show the value of the metadata associated with key for \fIidentifier\fR
+.TP
+-d identifier
+deletes all metadata for \fIidentifier\fR
+.TP
+-d identifier key
+deletes the metadata associated with \fIkey\fR for \fIidentifier\fR
+.TP
+-D
+delete all currently defined metadata
+.TP
+-s identifier key value [ type ]
+sets the metadata associated with \fIkey\fR to \fIvalue\fR for \fIidentifer\fR, with its type set to \fItype\fR if given
+.TP
+-c 
+interpret a given identifier as a client name rather than a UUID
+.TP 
+-p
+interpret a given identifier as a port name rather than a UUID
+
+
+

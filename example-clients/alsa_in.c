@@ -599,6 +599,7 @@ void printUsage() {
 fprintf(stderr, "usage: alsa_out [options]\n"
 		"\n"
 		"  -j <jack name> - client name\n"
+		"  -S <server name> - server to connect\n"
 		"  -d <alsa_device> \n"
 		"  -c <channels> \n"
 		"  -p <period_size> \n"
@@ -627,13 +628,15 @@ sigterm_handler( int signal )
 int main (int argc, char *argv[]) {
     char jack_name[30] = "alsa_in";
     char alsa_device[30] = "hw:0";
+    char *server_name = NULL;
+    int jack_opts = 0;
 
     extern char *optarg;
     extern int optind, optopt;
     int errflg=0;
     int c;
 
-    while ((c = getopt(argc, argv, "ivj:r:c:p:n:d:q:m:t:f:F:C:Q:s:")) != -1) {
+    while ((c = getopt(argc, argv, "ivj:r:c:p:n:d:q:m:t:f:F:C:Q:s:S:")) != -1) {
 	switch(c) {
 	    case 'j':
 		strcpy(jack_name,optarg);
@@ -683,6 +686,10 @@ int main (int argc, char *argv[]) {
 	    case 's':
 		smooth_size = atoi(optarg);
 		break;
+	    case 'S':
+		server_name = optarg;
+		jack_opts |= JackServerName;
+		break;
 	    case ':':
 		fprintf(stderr,
 			"Option -%c requires an operand\n", optopt);
@@ -703,7 +710,7 @@ int main (int argc, char *argv[]) {
 	fprintf (stderr, "invalid samplerate quality\n");
 	return 1;
     }
-    if ((client = jack_client_open (jack_name, 0, NULL)) == 0) {
+    if ((client = jack_client_open (jack_name, jack_opts, NULL, server_name)) == 0) {
 	fprintf (stderr, "jack server not running?\n");
 	return 1;
     }

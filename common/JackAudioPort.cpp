@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <Accelerate/Accelerate.h>
 #elif defined (__SSE__) && !defined (__sun__)
 #include <xmmintrin.h>
-#elif defined (__ARM_NEON__)
+#elif defined (__ARM_NEON__) || defined (__ARM_NEON)
 #include <arm_neon.h>
 #endif
 
@@ -56,7 +56,7 @@ static inline void MixAudioBuffer(jack_default_audio_sample_t* mixbuffer, jack_d
         mixbuffer += 4;
         buffer += 4;
         frames_group--;
-    #elif defined (__ARM_NEON__)
+    #elif defined (__ARM_NEON__) || defined (__ARM_NEON)
         float32x4_t vec = vaddq_f32(vld1q_f32(mixbuffer), vld1q_f32(buffer));
         vst1q_f32(mixbuffer, vec);
 
@@ -125,7 +125,7 @@ static void AudioBufferMixdown(void* mixbuffer, void** src_buffers, int src_coun
     for (jack_nframes_t i = 0; i != remaining_frames; ++i) {
         target[i] = source[i];
     }
-#elif defined (__ARM_NEON__)
+#elif defined (__ARM_NEON__) || defined (__ARM_NEON)
     jack_nframes_t frames_group = nframes / 4;
     jack_nframes_t remaining_frames = nframes % 4;
 

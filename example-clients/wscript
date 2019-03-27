@@ -29,7 +29,8 @@ example_programs = {
     'jack_latent_client' : 'latent_client.c',
     'jack_midi_dump' : 'midi_dump.c',
     'jack_midi_latency_test' : 'midi_latency_test.c',
-    'jack_simdtests' : 'simdtests.cpp'
+    'jack_simdtests' : 'simdtests.cpp',
+    'jack_property' : 'property.c',
     }
 
 example_libs = {
@@ -77,6 +78,8 @@ def build(bld):
             prog.use += ['RT', 'M']
         if bld.env['IS_SUN']:
             prog.use += ['M']
+        #prog.cflags = ['-Wno-deprecated-declarations', '-Wno-misleading-indentation']
+        #prog.cxxflags = ['-Wno-deprecated-declarations', '-Wno-misleading-indentation']
 
         prog.target = example_program
 

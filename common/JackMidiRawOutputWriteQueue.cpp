@@ -33,9 +33,9 @@ JackMidiRawOutputWriteQueue(JackMidiSendQueue *send_queue, size_t non_rt_size,
                             size_t max_non_rt_messages, size_t max_rt_messages)
 {
     non_rt_queue = new JackMidiAsyncQueue(non_rt_size, max_non_rt_messages);
-    std::auto_ptr<JackMidiAsyncQueue> non_rt_ptr(non_rt_queue);
+    std::unique_ptr<JackMidiAsyncQueue> non_rt_ptr(non_rt_queue);
     rt_queue = new JackMidiAsyncQueue(max_rt_messages, max_rt_messages);
-    std::auto_ptr<JackMidiAsyncQueue> rt_ptr(rt_queue);
+    std::unique_ptr<JackMidiAsyncQueue> rt_ptr(rt_queue);
     non_rt_event = 0;
     rt_event = 0;
     running_status = 0;

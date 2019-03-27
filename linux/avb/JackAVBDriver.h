@@ -21,7 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackNetDriver__
 
 #include "JackTimedDriver.h"
-#include "avb_1722avtp.h"
+#include "avb.h"
 
 
 namespace Jack
@@ -34,7 +34,7 @@ class JackAVBDriver : public JackWaiterDriver
 {
     private:
 
-        ieee1722_avtp_driver_state_t ieee1722mc;
+        avb_driver_state_t avb_ctx;
         int num_packets_even_odd;
 
     public:

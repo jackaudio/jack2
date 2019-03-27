@@ -48,12 +48,12 @@ struct AtomicCounter
         info.fLongVal = 0;
     }
 
-	AtomicCounter(volatile const AtomicCounter& obj) 
+	AtomicCounter(volatile const AtomicCounter& obj)
 	{
 		info.fLongVal = obj.info.fLongVal;
 	}
-    
-	AtomicCounter(volatile AtomicCounter& obj) 
+
+	AtomicCounter(volatile AtomicCounter& obj)
 	{
 		info.fLongVal = obj.info.fLongVal;
 	}
@@ -139,7 +139,7 @@ class JackAtomicState
         {}
 
         /*!
-        \brief Returns the current state : only valid in the RT reader thread 
+        \brief Returns the current state : only valid in the RT reader thread
         */
         T* ReadCurrentState()
         {
@@ -212,7 +212,7 @@ class JackAtomicState
 
         /*
               // Single writer : write methods get the *next* state to be updated
-        void TestWriteMethod() 
+        void TestWriteMethod()
         {
         	T* state = WriteNextStateStart();
         	......
@@ -221,7 +221,7 @@ class JackAtomicState
         }
 
               // First RT call possibly switch state
-        void TestReadRTMethod1() 
+        void TestReadRTMethod1()
         {
         	T* state = TrySwitchState();
         	......
@@ -235,25 +235,25 @@ class JackAtomicState
         	......
         	......
         }
-              
+
               // Non RT read methods : must check state coherency
-        void TestReadMethod() 
+        void TestReadMethod()
         {
         	T* state;
         	UInt16 cur_index;
             UInt16 next_index = GetCurrentIndex();
         	do {
-                cur_index = next_index; 
+                cur_index = next_index;
         		state = ReadCurrentState();
         		
         		......
         		......
-                
+
                 next_index = GetCurrentIndex();
         	} while (cur_index != next_index);
         }
         */
-        
+
 } POST_PACKED_STRUCTURE;
 
 } // end of namespace

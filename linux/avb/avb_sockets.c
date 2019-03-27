@@ -8,11 +8,7 @@
 
 #define DUMMY_STREAMID (0xABCDEF)
 
-/*
- *          IEEE 1722 AVTP Receiver Socket
- */
-
-
+/* IEEE 1722 AVTP Receive Socket */
 int enable_1722avtp_filter( FILE* filepointer, int raw_transport_socket, unsigned char *destinationMacAddress)
 {
     /*
@@ -52,32 +48,27 @@ int enable_1722avtp_filter( FILE* filepointer, int raw_transport_socket, unsigne
 }
 
 
-int create_RAW_AVB_Transport_Socket( FILE* filepointer, int* raw_transport_socket, char* eth_dev)
+int create_RAW_AVB_Transport_Socket( FILE* filepointer, int* raw_transport_socket, const char* eth_dev)
 {
-	struct ifreq ifr;	// set promiscuous mode
+	struct ifreq ifr;
 	memset((char*)&ifr, 0, sizeof(struct ifreq));
 	int sockopt=0;
 
-	struct ifreq ifopts; /* set promiscuous mode */
+	struct ifreq ifopts;
 	memset((char*)&ifopts, 0, sizeof(struct ifreq));
 	int s;
 
 	strncpy (ifr.ifr_name, eth_dev, IFNAMSIZ - 1);
 	ifr.ifr_name[sizeof(ifr.ifr_name)-1] = '\0';
 
-
-
-	// create a RAW socket
 	if (( s = socket(PF_PACKET, SOCK_RAW, htons(AVB_ETHER_TYPE/*ETH_P_ALL*/))) < 0){
 		fprintf(filepointer,  "[RAW_TRANSPORT] Error creating RAW Socket \n");fflush(filepointer);
 
 		return RETURN_VALUE_FAILURE;
 	}
 	*raw_transport_socket = s;
-//	printf("[RAW_TRANSPORT] Success creating RAW Socket %d %d\n", &raw_transport_socket, *raw_transport_socket);
 
 	strncpy(ifopts.ifr_name, ifr.ifr_name, IFNAMSIZ-1);
-
 
 	if( ioctl(*raw_transport_socket, SIOCGIFFLAGS, &ifopts) == -1) {
 		fprintf(filepointer,  "[RAW_TRANSPORT] No such interface");fflush(filepointer);
@@ -86,7 +77,6 @@ int create_RAW_AVB_Transport_Socket( FILE* filepointer, int* raw_transport_socke
 
 		return RETURN_VALUE_FAILURE;
 	}
-
 
 	ifopts.ifr_flags |= IFF_PROMISC;
 
@@ -97,14 +87,12 @@ int create_RAW_AVB_Transport_Socket( FILE* filepointer, int* raw_transport_socke
 		return RETURN_VALUE_FAILURE;
 	}
 
-	/* Allow the socket to be reused - incase connection is closed prematurely */
 	if (setsockopt(*raw_transport_socket, SOL_SOCKET, SO_REUSEADDR, &sockopt, sizeof( sockopt)) == -1) {
 		fprintf(filepointer,  "[RAW_TRANSPORT] setsockopt failed \n");fflush(filepointer);
 		close(*raw_transport_socket);
 
 		return RETURN_VALUE_FAILURE;
 	}
-
 
 	/* Set Timestamping Option => requires recvmsg to be used => timestamp in ancillary data */
     int timestamp_flags = 0;
@@ -114,13 +102,11 @@ int create_RAW_AVB_Transport_Socket( FILE* filepointer, int* raw_transport_socke
 	timestamp_flags |= SOF_TIMESTAMPING_SYS_HARDWARE;
 	timestamp_flags |= SOF_TIMESTAMPING_RAW_HARDWARE;
 
-
 	struct hwtstamp_config hwconfig;
 	memset( &hwconfig, 0, sizeof( hwconfig ));
 	hwconfig.rx_filter = HWTSTAMP_FILTER_ALL;
 //	hwconfig.tx_type = HWTSTAMP_TX_OFF;
-	hwconfig.tx_type = HWTSTAMP_TX_ON;
-
+	hwconfig.tx_type = HWTSTAMP_TX_ON; /* NECESARRY FOR CMSGs TO WORK*/
 
 	struct ifreq hwtstamp;
 	memset((char*)&hwtstamp, 0, sizeof(struct ifreq));
@@ -133,7 +119,6 @@ int create_RAW_AVB_Transport_Socket( FILE* filepointer, int* raw_transport_socke
 		return RETURN_VALUE_FAILURE;
 	}
 
-
 	if (setsockopt(*raw_transport_socket, SOL_SOCKET, SO_TIMESTAMPING, &timestamp_flags, sizeof(timestamp_flags) ) == -1) {
 		fprintf(filepointer,  "[RAW TRANSPORT] setsockopt timestamping failed %d %s \n", errno, strerror(errno));fflush(filepointer);
 		close(*raw_transport_socket);
@@ -142,34 +127,12 @@ int create_RAW_AVB_Transport_Socket( FILE* filepointer, int* raw_transport_socke
 		fprintf(filepointer,  "[RAW TRANSPORT] Timestamp Socket \n");fflush(filepointer);
 	}
 
-
-	/*  Bind Socket to Device */
 	if (setsockopt(*raw_transport_socket, SOL_SOCKET, SO_BINDTODEVICE, eth_dev, IFNAMSIZ-1) == -1)	{
 		fprintf(filepointer,  "[RAW_TRANSPORT] SO_BINDTODEVICE failed \n");fflush(filepointer);
 		close(*raw_transport_socket);
 
 		return RETURN_VALUE_FAILURE;
 	}
-
-
 	return RETURN_VALUE_SUCCESS;
 }
 
-
-void print_eth_header(etherheader_q_t *eh)
-{
-	printf("Ethernet Header: ");
-	for(int i=0; i<6; i++){
-		printf("%x",eh->ether_dhost[i]);
-		if(i<5) printf(":");
-		else 	printf(" ");
-	}
-	for(int i=0; i<6; i++){
-		printf("%x",eh->ether_shost[i]);
-		if(i<5) printf(":");
-		else 	printf(" ");
-	}
-	printf("%x ",eh->vlan_id);
-	printf("%x ",eh->ether_type);
-	printf("\n");
-}

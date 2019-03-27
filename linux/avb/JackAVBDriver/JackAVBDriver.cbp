@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/libJackAVBDriver" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Debug/JackAVBDriver" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -18,7 +18,7 @@
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/libJackAVBDriver" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Release/JackAVBDriver" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -38,31 +38,31 @@
 		</Compiler>
 		<Unit filename="../JackAVBDriver.cpp" />
 		<Unit filename="../JackAVBDriver.h" />
-		<Unit filename="../avb_1722avtp.c">
+		<Unit filename="../avb.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../avb_1722avtp.h" />
+		<Unit filename="../avb.h" />
+		<Unit filename="../avb_definitions.h" />
 		<Unit filename="../avb_sockets.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../avb_sockets.h" />
-		<Unit filename="../global_definitions.h" />
-		<Unit filename="../listener_mediaclock.c">
+		<Unit filename="../media_clock_listener.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../listener_mediaclock.h" />
-		<Unit filename="../mrpClient_control_socket.c">
+		<Unit filename="../media_clock_listener.h" />
+		<Unit filename="../mrp_client_control_socket.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../mrpClient_control_socket.h" />
-		<Unit filename="../mrpClient_interface.c">
+		<Unit filename="../mrp_client_control_socket.h" />
+		<Unit filename="../mrp_client_interface.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../mrpClient_interface.h" />
-		<Unit filename="../mrpClient_send_msg.c">
+		<Unit filename="../mrp_client_interface.h" />
+		<Unit filename="../mrp_client_send_msg.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../mrpClient_send_msg.h" />
+		<Unit filename="../mrp_client_send_msg.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

@@ -88,11 +88,11 @@ class SERVER_EXPORT JackLockedEngine
         {}
         ~JackLockedEngine()
         {}
-        
+
         bool Lock() { return fEngine.Lock(); }
         bool Unlock() { return fEngine.Unlock(); }
         bool Trylock() { return fEngine.Trylock(); }
-  
+
         int Open()
         {
             // No lock needed
@@ -107,7 +107,7 @@ class SERVER_EXPORT JackLockedEngine
             return fEngine.Close();
             CATCH_EXCEPTION_RETURN
         }
- 
+
         // Client management
         int ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status)
         {
@@ -361,6 +361,7 @@ class SERVER_EXPORT JackLockedEngine
             return fEngine.GetUUIDForClientName(client_name, uuid_res);
             CATCH_EXCEPTION_RETURN
         }
+
         int GetClientNameForUUID(const char *uuid, char *name_res)
         {
             TRY_CALL
@@ -381,6 +382,14 @@ class SERVER_EXPORT JackLockedEngine
             TRY_CALL
             JackLock lock(&fEngine);
             return fEngine.ClientHasSessionCallback(name);
+            CATCH_EXCEPTION_RETURN
+        }
+
+        int PropertyChangeNotify(jack_uuid_t subject, const char* key, jack_property_change_t change)
+        {
+            TRY_CALL
+            JackLock lock(&fEngine);
+            return fEngine.PropertyChangeNotify(subject, key, change);
             CATCH_EXCEPTION_RETURN
         }
 };

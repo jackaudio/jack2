@@ -161,7 +161,7 @@ namespace Jack
 
     int JackNetUnixSocket::Bind()
     {
-        return bind(fSockfd, reinterpret_cast<socket_address_t*>(&fRecvAddr), sizeof(socket_address_t));
+        return ::bind(fSockfd, reinterpret_cast<socket_address_t*>(&fRecvAddr), sizeof(socket_address_t));
     }
 
     int JackNetUnixSocket::BindWith(const char* ip)

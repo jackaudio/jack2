@@ -32,7 +32,7 @@ namespace Jack
     /**
     \Brief This class describes a Net Master
     */
-    
+
     typedef std::list<std::pair<std::string, std::string> > connections_list_t;
 
     class JackNetMaster : public JackNetMasterInterface
@@ -40,7 +40,7 @@ namespace Jack
             friend class JackNetMasterManager;
 
         private:
-      
+
             static int SetProcess(jack_nframes_t nframes, void* arg);
             static int SetBufferSize(jack_nframes_t nframes, void* arg);
             static int SetSampleRate(jack_nframes_t nframes, void* arg);
@@ -60,7 +60,7 @@ namespace Jack
 
             //sync and transport
             int fLastTransportState;
-       
+
             //monitoring
 #ifdef JACK_MONITOR
             jack_time_t fPeriodUsecs;
@@ -79,7 +79,7 @@ namespace Jack
             void TimebaseCallback(jack_position_t* pos);
             void ConnectPorts();
             void ConnectCallback(jack_port_id_t a, jack_port_id_t b, int connect);
-            
+
             void SaveConnections(connections_list_t& connections);
             void LoadConnections(const connections_list_t& connections);
 

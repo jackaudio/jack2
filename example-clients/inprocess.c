@@ -56,6 +56,7 @@ inprocess (jack_nframes_t nframes, void *arg)
  * @return 0 if successful; otherwise jack_finish() will be called and
  * the client terminated immediately.
  */
+JACK_LIB_EXPORT
 int
 jack_initialize (jack_client_t *client, const char *load_init)
 {
@@ -115,6 +116,7 @@ jack_initialize (jack_client_t *client, const char *load_init)
  *
  * @param arg the same parameter provided to inprocess().
  */
+JACK_LIB_EXPORT
 void
 jack_finish (void *arg)
 {

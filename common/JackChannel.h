@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "types.h"
 #include "JackSession.h"
+#include "JackMetadata.h"
 
 namespace Jack
 {
@@ -74,10 +75,10 @@ class JackClientRequestInterface : public JackChannelTransactionInterface, publi
         {}
         virtual ~JackClientRequestInterface()
         {}
-        
+
         virtual int Read(void* data, int len) { return -1; }
         virtual int Write(void* data, int len) { return -1; }
-        
+
         virtual int Connect(const char* dir, const char* name, int which) { return -1; }
         virtual int Close() { return -1; }
 
@@ -184,6 +185,9 @@ class JackClientChannelInterface
         virtual void ReserveClientName(int refnum, const char* client_name, const char *uuid, int* result)
         {}
         virtual void ClientHasSessionCallback(const char* client_name, int* result)
+        {}
+
+        virtual void PropertyChangeNotify(jack_uuid_t subject, const char* key, jack_property_change_t change, int* result)
         {}
 
         virtual bool IsChannelThread()

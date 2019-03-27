@@ -186,7 +186,7 @@ class JackShmReadWritePtr
         ~JackShmReadWritePtr()
         {
             if (!fInitDone) {
-               jack_error("JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for %d, skipping unlock", fInfo.index);                              
+               jack_error("JackShmReadWritePtr::~JackShmReadWritePtr - Init not done for %d, skipping unlock", fInfo.index);
                return;
             }
             if (fInfo.index >= 0) {
@@ -281,7 +281,7 @@ class JackShmReadWritePtr1
         ~JackShmReadWritePtr1()
         {
             if (!fInitDone) {
-               jack_error("JackShmReadWritePtr1::~JackShmReadWritePtr1 - Init not done for %d, skipping unlock", fInfo.index);                              
+               jack_error("JackShmReadWritePtr1::~JackShmReadWritePtr1 - Init not done for %d, skipping unlock", fInfo.index);
                return;
             }
             if (fInfo.index >= 0) {
@@ -370,7 +370,7 @@ class JackShmReadPtr
         ~JackShmReadPtr()
         {
             if (!fInitDone) {
-               jack_error("JackShmReadPtr::~JackShmReadPtr - Init not done for %ld, skipping unlock", fInfo.index);                              
+               jack_error("JackShmReadPtr::~JackShmReadPtr - Init not done for %ld, skipping unlock", fInfo.index);
                return;
             }
             if (fInfo.index >= 0) {

@@ -63,6 +63,17 @@ jack_midi_get_event_count(void* port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
  * guaranteed to be a complete MIDI event (the status byte will always be
  * present, and no realtime events will interspered with the event).
  *
+ * This rule does not apply to System Exclusive MIDI messages
+ * since they can be of arbitrary length.
+ * To maintain smooth realtime operation such events CAN be deliverd
+ * as multiple, non-normalised events.
+ * The maximum size of one event "chunk" depends on the MIDI backend in use.
+ * For example the midiseq driver will create chunks of 256 bytes.
+ * The first SysEx "chunked" event starts with 0xF0 and the last
+ * delivered chunk ends with 0xF7.
+ * To receive the full SysEx message, a caller of jack_midi_event_get()
+ * must concatenate chunks until a chunk ends with 0xF7.
+ *
  * @param event Event structure to store retrieved event in.
  * @param port_buffer Port buffer from which to retrieve event.
  * @param event_index Index of event to retrieve.
@@ -91,10 +102,12 @@ jack_midi_clear_buffer(void *port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
  * @ref jack_midi_event_reserve or @ref jack_midi_event_write. This
  * function may not be called on an input port's buffer.
  *
+ * @deprecated Please use jack_midi_clear_buffer().
+ *
  * @param port_buffer Port buffer to resetted.
  */
 void
-jack_midi_reset_buffer(void *port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
+jack_midi_reset_buffer(void *port_buffer) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
 
 
 /** Get the size of the largest event that can be stored by the port.

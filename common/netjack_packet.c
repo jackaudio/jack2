@@ -4,6 +4,7 @@
  *
  * used by the driver and the jacknet_client
  *
+ * Copyright (C) 2019 Karl Linden <karl.j.linden@gmail.com>
  * Copyright (C) 2008 Marc-Olivier Barre <marco@marcochapeau.org>
  * Copyright (C) 2008 Pieter Palmers <pieterpalmers@users.sourceforge.net>
  * Copyright (C) 2006 Torben Hohn <torbenh@gmx.de>
@@ -38,6 +39,7 @@
 #define _GNU_SOURCE
 #endif
 
+#include <alloca.h>
 #include <math.h>
 #include <stdio.h>
 #include <memory.h>
@@ -52,7 +54,6 @@
 
 #ifdef WIN32
 #include <winsock2.h>
-#define socklen_t int
 #include <malloc.h>
 #define socklen_t int
 #else

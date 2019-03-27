@@ -129,4 +129,13 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
     #define POST_PACKED_STRUCTURE
 #endif /* __arm__ || __aarch64__ || __ppc__ || __powerpc__ */
 
+/** define JACK_LIB_EXPORT, useful for internal clients */
+#if defined(_WIN32)
+    #define JACK_LIB_EXPORT __declspec(dllexport)
+#elif defined(__GNUC__)
+    #define JACK_LIB_EXPORT __attribute__((visibility("default")))
+#else
+    #define JACK_LIB_EXPORT
+#endif
+
 #endif /* __jack_systemdeps_h__ */

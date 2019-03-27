@@ -40,18 +40,18 @@ struct AtomicArrayCounter
         scounter;
         UInt32 fLongVal;
     }info;
-    
+
     AtomicArrayCounter()
     {
         info.fLongVal = 0;
     }
 
-    AtomicArrayCounter(volatile const AtomicArrayCounter& obj) 
+    AtomicArrayCounter(volatile const AtomicArrayCounter& obj)
     {
         info.fLongVal = obj.info.fLongVal;
     }
 
-    AtomicArrayCounter(volatile AtomicArrayCounter& obj) 
+    AtomicArrayCounter(volatile AtomicArrayCounter& obj)
     {
         info.fLongVal = obj.info.fLongVal;
     }
@@ -67,7 +67,7 @@ struct AtomicArrayCounter
         info.fLongVal = obj.info.fLongVal;
         return *this;
     }
-    
+
 } POST_PACKED_STRUCTURE;
 
 #define Counter1(e) (e).info.fLongVal
@@ -243,7 +243,7 @@ class JackAtomicArrayState
         /*!
         \brief Stop write operation : make the next state ready to be used by the RT thread
         */
-        
+
         void WriteNextStateStop(int state)
         {
             WriteNextStateStopAux(state);

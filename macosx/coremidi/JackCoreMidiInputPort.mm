@@ -51,9 +51,9 @@ JackCoreMidiInputPort::JackCoreMidiInputPort(double time_ratio,
     JackCoreMidiPort(time_ratio)
 {
     thread_queue = new JackMidiAsyncQueue(max_bytes, max_messages);
-    std::auto_ptr<JackMidiAsyncQueue> thread_queue_ptr(thread_queue);
+    std::unique_ptr<JackMidiAsyncQueue> thread_queue_ptr(thread_queue);
     write_queue = new JackMidiBufferWriteQueue();
-    std::auto_ptr<JackMidiBufferWriteQueue> write_queue_ptr(write_queue);
+    std::unique_ptr<JackMidiBufferWriteQueue> write_queue_ptr(write_queue);
     sysex_buffer = new jack_midi_data_t[max_bytes];
     write_queue_ptr.release();
     thread_queue_ptr.release();

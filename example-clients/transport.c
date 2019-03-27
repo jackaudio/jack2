@@ -213,7 +213,7 @@ static void com_timeout(char *arg)
 
 /* Toggle between play and stop state */
 static void com_toggle(char *arg)
-{       
+{
 	jack_position_t current;
 	jack_transport_state_t transport_state;
 
@@ -221,17 +221,17 @@ static void com_toggle(char *arg)
 
 	switch (transport_state) {
 	case JackTransportStopped:
-        	com_play( arg );
+		com_play( arg );
 		break;
 	case JackTransportRolling:
-        	com_stop( arg );
+		com_stop( arg );
 		break;
 	case JackTransportStarting:
 		fprintf(stderr, "state: Starting - no transport toggling");
 		break;
 	default:
 		fprintf(stderr, "unexpected state: no transport toggling");
-	} 
+	}
 }
 
 

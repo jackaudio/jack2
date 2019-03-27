@@ -35,11 +35,11 @@ JackALSARawMidiInputPort::JackALSARawMidiInputPort(snd_rawmidi_info_t *info,
     alsa_event = 0;
     jack_event = 0;
     receive_queue = new JackALSARawMidiReceiveQueue(rawmidi, max_bytes);
-    std::auto_ptr<JackALSARawMidiReceiveQueue> receive_ptr(receive_queue);
+    std::unique_ptr<JackALSARawMidiReceiveQueue> receive_ptr(receive_queue);
     thread_queue = new JackMidiAsyncQueue(max_bytes, max_messages);
-    std::auto_ptr<JackMidiAsyncQueue> thread_ptr(thread_queue);
+    std::unique_ptr<JackMidiAsyncQueue> thread_ptr(thread_queue);
     write_queue = new JackMidiBufferWriteQueue();
-    std::auto_ptr<JackMidiBufferWriteQueue> write_ptr(write_queue);
+    std::unique_ptr<JackMidiBufferWriteQueue> write_ptr(write_queue);
     raw_queue = new JackMidiRawInputWriteQueue(thread_queue, max_bytes,
                                                max_messages);
     write_ptr.release();

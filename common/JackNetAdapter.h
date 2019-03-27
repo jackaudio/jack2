@@ -50,7 +50,7 @@ namespace Jack
 
             //adapter thread
             JackThread fThread;
-     
+
             //transport
             void EncodeTransportData();
             void DecodeTransportData();

@@ -659,7 +659,7 @@ int JackFFADODriver::Detach()
     ffado_driver_t* driver = (ffado_driver_t*)fDriver;
     jack_log("JackFFADODriver::Detach");
 
-    // finish the libfreebob streaming
+    // finish the libffado streaming
     ffado_streaming_finish(driver->dev);
     driver->dev = NULL;
 
