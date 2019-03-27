@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008-2011 Torben Horn
+Copyright (C) 2016-2019 Christoph Kuhr
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -215,6 +215,7 @@ int JackAVBDriver::Read()
     if ( ret ) {
         return -1;
     }
+
 
     while (node != NULL) {
         jack_port_id_t port_index = (jack_port_id_t)(intptr_t) node->data;
