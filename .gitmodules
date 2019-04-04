@@ -1,0 +1,3 @@
+[submodule "linux/avb/OpenAvnu"]
+	path = linux/avb/OpenAvnu
+	url = https://github.com/chris-kuhr/OpenAvnu.git
