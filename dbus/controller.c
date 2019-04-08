@@ -27,7 +27,13 @@
 #include <dbus/dbus.h>
 #include <assert.h>
 #include <unistd.h>
-#include <sys/sysinfo.h>
+
+#ifdef __linux__
+    #include <sys/sysinfo.h>
+#elif defined(__APPLE__)
+    #include <sys/sysctl.h>
+#endif
+
 #include <errno.h>
 
 #include "controller.h"
@@ -787,13 +793,25 @@ void
 jack_controller_run(
     void * context)
 {
+#ifdef __linux__
     struct sysinfo si;
+#elif defined(__APPLE__)
+
+    int mib[2];
+    size_t size;
+    struct timeval  boottime;
+
+    mib[0] = CTL_KERN;
+    mib[1] = KERN_BOOTTIME;
+    size = sizeof(boottime);
+#endif
 
     if (controller_ptr->pending_save == 0)
     {
         return;
     }
 
+#ifdef __linux__
     if (sysinfo(&si) != 0)
     {
         jack_error("sysinfo() failed with %d", errno);
@@ -802,6 +820,16 @@ jack_controller_run(
     {
         return;
     }
+#elif defined(__APPLE__)
+    if (sysctl(mib, 2, &boottime, &size, NULL, 0) != -1)
+    {
+        jack_error("sysctl() failed with %d", errno);
+    }
+    else if (boottime.tv_sec < controller_ptr->pending_save + 2) /* delay save by two seconds */
+    {
+        return;
+    }
+#endif
 
     controller_ptr->pending_save = 0;
     jack_controller_settings_save_auto(controller_ptr);
@@ -813,15 +841,38 @@ void
 jack_controller_pending_save(
     struct jack_controller * controller_ptr)
 {
+#ifdef __linux__
     struct sysinfo si;
+#elif defined(__APPLE__)
 
+    int mib[2];
+    size_t size;
+    struct timeval  boottime;
+
+    mib[0] = CTL_KERN;
+    mib[1] = KERN_BOOTTIME;
+    size = sizeof(boottime);
+#endif
+
+#ifdef __linux__
     if (sysinfo(&si) != 0)
-    {
-        jack_error("sysinfo() failed with %d.", errno);
-        controller_ptr->pending_save = 0;
-        jack_controller_settings_save_auto(controller_ptr);
-        return;
-    }
+#elif defined(__APPLE__)
+        if (sysctl(mib, 2, &boottime, &size, NULL, 0) != -1)
+#endif
+        {
+#ifdef __linux__
+            jack_error("sysinfo() failed with %d.", errno);
+#elif defined(__APPLE__)
+            jack_error("sysctl() failed with %d.", errno);
+#endif
+            controller_ptr->pending_save = 0;
+            jack_controller_settings_save_auto(controller_ptr);
+            return;
+        }
 
+#ifdef __linux__
     controller_ptr->pending_save = si.uptime;
+#elif defined(__APPLE__)
+    controller_ptr->pending_save = boottime.tv_sec;
+#endif
 }
