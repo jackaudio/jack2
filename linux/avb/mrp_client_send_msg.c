@@ -18,6 +18,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "mrp_client_send_msg.h"
 
+
 int mrp_client_send_mrp_msg(FILE* filepointer, int control_socket, char *notify_data, int notify_len)
 {
     struct sockaddr_in addr;

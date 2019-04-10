@@ -25,7 +25,6 @@ extern "C"
 #endif
 
 #include <mqueue.h>
-#include "avb_definitions.h"
 #include "avb_sockets.h"
 #include "mrp_client_interface.h"
 

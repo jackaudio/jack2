@@ -23,22 +23,8 @@ extern "C"
 {
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <string.h>
-#include <unistd.h> // needed for sysconf(int name);
-#include <errno.h>
-#include <signal.h>
-#include <time.h>
-#include <malloc.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/errno.h>
-
 #include "avb_definitions.h"
 #include "mrp_client_control_socket.h"
-#include "mrp_client_send_msg.h"
 
 
 int mrp_client_getDomain_joinVLAN(FILE* filepointer, avb_driver_state_t **avb_ctx, mrp_ctx_t *mrp_ctx);

@@ -15,29 +15,28 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
-#ifndef MEDIACLOCKLISTENER_H
-#define MEDIACLOCKLISTENER_H
+#ifndef _MRP_CL_IF_H_
+#define _MRP_CL_IF_H_
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-#include <mqueue.h>
 #include "avb_definitions.h"
-#include "avb_sockets.h"
-#include "mrp_client_interface.h"
+#include "mrp_client_control_socket.h"
 
-int avtp_mcl_create( FILE* filepointer, avb_driver_state_t **avb_ctx, const char* avb_dev_name,
-                                    char* stream_id, char* destination_mac,
-                                    struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds);
-void avtp_mcl_delete( FILE* filepointer, avb_driver_state_t **avb_ctx);
+#include "OpenAvnu/daemons/mrpd/mrpd.h"
+#include "OpenAvnu/daemons/mrpd/mrp.h"
 
-uint64_t avtp_mcl_wait_for_rx_ts( FILE* filepointer, avb_driver_state_t **avb_ctx,
-                                        struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds, int packet_num );
+int mrp_client_getDomain_joinVLAN(FILE* filepointer, avb_driver_state_t **avb_ctx, mrp_ctx_t *mrp_ctx);
+
+int mrp_client_listener_await_talker(FILE* filepointer,avb_driver_state_t **avb_ctx, mrp_ctx_t *mrp_ctx);
+int mrp_client_listener_send_ready(FILE* filepointer,avb_driver_state_t **avb_ctx, mrp_ctx_t *mrp_ctx);
+int mrp_client_listener_send_leave(FILE* filepointer,avb_driver_state_t **avb_ctx, mrp_ctx_t *mrp_ctx);
+
 
 #ifdef __cplusplus
 }
 #endif
-#endif //MEDIACLOCKLISTENER_H
+#endif /* _MRP_CL_IF_H_ */

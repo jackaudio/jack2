@@ -16,24 +16,25 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _MRP_SEND_MSG_H_
-#define _MRP_SEND_MSG_H_
+#include "mrp_client_send_msg.h"
 
-#ifdef __cplusplus
-extern "C"
+#include "OpenAvnu/daemons/mrpd/mrpd.h"
+#include "OpenAvnu/daemons/mrpd/mrp.h"
+
+int mrp_client_send_mrp_msg(FILE* filepointer, int control_socket, char *notify_data, int notify_len)
 {
-#endif
+    struct sockaddr_in addr;
 
-#include <string.h>
-#include <errno.h>
-#include <malloc.h>
+    if ( control_socket == -1 )
+        return RETURN_VALUE_FAILURE;
+    if (notify_data == NULL)
+        return RETURN_VALUE_FAILURE;
 
-#include "avb_definitions.h"
+    memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(MRPD_PORT_DEFAULT);
+    addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    inet_aton("127.0.0.1", &addr.sin_addr);
 
-int mrp_client_send_mrp_msg(FILE* filepointer, int control_socket, char *notify_data, int notify_len);
-
-#ifdef __cplusplus
+    return sendto( control_socket, notify_data, notify_len, 0, (struct sockaddr*)&addr, (socklen_t)sizeof(addr));
 }
-#endif
-
-#endif /* _MRP_SEND_MSG_H_ */

@@ -23,21 +23,6 @@ extern "C"
 {
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <string.h>
-#include <unistd.h> // needed for sysconf(int name);
-#include <errno.h>
-#include <signal.h>
-#include <time.h>
-#include <malloc.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/errno.h>
-
-#include <arpa/inet.h>
-
 #include "avb_definitions.h"
 #include "mrp_client_send_msg.h"
 
