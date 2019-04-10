@@ -24,13 +24,13 @@ extern int errno;
 
 int mrp_client_getDomain(FILE* filepointer, mrp_ctx_t *mrp_ctx)
 {
-	int ret=0;
+    int ret=0;
 
     /*
      * we may not get a notification if we are joining late,
      * so query for what is already there ...
      */
-	char* msgbuf= malloc(1500);
+    char* msgbuf= malloc(1500);
     if (NULL == msgbuf){
         fprintf(filepointer,  "failed to create msgbuf. %d %s\n",  errno, strerror(errno));fflush(filepointer);
         return RETURN_VALUE_FAILURE;
@@ -38,7 +38,7 @@ int mrp_client_getDomain(FILE* filepointer, mrp_ctx_t *mrp_ctx)
 
     memset(msgbuf, 0, 1500);
     sprintf(msgbuf, "S??");
-	fprintf(filepointer, "Get Domain %s\n",msgbuf);fflush(filepointer);
+    fprintf(filepointer, "Get Domain %s\n",msgbuf);fflush(filepointer);
     ret = mrp_client_send_mrp_msg( filepointer, mrp_client_get_Control_socket(), msgbuf, 1500);
 
 
@@ -66,40 +66,40 @@ int mrp_client_getDomain(FILE* filepointer, mrp_ctx_t *mrp_ctx)
 //        class_b->vid = mrp_ctx->domain_class_b_vid;
 //    }
 
-	return RETURN_VALUE_SUCCESS;
+    return RETURN_VALUE_SUCCESS;
 }
 
 
 int mrp_client_report_domain_status(FILE* filepointer, mrp_ctx_t *mrp_ctx)
 {
-	char* msgbuf= malloc(1500);
-	int rc=0;
+    char* msgbuf= malloc(1500);
+    int rc=0;
 
 
-	if (NULL == msgbuf){
-		fprintf(filepointer,  "mrp_listener_report_domain_status - NULL == msgbuf \t LISTENER_FAILED \n");fflush(filepointer);
-		mrp_ctx->mrp_status = LISTENER_FAILED;
+    if (NULL == msgbuf){
+        fprintf(filepointer,  "mrp_listener_report_domain_status - NULL == msgbuf \t LISTENER_FAILED \n");fflush(filepointer);
+        mrp_ctx->mrp_status = LISTENER_FAILED;
 
 
-		return RETURN_VALUE_FAILURE;
-	}
-	memset(msgbuf, 0, 1500);
-	sprintf(msgbuf, "S+D:C=%d,P=%d,V=%04x", mrp_ctx->domain_class_a_id, mrp_ctx->domain_class_a_priority, mrp_ctx->domain_class_a_vid);
-	fprintf(filepointer, "Report Domain Status %s\n",msgbuf);fflush(filepointer);
-	rc = mrp_client_send_mrp_msg( filepointer, mrp_client_get_Control_socket(), msgbuf, 1500);
-	free(msgbuf);
+        return RETURN_VALUE_FAILURE;
+    }
+    memset(msgbuf, 0, 1500);
+    sprintf(msgbuf, "S+D:C=%d,P=%d,V=%04x", mrp_ctx->domain_class_a_id, mrp_ctx->domain_class_a_priority, mrp_ctx->domain_class_a_vid);
+    fprintf(filepointer, "Report Domain Status %s\n",msgbuf);fflush(filepointer);
+    rc = mrp_client_send_mrp_msg( filepointer, mrp_client_get_Control_socket(), msgbuf, 1500);
+    free(msgbuf);
 
-	if (rc != 1500){
-		fprintf(filepointer,  "mrp_listener_report_domain_status - rc != 1500 \t LISTENER_FAILED \n");fflush(filepointer);
-		mrp_ctx->mrp_status = LISTENER_FAILED;
+    if (rc != 1500){
+        fprintf(filepointer,  "mrp_listener_report_domain_status - rc != 1500 \t LISTENER_FAILED \n");fflush(filepointer);
+        mrp_ctx->mrp_status = LISTENER_FAILED;
 
-		return RETURN_VALUE_FAILURE;
-	}
+        return RETURN_VALUE_FAILURE;
+    }
 
     fprintf(filepointer,  "mrp_listener_report_domain_status\t LISTENER_IDLE \n");fflush(filepointer);
     mrp_ctx->mrp_status = LISTENER_IDLE;
 
-	return RETURN_VALUE_SUCCESS;
+    return RETURN_VALUE_SUCCESS;
 }
 
 
@@ -107,14 +107,14 @@ int mrp_client_report_domain_status(FILE* filepointer, mrp_ctx_t *mrp_ctx)
 
 int mrp_client_joinVLAN(FILE* filepointer, mrp_ctx_t *mrp_ctx)
 {
-	char* msgbuf= malloc(1500);
-	int rc=0;
+    char* msgbuf= malloc(1500);
+    int rc=0;
 
-	if (NULL == msgbuf)		return RETURN_VALUE_FAILURE;
+    if (NULL == msgbuf)        return RETURN_VALUE_FAILURE;
 
-	memset(msgbuf, 0, 1500);
-	sprintf(msgbuf, "V++:I=%04x",mrp_ctx->domain_class_a_vid);
-	fprintf(filepointer, "Joing VLAN %s\n",msgbuf);fflush(filepointer);
+    memset(msgbuf, 0, 1500);
+    sprintf(msgbuf, "V++:I=%04x",mrp_ctx->domain_class_a_vid);
+    fprintf(filepointer, "Joing VLAN %s\n",msgbuf);fflush(filepointer);
 
     rc = mrp_client_send_mrp_msg( filepointer, mrp_client_get_Control_socket(), msgbuf, 1500);
     free(msgbuf);
@@ -139,7 +139,7 @@ int mrp_client_getDomain_joinVLAN(FILE* filepointer, avb_driver_state_t **avb_ct
 {
     fprintf(filepointer,  "calling mrp_get_domain()\n");fflush(filepointer);
 
-    if ( mrp_client_getDomain( filepointer, mrp_ctx) > RETURN_VALUE_FAILURE)	{
+    if ( mrp_client_getDomain( filepointer, mrp_ctx) > RETURN_VALUE_FAILURE)    {
         fprintf(filepointer,  "success calling mrp_get_domain()\n");fflush(filepointer);
     } else {
         fprintf(filepointer,  "failed calling mrp_get_domain()\n");fflush(filepointer);
@@ -166,7 +166,7 @@ int mrp_client_getDomain_joinVLAN(FILE* filepointer, avb_driver_state_t **avb_ct
     }
 
 
-	return RETURN_VALUE_SUCCESS;
+    return RETURN_VALUE_SUCCESS;
 }
 
 
@@ -203,63 +203,63 @@ int mrp_client_listener_await_talker(FILE* filepointer, avb_driver_state_t **avb
 
 int mrp_client_listener_send_ready(FILE* filepointer, avb_driver_state_t **avb_ctx, mrp_ctx_t *mrp_ctx)
 {
-	char *databuf= malloc(1500);
-	int rc=0;
+    char *databuf= malloc(1500);
+    int rc=0;
 
-	if (NULL == databuf) return RETURN_VALUE_FAILURE;
+    if (NULL == databuf) return RETURN_VALUE_FAILURE;
 
-	memset(databuf, 0, 1500);
-	sprintf(databuf, "S+L:L=%02x%02x%02x%02x%02x%02x%02x%02x,D=2",
-			(*avb_ctx)->streamid8[0], (*avb_ctx)->streamid8[1],
-			(*avb_ctx)->streamid8[2], (*avb_ctx)->streamid8[3],
-			 (*avb_ctx)->streamid8[4], (*avb_ctx)->streamid8[5],
-			 (*avb_ctx)->streamid8[6], (*avb_ctx)->streamid8[7]);
-	rc = mrp_client_send_mrp_msg( filepointer, mrp_client_get_Control_socket(), databuf, 1500);
-	fprintf(filepointer, "Send Ready %s\n",databuf);fflush(filepointer);
-	free(databuf);
+    memset(databuf, 0, 1500);
+    sprintf(databuf, "S+L:L=%02x%02x%02x%02x%02x%02x%02x%02x,D=2",
+            (*avb_ctx)->streamid8[0], (*avb_ctx)->streamid8[1],
+            (*avb_ctx)->streamid8[2], (*avb_ctx)->streamid8[3],
+             (*avb_ctx)->streamid8[4], (*avb_ctx)->streamid8[5],
+             (*avb_ctx)->streamid8[6], (*avb_ctx)->streamid8[7]);
+    rc = mrp_client_send_mrp_msg( filepointer, mrp_client_get_Control_socket(), databuf, 1500);
+    fprintf(filepointer, "Send Ready %s\n",databuf);fflush(filepointer);
+    free(databuf);
 
-	if (rc != 1500){
+    if (rc != 1500){
         fprintf(filepointer,  "mrp_listener_send_ready - rc != 1500\t LISTENER_FAILED\n");fflush(filepointer);
-		mrp_ctx->mrp_status = LISTENER_FAILED;
+        mrp_ctx->mrp_status = LISTENER_FAILED;
 
-		return RETURN_VALUE_FAILURE;
-	}
+        return RETURN_VALUE_FAILURE;
+    }
 
     fprintf(filepointer,  "mrp_listener_send_ready - rc != 1500\t LISTENER_IDLE\n");fflush(filepointer);
 
-	return RETURN_VALUE_SUCCESS;
+    return RETURN_VALUE_SUCCESS;
 }
 
 
 int mrp_client_listener_send_leave(FILE* filepointer, avb_driver_state_t **avb_ctx, mrp_ctx_t *mrp_ctx)
 {
-	char *databuf= malloc(1500);
-	int rc=0;
+    char *databuf= malloc(1500);
+    int rc=0;
 
-	if (NULL == databuf){
-		return RETURN_VALUE_FAILURE;
-	}
-	memset(databuf, 0, 1500);
-	sprintf(databuf, "S-L:L=%02x%02x%02x%02x%02x%02x%02x%02x,D=3",
-			(*avb_ctx)->streamid8[0], (*avb_ctx)->streamid8[1],
-			 (*avb_ctx)->streamid8[2], (*avb_ctx)->streamid8[3],
-			 (*avb_ctx)->streamid8[4], (*avb_ctx)->streamid8[5],
-			 (*avb_ctx)->streamid8[6], (*avb_ctx)->streamid8[7]);
-	rc = mrp_client_send_mrp_msg(filepointer, mrp_client_get_Control_socket(), databuf, 1500);
-	fprintf(filepointer, "Send Leave %s\n",databuf);fflush(filepointer);
-	free(databuf);
+    if (NULL == databuf){
+        return RETURN_VALUE_FAILURE;
+    }
+    memset(databuf, 0, 1500);
+    sprintf(databuf, "S-L:L=%02x%02x%02x%02x%02x%02x%02x%02x,D=3",
+            (*avb_ctx)->streamid8[0], (*avb_ctx)->streamid8[1],
+             (*avb_ctx)->streamid8[2], (*avb_ctx)->streamid8[3],
+             (*avb_ctx)->streamid8[4], (*avb_ctx)->streamid8[5],
+             (*avb_ctx)->streamid8[6], (*avb_ctx)->streamid8[7]);
+    rc = mrp_client_send_mrp_msg(filepointer, mrp_client_get_Control_socket(), databuf, 1500);
+    fprintf(filepointer, "Send Leave %s\n",databuf);fflush(filepointer);
+    free(databuf);
 
-	if (rc != 1500){
-		fprintf(filepointer,  "mrp_listener_send_leave - rc != 1500\t LISTENER_FAILED\n");fflush(filepointer);
-		mrp_ctx->mrp_status = LISTENER_FAILED;
+    if (rc != 1500){
+        fprintf(filepointer,  "mrp_listener_send_leave - rc != 1500\t LISTENER_FAILED\n");fflush(filepointer);
+        mrp_ctx->mrp_status = LISTENER_FAILED;
 
-		return RETURN_VALUE_FAILURE;
-	} else {
+        return RETURN_VALUE_FAILURE;
+    } else {
         fprintf(filepointer,  "mrp_listener_send_leave - rc != 1500\t LISTENER_IDLE\n");fflush(filepointer);
-		mrp_ctx->mrp_status = LISTENER_IDLE;
+        mrp_ctx->mrp_status = LISTENER_IDLE;
 
         return RETURN_VALUE_SUCCESS;
-	}
+    }
 }
 
 

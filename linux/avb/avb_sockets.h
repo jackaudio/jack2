@@ -43,8 +43,8 @@ extern "C"
 #include <arpa/inet.h>
 #include <netinet/ether.h>
 #include <netinet/in.h>
-#include <netinet/udp.h>	//Provides declarations for udp header
-#include <netinet/ip.h>	//Provides declarations for udp header
+#include <netinet/udp.h>    //Provides declarations for udp header
+#include <netinet/ip.h>    //Provides declarations for udp header
 #include <netdb.h>
 #include <ifaddrs.h>
 #include <linux/if_packet.h>

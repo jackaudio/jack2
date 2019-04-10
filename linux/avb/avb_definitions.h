@@ -64,53 +64,53 @@ extern "C"
 #define ETHERNET_HDR_LENGTH 14
 #define IP_HDR_LENGTH 20
 #define UDP_HDR_LENGTH 8
-#define AVB_ETHER_TYPE	0x22f0
+#define AVB_ETHER_TYPE    0x22f0
 
 #define ARRAYSIZE(arr) (sizeof(arr) / sizeof(arr[0]))
 
 typedef struct etherheader_q
 {
-	unsigned char  ether_dhost[6];	// destination eth addr
-	unsigned char  ether_shost[6];	// source ether addr
-	unsigned int vlan_id;			// VLAN ID field
-	unsigned short int ether_type;	// packet type ID field
+    unsigned char  ether_dhost[6];    // destination eth addr
+    unsigned char  ether_shost[6];    // source ether addr
+    unsigned int vlan_id;            // VLAN ID field
+    unsigned short int ether_type;    // packet type ID field
 } etherheader_q_t;
 
 typedef struct etherheader
 {
-	unsigned char  ether_dhost[6];	// destination eth addr
-	unsigned char  ether_shost[6];	// source ether addr
-	unsigned short int ether_type;	// packet type ID field
+    unsigned char  ether_dhost[6];    // destination eth addr
+    unsigned char  ether_shost[6];    // source ether addr
+    unsigned short int ether_type;    // packet type ID field
 } etherheader_t;
 
 
 typedef struct mrp_ctx{
-	volatile int mrp_status;
-	volatile int domain_a_valid;
-	volatile int domain_b_valid;
-	int domain_class_a_id;
-	int domain_class_a_priority;
-	u_int16_t domain_class_a_vid;
-	int domain_class_b_id;
-	int domain_class_b_priority;
-	u_int16_t domain_class_b_vid;
+    volatile int mrp_status;
+    volatile int domain_a_valid;
+    volatile int domain_b_valid;
+    int domain_class_a_id;
+    int domain_class_a_priority;
+    u_int16_t domain_class_a_vid;
+    int domain_class_b_id;
+    int domain_class_b_priority;
+    u_int16_t domain_class_b_vid;
 }mrp_ctx_t;
 
 typedef enum mrpStatus{
     TL_UNDEFINED,
-	TALKER_IDLE,
-	TALKER_ADVERTISE,
-	TALKER_ASKFAILED,
-	TALKER_READYFAILED,
-	TALKER_CONNECTING,
-	TALKER_CONNECTED,
-	TALKER_ERROR,
-	LISTENER_IDLE,
-	LISTENER_WAITING,
-	LISTENER_READY,
-	LISTENER_CONNECTED,
-	LISTENER_ERROR,
-	LISTENER_FAILED
+    TALKER_IDLE,
+    TALKER_ADVERTISE,
+    TALKER_ASKFAILED,
+    TALKER_READYFAILED,
+    TALKER_CONNECTING,
+    TALKER_CONNECTED,
+    TALKER_ERROR,
+    LISTENER_IDLE,
+    LISTENER_WAITING,
+    LISTENER_READY,
+    LISTENER_CONNECTED,
+    LISTENER_ERROR,
+    LISTENER_FAILED
 } mrpStatus_t;
 
 
@@ -118,33 +118,33 @@ typedef struct _avb_driver_state avb_driver_state_t;
 
 struct _avb_driver_state {
 
-	uint8_t streamid8[8];
-	uint8_t destination_mac_address[6];
-	unsigned char serverMACAddress[6];
-	char avbdev[MAX_DEV_STR_LEN];
-	struct sockaddr_in si_other_avb;
-	int raw_transport_socket;
-	struct ifreq if_idx;
-	struct ifreq if_mac;
+    uint8_t streamid8[8];
+    uint8_t destination_mac_address[6];
+    unsigned char serverMACAddress[6];
+    char avbdev[MAX_DEV_STR_LEN];
+    struct sockaddr_in si_other_avb;
+    int raw_transport_socket;
+    struct ifreq if_idx;
+    struct ifreq if_mac;
 
-	pthread_t thread;
+    pthread_t thread;
     pthread_mutex_t threadLock;
     pthread_cond_t dataReady;
 
     jack_nframes_t  sample_rate;
 
     jack_nframes_t  period_size;
-    jack_time_t	    period_usecs;
+    jack_time_t        period_usecs;
     int             num_packets;
     int             adjust;
 
     unsigned int    capture_channels;
     unsigned int    playback_channels;
 
-    JSList	    *capture_ports;
-    JSList	    *playback_ports;
-    JSList	    *playback_srcs;
-    JSList	    *capture_srcs;
+    JSList        *capture_ports;
+    JSList        *playback_ports;
+    JSList        *playback_srcs;
+    JSList        *capture_srcs;
 
     jack_client_t   *client;
 };

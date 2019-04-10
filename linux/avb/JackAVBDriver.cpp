@@ -282,7 +282,7 @@ extern "C"
 
         for(int m=0;m<array_len;m++){
             if(( token = strsep(&der_string, ":")) != NULL ){
-    			outputArray[m] = (char)strtol(strdup(token), NULL, 16);       // number base 16
+                outputArray[m] = (char)strtol(strdup(token), NULL, 16);       // number base 16
             } else {
                 tokenCnt = m;
                 break;

@@ -28,22 +28,22 @@ int avtp_mcl_create( FILE* filepointer, avb_driver_state_t **avb_ctx, const char
                                     char* stream_id, char* destination_mac,
                                     struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds)
 {
-	fprintf(filepointer,  "Create Mediaclock Listener\n");fflush(filepointer);
+    fprintf(filepointer,  "Create Mediaclock Listener\n");fflush(filepointer);
 
 
     memset( timestamps, 0, sizeof(uint64_t)*NUM_TS);
-	//00:22:97:00:41:2c:00:00  91:e0:f0:11:11:11
+    //00:22:97:00:41:2c:00:00  91:e0:f0:11:11:11
     memcpy((*avb_ctx)->streamid8, stream_id, 8);
     memcpy((*avb_ctx)->destination_mac_address, destination_mac, 6);
 
-	fprintf(filepointer,  "create RAW AVTP Socket %s  \n", avb_dev_name);fflush(filepointer);
-	(*avtp_transport_socket_fds) = (struct pollfd*)malloc(sizeof(struct pollfd));
-	memset((*avtp_transport_socket_fds), 0, sizeof(struct sockaddr_in));
-	(*si_other_avb) = (struct sockaddr_in*)malloc(sizeof(struct sockaddr_in));
-	memset((*si_other_avb), 0, sizeof(struct sockaddr_in));
+    fprintf(filepointer,  "create RAW AVTP Socket %s  \n", avb_dev_name);fflush(filepointer);
+    (*avtp_transport_socket_fds) = (struct pollfd*)malloc(sizeof(struct pollfd));
+    memset((*avtp_transport_socket_fds), 0, sizeof(struct sockaddr_in));
+    (*si_other_avb) = (struct sockaddr_in*)malloc(sizeof(struct sockaddr_in));
+    memset((*si_other_avb), 0, sizeof(struct sockaddr_in));
 
 
-	if( create_RAW_AVB_Transport_Socket(filepointer, &((*avtp_transport_socket_fds)->fd), avb_dev_name) > RETURN_VALUE_FAILURE ){
+    if( create_RAW_AVB_Transport_Socket(filepointer, &((*avtp_transport_socket_fds)->fd), avb_dev_name) > RETURN_VALUE_FAILURE ){
         fprintf(filepointer,  "enable IEEE1722 AVTP MAC filter %x:%x:%x:%x:%x:%x  \n",
                 (*avb_ctx)->destination_mac_address[0],
                 (*avb_ctx)->destination_mac_address[1],
@@ -55,12 +55,12 @@ int avtp_mcl_create( FILE* filepointer, avb_driver_state_t **avb_ctx, const char
         enable_1722avtp_filter(filepointer, (*avtp_transport_socket_fds)->fd, (*avb_ctx)->destination_mac_address);
         (*avtp_transport_socket_fds)->events = POLLIN;
 
-	} else {
-		fprintf(filepointer,  "Listener Creation failed\n");fflush(filepointer);
+    } else {
+        fprintf(filepointer,  "Listener Creation failed\n");fflush(filepointer);
         return RETURN_VALUE_FAILURE;
-	}
+    }
 
-	fprintf(filepointer,  "Get Domain VLAN\n");fflush(filepointer);
+    fprintf(filepointer,  "Get Domain VLAN\n");fflush(filepointer);
 
     return RETURN_VALUE_SUCCESS;
 }
@@ -70,10 +70,10 @@ void avtp_mcl_delete( FILE* filepointer, avb_driver_state_t **avb_ctx )
 {
     FILE* filepointer2;
 
-	if( ! (filepointer2 = fopen("mcs_ts.log", "w")) ){
-		printf("Error Opening file %d\n", errno);
-		return;
-	}
+    if( ! (filepointer2 = fopen("mcs_ts.log", "w")) ){
+        printf("Error Opening file %d\n", errno);
+        return;
+    }
 
     for(int i = 0; i < NUM_TS; i++){
         if(timestamps[i] != 0 ){
@@ -107,36 +107,36 @@ uint64_t avtp_mcl_wait_for_rx_ts( FILE* filepointer, avb_driver_state_t **avb_ct
 //        int           msg_flags;      /* flags on received message */
 //    };
 
-	struct msghdr msg;
-	struct cmsghdr *cmsg;
-	struct sockaddr_ll remote;
-	struct iovec sgentry;
-	struct {
-		struct cmsghdr cm;
-		char control[256];
-	} control;
+    struct msghdr msg;
+    struct cmsghdr *cmsg;
+    struct sockaddr_ll remote;
+    struct iovec sgentry;
+    struct {
+        struct cmsghdr cm;
+        char control[256];
+    } control;
 
-	memset( &msg, 0, sizeof( msg ));
-	msg.msg_iov = &sgentry;
-	msg.msg_iovlen = 1;
-	sgentry.iov_base = stream_packet;
-	sgentry.iov_len = BUFLEN;
+    memset( &msg, 0, sizeof( msg ));
+    msg.msg_iov = &sgentry;
+    msg.msg_iovlen = 1;
+    sgentry.iov_base = stream_packet;
+    sgentry.iov_len = BUFLEN;
 
-	memset( &remote, 0, sizeof(remote));
-	msg.msg_name = (caddr_t) &remote;
-	msg.msg_namelen = sizeof( remote );
-	msg.msg_control = &control;
-	msg.msg_controllen = sizeof(control);
+    memset( &remote, 0, sizeof(remote));
+    msg.msg_name = (caddr_t) &remote;
+    msg.msg_namelen = sizeof( remote );
+    msg.msg_control = &control;
+    msg.msg_controllen = sizeof(control);
 
-	int status = recvmsg((*avtp_transport_socket_fds)->fd, &msg, 0);//NULL);
+    int status = recvmsg((*avtp_transport_socket_fds)->fd, &msg, 0);//NULL);
 
-	if (status == 0) {
-		fprintf(filepointer, "EOF\n");fflush(filepointer);
-		return -1;
-	} else if (status < 0) {
-		fprintf(filepointer, "Error recvmsg: %d %d %s\n", status, errno, strerror(errno));fflush(filepointer);
-		return -1;
-	}
+    if (status == 0) {
+        fprintf(filepointer, "EOF\n");fflush(filepointer);
+        return -1;
+    } else if (status < 0) {
+        fprintf(filepointer, "Error recvmsg: %d %d %s\n", status, errno, strerror(errno));fflush(filepointer);
+        return -1;
+    }
     if( /* Compare Stream IDs */
         ((*avb_ctx)->streamid8[0] == (uint8_t) stream_packet[18]) &&
         ((*avb_ctx)->streamid8[1] == (uint8_t) stream_packet[19]) &&

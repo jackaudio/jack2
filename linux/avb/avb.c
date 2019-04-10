@@ -37,8 +37,8 @@ struct pollfd *avtp_transport_socket_fds = NULL;
 /* POSIX Shared Memory for Listener Context */
 int mrp_shm_open(int _init)
 {
-	char shm_name[SHM_NAME_LENGTH];
-	memset(shm_name, 0, SHM_NAME_LENGTH);
+    char shm_name[SHM_NAME_LENGTH];
+    memset(shm_name, 0, SHM_NAME_LENGTH);
 
     sprintf(shm_name, "/mediaclock_jack_mrp_ctx");
     fprintf(filepointer,  "Open listener shm %s\n", shm_name);fflush(filepointer);
@@ -75,14 +75,14 @@ int mrp_shm_open(int _init)
         }
     }
 
-	return RETURN_VALUE_SUCCESS;
+    return RETURN_VALUE_SUCCESS;
 }
 
 
 int mrp_shm_close(int _remove)
 {
-	char shm_name[SHM_NAME_LENGTH];
-	memset(shm_name, 0, SHM_NAME_LENGTH);
+    char shm_name[SHM_NAME_LENGTH];
+    memset(shm_name, 0, SHM_NAME_LENGTH);
 
     if( close( shm_fd ) == -1){
         fprintf(filepointer,  "Close listener shm failed %s\n", strerror( errno ) );fflush(filepointer);
@@ -105,18 +105,18 @@ int mrp_shm_close(int _remove)
 /* MRP Client Functions */
 int check_stream_id(FILE* filepointer2, avb_driver_state_t **avb_ctx, int *buf_offset, char *buf)
 {
-	unsigned int streamid[8];
-	int hit;
+    unsigned int streamid[8];
+    int hit;
 
     fprintf(filepointer2,  "Event on Stream Id: ");fflush(filepointer2);
-    for(int i = 0; i < 8 ; (*buf_offset)+=2, i++)		{
+    for(int i = 0; i < 8 ; (*buf_offset)+=2, i++)        {
         sscanf(&buf[*buf_offset],"%02x",&streamid[i]);
         fprintf(filepointer2,  "%02x ", streamid[i]);fflush(filepointer2);
     }
     fprintf(filepointer2,  "\n");fflush(filepointer2);
 
     hit = 0;
-    for(int i = 0; i < 8 ; i++)		{
+    for(int i = 0; i < 8 ; i++)        {
         if( streamid[i] == (*avb_ctx)->streamid8[i]){
             hit++;
         } else {
@@ -141,7 +141,7 @@ int check_listener_dst_mac(FILE* filepointer2, avb_driver_state_t **avb_ctx, int
     int hit = 0;
 
     fprintf(filepointer2,  "Check destination MAC... ");fflush(filepointer2);
-    for(int i = 0; i < 6 ; (*buf_offset)+=2, i++)		{
+    for(int i = 0; i < 6 ; (*buf_offset)+=2, i++)        {
         sscanf(&buf[*buf_offset],"%02x",&mac_addr[i]);
 //        fprintf(filepointer2,  "%02x == %02x ?\n", mac_addr[i], (*avb_ctx)->destination_mac_address[i]);fflush(filepointer2);
         if( mac_addr[i] == (*avb_ctx)->destination_mac_address[i]){
@@ -177,59 +177,59 @@ int find_next_line(FILE* filepointer2, char* buf, int* buf_offset, int buflen, i
 
 int process_mrp_msg(FILE* filepointer2, avb_driver_state_t **avb_ctx, char *buf, int buflen)
 {
-	/*
-	 * 1st character indicates application
-	 * [MVS] - MAC, VLAN or STREAM
-	 */
-	unsigned int id=0;
-	unsigned int priority=0;
-	unsigned int vid=0;
-	int buf_offset=0;
-	int buf_pos = 0;
+    /*
+     * 1st character indicates application
+     * [MVS] - MAC, VLAN or STREAM
+     */
+    unsigned int id=0;
+    unsigned int priority=0;
+    unsigned int vid=0;
+    int buf_offset=0;
+    int buf_pos = 0;
 
 next_line_listener:
 
-	fprintf(filepointer2,  "%s", buf);fflush(filepointer2);
+    fprintf(filepointer2,  "%s", buf);fflush(filepointer2);
 
     fprintf(filepointer2,  "mrp status = %d\n", mrp_ctx->mrp_status);fflush(filepointer2);
-	if (strncmp(buf, "SNE T:", 6) == 0 || strncmp(buf, "SJO T:", 6) == 0)	{
+    if (strncmp(buf, "SNE T:", 6) == 0 || strncmp(buf, "SJO T:", 6) == 0)    {
         fprintf(filepointer2,  " SNE T or SJO T: %s\n", buf);fflush(filepointer2);
-		buf_offset = 6; /* skip "Sxx T:" */
-		while ((buf_offset < buflen) && ('S' != buf[buf_offset++]));
-		if (buf_offset == buflen)
-			return RETURN_VALUE_FAILURE;
-		buf_offset++;
+        buf_offset = 6; /* skip "Sxx T:" */
+        while ((buf_offset < buflen) && ('S' != buf[buf_offset++]));
+        if (buf_offset == buflen)
+            return RETURN_VALUE_FAILURE;
+        buf_offset++;
 
-		if( RETURN_VALUE_SUCCESS == check_stream_id(filepointer2, avb_ctx, &buf_offset, buf)){
+        if( RETURN_VALUE_SUCCESS == check_stream_id(filepointer2, avb_ctx, &buf_offset, buf)){
             buf_offset+=3;
             if( check_listener_dst_mac(filepointer2, avb_ctx, &buf_offset, buf)
                         && mrp_ctx->mrp_status == LISTENER_WAITING ){
                 mrp_ctx->mrp_status = LISTENER_READY;
 //                return RETURN_VALUE_SUCCESS;
             }
-		}
-	} else
-	if (strncmp(buf, "SJO D:", 6) == 0)	{
+        }
+    } else
+    if (strncmp(buf, "SJO D:", 6) == 0)    {
         fprintf(filepointer2,  " SJO D: %s\n", buf);fflush(filepointer2);
 
-//		buf_offset=8;
-		sscanf(&(buf[8]), "%d", &id);
-//		buf_offset+=4;
-		sscanf(&(buf[12]), "%d", &priority);
-//		buf_offset+=4;
-		sscanf(&(buf[16]), "%x", &vid);
+//        buf_offset=8;
+        sscanf(&(buf[8]), "%d", &id);
+//        buf_offset+=4;
+        sscanf(&(buf[12]), "%d", &priority);
+//        buf_offset+=4;
+        sscanf(&(buf[16]), "%x", &vid);
 
-		if( vid == 0 || priority == 0 || id == 0){
+        if( vid == 0 || priority == 0 || id == 0){
             fprintf(filepointer2,  " found 0-mvrp message ... skipping line\n");fflush(filepointer2);
 
             char* msgbuf2= malloc(1500);
 
-            if (NULL == msgbuf2)		return RETURN_VALUE_FAILURE;
+            if (NULL == msgbuf2)        return RETURN_VALUE_FAILURE;
 
             memset(msgbuf2, 0, 1500);
             sprintf(msgbuf2, "V--:I=%04x",vid);
             fprintf(filepointer2, "Leave VLAN %s\n",msgbuf2);fflush(filepointer2);
-        //	fclose(fp);
+        //    fclose(fp);
 
             mrp_client_send_mrp_msg( filepointer2, mrp_client_get_Control_socket(), msgbuf2, 1500);
             free(msgbuf2);
@@ -239,7 +239,7 @@ next_line_listener:
             } else {
                 goto next_line_listener;
             }
-		}
+        }
 
         if (id == 6 && mrp_ctx->domain_a_valid == 0 ){
             // Class A
@@ -265,36 +265,36 @@ next_line_listener:
                                                         mrp_ctx->domain_b_valid);fflush(filepointer2);
         }
 
-//		buf_offset+=4;
-		return RETURN_VALUE_SUCCESS;
+//        buf_offset+=4;
+        return RETURN_VALUE_SUCCESS;
 
-	}
-	return RETURN_VALUE_SUCCESS;
+    }
+    return RETURN_VALUE_SUCCESS;
 }
 
 int mrp_thread(avb_driver_state_t **avb_ctx)
 {
-	char *msgbuf;
-	struct sockaddr_in client_addr;
-	struct msghdr msg;
-	struct iovec iov;
-	int bytes = 0;
-	struct pollfd fds;
-	int rc;
-	FILE* filepointer2;
-	struct timespec tim, tim2;
+    char *msgbuf;
+    struct sockaddr_in client_addr;
+    struct msghdr msg;
+    struct iovec iov;
+    int bytes = 0;
+    struct pollfd fds;
+    int rc;
+    FILE* filepointer2;
+    struct timespec tim, tim2;
 
-	if( ! (filepointer2 = fopen("mrp.log", "w"))){
-		printf("Error Opening file %d\n", errno);
-		return RETURN_VALUE_FAILURE;
-	}
+    if( ! (filepointer2 = fopen("mrp.log", "w"))){
+        printf("Error Opening file %d\n", errno);
+        return RETURN_VALUE_FAILURE;
+    }
 
-	msgbuf = (char *)malloc(MAX_MRPD_CMDSZ);
+    msgbuf = (char *)malloc(MAX_MRPD_CMDSZ);
 
-	if (msgbuf == NULL ){
-		fprintf(filepointer2,  "mrp_talker_monitor_thread - NULL == msgbuf\n");fflush(filepointer2);
-		return RETURN_VALUE_FAILURE;
-	}
+    if (msgbuf == NULL ){
+        fprintf(filepointer2,  "mrp_talker_monitor_thread - NULL == msgbuf\n");fflush(filepointer2);
+        return RETURN_VALUE_FAILURE;
+    }
 
     if(RETURN_VALUE_FAILURE == mrp_shm_open( 0 ) ){
         return RETURN_VALUE_FAILURE;
@@ -310,9 +310,9 @@ int mrp_thread(avb_driver_state_t **avb_ctx)
     fds.revents = 0;
 
     /* Register this Client with MRP Daemon  */
-	bool connect_to_daemon = true;
+    bool connect_to_daemon = true;
 
-	while ( mrp_running ) {
+    while ( mrp_running ) {
         if( connect_to_daemon ){
             fprintf(filepointer2,  "connect to MRP daemon...");fflush(filepointer2);
             memset(&msg, 0, sizeof(msg));
@@ -331,60 +331,60 @@ int mrp_thread(avb_driver_state_t **avb_ctx)
             fprintf(filepointer2,  "successfully.\n");fflush(filepointer2);
         }
 
-		if( (rc = poll(&fds, 1, 100) ) == 0) continue;
-		if( (rc < 0) || ( (fds.revents & POLLIN) == 0 ) ) {
-			fprintf(filepointer2,  "mrp client process: rc = poll(&fds, 1, 100) failed\n");fflush(filepointer2);
-			break;
-		}
+        if( (rc = poll(&fds, 1, 100) ) == 0) continue;
+        if( (rc < 0) || ( (fds.revents & POLLIN) == 0 ) ) {
+            fprintf(filepointer2,  "mrp client process: rc = poll(&fds, 1, 100) failed\n");fflush(filepointer2);
+            break;
+        }
 
-		memset(&msg, 0, sizeof(msg));
-		memset(&client_addr, 0, sizeof(client_addr));
-		memset(msgbuf, 0, MAX_MRPD_CMDSZ);
-		iov.iov_len = MAX_MRPD_CMDSZ;
-		iov.iov_base = msgbuf;
-		msg.msg_name = &client_addr;
-		msg.msg_namelen = sizeof(client_addr);
-		msg.msg_iov = &iov;
-		msg.msg_iovlen = 1;
+        memset(&msg, 0, sizeof(msg));
+        memset(&client_addr, 0, sizeof(client_addr));
+        memset(msgbuf, 0, MAX_MRPD_CMDSZ);
+        iov.iov_len = MAX_MRPD_CMDSZ;
+        iov.iov_base = msgbuf;
+        msg.msg_name = &client_addr;
+        msg.msg_namelen = sizeof(client_addr);
+        msg.msg_iov = &iov;
+        msg.msg_iovlen = 1;
 
-		if( (bytes = recvmsg(mrp_client_get_Control_socket(), &msg, 0)) <=0) continue;
+        if( (bytes = recvmsg(mrp_client_get_Control_socket(), &msg, 0)) <=0) continue;
 
-		fprintf( filepointer2,  "\nprocess_mrp_msg %d:\n", bytes);fflush(filepointer2);
+        fprintf( filepointer2,  "\nprocess_mrp_msg %d:\n", bytes);fflush(filepointer2);
 
         process_mrp_msg(filepointer2, avb_ctx, msgbuf, bytes);
-		fprintf( filepointer2,  "\n\n");fflush(filepointer2);
+        fprintf( filepointer2,  "\n\n");fflush(filepointer2);
 
         nanosleep(&tim , &tim2);
-	}
+    }
 
     fprintf(filepointer2,  "quit_mrp: quitting\n");fflush(filepointer2);
 
-	if (NULL == msgbuf){
-		fprintf(filepointer2,  "LISTENER_FAILED\n");fflush(filepointer2);
-		return RETURN_VALUE_FAILURE;
-	}
+    if (NULL == msgbuf){
+        fprintf(filepointer2,  "LISTENER_FAILED\n");fflush(filepointer2);
+        return RETURN_VALUE_FAILURE;
+    }
 
-	memset(msgbuf, 0, 1500);
-	sprintf(msgbuf, "BYE");
+    memset(msgbuf, 0, 1500);
+    sprintf(msgbuf, "BYE");
 
-	rc = mrp_client_send_mrp_msg(filepointer2, mrp_client_get_Control_socket(), msgbuf, 1500);
-	free(msgbuf);
+    rc = mrp_client_send_mrp_msg(filepointer2, mrp_client_get_Control_socket(), msgbuf, 1500);
+    free(msgbuf);
 
-	if (rc != 1500)
-		return RETURN_VALUE_FAILURE;
-	else
-		return RETURN_VALUE_SUCCESS;
+    if (rc != 1500)
+        return RETURN_VALUE_FAILURE;
+    else
+        return RETURN_VALUE_SUCCESS;
 
-	free(msgbuf);
-	fclose(filepointer2);
-	mrp_shm_close(0);
+    free(msgbuf);
+    fclose(filepointer2);
+    mrp_shm_close(0);
 
     return RETURN_VALUE_SUCCESS;
 }
 
 void *worker_thread_mrp(void* v_avb_ctx)
 {
-	avb_driver_state_t *t_avb_ctx = (avb_driver_state_t *) v_avb_ctx;
+    avb_driver_state_t *t_avb_ctx = (avb_driver_state_t *) v_avb_ctx;
     mrp_thread( &t_avb_ctx );
 
     pthread_exit(0);
@@ -397,7 +397,7 @@ int init_avb_driver( avb_driver_state_t *avb_ctx, const char* name,
                         char* stream_id, char* destination_mac,
                         int sample_rate, int period_size, int num_periods, int adjust, int capture_ports, int playback_ports)
 {
-	char filename[100];
+    char filename[100];
     sprintf(filename, "jackAVBdriver.log");
     if( ! (filepointer = fopen(filename, "w"))){
         printf("Error Opening file %d\n", errno);
@@ -460,7 +460,7 @@ int init_avb_driver( avb_driver_state_t *avb_ctx, const char* name,
         fprintf(filepointer,  "Creation failed!\n");fflush(filepointer);
         fclose(filepointer);
         return /*EXIT_FAILURE*/ -1;
-	}
+    }
 
     if( RETURN_VALUE_FAILURE == mrp_client_listener_send_leave(filepointer, &avb_ctx, mrp_ctx )){
         fprintf(filepointer,  "send leave failed\n");fflush(filepointer);
@@ -469,11 +469,11 @@ int init_avb_driver( avb_driver_state_t *avb_ctx, const char* name,
     }
 
 
-	if( RETURN_VALUE_FAILURE == mrp_client_getDomain_joinVLAN( filepointer, &avb_ctx, mrp_ctx) ){
+    if( RETURN_VALUE_FAILURE == mrp_client_getDomain_joinVLAN( filepointer, &avb_ctx, mrp_ctx) ){
         fprintf(filepointer,  "mrp_client_getDomain_joinVLAN failed\n");fflush(filepointer);
         fclose(filepointer);
         return /*EXIT_FAILURE*/ -1;
-	}
+    }
 
     return 0;
 }
