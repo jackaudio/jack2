@@ -1632,7 +1632,7 @@ struct JackClientHasSessionCallbackRequest : public JackRequest
 struct JackPropertyChangeNotifyRequest : public JackRequest
 {
     jack_uuid_t fSubject;
-    char fKey[JACK_UUID_STRING_SIZE];
+    char fKey[MAX_PATH+1];
     jack_property_change_t fChange;
 
     JackPropertyChangeNotifyRequest() : fChange((jack_property_change_t)0)
