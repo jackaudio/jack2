@@ -25,7 +25,6 @@ extern "C"
 #endif
 
 #include "avb_definitions.h"
-#include "mrp_client_send_msg.h"
 
 int mrp_client_get_Control_socket( );
 int mrp_client_init_Control_socket( FILE* filepointer );

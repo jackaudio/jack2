@@ -17,6 +17,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "avb.h"
+#include "mrp_client_control_socket.h"
+#include "mrp_client_interface.h"
+#include "mrp_client_send_msg.h"
 
 #define SHM_SIZE (sizeof(gPtpTimeData) + sizeof(pthread_mutex_t))   // Shared memory size
 #define SHM_NAME  "/ptp"                                            // Shared memory name

@@ -25,7 +25,6 @@ extern "C"
 #endif
 
 #include "avb_definitions.h"
-#include "mrp_client_control_socket.h"
 
 int mrp_client_getDomain_joinVLAN(FILE* filepointer, avb_driver_state_t **avb_ctx, mrp_ctx_t *mrp_ctx);
 int mrp_client_listener_await_talker(FILE* filepointer,avb_driver_state_t **avb_ctx, mrp_ctx_t *mrp_ctx);

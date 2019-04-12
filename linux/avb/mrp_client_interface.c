@@ -17,6 +17,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "mrp_client_interface.h"
+#include "mrp_client_control_socket.h"
+#include "mrp_client_send_msg.h"
+
+#include <malloc.h>
 
 extern int errno;
 

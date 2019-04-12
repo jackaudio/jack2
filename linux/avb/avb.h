@@ -24,9 +24,6 @@ extern "C"
 {
 #endif
 
-#include <stdbool.h>
-#include <sys/mman.h>
-
 #include "avb_definitions.h"
 #include "media_clock_listener.h"
 

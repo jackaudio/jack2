@@ -24,10 +24,6 @@ extern "C"
 {
 #endif
 
-#include <string.h>
-#include <errno.h>
-#include <malloc.h>
-
 #include "avb_definitions.h"
 
 int mrp_client_send_mrp_msg(FILE* filepointer, int control_socket, char *notify_data, int notify_len);

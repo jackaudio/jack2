@@ -26,6 +26,19 @@ extern "C"
 
 #define _GNU_SOURCE
 
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
+#include <stdbool.h>
+#include <sys/mman.h>
+#include <sys/ioctl.h>
+#include <ifaddrs.h>
+#include <linux/if_packet.h>
+#include <linux/net_tstamp.h>
+#include <linux/sockios.h>
+#include <linux/filter.h>
+#include <poll.h>
+
 #include <netinet/in.h>
 #include <linux/if.h>
 #include <jack/transport.h>

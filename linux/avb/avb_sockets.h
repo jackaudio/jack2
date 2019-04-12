@@ -24,17 +24,6 @@ extern "C"
 {
 #endif
 
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <sys/ioctl.h>
-#include <ifaddrs.h>
-#include <linux/if_packet.h>
-#include <linux/net_tstamp.h>
-#include <linux/sockios.h>
-#include <linux/filter.h>
-#include <poll.h>
-
 #include "avb_definitions.h"
 
 int enable_1722avtp_filter( FILE* filepointer, int raw_transport_socket, unsigned char *destinationMacAddress);
