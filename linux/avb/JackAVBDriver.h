@@ -16,31 +16,27 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __JackNetDriver__
-#define __JackNetDriver__
+#ifndef _JACK_AVB_DRIVER_H_
+#define _JACK_AVB_DRIVER_H_
 
 #include "JackTimedDriver.h"
 #include "avb.h"
 
-
 namespace Jack
 {
-/**
-\Brief This class describes the Net Backend
-*/
 
+// Brief This class describes the AVB Backend
 class JackAVBDriver : public JackWaiterDriver
 {
     private:
-
-        avb_driver_state_t avb_ctx;
-        int num_packets_even_odd;
+        avb_driver_state_t 	avb_ctx;
+        int 				num_packets_even_odd;
 
     public:
-
         JackAVBDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
                            char* stream_id, char* destination_mac, char* eth_dev,
-                           int sample_rate, int period_size, int num_periods, int adjust, int capture_ports, int playback_ports);
+                           int sample_rate, int period_size, int num_periods,
+                           int adjust, int capture_ports, int playback_ports);
         virtual ~JackAVBDriver();
 
         int Close();
@@ -58,9 +54,8 @@ class JackAVBDriver : public JackWaiterDriver
         bool IsFixedBufferSize(){return true;}
         int SetBufferSize(jack_nframes_t buffer_size){return -1;}
         int SetSampleRate(jack_nframes_t sample_rate){return -1;}
-
 };
 
 }
 
-#endif
+#endif //_JACK_AVB_DRIVER_H_

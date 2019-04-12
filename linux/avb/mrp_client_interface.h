@@ -15,8 +15,9 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef _MRP_CL_IF_H_
-#define _MRP_CL_IF_H_
+
+#ifndef _MRP_CLIENT_INTERFACE_H_
+#define _MRP_CLIENT_INTERFACE_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -26,15 +27,13 @@ extern "C"
 #include "avb_definitions.h"
 #include "mrp_client_control_socket.h"
 
-
 int mrp_client_getDomain_joinVLAN(FILE* filepointer, avb_driver_state_t **avb_ctx, mrp_ctx_t *mrp_ctx);
-
 int mrp_client_listener_await_talker(FILE* filepointer,avb_driver_state_t **avb_ctx, mrp_ctx_t *mrp_ctx);
 int mrp_client_listener_send_ready(FILE* filepointer,avb_driver_state_t **avb_ctx, mrp_ctx_t *mrp_ctx);
 int mrp_client_listener_send_leave(FILE* filepointer,avb_driver_state_t **avb_ctx, mrp_ctx_t *mrp_ctx);
 
-
 #ifdef __cplusplus
 }
 #endif
-#endif /* _MRP_CL_IF_H_ */
+
+#endif //_MRP_CLIENT_INTERFACE_H_

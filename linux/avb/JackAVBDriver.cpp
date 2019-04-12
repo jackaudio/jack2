@@ -24,25 +24,19 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackTools.h"
 #include "driver_interface.h"
 
-
 #define MIN(x,y) ((x)<(y) ? (x) : (y))
 
 using namespace std;
 
-
-
-/*
- * "enp4s0"
- */
 namespace Jack
 {
 JackAVBDriver::JackAVBDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
                                        char* stream_id, char* destination_mac, char* eth_dev,
-                                       int sample_rate, int period_size, int adjust, int num_periods, int capture_ports, int playback_ports)
+                                       int sample_rate, int period_size, int adjust,
+                                       int num_periods, int capture_ports, int playback_ports)
     : JackWaiterDriver(name, alias, engine, table)
 {
     jack_log("JackAVBDriver::JackAVBPDriver Ethernet Device %s", eth_dev);
-
     jack_log("Stream ID: %02x %02x %02x %02x %02x %02x %02x %02x",
                                         (uint8_t) stream_id[0],
                                         (uint8_t) stream_id[1],
@@ -52,7 +46,6 @@ JackAVBDriver::JackAVBDriver(const char* name, const char* alias, JackLockedEngi
                                         (uint8_t) stream_id[5],
                                         (uint8_t) stream_id[6],
                                         (uint8_t) stream_id[7]);
-
     jack_log("Destination MAC Address: %02x:%02x:%02x:%02x:%02x:%02x",
                                         (uint8_t) destination_mac[0],
                                         (uint8_t) destination_mac[1],
@@ -60,41 +53,36 @@ JackAVBDriver::JackAVBDriver(const char* name, const char* alias, JackLockedEngi
                                         (uint8_t) destination_mac[3],
                                         (uint8_t) destination_mac[4],
                                         (uint8_t) destination_mac[5]);
-
     printf("JackAVBDriver::JackAVBPDriver Ethernet Device %s\n", eth_dev);
     printf("Stream ID: %02x %02x %02x %02x %02x %02x %02x %02x\n",
-                                                                (uint8_t) stream_id[0],
-                                                                (uint8_t) stream_id[1],
-                                                                (uint8_t) stream_id[2],
-                                                                (uint8_t) stream_id[3],
-                                                                (uint8_t) stream_id[4],
-                                                                (uint8_t) stream_id[5],
-                                                                (uint8_t) stream_id[6],
-                                                                (uint8_t) stream_id[7]);
-
+                                        (uint8_t) stream_id[0],
+                                        (uint8_t) stream_id[1],
+                                        (uint8_t) stream_id[2],
+                                        (uint8_t) stream_id[3],
+                                        (uint8_t) stream_id[4],
+                                        (uint8_t) stream_id[5],
+                                        (uint8_t) stream_id[6],
+                                        (uint8_t) stream_id[7]);
     printf("Destination MAC Address: %02x:%02x:%02x:%02x:%02x:%02x\n",
-                                                                (uint8_t) destination_mac[0],
-                                                                (uint8_t) destination_mac[1],
-                                                                (uint8_t) destination_mac[2],
-                                                                (uint8_t) destination_mac[3],
-                                                                (uint8_t) destination_mac[4],
-                                                                (uint8_t) destination_mac[5]);
+                                        (uint8_t) destination_mac[0],
+                                        (uint8_t) destination_mac[1],
+                                        (uint8_t) destination_mac[2],
+                                        (uint8_t) destination_mac[3],
+                                        (uint8_t) destination_mac[4],
+                                        (uint8_t) destination_mac[5]);
     num_packets_even_odd = 0; // even = 0, odd = 1
 
     init_avb_driver( &(this->avb_ctx),
-                  eth_dev,
-                  stream_id,
-                  destination_mac,
-                  sample_rate,
-                  period_size,
-                  num_periods,
-                  adjust,
-                  capture_ports,
-                  playback_ports
-                 );
-
-
-
+                      eth_dev,
+                      stream_id,
+                      destination_mac,
+                      sample_rate,
+                      period_size,
+                      num_periods,
+                      adjust,
+                      capture_ports,
+                      playback_ports
+                     );
 }
 
 JackAVBDriver::~JackAVBDriver()
@@ -102,18 +90,14 @@ JackAVBDriver::~JackAVBDriver()
     // No destructor yet.
 }
 
-//open, close, attach and detach------------------------------------------------------
-
 int JackAVBDriver::Close()
 {
     // Generic audio driver close
     int res = JackWaiterDriver::Close();
-
     FreePorts();
     shutdown_avb_driver(&avb_ctx);
     return res;
 }
-
 
 int JackAVBDriver::AllocPorts()
 {
@@ -146,25 +130,18 @@ int JackAVBDriver::AllocPorts()
         avb_ctx.playback_ports = jack_slist_append (avb_ctx.playback_ports, (void *)(intptr_t)port_index);
     }
     //port = fGraphManager->GetPort(port_index);
-
-
-
     return 0;
 }
 
-//init and restart--------------------------------------------------------------------
 bool JackAVBDriver::Initialize()
 {
     jack_log("JackAVBDriver::Init");
-
     FreePorts();
-
 
     //display some additional infos
     printf("AVB driver started\n");
 
     if (startup_avb_driver(&avb_ctx)) {
-
         return false;
     }
 
@@ -174,7 +151,6 @@ bool JackAVBDriver::Initialize()
         return false;
     }
 
-    //monitor
     //driver parametering
     JackTimedDriver::SetBufferSize(avb_ctx.period_size);
     JackTimedDriver::SetSampleRate(avb_ctx.sample_rate);
@@ -185,19 +161,13 @@ bool JackAVBDriver::Initialize()
     return true;
 }
 
-
-//jack ports and buffers--------------------------------------------------------------
-
-//driver processes--------------------------------------------------------------------
-
 int JackAVBDriver::Read()
 {
     int ret = 0;
     JSList *node = avb_ctx.capture_ports;
-
-
     uint64_t cumulative_rx_int_ns = 0;
     int n = 0;
+
     for(n=0; n<avb_ctx.num_packets; n++){
         cumulative_rx_int_ns += await_avtp_rx_ts( &avb_ctx, n );
 //        jack_log("duration: %lld", cumulative_rx_int_ns);
@@ -212,10 +182,7 @@ int JackAVBDriver::Read()
 
     JackDriver::CycleTakeBeginTime();
 
-    if ( ret ) {
-        return -1;
-    }
-
+    if ( ret ) return -1;
 
     while (node != NULL) {
         jack_port_id_t port_index = (jack_port_id_t)(intptr_t) node->data;
@@ -224,7 +191,6 @@ int JackAVBDriver::Read()
         //memcpy(buf, 0, avb_ctx.period_size * sizeof(jack_default_audio_sample_t));
         node = jack_slist_next (node);
     }
-
     return 0;
 }
 
@@ -241,8 +207,7 @@ int JackAVBDriver::Write()
     return 0;
 }
 
-void
-JackAVBDriver::FreePorts ()
+void JackAVBDriver::FreePorts ()
 {
     JSList *node = avb_ctx.capture_ports;
 
@@ -254,7 +219,6 @@ JackAVBDriver::FreePorts ()
         fEngine->PortUnRegister(fClientControl.fRefNum, port_index);
     }
     avb_ctx.capture_ports = NULL;
-
     node = avb_ctx.playback_ports;
 
     while (node != NULL) {
@@ -267,8 +231,6 @@ JackAVBDriver::FreePorts ()
     avb_ctx.playback_ports = NULL;
 }
 
-//driver loader-----------------------------------------------------------------------
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -279,8 +241,8 @@ extern "C"
         int tokenCnt=0;
         char *token;
         char *der_string = strdup(inputString);
-
-        for(int m=0;m<array_len;m++){
+        int m = 0;
+        for( m=0;m<array_len;m++){
             if(( token = strsep(&der_string, ":")) != NULL ){
                 outputArray[m] = (char)strtol(strdup(token), NULL, 16);       // number base 16
             } else {
@@ -291,7 +253,6 @@ extern "C"
         free(der_string);
         return tokenCnt;
     }
-
 
     SERVER_EXPORT jack_driver_desc_t* driver_get_descriptor ()
     {
@@ -316,7 +277,6 @@ extern "C"
 
         value.ui = 0U;
         jack_driver_descriptor_add_parameter(desc, &filler, "adjust", 'a', JackDriverParamUInt, &value, NULL, "Adjust Timestamps", NULL);
-
 
         sprintf( value.str, "enp4s0");
         jack_driver_descriptor_add_parameter(desc, &filler, "eth-dev", 'e', JackDriverParamString, &value, NULL, "AVB Ethernet Device", NULL);
@@ -355,62 +315,42 @@ extern "C"
                 case 'o':
                     playback_ports = param->value.ui;
                     break;
-
                 case 'r':
                     sample_rate = param->value.ui;
                     break;
-
                 case 'p':
                     period_size = param->value.ui;
                     break;
-
                 case 'n':
                     num_periods = param->value.ui;
                     break;
-
                 case 'a':
                     adjust = param->value.ui;
                     break;
-
                 case 'e':
                     sprintf(eth_dev, "%s", param->value.str);
                     printf("Eth Dev: %s %s\n", param->value.str, eth_dev);fflush(stdout);
                     break;
-
                 case 's':
-
                     // split stream ID
-
                     argumentsSplitDelimiters((char *)param->value.str, sid, 8);
-
-
-
-
                     printf("Stream ID: %s %02x %02x %02x %02x %02x %02x %02x %02x \n", param->value.str,
-                                                            sid[0], sid[1], sid[2], sid[3], sid[4], sid[5], sid[6], sid[7]);fflush(stdout);
+                                        sid[0], sid[1], sid[2], sid[3], sid[4], sid[5], sid[6], sid[7]);fflush(stdout);
                     break;
-
                 case 'm':
-
                     // split destination mac address
-
-
                     argumentsSplitDelimiters((char *)param->value.str, dmac, 6);
-
-
-
-
                     printf("Destination MAC Address: %s %02x %02x %02x %02x %02x %02x \n", param->value.str,
-                                                            dmac[0], dmac[1], dmac[2], dmac[3], dmac[4], dmac[5]);fflush(stdout);
+                                        dmac[0], dmac[1], dmac[2], dmac[3], dmac[4], dmac[5]);fflush(stdout);
                     break;
-
             }
         }
 
         try {
             Jack::JackDriverClientInterface* driver = new Jack::JackWaitThreadedDriver (
                 new Jack::JackAVBDriver("system", "avb_mc", engine, table, sid, dmac, eth_dev,
-                                             sample_rate, period_size, num_periods, adjust, capture_ports, playback_ports));
+                                             sample_rate, period_size, num_periods,
+                                             adjust, capture_ports, playback_ports));
 
             if (driver->Open(period_size, sample_rate, 1, 1, capture_ports, playback_ports,
                                 0, "from_master", "to_master", 0, 0) == 0) {

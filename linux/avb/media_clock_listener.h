@@ -16,8 +16,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef MEDIACLOCKLISTENER_H
-#define MEDIACLOCKLISTENER_H
+#ifndef _MEDIA_CLOCK_LISTENER_H_
+#define _MEDIA_CLOCK_LISTENER_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -31,13 +31,16 @@ extern "C"
 
 int avtp_mcl_create( FILE* filepointer, avb_driver_state_t **avb_ctx, const char* avb_dev_name,
                                     char* stream_id, char* destination_mac,
-                                    struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds);
+                                    struct sockaddr_in **si_other_avb,
+                                    struct pollfd **avtp_transport_socket_fds);
 void avtp_mcl_delete( FILE* filepointer, avb_driver_state_t **avb_ctx);
-
 uint64_t avtp_mcl_wait_for_rx_ts( FILE* filepointer, avb_driver_state_t **avb_ctx,
-                                        struct sockaddr_in **si_other_avb, struct pollfd **avtp_transport_socket_fds, int packet_num );
+                                        struct sockaddr_in **si_other_avb,
+                                        struct pollfd **avtp_transport_socket_fds,
+                                        int packet_num );
 
 #ifdef __cplusplus
 }
 #endif
-#endif //MEDIACLOCKLISTENER_H
+
+#endif //_MEDIA_CLOCK_LISTENER_H_

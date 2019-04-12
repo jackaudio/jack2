@@ -15,11 +15,10 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #include "mrp_client_control_socket.h"
 
 static int control_socket = -1;
-
-
 
 int mrp_client_get_Control_socket()
 {
@@ -29,25 +28,22 @@ int mrp_client_get_Control_socket()
 int mrp_client_init_Control_socket( FILE* filepointer )
 {
 
-    /** in POSIX fd 0,1,2 are reserved */
-//    if (2 > (*avb_ctx)->mrp_ctx.control_socket)    {
-//        if (-1 > (*avb_ctx)->mrp_ctx.control_socket)
-//            close((*avb_ctx)->mrp_ctx.control_socket);
-//        return RETURN_VALUE_FAILURE;
-//    }
+    //     in POSIX fd 0,1,2 are reserved
+    //    if (2 > (*avb_ctx)->mrp_ctx.control_socket)    {
+    //        if (-1 > (*avb_ctx)->mrp_ctx.control_socket)
+    //            close((*avb_ctx)->mrp_ctx.control_socket);
+    //        return RETURN_VALUE_FAILURE;
+    //    }
     struct sockaddr_in addr;
     int sockopt=0;
 
     fprintf(filepointer,  "Create MRP control socket.\n");fflush(filepointer);
-
     memset((char*)&addr, 0, sizeof(struct sockaddr_in));
     addr.sin_family = AF_INET;
 
-    //
     //      Listener... why 0?
-    //
     addr.sin_port = htons(0);
-//    addr.sin_port = htons(MRPD_PORT_DEFAULT);
+    //    addr.sin_port = htons(MRPD_PORT_DEFAULT);
     inet_aton("127.0.0.1", &addr.sin_addr);
 
     if( (control_socket = socket(addr.sin_family, SOCK_DGRAM, IPPROTO_UDP)) < 0 ){
@@ -56,12 +52,11 @@ int mrp_client_init_Control_socket( FILE* filepointer )
         return RETURN_VALUE_FAILURE;
     }
 
-    /* Allow the socket to be reused - incase connection is closed prematurely */
+    // Allow the socket to be reused - incase connection is closed prematurely
     if (setsockopt(control_socket, SOL_SOCKET, SO_REUSEADDR, &sockopt, sizeof( sockopt)) == -1) {
         fprintf(filepointer,  "setsockopt failed %d %s\n", errno, strerror(errno));fflush(filepointer);
         close(control_socket);
         fclose(filepointer);
-
         return RETURN_VALUE_FAILURE;
     }
 
@@ -73,5 +68,4 @@ int mrp_client_init_Control_socket( FILE* filepointer )
     } else {
         return RETURN_VALUE_SUCCESS;
     }
-
 }

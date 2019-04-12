@@ -15,8 +15,9 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef JACK1722DRIVER_H
-#define JACK1722DRIVER_H
+
+#ifndef _JACK_AVTP_DRIVER_H_
+#define _JACK_AVTP_DRIVER_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -36,8 +37,8 @@ int startup_avb_driver( avb_driver_state_t *avb_ctx);
 uint64_t await_avtp_rx_ts( avb_driver_state_t *avb_ctx, int packet_num );
 int shutdown_avb_driver( avb_driver_state_t *avb_ctx);
 
-
 #ifdef __cplusplus
 }
 #endif
-#endif //JACK1722DRIVER_H
+
+#endif //_JACK_AVTP_DRIVER_H_

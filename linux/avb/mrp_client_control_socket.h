@@ -15,6 +15,7 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
 #ifndef _MRP_CONTROL_SOCKET_H_
 #define _MRP_CONTROL_SOCKET_H_
 
@@ -29,8 +30,8 @@ extern "C"
 int mrp_client_get_Control_socket( );
 int mrp_client_init_Control_socket( FILE* filepointer );
 
-
 #ifdef __cplusplus
 }
 #endif
-#endif /* _MRP_CONTROL_SOCKET_H_ */
+
+#endif //_MRP_CONTROL_SOCKET_H_

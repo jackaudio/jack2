@@ -16,9 +16,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef AVBSOCKET_H_
-#define AVBSOCKET_H_
-
+#ifndef _AVB_SOCKET_H_
+#define _AVB_SOCKET_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -36,9 +35,7 @@ extern "C"
 #include <linux/filter.h>
 #include <poll.h>
 
-
 #include "avb_definitions.h"
-
 
 int enable_1722avtp_filter( FILE* filepointer, int raw_transport_socket, unsigned char *destinationMacAddress);
 int create_RAW_AVB_Transport_Socket( FILE* filepointer, int* raw_transport_socket, const char* eth_dev);
@@ -46,4 +43,5 @@ int create_RAW_AVB_Transport_Socket( FILE* filepointer, int* raw_transport_socke
 #ifdef __cplusplus
 }
 #endif
-#endif
+
+#endif //_AVB_SOCKET_H_

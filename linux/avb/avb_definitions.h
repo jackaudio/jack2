@@ -16,14 +16,13 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef SRC_GLOBAL_DEFINITIONS_H_
-#define SRC_GLOBAL_DEFINITIONS_H_
+#ifndef _AVB_DEFINITIONS_H_
+#define _AVB_DEFINITIONS_H_
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
 
 #define _GNU_SOURCE
 
@@ -31,7 +30,6 @@ extern "C"
 #include <linux/if.h>
 #include <jack/transport.h>
 #include "jack/jslist.h"
-
 
 #include "OpenAvnu/daemons/mrpd/mrpd.h"
 #include "OpenAvnu/daemons/mrpd/mrp.h"
@@ -43,15 +41,12 @@ extern "C"
 #define USLEEP_TIME 1000
 
 #define MAX_DEV_STR_LEN               32
-
-
 #define BUFLEN 1500
 #define ETHERNET_Q_HDR_LENGTH 18
 #define ETHERNET_HDR_LENGTH 14
 #define IP_HDR_LENGTH 20
 #define UDP_HDR_LENGTH 8
 #define AVB_ETHER_TYPE    0x22f0
-
 #define ARRAYSIZE(arr) (sizeof(arr) / sizeof(arr[0]))
 
 typedef struct etherheader_q
@@ -139,4 +134,4 @@ struct _avb_driver_state {
 }
 #endif
 
-#endif /* SRC_GLOBAL_DEFINITIONS_H_ */
+#endif // _AVB_DEFINITIONS_H_

@@ -16,8 +16,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _MRP_SEND_MSG_H_
-#define _MRP_SEND_MSG_H_
+#ifndef _MRP_CLIENT_SEND_MSG_H_
+#define _MRP_CLIENT_SEND_MSG_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -36,4 +36,4 @@ int mrp_client_send_mrp_msg(FILE* filepointer, int control_socket, char *notify_
 }
 #endif
 
-#endif /* _MRP_SEND_MSG_H_ */
+#endif // _MRP_CLIENT_SEND_MSG_H_
