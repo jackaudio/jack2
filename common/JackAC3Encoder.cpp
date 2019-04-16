@@ -126,7 +126,7 @@ void JackAC3Encoder::Process(float** inputs_buffer, float** outputs_buffer, int 
 			}  
 			
 			// use interleaved version
-            int res = aften_encode_frame(&fAftenContext, fAC3Buffer + SPDIF_HEADER_SIZE, fSampleBuffer);
+            int res = aften_encode_frame(&fAftenContext, fAC3Buffer + SPDIF_HEADER_SIZE, fSampleBuffer, nframes);
             if (res < 0) {
                 jack_error("aften_encode_frame error !!");
                 return;
