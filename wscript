@@ -216,6 +216,22 @@ def configure(conf):
 
     if conf.env['IS_MACOSX']:
         conf.check(lib='aften', uselib='AFTEN', define_name='AFTEN')
+        conf.check_cxx(
+            fragment=''
+                + '#include <aften/aften.h>\n'
+                + 'int\n'
+                + 'main(void)\n'
+                + '{\n'
+                + 'AftenContext fAftenContext;\n'
+                + 'aften_set_defaults(&fAftenContext);\n'
+                + 'unsigned char *fb;\n'
+                + 'float *buf=new float[10];\n'
+                + 'int res = aften_encode_frame(&fAftenContext, fb, buf, 1);\n'
+                + '}\n',
+            lib='aften',
+            msg='Checking for aften_encode_frame()',
+            define_name='HAVE_AFTEN_NEW_API',
+            mandatory=False)
 
     conf.load('autooptions')
 

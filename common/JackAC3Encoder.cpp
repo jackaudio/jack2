@@ -124,9 +124,17 @@ void JackAC3Encoder::Process(float** inputs_buffer, float** outputs_buffer, int 
 				}
 				pos += fAftenContext.channels;
 			}  
-			
+
 			// use interleaved version
-            int res = aften_encode_frame(&fAftenContext, fAC3Buffer + SPDIF_HEADER_SIZE, fSampleBuffer, nframes);
+#ifdef HAVE_AFTEN_NEW_API
+			// note additional parameter 'nframes'
+			// added in commit e1cbb66628de8aa496a75092d8d694234c67aa95 git://aften.git.sourceforge.net/gitroot/aften/aften
+			int res = aften_encode_frame(&fAftenContext, fAC3Buffer + SPDIF_HEADER_SIZE, fSampleBuffer, nframes);
+#else
+			// released version 0.0.8 hasn't the 'count' parameter
+			int res = aften_encode_frame(&fAftenContext, fAC3Buffer + SPDIF_HEADER_SIZE, fSampleBuffer);
+#endif
+
             if (res < 0) {
                 jack_error("aften_encode_frame error !!");
                 return;
