@@ -53,43 +53,43 @@ class JackAC3Encoder
 
     private:
 
-        AftenContext fAftenContext;
-        jack_ringbuffer_t* fRingBuffer;
+	AftenContext fAftenContext;
+	jack_ringbuffer_t* fRingBuffer;
 
-        float* fSampleBuffer;
-        unsigned char* fAC3Buffer;
-        unsigned char* fZeroBuffer;
+	float* fSampleBuffer;
+	unsigned char* fAC3Buffer;
+	unsigned char* fZeroBuffer;
 
-        int fOutSizeByte;
+	int fOutSizeByte;
 
-        jack_nframes_t fFramePos;
-        jack_nframes_t fSampleRate;
-        jack_nframes_t fByteRate;
+	jack_nframes_t fFramePos;
+	jack_nframes_t fSampleRate;
+	jack_nframes_t fByteRate;
 
-        void FillSpdifHeader(unsigned char* buf, int outsize);
-        int Output2Driver(float** outputs, jack_nframes_t nframes);
+	void FillSpdifHeader(unsigned char* buf, int outsize);
+	int Output2Driver(float** outputs, jack_nframes_t nframes);
 
-        void sample_move_dS_s16(jack_default_audio_sample_t* dst, char *src, jack_nframes_t nsamples, unsigned long src_skip);
-        void sample_move_dS_s16_24ph(jack_default_audio_sample_t* dst, char *src, jack_nframes_t nsamples, unsigned long src_skip);
+	void sample_move_dS_s16(jack_default_audio_sample_t* dst, char *src, jack_nframes_t nsamples, unsigned long src_skip);
+	void sample_move_dS_s16_24ph(jack_default_audio_sample_t* dst, char *src, jack_nframes_t nsamples, unsigned long src_skip);
 
     public:
 
     #ifdef __ppc__
-        JackAC3Encoder(const JackAC3EncoderParams& params) {}
-        virtual ~JackAC3Encoder() {}
+	JackAC3Encoder(const JackAC3EncoderParams& params) {}
+	virtual ~JackAC3Encoder() {}
 
-        bool Init(jack_nframes_t sample_rate) {return false;}
+	bool Init(jack_nframes_t sample_rate) {return false;}
 
-        void Process(float** inputs, float** outputs, int nframes) {}
-        void GetChannelName(const char* name, const char* alias, char* portname, int channel) {}
+	void Process(float** inputs, float** outputs, int nframes) {}
+	void GetChannelName(const char* name, const char* alias, char* portname, int channel) {}
     #else
-        JackAC3Encoder(const JackAC3EncoderParams& params);
-        virtual ~JackAC3Encoder();
+	JackAC3Encoder(const JackAC3EncoderParams& params);
+	virtual ~JackAC3Encoder();
 
-        bool Init(jack_nframes_t sample_rate);
+	bool Init(jack_nframes_t sample_rate);
 
-        void Process(float** inputs, float** outputs, int nframes);
-        void GetChannelName(const char* name, const char* alias, char* portname, int channel);
+	void Process(float** inputs, float** outputs, int nframes);
+	void GetChannelName(const char* name, const char* alias, char* portname, int channel);
     #endif
 };
 
