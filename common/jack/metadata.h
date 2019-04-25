@@ -137,10 +137,10 @@ jack_get_properties (jack_uuid_t         subject,
 
 /**
  * Get descriptions for all subjects with metadata.
- * @param descs Set to a NULL-terminated array of descriptions.
+ * @param descs Set to an array of descriptions.
  *              The caller must free each of these with jack_free_description(),
  *              and the array itself with jack_free().
- * @return 0 on success.
+ * @return the number of descriptions, or -1 on error.
  */
 int
 jack_get_all_properties (jack_description_t** descs);
