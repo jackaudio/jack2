@@ -129,7 +129,7 @@ jack_free_description (jack_description_t* desc, int free_description_itself);
  * @param subject The subject to get all properties of.
  * @param desc Set to the description of subject if found, or NULL otherwise.
  *             The caller must free this value with jack_free_description().
- * @return 0 on success, -1 if no @p subject with any properties exists.
+ * @return the number of properties, -1 if no @p subject with any properties exists.
  */
 int
 jack_get_properties (jack_uuid_t         subject,
