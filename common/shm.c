@@ -49,10 +49,15 @@
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/shm.h>
 #include <sys/sem.h>
 #include <stdlib.h>
 #include "promiscuous.h"
+
+#ifdef __QNXNTO__
+#include <sys/mman.h>
+#else
+#include <sys/shm.h>
+#endif
 
 #endif
 
