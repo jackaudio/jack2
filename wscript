@@ -95,6 +95,15 @@ def options(opt):
     alsa.check_cfg(
             package='alsa >= 1.0.18',
             args='--cflags --libs')
+    # Check for QNX sound headers
+    qsa = opt.add_auto_option(
+            'qsa',
+            help='Enable QNX sound driver',
+            conf_dest='BUILD_DRIVER_ALSA')
+    qsa.check(lib='asound', uselib_store='ALSA')
+    qsa.check(
+                header_name=['sys/asoundlib.h'],
+                msg='Checking for header sys/asoundlib.h')
     firewire = opt.add_auto_option(
             'firewire',
             help='Enable FireWire driver (FFADO)',
@@ -185,6 +194,7 @@ def detect_platform(conf):
     platforms = [
         # ('KEY, 'Human readable name', ['strings', 'to', 'check', 'for'])
         ('IS_LINUX',   'Linux',   ['gnu0', 'gnukfreebsd', 'linux', 'posix']),
+        ('IS_QNX',     'QNX',     ['qnx']),
         ('IS_MACOSX',  'MacOS X', ['darwin']),
         ('IS_SUN',     'SunOS',   ['sunos']),
         ('IS_WINDOWS', 'Windows', ['cygwin', 'msys', 'win32'])
@@ -293,7 +303,11 @@ def configure(conf):
     conf.check_cc(fragment=fragment, define_name='HAVE_NGREG', mandatory=False,
                   msg='Checking for NGREG')
 
-    conf.env['LIB_PTHREAD'] = ['pthread']
+    if conf.env['IS_QNX']:
+        conf.env['LIB_PTHREAD'] = ['c']
+        conf.env['LIB_SOCKET'] = ['socket']
+    else:
+        conf.env['LIB_PTHREAD'] = ['pthread']
     conf.env['LIB_DL'] = ['dl']
     conf.env['LIB_RT'] = ['rt']
     conf.env['LIB_M'] = ['m']
@@ -496,6 +510,9 @@ def obj_add_includes(bld, obj):
     if bld.env['IS_MACOSX']:
         obj.includes += ['macosx', 'posix']
 
+    if bld.env['IS_QNX']:
+        obj.includes += ['qnx', 'posix']
+
     if bld.env['IS_SUN']:
         obj.includes += ['posix', 'solaris']
 
@@ -523,6 +540,10 @@ def build_jackd(bld):
     if bld.env['IS_MACOSX']:
         jackd.use += ['DL', 'PTHREAD']
         jackd.framework = ['CoreFoundation']
+
+    if bld.env['IS_QNX']:
+        jackd.use += ['M', 'PTHREAD']
+
 
     if bld.env['IS_SUN']:
         jackd.use += ['DL', 'PTHREAD']
@@ -582,15 +603,19 @@ def build_drivers(bld):
     alsa_src = [
         'common/memops.c',
         'linux/alsa/JackAlsaDriver.cpp',
-        'linux/alsa/alsa_rawmidi.c',
-        'linux/alsa/alsa_seqmidi.c',
-        'linux/alsa/alsa_midi_jackmp.cpp',
-        'linux/alsa/generic_hw.c',
-        'linux/alsa/hdsp.c',
-        'linux/alsa/alsa_driver.c',
-        'linux/alsa/hammerfall.c',
-        'linux/alsa/ice1712.c'
+        'linux/alsa/alsa_driver.c'
     ]
+
+    if not bld.env['IS_QNX']:
+        alsa_src += [
+            'linux/alsa/alsa_rawmidi.c',
+            'linux/alsa/alsa_seqmidi.c',
+            'linux/alsa/alsa_midi_jackmp.cpp',
+            'linux/alsa/generic_hw.c',
+            'linux/alsa/hdsp.c',
+            'linux/alsa/hammerfall.c',
+            'linux/alsa/ice1712.c'
+        ]
 
     alsarawmidi_src = [
         'linux/alsarawmidi/JackALSARawMidiDriver.cpp',
@@ -688,11 +713,12 @@ def build_drivers(bld):
             target = 'alsa',
             source = alsa_src,
             use = ['ALSA'])
-        create_driver_obj(
-            bld,
-            target = 'alsarawmidi',
-            source = alsarawmidi_src,
-            use = ['ALSA'])
+        if not bld.env['IS_QNX']:
+            create_driver_obj(
+                bld,
+                target = 'alsarawmidi',
+                source = alsarawmidi_src,
+                use = ['ALSA'])
 
     if bld.env['BUILD_DRIVER_FFADO']:
         create_driver_obj(
