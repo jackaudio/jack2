@@ -428,7 +428,9 @@ netjack_poll (int sockfd, int timeout)
 
     action.sa_handler = SIG_DFL;
     action.sa_mask = sigmask;
+#ifndef __QNXNTO__
     action.sa_flags = SA_RESTART;
+#endif
 
     for (i = 1; i < NSIG; i++)
         if (sigismember (&sigmask, i))

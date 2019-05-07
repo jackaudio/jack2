@@ -663,7 +663,10 @@ jackctl_setup_signals(
     sigfillset(&allsignals);
     action.sa_handler = signal_handler;
     action.sa_mask = allsignals;
-    action.sa_flags = SA_RESTART|SA_RESETHAND;
+    action.sa_flags = SA_RESETHAND;
+#ifndef __QNXNTO__
+    action.sa_flags |= SA_RESTART;
+#endif
 
     for (i = 1; i < NSIG; i++)
     {
