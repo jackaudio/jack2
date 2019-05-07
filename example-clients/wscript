@@ -49,6 +49,8 @@ def build(bld):
         os_incdir = ['../linux', '../posix']
     if bld.env['IS_MACOSX']:
         os_incdir = ['../macosx', '../posix']
+    if bld.env['IS_QNX']:
+        os_incdir = ['../qnx', '../posix']
     if bld.env['IS_SUN']:
         os_incdir = ['../solaris', '../posix']
     if bld.env['IS_WINDOWS']:
@@ -76,7 +78,7 @@ def build(bld):
         prog.use = use
         if bld.env['IS_LINUX']:
             prog.use += ['RT', 'M']
-        if bld.env['IS_SUN']:
+        if bld.env['IS_SUN'] or bld.env['IS_QNX']:
             prog.use += ['M']
         #prog.cflags = ['-Wno-deprecated-declarations', '-Wno-misleading-indentation']
         #prog.cxxflags = ['-Wno-deprecated-declarations', '-Wno-misleading-indentation']
@@ -90,7 +92,7 @@ def build(bld):
         prog.use = ['clientlib']
         if bld.env['IS_LINUX']:
             prog.use += ['RT', 'READLINE']
-        if bld.env['IS_MACOSX']:
+        if bld.env['IS_MACOSX'] or bld.env['IS_QNX']:
             prog.use += ['READLINE']
         if bld.env['IS_WINDOWS']:
             prog.use += ['READLINE']
@@ -101,7 +103,7 @@ def build(bld):
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = 'capture_client.c'
         prog.use = ['clientlib']
-        if bld.env['IS_MACOSX']:
+        if bld.env['IS_MACOSX'] or bld.env['IS_QNX']:
             prog.use += ['SNDFILE']
         if bld.env['IS_LINUX']:
             prog.use += ['RT', 'SNDFILE']
@@ -111,7 +113,7 @@ def build(bld):
             prog.uselib = ['SNDFILE']
         prog.target = 'jack_rec'
 
-    if bld.env['IS_LINUX'] or bld.env['IS_MACOSX']:
+    if bld.env['IS_LINUX'] or bld.env['IS_MACOSX'] or bld.env['IS_QNX']:
         prog = bld(features = 'c cprogram')
         prog.includes = os_incdir + ['.', '..', '../common/jack', '../common']
         prog.source = ['netsource.c', '../common/netjack_packet.c']
