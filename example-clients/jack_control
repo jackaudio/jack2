@@ -157,17 +157,16 @@ def main():
         sys.exit(0)
 
     bus = dbus.SessionBus()
+    try:
+        controller = bus.get_object(service_name, "/org/jackaudio/Controller")
+        control_iface = dbus.Interface(controller, control_interface_name)
+        configure_iface = dbus.Interface(controller, configure_interface_name)
 
-    controller = bus.get_object(service_name, "/org/jackaudio/Controller")
-    control_iface = dbus.Interface(controller, control_interface_name)
-    configure_iface = dbus.Interface(controller, configure_interface_name)
-
-    # check arguments
-    index = 1
-    while index < len(sys.argv):
-        arg = sys.argv[index]
-        index += 1
-        try:
+        # check arguments
+        index = 1
+        while index < len(sys.argv):
+            arg = sys.argv[index]
+            index += 1
             if arg == "exit":
                 print("--- exit")
                 control_iface.Exit()
@@ -393,8 +392,11 @@ def main():
                 result = control_iface.RemoveSlaveDriver(name)
             else:
                 print("Unknown command '%s'" % arg)
-        except dbus.DBusException as e:
-            print("DBus exception: %s" % str(e))
+    except dbus.DBusException as e:
+        print("DBus exception: %s" % str(e))
+        print("Please check the dbus logs, most likely in the systemd journal (view with journalctl)")
+        print("If that doesn't help, you can try running `jackdbus auto` to check for errors in stderr")
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()
