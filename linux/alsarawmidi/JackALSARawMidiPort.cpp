@@ -108,7 +108,7 @@ JackALSARawMidiPort::JackALSARawMidiPort(snd_rawmidi_info_t *info,
     }
     try {
         CreateNonBlockingPipe(fds);
-    } catch (std::exception e) {
+    } catch (std::exception const& e) {
         error_message = e.what();
         func = "CreateNonBlockingPipe";
         goto close;
