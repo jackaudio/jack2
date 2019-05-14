@@ -23,15 +23,17 @@
 #include "config.h"
 #endif
 
-#include <stdbool.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <sys/stat.h>
-#include <signal.h>
+#include <assert.h>
 #include <dbus/dbus.h>
+#include <errno.h>
 #include <pthread.h>
+#include <pwd.h>
+#include <signal.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #include "config.h"
@@ -46,13 +48,114 @@
 
 static char * g_log_filename;
 static ino_t g_log_file_ino;
-FILE *g_logfile;
+static FILE *g_logfile;
+static char *g_jackdbus_log_dir;
+static size_t g_jackdbus_log_dir_len; /* without terminating '\0' char */
+
+// extern in header
 char *g_jackdbus_config_dir;
 size_t g_jackdbus_config_dir_len; /* without terminating '\0' char */
-char *g_jackdbus_log_dir;
-size_t g_jackdbus_log_dir_len; /* without terminating '\0' char */
 int g_exit_command;
 DBusConnection *g_connection;
+
+/* reimplementation of python's path.expanduser()
+   Input path must be nul terminated.
+
+   If we can't figure out current user, the current user's home-dir, open the
+   passwd file, or anything else really, or the incoming string is copied and
+   returned (this policy seems to work for python).
+
+   NULL is only returned if we run out of memory, or if the input is NULL */
+
+static
+char* expanduser(const char *path)
+{
+  if (!path)          return NULL;
+  if (!strlen(path))  return NULL;
+
+  // If the path doesn't start with a tilde, there's nothing interesting to do
+  // here
+  if (path[0] != '~') goto dup_and_exit;
+
+  // path is of form 1) '~/<whatever>'
+  // or              2) '~user/<whatever>'
+  // or              3) '~'
+  // or              4) '~user`
+
+  // Look for a slash
+  size_t slash_idx   = 0;
+  bool   found_slash = false;
+  for (; slash_idx < strlen(path); ++slash_idx) {
+    if (path[slash_idx] == '/') {
+      found_slash = true;
+      break;
+    }
+  }
+
+  char        userbuf[32+1];           // theoretically max from posix
+  size_t      replace_until;           // [0, replace_until)
+  char const* replace_with     = NULL; // if set, we'll use this as homedir
+  char const* replace_user     = NULL; // if ^ not set, try to lookup this user's homedir
+
+  if (found_slash) { // size at least 2 (we have a tilde and a slash)
+    assert(slash_idx > 0); // cannot be at zero, first char must be ~
+    if (slash_idx == 1) {
+      // case 1
+      replace_until = 1;
+      replace_with  = getenv("HOME"); // if not found, we'll use USER
+      replace_user  = getenv("USER"); // if not found, we'll bail
+    }
+    else {
+      // case 2
+      replace_until = slash_idx;
+      replace_with  = NULL;
+
+      // save from bit of path into the userbuf
+      if (slash_idx-1 > sizeof(userbuf)) goto dup_and_exit;
+      memcpy(userbuf, path + 1, slash_idx-1); // -1 for tilde at front
+      userbuf[slash_idx-1] = '\0';
+      replace_user = userbuf;
+    }
+  }
+  else {
+    if (strlen(path) == 1) { // must be '~' only
+      // case 3
+      replace_until = strlen(path);
+      replace_with  = getenv("HOME");
+      replace_user  = getenv("USER");
+    }
+    else { // treat the entire thing as a username
+      // case 4
+      replace_until = strlen(path);
+      replace_with  = NULL;
+      replace_user  = path + 1; // already nul terminated
+      // if there's something weird like a space here, we'll fail the user lookup
+    }
+  }
+
+  assert(replace_until); // cannot be zero at this point
+
+  if (!replace_with && replace_user) { // replace_with takes precendence
+    struct passwd* pw = getpwnam(replace_user); // not thread safe
+    if (!pw) goto dup_and_exit;
+    replace_with = pw->pw_dir;
+  }
+
+  if (replace_with) {
+    size_t repsz = strlen(replace_with);
+    size_t new_size = strlen(path) - replace_until + repsz + 1;
+    char* ret = malloc(new_size);
+    if (!ret) return NULL;
+
+    memcpy(ret,         replace_with,         repsz); // do not copy terminator
+    memcpy(ret + repsz, path + replace_until, strlen(path)-replace_until+1); // copy terminator
+    return ret;
+  }
+
+dup_and_exit:
+  // If we get here, we couldn't figure it out
+  return strdup(path);
+}
 
 void
 jack_dbus_send_signal(
@@ -368,13 +471,13 @@ jack_dbus_get_method_args_two_strings_and_variant(
     {
         dbus_message_iter_get_basic (&iter, arg1);
         dbus_message_iter_next (&iter);
-        
+
         /* ...and then a second string. */
         if (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_STRING)
         {
             return false;
         }
-        
+
         /* Got what we wanted. */
         dbus_message_iter_get_basic (&iter, arg2);
         dbus_message_iter_next (&iter);
@@ -601,7 +704,7 @@ static bool jack_dbus_log_open(void)
     return false;
 }
 
-void 
+static void
 jack_dbus_info_callback(const char *msg)
 {
     time_t timestamp;
@@ -623,7 +726,7 @@ jack_dbus_info_callback(const char *msg)
 #define ANSI_COLOR_RED  "\033[31m"
 #define ANSI_RESET      "\033[0m"
 
-void 
+void
 jack_dbus_error_callback(const char *msg)
 {
     time_t timestamp;
@@ -640,7 +743,7 @@ jack_dbus_error_callback(const char *msg)
     }
 }
 
-bool
+static bool
 ensure_dir_exist(const char *dirname, int mode)
 {
     struct stat st;
@@ -672,7 +775,7 @@ ensure_dir_exist(const char *dirname, int mode)
     return true;
 }
 
-char *
+static char *
 pathname_cat(const char *pathname_a, const char *pathname_b)
 {
     char *pathname;
@@ -692,25 +795,35 @@ pathname_cat(const char *pathname_a, const char *pathname_b)
     return pathname;
 }
 
-bool
+static bool
 paths_init()
 {
-	const char *home_dir, *xdg_config_home, *xdg_log_home;
-    
-    home_dir = getenv("HOME");
-    if (home_dir == NULL)
-    {
-        fprintf(stderr, "Environment variable HOME not set\n");
-        goto fail;
-    }
+	const char *home_dir_env, *xdg_config_home_env, *xdg_log_home_env;
+  char *xdg_config_home, *xdg_log_home;
 
-	xdg_config_home = getenv("XDG_CONFIG_HOME");
-	if (xdg_config_home == NULL)
-	{
-	    if (!(xdg_config_home = pathname_cat(home_dir, DEFAULT_XDG_CONFIG))) goto fail;
+  home_dir_env = getenv("HOME");
+  if (home_dir_env == NULL) {
+    fprintf(stderr, "Environment variable HOME not set\n");
+    goto fail;
+  }
+
+	xdg_config_home_env = getenv("XDG_CONFIG_HOME");
+	if (xdg_config_home_env) {
+    xdg_config_home = expanduser(xdg_config_home_env);
+    if (!xdg_config_home) goto fail;
 	}
+  else {
+    if (!(xdg_config_home = pathname_cat(home_dir_env, DEFAULT_XDG_CONFIG))) goto fail;
+  }
 
-    if (!(xdg_log_home = pathname_cat(home_dir, DEFAULT_XDG_LOG))) goto fail;
+	xdg_log_home_env = getenv("JACK_LOG_DIR"); // no official XDG location for logs yet
+	if (xdg_log_home_env) {
+    xdg_log_home = expanduser(xdg_log_home_env);
+    if (!xdg_log_home) goto fail;
+	}
+  else {
+    if (!(xdg_log_home = pathname_cat(home_dir_env, DEFAULT_XDG_LOG))) goto fail;
+  }
 
 	if (!(g_jackdbus_config_dir = pathname_cat(xdg_config_home, JACKDBUS_DIR))) goto fail;
 	if (!(g_jackdbus_log_dir = pathname_cat(xdg_log_home, JACKDBUS_DIR))) goto fail;
@@ -719,7 +832,7 @@ paths_init()
     {
         goto fail;
     }
-    
+
     if (!ensure_dir_exist(xdg_log_home, 0700))
     {
         goto fail;
@@ -731,7 +844,7 @@ paths_init()
         goto fail;
     }
     g_jackdbus_config_dir_len = strlen(g_jackdbus_config_dir);
-    
+
     if (!ensure_dir_exist(g_jackdbus_log_dir, 0700))
     {
         free(g_jackdbus_log_dir);
@@ -739,13 +852,16 @@ paths_init()
     }
     g_jackdbus_log_dir_len = strlen(g_jackdbus_log_dir);
 
+    free(xdg_config_home);
+    free(xdg_log_home);
+
     return true;
 
 fail:
     return false;
 }
 
-void
+static void
 paths_uninit()
 {
     free(g_jackdbus_config_dir);
