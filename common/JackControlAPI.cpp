@@ -26,6 +26,11 @@
 #include <pthread.h>
 #endif
 
+#ifdef __linux__
+#include <poll.h>
+#include <sys/signalfd.h>
+#endif
+
 #include "types.h"
 #include <string.h>
 #include <errno.h>
@@ -677,16 +682,56 @@ jackctl_setup_signals(
 SERVER_EXPORT void
 jackctl_wait_signals(jackctl_sigmask_t * sigmask)
 {
-    int sig;
+    int sig = 0;
     bool waiting = true;
+#ifdef __linux__
+    int err;
+    struct pollfd pfd;
+    struct signalfd_siginfo si;
+
+    /* Block the signals in order for signalfd to receive them */
+    sigprocmask(SIG_BLOCK, &sigmask->signals, NULL);
+
+    pfd.fd = signalfd(-1, &sigmask->signals, 0);
+    if(pfd.fd == -1) {
+        fprintf(stderr, "Jack : signalfd() failed with errno %d\n", -errno);
+        return;
+    }
+    pfd.events = POLLIN;
+#endif
 
     while (waiting) {
     #if defined(sun) && !defined(__sun__) // SUN compiler only, to check
         sigwait(&sigmask->signals);
+        fprintf(stderr, "Jack main caught signal\n");
+    #elif defined(__linux__)
+        err = poll(&pfd, 1, -1);
+        if (err < 0) {
+            if (errno == EINTR) {
+                continue;
+            } else {
+                fprintf(stderr, "Jack : poll() failed with errno %d\n", -errno);
+                break;
+            }
+        } else {
+            if (pfd.revents & (POLLERR | POLLHUP | POLLNVAL)) {
+                fprintf(stderr, "Jack : poll() exited with errno %d\n", -errno);
+                break;
+            } else if ((pfd.revents & POLLIN) == 0) {
+                continue;
+            }
+            err = read (pfd.fd, &si, sizeof(si));
+            if (err < 0) {
+                fprintf(stderr, "Jack : read() on signalfd failed with errno %d\n", -errno);
+                goto fail;
+            }
+            sig = si.ssi_signo;
+            fprintf(stderr, "Jack main caught signal %d\n", sig);
+        }
     #else
         sigwait(&sigmask->signals, &sig);
-    #endif
         fprintf(stderr, "Jack main caught signal %d\n", sig);
+    #endif
 
         switch (sig) {
             case SIGUSR1:
@@ -710,6 +755,12 @@ jackctl_wait_signals(jackctl_sigmask_t * sigmask)
         // bugs that cause segfaults etc. during shutdown.
         sigprocmask(SIG_UNBLOCK, &sigmask->signals, 0);
     }
+
+#ifdef __linux__
+fail:
+    close(pfd.fd);
+#endif
+
 }
 #endif
 
