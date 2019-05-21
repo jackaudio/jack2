@@ -212,16 +212,6 @@ alsa_driver_write_to_channel (alsa_driver_t *driver,
 
 void  alsa_driver_silence_untouched_channels (alsa_driver_t *driver,
 					      jack_nframes_t nframes);
-void  alsa_driver_set_clock_sync_status (alsa_driver_t *driver, channel_t chn,
-					 ClockSyncStatus status);
-int   alsa_driver_listen_for_clock_sync_status (alsa_driver_t *,
-						ClockSyncListenerFunction,
-						void *arg);
-int   alsa_driver_stop_listen_for_clock_sync_status (alsa_driver_t *,
-						     unsigned int);
-void  alsa_driver_clock_sync_notify (alsa_driver_t *, channel_t chn,
-				     ClockSyncStatus);
-
 int
 alsa_driver_reset_parameters (alsa_driver_t *driver,
 			      jack_nframes_t frames_per_cycle,
@@ -267,8 +257,6 @@ alsa_driver_read (alsa_driver_t *driver, jack_nframes_t nframes);
 
 int
 alsa_driver_write (alsa_driver_t* driver, jack_nframes_t nframes);
-
-jack_time_t jack_get_microseconds(void);
 
 // Code implemented in JackAlsaDriver.cpp
 

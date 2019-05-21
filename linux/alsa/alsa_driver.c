@@ -1350,14 +1350,6 @@ alsa_driver_silence_untouched_channels (alsa_driver_t *driver,
 	}
 }
 
-void
-alsa_driver_set_clock_sync_status (alsa_driver_t *driver, channel_t chn,
-				   ClockSyncStatus status)
-{
-	driver->clock_sync_data[chn] = status;
-	alsa_driver_clock_sync_notify (driver, chn, status);
-}
-
 static int
 alsa_driver_poll_descriptors(snd_pcm_t *pcm, struct pollfd *pfds, unsigned int space, bool is_capture)
 {
@@ -2386,25 +2378,6 @@ alsa_driver_new (char *name, char *playback_alsa_device,
 }
 
 int
-alsa_driver_listen_for_clock_sync_status (alsa_driver_t *driver,
-					  ClockSyncListenerFunction func,
-					  void *arg)
-{
-	ClockSyncListener *csl;
-
-	csl = (ClockSyncListener *) malloc (sizeof (ClockSyncListener));
-	csl->function = func;
-	csl->arg = arg;
-	csl->id = driver->next_clock_sync_listener_id++;
-
-	pthread_mutex_lock (&driver->clock_sync_lock);
-	driver->clock_sync_listeners =
-		jack_slist_prepend (driver->clock_sync_listeners, csl);
-	pthread_mutex_unlock (&driver->clock_sync_lock);
-	return csl->id;
-}
-
-int
 alsa_driver_stop_listening_to_clock_sync_status (alsa_driver_t *driver,
 						 unsigned int which)
 
@@ -2426,22 +2399,6 @@ alsa_driver_stop_listening_to_clock_sync_status (alsa_driver_t *driver,
 	}
 	pthread_mutex_unlock (&driver->clock_sync_lock);
 	return ret;
-}
-
-void
-alsa_driver_clock_sync_notify (alsa_driver_t *driver, channel_t chn,
-			       ClockSyncStatus status)
-{
-	JSList *node;
-
-	pthread_mutex_lock (&driver->clock_sync_lock);
-	for (node = driver->clock_sync_listeners; node;
-	     node = jack_slist_next (node)) {
-		ClockSyncListener *csl = (ClockSyncListener *) node->data;
-		csl->function (chn, status, csl->arg);
-	}
-	pthread_mutex_unlock (&driver->clock_sync_lock);
-
 }
 
 /* DRIVER "PLUGIN" INTERFACE */
