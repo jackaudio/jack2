@@ -29,6 +29,7 @@
 #ifdef __linux__
 #include <poll.h>
 #include <sys/signalfd.h>
+#include <sys/eventfd.h>
 #endif
 
 #include "types.h"
@@ -146,6 +147,35 @@ struct jackctl_parameter
     char id;
     jack_driver_param_constraint_desc_t * constraint_ptr;
 };
+
+#ifdef __linux__
+/** Jack file descriptors */
+typedef enum
+{
+    JackSignalFD,			/**< @brief File descriptor to accept the signals */
+    JackEventFD,			/**< @brief File descriptor to accept the events from threads */
+    JackFDCount				/**< @brief FD count, ensure this is the last element */
+} jackctl_fd;
+
+static int eventFD;
+#endif
+
+static
+void
+on_failure()
+{
+#ifdef __linux__
+    int ret = 0;
+    const uint64_t ev = 1;
+
+    ret = write(eventFD, &ev, sizeof(ev));
+    if (ret < 0) {
+        fprintf(stderr, "JackServerGlobals::on_failure : write() failed with errno %d\n", -errno);
+    }
+#else
+    fprintf(stderr, "JackServerGlobals::on_failure callback called from thread\n");
+#endif
+}
 
 const char * jack_get_self_connect_mode_description(char mode)
 {
@@ -686,18 +716,27 @@ jackctl_wait_signals(jackctl_sigmask_t * sigmask)
     bool waiting = true;
 #ifdef __linux__
     int err;
-    struct pollfd pfd;
+    struct pollfd pfd[JackFDCount];
     struct signalfd_siginfo si;
+    memset(pfd, 0, sizeof(pfd));
 
     /* Block the signals in order for signalfd to receive them */
     sigprocmask(SIG_BLOCK, &sigmask->signals, NULL);
 
-    pfd.fd = signalfd(-1, &sigmask->signals, 0);
-    if(pfd.fd == -1) {
-        fprintf(stderr, "Jack : signalfd() failed with errno %d\n", -errno);
+    pfd[JackSignalFD].fd = signalfd(-1, &sigmask->signals, 0);
+    if(pfd[JackSignalFD].fd == -1) {
+        fprintf(stderr, "signalfd() failed with errno %d\n", -errno);
         return;
     }
-    pfd.events = POLLIN;
+    pfd[JackSignalFD].events = POLLIN;
+
+    pfd[JackEventFD].fd = eventfd(0, EFD_NONBLOCK);
+    if(pfd[JackEventFD].fd == -1) {
+        goto fail;
+    }
+    eventFD = pfd[JackEventFD].fd;
+    pfd[JackEventFD].events = POLLIN;
+
 #endif
 
     while (waiting) {
@@ -705,7 +744,7 @@ jackctl_wait_signals(jackctl_sigmask_t * sigmask)
         sigwait(&sigmask->signals);
         fprintf(stderr, "Jack main caught signal\n");
     #elif defined(__linux__)
-        err = poll(&pfd, 1, -1);
+        err = poll(pfd, JackFDCount, -1);
         if (err < 0) {
             if (errno == EINTR) {
                 continue;
@@ -714,19 +753,24 @@ jackctl_wait_signals(jackctl_sigmask_t * sigmask)
                 break;
             }
         } else {
-            if (pfd.revents & (POLLERR | POLLHUP | POLLNVAL)) {
+            if ((pfd[JackSignalFD].revents & (POLLERR | POLLHUP | POLLNVAL)) ||
+                 pfd[JackEventFD].revents & (POLLERR | POLLHUP | POLLNVAL)) {
                 fprintf(stderr, "Jack : poll() exited with errno %d\n", -errno);
                 break;
-            } else if ((pfd.revents & POLLIN) == 0) {
+            } else if ((pfd[JackSignalFD].revents & POLLIN) != 0) {
+                err = read (pfd[JackSignalFD].fd, &si, sizeof(si));
+                if (err < 0) {
+                    fprintf(stderr, "Jack : read() on signalfd failed with errno %d\n", -errno);
+                    break;
+                }
+                sig = si.ssi_signo;
+                fprintf(stderr, "Jack main caught signal %d\n", sig);
+            } else if ((pfd[JackEventFD].revents & POLLIN) != 0) {
+                sig = 0; /* Received an event from one of the Jack thread */
+                fprintf(stderr, "Jack main received event from child thread, Exiting\n");
+            } else {
                 continue;
             }
-            err = read (pfd.fd, &si, sizeof(si));
-            if (err < 0) {
-                fprintf(stderr, "Jack : read() on signalfd failed with errno %d\n", -errno);
-                goto fail;
-            }
-            sig = si.ssi_signo;
-            fprintf(stderr, "Jack main caught signal %d\n", sig);
         }
     #else
         sigwait(&sigmask->signals, &sig);
@@ -758,7 +802,11 @@ jackctl_wait_signals(jackctl_sigmask_t * sigmask)
 
 #ifdef __linux__
 fail:
-    close(pfd.fd);
+    for(int i = 0; i < JackFDCount; i++) {
+        if(pfd[i].fd != 0) {
+            close(pfd[i].fd);
+        }
+    }
 #endif
 
 }
@@ -971,6 +1019,7 @@ SERVER_EXPORT jackctl_server_t * jackctl_server_create(
 
     JackServerGlobals::on_device_acquire = on_device_acquire;
     JackServerGlobals::on_device_release = on_device_release;
+    JackServerGlobals::on_failure = on_failure;
 
     if (!jackctl_drivers_load(server_ptr))
     {
