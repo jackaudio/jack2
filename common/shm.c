@@ -147,8 +147,6 @@ static char jack_shm_server_prefix[JACK_SERVER_NAME_SIZE+1] = "";
 #define JACK_SHM_REGISTRY_KEY JACK_SEMAPHORE_KEY
 #endif
 
-static int semid = -1;
-
 #ifdef WIN32
 
 #include <psapi.h>
@@ -177,12 +175,61 @@ static BOOL check_process_running(DWORD process_id)
 }
 
 static int
-semaphore_init () {return 0;}
+jack_shm_lock_registry () {return 0;}
 
-static  int
-semaphore_add (int value) {return 0;}
+static  void
+jack_shm_unlock_registry () { }
+
+#elif __QNXNTO__
+#include <semaphore.h>
+
+static sem_t* semid = SEM_FAILED;
+
+static int
+semaphore_init ()
+{
+	const char name[] = "/jack-shm-registry-lock";
+	const int oflag = O_CREAT | O_RDWR;
+	const mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
+	if ((semid = sem_open(name, oflag, mode, 1)) == SEM_FAILED) {
+		jack_error("Creating semaphore %s failed", name);
+		return -1;
+	}
+
+	return 0;
+}
+
+static int
+jack_shm_lock_registry (void)
+{
+	if (semid == SEM_FAILED) {
+        if (semaphore_init () < 0)
+            return -1;
+    }
+
+	// TODO automatically unblock in case the process terminates
+	const int ret = sem_wait(semid);
+	if (ret < 0) {
+		jack_error("sem_wait() failed with %s", strerror(ret));
+		return -1;
+	}
+
+	return 0;
+}
+
+static void
+jack_shm_unlock_registry (void)
+{
+	const int ret = sem_post(semid);
+
+	if (ret < 0) {
+		jack_error("sem_post() failed with %s", strerror(ret));
+	}
+}
 
 #else
+static int semid = -1;
+
 /* all semaphore errors are fatal -- issue message, but do not return */
 static void
 semaphore_error (char *msg)
@@ -246,8 +293,6 @@ semaphore_add (int value)
     return 0;
 }
 
-#endif
-
 static int
 jack_shm_lock_registry (void)
 {
@@ -264,6 +309,8 @@ jack_shm_unlock_registry (void)
 {
 	semaphore_add (1);
 }
+
+#endif
 
 static void
 jack_shm_init_registry ()
@@ -1312,4 +1359,3 @@ jack_attach_shm_read (jack_shm_info_t* si)
 }
 
 #endif /* !USE_POSIX_SHM */
-
