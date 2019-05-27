@@ -12,6 +12,7 @@ Andrew Kelley
 Andrzej Szombierski
 Andy Wingo
 Anthony Van Groningen
+Arnout Diels
 Arnaud Rebillout
 Arnold Krille
 Bernhard M. Wiedemann
@@ -62,6 +63,7 @@ Marc-Olivier Barre
 Mario Lang
 Markus Seeber
 Matt Flax
+Matthias Geier
 Maxim Grishin
 Melanie Thielker
 Michael Voigt
@@ -96,5 +98,6 @@ Tom Szilagyi
 Torben Hohn
 Valentin David
 Valerio Pilo
+Viktor Wilhelmsson
 Yasuhiro Fujii
 Youri Westerman

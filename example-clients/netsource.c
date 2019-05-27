@@ -62,6 +62,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <celt/celt.h>
 #endif
 
+#ifndef CUSTOM_MODES
+#define CUSTOM_MODES // for opus_custom_decoder_init
+#endif
+
 #if HAVE_OPUS
 #include <opus/opus.h>
 #include <opus/opus_custom.h>

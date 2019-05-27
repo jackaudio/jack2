@@ -18,7 +18,7 @@
 */
 
 #include "JackConstants.h"
-#include "JackDriverLoader.h"
+#include "driver_interface.h"
 #include "JackTools.h"
 #include "JackError.h"
 #include <stdlib.h>
@@ -42,11 +42,6 @@ namespace Jack {
     #else
         kill(GetPID(), SIGINT);
     #endif
-    }
-
-    void JackTools::ThrowJackNetException()
-    {
-        throw JackNetException();
     }
 
      int JackTools::MkDir(const char* path)
@@ -299,4 +294,3 @@ void BuildClientPath(char* path_to_so, int path_len, const char* so_name)
 
 
 }  // end of namespace
-

@@ -91,7 +91,7 @@ JackLibClient::~JackLibClient()
     delete fChannel;
 }
 
-int JackLibClient::Open(const char* server_name, const char* name, int uuid, jack_options_t options, jack_status_t* status)
+int JackLibClient::Open(const char* server_name, const char* name, jack_uuid_t uuid, jack_options_t options, jack_status_t* status)
 {
     int shared_engine, shared_client, shared_graph, result;
     bool res;

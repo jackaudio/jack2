@@ -46,7 +46,7 @@ class JackInternalClient : public JackClient
         JackInternalClient(JackServer* server, JackSynchro* table);
         virtual ~JackInternalClient();
 
-        int Open(const char* server_name, const char* name, int uuid, jack_options_t options, jack_status_t* status);
+        int Open(const char* server_name, const char* name, jack_uuid_t uuid, jack_options_t options, jack_status_t* status);
         void ShutDown(jack_status_t code, const char* message);
 
         JackGraphManager* GetGraphManager() const;
@@ -100,7 +100,7 @@ class JackLoadableInternalClient1 : public JackLoadableInternalClient
         {}
 
         int Init(const char* so_name);
-        int Open(const char* server_name, const char* name, int uuid, jack_options_t options, jack_status_t* status);
+        int Open(const char* server_name, const char* name, jack_uuid_t uuid, jack_options_t options, jack_status_t* status);
 
 };
 
@@ -119,7 +119,7 @@ class JackLoadableInternalClient2 : public JackLoadableInternalClient
         {}
 
         int Init(const char* so_name);
-        int Open(const char* server_name, const char* name, int uuid, jack_options_t options, jack_status_t* status);
+        int Open(const char* server_name, const char* name, jack_uuid_t uuid, jack_options_t options, jack_status_t* status);
 
 };
 

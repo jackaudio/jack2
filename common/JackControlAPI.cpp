@@ -219,6 +219,7 @@ jackctl_free_driver_parameters(
     while (driver_ptr->parameters)
     {
         next_node_ptr = driver_ptr->parameters->next;
+        jack_constraint_free(((jackctl_parameter *)driver_ptr->parameters->data)->constraint_ptr);
         free(driver_ptr->parameters->data);
         free(driver_ptr->parameters);
         driver_ptr->parameters = next_node_ptr;
@@ -526,6 +527,7 @@ jackctl_server_free_parameters(
     while (server_ptr->parameters)
     {
         next_node_ptr = server_ptr->parameters->next;
+        jack_constraint_free(((jackctl_parameter *)server_ptr->parameters->data)->constraint_ptr);
         free(server_ptr->parameters->data);
         free(server_ptr->parameters);
         server_ptr->parameters = next_node_ptr;
@@ -1070,7 +1072,7 @@ jackctl_server_open(
 
         return true;
 
-    } catch (std::exception e) {
+    } catch (std::exception&) {
         jack_error("jackctl_server_open error...");
         jackctl_destroy_param_list(paramlist);
     }
@@ -1433,5 +1435,3 @@ SERVER_EXPORT bool jackctl_server_switch_master(jackctl_server * server_ptr, jac
         return false;
     }
 }
-
-
