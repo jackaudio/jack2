@@ -608,11 +608,7 @@ int JackEngine::ClientExternalOpen(const char* name, int pid, jack_uuid_t uuid, 
 {
     char real_name[JACK_CLIENT_NAME_SIZE + 1];
 
-<<<<<<< HEAD
-    if (uuid < 0) {
-=======
     if (jack_uuid_empty(uuid)) {
->>>>>>> f7f2244b07ee0a723853e838de85e25471b8903f
         uuid = jack_client_uuid_generate();
         strncpy(real_name, name, JACK_CLIENT_NAME_SIZE);
     } else {
