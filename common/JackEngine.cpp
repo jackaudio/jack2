@@ -1087,11 +1087,7 @@ void JackEngine::SessionNotify(int refnum, const char *target, jack_session_even
 
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
-<<<<<<< HEAD
-        if (client && (client->GetClientControl()->fSessionID < 0)) {
-=======
         if (client && jack_uuid_empty(client->GetClientControl()->fSessionID)) {
->>>>>>> f7f2244b07ee0a723853e838de85e25471b8903f
             client->GetClientControl()->fSessionID = jack_client_uuid_generate();
         }
     }
