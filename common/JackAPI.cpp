@@ -2113,7 +2113,7 @@ LIB_EXPORT void jack_uuid_copy(jack_uuid_t* dst, jack_uuid_t src)
 
 LIB_EXPORT void jack_uuid_clear(jack_uuid_t* u)
 {
-    *u = 0;
+    *u = JACK_UUID_EMPTY_INITIALIZER;
 }
 
 LIB_EXPORT int jack_uuid_parse(const char* b, jack_uuid_t* u)
@@ -2138,5 +2138,5 @@ LIB_EXPORT void jack_uuid_unparse(jack_uuid_t u, char b[JACK_UUID_STRING_SIZE])
 
 LIB_EXPORT int jack_uuid_empty(jack_uuid_t u)
 {
-    return u == 0;
+    return u == JACK_UUID_EMPTY_INITIALIZER;
 }
