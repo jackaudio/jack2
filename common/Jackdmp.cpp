@@ -1,6 +1,7 @@
 /*
 Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2013 Grame
+Copyright (C) 2016-2019 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -96,7 +97,7 @@ static void copyright(FILE* file)
     fprintf(file, "jackdmp " VERSION "\n"
             "Copyright 2001-2005 Paul Davis and others.\n"
             "Copyright 2004-2016 Grame.\n"
-            "Copyright 2016-2018 Filipe Coelho.\n"
+            "Copyright 2016-2019 Filipe Coelho.\n"
             "jackdmp comes with ABSOLUTELY NO WARRANTY\n"
             "This is free software, and you are welcome to redistribute it\n"
             "under certain conditions; see the file COPYING for details\n");

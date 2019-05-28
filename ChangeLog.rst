@@ -1,6 +1,22 @@
 ChangeLog
 #########
 
+* 1.9.13 (2019-xx-xx)
+
+  * Meta-data API implementation.
+
+  * Correct GPL licence to LGPL for files needed to build libjack.
+
+  * Remove FreeBoB backend (superseded by FFADO).
+
+  * define JACK_LIB_EXPORT, useful for internal clients.
+
+  * Mark jack_midi_reset_buffer as deprecated.
+
+  * Signal to systemd when jackd is ready.
+
+  * Code cleanup and various fixes. (too many to mention here, see git log for details)
+
 * 1.9.12 (2017-12-13)
 
   * Fix Windows build issues.
