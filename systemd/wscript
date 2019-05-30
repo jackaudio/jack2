@@ -14,8 +14,8 @@ def set_systemd_user_unit_dir(conf):
     if not systemd_user_unit_dir:
         conf.env['SYSTEMD_USER_UNIT_DIR'] = None
     else:
-        systemd_user_unit_dir.strip()
-        conf.env['SYSTEMD_USER_UNIT_DIR'] = systemd_user_unit_dir
+        conf.env['SYSTEMD_USER_UNIT_DIR'] = \
+                systemd_user_unit_dir.replace("\n", "")
 
 
 def configure(conf):
