@@ -12,7 +12,7 @@ matrix:
             - ubuntu-toolchain-r-test
           install:
             - gcc-8
-      dist: trusty
+      dist: xenial
       env:
         - MATRIX_EVAL="CC=gcc-8 CXX=g++-8"
       compiler: gcc

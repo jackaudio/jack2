@@ -40,6 +40,7 @@ if [ "$TRAVIS_OS_NAME" == "linux" ]; then
     libsystemd-login-dev \
     libsystemd-id128-dev \
     libsystemd-daemon-dev \
+    libsystemd-dev \
     libpam-systemd \
     libdbus-1-dev \
     libeigen3-dev \
