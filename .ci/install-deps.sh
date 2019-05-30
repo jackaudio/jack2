@@ -36,10 +36,6 @@ if [ "$TRAVIS_OS_NAME" == "linux" ]; then
     libdb-dev \
     systemd-services \
     systemd \
-    libsystemd-journal-dev \
-    libsystemd-login-dev \
-    libsystemd-id128-dev \
-    libsystemd-daemon-dev \
     libsystemd-dev \
     libpam-systemd \
     libdbus-1-dev \
