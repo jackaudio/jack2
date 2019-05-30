@@ -56,7 +56,7 @@ matrix:
             - ubuntu-toolchain-r-test
           install:
             - clang-3.8
-      dist: trusty
+      dist: xenial
       env:
         - MATRIX_EVAL="CC=clang-3.8 CXX=clang++-3.8"
       compiler: clang
