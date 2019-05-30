@@ -269,6 +269,9 @@ def configure(conf):
     if conf.env['IS_LINUX']:
         if Options.options.systemd_unit:
             conf.recurse('systemd')
+        else:
+            conf.env['SYSTEMD_USER_UNIT_DIR'] = None
+
 
     conf.recurse('example-clients')
 
@@ -773,8 +776,7 @@ def build(bld):
     bld.recurse('example-clients')
     if bld.env['IS_LINUX']:
         bld.recurse('man')
-        if Options.options.systemd_unit:
-            bld.recurse('systemd')
+        bld.recurse('systemd')
     if not bld.env['IS_WINDOWS']:
         bld.recurse('tests')
     if bld.env['BUILD_JACKDBUS']:
