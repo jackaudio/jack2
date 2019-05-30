@@ -24,7 +24,7 @@ matrix:
             - ubuntu-toolchain-r-test
           install:
             - gcc-7
-      dist: trusty
+      dist: xenial
       env:
         - MATRIX_EVAL="CC=gcc-7 CXX=g++-7"
       compiler: gcc
@@ -36,17 +36,17 @@ matrix:
             - ubuntu-toolchain-r-test
           install:
             - gcc-6
-      dist: trusty
+      dist: xenial
       env:
         - MATRIX_EVAL="CC=gcc-6 CXX=g++-6"
       compiler: gcc
     # linux with gcc default (4.8)
     - os: linux
-      dist: trusty
+      dist: xenial
       compiler: gcc
     # linux with clang default (3.5)
     - os: linux
-      dist: trusty
+      dist: xenial
       compiler: clang
     # linux with clang 3.8
     - os: linux
