@@ -200,6 +200,7 @@ def detect_platform(conf):
                 conf.end_msg(name, color='CYAN')
                 break
 
+
 def configure(conf):
     conf.load('compiler_cxx')
     conf.load('compiler_c')
@@ -264,6 +265,8 @@ def configure(conf):
         conf.recurse('dbus')
         if conf.env['BUILD_JACKDBUS'] != True:
             conf.fatal('jackdbus was explicitly requested but cannot be built')
+    if conf.env['IS_LINUX']:
+        conf.recurse('systemd')
 
     conf.recurse('example-clients')
 
@@ -768,6 +771,7 @@ def build(bld):
     bld.recurse('example-clients')
     if bld.env['IS_LINUX']:
         bld.recurse('man')
+        bld.recurse('systemd')
     if not bld.env['IS_WINDOWS']:
         bld.recurse('tests')
     if bld.env['BUILD_JACKDBUS']:
