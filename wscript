@@ -75,6 +75,7 @@ def options(opt):
     opt.add_option('--profile', action='store_true', default=False, help='Build with engine profiling')
     opt.add_option('--clients', default=64, type='int', dest='clients', help='Maximum number of JACK clients')
     opt.add_option('--ports-per-application', default=768, type='int', dest='application_ports', help='Maximum number of ports per application')
+    opt.add_option('--systemd-unit', action='store_true', default=False, help='Install systemd units.')
 
     opt.set_auto_options_define('HAVE_%s')
     opt.set_auto_options_style('yesno_and_hack')
@@ -200,6 +201,7 @@ def detect_platform(conf):
                 conf.end_msg(name, color='CYAN')
                 break
 
+
 def configure(conf):
     conf.load('compiler_cxx')
     conf.load('compiler_c')
@@ -264,6 +266,12 @@ def configure(conf):
         conf.recurse('dbus')
         if conf.env['BUILD_JACKDBUS'] != True:
             conf.fatal('jackdbus was explicitly requested but cannot be built')
+    if conf.env['IS_LINUX']:
+        if Options.options.systemd_unit:
+            conf.recurse('systemd')
+        else:
+            conf.env['SYSTEMD_USER_UNIT_DIR'] = None
+
 
     conf.recurse('example-clients')
 
@@ -768,6 +776,7 @@ def build(bld):
     bld.recurse('example-clients')
     if bld.env['IS_LINUX']:
         bld.recurse('man')
+        bld.recurse('systemd')
     if not bld.env['IS_WINDOWS']:
         bld.recurse('tests')
     if bld.env['BUILD_JACKDBUS']:

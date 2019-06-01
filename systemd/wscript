@@ -1,0 +1,36 @@
+#! /usr/bin/env python
+# encoding: utf-8
+
+
+def set_systemd_user_unit_dir(conf):
+    """
+    Adding systemd's user unit dir (by using pkg-config) to the configuration.
+    """
+    systemd_user_unit_dir = conf.check_cfg(
+            package='systemd',
+            args='--variable=systemduserunitdir',
+            okmsg='Successfully detected systemd user unit dir.',
+            errormsg='Could not detect systemd user unit dir. Skipping...')
+    if not systemd_user_unit_dir:
+        conf.env['SYSTEMD_USER_UNIT_DIR'] = None
+    else:
+        conf.env['SYSTEMD_USER_UNIT_DIR'] = \
+                systemd_user_unit_dir.replace("\n", "")
+
+
+def configure(conf):
+    set_systemd_user_unit_dir(conf)
+    conf.env['JACK_USER_UNIT_CONFIG_DIR'] = '/etc/jack'
+
+
+def build(bld):
+    if bld.env['SYSTEMD_USER_UNIT_DIR']:
+        bld.install_files(
+                bld.env['JACK_USER_UNIT_CONFIG_DIR'],
+                bld.path.ant_glob('*.conf'))
+        bld(
+                features='subst',
+                source='jack@.service.in',
+                target='jack@.service',
+                install_path=bld.env.SYSTEMD_USER_UNIT_DIR,
+                PREFIX=bld.env.PREFIX)
