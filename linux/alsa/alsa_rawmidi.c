@@ -860,7 +860,11 @@ void *midi_thread(void *arg)
 			struct timespec ts;
 			ts.tv_sec = 0;
 			ts.tv_nsec = wait_nanosleep;
+#ifdef CLOCK_MONOTONIC_RAW
+			clock_nanosleep(CLOCK_MONOTONIC_RAW, 0, &ts, NULL);
+#else
 			clock_nanosleep(CLOCK_MONOTONIC, 0, &ts, NULL);
+#endif
 		}
 		int res = poll((struct pollfd*)&pfds, npfds, poll_timeout);
 		//debug_log("midi_thread(%s): poll exit: %d", str->name, res);

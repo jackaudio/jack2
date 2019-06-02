@@ -143,7 +143,11 @@ static jack_time_t jack_get_microseconds_from_system (void)
 	jack_time_t jackTime;
 	struct timespec time;
 
+#ifdef CLOCK_MONOTONIC_RAW
+	clock_gettime(CLOCK_MONOTONIC_RAW, &time);
+#else
 	clock_gettime(CLOCK_MONOTONIC, &time);
+#endif
 	jackTime = (jack_time_t) time.tv_sec * 1e6 +
 		(jack_time_t) time.tv_nsec / 1e3;
 	return jackTime;
