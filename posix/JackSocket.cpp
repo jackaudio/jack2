@@ -137,6 +137,7 @@ int JackClientSocket::Connect(const char* dir, const char* name, int which) // A
     if (connect(fSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
         jack_error("Cannot connect to server socket err = %s", strerror(errno));
         close(fSocket);
+        fSocket = -1;
         return -1;
     }
 
@@ -297,6 +298,7 @@ int JackServerSocket::Bind(const char* dir, const char* name, int which) // A re
 error:
     unlink(fName);
     close(fSocket);
+    fSocket = -1;
     return -1;
 }
 
