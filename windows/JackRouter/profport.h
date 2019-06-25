@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 #include "Windows.h"
 #define get_private_profile_int        GetPrivateProfileInt
 #define get_private_profile_string     GetPrivateProfileString

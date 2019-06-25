@@ -43,7 +43,7 @@ JackEngine::JackEngine(JackGraphManager* manager,
                        char self_connect_mode)
                     : JackLockAble(control->fServerName), 
                     fSignal(control->fServerName),
-                    fMetadata(NULL) // FIXME use control->fServerName?
+					fMetadata(NULL) // FIXME use control->fServerName?
 {
     fGraphManager = manager;
     fSynchroTable = table;
@@ -774,6 +774,7 @@ int JackEngine::ClientCloseAux(int refnum, bool wait)
     NotifyRemoveClient(client->GetClientControl()->fName, refnum);
 
     fMetadata.RemoveProperties(NULL, uuid);
+
     /* have to do the notification ourselves, since the client argument
        to fMetadata->RemoveProperties() was NULL
      */

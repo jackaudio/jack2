@@ -24,6 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackCompilerDeps.h"
 #include <string.h> // for memcpy
 
+
 namespace Jack
 {
 
@@ -110,7 +111,7 @@ class JackAtomicState
                 next_index = NextArrayIndex(new_val);
                 need_copy = (CurIndex(new_val) == NextIndex(new_val));
                 NextIndex(new_val) = CurIndex(new_val); // Invalidate next index
-            } while (!CAS(Counter(old_val), Counter(new_val), (UInt32*)&fCounter));
+            } while (!COMPARE_EXCHANGE((UInt32*)&fCounter, Counter(new_val), Counter(old_val)));
             if (need_copy)
                 memcpy(&fState[next_index], &fState[cur_index], sizeof(T));
             return next_index;
@@ -124,7 +125,7 @@ class JackAtomicState
                 old_val = fCounter;
                 new_val = old_val;
                 NextIndex(new_val)++; // Set next index
-            } while (!CAS(Counter(old_val), Counter(new_val), (UInt32*)&fCounter));
+            } while (!COMPARE_EXCHANGE((UInt32*)&fCounter, Counter(new_val), Counter(old_val)));
         }
 
     public:
@@ -165,7 +166,7 @@ class JackAtomicState
                 old_val = fCounter;
                 new_val = old_val;
                 CurIndex(new_val) = NextIndex(new_val);	// Prepare switch
-            } while (!CAS(Counter(old_val), Counter(new_val), (UInt32*)&fCounter));
+            } while (!COMPARE_EXCHANGE((UInt32*)&fCounter, Counter(new_val), Counter(old_val)));
             return &fState[CurArrayIndex(fCounter)];	// Read the counter again
         }
 
@@ -181,7 +182,7 @@ class JackAtomicState
                 new_val = old_val;
                 *result = (CurIndex(new_val) != NextIndex(new_val));
                 CurIndex(new_val) = NextIndex(new_val);  // Prepare switch
-            } while (!CAS(Counter(old_val), Counter(new_val), (UInt32*)&fCounter));
+            } while (!COMPARE_EXCHANGE((UInt32*)&fCounter, Counter(new_val), Counter(old_val)));
             return &fState[CurArrayIndex(fCounter)];	// Read the counter again
         }
 

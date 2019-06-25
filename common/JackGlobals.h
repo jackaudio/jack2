@@ -45,7 +45,7 @@ struct JackGlobals {
     static volatile bool fServerRunning;
     static JackClient* fClientTable[CLIENT_NUM];
     static bool fVerbose;
-#ifndef WIN32
+#ifndef _WIN32
     static jack_thread_creator_t fJackThreadCreator;
 #endif
 

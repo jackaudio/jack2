@@ -47,7 +47,7 @@ JackMidiBufferWriteQueue::EnqueueEvent(jack_nframes_t time, size_t size,
 }
 
 void
-JackMidiBufferWriteQueue::ResetMidiBuffer(JackMidiBuffer *buffer,
+Jack::JackMidiBufferWriteQueue::ResetMidiBuffer(JackMidiBuffer *buffer,
                                           jack_nframes_t frames)
 {
     if (! buffer) {

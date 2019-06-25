@@ -24,7 +24,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <assert.h>
 #include <stdlib.h>
 #include <algorithm>
+#ifdef _WIN32
+#include <regex>
+#else
 #include <regex.h>
+#endif
 
 namespace Jack
 {
@@ -811,6 +815,7 @@ void JackGraphManager::GetPortsAux(const char** matching_ports, const char* port
     memset(matching_ports, 0, sizeof(char*) * fPortMax);
 
     int match_cnt = 0;
+	#ifndef _WIN32
     regex_t port_regex, type_regex;
 
     if (port_name_pattern && port_name_pattern[0]) {
@@ -825,6 +830,16 @@ void JackGraphManager::GetPortsAux(const char** matching_ports, const char* port
              return;
         }
     }
+        #define PORT_REGEX_MATCHES regexec(&port_regex, port->GetName(), 0, NULL, 0)
+	#define TYPE_REGEX_MATCHES regexec(&type_regex, port->GetType(), 0, NULL, 0)
+	#else
+	std::regex port_regex(&port_name_pattern[0]);
+	std::regex type_regex(&type_name_pattern[0]);
+	std::cmatch port_regex_match;
+	std::cmatch type_regex_match;
+	#define PORT_REGEX_MATCHES regex_match(port->GetName(), port_regex_match, port_regex)
+	#define TYPE_REGEX_MATCHES regex_match(port->GetType(), type_regex_match, type_regex)
+	#endif
 
     for (unsigned int i = 0; i < fPortMax; i++) {
         bool matching = true;
@@ -839,12 +854,12 @@ void JackGraphManager::GetPortsAux(const char** matching_ports, const char* port
             }
 
             if (matching && port_name_pattern && port_name_pattern[0]) {
-                if (regexec(&port_regex, port->GetName(), 0, NULL, 0)) {
+                if (PORT_REGEX_MATCHES) {
                     matching = false;
                 }
             }
             if (matching && type_name_pattern && type_name_pattern[0]) {
-                if (regexec(&type_regex, port->GetType(), 0, NULL, 0)) {
+                if (TYPE_REGEX_MATCHES) {
                     matching = false;
                 }
             }
@@ -856,13 +871,14 @@ void JackGraphManager::GetPortsAux(const char** matching_ports, const char* port
     }
 
     matching_ports[match_cnt] = 0;
-
+#ifndef _WIN32
     if (port_name_pattern && port_name_pattern[0]) {
         regfree(&port_regex);
     }
     if (type_name_pattern && type_name_pattern[0]) {
         regfree(&type_regex);
     }
+#endif
 }
 
 // Client
@@ -910,5 +926,3 @@ void JackGraphManager::Restore(JackConnectionManager* src)
 }
 
 } // end of namespace
-
-

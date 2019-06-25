@@ -20,6 +20,7 @@
 #ifndef __JackWinNamedPipeServerChannel__
 #define __JackWinNamedPipeServerChannel__
 
+#include "JackCompilerDeps_os.h"
 #include "JackWinNamedPipe.h"
 #include "JackPlatformPlug.h"
 #include "JackConstants.h"
@@ -31,7 +32,7 @@ namespace Jack
 
 class JackServer;
 
-class JackClientPipeThread : public JackRunnableInterface, public JackClientHandlerInterface
+class SERVER_EXPORT JackClientPipeThread : public JackRunnableInterface, public JackClientHandlerInterface
 {
 
     private:
@@ -72,7 +73,7 @@ class JackClientPipeThread : public JackRunnableInterface, public JackClientHand
 \brief JackServerChannel using pipe.
 */
 
-class JackWinNamedPipeServerChannel : public JackRunnableInterface
+class SERVER_EXPORT JackWinNamedPipeServerChannel : public JackRunnableInterface
 {
 
     private:

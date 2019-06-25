@@ -32,7 +32,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <assert.h>
 #include <signal.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifdef __MINGW32__
 #include <sys/types.h>
 typedef _sigset_t sigset_t;
@@ -73,7 +73,7 @@ struct JackLibGlobals
         fMetadata = new JackMetadata(NULL);
 
         // Filter SIGPIPE to avoid having client get a SIGPIPE when trying to access a died server.
-    #ifdef WIN32
+    #ifdef _WIN32
         // TODO
     #else
         sigset_t signals;
@@ -94,7 +94,7 @@ struct JackLibGlobals
         delete fMetadata;
 
        // Restore old signal mask
-    #ifdef WIN32
+    #ifdef _WIN32
        // TODO
     #else
        sigprocmask(SIG_BLOCK, &fProcessSignals, 0);

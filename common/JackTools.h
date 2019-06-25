@@ -20,7 +20,7 @@
 #ifndef __JackTools__
 #define __JackTools__
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #define DIR_SEPARATOR '\\'
 #else

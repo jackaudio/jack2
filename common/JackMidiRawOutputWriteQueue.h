@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define __JackMidiRawOutputWriteQueue__
 
 #include "JackMidiAsyncQueue.h"
+#include "JackMidiPort.h"
 #include "JackMidiSendQueue.h"
 
 namespace Jack {

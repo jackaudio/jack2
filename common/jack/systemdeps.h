@@ -26,7 +26,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
         /* POST_PACKED_STRUCTURE needs to be a macro which
            expands into a compiler directive. The directive must
            tell the compiler to arrange the preceding structure
-           declaration so that it is packed on byte-boundaries rather 
+           declaration so that it is packed on byte-boundaries rather
            than use the natural alignment of the processor and/or
            compiler.
         */
@@ -35,7 +35,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
         #define POST_PACKED_STRUCTURE __attribute__((__packed__))
 
     #else
-    
+
         #ifdef _MSC_VER
             #define PRE_PACKED_STRUCTURE1 __pragma(pack(push,1))
             #define PRE_PACKED_STRUCTURE    PRE_PACKED_STRUCTURE1
@@ -60,6 +60,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #if defined(_WIN32) && !defined(__CYGWIN__) && !defined(GNU_WIN32)
 
+    #include <stdint.h>
+
     #ifdef __MINGW32__
     #  include <winsock2.h> // mingw gives warning if we include windows.h before winsock2.h
     #endif
@@ -68,19 +70,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
     #ifdef _MSC_VER     /* Microsoft compiler */
         #define __inline__ inline
-        #if (!defined(int8_t) && !defined(_STDINT_H))
-            #define __int8_t_defined
-            typedef char int8_t;
-            typedef unsigned char uint8_t;
-            typedef short int16_t;
-            typedef unsigned short uint16_t;
-            typedef long int32_t;
-            typedef unsigned long uint32_t;
-            typedef LONGLONG int64_t;
-            typedef ULONGLONG uint64_t;
-        #endif
     #elif __MINGW32__   /* MINGW */
-        #include <stdint.h>
         #include <sys/types.h>
     #else               /* other compilers ...*/
         #include <inttypes.h>

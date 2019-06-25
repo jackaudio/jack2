@@ -45,7 +45,7 @@ JackMidiBufferReadQueue::DequeueEvent()
 }
 
 void
-JackMidiBufferReadQueue::ResetMidiBuffer(JackMidiBuffer *buffer)
+Jack::JackMidiBufferReadQueue::ResetMidiBuffer(JackMidiBuffer *buffer)
 {
     event_count = 0;
     index = 0;

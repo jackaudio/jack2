@@ -21,7 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackTools.h"
 #include "types.h"
 #include "transport.h"
-#ifndef WIN32
+#ifndef _WIN32
 #include <netinet/in.h>
 #endif
 #include <cmath>

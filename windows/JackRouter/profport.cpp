@@ -286,7 +286,7 @@ int write_private_profile_int(char *section,
     return write_private_profile_string (section,entry, buffer, file_name);
 }
 
-#endif // #ifndef WIN32
+#endif // #ifndef _WIN32
 
 
 /**************************************************************************

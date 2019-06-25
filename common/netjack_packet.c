@@ -43,7 +43,6 @@
 #include <math.h>
 #include <stdio.h>
 #include <memory.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <stdarg.h>
@@ -52,12 +51,12 @@
 
 #include <sys/types.h>
 
-#ifdef WIN32
-#include <winsock2.h>
+#ifdef _WIN32
 #include <malloc.h>
 #define socklen_t int
 #else
 #include <sys/socket.h>
+#include <unistd.h>
 #include <netinet/in.h>
 #include <poll.h>
 #endif
@@ -350,7 +349,7 @@ cache_packet_is_complete (cache_packet *pack)
     return 1;
 }
 
-#ifndef WIN32
+#ifndef _WIN32
 // new poll using nanoseconds resolution and
 // not waiting forever.
 int
@@ -512,7 +511,7 @@ packet_cache_drain_socket( packet_cache *pcache, int sockfd )
     jack_nframes_t framecnt;
     cache_packet *cpack;
     struct sockaddr_in sender_address;
-#ifdef WIN32
+#ifdef _WIN32
     int senderlen = sizeof( struct sockaddr_in );
     u_long parm = 1;
     ioctlsocket( sockfd, FIONBIO, &parm );
@@ -520,7 +519,7 @@ packet_cache_drain_socket( packet_cache *pcache, int sockfd )
     unsigned int senderlen = sizeof( struct sockaddr_in );
 #endif
     while (1) {
-#ifdef WIN32
+#ifdef _WIN32
         rcv_len = recvfrom (sockfd, rx_packet, pcache->mtu, 0,
                             (struct sockaddr*) &sender_address, &senderlen);
 #else

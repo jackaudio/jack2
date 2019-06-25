@@ -28,11 +28,16 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <errno.h>
 #include <string.h>
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <dirent.h>
 #endif
 
-#ifdef WIN32
+#ifdef _MSC_VER 
+#define strncasecmp _strnicmp
+#define strcasecmp _stricmp
+#endif
+
+#ifdef _WIN32
 
 static char* locate_dll_driver_dir()
 {
@@ -48,7 +53,7 @@ static char* locate_dll_driver_dir()
             *p = 0;
         }
         jack_info("Drivers/internals found in : %s", driver_dir_storage);
-        strcat(driver_dir_storage, "/");
+        strcat(driver_dir_storage, "\\");
         strcat(driver_dir_storage, ADDON_DIR);
         return strdup(driver_dir_storage);
     } else {
@@ -186,7 +191,8 @@ int jack_parse_driver_params(jack_driver_desc_t* desc, int argc, char* argv[], J
     /* create the params */
     optind = 0;
     opterr = 0;
-    while ((opt = getopt_long(argc, argv, options, long_options, NULL)) != -1) {
+
+	while ((opt = getopt_long(argc, argv, options, long_options, NULL)) != -1) {
 
         if (opt == ':' || opt == '?') {
             if (opt == ':') {
@@ -318,8 +324,9 @@ SERVER_EXPORT int jackctl_driver_params_parse(jackctl_driver *driver_ptr, int ar
 
     /* create the params */
     optind = 0;
-    opterr = 0;
-    while ((opt = getopt_long(argc, argv, options, long_options, NULL)) != -1) {
+    opterr = 0; 
+    
+	while ((opt = getopt_long(argc, argv, options, long_options, NULL)) != -1) {
 
         if (opt == ':' || opt == '?') {
             if (opt == ':') {
@@ -417,10 +424,15 @@ static void* check_symbol(const char* sofile, const char* symbol, const char* dr
     void* dlhandle;
     void* res = NULL;
     char filename[1024];
+
+#ifdef _WIN32
+    sprintf(filename, "%s\\%s", driver_dir, sofile);
+#else 
     sprintf(filename, "%s/%s", driver_dir, sofile);
+#endif
 
     if ((dlhandle = LoadDriverModule(filename)) == NULL) {
-#ifdef WIN32
+#ifdef _WIN32
         jack_error ("Could not open component .dll '%s': %ld", filename, GetLastError());
 #else
         jack_error ("Could not open component .so '%s': %s", filename, dlerror());
@@ -479,7 +491,7 @@ error:
     return descriptor;
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 
 JSList * jack_drivers_load(JSList * drivers)
 {
@@ -608,7 +620,7 @@ JSList* jack_drivers_load (JSList * drivers)
 
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 
 JSList* jack_internals_load(JSList * internals)
 {
@@ -734,7 +746,7 @@ Jack::JackDriverClientInterface* JackDriverInfo::Open(jack_driver_desc_t* driver
                                                     Jack::JackSynchro* synchro,
                                                     const JSList* params)
 {
-#ifdef WIN32
+#ifdef _WIN32
     int errstr;
 #else
     const char* errstr;
@@ -743,7 +755,7 @@ Jack::JackDriverClientInterface* JackDriverInfo::Open(jack_driver_desc_t* driver
     fHandle = LoadDriverModule (driver_desc->file);
 
     if (fHandle == NULL) {
-#ifdef WIN32
+#ifdef _WIN32
         if ((errstr = GetLastError ()) != 0) {
             jack_error ("Can't load \"%s\": %ld", driver_desc->file, errstr);
 #else
@@ -759,7 +771,7 @@ Jack::JackDriverClientInterface* JackDriverInfo::Open(jack_driver_desc_t* driver
 
     fInitialize = (driverInitialize)GetDriverProc(fHandle, "driver_initialize");
 
-#ifdef WIN32
+#ifdef _WIN32
     if ((fInitialize == NULL) && (errstr = GetLastError ()) != 0) {
 #else
     if ((fInitialize == NULL) && (errstr = dlerror ()) != 0) {

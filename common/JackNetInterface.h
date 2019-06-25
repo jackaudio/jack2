@@ -173,18 +173,18 @@ namespace Jack
 
         public:
 
-            JackNetMasterInterface() 
-                : JackNetInterface(), 
-                fRunning(false), 
-                fCurrentCycleOffset(0), 
-                fMaxCycleOffset(0), 
+            JackNetMasterInterface()
+                : JackNetInterface(),
+                fRunning(false),
+                fCurrentCycleOffset(0),
+                fMaxCycleOffset(0),
                 fSynched(false)
             {}
             JackNetMasterInterface(session_params_t& params, JackNetSocket& socket, const char* multicast_ip)
-                    : JackNetInterface(params, socket, multicast_ip), 
-                    fRunning(false), 
-                    fCurrentCycleOffset(0), 
-                    fMaxCycleOffset(0), 
+                    : JackNetInterface(params, socket, multicast_ip),
+                    fRunning(false),
+                    fCurrentCycleOffset(0),
+                    fMaxCycleOffset(0),
                     fSynched(false)
             {}
 
@@ -200,8 +200,6 @@ namespace Jack
     {
 
         protected:
-
-            static uint fSlaveCounter;
 
             bool Init();
             bool InitConnection(int time_out_sec);
@@ -230,6 +228,8 @@ namespace Jack
 
             void InitAPI();
 
+			static uint fSlaveCounter;
+
         public:
 
             JackNetSlaveInterface() : JackNetInterface()
@@ -241,14 +241,16 @@ namespace Jack
             {
                 InitAPI();
             }
-
+            #ifndef _MSC_VER
+            // FIXME: window static reference to fSlaveCounter not working while linking
             virtual ~JackNetSlaveInterface()
             {
                 // close Socket API with the last slave
-                if (--fSlaveCounter == 0) {
+                if ( --fSlaveCounter == 0) {
                     SocketAPIEnd();
                 }
             }
+            #endif
     };
 }
 

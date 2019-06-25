@@ -116,10 +116,10 @@ def options(opt):
             help='Enable Portaudio driver',
             conf_dest='BUILD_DRIVER_PORTAUDIO')
     portaudio.check(header_name='windows.h') # only build portaudio on windows
-    portaudio.check_cfg(
-            package='portaudio-2.0 >= 19',
-            uselib_store='PORTAUDIO',
-            args='--cflags --libs')
+    # portaudio.check_cfg(
+            # package='portaudio-2.0 >= 19',
+            # uselib_store='PORTAUDIO',
+            # args='--cflags --libs')
     winmme = opt.add_auto_option(
             'winmme',
             help='Enable WinMME driver',
@@ -211,10 +211,14 @@ def configure(conf):
     if conf.env['IS_WINDOWS']:
         conf.env.append_unique('CCDEFINES', '_POSIX')
         conf.env.append_unique('CXXDEFINES', '_POSIX')
-
-    conf.env.append_unique('CXXFLAGS', '-Wall')
-    conf.env.append_unique('CXXFLAGS', '-std=gnu++11')
-    conf.env.append_unique('CFLAGS', '-Wall')
+        if conf.env['CC_NAME'] == 'msvc':
+            conf.env.append_unique('CXXFLAGS', '/std:c++14')
+            conf.env.append_unique('CXXFLAGS', '/EHsc')
+            conf.env.append_unique('LIBPATH', os.getcwd() + '\\windows\\lib')
+    else:
+        conf.env.append_unique('CXXFLAGS', '-Wall')
+        conf.env.append_unique('CXXFLAGS', '-std=gnu++11')
+        conf.env.append_unique('CFLAGS', '-Wall')
 
     if conf.env['IS_MACOSX']:
         conf.check(lib='aften', uselib='AFTEN', define_name='AFTEN')
@@ -276,14 +280,17 @@ def configure(conf):
     conf.recurse('example-clients')
 
     # test for the availability of ucontext, and how it should be used
-    for t in ['gp_regs', 'uc_regs', 'mc_gregs', 'gregs']:
-        fragment = '#include <ucontext.h>\n'
-        fragment += 'int main() { ucontext_t *ucontext; return (int) ucontext->uc_mcontext.%s[0]; }' % t
-        confvar = 'HAVE_UCONTEXT_%s' % t.upper()
-        conf.check_cc(fragment=fragment, define_name=confvar, mandatory=False,
-                      msg='Checking for ucontext->uc_mcontext.%s' % t)
-        if conf.is_defined(confvar):
-            conf.define('HAVE_UCONTEXT', 1)
+    if conf.env['IS_WINDOWS']:
+        conf.define('HAVE_UCONTEXT', 0)
+    else:
+        for t in ['gp_regs', 'uc_regs', 'mc_gregs', 'gregs']:
+            fragment = '#include <ucontext.h>\n'
+            fragment += 'int main() { ucontext_t *ucontext; return (int) ucontext->uc_mcontext.%s[0]; }' % t
+            confvar = 'HAVE_UCONTEXT_%s' % t.upper()
+            conf.check_cc(fragment=fragment, define_name=confvar, mandatory=False,
+                        msg='Checking for ucontext->uc_mcontext.%s' % t)
+            if conf.is_defined(confvar):
+                conf.define('HAVE_UCONTEXT', 1)
 
     fragment = '#include <ucontext.h>\n'
     fragment += 'int main() { return NGREG; }'
@@ -508,6 +515,10 @@ def build_jackd(bld):
         jackd.use += ['DL', 'PTHREAD']
         jackd.framework = ['CoreFoundation']
 
+    if bld.env['IS_WINDOWS']:
+        jackd.source += ['windows/getopt.c']
+        jackd.env.append_unique('LDFLAGS', ['/ENTRY:mainCRTStartup', '/SubSystem:console'])
+
     if bld.env['IS_SUN']:
         jackd.use += ['DL', 'PTHREAD']
 
@@ -515,9 +526,14 @@ def build_jackd(bld):
 
     return jackd
 
+def removekey(d, key):
+    r = dict(d)
+    del r[key]
+    return r
+
 # FIXME: Is SERVER_SIDE needed?
 def create_driver_obj(bld, **kw):
-    if bld.env['IS_MACOSX'] or bld.env['IS_WINDOWS']:
+    if bld.env['IS_MACOSX']:
         # On MacOSX this is necessary.
         # I do not know if this is necessary on Windows.
         # Note added on 2015-12-13 by karllinden.
@@ -525,6 +541,11 @@ def create_driver_obj(bld, **kw):
             kw['use'] += ['serverlib']
         else:
             kw['use'] = ['serverlib']
+
+    win_dll = []
+    if 'win_dll' in kw:
+        win_dll = kw['win_dll']
+        kw = removekey(kw, 'win_dll')
 
     driver = bld(
         features = ['c', 'cxx', 'cshlib', 'cxxshlib'],
@@ -534,7 +555,12 @@ def create_driver_obj(bld, **kw):
         **kw)
 
     if bld.env['IS_WINDOWS']:
-        driver.env['cxxshlib_PATTERN'] = 'jack_%s.dll'
+        for dll in win_dll:
+            driver.env.append_unique('LDFLAGS', ['/DLL', dll])
+        if bld.env['IS_WIN64']:
+            driver.env['cxxshlib_PATTERN'] = 'jack_%s64.dll'
+        else:
+            driver.env['cxxshlib_PATTERN'] = 'jack_%s.dll'
     else:
         driver.env['cxxshlib_PATTERN'] = 'jack_%s.so'
 
@@ -645,28 +671,33 @@ def build_drivers(bld):
     create_driver_obj(
         bld,
         target = 'dummy',
-        source = dummy_src)
+        source = dummy_src,
+        win_dll = ['common\\jackserver.lib'])
 
     create_driver_obj(
         bld,
         target = 'loopback',
-        source = loopback_src)
+        source = loopback_src,
+        win_dll = ['common\\jackserver.lib'])
 
     create_driver_obj(
         bld,
         target = 'net',
-        source = net_src)
+        source = net_src,
+        win_dll = ['common\\jackserver.lib'])
 
     create_driver_obj(
         bld,
         target = 'netone',
         source = netone_src,
-        use = ['SAMPLERATE', 'CELT'])
+        use = ['SAMPLERATE', 'CELT'],
+        win_dll = ['common\\jackserver.lib', 'Ws2_32.lib'])
 
     create_driver_obj(
         bld,
         target = 'proxy',
-        source = proxy_src)
+        source = proxy_src,
+        win_dll = ['common\\jackserver.lib'])
 
     # Create hardware driver objects. Lexically sorted after the conditional,
     # e.g. BUILD_DRIVER_ALSA.
@@ -701,14 +732,16 @@ def build_drivers(bld):
             bld,
             target = 'portaudio',
             source = portaudio_src,
-            use = ['PORTAUDIO'])
+            use = ['PORTAUDIO'],
+            win_dll = ['common\\jackserver.lib', '..\\libportaudio64.lib'])
 
     if bld.env['BUILD_DRIVER_WINMME']:
         create_driver_obj(
             bld,
             target = 'winmme',
             source = winmme_src,
-            use = ['WINMME'])
+            use = ['WINMME'],
+            win_dll = ['common\\jackserver.lib', 'Winmm.lib'])
 
     if bld.env['IS_MACOSX']:
         create_driver_obj(
@@ -773,7 +806,8 @@ def build(bld):
 
     build_drivers(bld)
 
-    bld.recurse('example-clients')
+    if not bld.env['IS_WINDOWS']:
+        bld.recurse('example-clients')
     if bld.env['IS_LINUX']:
         bld.recurse('man')
         bld.recurse('systemd')

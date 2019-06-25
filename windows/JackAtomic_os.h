@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackTypes.h"
 
 #ifndef __MINGW32__
+#define COMPARE_EXCHANGE(ADDRESS, NEW, EXPECTED) atomic::msvc::interlocked<UInt32, 4>::compare_exchange(ADDRESS, NEW, EXPECTED)
 #ifdef __SMP__
 #	define LOCK lock
 #else
@@ -36,6 +37,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //----------------------------------------------------------------
 // CAS functions
 //----------------------------------------------------------------
+#if defined(_M_X64)
+
+#include <atomic>
+
+bool CAS(volatile UInt32 value, UInt32 newvalue, volatile void * addr)
+{
+	return std::atomic_compare_exchange_weak((std::_Atomic_address *) addr, value, newvalue);
+}
+
+#else
+
 inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void * addr)
 {
     register char c;
@@ -52,6 +64,8 @@ inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void * addr)
     }
     return c;
 }
+
+#endif
 
 #else
 
@@ -73,4 +87,3 @@ static inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void* ad
 #endif
 
 #endif
-

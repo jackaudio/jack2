@@ -14,7 +14,7 @@
 /*
  Copyright (C) 2001-2003 Paul Davis
  Copyright (C) 2005-2012 Grame
- 
+
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as published by
  the Free Software Foundation; either version 2.1 of the License, or
@@ -32,12 +32,13 @@
  */
 
 #include "JackConstants.h"
-
-#ifdef WIN32
+#ifdef _WIN32
 #include <process.h>
 #include <stdio.h>
+#include <windows.h>
+#include <Lmcons.h>
+#include <memoryapi.h>
 #else
-
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -47,31 +48,41 @@
 #include <errno.h>
 #include <dirent.h>
 #include <sys/mman.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/shm.h>
 #include <sys/sem.h>
+#include <sys/types.h>
 #include <stdlib.h>
 #include "promiscuous.h"
-
 #endif
 
 #include "shm.h"
 #include "JackError.h"
 
-static int GetUID()
+#ifdef _WIN32
+static char* GetUID()
 {
-#ifdef WIN32
-    return  _getpid();
-    //#error "No getuid function available"
-#else
-    return geteuid();
-#endif
+    #if defined(__HAVE_USERENV_H)
+		char username[UNLEN+1];
+		DWORD username_len = UNLEN+1;
+		return GetUserName(username, &username_len);
+	#else
+		char* username = getenv("USERNAME");
+		return username;
+	#endif
 }
+#else
+static char* GetUID()
+{
+	char buffer [256];
+	int n, a=5, b=3;
+    return sprintf(buffer, "%d", geteuid());
+}
+#endif
 
 static int GetPID()
 {
-#ifdef WIN32
+#ifdef _WIN32
     return  _getpid();
 #else
     return getpid();
@@ -80,7 +91,7 @@ static int GetPID()
 
 #ifdef USE_POSIX_SHM
 static jack_shmtype_t jack_shmtype = shm_POSIX;
-#elif WIN32
+#elif defined(_WIN32)
 static jack_shmtype_t jack_shmtype = shm_WIN32;
 #else
 static jack_shmtype_t jack_shmtype = shm_SYSV;
@@ -105,10 +116,10 @@ static void	jack_remove_shm (jack_shm_id_t *id);
 /* per-process global data for the SHM interfaces */
 static jack_shm_id_t   registry_id;	/* SHM id for the registry */
 
-#ifdef WIN32
+#ifdef _WIN32
 static jack_shm_info_t registry_info = {/* SHM info for the registry */
 	JACK_SHM_NULL_INDEX,
-	NULL
+	0
 };
 #else
 static jack_shm_info_t registry_info = { /* SHM info for the registry */
@@ -144,7 +155,7 @@ static char jack_shm_server_prefix[JACK_SERVER_NAME_SIZE+1] = "";
 
 static int semid = -1;
 
-#ifdef WIN32
+#ifdef _WIN32
 
 #include <psapi.h>
 #include <lmcons.h>
@@ -317,16 +328,8 @@ jack_shm_validate_registry ()
 static void
 jack_set_server_prefix (const char *server_name)
 {
-#ifdef WIN32
-    char buffer[UNLEN+1]={0};
-    DWORD len = UNLEN+1;
-    GetUserName(buffer, &len);
-    snprintf (jack_shm_server_prefix, sizeof (jack_shm_server_prefix),
-		  "jack-%s:%s:", buffer, server_name);
-#else
-    snprintf (jack_shm_server_prefix, sizeof (jack_shm_server_prefix),
-		  "jack-%d:%s:", GetUID(), server_name);
-#endif
+	snprintf (jack_shm_server_prefix, sizeof (jack_shm_server_prefix),
+		"jack-%s:%s:", GetUID(), server_name);
 }
 
 /* gain server addressability to shared memory registration segment
@@ -517,7 +520,7 @@ jack_register_server (const char *server_name, int new_registry)
 		}
 
 		/* see if server still exists */
-    #ifdef WIN32
+    #ifdef _WIN32
         if (check_process_running(jack_shm_header->server[i].pid)) {
             res = EEXIST;	/* other server running */
 			goto unlock;
@@ -612,7 +615,7 @@ jack_cleanup_shm ()
 		} else {
 
 			/* see if allocator still exists */
-		#ifdef WIN32 
+		#ifdef _WIN32
 			//jack_info("TODO: kill API not available !!");
 		#else
 			if (kill (r->allocator, 0)) {
@@ -742,7 +745,7 @@ jack_access_registry (jack_shm_info_t *ri)
 	jack_shm_header = ri->ptr.attached_at;
 	jack_shm_registry = (jack_shm_registry_t *) (jack_shm_header + 1);
 
-	close (shm_fd); 
+	close (shm_fd);
 	return 0;
 }
 
@@ -801,7 +804,7 @@ jack_create_registry (jack_shm_info_t *ri)
 
 	/* initialize registry contents */
 	jack_shm_init_registry ();
-	close (shm_fd); 
+	close (shm_fd);
 	return 0;
 }
 
@@ -858,7 +861,7 @@ jack_shmalloc (const char *shm_name, jack_shmsize_t size, jack_shm_info_t* si)
 	 * registry index for uniqueness and ignore the shm_name
 	 * parameter.  Bah!
 	 */
-	snprintf (name, sizeof (name), "/jack-%d-%d", GetUID(), registry->index);
+	snprintf (name, sizeof (name), "/jack-%s-%d", GetUID(), registry->index);
 
 	if (strlen (name) >= sizeof (registry->id)) {
 		jack_error ("shm segment name too long %s", name);
@@ -948,7 +951,7 @@ jack_attach_shm_read (jack_shm_info_t* si)
 	return 0;
 }
 
-#elif WIN32
+#elif _WIN32
 
 static int
 jack_access_registry (jack_shm_info_t *ri)
@@ -1058,7 +1061,7 @@ jack_shmalloc (const char *shm_name, jack_shmsize_t size, jack_shm_info_t* si)
 		goto unlock;
 	}
 
-	snprintf (name, sizeof (name), "jack-%d-%d", GetUID(), registry->index);
+	snprintf (name, sizeof (name), "jack-%s-%d", GetUID(), registry->index);
 
 	if (strlen (name) >= sizeof (registry->id)) {
 		jack_error ("shm segment name too long %s", name);
@@ -1307,4 +1310,3 @@ jack_attach_shm_read (jack_shm_info_t* si)
 }
 
 #endif /* !USE_POSIX_SHM */
-

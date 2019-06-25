@@ -105,7 +105,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
         fSavedRealTime = false;
         fServerPriority = priority;
 
-    #ifdef WIN32
+    #ifdef _WIN32
         fClientPriority = (rt) ? priority - 3 : 0;
     #else
         fClientPriority = (rt) ? priority - 5 : 0;

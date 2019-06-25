@@ -169,7 +169,7 @@ int JackMessageBuffer::SetInitCallback(JackThreadInitCallback callback, void *ar
         fInitArg = arg;
         fInit = callback;
         
-    #ifndef WIN32
+    #ifndef _WIN32
         // wake msg buffer thread 
         fGuard.Signal();
         // wait for it to be done  

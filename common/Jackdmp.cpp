@@ -48,6 +48,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <systemd/sd-daemon.h>
 #endif
 
+#ifdef _WIN32
+#include "getopt.h"
+#endif
+
 /*
 This is a simple port of the old jackdmp.cpp file to use the new jack2 control API. Available options for the server
 are "hard-coded" in the source. A much better approach would be to use the control API to:

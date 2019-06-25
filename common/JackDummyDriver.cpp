@@ -23,7 +23,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackThreadedDriver.h"
 #include "JackCompilerDeps.h"
 #include <iostream>
+#ifdef _WIN32
+#include "JackWinThread.h"
+#else
 #include <unistd.h>
+#endif
 #include <math.h>
 
 

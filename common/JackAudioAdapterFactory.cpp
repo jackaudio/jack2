@@ -40,7 +40,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define JackPlatformAdapter JackOSSAdapter
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 #include "JackPortAudioAdapter.h"
 #define JackPlatformAdapter JackPortAudioAdapter
 #endif

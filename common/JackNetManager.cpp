@@ -21,8 +21,12 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackServerGlobals.h"
 #include "JackLockedEngine.h"
 #include "thread.h"
+#ifdef _WIN32
+#include "JackMetadata.h"
+#include "JackWinNamedPipe.h"
+#include "JackNetInterface.h"
+#endif
 
-using namespace std;
 
 namespace Jack
 {

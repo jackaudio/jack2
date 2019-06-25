@@ -21,8 +21,8 @@
 #define __JackNetWinSocket__
 
 #include "JackNetSocket.h"
-#ifdef __MINGW32__
 #include <winsock2.h>
+#ifdef __MINGW32__
 #include <ws2tcpip.h>
 #include <stdint.h>
 #endif
@@ -112,4 +112,3 @@ namespace Jack
 }
 
 #endif
-

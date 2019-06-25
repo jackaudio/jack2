@@ -20,7 +20,7 @@
 
 */
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <stdint.h>
 #include <dirent.h>
 #include <pthread.h>
@@ -534,7 +534,7 @@ jackctl_server_free_parameters(
     }
 }
 
-#ifdef WIN32
+#ifdef _WIN32
 
 struct jackctl_sigmask
 {

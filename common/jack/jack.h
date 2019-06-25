@@ -337,9 +337,9 @@ int jack_set_thread_init_callback (jack_client_t *client,
  * passed to this function will not be called, and the one passed to
  * jack_on_info_shutdown() will.
  *
- * NOTE: application should typically signal another thread to correctly 
- * finish cleanup, that is by calling "jack_client_close" 
- * (since "jack_client_close" cannot be called directly in the context 
+ * NOTE: application should typically signal another thread to correctly
+ * finish cleanup, that is by calling "jack_client_close"
+ * (since "jack_client_close" cannot be called directly in the context
  * of the thread that calls the shutdown callback).
  */
 void jack_on_shutdown (jack_client_t *client,
@@ -367,9 +367,9 @@ void jack_on_shutdown (jack_client_t *client,
  * in case of a client thread shutdown, the callback passed to
  * jack_on_info_shutdown() will be called.
  *
- * NOTE: application should typically signal another thread to correctly 
- * finish cleanup, that is by calling "jack_client_close" 
- * (since "jack_client_close" cannot be called directly in the context 
+ * NOTE: application should typically signal another thread to correctly
+ * finish cleanup, that is by calling "jack_client_close"
+ * (since "jack_client_close" cannot be called directly in the context
  * of the thread that calls the shutdown callback).
  */
 void jack_on_info_shutdown (jack_client_t *client,
@@ -1360,14 +1360,14 @@ jack_nframes_t jack_last_frame_time (const jack_client_t *client) JACK_OPTIONAL_
  *                  microseconds.
  *
  * NOTES:
- * 
+ *
  * Because of the types used, all the returned values except period_usecs
  * are unsigned. In computations mapping between frames and microseconds
  * *signed* differences are required. The easiest way is to compute those
  * separately and assign them to the appropriate signed variables,
  * int32_t for frames and int64_t for usecs. See the implementation of
  * jack_frames_to_time() and Jack_time_to_frames() for an example.
- * 
+ *
  * Unless there was an xrun, skipped cycles, or the current cycle is the
  * first after freewheeling or starting Jack, the value of current_usecs
  * will always be the value of next_usecs of the previous cycle.
@@ -1386,7 +1386,7 @@ int jack_get_cycle_times(const jack_client_t *client,
                         jack_time_t    *current_usecs,
                         jack_time_t    *next_usecs,
                         float          *period_usecs) JACK_OPTIONAL_WEAK_EXPORT;
-                  
+
 /**
  * @return the estimated time in microseconds of the specified frame time
  */
@@ -1421,7 +1421,6 @@ jack_time_t jack_get_time(void) JACK_OPTIONAL_WEAK_EXPORT;
  * @param msg error message text (no newline at end).
  */
 extern void (*jack_error_callback)(const char *msg) JACK_OPTIONAL_WEAK_EXPORT;
-
 /**
  * Set the @ref jack_error_callback for error message display.
  * Set it to NULL to restore default_jack_error_callback function.

@@ -21,7 +21,9 @@
 #ifndef __NETJACK_H__
 #define __NETJACK_H__
 
+#ifndef _MSC_VER
 #include <unistd.h>
+#endif
 
 #include <jack/types.h>
 #include <jack/jack.h>
