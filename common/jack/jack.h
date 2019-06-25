@@ -1420,7 +1420,9 @@ jack_time_t jack_get_time(void) JACK_OPTIONAL_WEAK_EXPORT;
  *
  * @param msg error message text (no newline at end).
  */
+ #ifndef _MSC_VER
 extern void (*jack_error_callback)(const char *msg) JACK_OPTIONAL_WEAK_EXPORT;
+#endif
 /**
  * Set the @ref jack_error_callback for error message display.
  * Set it to NULL to restore default_jack_error_callback function.
@@ -1438,7 +1440,9 @@ void jack_set_error_function (void (*func)(const char *)) JACK_OPTIONAL_WEAK_EXP
  *
  * @param msg info message text (no newline at end).
  */
+ #ifndef _MSC_VER
 extern void (*jack_info_callback)(const char *msg) JACK_OPTIONAL_WEAK_EXPORT;
+#endif
 
 /**
  * Set the @ref jack_info_callback for info message display.

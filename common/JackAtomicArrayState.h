@@ -21,6 +21,9 @@
 #define __JackAtomicArrayState__
 
 #include "JackAtomic.h"
+#ifdef _MSC_VER
+#include "JackAtomic_os.h"
+#endif
 #include "JackCompilerDeps.h"
 #include <string.h> // for memcpy
 

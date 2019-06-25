@@ -22,8 +22,8 @@
 
 #include "JackNetSocket.h"
 #include <winsock2.h>
-#ifdef __MINGW32__
 #include <ws2tcpip.h>
+#ifdef __MINGW32__
 #include <stdint.h>
 #endif
 

@@ -29,7 +29,8 @@ def create_jack_process_obj(bld, target, sources, uselib = None, framework = Non
     if bld.env['IS_SUN']:
         env_includes = ['../solaris', '../posix', '../solaris/oss']
     if bld.env['IS_WINDOWS']:
-        driver.env.append_unique('LDFLAGS', ['/DLL', "common\\build"])
+        if conf.env['CC_NAME'] == 'msvc':
+            driver.env.append_unique('LDFLAGS', ['/DLL', "common\\build", '/MT'])
         env_includes = ['../windows', '../windows/portaudio']
     process.includes = ['.'] + env_includes + ['jack', '..']
     process.name     = target

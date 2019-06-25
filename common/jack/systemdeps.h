@@ -61,11 +61,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #if defined(_WIN32) && !defined(__CYGWIN__) && !defined(GNU_WIN32)
 
     #include <stdint.h>
-
-    #ifdef __MINGW32__
-    #  include <winsock2.h> // mingw gives warning if we include windows.h before winsock2.h
-    #endif
-
+    #include <winsock2.h>
     #include <windows.h>
 
     #ifdef _MSC_VER     /* Microsoft compiler */

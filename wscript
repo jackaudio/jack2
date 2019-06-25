@@ -116,10 +116,6 @@ def options(opt):
             help='Enable Portaudio driver',
             conf_dest='BUILD_DRIVER_PORTAUDIO')
     portaudio.check(header_name='windows.h') # only build portaudio on windows
-    # portaudio.check_cfg(
-            # package='portaudio-2.0 >= 19',
-            # uselib_store='PORTAUDIO',
-            # args='--cflags --libs')
     winmme = opt.add_auto_option(
             'winmme',
             help='Enable WinMME driver',
@@ -209,12 +205,15 @@ def configure(conf):
     detect_platform(conf)
 
     if conf.env['IS_WINDOWS']:
-        conf.env.append_unique('CCDEFINES', '_POSIX')
-        conf.env.append_unique('CXXDEFINES', '_POSIX')
         if conf.env['CC_NAME'] == 'msvc':
+            conf.env.append_unique('CXXFLAGS', '/MT') # static linking
             conf.env.append_unique('CXXFLAGS', '/std:c++14')
             conf.env.append_unique('CXXFLAGS', '/EHsc')
+            conf.env.append_unique('CXXFLAGS', '/D_WINSOCKAPI_=1') # https://stackoverflow.com/a/1517198
             conf.env.append_unique('LIBPATH', os.getcwd() + '\\windows\\lib')
+        else:
+            conf.env.append_unique('CCDEFINES', '_POSIX')
+            conf.env.append_unique('CXXDEFINES', '_POSIX')
     else:
         conf.env.append_unique('CXXFLAGS', '-Wall')
         conf.env.append_unique('CXXFLAGS', '-std=gnu++11')
@@ -733,7 +732,7 @@ def build_drivers(bld):
             target = 'portaudio',
             source = portaudio_src,
             use = ['PORTAUDIO'],
-            win_dll = ['common\\jackserver.lib', '..\\libportaudio64.lib'])
+            win_dll = ['common\\jackserver.lib', os.getenv('PORTAUDIO_LIBRARY') or 'libportaudio64.lib'])
 
     if bld.env['BUILD_DRIVER_WINMME']:
         create_driver_obj(

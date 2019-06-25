@@ -33,9 +33,10 @@
 
 #include "JackConstants.h"
 #ifdef _WIN32
+#define _WINSOCKAPI_
+#include <windows.h>
 #include <process.h>
 #include <stdio.h>
-#include <windows.h>
 #include <Lmcons.h>
 #include <memoryapi.h>
 #else
