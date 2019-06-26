@@ -1307,7 +1307,7 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 
   again:
 
-	while (need_playback || need_capture) {
+	while ((need_playback || need_capture) && !xrun_detected) {
 
 		int poll_result;
 		unsigned int ci = 0;
