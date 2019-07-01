@@ -406,6 +406,9 @@ int JackAlsaDriver::Read()
     int wait_status;
     jack_nframes_t nframes;
     fDelayedUsecs = 0.f;
+    int retry_cnt = 0;
+
+#define MAX_RECOVERY_RETRY 10
 
 retry:
 
@@ -420,6 +423,11 @@ retry:
          */
         jack_log("ALSA XRun wait_status = %d", wait_status);
         NotifyXRun(fBeginDateUst, fDelayedUsecs);
+        if(retry_cnt >= MAX_RECOVERY_RETRY) {
+            jack_error("ALSA Device not recovering, tried Xrun recovery for %d times", retry_cnt);
+            return -1;
+        }
+        retry_cnt++;
         goto retry; /* recoverable error*/
     }
 
