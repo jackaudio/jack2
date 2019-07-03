@@ -408,8 +408,6 @@ int JackAlsaDriver::Read()
     fDelayedUsecs = 0.f;
     int retry_cnt = 0;
 
-#define MAX_RECOVERY_RETRY 10
-
 retry:
 
     nframes = alsa_driver_wait((alsa_driver_t *)fDriver, -1, &wait_status, &fDelayedUsecs);
@@ -933,10 +931,14 @@ void SetTime(jack_time_t time)
     g_alsa_driver->SetTimetAux(time);
 }
 
-int Restart()
+int Restart(int delay)
 {
     int res;
+
     if ((res = g_alsa_driver->Stop()) == 0) {
+        if(delay > 0) {
+            usleep(delay * MS_TO_US);
+        }
         res = g_alsa_driver->Start();
     }
     return res;

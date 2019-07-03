@@ -26,6 +26,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackTime.h"
 #include "alsa_driver.h"
 
+/* Milli Seconds represented in Micro seconds */
+#define MS_TO_US   1000
+/* Max re-try count for Alsa XRUNs */
+#define MAX_RECOVERY_RETRY 10
+
 namespace Jack
 {
 

@@ -58,6 +58,8 @@ char* strcasestr(const char* haystack, const char* needle);
 #define XRUN_REPORT_DELAY 0
 /* Max re-try count for Alsa poll timeout handling */
 #define MAX_RETRY_COUNT 5
+/* Delay in initiating the second xrun recovery */
+#define RECOVER_DELAY_MS 20
 
 void
 jack_driver_init (jack_driver_t *driver)
@@ -1168,7 +1170,7 @@ alsa_driver_stop (alsa_driver_t *driver)
 }
 
 static int
-alsa_driver_restart (alsa_driver_t *driver)
+alsa_driver_restart (alsa_driver_t *driver, int delay)
 {
 	int res;
 
@@ -1178,7 +1180,7 @@ alsa_driver_restart (alsa_driver_t *driver)
  	if ((res = driver->nt_stop((struct _jack_driver_nt *) driver))==0)
 		res = driver->nt_start((struct _jack_driver_nt *) driver);
     */
-    res = Restart();
+    res = Restart(delay);
 	driver->xrun_recovery = 0;
 
 	if (res && driver->midi)
@@ -1192,6 +1194,7 @@ alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs)
 {
 	snd_pcm_status_t *status;
 	int res;
+	int delay = 0;
 
 	snd_pcm_status_alloca(&status);
 
@@ -1224,10 +1227,11 @@ alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs)
 		}
 	}
 
+	driver->xrun_count++;
+
 	if (snd_pcm_status_get_state(status) == SND_PCM_STATE_XRUN
 	    && driver->process_count > XRUN_REPORT_DELAY) {
 		struct timeval now, diff, tstamp;
-		driver->xrun_count++;
 		snd_pcm_status_get_tstamp(status,&now);
 		snd_pcm_status_get_trigger_tstamp(status, &tstamp);
 		timersub(&now, &tstamp, &diff);
@@ -1247,7 +1251,12 @@ alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs)
 		}
 	}
 
-	if (alsa_driver_restart (driver)) {
+	/* Try the first xrun recovery without delay and the subsequent ones with delay */
+	if(driver->xrun_count > 1) {
+		delay = RECOVER_DELAY_MS;
+	}
+
+	if (alsa_driver_restart (driver, delay)) {
 		return -1;
 	}
 	return 0;
@@ -1536,6 +1545,10 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 	if (xrun_detected) {
 		*status = alsa_driver_xrun_recovery (driver, delayed_usecs);
 		return 0;
+	} else {
+		if(driver->xrun_count > 0) {
+			driver->xrun_count = 0;
+		}
 	}
 
 	*status = 0;
