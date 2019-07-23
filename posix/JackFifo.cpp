@@ -132,7 +132,7 @@ bool JackFifo::Allocate(const char* name, const char* server_name, int value)
     if (stat(fName, &statbuf) < 0) {
         if (errno == ENOENT || errno == EPERM) {
             if (mkfifo(fName, 0666) < 0) {
-                jack_error("Cannot create inter-client FIFO name = %s err = %s", name, strerror(errno));
+                jack_error("Cannot create inter-client FIFO name = %s err = %s", fName, strerror(errno));
                 return false;
             }
         } else {
