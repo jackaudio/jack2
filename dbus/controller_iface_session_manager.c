@@ -331,7 +331,7 @@ jack_controller_dbus_session_notify(
     call->message = NULL; /* mark that reply will be sent asynchronously */
     cmd_ptr->connection = dbus_connection_ref(call->connection);
 
-    /* it is safe to use the retrived pointers because we already made an additional message reference */
+    /* it is safe to use the retrieved pointers because we already made an additional message reference */
     cmd_ptr->type = type;
     cmd_ptr->target = target;
     cmd_ptr->path = path;

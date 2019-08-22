@@ -64,7 +64,7 @@ namespace Jack {
                     copy_length = pos - copy_start;
                     start = pos + 1;
                 }
-                //else there is someting before the quote, first copy that
+                //else there is something before the quote, first copy that
                 else {
                     copy_start = start;
                     copy_length = pos - copy_start;

@@ -165,7 +165,7 @@ class JackCoreAudioAdapter : public JackAudioAdapterInterface
 };
 
 
-} // end of namepace
+} // end of namespace
 
 #ifdef __cplusplus
 extern "C"

@@ -334,7 +334,7 @@ int jack_net_master_recv_slice(jack_net_master_t* net, int audio_input, float** 
  * @param net the network connection
  * @param audio_output number of audio outputs
  * @param audio_output_buffer an array of audio output buffers
- * @param midi_output number of MIDI ouputs
+ * @param midi_output number of MIDI outputs
  * @param midi_output_buffer an array of MIDI output buffers
  *
  * @return zero on success, non-zero on error
@@ -347,7 +347,7 @@ int jack_net_master_send(jack_net_master_t* net, int audio_output, float** audio
  * @param net the network connection
  * @param audio_output number of audio outputs
  * @param audio_output_buffer an array of audio output buffers
- * @param midi_output number of MIDI ouputs
+ * @param midi_output number of MIDI outputs
  * @param midi_output_buffer an array of MIDI output buffers
  * @param frames the number of frames to send
  *
@@ -403,7 +403,7 @@ void jack_flush_adapter(jack_adapter_t* adapter);
  *
  * @param adapter the adapter
  * @param input an array of audio input buffers
- * @param output an array of audio ouput buffers
+ * @param output an array of audio output buffers
  * @param frames number of frames
  *
  * @return 0 on success, otherwise a non-zero error code
@@ -415,7 +415,7 @@ int jack_adapter_push_and_pull(jack_adapter_t* adapter, float** input, float** o
  *
  * @param adapter the adapter
  * @param input an array of audio input buffers
- * @param output an array of audio ouput buffers
+ * @param output an array of audio output buffers
  * @param frames number of frames
  *
  * @return 0 on success, otherwise a non-zero error code

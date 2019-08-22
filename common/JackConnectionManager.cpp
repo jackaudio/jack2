@@ -393,7 +393,7 @@ int JackConnectionManager::GetInputRefNum(jack_port_id_t port_index) const
 }
 
 /*!
-\brief Get the client refnum of a given ouput port.
+\brief Get the client refnum of a given output port.
 */
 int JackConnectionManager::GetOutputRefNum(jack_port_id_t port_index) const
 {

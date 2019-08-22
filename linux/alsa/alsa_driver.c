@@ -666,7 +666,7 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 		}
 	}
 
-	/* check the rate, since thats rather important */
+	/* check the rate, since that's rather important */
 
 	if (driver->playback_handle) {
 		snd_pcm_hw_params_get_rate (driver->playback_hw_params,
@@ -711,7 +711,7 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 	}
 
 
-	/* check the fragment size, since thats non-negotiable */
+	/* check the fragment size, since that's non-negotiable */
 
 	if (driver->playback_handle) {
  		snd_pcm_access_t access;

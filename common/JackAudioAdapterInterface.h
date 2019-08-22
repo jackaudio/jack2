@@ -82,7 +82,7 @@ namespace Jack
         jack_nframes_t fAdaptedBufferSize;
         jack_nframes_t fAdaptedSampleRate;
 
-        //PI controler
+        //PI controller
         JackPIControler fPIControler;
 
         JackResampler** fCaptureRingBuffer;

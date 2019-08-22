@@ -637,7 +637,7 @@ OSStatus JackCoreAudioDriver::GetDefaultOutputDevice(AudioDeviceID* id)
     }
 
     if (outDefault == 0) {
-        jack_error("Error default ouput device is 0, will take 'Built-in'...");
+        jack_error("Error default output device is 0, will take 'Built-in'...");
         if (CheckAvailableDeviceName("Built-in Output", id)) {
             jack_log("JackCoreAudioDriver::GetDefaultOutputDevice : output = %ld", *id);
             return noErr;
@@ -1717,7 +1717,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
         jack_log("JackCoreAudioDriver::OpenAUHAL : AudioUnitGetPropertyCurrentDevice = %d", currAudioDeviceID);
     }
 
-    // Setup up choosen device, in both input and output cases
+    // Setup up chosen device, in both input and output cases
     err1 = AudioUnitSetProperty(fAUHAL, kAudioOutputUnitProperty_CurrentDevice, kAudioUnitScope_Global, 0, &fDeviceID, sizeof(AudioDeviceID));
     if (err1 != noErr) {
         jack_error("Error calling AudioUnitSetProperty - kAudioOutputUnitProperty_CurrentDevice");
@@ -2556,8 +2556,8 @@ extern "C"
         jack_nframes_t frames_per_interrupt = 256;
         bool capture = false;
         bool playback = false;
-        int chan_in = -1;   // Default: if not explicitely set, then max possible will be used...
-        int chan_out = -1;  // Default: if not explicitely set, then max possible will be used...
+        int chan_in = -1;   // Default: if not explicitly set, then max possible will be used...
+        int chan_out = -1;  // Default: if not explicitly set, then max possible will be used...
         const char* chan_in_list = "";
         const char* chan_out_list = "";
         bool monitor = false;

@@ -180,7 +180,7 @@ int JackMessageBuffer::SetInitCallback(JackThreadInitCallback callback, void *ar
         /*
         The condition variable emulation code does not work reliably on Windows (lost signal).
         So use a "hackish" way to signal/wait for the result.
-        Probaly better in the long term : use pthread-win32 (http://sourceware.org/pthreads-win32/`
+        Probably better in the long term : use pthread-win32 (http://sourceware.org/pthreads-win32/`
         */
         fGuard.Unlock();
         int count = 0;

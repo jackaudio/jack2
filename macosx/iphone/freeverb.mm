@@ -606,7 +606,7 @@ static void net_shutdown(void *)
 }
 
 #ifdef BENCHMARKMODE
-// mesuring jack performances
+// measuring jack performances
 static __inline__ unsigned long long int rdtsc(void)
 {
   unsigned long long int x;

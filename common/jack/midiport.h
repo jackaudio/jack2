@@ -104,7 +104,7 @@ jack_midi_clear_buffer(void *port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
  *
  * @deprecated Please use jack_midi_clear_buffer().
  *
- * @param port_buffer Port buffer to resetted.
+ * @param port_buffer Port buffer to reset.
  */
 void
 jack_midi_reset_buffer(void *port_buffer) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;

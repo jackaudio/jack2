@@ -60,7 +60,7 @@
  *    With normal symbol linkage, this would create a startup error whenever
  *    someone tries to run Jill with the "old" version of JACK. However, functions
  *    added to JACK after version 0.116.2 are all declared to have "weak" linkage
- *    which means that their abscence doesn't cause an error during program
+ *    which means that their absence doesn't cause an error during program
  *    startup. Instead, Jill can test whether or not the symbol jack_set_latency_callback
  *    is null or not. If its null, it means that the JACK installed on this machine
  *    is too old to support this function. If its not null, then Jill can use it

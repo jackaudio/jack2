@@ -186,7 +186,7 @@ char *jack_get_client_name_by_uuid (jack_client_t *client,
  * @param load_name of a shared object file containing the code for
  * the new client.
  *
- * @param load_init an arbitary string passed to the jack_initialize()
+ * @param load_init an arbitrary string passed to the jack_initialize()
  * routine of the new client (may be NULL).
  *
  * @return 0 if successful.
@@ -403,7 +403,7 @@ int jack_set_process_callback (jack_client_t *client,
  * callback will be non-zero if JACK is entering freewheel
  * mode, and zero otherwise.
  *
- * All "notification events" are received in a seperated non RT thread,
+ * All "notification events" are received in a separated non RT thread,
  * the code in the supplied function does not need to be
  * suitable for real-time execution.
  *
@@ -422,7 +422,7 @@ int jack_set_freewheel_callback (jack_client_t *client,
  * change.  Clients that depend on knowing the buffer size must supply
  * a @a bufsize_callback before activating themselves.
  *
- * All "notification events" are received in a seperated non RT thread,
+ * All "notification events" are received in a separated non RT thread,
  * the code in the supplied function does not need to be
  * suitable for real-time execution.
  *
@@ -443,7 +443,7 @@ int jack_set_buffer_size_callback (jack_client_t *client,
  * Tell the Jack server to call @a srate_callback whenever the system
  * sample rate changes.
  *
- * All "notification events" are received in a seperated non RT thread,
+ * All "notification events" are received in a separated non RT thread,
  * the code in the supplied function does not need to be
  * suitable for real-time execution.
  *
@@ -460,7 +460,7 @@ int jack_set_sample_rate_callback (jack_client_t *client,
  * Tell the JACK server to call @a client_registration_callback whenever a
  * client is registered or unregistered, passing @a arg as a parameter.
  *
- * All "notification events" are received in a seperated non RT thread,
+ * All "notification events" are received in a separated non RT thread,
  * the code in the supplied function does not need to be
  * suitable for real-time execution.
  *
@@ -477,7 +477,7 @@ int jack_set_client_registration_callback (jack_client_t *client,
  * Tell the JACK server to call @a registration_callback whenever a
  * port is registered or unregistered, passing @a arg as a parameter.
  *
- * All "notification events" are received in a seperated non RT thread,
+ * All "notification events" are received in a separated non RT thread,
  * the code in the supplied function does not need to be
  * suitable for real-time execution.
  *
@@ -494,7 +494,7 @@ int jack_set_client_registration_callback (jack_client_t *client,
  * Tell the JACK server to call @a connect_callback whenever a
  * port is connected or disconnected, passing @a arg as a parameter.
  *
- * All "notification events" are received in a seperated non RT thread,
+ * All "notification events" are received in a separated non RT thread,
  * the code in the supplied function does not need to be
  * suitable for real-time execution.
  *
@@ -511,7 +511,7 @@ int jack_set_port_connect_callback (jack_client_t *client,
  * Tell the JACK server to call @a rename_callback whenever a
  * port is renamed, passing @a arg as a parameter.
  *
- * All "notification events" are received in a seperated non RT thread,
+ * All "notification events" are received in a separated non RT thread,
  * the code in the supplied function does not need to be
  * suitable for real-time execution.
  *
@@ -528,7 +528,7 @@ int jack_set_port_rename_callback (jack_client_t *client,
  * Tell the JACK server to call @a graph_callback whenever the
  * processing graph is reordered, passing @a arg as a parameter.
  *
- * All "notification events" are received in a seperated non RT thread,
+ * All "notification events" are received in a separated non RT thread,
  * the code in the supplied function does not need to be
  * suitable for real-time execution.
  *
@@ -545,7 +545,7 @@ int jack_set_graph_order_callback (jack_client_t *client,
  * Tell the JACK server to call @a xrun_callback whenever there is a
  * xrun, passing @a arg as a parameter.
  *
- * All "notification events" are received in a seperated non RT thread,
+ * All "notification events" are received in a separated non RT thread,
  * the code in the supplied function does not need to be
  * suitable for real-time execution.
  *
@@ -769,7 +769,7 @@ int jack_port_unregister (jack_client_t *client, jack_port_t *port) JACK_OPTIONA
  * address from there.
  *
  * Caching output ports is DEPRECATED in Jack 2.0, due to some new optimization (like "pipelining").
- * Port buffers have to be retrieved in each callback for proper functionning.
+ * Port buffers have to be retrieved in each callback for proper functioning.
  */
 void * jack_port_get_buffer (jack_port_t *port, jack_nframes_t) JACK_OPTIONAL_WEAK_EXPORT;
 

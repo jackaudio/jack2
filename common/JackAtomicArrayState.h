@@ -90,7 +90,7 @@ Requirement:
 	- a WriteNextStartState(int state) returns a "pending" state to be written into
 	- a WriteNextStartStop(int state) make the written "pending" state become "switchable"
 
-	Different pending states can be written independantly and concurrently.
+	Different pending states can be written independently and concurrently.
 
 	GetCurrentIndex() *must* return an increasing value to be able to check reading current state coherency
 
@@ -136,7 +136,7 @@ class JackAtomicArrayState
                 *result = GetIndex1(new_val, state);
                 cur_index = GetIndex1(new_val, 0);
                 next_index = SwapIndex1(fCounter, state);
-                need_copy = (GetIndex1(new_val, state) == 0);	// Written = false, switch just occured
+                need_copy = (GetIndex1(new_val, state) == 0);	// Written = false, switch just occurred
                 SetIndex1(new_val, state, 0);					// Written = false, invalidate state
             } while (!CAS(Counter1(old_val), Counter1(new_val), (UInt32*)&fCounter));
             if (need_copy)

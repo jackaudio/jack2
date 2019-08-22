@@ -181,7 +181,7 @@ jack_dbus_message_handler(
     if (interface_name != NULL)
     {
         /* Check if we can match the interface and method.
-         * The inteface handler functions only return false if the
+         * The interface handler functions only return false if the
          * method name was unknown, otherwise they run the specified
          * method and return TRUE.
          */

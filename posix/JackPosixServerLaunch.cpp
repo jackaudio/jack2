@@ -103,7 +103,7 @@ static void start_server_classic_aux(const char* server_name)
     if (!fp) {
         fp = fopen("/etc/jackdrc", "r");
     }
-    /* if still not found, check old config name for backwards compatability */
+    /* if still not found, check old config name for backwards compatibility */
     if (!fp) {
         fp = fopen("/etc/jackd.conf", "r");
     }

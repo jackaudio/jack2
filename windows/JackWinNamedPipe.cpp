@@ -206,7 +206,7 @@ int JackWinAsyncNamedPipeClient::FinishIO()
 
         case kConnecting:
             if (!success) {
-                jack_error("Conection error");
+                jack_error("Connection error");
                 return -1;
             } else {
                 fIOState = kReading;
@@ -314,7 +314,7 @@ bool JackWinNamedPipeServer::Accept()
     } else {
         jack_error("Cannot connect server pipe name = %s err = %ld", fName, GetLastError());
         if (GetLastError() == ERROR_PIPE_CONNECTED) {
-            jack_error("Pipe already connnected = %s", fName);
+            jack_error("Pipe already connected = %s", fName);
             return true;
         } else {
             return false;

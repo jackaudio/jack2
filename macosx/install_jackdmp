@@ -1,4 +1,4 @@
-# Install jackdmp and owerwrite JACK installation
+# Install jackdmp and overwrite JACK installation
 
 # Plug-ins
 [ -d Panda.framework ] && sudo cp -r Panda.framework /Library/Frameworks
@@ -28,7 +28,7 @@ sudo cp  jack_loopback.so  /usr/local/lib/jackmp
 [ -f netadapter.so ] && sudo cp  netadapter.so /usr/local/lib/jackmp
 [ -f audioadapter.so ] && sudo cp  audioadapter.so /usr/local/lib/jackmp
 
-# Create links to jackmp ressources
+# Create links to jackmp resources
 cd /usr/local/bin && [ -f jackd ] && sudo rm jackd
 
 cd /usr/local/lib && [ -f libjack.0.dylib ] && sudo rm libjack.0.dylib

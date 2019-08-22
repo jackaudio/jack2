@@ -85,7 +85,7 @@ namespace Jack {
 
         /**
          * Enqueues the MIDI event specified by the arguments.  The return
-         * value indiciates whether or not the event was successfully enqueued.
+         * value indicates whether or not the event was successfully enqueued.
          */
 
         EnqueueResult

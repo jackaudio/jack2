@@ -168,7 +168,7 @@ bool JackServerGlobals::Init()
         if (!fp) {
             fp = fopen("/etc/jackdrc", "r");
         }
-        // if still not found, check old config name for backwards compatability
+        // if still not found, check old config name for backwards compatibility
         if (!fp) {
             fp = fopen("/etc/jackd.conf", "r");
         }

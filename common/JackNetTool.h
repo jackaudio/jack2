@@ -71,13 +71,13 @@ namespace Jack
 //session params ******************************************************************************
 
     /**
-    \brief This structure containes master/slave connection parameters, it's used to setup the whole system
+    \brief This structure contains master/slave connection parameters, it's used to setup the whole system
 
     We have :
         - some info like version, type and packet id
         - names
         - network parameters (hostnames and mtu)
-        - nunber of audio and midi channels
+        - number of audio and midi channels
         - sample rate and buffersize
         - number of audio frames in one network packet (depends on the channel number)
         - is the NetDriver in Sync or ASync mode ?

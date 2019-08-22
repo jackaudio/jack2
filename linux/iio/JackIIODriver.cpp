@@ -218,7 +218,7 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
 
     return threaded_driver;
 
-initError: // error during intialisation, delete and return NULL
+initError: // error during initialisation, delete and return NULL
         delete iio_driver;
         return NULL;
 }

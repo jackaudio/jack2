@@ -107,7 +107,7 @@ void JackEngine::NotifyQuit()
 
 
 //-----------------------------
-// Client ressource management
+// Client resource management
 //-----------------------------
 
 int JackEngine::AllocateRefnum()
@@ -133,7 +133,7 @@ void JackEngine::ReleaseRefnum(int refnum)
             }
         }
         if (i == CLIENT_NUM) {
-            // Last client and temporay case: quit the server
+            // Last client and temporary case: quit the server
             jack_log("JackEngine::ReleaseRefnum server quit");
             fEngineControl->fTemporary = false;
             throw JackTemporaryException();
@@ -351,7 +351,7 @@ int JackEngine::NotifyAddClient(JackClientInterface* new_client, const char* new
 
 void JackEngine::NotifyRemoveClient(const char* name, int refnum)
 {
-    // Notify existing clients (including the one beeing suppressed) of the removed client
+    // Notify existing clients (including the one being suppressed) of the removed client
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
         if (client) {

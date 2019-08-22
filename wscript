@@ -357,7 +357,7 @@ def configure(conf):
     conf.define('PORT_NUM_FOR_CLIENT', Options.options.application_ports)
 
     if conf.env['IS_WINDOWS']:
-        # we define this in the environment to maintain compatability with
+        # we define this in the environment to maintain compatibility with
         # existing install paths that use ADDON_DIR rather than have to
         # have special cases for windows each time.
         conf.env['ADDON_DIR'] = conf.env['BINDIR'] + '/jack'

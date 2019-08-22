@@ -1893,7 +1893,7 @@ LIB_EXPORT void jack_get_version(int *major_ptr,
 {
     JackGlobals::CheckContext("jack_get_version");
 
-    // FIXME: We need these comming from build system
+    // FIXME: We need these coming from build system
     *major_ptr = 0;
     *minor_ptr = 0;
     *micro_ptr = 0;

@@ -427,7 +427,7 @@ process (jack_nframes_t nframes, void *arg)
     }
     /* Second alternative : we've received something that's not
      * as big as expected or we missed a packet. We render silence
-     * to the ouput ports */
+     * to the output ports */
     else {
         jack_nframes_t latency_estimate;
         if( packet_cache_find_latency( packcache, framecnt, &latency_estimate ) )
@@ -700,7 +700,7 @@ main (int argc, char *argv[])
     insockfd = socket (AF_INET, SOCK_DGRAM, 0);
 
     if ((outsockfd == -1) || (insockfd == -1)) {
-        fprintf (stderr, "cant open sockets\n" );
+        fprintf (stderr, "can not open sockets\n" );
         return 1;
     }
 

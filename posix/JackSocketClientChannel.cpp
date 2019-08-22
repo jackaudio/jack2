@@ -123,7 +123,7 @@ bool JackSocketClientChannel::Init()
     }
 
     if (!fNotificationSocket) {
-        jack_error("JackSocketClientChannel: cannot establish notication socket");
+        jack_error("JackSocketClientChannel: cannot establish notification socket");
         return false;
     } else {
         return true;

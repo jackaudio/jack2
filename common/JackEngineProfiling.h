@@ -34,7 +34,7 @@ namespace Jack
 #define MEASURED_CLIENTS 32
 
 /*!
-\brief Timing stucture for a client.
+\brief Timing structure for a client.
 */
 
 PRE_PACKED_STRUCTURE
@@ -77,7 +77,7 @@ struct JackTimingClientInterval
 } POST_PACKED_STRUCTURE;
 
 /*!
-\brief Timing stucture for a table of clients.
+\brief Timing structure for a table of clients.
 */
 
 PRE_PACKED_STRUCTURE

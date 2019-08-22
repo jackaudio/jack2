@@ -16,7 +16,7 @@ TEMP_FILE="${OUTPUT_FILE}.tmp"
 #echo "$OUTPUT_FILE"
 #echo "$TEMP_FILE"
 
-# The script should reside in the toplevel source directory which sould contain
+# The script should reside in the toplevel source directory which should contain
 # all version control files.
 cd `dirname ${0}`
 

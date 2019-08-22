@@ -176,7 +176,7 @@ extern "C"
         union {
             void *attached_at;  /* address where attached */
             char ptr_size[8];
-        } ptr;  /* a "pointer" that has the same 8 bytes size when compling in 32 or 64 bits */
+        } ptr;  /* a "pointer" that has the same 8 bytes size when compiling in 32 or 64 bits */
     } POST_PACKED_STRUCTURE;
 
     typedef struct _jack_shm_info jack_shm_info_t;

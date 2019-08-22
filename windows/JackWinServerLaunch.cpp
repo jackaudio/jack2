@@ -107,7 +107,7 @@ static int start_server_aux(const char* server_name)
 	if (find_path_to_jackdrc(filename))
 		fp = fopen(filename, "r");
 
-	/* if still not found, check old config name for backwards compatability */
+	/* if still not found, check old config name for backwards compatibility */
 	/* JE - hopefully won't be needed for the Windows build
     if (!fp) {
         fp = fopen("/etc/jackd.conf", "r");

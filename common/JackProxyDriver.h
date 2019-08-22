@@ -50,11 +50,11 @@ namespace Jack
     The main use case is the multi-user, multi-session, shared workstation:
 
     - a classic server with hw driver is launched system-wide at boot time, in
-      promiscuous mode, optionaly restricted to the audio group
+      promiscuous mode, optionally restricted to the audio group
     - in each user session, a jackdbus server is automatically started with
       JackProxyDriver as master driver, automatically connected to the
       system-wide one
-    - optionaly, each user run PulseAudio with a pulse-jack bridge
+    - optionally, each user run PulseAudio with a pulse-jack bridge
     */
 
     class JackProxyDriver : public JackRestarterDriver

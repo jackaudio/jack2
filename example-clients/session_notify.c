@@ -88,7 +88,7 @@ JSList *uuid_map = NULL;
 void add_uuid_mapping( const char *uuid ) {
 	char *clientname = jack_get_client_name_by_uuid( client, uuid );
 	if( !clientname ) {
-		printf( "error... cant find client for uuid" );
+		printf( "error... can not find client for uuid" );
 		return;
 	}
 

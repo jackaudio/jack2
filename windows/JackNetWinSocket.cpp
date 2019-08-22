@@ -292,7 +292,7 @@ namespace Jack
         return getsockopt(fSockfd, level, optname, static_cast<char*>(optval), optlen);
     }
 
-    //tiemout************************************************************************************************************
+    //timeout************************************************************************************************************
     int JackNetWinSocket::SetTimeOut(int usec)
     {
         jack_log("JackNetWinSocket::SetTimeout %d usec", usec);

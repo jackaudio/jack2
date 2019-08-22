@@ -3,7 +3,7 @@
 
    Adaption to JACK, Copyright (C) 2002 Kai Vehmanen.
      - replaced use of gtypes with normal ANSI C types
-     - glib's memery allocation routines replaced with
+     - glib's memory allocation routines replaced with
        malloc/free calls
 
    This program is free software; you can redistribute it and/or modify
