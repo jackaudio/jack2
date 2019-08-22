@@ -655,7 +655,7 @@ jack_cleanup_shm ()
  * from here.
  *
  * This is not done under a single lock.  I don't even want to think
- * about all the things that could possibly go wrong if multple
+ * about all the things that could possibly go wrong if multiple
  * processes tried to resize the same segment concurrently.  That
  * probably doesn't happen.
  */
@@ -768,7 +768,7 @@ jack_create_registry (jack_shm_info_t *ri)
 		return rc;
 	}
 
-    /* Previous shm_open result depends of the actual value of umask, force correct file permisssion here */
+    /* Previous shm_open result depends of the actual value of umask, force correct file permission here */
     if (fchmod(shm_fd, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH) < 0) {
 	    jack_log("Cannot chmod jack-shm-registry (%s) %d %d", strerror (errno));
     }

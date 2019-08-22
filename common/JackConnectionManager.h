@@ -401,7 +401,7 @@ struct JackClientTiming
 <UL>
 <LI>The <B>fConnection</B> array contains the list (array line) of connected ports for a given port.
 <LI>The <B>fInputPort</B> array contains the list (array line) of input connected  ports for a given client.
-<LI>The <B>fOutputPort</B> array contains the list (array line) of ouput connected  ports for a given client.
+<LI>The <B>fOutputPort</B> array contains the list (array line) of output connected  ports for a given client.
 <LI>The <B>fConnectionRef</B> array contains the number of ports connected between two clients.
 <LI>The <B>fInputCounter</B> array contains the number of input clients connected to a given for activation purpose.
 </UL>

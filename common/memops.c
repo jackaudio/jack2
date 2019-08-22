@@ -50,7 +50,7 @@
 
    the MAX_<N>BIT values are floating point. when multiplied by
    a full-scale normalized floating point sample value (-1.0..+1.0)
-   they should give the maxium value representable with an integer
+   they should give the maximum value representable with an integer
    sample type of N bits. Note that this is asymmetric. Sample ranges 
    for signed integer, 2's complement values are -(2^(N-1) to +(2^(N-1)-1)
 

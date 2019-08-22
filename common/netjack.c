@@ -198,7 +198,7 @@ int netjack_wait( netjack_driver_state_t *netj )
         if( packet_cache_get_next_available_framecnt( netj->packcache, netj->expected_framecnt, &next_frame_avail) ) {
             jack_nframes_t offset = next_frame_avail - netj->expected_framecnt;
 
-            //XXX: hmm... i need to remember why resync_threshold wasnt right.
+            //XXX: hmm... i need to remember why resync_threshold wasn't right.
             //if( offset < netj->resync_threshold )
             if( offset < 10 ) {
                 // ok. don't do nothing. we will run without data.
@@ -246,7 +246,7 @@ int netjack_wait( netjack_driver_state_t *netj )
                 // It would not be in the queue anymore, if it had been
                 // retrieved. This might break for redundancy, but
                 // i will make the packet cache drop redundant packets,
-                // that have already been retreived.
+                // that have already been retrieved.
                 //
                 if( packet_cache_get_highest_available_framecnt( netj->packcache, &next_frame_avail) ) {
                     if( next_frame_avail == (netj->expected_framecnt - 1) ) {

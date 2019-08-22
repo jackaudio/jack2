@@ -85,7 +85,7 @@ JackFFADOMidiInputPort::Process(JackMidiBuffer *port_buffer,
         case JackMidiWriteQueue::OK:
             continue;
         default:
-            // This is here to stop compliers from warning us about not
+            // This is here to stop compilers from warning us about not
             // handling enumeration values.
             ;
         }

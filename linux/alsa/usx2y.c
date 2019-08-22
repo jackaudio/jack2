@@ -210,7 +210,7 @@ usx2y_driver_start (alsa_driver_t *driver)
 	usx2y_t *h = (usx2y_t *) driver->hw->private_hw;
 
 	for (i = 0; i < driver->capture_nchannels; i++)
-		// US428 channels 3+4 are on a seperate 2 channel stream.
+		// US428 channels 3+4 are on a separate 2 channel stream.
 		// ALSA thinks its 1 stream with 4 channels.
 		driver->capture_interleave_skip[i] = 2 * driver->capture_sample_bytes;
 

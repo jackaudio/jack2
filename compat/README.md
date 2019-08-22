@@ -30,7 +30,7 @@ def build(bld):
 assuming this directory is called `compat`. After doing this you need to
 take any necessary actions described in the modules you want to use.
 
-The code in this directory is inteded to be generic and reusable. When
+The code in this directory is intended to be generic and reusable. When
 writing new modules, please keep this in mind. Whenever necessary it
 should be possible to make this directory a git submodule and all the
 subdirectories other submodules, to aid reuse.

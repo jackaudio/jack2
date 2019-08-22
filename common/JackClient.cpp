@@ -921,7 +921,7 @@ void JackClient::TransportStop()
     GetEngineControl()->fTransport.SetCommand(TransportCommandStop);
 }
 
-// Never called concurently with the server
+// Never called concurrently with the server
 // TODO check concurrency with SetSyncCallback
 
 void JackClient::CallSyncCallback()

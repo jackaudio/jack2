@@ -325,7 +325,7 @@ typedef int (*JackGraphOrderCallback)(void *arg);
 
 /**
  * Prototype for the client-supplied function that is called whenever
- * an xrun has occured.
+ * an xrun has occurred.
  *
  * @see jack_get_xrun_delayed_usecs()
  *
@@ -420,7 +420,7 @@ typedef void (*JackFreewheelCallback)(int starting, void *arg);
  * whenever jackd is shutdown. Note that after server shutdown,
  * the client pointer is *not* deallocated by libjack,
  * the application is responsible to properly use jack_client_close()
- * to release client ressources. Warning: jack_client_close() cannot be
+ * to release client resources. Warning: jack_client_close() cannot be
  * safely used inside the shutdown callback and has to be called outside of
  * the callback context.
  *
@@ -433,7 +433,7 @@ typedef void (*JackShutdownCallback)(void *arg);
  * whenever jackd is shutdown. Note that after server shutdown,
  * the client pointer is *not* deallocated by libjack,
  * the application is responsible to properly use jack_client_close()
- * to release client ressources. Warning: jack_client_close() cannot be
+ * to release client resources. Warning: jack_client_close() cannot be
  * safely used inside the shutdown callback and has to be called outside of
  * the callback context.
 

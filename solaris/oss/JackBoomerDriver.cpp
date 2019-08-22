@@ -578,7 +578,7 @@ int JackBoomerDriver::Start()
         // Maybe necessary to write an empty output buffer first time : see http://manuals.opensound.com/developer/fulldup.c.html
         memset(fOutputBuffer, 0, fOutputBufferSize);
 
-        // Prefill ouput buffer
+        // Prefill output buffer
         for (int i = 0; i < fNperiods; i++) {
             ssize_t count = ::write(fOutFD, fOutputBuffer, fOutputBufferSize);
             if (count < (int)fOutputBufferSize) {

@@ -505,7 +505,7 @@ namespace Jack
         fCurrentCycleOffset = fTxHeader.fCycle - rx_head->fCycle;
 
         if (fCurrentCycleOffset < fMaxCycleOffset && !fSynched) {
-            jack_info("Synching with latency = %d", fCurrentCycleOffset);
+            jack_info("Syncing with latency = %d", fCurrentCycleOffset);
             return NET_SYNCHING;
         } else {
             if (fCurrentCycleOffset == fMaxCycleOffset) {
@@ -557,7 +557,7 @@ namespace Jack
 
     void JackNetMasterInterface::EncodeSyncPacket(int frames)
     {
-        // This method contains every step of sync packet informations coding
+        // This method contains every step of sync packet information coding
         // first of all, clear sync packet
         memset(fTxData, 0, PACKET_AVAILABLE_SIZE(&fParams));
     
@@ -581,7 +581,7 @@ namespace Jack
 
     void JackNetMasterInterface::DecodeSyncPacket(int& frames)
     {
-        // This method contains every step of sync packet informations decoding process
+        // This method contains every step of sync packet information decoding process
         
         // Transport not used for now...
         /*
@@ -960,7 +960,7 @@ namespace Jack
     // network sync------------------------------------------------------------------------
     void JackNetSlaveInterface::EncodeSyncPacket(int frames)
     {
-        // This method contains every step of sync packet informations coding
+        // This method contains every step of sync packet information coding
         // first of all, clear sync packet
         memset(fTxData, 0, PACKET_AVAILABLE_SIZE(&fParams));
 
@@ -984,7 +984,7 @@ namespace Jack
 
     void JackNetSlaveInterface::DecodeSyncPacket(int& frames)
     {
-        // This method contains every step of sync packet informations decoding process
+        // This method contains every step of sync packet information decoding process
         
         // Transport not used for now...
         /*

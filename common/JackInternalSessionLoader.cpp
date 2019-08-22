@@ -132,7 +132,7 @@ void JackInternalSessionLoader::LoadClient(std::istringstream& iss, const int li
 
     /* status has not to be checked for JackFailure
      * because JackServer::InternalClientLoad1() will return a value < 0
-     * and this is handled by the previouse if-clause.
+     * and this is handled by the previous if-clause.
      */
 
     jack_info("Internal client %s successfully loaded", client_name.c_str());

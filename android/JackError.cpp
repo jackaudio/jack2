@@ -85,7 +85,7 @@ static void jack_format_and_log(int level, const char *prefix, const char *fmt, 
 
     log_function = (jack_log_function_t)jack_tls_get(JackGlobals::fKeyLogFunction);
 
-    /* if log function is not overriden for thread, use default one */
+    /* if log function is not overridden for thread, use default one */
     if (log_function == NULL)
     {
         log_function = jack_log_function;

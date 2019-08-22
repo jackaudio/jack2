@@ -533,7 +533,7 @@ namespace Jack
             }
 
             /**
-             *  print more detailled information on the audio device
+             *  print more detailed information on the audio device
              */
             int longinfo()
             {

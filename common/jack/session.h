@@ -37,7 +37,7 @@ extern "C" {
 /**
  * Session event type.
  *
- * If a client cant save templates, i might just do a normal save.
+ * If a client can't save templates, i might just do a normal save.
  *
  * There is no "quit without saving" event because a client might refuse to
  * quit when it has unsaved data, but other clients may have already quit.
@@ -57,7 +57,7 @@ enum JackSessionEventType {
     JackSessionSave = 1,
 
     /**
-     * Save the session completly, then quit.
+     * Save the session completely, then quit.
      *
      * The rules for saving are exactly the same as for JackSessionSave.
      */
@@ -82,7 +82,7 @@ typedef enum JackSessionEventType jack_session_event_type_t;
  */
 enum JackSessionFlags {
     /**
-     * An error occured while saving.
+     * An error occurred while saving.
      */
     JackSessionSaveError = 0x01,
 

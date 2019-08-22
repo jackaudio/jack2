@@ -96,7 +96,7 @@ jack_intclient_t jack_internal_client_handle (jack_client_t *client,
  * object file from which to load the new internal client (otherwise
  * use the @a client_name).
  *
- * @arg [@ref JackLoadInit] <em>(char *) load_init</em> an arbitary
+ * @arg [@ref JackLoadInit] <em>(char *) load_init</em> an arbitrary
  * string passed to the internal client's jack_initialize() routine
  * (otherwise NULL), of no more than @ref JACK_LOAD_INIT_LIMIT bytes.
  *

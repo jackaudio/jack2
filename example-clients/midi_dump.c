@@ -118,7 +118,7 @@ static void usage (int status) {
 	printf ("jack_midi_dump - JACK MIDI Monitor.\n\n");
 	printf ("Usage: jack_midi_dump [ OPTIONS ] [CLIENT-NAME]\n\n");
 	printf ("Options:\n\
-  -a        use absoute timestamps relative to application start\n\
+  -a        use absolute timestamps relative to application start\n\
   -h        display this help and exit\n\
   -r        use relative timestamps to previous MIDI event\n\
 \n");

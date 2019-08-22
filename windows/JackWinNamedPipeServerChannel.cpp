@@ -175,7 +175,7 @@ void JackWinNamedPipeServerChannel::Close()
 {
     /* TODO : solve WIN32 thread Kill issue
     This would hang the server... since we are quitting it, its not really problematic,
-    all ressources will be deallocated at the end.
+    all resources will be deallocated at the end.
 
     fRequestListenPipe.Close();
     fThread.Stop();

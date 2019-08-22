@@ -72,7 +72,7 @@ jack_control_run_method(
     int type;
     message_arg_t arg;
 
-    /* use empty reply if not overriden in the code that follows */
+    /* use empty reply if not overridden in the code that follows */
     type = DBUS_TYPE_INVALID;
 
     if (strcmp (call->method_name, "Exit") == 0)
