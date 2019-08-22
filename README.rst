@@ -2,8 +2,10 @@
 ################################
 
 .. image:: https://travis-ci.org/jackaudio/jack2.svg?branch=master
-   :target: https://travis-ci.org/jackaudio/jack2
-
+   :target: https://travis-ci.org/jackaudio/jack2  
+.. image:: https://repology.org/badge/tiny-repos/jack-audio-connection-kit.svg
+   :target: https://repology.org/metapackage/jack-audio-connection-kit/versions
+   
 JACK2 aka jackdmp is a C++ version of the JACK low-latency audio server for
 multi-processor machines. It is a new implementation of the JACK server core
 features that aims at removing some limitations of the JACK1 design. The
