@@ -196,7 +196,10 @@ int JackLoadableInternalClient2::Init(const char* so_name)
 JackLoadableInternalClient1::JackLoadableInternalClient1(JackServer* server, JackSynchro* table, const char* object_data)
         : JackLoadableInternalClient(server, table)
 {
-    strncpy(fObjectData, object_data, JACK_LOAD_INIT_LIMIT);
+    if (object_data != NULL)
+        strncpy(fObjectData, object_data, JACK_LOAD_INIT_LIMIT);
+    else
+        memset(fObjectData, 0, sizeof(fObjectData));
 }
 
 JackLoadableInternalClient2::JackLoadableInternalClient2(JackServer* server, JackSynchro* table, const JSList*  parameters)
