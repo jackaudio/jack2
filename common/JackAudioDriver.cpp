@@ -322,21 +322,21 @@ void JackAudioDriver::ProcessGraphSyncMaster()
     // fBeginDateUst is set in the "low level" layer, fEndDateUst is from previous cycle
     if (fEngine->Process(fBeginDateUst, fEndDateUst)) {
 
-        if (ResumeRefNum() < 0) {
-            jack_error("JackAudioDriver::ProcessGraphSyncMaster: ResumeRefNum error");
-        }
-
         if (ProcessReadSlaves() < 0) {
             jack_error("JackAudioDriver::ProcessGraphSync: ProcessReadSlaves error, engine may now behave abnormally!!");
         }
 
-        if (ProcessWriteSlaves() < 0) {
-            jack_error("JackAudioDriver::ProcessGraphSync: ProcessWriteSlaves error, engine may now behave abnormally!!");
+        if (ResumeRefNum() < 0) {
+            jack_error("JackAudioDriver::ProcessGraphSyncMaster: ResumeRefNum error");
         }
 
         // Waits for graph execution end
         if (SuspendRefNum() < 0) {
             jack_error("JackAudioDriver::ProcessGraphSync: SuspendRefNum error, engine may now behave abnormally!!");
+        }
+
+        if (ProcessWriteSlaves() < 0) {
+            jack_error("JackAudioDriver::ProcessGraphSync: ProcessWriteSlaves error, engine may now behave abnormally!!");
         }
 
     } else { // Graph not finished: do not activate it
