@@ -24,6 +24,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackError.h"
 #include "JackTime.h"
 #include "JackMidiUtil.h"
+#include "JackMidiPort.h"
 #include "JackWinMMEInputPort.h"
 #include "JackMidiWriteQueue.h"
 
@@ -176,7 +177,7 @@ JackWinMMEInputPort::GetInErrorString(MMRESULT error, LPTSTR text)
 }
 
 void
-JackWinMMEInputPort::ProcessJack(JackMidiBuffer *port_buffer,
+JackWinMMEInputPort::ProcessJack(Jack::JackMidiBuffer *port_buffer,
                                  jack_nframes_t frames)
 {
     write_queue->ResetMidiBuffer(port_buffer, frames);

@@ -37,8 +37,7 @@ namespace Jack {
 
     public:
 
-        JackWinMMEDriver(const char* name, const char* alias,
-                         JackLockedEngine* engine, JackSynchro* table);
+        JackWinMMEDriver(char* name, char* alias, JackLockedEngine* engine, JackSynchro* table);
 
         ~JackWinMMEDriver();
 

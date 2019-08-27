@@ -23,6 +23,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackConstants.h"
 #include "JackGraphManager.h"
 #include "JackSynchro.h"
+#include "JackMetadata.h"
 #include "JackMutex.h"
 #include "JackTransportEngine.h"
 #include "JackPlatformPlug.h"
@@ -55,7 +56,6 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         JackServerNotifyChannel fChannel;              /*! To communicate between the RT thread and server */
         JackProcessSync fSignal;
         jack_time_t fLastSwitchUsecs;
-        JackMetadata fMetadata;
 
         int fSessionPendingReplies;
         detail::JackChannelTransactionInterface* fSessionTransaction;
@@ -163,10 +163,12 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         int GetClientNameForUUID(const char *uuid, char *name_res);
         int ReserveClientName(const char *name, const char *uuid);
         int ClientHasSessionCallback(const char *name);
+
+        // fMetadata needs to be public for JackNetManager.cpp to refernce to it
+        JackMetadata fMetadata;
 };
 
 
 } // end of namespace
 
 #endif
-

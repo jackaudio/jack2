@@ -71,7 +71,7 @@ extern "C"
     typedef char shm_name_t[SHM_NAME_MAX];
     typedef shm_name_t jack_shm_id_t;
 
-#elif WIN32
+#elif defined(_WIN32)
 #define NAME_MAX 255
 #ifndef SHM_NAME_MAX
 #define SHM_NAME_MAX NAME_MAX

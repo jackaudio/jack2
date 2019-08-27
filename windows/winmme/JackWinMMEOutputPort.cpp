@@ -21,6 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <stdexcept>
 
 #include "JackMidiUtil.h"
+#include "JackMidiPort.h"
 #include "JackTime.h"
 #include "JackWinMMEOutputPort.h"
 #include "JackGlobals.h"
@@ -285,7 +286,7 @@ JackWinMMEOutputPort::Init()
 }
 
 void
-JackWinMMEOutputPort::ProcessJack(JackMidiBuffer *port_buffer,
+JackWinMMEOutputPort::ProcessJack(Jack::JackMidiBuffer *port_buffer,
                                   jack_nframes_t frames)
 {
     read_queue->ResetMidiBuffer(port_buffer);

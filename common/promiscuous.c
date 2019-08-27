@@ -17,7 +17,7 @@
 
 */
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
@@ -35,7 +35,7 @@
 int
 jack_group2gid(const char* group)
 {
-#ifdef WIN32
+#ifdef _WIN32
     return -1;
 #else
     size_t buflen;
@@ -74,7 +74,7 @@ jack_group2gid(const char* group)
 #endif
 }
 
-#ifndef WIN32
+#ifndef _WIN32
 int
 jack_promiscuous_perms(int fd, const char* path, gid_t gid)
 {

@@ -23,22 +23,20 @@
 
 #include <windows.h>
 
+#include "JackCompilerDeps_os.h"
 #include "JackChannel.h"
 
 namespace Jack
 {
 
-class JackWinNamedPipeAux
+class SERVER_EXPORT JackWinNamedPipeAux
 {
 
     protected:
 
         HANDLE fNamedPipe;
         char fName[256];
-
-        int ReadAux(void* data, int len);
-        int WriteAux(void* data, int len);
-
+		
     public:
 
         JackWinNamedPipeAux(): fNamedPipe(INVALID_HANDLE_VALUE)
@@ -47,11 +45,15 @@ class JackWinNamedPipeAux
         {}
         virtual ~JackWinNamedPipeAux()
         {}
+		
+		int ReadAux(void* data, int len);
+		
+		int WriteAux(void* data, int len);
 
 };
 
 
-class JackWinNamedPipe : public JackWinNamedPipeAux, public detail::JackChannelTransactionInterface
+class SERVER_EXPORT JackWinNamedPipe : public JackWinNamedPipeAux, public detail::JackChannelTransactionInterface
 {
 
     public:
@@ -63,21 +65,15 @@ class JackWinNamedPipe : public JackWinNamedPipeAux, public detail::JackChannelT
         virtual ~JackWinNamedPipe()
         {}
 
-        virtual int Read(void* data, int len)
-        {
-            return ReadAux(data, len);
-        }
-        virtual int Write(void* data, int len)
-        {
-            return WriteAux(data, len);
-        }
+        int Read(void* data, int len);
+        int Write(void* data, int len);
 };
 
 /*!
 \brief Client named pipe.
 */
 
-class JackWinNamedPipeClient : public JackWinNamedPipeAux, public detail::JackClientRequestInterface
+class SERVER_EXPORT JackWinNamedPipeClient : public JackWinNamedPipeAux, public detail::JackClientRequestInterface
 {
 
     protected:
@@ -115,7 +111,7 @@ class JackWinNamedPipeClient : public JackWinNamedPipeAux, public detail::JackCl
         virtual void SetNonBlocking(bool onoff);
 };
 
-class JackWinAsyncNamedPipeClient : public JackWinNamedPipeClient
+class SERVER_EXPORT JackWinAsyncNamedPipeClient : public JackWinNamedPipeClient
 {
         enum kIOState {kIdle = 0, kConnecting, kReading, kWriting};
 
@@ -156,7 +152,7 @@ class JackWinAsyncNamedPipeClient : public JackWinNamedPipeClient
 \brief Server named pipe.
 */
 
-class JackWinNamedPipeServer : public JackWinNamedPipe
+class SERVER_EXPORT JackWinNamedPipeServer : public JackWinNamedPipe
 {
     private:
 
@@ -180,7 +176,7 @@ class JackWinNamedPipeServer : public JackWinNamedPipe
 \brief Server async named pipe.
 */
 
-class JackWinAsyncNamedPipeServer : public JackWinNamedPipeServer
+class SERVER_EXPORT JackWinAsyncNamedPipeServer : public JackWinNamedPipeServer
 {
 
     private:

@@ -38,7 +38,7 @@ JackMutex* JackGlobals::fSynchroMutex = new JackMutex();
 volatile bool JackGlobals::fServerRunning = false;
 JackClient* JackGlobals::fClientTable[CLIENT_NUM] = {};
 
-#ifndef WIN32
+#ifndef _WIN32
 jack_thread_creator_t JackGlobals::fJackThreadCreator = pthread_create;
 #endif
 

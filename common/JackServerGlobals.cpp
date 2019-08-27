@@ -314,7 +314,7 @@ bool JackServerGlobals::Init()
             goto error;
         }
 
-#ifndef WIN32
+#ifndef _WIN32
         if (server_name == NULL) {
             server_name = (char*)JackTools::DefaultServerName();
         }
@@ -416,5 +416,3 @@ void JackServerGlobals::Destroy()
 }
 
 } // end of namespace
-
-

@@ -543,7 +543,7 @@ namespace Jack
             const char* default_client_name = getenv("JACK_PROXY_CLIENT_NAME");
             strcpy(client_name, (default_client_name) ? default_client_name : DEFAULT_CLIENT_NAME);
 
-#ifdef WIN32
+#ifdef _WIN32
             const char* username = getenv("USERNAME");
 #else
             const char* username = getenv("LOGNAME");

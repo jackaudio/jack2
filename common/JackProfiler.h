@@ -22,7 +22,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackConstants.h"
 #include "JackPlatformPlug.h"
+#include "JackCompilerDeps.h"
 #include "jack.h"
+#include "JackServer.h"
 #include "jslist.h"
 #include <map>
 #include <string>
@@ -34,7 +36,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-struct JackProfilerClient {
+struct SERVER_EXPORT JackProfilerClient {
 
     int fRefNum;
     jack_client_t* fClient;

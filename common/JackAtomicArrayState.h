@@ -21,6 +21,9 @@
 #define __JackAtomicArrayState__
 
 #include "JackAtomic.h"
+#ifdef _MSC_VER
+#include "JackAtomic_os.h"
+#endif
 #include "JackCompilerDeps.h"
 #include <string.h> // for memcpy
 
@@ -138,7 +141,7 @@ class JackAtomicArrayState
                 next_index = SwapIndex1(fCounter, state);
                 need_copy = (GetIndex1(new_val, state) == 0);	// Written = false, switch just occured
                 SetIndex1(new_val, state, 0);					// Written = false, invalidate state
-            } while (!CAS(Counter1(old_val), Counter1(new_val), (UInt32*)&fCounter));
+            } while (!COMPARE_EXCHANGE((UInt32*)&fCounter, Counter1(new_val), Counter1(old_val)));
             if (need_copy)
                 memcpy(&fState[next_index], &fState[cur_index], sizeof(T));
             return next_index;
@@ -152,7 +155,7 @@ class JackAtomicArrayState
                 old_val = fCounter;
                 new_val = old_val;
                 SetIndex1(new_val, state, 1);  // Written = true, state becomes "switchable"
-            } while (!CAS(Counter1(old_val), Counter1(new_val), (UInt32*)&fCounter));
+            } while (!COMPARE_EXCHANGE((UInt32*)&fCounter, Counter1(new_val), Counter1(old_val)));
         }
 
     public:
@@ -199,7 +202,7 @@ class JackAtomicArrayState
                     SetIndex1(new_val, state, 0);						// Invalidate the state "state"
                     IncIndex1(new_val, 3);								// Inc switch
                 }
-            } while (!CAS(Counter1(old_val), Counter1(new_val), (UInt32*)&fCounter));
+            } while (!COMPARE_EXCHANGE((UInt32*)&fCounter, Counter1(new_val), Counter1(old_val)));
             return &fState[GetIndex1(fCounter, 0)];	// Read the counter again
         }
 
@@ -219,7 +222,7 @@ class JackAtomicArrayState
                     SetIndex1(new_val, state, 0);						// Invalidate the state "state"
                     IncIndex1(new_val, 3);								// Inc switch
                 }
-            } while (!CAS(Counter1(old_val), Counter1(new_val), (UInt32*)&fCounter));
+            } while (!COMPARE_EXCHANGE((UInt32*)&fCounter, Counter1(new_val), Counter1(old_val)));
             return &fState[GetIndex1(fCounter, 0)];	// Read the counter again
         }
 

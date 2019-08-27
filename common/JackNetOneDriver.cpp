@@ -58,7 +58,7 @@ JackNetOneDriver::JackNetOneDriver(const char* name, const char* alias, JackLock
 {
     jack_log("JackNetOneDriver::JackNetOneDriver port %d", port);
 
-#ifdef WIN32
+#ifdef _WIN32
     WSADATA wsa;
     WSAStartup(MAKEWORD(2, 0), &wsa);
 #endif

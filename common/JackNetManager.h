@@ -20,7 +20,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JACKNETMANAGER_H__
 #define __JACKNETMANAGER_H__
 
+#include "JackCompilerDeps.h"
 #include "JackNetInterface.h"
+#include "JackServer.h"
 #include "jack.h"
 #include <list>
 #include <map>
@@ -35,7 +37,7 @@ namespace Jack
 
     typedef std::list<std::pair<std::string, std::string> > connections_list_t;
 
-    class JackNetMaster : public JackNetMasterInterface
+    class SERVER_EXPORT JackNetMaster : public JackNetMasterInterface
     {
             friend class JackNetMasterManager;
 
@@ -75,7 +77,6 @@ namespace Jack
             void EncodeTransportData();
             void DecodeTransportData();
 
-            int Process();
             void TimebaseCallback(jack_position_t* pos);
             void ConnectPorts();
             void ConnectCallback(jack_port_id_t a, jack_port_id_t b, int connect);
@@ -89,6 +90,8 @@ namespace Jack
             ~JackNetMaster();
 
             bool IsSlaveReadyToRoll();
+			
+			int Process();
     };
 
     typedef std::list<JackNetMaster*> master_list_t;

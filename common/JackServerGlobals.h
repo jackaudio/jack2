@@ -29,7 +29,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-class JackClient;
+class SERVER_EXPORT JackClient;
 
 /*!
 \brief Global server static structure: singleton kind of pattern.

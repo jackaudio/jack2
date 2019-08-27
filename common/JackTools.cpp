@@ -26,7 +26,8 @@
 #include <assert.h>
 #include <signal.h>
 
-#ifdef WIN32
+#ifdef _WIN32
+#include <JackPlatformPlug_os.h>
 #include <process.h>
 #endif
 
@@ -37,7 +38,7 @@ namespace Jack {
 
     void JackTools::KillServer()
     {
-    #ifdef WIN32
+    #ifdef _WIN32
         raise(SIGINT);
     #else
         kill(GetPID(), SIGINT);
@@ -46,7 +47,7 @@ namespace Jack {
 
      int JackTools::MkDir(const char* path)
      {
-#ifdef WIN32
+#ifdef _WIN32
         return CreateDirectory(path, NULL) == 0;
 #else
         return mkdir(path, 0777) != 0;
@@ -58,7 +59,7 @@ namespace Jack {
 
     int JackTools::GetPID()
     {
-#ifdef WIN32
+#ifdef _WIN32
         return _getpid();
 #else
         return getpid();
@@ -67,7 +68,7 @@ namespace Jack {
 
     int JackTools::GetUID()
     {
-#ifdef WIN32
+#ifdef _WIN32
         return  _getpid();
         //#error "No getuid function available"
 #else
@@ -85,7 +86,7 @@ namespace Jack {
     }
 
     /* returns the name of the per-user subdirectory of jack_tmpdir */
-#ifdef WIN32
+#ifdef _WIN32
 
     char* JackTools::UserDir()
     {
@@ -235,7 +236,7 @@ namespace Jack {
         new_name[i] = '\0';
     }
 
-#ifdef WIN32
+#ifdef _WIN32
 
 void BuildClientPath(char* path_to_so, int path_len, const char* so_name)
 {

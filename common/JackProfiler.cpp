@@ -21,13 +21,17 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackEngineControl.h"
 #include "JackLockedEngine.h"
 #include "JackArgParser.h"
+#ifdef _WIN32
+#include "JackWinNamedPipe.h"
+#include "JackWinNamedPipeServerChannel.h"
+#endif
 #include <assert.h>
 #include <string>
 
 namespace Jack
 {
 
-    JackProfilerClient::JackProfilerClient(jack_client_t* client, const char* name)
+    SERVER_EXPORT JackProfilerClient::JackProfilerClient(jack_client_t* client, const char* name)
         :fClient(client)
     {
         char port_name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
@@ -40,7 +44,7 @@ namespace Jack
         fDurationPort = jack_port_register(client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
     }
     
-    JackProfilerClient::~JackProfilerClient()
+    SERVER_EXPORT JackProfilerClient::~JackProfilerClient()
     {
         jack_port_unregister(fClient, fSchedulingPort);
         jack_port_unregister(fClient, fDurationPort);
@@ -202,7 +206,7 @@ extern "C"
 
     using namespace Jack;
     
-    static Jack::JackProfiler* profiler = NULL;
+    static JackProfiler* profiler = NULL;
 
     SERVER_EXPORT jack_driver_desc_t* jack_get_descriptor()
     {
@@ -229,7 +233,7 @@ extern "C"
         
         jack_log("Loading profiler");
         try {
-            profiler = new Jack::JackProfiler(jack_client, params);
+            profiler = new JackProfiler(jack_client, params);
             assert(profiler);
             return 0;
         } catch (...) {
@@ -244,7 +248,7 @@ extern "C"
         int res = 1;
         jack_driver_desc_t* desc = jack_get_descriptor();
 
-        Jack::JackArgParser parser ( load_init );
+        JackArgParser parser ( load_init );
         if ( parser.GetArgc() > 0 )
             parse_params = parser.ParseParams ( desc, &params );
 
@@ -257,7 +261,7 @@ extern "C"
 
     SERVER_EXPORT void jack_finish(void* arg)
     {
-        Jack::JackProfiler* profiler = static_cast<Jack::JackProfiler*>(arg);
+        JackProfiler* profiler = static_cast<JackProfiler*>(arg);
 
         if (profiler) {
             jack_log("Unloading profiler");

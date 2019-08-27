@@ -122,6 +122,11 @@ int JackWinThread::StartImp(jack_native_thread_t* thread, int priority, int real
     return 0;
 }
 
+int JackWinThread::StartImp(jack_native_thread_t* thread, int priority, int realtime, void*(*start_routine)(void*), void* arg)
+{
+    return JackWinThread::StartImp(thread, priority, realtime, (ThreadCallback) start_routine, arg);
+}
+
 // voir http://www.microsoft.com/belux/msdn/nl/community/columns/ldoc/multithread1.mspx
 
 int JackWinThread::Kill()
@@ -176,29 +181,7 @@ int JackWinThread::StopImp(jack_native_thread_t thread)
     }
 }
 
-int JackWinThread::AcquireRealTime()
-{
-    return (fThread != (HANDLE)NULL) ? AcquireRealTimeImp(fThread, fPriority) : -1;
-}
-
-int JackWinThread::AcquireSelfRealTime()
-{
-    return AcquireRealTimeImp(GetCurrentThread(), fPriority);
-}
-
-int JackWinThread::AcquireRealTime(int priority)
-{
-    fPriority = priority;
-    return AcquireRealTime();
-}
-
-int JackWinThread::AcquireSelfRealTime(int priority)
-{
-    fPriority = priority;
-    return AcquireSelfRealTime();
-}
-
-int JackWinThread::AcquireRealTimeImp(jack_native_thread_t thread, int priority)
+int JackWinThread::AcquireRealTimeImp(jack_native_thread_t thread, int priority, UInt64 period, UInt64 computation, UInt64 constraintt)
 {
     jack_log("JackWinThread::AcquireRealTimeImp priority = %d", priority);
 
@@ -214,6 +197,28 @@ int JackWinThread::AcquireRealTimeImp(jack_native_thread_t thread, int priority)
             return -1;
         }
     }
+}
+
+int JackWinThread::AcquireRealTime()
+{
+    return (fThread != (HANDLE)NULL) ? JackWinThread::AcquireRealTimeImp(fThread, fPriority, NULL, NULL, NULL) : -1;
+}
+
+int JackWinThread::AcquireSelfRealTime()
+{
+    return JackWinThread::AcquireRealTimeImp(GetCurrentThread(), fPriority, NULL, NULL, NULL);
+}
+
+int JackWinThread::AcquireRealTime(int priority)
+{
+    fPriority = priority;
+    return AcquireRealTime();
+}
+
+int JackWinThread::AcquireSelfRealTime(int priority)
+{
+    fPriority = priority;
+    return AcquireSelfRealTime();
 }
 
 int JackWinThread::DropRealTime()

@@ -1346,7 +1346,7 @@ namespace Jack
 
     SERVER_EXPORT int SocketAPIInit()
     {
-#ifdef WIN32
+#ifdef _WIN32
         WORD wVersionRequested = MAKEWORD(2, 2);
         WSADATA wsaData;
 
@@ -1366,7 +1366,7 @@ namespace Jack
 
     SERVER_EXPORT int SocketAPIEnd()
     {
-#ifdef WIN32
+#ifdef _WIN32
         return WSACleanup();
 #endif
         return 0;

@@ -31,6 +31,7 @@ JSList* jack_internals_load(JSList* internals);
 void jack_free_driver_params(JSList * param_ptr);
 void jack_print_driver_options(jack_driver_desc_t* desc, FILE* file);
 
+
 // External control.h API
 extern "C" SERVER_EXPORT int jackctl_driver_params_parse(jackctl_driver * driver, int argc, char* argv[]);
 

@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "JackError.h"
 #include "JackMidiRawOutputWriteQueue.h"
+#include "JackMidiSendQueue.h"
 #include "JackMidiUtil.h"
 
 using Jack::JackMidiRawOutputWriteQueue;
@@ -29,7 +30,7 @@ using Jack::JackMidiRawOutputWriteQueue;
 #define STILL_TIME(c, b) ((! (b)) || ((c) < (b)))
 
 JackMidiRawOutputWriteQueue::
-JackMidiRawOutputWriteQueue(JackMidiSendQueue *send_queue, size_t non_rt_size,
+JackMidiRawOutputWriteQueue(Jack::JackMidiSendQueue *send_queue, size_t non_rt_size,
                             size_t max_non_rt_messages, size_t max_rt_messages)
 {
     non_rt_queue = new JackMidiAsyncQueue(non_rt_size, max_non_rt_messages);

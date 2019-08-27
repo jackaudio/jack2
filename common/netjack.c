@@ -30,7 +30,6 @@ $Id: net_driver.c,v 1.17 2006/04/16 20:16:10 torbenh Exp $
 #include <math.h>
 #include <stdio.h>
 #include <memory.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <stdarg.h>
@@ -40,11 +39,11 @@ $Id: net_driver.c,v 1.17 2006/04/16 20:16:10 torbenh Exp $
 
 #include <sys/types.h>
 
-#ifdef WIN32
-#include <winsock2.h>
+#ifdef _WIN32
 #include <malloc.h>
 #define socklen_t int
 #else
+#include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #endif
@@ -663,7 +662,7 @@ netjack_startup( netjack_driver_state_t *netj )
     struct sockaddr_in address;
     // Now open the socket, and wait for the first packet to arrive...
     netj->sockfd = socket (AF_INET, SOCK_DGRAM, 0);
-#ifdef WIN32
+#ifdef _WIN32
     if (netj->sockfd == INVALID_SOCKET)
 #else
     if (netj->sockfd == -1)
@@ -681,7 +680,7 @@ netjack_startup( netjack_driver_state_t *netj )
     }
 
     netj->outsockfd = socket (AF_INET, SOCK_DGRAM, 0);
-#ifdef WIN32
+#ifdef _WIN32
     if (netj->outsockfd == INVALID_SOCKET)
 #else
     if (netj->outsockfd == -1)
@@ -693,7 +692,7 @@ netjack_startup( netjack_driver_state_t *netj )
     netj->srcaddress_valid = 0;
     if (netj->use_autoconfig) {
         jacknet_packet_header *first_packet = alloca (sizeof (jacknet_packet_header));
-#ifdef WIN32
+#ifdef _WIN32
         int address_size = sizeof( struct sockaddr_in );
 #else
         socklen_t address_size = sizeof (struct sockaddr_in);
@@ -707,7 +706,7 @@ netjack_startup( netjack_driver_state_t *netj )
                 return -1;
             }
             first_pack_len = recvfrom (netj->sockfd, (char *)first_packet, sizeof (jacknet_packet_header), 0, (struct sockaddr*) & netj->syncsource_address, &address_size);
-#ifdef WIN32
+#ifdef _WIN32
             if( first_pack_len == -1 ) {
                 first_pack_len = sizeof(jacknet_packet_header);
                 break;

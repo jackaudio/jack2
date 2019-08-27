@@ -239,7 +239,7 @@ extern "C"
 
     LIB_EXPORT int jack_client_stop_thread(jack_client_t* client, jack_native_thread_t thread);
     LIB_EXPORT int jack_client_kill_thread(jack_client_t* client, jack_native_thread_t thread);
-#ifndef WIN32
+#ifndef _WIN32
     LIB_EXPORT void jack_set_thread_creator(jack_thread_creator_t jtc);
 #endif
     LIB_EXPORT char * jack_get_internal_client_name(jack_client_t *client,
@@ -267,15 +267,6 @@ extern "C"
     LIB_EXPORT void jack_session_commands_free(jack_session_command_t *cmds);
     LIB_EXPORT int jack_client_has_session_callback(jack_client_t *client, const char* client_name);
 
-    LIB_EXPORT jack_uuid_t jack_client_uuid_generate();
-    LIB_EXPORT jack_uuid_t jack_port_uuid_generate(uint32_t port_id);
-    LIB_EXPORT uint32_t jack_uuid_to_index(jack_uuid_t);
-    LIB_EXPORT int  jack_uuid_compare(jack_uuid_t, jack_uuid_t);
-    LIB_EXPORT void jack_uuid_copy(jack_uuid_t* dst, jack_uuid_t src);
-    LIB_EXPORT void jack_uuid_clear(jack_uuid_t*);
-    LIB_EXPORT int  jack_uuid_parse(const char* buf, jack_uuid_t*);
-    LIB_EXPORT void jack_uuid_unparse(jack_uuid_t, char buf[JACK_UUID_STRING_SIZE]);
-    LIB_EXPORT int  jack_uuid_empty(jack_uuid_t);
 
 #ifdef __cplusplus
 }
@@ -1768,7 +1759,7 @@ LIB_EXPORT int jack_client_kill_thread(jack_client_t* client, jack_native_thread
     return JackThread::KillImp(thread);
 }
 
-#ifndef WIN32
+#ifndef _WIN32
 LIB_EXPORT void jack_set_thread_creator (jack_thread_creator_t jtc)
 {
     if (jtc == NULL) {
@@ -2073,7 +2064,7 @@ LIB_EXPORT int jack_client_has_session_callback(jack_client_t* ext_client, const
     }
 }
 
-LIB_EXPORT jack_uuid_t jack_client_uuid_generate()
+jack_uuid_t jack_client_uuid_generate()
 {
     static uint32_t uuid_cnt = 0;
     jack_uuid_t uuid = 0x2; /* JackUUIDClient */;
@@ -2081,19 +2072,19 @@ LIB_EXPORT jack_uuid_t jack_client_uuid_generate()
     return uuid;
 }
 
-LIB_EXPORT jack_uuid_t jack_port_uuid_generate(uint32_t port_id)
+jack_uuid_t jack_port_uuid_generate(uint32_t port_id)
 {
     jack_uuid_t uuid = 0x1; /* JackUUIDPort */
     uuid = (uuid << 32) | (port_id + 1);
     return uuid;
 }
 
-LIB_EXPORT uint32_t jack_uuid_to_index(jack_uuid_t u)
+uint32_t jack_uuid_to_index(jack_uuid_t u)
 {
     return (u & 0xffff) - 1;
 }
 
-LIB_EXPORT int jack_uuid_compare(jack_uuid_t a, jack_uuid_t b)
+int jack_uuid_compare(jack_uuid_t a, jack_uuid_t b)
 {
     if (a == b) {
         return 0;
@@ -2106,17 +2097,17 @@ LIB_EXPORT int jack_uuid_compare(jack_uuid_t a, jack_uuid_t b)
     return 1;
 }
 
-LIB_EXPORT void jack_uuid_copy(jack_uuid_t* dst, jack_uuid_t src)
+void jack_uuid_copy(jack_uuid_t* dst, jack_uuid_t src)
 {
     *dst = src;
 }
 
-LIB_EXPORT void jack_uuid_clear(jack_uuid_t* u)
+void jack_uuid_clear(jack_uuid_t* u)
 {
     *u = JACK_UUID_EMPTY_INITIALIZER;
 }
 
-LIB_EXPORT int jack_uuid_parse(const char* b, jack_uuid_t* u)
+int jack_uuid_parse(const char* b, jack_uuid_t* u)
 {
     if (sscanf (b, "%" PRIu64, u) == 1) {
 
@@ -2131,12 +2122,12 @@ LIB_EXPORT int jack_uuid_parse(const char* b, jack_uuid_t* u)
     return -1;
 }
 
-LIB_EXPORT void jack_uuid_unparse(jack_uuid_t u, char b[JACK_UUID_STRING_SIZE])
+void jack_uuid_unparse(jack_uuid_t u, char b[JACK_UUID_STRING_SIZE])
 {
     snprintf (b, JACK_UUID_STRING_SIZE, "%" PRIu64, u);
 }
 
-LIB_EXPORT int jack_uuid_empty(jack_uuid_t u)
+int jack_uuid_empty(jack_uuid_t u)
 {
     return u == JACK_UUID_EMPTY_INITIALIZER;
 }

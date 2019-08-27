@@ -17,7 +17,6 @@
 
  */
 
-
 #include "JackWinNamedPipe.h"
 #include "JackError.h"
 #include <assert.h>
@@ -50,6 +49,16 @@ int JackWinNamedPipeAux::WriteAux(void* data, int len)
         jack_log("Cannot write named pipe name = %s err = %ld", fName, GetLastError());
         return -1;
     }
+}
+
+int JackWinNamedPipe::Read(void* data, int len)
+{
+	return JackWinNamedPipeAux::ReadAux(data, len);
+}
+
+int JackWinNamedPipe::Write(void* data, int len)
+{
+    return JackWinNamedPipeAux::WriteAux(data, len);
 }
 
 /*

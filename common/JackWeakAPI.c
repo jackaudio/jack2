@@ -24,7 +24,7 @@
 #include <jack/thread.h>
 #include <jack/midiport.h>
 #include <math.h>
-#ifndef WIN32
+#ifndef _WIN32
 #include <dlfcn.h>
 #endif
 #include <stdlib.h>
@@ -39,12 +39,12 @@ typedef void *(*thread_routine)(void*);
 
 static int libjack_is_present = 0;     // public symbol, similar to what relaytool does.
 
-#ifdef WIN32
+#ifdef _WIN32
 static HMODULE libjack_handle = 0;
 #else
 static void *libjack_handle = 0;
 #endif
-#ifndef WIN32
+#ifndef _WIN32
 static void __attribute__((constructor)) tryload_libjack()
 #else
 void tryload_libjack()
@@ -60,7 +60,7 @@ void tryload_libjack()
         if (!libjack_handle) {
             fprintf(stderr, "dlopen error : %s \n", dlerror());
         }
-    #elif defined(WIN32)
+    #elifdef _WIN32
         #ifdef _WIN64
             libjack_handle = LoadLibrary("libjack64.dll");
         #else
@@ -80,13 +80,13 @@ void *load_jack_function(const char *fn_name)
         fprintf (stderr, "libjack not found, so do not try to load  %s ffs  !\n", fn_name);
         return 0;
     }
-#ifdef WIN32
+#ifdef _WIN32
     fn = (void*)GetProcAddress(libjack_handle, fn_name);
 #else
     fn = dlsym(libjack_handle, fn_name);
 #endif
     if (!fn) {
-#ifdef WIN32
+#ifdef _WIN32
         char* lpMsgBuf;
         FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,NULL,GetLastError(),MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),(LPTSTR) &lpMsgBuf,0,NULL );
         fprintf(stderr, "could not GetProcAddress( %s ), %s \n", fn_name, lpMsgBuf);
@@ -280,7 +280,7 @@ DECL_FUNCTION(int, jack_drop_real_time_scheduling, (jack_native_thread_t thread)
 
 DECL_FUNCTION(int, jack_client_stop_thread, (jack_client_t* client, jack_native_thread_t thread), (client, thread));
 DECL_FUNCTION(int, jack_client_kill_thread, (jack_client_t* client, jack_native_thread_t thread), (client, thread));
-#ifndef WIN32
+#ifndef _WIN32
 DECL_VOID_FUNCTION(jack_set_thread_creator, (jack_thread_creator_t jtc), (jtc));
 #endif
 DECL_FUNCTION(char *, jack_get_internal_client_name, (jack_client_t *client, jack_intclient_t intclient), (client, intclient));

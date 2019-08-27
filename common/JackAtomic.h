@@ -21,7 +21,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define __JackAtomic__
 
 #include "JackTypes.h"
+
+#ifndef _MSC_VER
 #include "JackAtomic_os.h"
+#define COMPARE_EXCHANGE(ADDRESS, NEW, EXPECTED) CAS(EXPECTED, NEW, ADDRESS)
 
 static inline long INC_ATOMIC(volatile SInt32* val)
 {
@@ -41,6 +44,20 @@ static inline long DEC_ATOMIC(volatile SInt32* val)
     return actual;
 }
 
+#else
+
+#include "atomic_msvc.h"
+
+using namespace atomic::msvc;
+
+static inline long INC_ATOMIC(volatile SInt32* val) {
+	return interlocked<volatile SInt32, 4>::increment(val);
+}
+
+static inline long DEC_ATOMIC(volatile SInt32* val) {
+	return interlocked<volatile SInt32, 4>::decrement(val);
+}
+
+#endif // _MSC_VER
+
 #endif
-
-

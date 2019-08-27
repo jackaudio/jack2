@@ -58,8 +58,6 @@ LIB_EXPORT void jack_ringbuffer_reset(jack_ringbuffer_t *rb);
 LIB_EXPORT void jack_ringbuffer_reset_size (jack_ringbuffer_t * rb, size_t sz);
 LIB_EXPORT size_t jack_ringbuffer_write(jack_ringbuffer_t *rb, const char *src,
                                  size_t cnt);
-void jack_ringbuffer_write_advance(jack_ringbuffer_t *rb, size_t cnt);
-size_t jack_ringbuffer_write_space(const jack_ringbuffer_t *rb);
 
 /* Create a new ringbuffer to hold at least `sz' bytes of data. The
    actual buffer size is rounded up to the next power of two.  */

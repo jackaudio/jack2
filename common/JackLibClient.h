@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackClient.h"
 #include "JackShmMem.h"
 #include "JackClientControl.h"
+#include "JackCompilerDeps.h"
 #include "JackEngineControl.h"
 
 namespace Jack
@@ -32,7 +33,7 @@ namespace Jack
 \brief Client on the library side.
 */
 
-class JackLibClient : public JackClient
+class LIB_EXPORT JackLibClient : public JackClient
 {
 
     private:
