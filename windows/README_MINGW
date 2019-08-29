@@ -1,0 +1,216 @@
+HOW TO COMPILE JACK USING WAF AND MINGW
+=======================================
+
+Rev. 0 - 2019-28-08
+Rev. 1 - 2019-29-08 - Ardour compatibility by statically linking libstdc++
+
+
+About
+-----
+
+This guide contains instructions for building JACK on a modern MinGW
+installation. It was conceived as the starting point for unifying the JACK build
+process across all platforms. On Windows that would involve deprecating the
+Code::Blocks projects and repo dependence on static Windows libraries that can
+become obsolete in the future (if not already).
+
+As this is work in progress, there are a couple of missing things:
+
+- ASIO output support
+- Metadata support on Windows still not working
+- Update waf scripts to compile JackRouter
+- Update waf scripts to avoid unnecessary patching (see below)
+- Lots of testing, I am neither a Windows, MinGW or JACK power user.
+
+For getting ASIO to work, PortAudio needs to be compiled against the Steinberg
+ASIO SDK. The prebuilt MinGW binary package for portaudio does not include ASIO
+support and also probably it is not a good idea to rely on prebuilt binary
+packages since the guide uses a GCC compiler that is not the default version
+shipped by MinGW. It would be helpful to include a good technical explanation
+and/or evidence for this statement. Some interesting information on building
+PortAudio with ASIO support can be found here:
+
+https://app.assembla.com/wiki/show/portaudio/Notes_about_building_PortAudio_with_MinGW
+
+
+Install the toolchain - MSYS2
+-----------------------------
+
+The installer is called msys2-x86_64-{version}.exe and can be found at
+https://www.msys2.org/
+
+- Open "MSYS2 MinGW 64-bit terminal" from the MSYS2 start menu shortcuts with
+administrator privileges. Running from a regular user causes compilation issues
+for some dependencies because of the inability to fork processes. For example
+libtool will fail for portaudio.
+
+- Upgrade MSYS2 installation. Running the following command might require
+closing the MSYS2 window at a certain point and then restarting (do not forget
+to re-run as administrator)
+
+pacman -Suy
+
+- Install some packages
+
+pacman -S mingw-w64-x86_64-toolchain patch autoconf make \
+gettext-devel automake libtool pkgconfig p7zip git python
+
+- Replace the GCC compiler with a version configured for SJLJ exceptions, as
+instructed by the original Windows build instructions (windows/README)
+
+Prebuilt binaries can be found at
+https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/
+
+Look for "x86_64-posix-sjlj" under "MinGW-W64 GCC-{version}", the file should be
+called x86_64-{version}-release-posix-sjlj-rt_v6-rev0.7z
+
+Or just download from a direct link (GCC 8.1.0):
+
+wget https://downloads.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/sjlj/x86_64-8.1.0-release-posix-sjlj-rt_v6-rev0.7z
+
+Once downloaded:
+
+p7zip -d x86_64-8.1.0-release-posix-sjlj-rt_v6-rev0.7z
+
+That will decompress to a folder called mingw64 in the working directory.
+Now replace the files from the previous mingw-w64-x86_64-toolchain package
+installation:
+
+mv /mingw64 /mingw64.pacman
+mv mingw64 /
+
+Make sure GCC still runs and it is the version we need:
+
+$ gcc --version
+gcc.exe (x86_64-posix-sjlj-rev0, Built by MinGW-W64 project) {version}
+
+
+Install JACK depdendencies
+--------------------------
+
+There are prebuilt MinGW binaries for all the libraries that can be installed
+using the pacman package manager, but since there are many MinGW flavors it is
+better idea to build from source to avoid any linker and runtime issues.
+Fortunately there are PKGBUILD files for doing so together with a nice guide at
+https://github.com/msys2/MINGW-packages
+
+git clone https://github.com/msys2/MINGW-packages.git
+
+cd MINGW-packages/mingw-w64-{libname}-git
+MINGW_INSTALLS=mingw64 makepkg-mingw -sLf
+pacman -U mingw-w64-{libname}-git-{suffix}.pkg.tar.xz
+
+Repeat procedure for each library replacing {libname} with the appropriate name
+and {suffix} with whatever the above process created. For example:
+mingw-w64-x86_64-libtre-git-r128.6fb7206-2-any.pkg.tar.xz
+
+db
+libtre
+portaudio
+libsndfile
+libsamplerate
+
+Some libraries like libsndfile and libsamplerate will ask for installing extra
+dependencies, it is ok to do so.
+
+
+Compile JACK
+------------
+
+- Clone repo
+git clone https://github.com/jackaudio/jack2
+cd jack2
+
+- (Needs better solution) Allow gcc to find regex.h and db.h, pkgconfig is not
+of much help here:
+
+export CPATH=$CPATH:/mingw64/include/tre:/mingw64/include
+
+- (Needs wscript solution) disable check for db.h otherwise waf will configure
+without metadata support. Edit wscript and comment out the following line:
+
+db.check(header_name='db.h')
+
+Note that currently metadata support is not working on Windows and probably
+involves patching common/JackMetadata.cpp:
+server\__db.001: No such file or directory
+
+Creating the mentioned "server" directory results in:
+Cannot open metadata DB at server\metadata.db: No such file or directory
+
+So for now it is recommended to pass --db=no to waf configure or leaving wscript
+intact, so the db.check() call fails and DB ends disabled. Leaving DB enabled
+will make jackd behave erratically or crash.
+
+- (Needs wscript solution) define missing constants, this can be done by editing
+build/config.h:
+
+#define ADDON_DIR "jack"
+#define PRIu64 "llu"     (unsigned long long is 64bits wide on MinGW-W64)
+//#define HAVE_ASIO 1    (do not use this yet) 
+
+Do not forget to re-add these lines after every waf configure run. As stated
+above, a final solution should come from wscript.
+
+- Link libjack to libstdc++ statically. Some client apps like Ardour already
+ship with a libstdc++-6.dll library that will take precedence, resulting in
+missing symbols during runtime load of libjack.dll. Add the following link flags
+to common/wscript @ ~200:
+
+if bld.env['IS_WINDOWS']:
+    clientlib.env.append_value('LINKFLAGS', ['-static-libstdc++', '--disable-auto-import'])
+
+- Finally build and install
+
+./waf configure --prefix=/opt/jack --db=no
+./waf
+./waf install
+
+The resulting files can be found at /c/opt/jack/bin, or c:\msys64\opt\jack\bin
+
+
+Running and distributing
+------------------------
+
+Make sure the following DLLs are distributed together with the JACK binaries.
+They can be found in c:\msys64\mingw64\bin:
+
+libstdc++-6.dll
+libgcc_s_sjlj-1.dll
+libwinpthread-1.dll
+libtre-5.dll
+libdb-6.0.dll
+libsndfile-1.dll
+libportaudio-2.dll
+libsamplerate-0.dll (audioadapter, jack_netone, netadapter)
+
+To enable JACK-enabled applications talk to the freshly built server, copy the
+following DLLs to c:\windows (that is what the current official 1.9.11 installer
+for Windows does, needs to be improved):
+
+libjackserver-0.dll   (rename to libjackserver64.dll)
+libjack-0.dll         (rename to libjack64.dll)
+libgcc_s_sjlj-1.dll
+libwinpthread-1.dll
+libtre-5.dll
+
+Tested working clients:
+QJackCtl
+Ardour
+Bitwig Studio
+JackRouter.dll
+
+Example of starting the JACK server including MIDI support for a Focusrite USB
+audio device using WASAPI:
+jackd -R -X winmme -d portaudio -p 1024 -r 48000 ^
+-d "Windows WASAPI::Focusrite USB (Focusrite USB Audio)"
+
+Lower latencies cause xruns, even with official JACK binaries + WASAPI
+
+Handy development tools and links:
+
+http://www.dependencywalker.com/
+https://docs.microsoft.com/en-us/sysinternals/downloads/procmon
+https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/gflags
+https://blogs.msdn.microsoft.com/junfeng/2006/11/20/debugging-loadlibrary-failures/
+https://stackoverflow.com/questions/15852677/static-and-dynamic-shared-linking-with-mingw
