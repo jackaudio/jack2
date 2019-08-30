@@ -211,6 +211,8 @@ def configure(conf):
     if conf.env['IS_WINDOWS']:
         conf.env.append_unique('CCDEFINES', '_POSIX')
         conf.env.append_unique('CXXDEFINES', '_POSIX')
+        if Options.options.platform == 'msys':
+           conf.env.append_value('INCLUDES', ['/mingw64/include'])
 
     conf.env.append_unique('CXXFLAGS', '-Wall')
     conf.env.append_unique('CXXFLAGS', '-std=gnu++11')
@@ -361,8 +363,13 @@ def configure(conf):
         # existing install paths that use ADDON_DIR rather than have to
         # have special cases for windows each time.
         conf.env['ADDON_DIR'] = conf.env['BINDIR'] + '/jack'
-        # don't define ADDON_DIR in config.h, use the default 'jack' defined in
-        # windows/JackPlatformPlug_os.h
+        if Options.options.platform == 'msys':
+            conf.define('ADDON_DIR', 'jack')
+            conf.define('__STDC_FORMAT_MACROS', 1) # for PRIu64
+        else:
+            # don't define ADDON_DIR in config.h, use the default 'jack' defined in
+            # windows/JackPlatformPlug_os.h
+            pass
     else:
         conf.env['ADDON_DIR'] = os.path.normpath(os.path.join(conf.env['LIBDIR'], 'jack'))
         conf.define('ADDON_DIR', conf.env['ADDON_DIR'])
