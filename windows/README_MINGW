@@ -188,7 +188,7 @@ JackRouter
 
 Example of starting the JACK server including MIDI support for a Focusrite USB
 audio device using ASIO:
-jackd -R -S -X winmme -d portaudio -p 16 -r 48000 -d "ASIO::Focusrite USB ASIO"
+jackd -R -S -X winmme -d portaudio -p 32 -r 48000 -d "ASIO::Focusrite USB ASIO"
 
 
 
