@@ -78,7 +78,7 @@ Preparing JACK dependencies
 
 There are prebuilt MinGW binaries for all the libraries that can be installed
 using the pacman package manager, but since we are using a compiler that is not
-the default shipped version by MinGW, it seems better idea to build from source
+the default version shipped by MinGW, it seems better idea to build from source
 to avoid any linker and runtime issues. A good technical explanation and/or
 evidence for this statement is currently missing from this guide.
 
