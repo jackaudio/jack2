@@ -1,31 +1,27 @@
 HOW TO COMPILE JACK USING WAF AND MINGW
 =======================================
 
+
 Rev. 0 - 2019-08-28 - First version
 Rev. 1 - 2019-08-30 - Update guide to reflect patched wscripts
+Rev. 2 - 2019-08-31 - Add instructions for compiling ASIO
+
 
 
 About
 -----
 
-This guide contains instructions for building JACK on a modern MinGW
+This guide contains detailed instructions for building JACK on a modern MinGW
 installation. It was conceived as the starting point for unifying the JACK build
-process across all platforms. On Windows that would involve deprecating the
-Code::Blocks projects and repo dependence on static Windows libraries that can
-become obsolete in the future (if not already).
+process across all platforms.
 
-As this is work in progress, there are still a couple of missing things:
+As this is work in progress, there are still a couple of caveats:
 
-- ASIO output support
-- Metadata support on Windows still not working
-- Update waf scripts to include JackRouter
-- Lots of testing
+- Asynchronous mode is unusable with lower latencies
+- Metadata support on Windows is not working
+- A waf script for building JackRouter is missing
+- Lots of real world testing is needed
 
-For getting ASIO to work, PortAudio needs to be compiled against the Steinberg
-ASIO SDK. The prebuilt MinGW binary package for portaudio does not include ASIO
-support. Some interesting information on the build process can be found here:
-
-https://app.assembla.com/wiki/show/portaudio/Notes_about_building_PortAudio_with_MinGW
 
 
 Creating the development environment
@@ -44,7 +40,7 @@ pacman -Suy
 - Install needed packages
 
 pacman -S mingw-w64-x86_64-toolchain patch autoconf make \
-gettext-devel automake libtool pkgconfig p7zip git python
+gettext-devel automake libtool pkgconfig p7zip unzip git python
 
 - Replace the GCC compiler with a version configured for SJLJ exceptions, as
 instructed by the original Windows build instructions (windows/README)
@@ -76,8 +72,9 @@ $ gcc --version
 gcc.exe (x86_64-posix-sjlj-rev0, Built by MinGW-W64 project) {version}
 
 
-Installing JACK dependencies
-----------------------------
+
+Preparing JACK dependencies
+---------------------------
 
 There are prebuilt MinGW binaries for all the libraries that can be installed
 using the pacman package manager, but since we are using a compiler that is not
@@ -98,7 +95,6 @@ Repeat procedure for each library replacing {libname} with the appropriate name
 and {suffix} with whatever the above process created.
 
 db
-portaudio
 libsndfile
 libsamplerate
 
@@ -109,13 +105,32 @@ libtre
 libsystre
 
 libsystre is a wrapper around libtre that allows including <regex.h> later.
-Before building it adjust the includes path, you can unset afterwards.
+Before building it adjust the includes path, it can be unset afterwards:
 
 export C_INCLUDE_PATH=/mingw64/include
 
+Finally for portaudio the Steinberg ASIO SDK should be manually downloaded.
+It can be found at https://www.steinberg.net/en/company/developers.html. The waf
+script will later check if the SDK is present at /opt/asiosdk
 
-Compile JACK
-------------
+wget https://www.steinberg.net/asiosdk -O /tmp/asiosdk.zip
+unzip /tmp/asiosdk.zip -d /tmp
+mv /tmp/asiosdk_{version}_{date} /opt/asiosdk
+
+The PKGBUILD description file needs to be patched so configure is called with
+the necessary flags for ASIO:
+
+--with-asiodir=/opt/asiosdk   <- new option     
+--with-winapi=wmme,directx,wasapi,vdmks,asio   <- append 'asio' to existing
+
+Currently the shared library version of portaudio fails to build, a further
+patch is needed so only the static version is generated. Comment out lines
+[61-75], [82-83] from PKGBUILD.
+
+
+
+Compiling JACK
+--------------
 
 - Clone repo
 git clone https://github.com/jackaudio/jack2
@@ -138,6 +153,7 @@ So for now it is recommended to pass --db=no to waf configure. Leaving metadata
 support enabled will make jackd behave erratically or crash.
 
 
+
 Running and distributing
 ------------------------
 
@@ -151,7 +167,6 @@ libtre-5.dll
 libsystre-0.dll
 libdb-6.0.dll
 libsndfile-1.dll
-libportaudio-2.dll
 libsamplerate-0.dll
 
 To enable JACK-enabled applications talk to the freshly built server, copy the
@@ -166,17 +181,15 @@ libtre-5.dll
 libsystre-0.dll
 
 Tested working clients:
-QJackCtl
 Ardour
 Bitwig Studio
+QJackCtl
 JackRouter
 
 Example of starting the JACK server including MIDI support for a Focusrite USB
-audio device using WASAPI:
-jackd -R -X winmme -d portaudio -p 1024 -r 48000 ^
--d "Windows WASAPI::Focusrite USB (Focusrite USB Audio)"
+audio device using ASIO:
+jackd -R -S -X winmme -d portaudio -p 16 -r 48000 -d "ASIO::Focusrite USB ASIO"
 
-Lower latencies cause xruns, even with official JACK binaries + WASAPI
 
 
 Development tools and links
@@ -187,3 +200,4 @@ https://docs.microsoft.com/en-us/sysinternals/downloads/procmon
 https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/gflags
 https://blogs.msdn.microsoft.com/junfeng/2006/11/20/debugging-loadlibrary-failures/
 https://stackoverflow.com/questions/15852677/static-and-dynamic-shared-linking-with-mingw
+https://github.com/EddieRingle/portaudio/blob/master/src/hostapi/asio/ASIO-README.txt

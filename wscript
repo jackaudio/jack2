@@ -212,7 +212,13 @@ def configure(conf):
         conf.env.append_unique('CCDEFINES', '_POSIX')
         conf.env.append_unique('CXXDEFINES', '_POSIX')
         if Options.options.platform == 'msys':
-           conf.env.append_value('INCLUDES', ['/mingw64/include'])
+            conf.env.append_value('INCLUDES', ['/mingw64/include'])
+            conf.check(
+                header_name='asio.h',
+                includes='/opt/asiosdk/common',
+                msg='Checking for ASIO SDK',
+                define_name='HAVE_ASIO',
+                mandatory=False)
 
     conf.env.append_unique('CXXFLAGS', '-Wall')
     conf.env.append_unique('CXXFLAGS', '-std=gnu++11')
