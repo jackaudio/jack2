@@ -68,7 +68,19 @@ int JackMetadata::PropertyInit(const char* server_name)
         return -1;
     }
 
+#ifdef WIN32
+/* jack_server_dir is set to 'server' and a relative path
+ * makes fDBenv->open() and fDB->open() calls fail
+ */
+#define jack_db_tmp_dir "c:\\windows\\temp\\jack"
+    // FIXME - directory not created despite DB_CREATE flag
+    if (CreateDirectory (jack_db_tmp_dir, NULL) == ERROR_PATH_NOT_FOUND) {
+        jack_error ("cannot create DB files directory");
+    }
+    if ((ret = fDBenv->open (fDBenv, jack_db_tmp_dir, DB_CREATE | DB_INIT_LOCK | DB_INIT_MPOOL | DB_THREAD, 0)) != 0) {
+#else
     if ((ret = fDBenv->open (fDBenv, jack_server_dir /*FIXME:(server_name, server_dir)*/, DB_CREATE | DB_INIT_LOCK | DB_INIT_MPOOL | DB_THREAD, 0)) != 0) {
+#endif
         jack_error ("cannot open DB environment: %s", db_strerror (ret));
         return -1;
     }
@@ -78,8 +90,11 @@ int JackMetadata::PropertyInit(const char* server_name)
         return -1;
     }
 
+#ifdef WIN32
+    snprintf (dbpath, sizeof(dbpath), "%s\\%s", jack_db_tmp_dir, "metadata.db");
+#else
     snprintf (dbpath, sizeof(dbpath), "%s/%s", jack_server_dir /*FIXME:(server_name, server_dir)*/, "metadata.db");
-
+#endif
     if ((ret = fDB->open (fDB, NULL, dbpath, NULL, DB_HASH, DB_CREATE | DB_THREAD, 0666)) != 0) {
         jack_error ("Cannot open metadata DB at %s: %s", dbpath, db_strerror (ret));
         fDB->close (fDB, 0);

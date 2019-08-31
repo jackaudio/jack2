@@ -5,6 +5,7 @@ HOW TO COMPILE JACK USING WAF AND MINGW
 Rev. 0 - 2019-08-28 - First version
 Rev. 1 - 2019-08-30 - Update guide to reflect patched wscripts
 Rev. 2 - 2019-08-31 - Add instructions for compiling ASIO
+Rev. 3 - 2019-09-01 - Update guide to reflect metadata patch
 
 
 
@@ -17,8 +18,7 @@ process across all platforms.
 
 As this is work in progress, there are still a couple of caveats:
 
-- Asynchronous mode is unusable with lower latencies
-- Metadata support on Windows is not working
+- Asynchronous mode is unusable with low latencies
 - A waf script for building JackRouter is missing
 - Lots of real world testing is needed
 
@@ -133,24 +133,15 @@ Compiling JACK
 --------------
 
 - Clone repo
+
 git clone https://github.com/jackaudio/jack2
 
 - Build and install
 
 cd jack2
-./waf configure --prefix=/opt/jack --db=no && ./waf -p install
+./waf configure --prefix=/opt/jack && ./waf -p install
 
 The resulting files can be found at /c/opt/jack/bin, or c:\msys64\opt\jack\bin
-
-Note that currently metadata support is not working on Windows and probably
-involves patching common/JackMetadata.cpp:
-server\__db.001: No such file or directory
-
-Creating the mentioned "server" directory results in:
-Cannot open metadata DB at server\metadata.db: No such file or directory
-
-So for now it is recommended to pass --db=no to waf configure. Leaving metadata
-support enabled will make jackd behave erratically or crash.
 
 
 
@@ -184,7 +175,6 @@ Tested working clients:
 Ardour
 Bitwig Studio
 QJackCtl
-JackRouter
 
 Example of starting the JACK server including MIDI support for a Focusrite USB
 audio device using ASIO:
