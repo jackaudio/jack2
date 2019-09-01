@@ -1,11 +1,7 @@
 HOW TO COMPILE JACK USING WAF AND MINGW
 =======================================
 
-
-Rev. 0 - 2019-08-28 - First version
-Rev. 1 - 2019-08-30 - Update guide to reflect patched wscripts
-Rev. 2 - 2019-08-31 - Add instructions for compiling ASIO
-Rev. 3 - 2019-09-01 - Update guide to reflect metadata patch
+Rev. 1 - 2019-09-01 - First version
 
 
 
@@ -19,7 +15,7 @@ process across all platforms.
 As this is work in progress, there are still a couple of caveats:
 
 - Asynchronous mode is unusable with low latencies
-- A waf script for building JackRouter is missing
+- JackRouter still builds with a Visual Studio project
 - Lots of real world testing is needed
 
 
@@ -145,6 +141,27 @@ The resulting files can be found at /c/opt/jack/bin, or c:\msys64\opt\jack\bin
 
 
 
+Compiling JackRouter
+--------------------
+
+Assuming you have Visual Studio installed, just open and build the project:
+
+windows/JackRouter/JackRouter_MinGW_deps.vcxproj
+
+Differences from the original JackRouter.vcxproj:
+
+- Depends on the asiosdk files from the previous MinGW JACK installation (i.e.,
+  it points to absolute paths starting with c:\msys64\opt)
+- Links to the jack.dll.a created by the previous build, instead of libjack.lib
+  This means JackRouter.dll will currently depend on libjack-0.dll
+- Force includes stdint.h and defines _STDIN_H to avoid int8_t, int32_t and
+  uint32_t basic types redefinition duringn compilation
+
+The project was successfully tested to build a 64bits version of JackRouter.dll
+using Visual Studio 2017.
+
+
+
 Running and distributing
 ------------------------
 
@@ -160,9 +177,9 @@ libdb-6.0.dll
 libsndfile-1.dll
 libsamplerate-0.dll
 
-To enable JACK-enabled applications talk to the freshly built server, copy the
-following DLLs to c:\windows (that is what the current official 1.9.11 installer
-for Windows does, needs to be improved):
+To enable JACK-enabled applications connect to the freshly built server, copy
+the following DLLs to c:\windows (that is what the current official 1.9.11
+installer for Windows does, needs to be improved):
 
 libjackserver-0.dll   (rename to libjackserver64.dll)
 libjack-0.dll         (rename to libjack64.dll)
@@ -171,10 +188,18 @@ libwinpthread-1.dll
 libtre-5.dll
 libsystre-0.dll
 
+JackRouter.dll is created inside windows/JackRouter/Release64. It depends on
+libjack through libjack-0.dll instead of libjack64.dll. To avoid polluting
+c:\windows even more, the dependency dll can be copied to the same directory
+where JackRouter.dll will reside. Once done it needs to be registered:
+
+regsvr32 JackRouter.dll
+
 Tested working clients:
 Ardour
 Bitwig Studio
 QJackCtl
+JackRouter
 
 Example of starting the JACK server including MIDI support for a Focusrite USB
 audio device using ASIO:
