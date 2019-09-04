@@ -65,6 +65,13 @@ JackCoreMidiPort::GetName()
     return name;
 }
 
+const char *
+JackCoreMidiPort::GetDeviceName()
+{
+    assert(initialized);
+    return device_name;
+}
+
 void
 JackCoreMidiPort::Initialize(const char *alias_name, const char *client_name,
                              const char *driver_name, int index,
@@ -96,6 +103,7 @@ JackCoreMidiPort::Initialize(const char *alias_name, const char *client_name,
     }
     snprintf(name, sizeof(name), "%s:%s_%d", client_name,
              is_output ? "playback" : "capture", num);
+    strncpy(device_name, endpoint_name, sizeof(device_name) - 1);
     this->endpoint = endpoint;
     initialized = true;
 }

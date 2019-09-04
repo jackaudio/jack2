@@ -34,6 +34,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackChannel.h"
 #include "JackError.h"
 
+extern const char* JACK_METADATA_PRETTY_NAME;
+
 namespace Jack
 {
 
@@ -1069,6 +1071,14 @@ int JackEngine::PortRename(int refnum, jack_port_id_t port, const char* name)
     fGraphManager->GetPort(port)->SetName(name);
     NotifyPortRename(port, old_name);
     return 0;
+}
+
+int JackEngine::PortSetPrettyNameProperty(jack_port_id_t port, const char* pretty_name)
+{
+    jack_uuid_t uuid = jack_port_uuid_generate(port);
+    static const char* key = "http://jackaudio.org/metadata/pretty-name";
+    static const char* type = "text/plain";
+    return fMetadata.SetProperty(NULL, uuid, key, pretty_name, type);
 }
 
 //--------------------
