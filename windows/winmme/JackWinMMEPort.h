@@ -33,6 +33,7 @@ namespace Jack {
 
         char alias[REAL_JACK_PORT_NAME_SIZE+1];
         char name[REAL_JACK_PORT_NAME_SIZE+1];
+        char device_name[REAL_JACK_PORT_NAME_SIZE+1];
 
     public:
 
@@ -45,6 +46,9 @@ namespace Jack {
 
         const char *
         GetName();
+
+        const char *
+        GetDeviceName();
 
         void
         GetOSErrorString(LPTSTR text);

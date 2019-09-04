@@ -48,6 +48,12 @@ JackWinMMEPort::GetName()
      return name;
 }
 
+const char *
+JackWinMMEPort::GetDeviceName()
+{
+     return device_name;
+}
+
 void
 JackWinMMEPort::GetOSErrorString(LPTSTR text)
 {
