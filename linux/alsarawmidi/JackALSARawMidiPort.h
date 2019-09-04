@@ -61,8 +61,8 @@ namespace Jack {
 
     public:
 
-        JackALSARawMidiPort(snd_rawmidi_info_t *info, size_t index,
-                            unsigned short io_mask);
+        JackALSARawMidiPort(const char *client_name, snd_rawmidi_info_t *info,
+                            size_t index, unsigned short io_mask);
 
         virtual
         ~JackALSARawMidiPort();

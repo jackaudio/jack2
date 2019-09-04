@@ -41,7 +41,9 @@ namespace Jack {
 
     public:
 
-        JackALSARawMidiInputPort(snd_rawmidi_info_t *info, size_t index,
+        JackALSARawMidiInputPort(const char* client_name,
+                                 snd_rawmidi_info_t *info,
+                                 size_t index,
                                  size_t max_bytes=4096,
                                  size_t max_messages=1024);
 

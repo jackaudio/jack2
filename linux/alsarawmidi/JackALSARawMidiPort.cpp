@@ -27,7 +27,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 using Jack::JackALSARawMidiPort;
 
-JackALSARawMidiPort::JackALSARawMidiPort(snd_rawmidi_info_t *info,
+JackALSARawMidiPort::JackALSARawMidiPort(const char *client_name, snd_rawmidi_info_t *info,
                                          size_t index, unsigned short io_mask)
 {
     int card = snd_rawmidi_info_get_card(info);
@@ -40,17 +40,17 @@ JackALSARawMidiPort::JackALSARawMidiPort(snd_rawmidi_info_t *info,
     const char *alias_suffix;
     const char *error_message;
     snd_rawmidi_t **in;
-    const char *name_prefix;
+    const char *port_name;
     snd_rawmidi_t **out;
     if (snd_rawmidi_info_get_stream(info) == SND_RAWMIDI_STREAM_OUTPUT) {
         alias_suffix = "out";
         in = 0;
-        name_prefix = "system:midi_playback_";
+        port_name = "playback_";
         out = &rawmidi;
     } else {
         alias_suffix = "in";
         in = &rawmidi;
-        name_prefix = "system:midi_capture_";
+        port_name = "capture_";
         out = 0;
     }
     const char *func;
@@ -117,7 +117,7 @@ JackALSARawMidiPort::JackALSARawMidiPort(snd_rawmidi_info_t *info,
     snprintf(alias, sizeof(alias), "system:%d-%d %s %d %s", card + 1,
              device + 1, driver_name, subdevice + 1,
              alias_suffix);
-    snprintf(name, sizeof(name), "%s%zu", name_prefix, index + 1);
+    snprintf(name, sizeof(name), "%s:%s%zu", client_name, port_name, index + 1);
     strncpy(device_name, driver_name, sizeof(device_name) - 1);
     this->io_mask = io_mask;
     return;

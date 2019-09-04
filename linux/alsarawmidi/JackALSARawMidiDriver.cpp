@@ -409,6 +409,7 @@ JackALSARawMidiDriver::Open(bool capturing, bool playing, int in_channels,
     }
     size_t num_inputs = 0;
     size_t num_outputs = 0;
+    const char *client_name = fClientControl.fName;
     if (potential_inputs) {
         try {
             input_ports = new JackALSARawMidiInputPort *[potential_inputs];
@@ -432,7 +433,7 @@ JackALSARawMidiDriver::Open(bool capturing, bool playing, int in_channels,
     for (size_t i = 0; i < potential_inputs; i++) {
         snd_rawmidi_info_t *info = in_info_list.at(i);
         try {
-            input_ports[num_inputs] = new JackALSARawMidiInputPort(info, i);
+            input_ports[num_inputs] = new JackALSARawMidiInputPort(client_name, info, i);
             num_inputs++;
         } catch (std::exception& e) {
             jack_error("JackALSARawMidiDriver::Open - while creating new "
@@ -443,7 +444,7 @@ JackALSARawMidiDriver::Open(bool capturing, bool playing, int in_channels,
     for (size_t i = 0; i < potential_outputs; i++) {
         snd_rawmidi_info_t *info = out_info_list.at(i);
         try {
-            output_ports[num_outputs] = new JackALSARawMidiOutputPort(info, i);
+            output_ports[num_outputs] = new JackALSARawMidiOutputPort(client_name, info, i);
             num_outputs++;
         } catch (std::exception& e) {
             jack_error("JackALSARawMidiDriver::Open - while creating new "
