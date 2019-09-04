@@ -37,6 +37,7 @@ namespace Jack {
         int fds[2];
         unsigned short io_mask;
         char name[REAL_JACK_PORT_NAME_SIZE+1];
+        char device_name[REAL_JACK_PORT_NAME_SIZE+1];
         struct pollfd *queue_poll_fd;
 
     protected:
@@ -71,6 +72,9 @@ namespace Jack {
 
         const char *
         GetName();
+
+        const char *
+        GetDeviceName();
 
         int
         GetPollDescriptorCount();

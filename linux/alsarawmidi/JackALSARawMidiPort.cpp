@@ -36,6 +36,7 @@ JackALSARawMidiPort::JackALSARawMidiPort(snd_rawmidi_info_t *info,
     char device_id[32];
     snprintf(device_id, sizeof(device_id), "hw:%d,%d,%d", card, device,
              subdevice);
+    const char* driver_name = snd_rawmidi_info_get_name(info);
     const char *alias_suffix;
     const char *error_message;
     snd_rawmidi_t **in;
@@ -114,9 +115,10 @@ JackALSARawMidiPort::JackALSARawMidiPort(snd_rawmidi_info_t *info,
         goto close;
     }
     snprintf(alias, sizeof(alias), "system:%d-%d %s %d %s", card + 1,
-             device + 1, snd_rawmidi_info_get_name(info), subdevice + 1,
+             device + 1, driver_name, subdevice + 1,
              alias_suffix);
     snprintf(name, sizeof(name), "%s%zu", name_prefix, index + 1);
+    strncpy(device_name, driver_name, sizeof(device_name) - 1);
     this->io_mask = io_mask;
     return;
  free_params:
@@ -176,6 +178,12 @@ const char *
 JackALSARawMidiPort::GetName()
 {
     return name;
+}
+
+const char *
+JackALSARawMidiPort::GetDeviceName()
+{
+    return device_name;
 }
 
 int
