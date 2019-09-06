@@ -983,6 +983,12 @@ alsa_driver_get_channel_addresses (alsa_driver_t *driver,
 	return 0;
 }
 
+static int
+alsa_driver_stream_start(snd_pcm_t *pcm, bool is_capture)
+{
+	return snd_pcm_start(pcm);
+}
+
 int
 alsa_driver_start (alsa_driver_t *driver)
 {
@@ -1089,7 +1095,7 @@ alsa_driver_start (alsa_driver_t *driver)
 				     driver->user_nperiods
 				     * driver->frames_per_cycle);
 
-		if ((err = snd_pcm_start (driver->playback_handle)) < 0) {
+		if ((err = alsa_driver_stream_start (driver->playback_handle, SND_PCM_STREAM_PLAYBACK)) < 0) {
 			jack_error ("ALSA: could not start playback (%s)",
 				    snd_strerror (err));
 			return -1;
@@ -1098,7 +1104,7 @@ alsa_driver_start (alsa_driver_t *driver)
 
 	if ((driver->capture_handle && driver->capture_and_playback_not_synced)
 	    || !driver->playback_handle) {
-		if ((err = snd_pcm_start (driver->capture_handle)) < 0) {
+		if ((err = alsa_driver_stream_start (driver->capture_handle, SND_PCM_STREAM_CAPTURE)) < 0) {
 			jack_error ("ALSA: could not start capture (%s)",
 				    snd_strerror (err));
 			return -1;
@@ -1280,6 +1286,18 @@ alsa_driver_set_clock_sync_status (alsa_driver_t *driver, channel_t chn,
 	alsa_driver_clock_sync_notify (driver, chn, status);
 }
 
+static int
+alsa_driver_poll_descriptors(snd_pcm_t *pcm, struct pollfd *pfds, unsigned int space, bool is_capture)
+{
+	return snd_pcm_poll_descriptors(pcm, pfds, space);
+}
+
+static snd_pcm_sframes_t
+alsa_driver_avail(alsa_driver_t *driver, snd_pcm_t *pcm, bool is_capture)
+{
+	return snd_pcm_avail_update(pcm);
+}
+
 static int under_gdb = FALSE;
 
 jack_nframes_t
@@ -1320,16 +1338,16 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 		nfds = 0;
 
 		if (need_playback) {
-			snd_pcm_poll_descriptors (driver->playback_handle,
+			alsa_driver_poll_descriptors (driver->playback_handle,
 						  &driver->pfd[0],
-						  driver->playback_nfds);
+						  driver->playback_nfds, SND_PCM_STREAM_PLAYBACK);
 			nfds += driver->playback_nfds;
 		}
 
 		if (need_capture) {
-			snd_pcm_poll_descriptors (driver->capture_handle,
+			alsa_driver_poll_descriptors (driver->capture_handle,
 						  &driver->pfd[nfds],
-						  driver->capture_nfds);
+						  driver->capture_nfds, SND_PCM_STREAM_CAPTURE);
 			ci = nfds;
 			nfds += driver->capture_nfds;
 		}
@@ -1506,8 +1524,8 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 	}
 
 	if (driver->capture_handle) {
-		if ((capture_avail = snd_pcm_avail_update (
-			     driver->capture_handle)) < 0) {
+		if ((capture_avail = alsa_driver_avail (driver,
+			     driver->capture_handle, SND_PCM_STREAM_CAPTURE)) < 0) {
 			if (capture_avail == -EPIPE) {
 				xrun_detected = TRUE;
 			} else {
@@ -1521,8 +1539,8 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 	}
 
 	if (driver->playback_handle) {
-		if ((playback_avail = snd_pcm_avail_update (
-			     driver->playback_handle)) < 0) {
+		if ((playback_avail = alsa_driver_avail (driver,
+			     driver->playback_handle, SND_PCM_STREAM_PLAYBACK)) < 0) {
 			if (playback_avail == -EPIPE) {
 				xrun_detected = TRUE;
 			} else {
