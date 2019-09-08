@@ -1,17 +1,11 @@
--------------------------------
-NetJack2 for Jack2
--------------------------------
+# NetJack2 for Jack2
 
 
 This release includes a version of netjack designed for jack2. Indeed, the original concept has been completely redesigned to better fit to the Jack2 architecture, but also in order to provide additional capabilities, and ultimately a greater robustness.
 
 This document describes the major changes between those two systems, then a simple how-to for setting up a basic usage of 'netjack2'.
 
-
--------------------------------
-Major changes and architecture
--------------------------------
-
+## Major changes and architecture
 
 The biggest difference between netjack1 and netjack2 is the way of slicing audio and midi streams into network packets. For one audio cycle, netjack1 used to take all audio and midi buffers (one per channel), put butt all of them, then send it over the network. The problem is that a network packet has a fixed maximum size, depending on the network infrastructure (for 100mb, it reaches 1500bytes - MTU of the network). The solution is then to slice those buffers into smaller ones, and then send as many packets as we need. This cutting up can be done by network equipments, but it's more efficient and secure to include it in the software data management. Still this slicing brings another issue : all the packets are not pleased with any emission order and are unfortunately received in a random order, thanks to UDP. So we can't deal with data as it comes, we need to re-bufferize incoming streams in order to rebuild complete audio buffers.
 
@@ -32,11 +26,7 @@ The loaded internal client is no longer only an interface for the slave, like in
 
 The 'unloading' of the internal client (the manager) will cause a full cleaning of the infrastructure. The jack clients are all removed from the server, the slave are all turned available again, ready to be caught by another master etc. When a slave quits, it's also automatically removed from the manager's slaves list.
 
-
--------------------------------
-How-to use this ?
--------------------------------
-
+## How-to use this?
 
 Netjackmp is very simple to use. On the master's side, an internal client deals with the slaves, and the slaves themselves are classical jack servers running under a 'network audio driver'. The difference between the two versions is that the master now has a manager, which takes care of the slaves, while listening on the multicast address and create a new master as soon as a slave is available. But everything is transparent to the user, that's why it uses multicast (someone says "hello", and anyone who wants to hear it just has to listen).
 
@@ -62,10 +52,7 @@ Latency (-n) is the number of buffers added in network transmission. Zero is for
 
 For additional informations, you can go to the NetJack2 Wiki at : http://trac.jackaudio.org/wiki/WalkThrough/User/NetJack2.
 
-
--------------------------------
-What's next ?
--------------------------------
+## What's next?
 
 The development of netjack2 continues and some things are always moving... If you use it, please report encountered bugs, ideas or anything you think about.
 
