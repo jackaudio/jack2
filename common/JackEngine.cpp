@@ -1073,7 +1073,7 @@ int JackEngine::PortRename(int refnum, jack_port_id_t port, const char* name)
     return 0;
 }
 
-int JackEngine::PortSetPrettyNameProperty(jack_port_id_t port, const char* pretty_name)
+int JackEngine::PortSetDeviceName(jack_port_id_t port, const char* pretty_name)
 {
     jack_uuid_t uuid = jack_port_uuid_generate(port);
     static const char* key = "http://jackaudio.org/metadata/pretty-name";
