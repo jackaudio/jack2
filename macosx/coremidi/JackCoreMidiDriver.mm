@@ -372,7 +372,7 @@ JackCoreMidiDriver::Attach()
         port = fGraphManager->GetPort(index);
         port->SetAlias(port_obj->GetAlias());
         port->SetLatencyRange(JackCaptureLatency, &latency_range);
-        fEngine->PortSetDeviceName(fClientControl.fRefNum, index,
+        fEngine->PortSetDeviceMetadata(fClientControl.fRefNum, index,
                                         port_obj->GetDeviceName());
         fCapturePortList[i] = index;
     }
@@ -392,7 +392,7 @@ JackCoreMidiDriver::Attach()
         port = fGraphManager->GetPort(index);
         port->SetAlias(port_obj->GetAlias());
         port->SetLatencyRange(JackCaptureLatency, &latency_range);
-        fEngine->PortSetDeviceName(fClientControl.fRefNum, index,
+        fEngine->PortSetDeviceMetadata(fClientControl.fRefNum, index,
                                         port_obj->GetDeviceName());
         fCapturePortList[num_physical_inputs + i] = index;
     }
@@ -419,7 +419,7 @@ JackCoreMidiDriver::Attach()
         port = fGraphManager->GetPort(index);
         port->SetAlias(port_obj->GetAlias());
         port->SetLatencyRange(JackPlaybackLatency, &latency_range);
-        fEngine->PortSetDeviceName(fClientControl.fRefNum, index,
+        fEngine->PortSetDeviceMetadata(fClientControl.fRefNum, index,
                                         port_obj->GetDeviceName());
         fPlaybackPortList[i] = index;
     }
@@ -440,7 +440,7 @@ JackCoreMidiDriver::Attach()
         port = fGraphManager->GetPort(index);
         port->SetAlias(port_obj->GetAlias());
         port->SetLatencyRange(JackPlaybackLatency, &latency_range);
-        fEngine->PortSetDeviceName(fClientControl.fRefNum, index,
+        fEngine->PortSetDeviceMetadata(fClientControl.fRefNum, index,
                                         port_obj->GetDeviceName());
         fPlaybackPortList[num_physical_outputs + i] = index;
     }

@@ -246,11 +246,11 @@ class SERVER_EXPORT JackLockedEngine
             CATCH_EXCEPTION_RETURN
         }
 
-        int PortSetDeviceName(int refnum, jack_port_id_t port, const char* pretty_name)
+        int PortSetDeviceMetadata(int refnum, jack_port_id_t port, const char* pretty_name)
         {
             TRY_CALL
             JackLock lock(&fEngine);
-            return (fEngine.CheckClient(refnum)) ? fEngine.PortSetDeviceName(port, pretty_name) : -1;
+            return (fEngine.CheckClient(refnum)) ? fEngine.PortSetDeviceMetadata(port, pretty_name) : -1;
             CATCH_EXCEPTION_RETURN
         }
 

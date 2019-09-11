@@ -80,7 +80,7 @@ JackALSARawMidiDriver::Attach()
         port = fGraphManager->GetPort(index);
         port->SetAlias(alias);
         port->SetLatencyRange(JackCaptureLatency, &latency_range);
-        fEngine->PortSetDeviceName(fClientControl.fRefNum, index,
+        fEngine->PortSetDeviceMetadata(fClientControl.fRefNum, index,
                                         input_port->GetDeviceName());
         fCapturePortList[i] = index;
 
@@ -108,7 +108,7 @@ JackALSARawMidiDriver::Attach()
         port = fGraphManager->GetPort(index);
         port->SetAlias(alias);
         port->SetLatencyRange(JackPlaybackLatency, &latency_range);
-        fEngine->PortSetDeviceName(fClientControl.fRefNum, index,
+        fEngine->PortSetDeviceMetadata(fClientControl.fRefNum, index,
                                         output_port->GetDeviceName());
         fPlaybackPortList[i] = index;
 

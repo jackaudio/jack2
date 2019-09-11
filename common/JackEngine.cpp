@@ -1074,7 +1074,7 @@ int JackEngine::PortRename(int refnum, jack_port_id_t port, const char* name)
     return 0;
 }
 
-int JackEngine::PortSetDeviceName(jack_port_id_t port, const char* pretty_name)
+int JackEngine::PortSetDeviceMetadata(jack_port_id_t port, const char* pretty_name)
 {
     static const char* type = "text/plain";
     jack_uuid_t uuid = jack_port_uuid_generate(port);
