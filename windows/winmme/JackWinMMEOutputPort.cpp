@@ -87,6 +87,7 @@ JackWinMMEOutputPort::JackWinMMEOutputPort(const char *alias_name,
     snprintf(alias, sizeof(alias) - 1, "%s:%s:out%d", alias_name, name_tmp,
              index + 1);
     snprintf(name, sizeof(name) - 1, "%s:playback_%d", client_name, index + 1);
+    strncpy(device_name, name_tmp, sizeof(device_name) - 1);
     read_queue_ptr.release();
     thread_queue_ptr.release();
     thread_ptr.release();

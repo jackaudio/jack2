@@ -92,6 +92,7 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
     snprintf(alias, sizeof(alias) - 1, "%s:%s:in%d", alias_name, name_tmp,
              index + 1);
     snprintf(name, sizeof(name) - 1, "%s:capture_%d", client_name, index + 1);
+    strncpy(device_name, name_tmp, sizeof(device_name) - 1);
     jack_event = 0;
     started = false;
     write_queue_ptr.release();

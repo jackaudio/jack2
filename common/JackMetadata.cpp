@@ -25,6 +25,14 @@
 #include <limits.h>
 
 
+LIB_EXPORT const char* JACK_METADATA_PRETTY_NAME = "http://jackaudio.org/metadata/pretty-name";
+LIB_EXPORT const char* JACK_METADATA_HARDWARE = "http://jackaudio.org/metadata/hardware";
+LIB_EXPORT const char* JACK_METADATA_CONNECTED = "http://jackaudio.org/metadata/connected";
+LIB_EXPORT const char* JACK_METADATA_PORT_GROUP = "http://jackaudio.org/metadata/port-group";
+LIB_EXPORT const char* JACK_METADATA_ICON_SMALL = "http://jackaudio.org/metadata/icon-small";
+LIB_EXPORT const char* JACK_METADATA_ICON_LARGE = "http://jackaudio.org/metadata/icon-large";
+
+
 namespace Jack
 {
 

@@ -138,6 +138,8 @@ class SERVER_EXPORT JackEngine : public JackLockAble
 
         int PortRename(int refnum, jack_port_id_t port, const char* name);
 
+        int PortSetDeviceName(jack_port_id_t port, const char* pretty_name);
+
         int ComputeTotalLatencies();
 
         int PropertyChangeNotify(jack_uuid_t subject, const char* key,jack_property_change_t change);
