@@ -28,6 +28,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //#define JACK_SCHED_POLICY SCHED_RR
 #define JACK_SCHED_POLICY SCHED_FIFO
 
+#if defined(__linux__) && !defined(SCHED_RESET_ON_FORK)
+# define SCHED_RESET_ON_FORK 0x40000000
+#endif
+
 namespace Jack
 {
 
@@ -237,13 +241,19 @@ int JackPosixThread::AcquireRealTimeImp(jack_native_thread_t thread, int priorit
 
     jack_log("JackPosixThread::AcquireRealTimeImp priority = %d", priority);
 
-    if ((res = pthread_setschedparam(thread, JACK_SCHED_POLICY, &rtparam)) != 0) {
-        jack_error("Cannot use real-time scheduling (RR/%d)"
-                   "(%d: %s)", rtparam.sched_priority, res,
-                   strerror(res));
-        return -1;
-    }
-    return 0;
+    if ((res = pthread_setschedparam(thread, JACK_SCHED_POLICY, &rtparam)) == 0)
+        return 0;
+
+#ifdef SCHED_RESET_ON_FORK
+    jack_log("pthread_setschedparam() failed (%d), trying with SCHED_RESET_ON_FORK.", res);
+    if ((res = pthread_setschedparam(thread, JACK_SCHED_POLICY|SCHED_RESET_ON_FORK, &rtparam)) == 0)
+        return 0;
+#endif
+
+    jack_error("Cannot use real-time scheduling (RR/%d)"
+               " (%d: %s)", rtparam.sched_priority, res,
+               strerror(res));
+    return -1;
 }
 
 int JackPosixThread::DropRealTime()
