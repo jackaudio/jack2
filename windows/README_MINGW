@@ -109,7 +109,7 @@ Before building libraries, adjust the includes path:
 
 export C_INCLUDE_PATH=/mingw64/include
 
-The basic procedure for buliding and installing libraries is:
+The basic procedure for building and installing libraries is:
 
 cd MINGW-packages/mingw-w64-{libname}
 MINGW_INSTALLS=mingw64 makepkg-mingw -sLf
@@ -147,7 +147,7 @@ PKGBUILD after the first make call (between lines 60 and 61):
 find /opt/asiosdk -name "*.lo" -type f -delete
 find /opt/asiosdk -name "*.o" -type f -delete
 
-Finally here is the libraries list:
+Finally here is the list of libraries to build:
 
 db
 libsndfile
@@ -239,9 +239,9 @@ libsystre-0.dll
 This allows non-JACK applications to connect to the server through a special
 ASIO driver that routes audio to JACK instead of a physical audio device.
 Also copy libjack-0.dll from C:\msys64\mingw64\bin to C:\Program Files\Jack
-because JackRouter depends on libjack but it will check for libjack-0.dll
-instead of the system-wide libjack64.dll previously copied to C:\Windows. Once
-done, JackRouter needs to be registered:
+because JackRouter depends on libjack but will check for libjack-0.dll instead
+of the system-wide libjack64.dll previously copied to C:\Windows. Once done,
+JackRouter needs to be registered:
 
 regsvr32 JackRouter.dll
 
