@@ -26,6 +26,12 @@
 #include <pthread.h>
 #endif
 
+#ifdef __linux__
+#include <poll.h>
+#include <sys/signalfd.h>
+#include <sys/eventfd.h>
+#endif
+
 #include "types.h"
 #include <string.h>
 #include <errno.h>
@@ -141,6 +147,35 @@ struct jackctl_parameter
     char id;
     jack_driver_param_constraint_desc_t * constraint_ptr;
 };
+
+#ifdef __linux__
+/** Jack file descriptors */
+typedef enum
+{
+    JackSignalFD,			/**< @brief File descriptor to accept the signals */
+    JackEventFD,			/**< @brief File descriptor to accept the events from threads */
+    JackFDCount				/**< @brief FD count, ensure this is the last element */
+} jackctl_fd;
+
+static int eventFD;
+#endif
+
+static
+void
+on_failure()
+{
+#ifdef __linux__
+    int ret = 0;
+    const uint64_t ev = 1;
+
+    ret = write(eventFD, &ev, sizeof(ev));
+    if (ret < 0) {
+        fprintf(stderr, "JackServerGlobals::on_failure : write() failed with errno %d\n", -errno);
+    }
+#else
+    fprintf(stderr, "JackServerGlobals::on_failure callback called from thread\n");
+#endif
+}
 
 const char * jack_get_self_connect_mode_description(char mode)
 {
@@ -679,16 +714,70 @@ jackctl_setup_signals(
 SERVER_EXPORT void
 jackctl_wait_signals(jackctl_sigmask_t * sigmask)
 {
-    int sig;
+    int sig = 0;
     bool waiting = true;
+#ifdef __linux__
+    int err;
+    struct pollfd pfd[JackFDCount];
+    struct signalfd_siginfo si;
+    memset(pfd, 0, sizeof(pfd));
+
+    /* Block the signals in order for signalfd to receive them */
+    sigprocmask(SIG_BLOCK, &sigmask->signals, NULL);
+
+    pfd[JackSignalFD].fd = signalfd(-1, &sigmask->signals, 0);
+    if(pfd[JackSignalFD].fd == -1) {
+        fprintf(stderr, "signalfd() failed with errno %d\n", -errno);
+        return;
+    }
+    pfd[JackSignalFD].events = POLLIN;
+
+    pfd[JackEventFD].fd = eventfd(0, EFD_NONBLOCK);
+    if(pfd[JackEventFD].fd == -1) {
+        goto fail;
+    }
+    eventFD = pfd[JackEventFD].fd;
+    pfd[JackEventFD].events = POLLIN;
+
+#endif
 
     while (waiting) {
     #if defined(sun) && !defined(__sun__) // SUN compiler only, to check
         sigwait(&sigmask->signals);
+        fprintf(stderr, "Jack main caught signal\n");
+    #elif defined(__linux__)
+        err = poll(pfd, JackFDCount, -1);
+        if (err < 0) {
+            if (errno == EINTR) {
+                continue;
+            } else {
+                fprintf(stderr, "Jack : poll() failed with errno %d\n", -errno);
+                break;
+            }
+        } else {
+            if ((pfd[JackSignalFD].revents & (POLLERR | POLLHUP | POLLNVAL)) ||
+                 pfd[JackEventFD].revents & (POLLERR | POLLHUP | POLLNVAL)) {
+                fprintf(stderr, "Jack : poll() exited with errno %d\n", -errno);
+                break;
+            } else if ((pfd[JackSignalFD].revents & POLLIN) != 0) {
+                err = read (pfd[JackSignalFD].fd, &si, sizeof(si));
+                if (err < 0) {
+                    fprintf(stderr, "Jack : read() on signalfd failed with errno %d\n", -errno);
+                    break;
+                }
+                sig = si.ssi_signo;
+                fprintf(stderr, "Jack main caught signal %d\n", sig);
+            } else if ((pfd[JackEventFD].revents & POLLIN) != 0) {
+                sig = 0; /* Received an event from one of the Jack thread */
+                fprintf(stderr, "Jack main received event from child thread, Exiting\n");
+            } else {
+                continue;
+            }
+        }
     #else
         sigwait(&sigmask->signals, &sig);
-    #endif
         fprintf(stderr, "Jack main caught signal %d\n", sig);
+    #endif
 
         switch (sig) {
             case SIGUSR1:
@@ -712,6 +801,16 @@ jackctl_wait_signals(jackctl_sigmask_t * sigmask)
         // bugs that cause segfaults etc. during shutdown.
         sigprocmask(SIG_UNBLOCK, &sigmask->signals, 0);
     }
+
+#ifdef __linux__
+fail:
+    for(int i = 0; i < JackFDCount; i++) {
+        if(pfd[i].fd != 0) {
+            close(pfd[i].fd);
+        }
+    }
+#endif
+
 }
 #endif
 
@@ -922,6 +1021,7 @@ SERVER_EXPORT jackctl_server_t * jackctl_server_create(
 
     JackServerGlobals::on_device_acquire = on_device_acquire;
     JackServerGlobals::on_device_release = on_device_release;
+    JackServerGlobals::on_failure = on_failure;
 
     if (!jackctl_drivers_load(server_ptr))
     {
