@@ -113,48 +113,57 @@ alsa_driver_prepare (snd_pcm_t *handle, int is_capture)
 }
 
 static void
-alsa_driver_release_channel_dependent_memory (alsa_driver_t *driver)
+alsa_driver_release_channel_dependent_memory (alsa_driver_t *driver, alsa_device_t *device)
 {
-	bitset_destroy (&driver->channels_done);
-	bitset_destroy (&driver->channels_not_done);
+	bitset_destroy (&device->channels_done);
+	bitset_destroy (&device->channels_not_done);
 
-	if (driver->playback_addr) {
-		free (driver->playback_addr);
-		driver->playback_addr = 0;
+	device->capture_channel_offset = 0;
+	device->playback_channel_offset = 0;
+
+	/* if we have only 1 device reuse user requested channels, otherwise 0 will attemp to allocate max channels on next setup pass */
+	if (driver->devices_count != 1) {
+		driver->capture_nchannels = 0;
+		driver->playback_nchannels = 0;
+		device->capture_nchannels = 0;
+		device->playback_nchannels = 0;
 	}
 
-	if (driver->capture_addr) {
-		free (driver->capture_addr);
-		driver->capture_addr = 0;
+	if (device->playback_addr) {
+		free (device->playback_addr);
+		device->playback_addr = 0;
+	}
+
+	if (device->capture_addr) {
+		free (device->capture_addr);
+		device->capture_addr = 0;
 	}
 
 #ifdef __QNXNTO__
-	if (driver->playback_areas_ptr) {
-		free(driver->playback_areas_ptr);
-		driver->playback_areas = NULL;
-		driver->playback_areas_ptr = NULL;
+	if (device->playback_areas_ptr) {
+		free(device->playback_areas_ptr);
+		device->playback_areas_ptr = NULL;
 	}
 
-	if (driver->capture_areas_ptr) {
-		free(driver->capture_areas_ptr);
-		driver->capture_areas = NULL;
-		driver->capture_areas_ptr = NULL;
+	if (device->capture_areas_ptr) {
+		free(device->capture_areas_ptr);
+		device->capture_areas_ptr = NULL;
 	}
 #endif
 
-	if (driver->playback_interleave_skip) {
-		free (driver->playback_interleave_skip);
-		driver->playback_interleave_skip = NULL;
+	if (device->playback_interleave_skip) {
+		free (device->playback_interleave_skip);
+		device->playback_interleave_skip = NULL;
 	}
 
-	if (driver->capture_interleave_skip) {
-		free (driver->capture_interleave_skip);
-		driver->capture_interleave_skip = NULL;
+	if (device->capture_interleave_skip) {
+		free (device->capture_interleave_skip);
+		device->capture_interleave_skip = NULL;
 	}
 
-	if (driver->silent) {
-		free (driver->silent);
-		driver->silent = 0;
+	if (device->silent) {
+		free (device->silent);
+		device->silent = 0;
 	}
 
 	if (driver->dither_state) {
@@ -166,7 +175,7 @@ alsa_driver_release_channel_dependent_memory (alsa_driver_t *driver)
 #ifndef __QNXNTO__
 
 static int
-alsa_driver_check_capabilities (alsa_driver_t *driver)
+alsa_driver_check_capabilities (alsa_driver_t *driver, alsa_device_t *device)
 {
 	return 0;
 }
@@ -174,7 +183,7 @@ alsa_driver_check_capabilities (alsa_driver_t *driver)
 char* get_control_device_name(const char * device_name);
 
 static int
-alsa_driver_check_card_type (alsa_driver_t *driver)
+alsa_driver_check_card_type (alsa_driver_t *driver, alsa_device_t *device)
 {
 	int err;
 	snd_ctl_card_info_t *card_info;
@@ -182,7 +191,7 @@ alsa_driver_check_card_type (alsa_driver_t *driver)
 
 	snd_ctl_card_info_alloca (&card_info);
 
-	ctl_name = get_control_device_name(driver->alsa_name_playback);
+	ctl_name = get_control_device_name(device->playback_name);
 
 	// XXX: I don't know the "right" way to do this. Which to use
 	// driver->alsa_name_playback or driver->alsa_name_capture.
@@ -191,35 +200,35 @@ alsa_driver_check_card_type (alsa_driver_t *driver)
 			    snd_strerror(err));
 	} else if ((err = snd_ctl_card_info(driver->ctl_handle, card_info)) < 0) {
 		jack_error ("control hardware info \"%s\" (%s)",
-			    driver->alsa_name_playback, snd_strerror (err));
+			    device->playback_name, snd_strerror (err));
 		snd_ctl_close (driver->ctl_handle);
 	}
 
-	driver->alsa_driver = strdup(snd_ctl_card_info_get_driver (card_info));
+	device->alsa_driver = strdup(snd_ctl_card_info_get_driver (card_info));
 
 	free(ctl_name);
 
-	return alsa_driver_check_capabilities (driver);
+	return alsa_driver_check_capabilities (driver, device);
 }
 
 static int
-alsa_driver_hammerfall_hardware (alsa_driver_t *driver)
+alsa_driver_hammerfall_hardware (alsa_driver_t *driver, alsa_device_t *device)
 {
-	driver->hw = jack_alsa_hammerfall_hw_new (driver);
+	device->hw = jack_alsa_hammerfall_hw_new (driver);
 	return 0;
 }
 
 static int
-alsa_driver_hdsp_hardware (alsa_driver_t *driver)
+alsa_driver_hdsp_hardware (alsa_driver_t *driver, alsa_device_t *device)
 {
-	driver->hw = jack_alsa_hdsp_hw_new (driver);
+	device->hw = jack_alsa_hdsp_hw_new (driver);
 	return 0;
 }
 
 static int
-alsa_driver_ice1712_hardware (alsa_driver_t *driver)
+alsa_driver_ice1712_hardware (alsa_driver_t *driver, alsa_device_t *device)
 {
-        driver->hw = jack_alsa_ice1712_hw_new (driver);
+        device->hw = jack_alsa_ice1712_hw_new (driver);
         return 0;
 }
 
@@ -234,46 +243,46 @@ alsa_driver_usx2y_hardware (alsa_driver_t *driver)
 */
 
 static int
-alsa_driver_generic_hardware (alsa_driver_t *driver)
+alsa_driver_generic_hardware (alsa_driver_t *driver, alsa_device_t *device)
 {
-	driver->hw = jack_alsa_generic_hw_new (driver);
+	device->hw = jack_alsa_generic_hw_new (driver);
 	return 0;
 }
 
 static int
-alsa_driver_hw_specific (alsa_driver_t *driver, int hw_monitoring,
+alsa_driver_hw_specific (alsa_driver_t *driver, alsa_device_t *device, int hw_monitoring,
 			 int hw_metering)
 {
 	int err;
 
-	if (!strcmp(driver->alsa_driver, "RME9652")) {
-		if ((err = alsa_driver_hammerfall_hardware (driver)) != 0) {
+	if (!strcmp(device->alsa_driver, "RME9652")) {
+		if ((err = alsa_driver_hammerfall_hardware (driver, device)) != 0) {
 			return err;
 		}
-	} else if (!strcmp(driver->alsa_driver, "H-DSP")) {
-                if ((err = alsa_driver_hdsp_hardware (driver)) !=0) {
+	} else if (!strcmp(device->alsa_driver, "H-DSP")) {
+                if ((err = alsa_driver_hdsp_hardware (driver, device)) !=0) {
                         return err;
                 }
-	} else if (!strcmp(driver->alsa_driver, "ICE1712")) {
-                if ((err = alsa_driver_ice1712_hardware (driver)) !=0) {
+	} else if (!strcmp(device->alsa_driver, "ICE1712")) {
+                if ((err = alsa_driver_ice1712_hardware (driver, device)) !=0) {
                         return err;
                 }
 	}
     // JACK2
     /*
-        else if (!strcmp(driver->alsa_driver, "USB US-X2Y")) {
-		if ((err = alsa_driver_usx2y_hardware (driver)) !=0) {
+        else if (!strcmp(device->alsa_driver, "USB US-X2Y")) {
+		if ((err = alsa_driver_usx2y_hardware (driver, device)) !=0) {
 				return err;
 		}
 	}
     */
        else {
-	        if ((err = alsa_driver_generic_hardware (driver)) != 0) {
+	        if ((err = alsa_driver_generic_hardware (driver, device)) != 0) {
 			return err;
 		}
 	}
 
-	if (driver->hw->capabilities & Cap_HardwareMonitoring) {
+	if (device->hw->capabilities & Cap_HardwareMonitoring) {
 		driver->has_hw_monitoring = TRUE;
 		/* XXX need to ensure that this is really FALSE or
 		 * TRUE or whatever*/
@@ -283,13 +292,13 @@ alsa_driver_hw_specific (alsa_driver_t *driver, int hw_monitoring,
 		driver->hw_monitoring = FALSE;
 	}
 
-	if (driver->hw->capabilities & Cap_ClockLockReporting) {
+	if (device->hw->capabilities & Cap_ClockLockReporting) {
 		driver->has_clock_sync_reporting = TRUE;
 	} else {
 		driver->has_clock_sync_reporting = FALSE;
 	}
 
-	if (driver->hw->capabilities & Cap_HardwareMetering) {
+	if (device->hw->capabilities & Cap_HardwareMetering) {
 		driver->has_hw_metering = TRUE;
 		driver->hw_metering = hw_metering;
 	} else {
@@ -302,38 +311,38 @@ alsa_driver_hw_specific (alsa_driver_t *driver, int hw_monitoring,
 #endif
 
 static void
-alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
+alsa_driver_setup_io_function_pointers (alsa_driver_t *driver, alsa_device_t *device)
 {
-	if (driver->playback_handle) {
-		if (SND_PCM_FORMAT_FLOAT_LE == driver->playback_sample_format) {
-			driver->write_via_copy = sample_move_dS_floatLE;
+	if (device->playback_handle) {
+		if (SND_PCM_FORMAT_FLOAT_LE == device->playback_sample_format) {
+			device->write_via_copy = sample_move_dS_floatLE;
 		} else {
-			switch (driver->playback_sample_bytes) {
+			switch (device->playback_sample_bytes) {
 			case 2:
 				switch (driver->dither) {
 				case Rectangular:
 					jack_info("Rectangular dithering at 16 bits");
-					driver->write_via_copy = driver->quirk_bswap?
+					device->write_via_copy = device->quirk_bswap?
 						sample_move_dither_rect_d16_sSs:
 						sample_move_dither_rect_d16_sS;
 					break;
 
 				case Triangular:
 					jack_info("Triangular dithering at 16 bits");
-					driver->write_via_copy = driver->quirk_bswap?
+					device->write_via_copy = device->quirk_bswap?
 						sample_move_dither_tri_d16_sSs:
 						sample_move_dither_tri_d16_sS;
 					break;
 
 				case Shaped:
 					jack_info("Noise-shaped dithering at 16 bits");
-					driver->write_via_copy = driver->quirk_bswap?
+					device->write_via_copy = device->quirk_bswap?
 						sample_move_dither_shaped_d16_sSs:
 						sample_move_dither_shaped_d16_sS;
 					break;
 
 				default:
-					driver->write_via_copy = driver->quirk_bswap?
+					device->write_via_copy = device->quirk_bswap?
 						sample_move_d16_sSs :
 						sample_move_d16_sS;
 					break;
@@ -341,43 +350,43 @@ alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 				break;
 
 			case 3: /* NO DITHER */
-				driver->write_via_copy = driver->quirk_bswap?
+				device->write_via_copy = device->quirk_bswap?
 					sample_move_d24_sSs:
 					sample_move_d24_sS;
 
 				break;
 
 			case 4: /* NO DITHER */
-				driver->write_via_copy = driver->quirk_bswap?
+				device->write_via_copy = device->quirk_bswap?
 					sample_move_d32u24_sSs:
 					sample_move_d32u24_sS;
 				break;
 
 			default:
 				jack_error ("impossible sample width (%d) discovered!",
-						driver->playback_sample_bytes);
+						device->playback_sample_bytes);
 				exit (1);
 			}
 		}
 	}
 
-	if (driver->capture_handle) {
-		if (SND_PCM_FORMAT_FLOAT_LE == driver->capture_sample_format) {
-			driver->read_via_copy = sample_move_floatLE_sSs;
+	if (device->capture_handle) {
+		if (SND_PCM_FORMAT_FLOAT_LE == device->capture_sample_format) {
+			device->read_via_copy = sample_move_floatLE_sSs;
 		} else {
-			switch (driver->capture_sample_bytes) {
+			switch (device->capture_sample_bytes) {
 			case 2:
-				driver->read_via_copy = driver->quirk_bswap?
+				device->read_via_copy = device->quirk_bswap?
 					sample_move_dS_s16s:
 					sample_move_dS_s16;
 				break;
 			case 3:
-				driver->read_via_copy = driver->quirk_bswap?
+				device->read_via_copy = device->quirk_bswap?
 					sample_move_dS_s24s:
 					sample_move_dS_s24;
 				break;
 			case 4:
-				driver->read_via_copy = driver->quirk_bswap?
+				device->read_via_copy = device->quirk_bswap?
 					sample_move_dS_s32u24s:
 					sample_move_dS_s32u24;
 				break;
@@ -389,7 +398,7 @@ alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 #ifdef __QNXNTO__
 
 static int
-alsa_driver_allocate_buffer(alsa_driver_t *driver, int frames, int channels, bool is_capture)
+alsa_driver_allocate_buffer(alsa_driver_t *driver, alsa_device_t *device, int frames, int channels, bool is_capture)
 {
 	const long ALIGNMENT = 32;
 
@@ -400,11 +409,11 @@ alsa_driver_allocate_buffer(alsa_driver_t *driver, int frames, int channels, boo
 		char* const aligned_buffer = (char*)((uintptr_t)fBuffer & ~(ALIGNMENT-1)) + ALIGNMENT;
 
 		if(is_capture) {
-			driver->capture_areas_ptr = fBuffer;
-			driver->capture_areas = aligned_buffer;
+			device->capture_areas_ptr = fBuffer;
+			device->capture_areas = aligned_buffer;
 		} else {
-			driver->playback_areas_ptr = fBuffer;
-			driver->playback_areas = aligned_buffer;
+			device->playback_areas_ptr = fBuffer;
+			device->playback_areas = aligned_buffer;
 		}
 
 		return 0;
@@ -415,7 +424,7 @@ alsa_driver_allocate_buffer(alsa_driver_t *driver, int frames, int channels, boo
 }
 
 static int
-alsa_driver_get_setup (alsa_driver_t *driver, snd_pcm_channel_setup_t *setup, bool is_capture)
+alsa_driver_get_setup (alsa_driver_t *driver, alsa_device_t *device, snd_pcm_channel_setup_t *setup, bool is_capture)
 {
 	int err = 0;
 
@@ -423,13 +432,13 @@ alsa_driver_get_setup (alsa_driver_t *driver, snd_pcm_channel_setup_t *setup, bo
 	setup->channel = is_capture;
 
 	if(is_capture) {
-		err = snd_pcm_plugin_setup(driver->capture_handle, setup);
+		err = snd_pcm_plugin_setup(device->capture_handle, setup);
 	} else {
-		err = snd_pcm_plugin_setup(driver->playback_handle, setup);
+		err = snd_pcm_plugin_setup(device->playback_handle, setup);
 	}
 	if (err < 0) {
 		jack_error("couldn't get channel setup for %s, err = %s ",
-			   is_capture ? driver->alsa_name_capture : driver->alsa_name_playback,
+			   is_capture ? device->capture_name : device->playback_name,
 			   strerror(err));
 		return -1;
 	}
@@ -438,7 +447,7 @@ alsa_driver_get_setup (alsa_driver_t *driver, snd_pcm_channel_setup_t *setup, bo
 }
 
 static int
-alsa_driver_configure_stream (alsa_driver_t *driver, char *device_name,
+alsa_driver_configure_stream (alsa_driver_t *driver, alsa_device_t *device, char *device_name,
 			      const char *stream_name,
 			      snd_pcm_t *handle,
 			      unsigned int *nperiodsp,
@@ -449,8 +458,8 @@ alsa_driver_configure_stream (alsa_driver_t *driver, char *device_name,
 	int err = 0;
 	snd_pcm_channel_info_t ch_info;
 	snd_pcm_channel_params_t ch_params;
-	const unsigned long sample_size = is_capture ? driver->capture_sample_bytes
-	                                             : driver->playback_sample_bytes;
+	const unsigned long sample_size = is_capture ? device->capture_sample_bytes
+	                                             : device->playback_sample_bytes;
 
 	memset(&ch_info, 0, sizeof(ch_info));
 	/*A pointer to a snd_pcm_channel_info_t structure that snd_pcm_plugin_info() fills in with information about the PCM channel.
@@ -496,11 +505,11 @@ alsa_driver_configure_stream (alsa_driver_t *driver, char *device_name,
 	 * (periods * period_size) because the silence prefill will fill the
 	 * complete buffer
 	 */
-	return alsa_driver_allocate_buffer(driver, driver->frames_per_cycle * *nperiodsp, *nchns, is_capture);
+	return alsa_driver_allocate_buffer(driver, device, driver->frames_per_cycle * *nperiodsp, *nchns, is_capture);
 }
 #else
 static int
-alsa_driver_configure_stream (alsa_driver_t *driver, char *device_name,
+alsa_driver_configure_stream (alsa_driver_t *driver, alsa_device_t *device, char *device_name,
 			      const char *stream_name,
 			      snd_pcm_t *handle,
 			      snd_pcm_hw_params_t *hw_params,
@@ -575,9 +584,9 @@ alsa_driver_configure_stream (alsa_driver_t *driver, char *device_name,
 			}
 		} else {
 			if (formats[format].swapped) {
-				driver->quirk_bswap = 1;
+				device->quirk_bswap = 1;
 			} else {
-				driver->quirk_bswap = 0;
+				device->quirk_bswap = 0;
 			}
 			jack_info ("ALSA: final selected sample format for %s: %s", stream_name, formats[format].Name);
 			break;
@@ -724,7 +733,7 @@ alsa_driver_configure_stream (alsa_driver_t *driver, char *device_name,
 	}
 #endif
 
-	if (handle == driver->playback_handle)
+	if (handle == device->playback_handle)
 		err = snd_pcm_sw_params_set_avail_min (
 			handle, sw_params,
 			driver->frames_per_cycle
@@ -794,27 +803,28 @@ alsa_driver_check_format (snd_pcm_format_t format)
 }
 
 static void
-alsa_driver_set_sample_bytes (alsa_driver_t *driver)
+alsa_driver_set_sample_bytes (alsa_driver_t *driver, alsa_device_t *device)
 {
 #ifdef __QNXNTO__
-	driver->playback_sample_bytes =
-		snd_pcm_format_width (driver->playback_sample_format)
+	device->playback_sample_bytes =
+		snd_pcm_format_width (device->playback_sample_format)
 		/ 8;
-	driver->capture_sample_bytes =
-		snd_pcm_format_width (driver->capture_sample_format)
+	device->capture_sample_bytes =
+		snd_pcm_format_width (device->capture_sample_format)
 		/ 8;
 #else
-	driver->playback_sample_bytes =
-		snd_pcm_format_physical_width (driver->playback_sample_format)
+	device->playback_sample_bytes =
+		snd_pcm_format_physical_width (device->playback_sample_format)
 		/ 8;
-	driver->capture_sample_bytes =
-		snd_pcm_format_physical_width (driver->capture_sample_format)
+	device->capture_sample_bytes =
+		snd_pcm_format_physical_width (device->capture_sample_format)
 		/ 8;
 #endif
 }
 
 static int
 alsa_driver_set_parameters (alsa_driver_t *driver,
+			    alsa_device_t *device,
 			    jack_nframes_t frames_per_cycle,
 			    jack_nframes_t user_nperiods,
 			    jack_nframes_t rate)
@@ -838,32 +848,35 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 	driver->frames_per_cycle = frames_per_cycle;
 	driver->user_nperiods = user_nperiods;
 
-	jack_info ("configuring for %" PRIu32 "Hz, period = %"
+	jack_info ("configuring C: '%s' P: '%s' %" PRIu32 "Hz, period = %"
 		 PRIu32 " frames (%.1f ms), buffer = %" PRIu32 " periods",
+		 device->capture_name != NULL ? device->capture_name : "-", device->playback_name != NULL ? device->playback_name : "-",
 		 rate, frames_per_cycle, (((float)frames_per_cycle / (float) rate) * 1000.0f), user_nperiods);
 
-	if (driver->capture_handle) {
+	if (device->capture_handle) {
 #ifdef __QNXNTO__
 	    err = alsa_driver_configure_stream (
 		    driver,
-		    driver->alsa_name_capture,
+		    device,
+		    device->capture_name,
 		    "capture",
-		    driver->capture_handle,
+		    device->capture_handle,
 		    &driver->capture_nperiods,
-		    &driver->capture_nchannels,
-		    driver->capture_sample_bytes,
+		    &device->capture_nchannels,
+		    device->capture_sample_bytes,
 		    SND_PCM_CHANNEL_CAPTURE);
 #else
 	    err = alsa_driver_configure_stream (
 		    driver,
-		    driver->alsa_name_capture,
+		    device,
+		    device->capture_name,
 		    "capture",
-		    driver->capture_handle,
+		    device->capture_handle,
 		    driver->capture_hw_params,
 		    driver->capture_sw_params,
 		    &driver->capture_nperiods,
-		    &driver->capture_nchannels,
-		    driver->capture_sample_bytes);
+		    &device->capture_nchannels,
+		    device->capture_sample_bytes);
 #endif
 		if (err) {
 			jack_error ("ALSA: cannot configure capture channel");
@@ -871,28 +884,30 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 		}
 	}
 
-	if (driver->playback_handle) {
+	if (device->playback_handle) {
 #ifdef __QNXNTO__
 	    err = alsa_driver_configure_stream (
 		    driver,
-		    driver->alsa_name_playback,
+		    device,
+		    device->playback_name,
 		    "playback",
-		    driver->playback_handle,
+		    device->playback_handle,
 		    &driver->playback_nperiods,
-		    &driver->playback_nchannels,
-		    driver->playback_sample_bytes,
+		    &device->playback_nchannels,
+		    device->playback_sample_bytes,
 		    SND_PCM_CHANNEL_PLAYBACK);
 #else
 	    err = alsa_driver_configure_stream (
 		    driver,
-		    driver->alsa_name_playback,
+		    device,
+		    device->playback_name,
 		    "playback",
-		    driver->playback_handle,
+		    device->playback_handle,
 		    driver->playback_hw_params,
 		    driver->playback_sw_params,
 		    &driver->playback_nperiods,
-		    &driver->playback_nchannels,
-		    driver->playback_sample_bytes);
+		    &device->playback_nchannels,
+		    device->playback_sample_bytes);
 #endif
 		if (err) {
 			jack_error ("ALSA: cannot configure playback channel");
@@ -901,46 +916,46 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 	}
 
 #ifdef __QNXNTO__
-	if (driver->capture_handle) {
-		err = alsa_driver_get_setup(driver, &c_setup, SND_PCM_CHANNEL_CAPTURE);
+	if (device->capture_handle) {
+		err = alsa_driver_get_setup(driver, device, &c_setup, SND_PCM_CHANNEL_CAPTURE);
 		if(err < 0) {
 			return -1;
 		}
 		cr = c_setup.format.rate;
-		c_period_size = c_setup.buf.block.frag_size / driver->capture_nchannels
-		        / driver->capture_sample_bytes;
+		c_period_size = c_setup.buf.block.frag_size / device->capture_nchannels
+		        / device->capture_sample_bytes;
 		c_periods = c_setup.buf.block.frags;
-		driver->capture_sample_format = c_setup.format.format;
-		driver->capture_interleaved = c_setup.format.interleave;
+		device->capture_sample_format = c_setup.format.format;
+		device->capture_interleaved = c_setup.format.interleave;
 	}
-	if (driver->playback_handle) {
-		err = alsa_driver_get_setup(driver, &p_setup, SND_PCM_CHANNEL_PLAYBACK);
+	if (device->playback_handle) {
+		err = alsa_driver_get_setup(driver, device, &p_setup, SND_PCM_CHANNEL_PLAYBACK);
 		if(err < 0) {
 			return -1;
 		}
 		pr = p_setup.format.rate;
-		p_period_size = p_setup.buf.block.frag_size  / driver->playback_nchannels
-		        / driver->playback_sample_bytes;
+		p_period_size = p_setup.buf.block.frag_size  / device->playback_nchannels
+		        / device->playback_sample_bytes;
 		p_periods = p_setup.buf.block.frags;
-		driver->playback_sample_format = p_setup.format.format;
-		driver->playback_interleaved = p_setup.format.interleave;
+		device->playback_sample_format = p_setup.format.format;
+		device->playback_interleaved = p_setup.format.interleave;
 	}
 #else
 
 	/* check the rate, since that's rather important */
 
-	if (driver->playback_handle) {
+	if (device->playback_handle) {
 		snd_pcm_hw_params_get_rate (driver->playback_hw_params,
 					    &pr, &dir);
 	}
 
-	if (driver->capture_handle) {
+	if (device->capture_handle) {
 		snd_pcm_hw_params_get_rate (driver->capture_hw_params,
-					    &cr, &dir);
+						&cr, &dir);
 	}
 #endif
 
-	if (driver->capture_handle && driver->playback_handle) {
+	if (device->capture_handle && device->playback_handle) {
 		if (cr != pr) {
 			jack_error ("playback and capture sample rates do "
 				    "not match (%d vs. %d)", pr, cr);
@@ -959,13 +974,13 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 		}
 
 	}
-	else if (driver->capture_handle && cr != driver->frame_rate) {
+	else if (device->capture_handle && cr != driver->frame_rate) {
 		jack_error ("capture sample rate in use (%d Hz) does not "
 			    "match requested rate (%d Hz)",
 			    cr, driver->frame_rate);
 		driver->frame_rate = cr;
 	}
-	else if (driver->playback_handle && pr != driver->frame_rate) {
+	else if (device->playback_handle && pr != driver->frame_rate) {
 		jack_error ("playback sample rate in use (%d Hz) does not "
 			    "match requested rate (%d Hz)",
 			    pr, driver->frame_rate);
@@ -975,7 +990,7 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 
 	/* check the fragment size, since that's non-negotiable */
 
-	if (driver->playback_handle) {
+	if (device->playback_handle) {
 #ifndef __QNXNTO__
  		snd_pcm_access_t access;
 
@@ -983,10 +998,10 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
  			driver->playback_hw_params, &p_period_size, &dir);
  		err = snd_pcm_hw_params_get_format (
  			driver->playback_hw_params,
-			&(driver->playback_sample_format));
+			&(device->playback_sample_format));
  		err = snd_pcm_hw_params_get_access (driver->playback_hw_params,
 						    &access);
- 		driver->playback_interleaved =
+		device->playback_interleaved =
 			(access == SND_PCM_ACCESS_MMAP_INTERLEAVED)
 			|| (access == SND_PCM_ACCESS_MMAP_COMPLEX);
 #endif
@@ -1010,7 +1025,7 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 #endif
 	}
 
-	if (driver->capture_handle) {
+	if (device->capture_handle) {
 #ifndef __QNXNTO__
  		snd_pcm_access_t access;
 
@@ -1018,10 +1033,10 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
  			driver->capture_hw_params, &c_period_size, &dir);
  		err = snd_pcm_hw_params_get_format (
  			driver->capture_hw_params,
-			&(driver->capture_sample_format));
+			&(device->capture_sample_format));
  		err = snd_pcm_hw_params_get_access (driver->capture_hw_params,
 						    &access);
- 		driver->capture_interleaved =
+		device->capture_interleaved =
 			(access == SND_PCM_ACCESS_MMAP_INTERLEAVED)
 			|| (access == SND_PCM_ACCESS_MMAP_COMPLEX);
 #endif
@@ -1048,10 +1063,10 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 #endif
 	}
 
-	alsa_driver_set_sample_bytes(driver);
+	alsa_driver_set_sample_bytes(driver, device);
 
-	if (driver->playback_handle) {
-		err = alsa_driver_check_format(driver->playback_sample_format);
+	if (device->playback_handle) {
+		err = alsa_driver_check_format(device->playback_sample_format);
 		if(err < 0) {
 			jack_error ("programming error: unhandled format "
 				    "type for playback");
@@ -1059,8 +1074,8 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 		}
 	}
 
-	if (driver->capture_handle) {
-		err = alsa_driver_check_format(driver->capture_sample_format);
+	if (device->capture_handle) {
+		err = alsa_driver_check_format(device->capture_sample_format);
 		if(err < 0) {
 			jack_error ("programming error: unhandled format "
 				    "type for capture");
@@ -1068,51 +1083,58 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 		}
 	}
 
-	if (driver->playback_interleaved) {
+	if (device->playback_interleaved) {
 #ifndef __QNXNTO__
 		const snd_pcm_channel_area_t *my_areas;
 		snd_pcm_uframes_t offset, frames;
-		if (snd_pcm_mmap_begin(driver->playback_handle,
+		if (snd_pcm_mmap_begin(device->playback_handle,
 				       &my_areas, &offset, &frames) < 0) {
 			jack_error ("ALSA: %s: mmap areas info error",
-				    driver->alsa_name_playback);
+				    device->playback_name);
 			return -1;
 		}
 
 		// TODO does not work for capture only
-		driver->interleave_unit =
+		device->interleave_unit =
 			snd_pcm_format_physical_width (
-				driver->playback_sample_format) / 8;
+				device->playback_sample_format) / 8;
 #else
-		driver->interleave_unit = snd_pcm_format_width(
-		            driver->playback_sample_format) / 8;
+		device->interleave_unit = snd_pcm_format_width(
+		            device->playback_sample_format) / 8;
 #endif
 	} else {
 
-		driver->interleave_unit = 0;  /* NOT USED */
+		device->interleave_unit = 0;  /* NOT USED */
 	}
 
 #ifndef __QNXNTO__
-	if (driver->capture_interleaved) {
+	if (device->capture_interleaved) {
 		const snd_pcm_channel_area_t *my_areas;
 		snd_pcm_uframes_t offset, frames;
-		if (snd_pcm_mmap_begin(driver->capture_handle,
+		if (snd_pcm_mmap_begin(device->capture_handle,
 				       &my_areas, &offset, &frames) < 0) {
 			jack_error ("ALSA: %s: mmap areas info error",
-				    driver->alsa_name_capture);
+				    device->capture_name);
 			return -1;
 		}
 	}
 #endif
-	if (driver->playback_nchannels > driver->capture_nchannels) {
-		driver->max_nchannels = driver->playback_nchannels;
-		driver->user_nchannels = driver->capture_nchannels;
+	if (device->playback_nchannels > device->capture_nchannels) {
+		device->max_nchannels = device->playback_nchannels;
+		device->user_nchannels = device->capture_nchannels;
 	} else {
-		driver->max_nchannels = driver->capture_nchannels;
-		driver->user_nchannels = driver->playback_nchannels;
+		device->max_nchannels = device->capture_nchannels;
+		device->user_nchannels = device->playback_nchannels;
 	}
 
-	alsa_driver_setup_io_function_pointers (driver);
+	/* device local channel offset to offsets in driver, used by Jack2 */
+	device->capture_channel_offset = driver->capture_nchannels;
+	device->playback_channel_offset = driver->playback_nchannels;
+
+	driver->capture_nchannels += device->capture_nchannels;
+	driver->playback_nchannels += device->playback_nchannels;
+
+	alsa_driver_setup_io_function_pointers (driver, device);
 
 	/* Allocate and initialize structures that rely on the
 	   channels counts.
@@ -1123,48 +1145,43 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 	   that potentially need to be silenced.
 	*/
 
-	bitset_create (&driver->channels_done, driver->max_nchannels);
-	bitset_create (&driver->channels_not_done, driver->max_nchannels);
+	bitset_create (&device->channels_done, device->max_nchannels);
+	bitset_create (&device->channels_not_done, device->max_nchannels);
 
-	if (driver->playback_handle) {
-		driver->playback_addr = (char **)
-			malloc (sizeof (char *) * driver->playback_nchannels);
-		memset (driver->playback_addr, 0,
-			sizeof (char *) * driver->playback_nchannels);
-		driver->playback_interleave_skip = (unsigned long *)
-			malloc (sizeof (unsigned long *) * driver->playback_nchannels);
-		memset (driver->playback_interleave_skip, 0,
-			sizeof (unsigned long *) * driver->playback_nchannels);
-		driver->silent = (unsigned long *)
+	if (device->playback_handle) {
+		device->playback_addr = (char **)
+			malloc (sizeof (char *) * device->playback_nchannels);
+		memset (device->playback_addr, 0,
+			sizeof (char *) * device->playback_nchannels);
+		device->playback_interleave_skip = (unsigned long *)
+			malloc (sizeof (unsigned long *) * device->playback_nchannels);
+		memset (device->playback_interleave_skip, 0,
+			sizeof (unsigned long *) * device->playback_nchannels);
+		device->silent = (unsigned long *)
 			malloc (sizeof (unsigned long)
-				* driver->playback_nchannels);
+				* device->playback_nchannels);
 
-		for (chn = 0; chn < driver->playback_nchannels; chn++) {
-			driver->silent[chn] = 0;
+		for (chn = 0; chn < device->playback_nchannels; chn++) {
+			device->silent[chn] = 0;
 		}
 
-		for (chn = 0; chn < driver->playback_nchannels; chn++) {
-			bitset_add (driver->channels_done, chn);
+		for (chn = 0; chn < device->playback_nchannels; chn++) {
+			bitset_add (device->channels_done, chn);
 		}
 
-		driver->dither_state = (dither_state_t *)
-			calloc ( driver->playback_nchannels,
-				 sizeof (dither_state_t));
+		driver->dither_state = (dither_state_t *) calloc (device->playback_nchannels, sizeof (dither_state_t));
 	}
 
-	if (driver->capture_handle) {
-		driver->capture_addr = (char **)
-			malloc (sizeof (char *) * driver->capture_nchannels);
-		memset (driver->capture_addr, 0,
-			sizeof (char *) * driver->capture_nchannels);
-		driver->capture_interleave_skip = (unsigned long *)
-			malloc (sizeof (unsigned long *) * driver->capture_nchannels);
-		memset (driver->capture_interleave_skip, 0,
-			sizeof (unsigned long *) * driver->capture_nchannels);
+	if (device->capture_handle) {
+		device->capture_addr = (char **)
+			malloc (sizeof (char *) * device->capture_nchannels);
+		memset (device->capture_addr, 0,
+			sizeof (char *) * device->capture_nchannels);
+		device->capture_interleave_skip = (unsigned long *)
+			malloc (sizeof (unsigned long *) * device->capture_nchannels);
+		memset (device->capture_interleave_skip, 0,
+			sizeof (unsigned long *) * device->capture_nchannels);
 	}
-
-	driver->clock_sync_data = (ClockSyncStatus *)
-		malloc (sizeof (ClockSyncStatus) * driver->max_nchannels);
 
 	driver->period_usecs =
 		(jack_time_t) floor ((((float) driver->frames_per_cycle) /
@@ -1194,11 +1211,18 @@ alsa_driver_reset_parameters (alsa_driver_t *driver,
 			      jack_nframes_t user_nperiods,
 			      jack_nframes_t rate)
 {
+	int err = 0;
+
 	/* XXX unregister old ports ? */
-	alsa_driver_release_channel_dependent_memory (driver);
-	return alsa_driver_set_parameters (driver,
-					   frames_per_cycle,
-					   user_nperiods, rate);
+	for (int i = 0; i < driver->devices_count; ++i) {
+		alsa_device_t *device = &driver->devices[i];
+		alsa_driver_release_channel_dependent_memory (driver, device);
+		if ((err = alsa_driver_set_parameters (driver, device, frames_per_cycle, user_nperiods, rate)) != 0) {
+			return err;
+		}
+	}
+
+	return err;
 }
 
 #ifdef __QNXNTO__
@@ -1220,6 +1244,7 @@ snd_pcm_poll_descriptors_revents(snd_pcm_t *pcm, struct pollfd *pfds,
 
 static int
 alsa_driver_get_channel_addresses (alsa_driver_t *driver,
+				   alsa_device_t *device,
 				   snd_pcm_uframes_t *capture_avail,
 				   snd_pcm_uframes_t *playback_avail,
 				   snd_pcm_uframes_t *capture_offset,
@@ -1231,32 +1256,32 @@ alsa_driver_get_channel_addresses (alsa_driver_t *driver,
 #ifndef __QNXNTO__
 		int err;
 		if ((err = snd_pcm_mmap_begin (
-			     driver->capture_handle, &driver->capture_areas,
+			     device->capture_handle, &device->capture_areas,
 			     (snd_pcm_uframes_t *) capture_offset,
 			     (snd_pcm_uframes_t *) capture_avail)) < 0) {
 			jack_error ("ALSA: %s: mmap areas info error",
-				    driver->alsa_name_capture);
+				    device->capture_name);
 			return -1;
 		}
 
-		for (chn = 0; chn < driver->capture_nchannels; chn++) {
+		for (chn = 0; chn < device->capture_nchannels; chn++) {
 			const snd_pcm_channel_area_t *a =
-				&driver->capture_areas[chn];
-			driver->capture_addr[chn] = (char *) a->addr
+				&device->capture_areas[chn];
+			device->capture_addr[chn] = (char *) a->addr
 				+ ((a->first + a->step * *capture_offset) / 8);
-			driver->capture_interleave_skip[chn] = (unsigned long ) (a->step / 8);
+			device->capture_interleave_skip[chn] = (unsigned long ) (a->step / 8);
 		}
 #else
-		for (chn = 0; chn < driver->capture_nchannels; chn++) {
-			char* const a = driver->capture_areas;
-			if (driver->capture_interleaved) {
-				driver->capture_addr[chn] = &a[chn * driver->capture_sample_bytes];
-				driver->capture_interleave_skip[chn] = driver->capture_nchannels *
-				        driver->capture_sample_bytes;
+		for (chn = 0; chn < device->capture_nchannels; chn++) {
+			char* const a = device->capture_areas;
+			if (device->capture_interleaved) {
+				device->capture_addr[chn] = &a[chn * device->capture_sample_bytes];
+				device->capture_interleave_skip[chn] = device->capture_nchannels *
+				        device->capture_sample_bytes;
 			} else {
-				driver->capture_addr[chn] = &a[chn *
-				        driver->capture_sample_bytes * driver->frames_per_cycle];
-				driver->capture_interleave_skip[chn] = driver->capture_sample_bytes;
+				device->capture_addr[chn] = &a[chn *
+				        device->capture_sample_bytes * driver->frames_per_cycle];
+				device->capture_interleave_skip[chn] = device->capture_sample_bytes;
 			}
 		}
 #endif
@@ -1266,32 +1291,32 @@ alsa_driver_get_channel_addresses (alsa_driver_t *driver,
 #ifndef __QNXNTO__
 		int err;
 		if ((err = snd_pcm_mmap_begin (
-			     driver->playback_handle, &driver->playback_areas,
+			     device->playback_handle, &device->playback_areas,
 			     (snd_pcm_uframes_t *) playback_offset,
 			     (snd_pcm_uframes_t *) playback_avail)) < 0) {
 			jack_error ("ALSA: %s: mmap areas info error ",
-				    driver->alsa_name_playback);
+				    device->playback_name);
 			return -1;
 		}
 
-		for (chn = 0; chn < driver->playback_nchannels; chn++) {
+		for (chn = 0; chn < device->playback_nchannels; chn++) {
 			const snd_pcm_channel_area_t *a =
-				&driver->playback_areas[chn];
-			driver->playback_addr[chn] = (char *) a->addr
+				&device->playback_areas[chn];
+			device->playback_addr[chn] = (char *) a->addr
 				+ ((a->first + a->step * *playback_offset) / 8);
-			driver->playback_interleave_skip[chn] = (unsigned long ) (a->step / 8);
+			device->playback_interleave_skip[chn] = (unsigned long ) (a->step / 8);
 		}
 #else
-		for (chn = 0; chn < driver->playback_nchannels; chn++) {
-			char* const a = driver->playback_areas;
-			if (driver->playback_interleaved) {
-				driver->playback_addr[chn] = &a[chn * driver->playback_sample_bytes];
-				driver->playback_interleave_skip[chn] = driver->playback_nchannels *
-				        driver->playback_sample_bytes;
+		for (chn = 0; chn < device->playback_nchannels; chn++) {
+			char* const a = device->playback_areas;
+			if (device->playback_interleaved) {
+				device->playback_addr[chn] = &a[chn * device->playback_sample_bytes];
+				device->playback_interleave_skip[chn] = device->playback_nchannels *
+				        device->playback_sample_bytes;
 			} else {
-				driver->playback_addr[chn] = &a[chn *
-				        driver->playback_sample_bytes * driver->frames_per_cycle];
-				driver->playback_interleave_skip[chn] = driver->playback_sample_bytes;
+				device->playback_addr[chn] = &a[chn *
+				        device->playback_sample_bytes * driver->frames_per_cycle];
+				device->playback_interleave_skip[chn] = device->playback_sample_bytes;
 			}
 		}
 #endif
@@ -1324,51 +1349,56 @@ alsa_driver_start (alsa_driver_t *driver)
 	driver->poll_last = 0;
 	driver->poll_next = 0;
 
-	if (driver->playback_handle) {
-		if ((err = alsa_driver_prepare (driver->playback_handle, SND_PCM_STREAM_PLAYBACK)) < 0) {
-			jack_error ("ALSA: prepare error for playback on "
-				    "\"%s\" (%s)", driver->alsa_name_playback,
-				    snd_strerror(err));
-			return -1;
-		}
-	}
+	for (int i = 0; i < driver->devices_c_count; ++i) {
+		alsa_device_t *device = &driver->devices[i];
 
-	if ((driver->capture_handle && driver->capture_and_playback_not_synced)
-	    || !driver->playback_handle) {
-		if ((err = alsa_driver_prepare (driver->capture_handle, SND_PCM_STREAM_CAPTURE)) < 0) {
-			jack_error ("ALSA: prepare error for capture on \"%s\""
-				    " (%s)", driver->alsa_name_capture,
-				    snd_strerror(err));
-			return -1;
-		}
-	}
-
-	if (driver->hw_monitoring) {
-		if (driver->input_monitor_mask || driver->all_monitor_in) {
-			if (driver->all_monitor_in) {
-				driver->hw->set_input_monitor_mask (driver->hw, ~0U);
-			} else {
-				driver->hw->set_input_monitor_mask (
-					driver->hw, driver->input_monitor_mask);
+		if (device->capture_handle && !device->capture_linked) {
+			jack_log("prepare device %s", device->capture_name);
+			if ((err = alsa_driver_prepare (device->capture_handle, SND_PCM_STREAM_CAPTURE)) < 0) {
+				jack_error ("ALSA: failed to prepare device '%s' (%s)", device->capture_name, snd_strerror(err));
+				return -1;
 			}
-		} else {
-			driver->hw->set_input_monitor_mask (driver->hw,
-							    driver->input_monitor_mask);
 		}
 	}
 
-	if (driver->playback_handle) {
-		driver->playback_nfds =
-			snd_pcm_poll_descriptors_count (driver->playback_handle);
-	} else {
-		driver->playback_nfds = 0;
+	for (int i = 0; i < driver->devices_p_count; ++i) {
+		alsa_device_t *device = &driver->devices[i];
+
+		if (device->playback_handle && !device->playback_linked) {
+			jack_log("prepare device %s", device->playback_name);
+			if ((err = alsa_driver_prepare (device->playback_handle, SND_PCM_STREAM_PLAYBACK)) < 0) {
+				jack_error ("ALSA: failed to prepare device '%s' (%s)", device->playback_name, snd_strerror(err));
+				return -1;
+			}
+		}
 	}
 
-	if (driver->capture_handle) {
-		driver->capture_nfds =
-			snd_pcm_poll_descriptors_count (driver->capture_handle);
-	} else {
-		driver->capture_nfds = 0;
+	// TODO amiartus
+//	if (driver->hw_monitoring) {
+//		if (driver->input_monitor_mask || driver->all_monitor_in) {
+//			if (driver->all_monitor_in) {
+//				driver->hw->set_input_monitor_mask (driver->hw, ~0U);
+//			} else {
+//				driver->hw->set_input_monitor_mask (
+//					driver->hw, driver->input_monitor_mask);
+//			}
+//		} else {
+//			driver->hw->set_input_monitor_mask (driver->hw,
+//							    driver->input_monitor_mask);
+//		}
+//	}
+
+	driver->capture_nfds = 0;
+	driver->playback_nfds = 0;
+
+	for (int i = 0; i < driver->devices_count; ++i) {
+		alsa_device_t *device = &driver->devices[i];
+		if (device->capture_handle) {
+			driver->capture_nfds += snd_pcm_poll_descriptors_count (device->capture_handle);
+		}
+		if (device->playback_handle) {
+			driver->playback_nfds += snd_pcm_poll_descriptors_count (device->playback_handle);
+		}
 	}
 
 	if (driver->pfd) {
@@ -1382,7 +1412,12 @@ alsa_driver_start (alsa_driver_t *driver)
 	if (driver->midi && !driver->xrun_recovery)
 		(driver->midi->start)(driver->midi);
 
-	if (driver->playback_handle) {
+	for (int i = 0; i < driver->devices_p_count; ++i) {
+		alsa_device_t *device = &driver->devices[i];
+		if (!device->playback_handle) {
+			continue;
+		}
+
 		const jack_nframes_t silence_frames = driver->frames_per_cycle *
 		        driver->playback_nperiods;
 		/* fill playback buffer with zeroes, and mark
@@ -1390,15 +1425,14 @@ alsa_driver_start (alsa_driver_t *driver)
 		*/
 
 #ifndef __QNXNTO__
-		pavail = snd_pcm_avail_update (driver->playback_handle);
-
+		pavail = snd_pcm_avail_update (device->playback_handle);
 		if (pavail != silence_frames) {
 			jack_error ("ALSA: full buffer not available at start");
 			return -1;
 		}
 #endif
 
-		if (alsa_driver_get_channel_addresses (driver,
+		if (alsa_driver_get_channel_addresses (driver, device,
 					0, &pavail, 0, &poffset)) {
 			jack_error("silence failed, get channel addresses");
 			return -1;
@@ -1413,37 +1447,46 @@ alsa_driver_start (alsa_driver_t *driver)
 		   buffer.
 		*/
 
-		for (chn = 0; chn < driver->playback_nchannels; chn++) {
+		for (chn = 0; chn < device->playback_nchannels; chn++) {
 			alsa_driver_silence_on_channel (
-				driver, chn, silence_frames);
+				driver, device, chn, silence_frames);
 		}
 
 #ifdef __QNXNTO__
-		const size_t bytes = silence_frames * driver->playback_nchannels *
-		        driver->playback_sample_bytes;
-		if ((err = snd_pcm_plugin_write(driver->playback_handle,
-					       driver->playback_areas, bytes)) < bytes) {
+		const size_t bytes = silence_frames * device->playback_nchannels *
+		        device->playback_sample_bytes;
+		if ((err = snd_pcm_plugin_write(device->playback_handle,
+					       device->playback_areas, bytes)) < bytes) {
 			jack_error ("ALSA: could not complete write of %"
 				PRIu32 " frames: error = %d", silence_frames, err);
 			return -1;
 		}
 #else
-		snd_pcm_mmap_commit (driver->playback_handle, poffset, silence_frames);
+		snd_pcm_mmap_commit (device->playback_handle, poffset, silence_frames);
 #endif
+	}
 
-		if ((err = alsa_driver_stream_start (driver->playback_handle, SND_PCM_STREAM_PLAYBACK)) < 0) {
-			jack_error ("ALSA: could not start playback (%s)",
-				    snd_strerror (err));
-			return -1;
+	for (int i = 0; i < driver->devices_c_count; ++i) {
+		alsa_device_t *device = &driver->devices[i];
+		if (device->capture_handle && !device->capture_linked) {
+			jack_log("start device %s", device->capture_name);
+			if ((err = alsa_driver_stream_start (device->capture_handle, SND_PCM_STREAM_CAPTURE)) < 0) {
+				jack_error ("ALSA: failed to start device C: '%s' (%s)", device->capture_name,
+						snd_strerror(err));
+				return -1;
+			}
 		}
 	}
 
-	if ((driver->capture_handle && driver->capture_and_playback_not_synced)
-	    || !driver->playback_handle) {
-		if ((err = alsa_driver_stream_start (driver->capture_handle, SND_PCM_STREAM_CAPTURE)) < 0) {
-			jack_error ("ALSA: could not start capture (%s)",
-				    snd_strerror (err));
-			return -1;
+	for (int i = 0; i < driver->devices_p_count; ++i) {
+		alsa_device_t *device = &driver->devices[i];
+		if (device->playback_handle && !device->playback_linked) {
+			jack_log("start device %s", device->playback_name);
+			if ((err = alsa_driver_stream_start (device->playback_handle, SND_PCM_STREAM_PLAYBACK)) < 0) {
+				jack_error ("ALSA: failed to start device P: '%s' (%s)", device->playback_name,
+					    snd_strerror(err));
+				return -1;
+			}
 		}
 	}
 
@@ -1479,44 +1522,45 @@ alsa_driver_stop (alsa_driver_t *driver)
 // JACK2
     ClearOutput();
 
-	if (driver->playback_handle) {
-#ifdef __QNXNTO__
-		/* In case of playback: Drain discards the frames */
-		err = snd_pcm_plugin_playback_drain(driver->playback_handle);
-#else
-		err = snd_pcm_drop (driver->playback_handle);
-#endif
-		if (err < 0) {
-			jack_error ("ALSA: channel flush for playback "
-				    "failed (%s)", snd_strerror (err));
-			return -1;
-		}
-	}
+	for (int i = 0; i < driver->devices_count; ++i) {
+		alsa_device_t *device = &driver->devices[i];
 
-	if (!driver->playback_handle
-	    || driver->capture_and_playback_not_synced) {
-		if (driver->capture_handle) {
+		if (device->playback_handle && !device->playback_linked) {
 #ifdef __QNXNTO__
-			/* In case of capture: Flush discards the frames */
-			err = snd_pcm_plugin_flush(driver->capture_handle, SND_PCM_CHANNEL_CAPTURE);
+			/* In case of playback: Drain discards the frames */
+			err = snd_pcm_plugin_playback_drain(device->playback_handle);
 #else
-			err = snd_pcm_drop (driver->capture_handle);
+			jack_info("flush device %s", device->playback_name);
+			err = snd_pcm_drop (device->playback_handle);
 #endif
 			if (err < 0) {
-				jack_error ("ALSA: channel flush for "
-					    "capture failed (%s)",
-					    snd_strerror (err));
+				jack_error ("ALSA: failed to flush device (%s)", snd_strerror (err));
+				return -1;
+			}
+		}
+
+		if (device->capture_handle && !device->capture_linked) {
+#ifdef __QNXNTO__
+			/* In case of capture: Flush discards the frames */
+			err = snd_pcm_plugin_flush(device->capture_handle, SND_PCM_CHANNEL_CAPTURE);
+#else
+			jack_info("flush device %s", device->capture_name);
+			err = snd_pcm_drop (device->capture_handle);
+#endif
+			if (err < 0) {
+				jack_error ("ALSA: failed to flush device (%s)", snd_strerror (err));
 				return -1;
 			}
 		}
 	}
 
-	if (driver->hw_monitoring) {
-		driver->hw->set_input_monitor_mask (driver->hw, 0);
-	}
+// TODO: amiartus
+//	if (driver->hw_monitoring) {
+//		driver->hw->set_input_monitor_mask (driver->hw, 0);
+//	}
 
-	if (driver->midi && !driver->xrun_recovery)
-		(driver->midi->stop)(driver->midi);
+//	if (driver->midi && !driver->xrun_recovery)
+//		(driver->midi->stop)(driver->midi);
 
 	return 0;
 }
@@ -1542,85 +1586,74 @@ alsa_driver_restart (alsa_driver_t *driver)
 }
 
 static int
-alsa_driver_get_status (alsa_driver_t *driver)
+alsa_driver_get_state (snd_pcm_t *handle, int is_capture)
 {
-	snd_pcm_t *pcm_handle;
-
 #ifdef __QNXNTO__
 	int res;
 	snd_pcm_channel_status_t status;
-#endif
 
-	if (driver->capture_handle) {
-		pcm_handle = driver->capture_handle;
-	} else {
-		pcm_handle = driver->playback_handle;
-	}
-
-#ifdef __QNXNTO__
 	memset (&status, 0, sizeof (status));
-	status.channel = driver->capture_handle ? SND_PCM_CHANNEL_CAPTURE :
-	                                          SND_PCM_CHANNEL_PLAYBACK;
-	res = snd_pcm_plugin_status(pcm_handle, &status);
+	status.channel = is_capture;
+	res = snd_pcm_plugin_status(handle, &status);
 	if (res < 0) {
 		jack_error("status error: %s", snd_strerror(res));
 		return -1;
 	}
 	return status.status;
 #else
-	return snd_pcm_state(pcm_handle);
+	return snd_pcm_state(handle);
 #endif
 }
 
 static int
 alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs)
 {
-	int status;
-	int res;
+	int state;
 
-	status = alsa_driver_get_status(driver);
-	if (status == SND_PCM_STATE_SUSPENDED) {
-		if (driver->capture_handle) {
-			if ((res = alsa_driver_prepare(driver->capture_handle, SND_PCM_STREAM_CAPTURE))
-			    < 0) {
-				jack_error("error preparing after suspend: %s", snd_strerror(res));
-			}
-		} 
-		if (driver->playback_handle) {
-			if ((res = alsa_driver_prepare(driver->playback_handle, SND_PCM_STREAM_PLAYBACK))
-			    < 0) {
-				jack_error("error preparing after suspend: %s", snd_strerror(res));
-			}
-		}
-	}
-
-	// TODO overrun
-	if (status == SND_PCM_STATE_XRUN
-	    && driver->process_count > XRUN_REPORT_DELAY) {
-		driver->xrun_count++;
+	for (int i = 0; i < driver->devices_count; ++i) {
+		alsa_device_t *device = &driver->devices[i];
+		if (device->capture_handle) {
+			state = alsa_driver_get_state(device->capture_handle, SND_PCM_STREAM_CAPTURE);
+			// TODO overrun
+			if (state == SND_PCM_STATE_XRUN) {
+				driver->xrun_count++;
 #ifdef __QNXNTO__
-		/* Timestamp api's are not available as per QNX Documentation */
-		*delayed_usecs = 0;
+				/* Timestamp api's are not available as per QNX Documentation */
+				*delayed_usecs = 0;
 #else
-		struct timeval now, diff, tstamp;
-		snd_pcm_status_get_tstamp(status,&now);
-		snd_pcm_status_get_trigger_tstamp(status, &tstamp);
-		timersub(&now, &tstamp, &diff);
-		*delayed_usecs = diff.tv_sec * 1000000.0 + diff.tv_usec;
+				snd_pcm_status_t *status;
+				snd_pcm_status_alloca(&status);
+				snd_pcm_status(device->capture_handle, status);
+				struct timeval now, diff, tstamp;
+				snd_pcm_status_get_tstamp(status,&now);
+				snd_pcm_status_get_trigger_tstamp(status, &tstamp);
+				timersub(&now, &tstamp, &diff);
+				*delayed_usecs = diff.tv_sec * 1000000.0 + diff.tv_usec;
 #endif
-		jack_log("**** alsa_pcm: xrun of at least %.3f msecs",*delayed_usecs / 1000.0);
-		if (driver->capture_handle) {
-			jack_log("Repreparing capture");
-			if ((res = alsa_driver_prepare(driver->capture_handle,
-			                               SND_PCM_STREAM_CAPTURE)) < 0) {
-				jack_error("error preparing after xrun: %s", snd_strerror(res));
+				jack_log("**** alsa_pcm: xrun of at least %.3f msecs",*delayed_usecs / 1000.0);
 			}
 		}
-		if (driver->playback_handle) {
-			jack_log("Repreparing playback");
-			if ((res = alsa_driver_prepare(driver->playback_handle,
-			                               SND_PCM_STREAM_PLAYBACK)) < 0) {
-				jack_error("error preparing after xrun: %s", snd_strerror(res));
+
+		if (device->playback_handle) {
+			state = alsa_driver_get_state(device->playback_handle, SND_PCM_STREAM_PLAYBACK);
+
+			// TODO overrun
+			if (state == SND_PCM_STATE_XRUN) {
+				driver->xrun_count++;
+#ifdef __QNXNTO__
+				/* Timestamp api's are not available as per QNX Documentation */
+				*delayed_usecs = 0;
+#else
+				snd_pcm_status_t *status;
+				snd_pcm_status_alloca(&status);
+				snd_pcm_status(device->playback_handle, status);
+				struct timeval now, diff, tstamp;
+				snd_pcm_status_get_tstamp(status,&now);
+				snd_pcm_status_get_trigger_tstamp(status, &tstamp);
+				timersub(&now, &tstamp, &diff);
+				*delayed_usecs = diff.tv_sec * 1000000.0 + diff.tv_usec;
+#endif
+				jack_log("**** alsa_pcm: xrun of at least %.3f msecs",*delayed_usecs / 1000.0);
 			}
 		}
 	}
@@ -1633,19 +1666,19 @@ alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs)
 }
 
 static void
-alsa_driver_silence_untouched_channels (alsa_driver_t *driver,
+alsa_driver_silence_untouched_channels (alsa_driver_t *driver, alsa_device_t *device,
 					jack_nframes_t nframes)
 {
 	channel_t chn;
 	jack_nframes_t buffer_frames =
 		driver->frames_per_cycle * driver->playback_nperiods;
 
-	for (chn = 0; chn < driver->playback_nchannels; chn++) {
-		if (bitset_contains (driver->channels_not_done, chn)) {
-			if (driver->silent[chn] < buffer_frames) {
+	for (chn = 0; chn < device->playback_nchannels; chn++) {
+		if (bitset_contains (device->channels_not_done, chn)) {
+			if (device->silent[chn] < buffer_frames) {
 				alsa_driver_silence_on_channel_no_mark (
-					driver, chn, nframes);
-				driver->silent[chn] += nframes;
+					driver, device, chn, nframes);
+				device->silent[chn] += nframes;
 			}
 		}
 	}
@@ -1659,7 +1692,7 @@ alsa_driver_poll_descriptors(snd_pcm_t *pcm, struct pollfd *pfds, unsigned int s
 	pfds->events = POLLHUP|POLLNVAL;
 	pfds->events |= (is_capture == SND_PCM_STREAM_PLAYBACK) ? POLLOUT : POLLIN;
 
-	return 0;
+	return snd_pcm_poll_descriptors_count(pcm);
 }
 
 static snd_pcm_sframes_t
@@ -1691,62 +1724,90 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 	snd_pcm_sframes_t avail = 0;
 	snd_pcm_sframes_t capture_avail = 0;
 	snd_pcm_sframes_t playback_avail = 0;
-	int xrun_detected = FALSE;
-	int need_capture;
-	int need_playback;
 	int retry_cnt = 0;
-	unsigned int i;
 	jack_time_t poll_enter;
 	jack_time_t poll_ret = 0;
 
 	*status = -1;
 	*delayed_usecs = 0;
 
-	need_capture = driver->capture_handle ? 1 : 0;
+	int cap_revents[driver->devices_c_count];
+	memset(cap_revents, 0, sizeof(cap_revents));
+	int play_revents[driver->devices_p_count];
+	memset(play_revents, 0, sizeof(play_revents));
 
-	if (extra_fd >= 0) {
-		need_playback = 0;
-	} else {
-		need_playback = driver->playback_handle ? 1 : 0;
-	}
+	int pfd_cap_count[driver->devices_c_count];
+	int pfd_play_count[driver->devices_p_count];
+	/* In case if extra_fd is positive number then should be added to pfd_count
+	 * since at present extra_fd is always negative this is not changed now.
+	 */
+	int pfd_count = driver->capture_nfds + driver->playback_nfds;
 
-  again:
-
-	while ((need_playback || need_capture) && !xrun_detected) {
-
+	do {
 		int poll_result;
-		unsigned int ci = 0;
-		unsigned int nfds;
-		unsigned short revents;
+		int pfd_index = 0;
 
-		nfds = 0;
-
-		if (need_playback) {
-			alsa_driver_poll_descriptors (driver->playback_handle,
-						  &driver->pfd[0],
-						  driver->playback_nfds, SND_PCM_STREAM_PLAYBACK);
-			nfds += driver->playback_nfds;
+		/* collect capture poll descriptors */
+		for (int i = 0; i < driver->devices_c_count; ++i) {
+			/* this device already triggered poll event before */
+			if (cap_revents[i]) {
+				continue;
+			}
+			alsa_device_t *device = &driver->devices[i];
+			pfd_cap_count[i] = alsa_driver_poll_descriptors (device->capture_handle,
+				&driver->pfd[pfd_index],
+				pfd_count - pfd_index,
+				SND_PCM_STREAM_CAPTURE);
+			if (pfd_cap_count[i] < 0) {
+				jack_log ("alsa_driver_poll_descriptors failed pfd_cap_count[%d]=%d", i ,pfd_cap_count[i] );
+				/* In case of xrun -EPIPE is returned perform xrun recovery*/
+				if (pfd_cap_count[i] == -EPIPE) {
+					goto xrun;
+				}
+				/* for any other error return negative wait status to caller */
+				*status = ALSA_DRIVER_WAIT_ERROR;
+				return 0;
+			} else {
+				pfd_index += pfd_cap_count[i];
+			}
 		}
 
-		if (need_capture) {
-			alsa_driver_poll_descriptors (driver->capture_handle,
-						  &driver->pfd[nfds],
-						  driver->capture_nfds, SND_PCM_STREAM_CAPTURE);
-			ci = nfds;
-			nfds += driver->capture_nfds;
-		}
-
-		/* ALSA doesn't set POLLERR in some versions of 0.9.X */
-
-		for (i = 0; i < nfds; i++) {
-			driver->pfd[i].events |= POLLERR;
+		/* collect playback poll descriptors */
+		for (int i = 0; i < driver->devices_p_count; ++i) {
+			/* this device already triggered poll event before */
+			if (play_revents[i]) {
+				continue;
+			}
+			alsa_device_t *device = &driver->devices[i];
+			pfd_play_count[i] = alsa_driver_poll_descriptors (device->playback_handle,
+				&driver->pfd[pfd_index],
+				pfd_count - pfd_index,
+				SND_PCM_STREAM_PLAYBACK);
+			if (pfd_play_count[i] < 0) {
+				jack_log ("alsa_driver_poll_descriptors failed pfd_play_count[%d]=%d", i ,pfd_play_count[i] );
+				/* In case of xrun -EPIPE is returned perform xrun recovery*/
+				if (pfd_cap_count[i] == -EPIPE) {
+					goto xrun;
+				}
+				/* for any other error return negative wait status to caller */
+				*status = ALSA_DRIVER_WAIT_ERROR;
+				return 0;
+			} else {
+				pfd_index += pfd_play_count[i];
+			}
 		}
 
 		if (extra_fd >= 0) {
-			driver->pfd[nfds].fd = extra_fd;
-			driver->pfd[nfds].events =
+			driver->pfd[pfd_index].fd = extra_fd;
+			driver->pfd[pfd_index].events =
 				POLLIN|POLLERR|POLLHUP|POLLNVAL;
-			nfds++;
+			pfd_index++;
+		}
+
+		/* nothing to poll on */
+		if (pfd_index == 0 && extra_fd < 0) {
+			*status = -1;
+			return 0;
 		}
 
 		poll_enter = jack_get_microseconds ();
@@ -1764,7 +1825,7 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 #ifdef __ANDROID__
 		poll_result = poll (driver->pfd, nfds, -1);  //fix for sleep issue
 #else
-		poll_result = poll (driver->pfd, nfds, driver->poll_timeout_ms);
+		poll_result = poll (driver->pfd,(unsigned int) pfd_count, driver->poll_timeout_ms);
 #endif
 		if (poll_result < 0) {
 
@@ -1774,7 +1835,7 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 				// under gdb, or when exiting due to a signal
 				if (under_gdb) {
 					jack_info(poll_log);
-					goto again;
+					continue;
 				}
 				jack_error(poll_log);
 				*status = -2;
@@ -1803,10 +1864,7 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 				    " usecs, Retrying with a recovery, retry cnt = %d",
 				    poll_ret - poll_enter, retry_cnt);
 			*status = alsa_driver_xrun_recovery (driver, delayed_usecs);
-			if(*status != 0) {
-				jack_error ("ALSA: poll time out, recovery failed with status = %d", *status);
-				return 0;
-			}
+			return 0;
 		}
 
         // JACK2
@@ -1818,128 +1876,133 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 			}
 			driver->poll_last = poll_ret;
 			driver->poll_next = poll_ret + driver->period_usecs;
-// JACK2
-/*
-			driver->engine->transport_cycle_start (driver->engine,
-							       poll_ret);
-*/
+		} else {
+			/* check to see if it was the extra FD that caused us
+			 * to return from poll */
+			if (driver->pfd[pfd_index-1].revents == 0) {
+				/* we timed out on the extra fd */
+				*status = -4;
+				return -1;
+			}
+			/* if POLLIN was the only bit set, we're OK */
+			*status = 0;
+			return (driver->pfd[pfd_index-1].revents == POLLIN) ? 0 : -1;
 		}
 
 #ifdef DEBUG_WAKEUP
 		fprintf (stderr, "%" PRIu64 ": checked %d fds, started at %" PRIu64 " %" PRIu64 "  usecs since poll entered\n",
-			 poll_ret, nfds, poll_enter, poll_ret - poll_enter);
+			 poll_ret, desc_count, poll_enter, poll_ret - poll_enter);
 #endif
 
-		/* check to see if it was the extra FD that caused us
-		 * to return from poll */
+		pfd_index = 0;
 
-		if (extra_fd >= 0) {
-
-			if (driver->pfd[nfds-1].revents == 0) {
-				/* we timed out on the extra fd */
-
-				*status = -4;
-				return -1;
+		for (int i = 0; i < driver->devices_c_count; ++i) {
+			/* this device already triggered poll event before */
+			if (cap_revents[i]) {
+				continue;
 			}
+			alsa_device_t *device = &driver->devices[i];
 
-			/* if POLLIN was the only bit set, we're OK */
-
-			*status = 0;
-			return (driver->pfd[nfds-1].revents == POLLIN) ? 0 : -1;
-		}
-
-		if (need_playback) {
-			if (snd_pcm_poll_descriptors_revents
-			    (driver->playback_handle, &driver->pfd[0],
-			     driver->playback_nfds, &revents) < 0) {
-				jack_error ("ALSA: playback revents failed");
-				*status = -6;
-				return 0;
-			}
-
-			if (revents & POLLNVAL) {
-				jack_error ("ALSA: playback device disconnected");
-				*status = -7;
-				return 0;
-			}
-
-			if (revents & POLLERR) {
-				xrun_detected = TRUE;
-			}
-
-			if (revents & POLLOUT) {
-				need_playback = 0;
-#ifdef DEBUG_WAKEUP
-				fprintf (stderr, "%" PRIu64
-					 " playback stream ready\n",
-					 poll_ret);
-#endif
-			}
-		}
-
-		if (need_capture) {
-			if (snd_pcm_poll_descriptors_revents
-			    (driver->capture_handle, &driver->pfd[ci],
-			     driver->capture_nfds, &revents) < 0) {
+			unsigned short collect_revs = 0;
+			if (snd_pcm_poll_descriptors_revents (device->capture_handle, &driver->pfd[pfd_index],
+					pfd_cap_count[i], &collect_revs) != 0) {
 				jack_error ("ALSA: capture revents failed");
 				*status = -6;
 				return 0;
 			}
+			pfd_index += pfd_cap_count[i];
+			if (collect_revs & (POLLERR | POLLIN)) {
+				if (collect_revs & POLLERR) {
+					/* optimization, no point in polling more if we already have xrun on one device */
+					jack_error ("ALSA: device reported xrun C: '%s'", device->capture_name);
+					*status = alsa_driver_xrun_recovery (driver, delayed_usecs);
+					return 0;
+				}
+				if (collect_revs & POLLIN) {
+				}
+				/* on next poll round skip fds from this device */
+				cap_revents[i] = collect_revs;
+				pfd_count -= pfd_cap_count[i];
+			}
+		}
 
-			if (revents & POLLNVAL) {
-				jack_error ("ALSA: capture device disconnected");
-				*status = -7;
+		for (int i = 0; i < driver->devices_p_count; ++i) {
+			/* this device already triggered poll event before */
+			if (play_revents[i]) {
+				continue;
+			}
+			alsa_device_t *device = &driver->devices[i];
+
+			unsigned short collect_revs = 0;
+			if (snd_pcm_poll_descriptors_revents (device->playback_handle, &driver->pfd[pfd_index],
+					pfd_play_count[i], &collect_revs) != 0) {
+				jack_error ("ALSA: playback revents failed");
+				*status = -6;
 				return 0;
 			}
-
-			if (revents & POLLERR) {
-				xrun_detected = TRUE;
-			}
-
-			if (revents & POLLIN) {
-				need_capture = 0;
-#ifdef DEBUG_WAKEUP
-				fprintf (stderr, "%" PRIu64
-					 " capture stream ready\n",
-					 poll_ret);
-#endif
+			pfd_index += pfd_play_count[i];
+			if (collect_revs & (POLLERR | POLLOUT)) {
+				if (collect_revs & POLLERR) {
+					/* optimization, no point in polling more if we already have xrun on one device */
+					jack_error ("ALSA: device reported xrun P: '%s'", device->playback_name);
+					*status = alsa_driver_xrun_recovery (driver, delayed_usecs);
+					return 0;
+				}
+				if (collect_revs & POLLNVAL) {
+					jack_error ("ALSA: playback device disconnected");
+					*status = -7;
+					return 0;
+				}
+				if (collect_revs & POLLOUT) {
+				}
+				/* on next poll round skip fds from this device */
+				play_revents[i] = collect_revs;
+				pfd_count -= pfd_play_count[i];
 			}
 		}
-	}
+	} while (pfd_count > 0);
 
-	if (driver->capture_handle) {
-		if ((capture_avail = alsa_driver_avail (driver,
-			     driver->capture_handle, SND_PCM_STREAM_CAPTURE)) < 0) {
-			if (capture_avail == -EPIPE) {
-				xrun_detected = TRUE;
+	/* TODO: amiartus; I assume all devices are snd_pcm_link-ed and running on the same clock source,
+	 * therefore should have the same avail frames, however in practice, this might have to be reworked,
+	 * since we should check carefully for avail frames on each device, make sure it matches and handle corner cases
+	 */
+
+	capture_avail = INT_MAX;
+
+	for (int i = 0; i < driver->devices_c_count; ++i) {
+		alsa_device_t *device = &driver->devices[i];
+		snd_pcm_sframes_t avail = 0;
+
+		if ((avail = alsa_driver_avail (driver, device->capture_handle, SND_PCM_STREAM_CAPTURE)) < 0) {
+			if (avail == -EPIPE) {
+				jack_error ("ALSA: avail_update xrun on capture dev '%s'", device->capture_name);
+				*status = alsa_driver_xrun_recovery (driver, delayed_usecs);
+				return 0;
 			} else {
-				jack_error ("unknown ALSA avail_update return"
-					    " value (%u)", capture_avail);
+				jack_error ("unknown ALSA avail_update return value (%u)", capture_avail);
 			}
 		}
-	} else {
-		/* odd, but see min() computation below */
-		capture_avail = INT_MAX;
+		jack_log("ALSA: avail frames C: %s %ld", device->capture_name, avail);
+		capture_avail = capture_avail < avail ? capture_avail : avail;
 	}
 
-	if (driver->playback_handle) {
-		if ((playback_avail = alsa_driver_avail (driver,
-			     driver->playback_handle, SND_PCM_STREAM_PLAYBACK)) < 0) {
-			if (playback_avail == -EPIPE) {
-				xrun_detected = TRUE;
+	playback_avail = INT_MAX;
+
+	for (int i = 0; i < driver->devices_p_count; ++i) {
+		alsa_device_t *device = &driver->devices[i];
+		snd_pcm_sframes_t avail = 0;
+
+		if ((avail = alsa_driver_avail (driver, device->playback_handle, SND_PCM_STREAM_PLAYBACK)) < 0) {
+			if (avail == -EPIPE) {
+				jack_error ("ALSA: avail_update xrun on playback dev '%s'", device->playback_name);
+				*status = alsa_driver_xrun_recovery (driver, delayed_usecs);
+				return 0;
 			} else {
-				jack_error ("unknown ALSA avail_update return"
-					    " value (%u)", playback_avail);
+				jack_error ("unknown ALSA avail_update return value (%u)", playback_avail);
 			}
 		}
-	} else {
-		/* odd, but see min() computation below */
-		playback_avail = INT_MAX;
-	}
-
-	if (xrun_detected) {
-		*status = alsa_driver_xrun_recovery (driver, delayed_usecs);
-		return 0;
+		jack_log("ALSA: avail frames P: %s %ld", device->playback_name, avail);
+		playback_avail = playback_avail < avail ? playback_avail : avail;
 	}
 
 	*status = 0;
@@ -1954,8 +2017,10 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 #endif
 
 	/* mark all channels not done for now. read/write will change this */
-
-	bitset_copy (driver->channels_not_done, driver->channels_done);
+	for (int i = 0; i < driver->devices_p_count; ++i) {
+		alsa_device_t *device = &driver->devices[i];
+		bitset_copy (device->channels_not_done, device->channels_done);
+	}
 
 	/* constrain the available count to the nearest (round down) number of
 	   periods.
@@ -1964,61 +2029,46 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 	return avail - (avail % driver->frames_per_cycle);
 }
 
-
 int
 alsa_driver_read (alsa_driver_t *driver, jack_nframes_t nframes)
 {
 	snd_pcm_sframes_t contiguous;
 	snd_pcm_sframes_t nread;
 	snd_pcm_uframes_t offset;
-	jack_nframes_t  orig_nframes;
-//	jack_default_audio_sample_t* buf;
-//	channel_t chn;
-//	JSList *node;
-//	jack_port_t* port;
 	int err;
 
 	if (nframes > driver->frames_per_cycle) {
 		return -1;
 	}
 
-// JACK2
-/*
-	if (driver->engine->freewheeling) {
-		return 0;
-	}
-*/
-	if (driver->midi)
-		(driver->midi->read)(driver->midi, nframes);
+	for (size_t i = 0; i < driver->devices_c_count; ++i) {
+		alsa_device_t *device = &driver->devices[i];
 
-	if (!driver->capture_handle) {
-		return 0;
-	}
+		nread = 0;
+		contiguous = 0;
+		jack_nframes_t frames_remain = nframes;
 
-	nread = 0;
-	contiguous = 0;
-	orig_nframes = nframes;
+		while (frames_remain) {
 
-	while (nframes) {
+			contiguous = frames_remain;
 
-		contiguous = nframes;
-
-		if (alsa_driver_get_channel_addresses (
-			    driver,
-			    (snd_pcm_uframes_t *) &contiguous,
-			    (snd_pcm_uframes_t *) 0,
-			    &offset, 0) < 0) {
-			return -1;
-		}
+			if (alsa_driver_get_channel_addresses (
+					driver,
+					device,
+					(snd_pcm_uframes_t *) &contiguous,
+					(snd_pcm_uframes_t *) 0,
+					&offset, 0) < 0) {
+				return -1;
+			}
 
 #ifdef __QNXNTO__
-		const size_t bytes = contiguous * driver->capture_nchannels * driver->capture_sample_bytes;
-		if ((err = snd_pcm_plugin_read(driver->capture_handle,
-					       driver->capture_areas, bytes)) < bytes) {
-			jack_error ("ALSA: could not complete read of %"
-				    PRIu32 " frames: error = %d", contiguous, err);
-			return -1;
-		}
+			const size_t bytes = contiguous * device->capture_nchannels * device->capture_sample_bytes;
+			if ((err = snd_pcm_plugin_read(device->capture_handle,
+							   device->capture_areas, bytes)) < bytes) {
+				jack_error ("ALSA: could not complete read of %"
+						PRIu32 " frames: error = %d", contiguous, err);
+				return -1;
+			}
 #endif
 
 // JACK2
@@ -2037,19 +2087,20 @@ alsa_driver_read (alsa_driver_t *driver, jack_nframes_t nframes)
 				buf + nread, contiguous);
 		}
 */
-        ReadInput(orig_nframes, contiguous, nread);
+            ReadInput(device, nframes, contiguous, nread);
 
 #ifndef __QNXNTO__
-		if ((err = snd_pcm_mmap_commit (driver->capture_handle,
-				offset, contiguous)) < 0) {
-			jack_error ("ALSA: could not complete read of %"
-				PRIu32 " frames: error = %d", contiguous, err);
-			return -1;
-		}
+			if ((err = snd_pcm_mmap_commit (device->capture_handle,
+					offset, contiguous)) < 0) {
+				jack_error ("ALSA: could not complete read of %"
+					PRIu32 " frames: error = %d", contiguous, err);
+				return -1;
+			}
 #endif
 
-		nframes -= contiguous;
-		nread += contiguous;
+			frames_remain -= contiguous;
+			nread += contiguous;
+		}
 	}
 
 	return 0;
@@ -2058,77 +2109,54 @@ alsa_driver_read (alsa_driver_t *driver, jack_nframes_t nframes)
 int
 alsa_driver_write (alsa_driver_t* driver, jack_nframes_t nframes)
 {
-//	channel_t chn;
-//	JSList *node;
-//	JSList *mon_node;
-//	jack_default_audio_sample_t* buf;
-//	jack_default_audio_sample_t* monbuf;
-	jack_nframes_t orig_nframes;
-	snd_pcm_sframes_t nwritten;
 	snd_pcm_sframes_t contiguous;
+	snd_pcm_sframes_t nwritten;
 	snd_pcm_uframes_t offset;
-//	jack_port_t *port;
 	int err;
 
 	driver->process_count++;
-
-// JACK2
-/*
-	if (!driver->playback_handle || driver->engine->freewheeling) {
-		return 0;
-	}
-*/
-	if (!driver->playback_handle) {
-		return 0;
-	}
 
 	if (nframes > driver->frames_per_cycle) {
 		return -1;
 	}
 
-	if (driver->midi)
-		(driver->midi->write)(driver->midi, nframes);
+	for (size_t i = 0; i < driver->devices_p_count; ++i) {
+		alsa_device_t *device = &driver->devices[i];
 
-	nwritten = 0;
-	contiguous = 0;
-	orig_nframes = nframes;
 
-	/* check current input monitor request status */
+		if (driver->midi)
+			(driver->midi->write)(driver->midi, nframes);
 
-	driver->input_monitor_mask = 0;
+		nwritten = 0;
+		contiguous = 0;
+		jack_nframes_t frames_remain = nframes;
 
-// JACK2
-/*
-	for (chn = 0, node = driver->capture_ports; node;
-	     node = jack_slist_next (node), chn++) {
-		if (((jack_port_t *) node->data)->shared->monitor_requests) {
-			driver->input_monitor_mask |= (1<<chn);
-		}
-	}
-*/
-    MonitorInput();
+		/* check current input monitor request status */
+		driver->input_monitor_mask = 0;
 
-	if (driver->hw_monitoring) {
-		if ((driver->hw->input_monitor_mask
-		     != driver->input_monitor_mask)
-		    && !driver->all_monitor_in) {
-			driver->hw->set_input_monitor_mask (
-				driver->hw, driver->input_monitor_mask);
-		}
-	}
+		MonitorInput();
 
-	while (nframes) {
-
-		contiguous = nframes;
-
-		if (alsa_driver_get_channel_addresses (
-			    driver,
-			    (snd_pcm_uframes_t *) 0,
-			    (snd_pcm_uframes_t *) &contiguous,
-			    0, &offset) < 0) {
-			return -1;
+		if (driver->hw_monitoring) {
+			if ((device->hw->input_monitor_mask
+				 != driver->input_monitor_mask)
+				&& !driver->all_monitor_in) {
+				device->hw->set_input_monitor_mask (
+						device->hw, driver->input_monitor_mask);
+			}
 		}
 
+		while (frames_remain) {
+	
+			contiguous = frames_remain;
+	
+			if (alsa_driver_get_channel_addresses (
+					driver,
+					device,
+					(snd_pcm_uframes_t *) 0,
+					(snd_pcm_uframes_t *) &contiguous,
+					0, &offset) < 0) {
+				return -1;
+			}
 // JACK2
 /*
 		for (chn = 0, node = driver->playback_ports, mon_node=driver->monitor_ports;
@@ -2156,34 +2184,34 @@ alsa_driver_write (alsa_driver_t* driver, jack_nframes_t nframes)
 		}
 */
 
-        // JACK2
-        WriteOutput(orig_nframes, contiguous, nwritten);
+            // JACK2
+            WriteOutput(device, nframes, contiguous, nwritten);
 
-		if (!bitset_empty (driver->channels_not_done)) {
-			alsa_driver_silence_untouched_channels (driver,
-								contiguous);
-		}
+			if (!bitset_empty (device->channels_not_done)) {
+				alsa_driver_silence_untouched_channels (driver, device, contiguous);
+			}
 
 #ifdef __QNXNTO__
-		const size_t bytes = contiguous * driver->playback_nchannels * driver->playback_sample_bytes;
-		if ((err = snd_pcm_plugin_write(driver->playback_handle,
-					       driver->playback_areas, bytes)) < bytes) {
-			jack_error ("ALSA: could not complete write of %"
-				PRIu32 " frames: error = %d", contiguous, err);
-			return -1;
-		}
-#else
-		if ((err = snd_pcm_mmap_commit (driver->playback_handle,
-				offset, contiguous)) < 0) {
-			jack_error ("ALSA: could not complete playback of %"
-				PRIu32 " frames: error = %d", contiguous, err);
-			if (err != -EPIPE && err != -ESTRPIPE)
+			const size_t bytes = contiguous * device->playback_nchannels * device->playback_sample_bytes;
+			if ((err = snd_pcm_plugin_write(device->playback_handle,
+							   device->playback_areas, bytes)) < bytes) {
+				jack_error ("ALSA: could not complete write of %"
+					PRIu32 " frames: error = %d", contiguous, err);
 				return -1;
-		}
+			}
+#else
+			if ((err = snd_pcm_mmap_commit (device->playback_handle,
+					offset, contiguous)) < 0) {
+				jack_error ("ALSA: could not complete playback of %"
+					PRIu32 " frames: error = %d", contiguous, err);
+				if (err != -EPIPE && err != -ESTRPIPE)
+					return -1;
+			}
 #endif
 
-		nframes -= contiguous;
-		nwritten += contiguous;
+			frames_remain -= contiguous;
+			nwritten += contiguous;
+		}
 	}
 
 	return 0;
@@ -2256,14 +2284,27 @@ alsa_driver_delete (alsa_driver_t *driver)
 		driver->ctl_handle = 0;
 	}
 
-	if (driver->capture_handle) {
-		snd_pcm_close (driver->capture_handle);
-		driver->capture_handle = 0;
-	}
+	for (int i = 0; i < driver->devices_count; ++i) {
+		if (driver->devices[i].capture_handle) {
+			snd_pcm_close (driver->devices[i].capture_handle);
+			driver->devices[i].capture_handle = 0;
+		}
 
-	if (driver->playback_handle) {
-		snd_pcm_close (driver->playback_handle);
-		driver->capture_handle = 0;
+		if (driver->devices[i].playback_handle) {
+			snd_pcm_close (driver->devices[i].playback_handle);
+			driver->devices[i].playback_handle = 0;
+		}
+
+		free(driver->devices[i].capture_name);
+		free(driver->devices[i].playback_name);
+		free(driver->devices[i].alsa_driver);
+
+		alsa_driver_release_channel_dependent_memory (driver, &driver->devices[i]);
+
+		if (driver->devices[i].hw) {
+			driver->devices[i].hw->release (driver->devices[i].hw);
+			driver->devices[i].hw = 0;
+		}
 	}
 
 #ifndef __QNXNTO__
@@ -2291,16 +2332,6 @@ alsa_driver_delete (alsa_driver_t *driver)
 	if (driver->pfd) {
 		free (driver->pfd);
 	}
-
-	if (driver->hw) {
-		driver->hw->release (driver->hw);
-		driver->hw = 0;
-	}
-	free(driver->alsa_name_playback);
-	free(driver->alsa_name_capture);
-	free(driver->alsa_driver);
-
-	alsa_driver_release_channel_dependent_memory (driver);
     //JACK2
     //jack_driver_nt_finish ((jack_driver_nt_t *) driver);
 	free (driver);
@@ -2408,30 +2439,30 @@ discover_alsa_using_apps ()
 }
 
 static int
-alsa_driver_open (alsa_driver_t *driver, bool is_capture)
+alsa_driver_open (alsa_driver_t *driver, alsa_device_t *device, bool is_capture)
 {
 	int err = 0;
 	char* current_apps;
 
 	if(is_capture) {
 #ifdef __QNXNTO__
-		err = snd_pcm_open_name (&driver->capture_handle,
-					 driver->alsa_name_capture,
+		err = snd_pcm_open_name (&device->capture_handle,
+					 device->capture_name,
 					 SND_PCM_OPEN_CAPTURE | SND_PCM_OPEN_NONBLOCK);
 #else
-		err = snd_pcm_open (&driver->capture_handle,
-				    driver->alsa_name_capture,
+		err = snd_pcm_open (&device->capture_handle,
+				    device->capture_name,
 				    SND_PCM_STREAM_CAPTURE,
 				    SND_PCM_NONBLOCK);
 #endif
 	} else {
 #ifdef __QNXNTO__
-		err = snd_pcm_open_name (&driver->playback_handle,
-					 driver->alsa_name_playback,
+		err = snd_pcm_open_name (&device->playback_handle,
+					 device->playback_name,
 					 SND_PCM_OPEN_PLAYBACK | SND_PCM_OPEN_NONBLOCK);
 #else
-		err = snd_pcm_open (&driver->playback_handle,
-				    driver->alsa_name_playback,
+		err = snd_pcm_open (&device->playback_handle,
+				    device->playback_name,
 				    SND_PCM_STREAM_PLAYBACK,
 				    SND_PCM_NONBLOCK);
 #endif
@@ -2444,7 +2475,7 @@ alsa_driver_open (alsa_driver_t *driver, bool is_capture)
 				    "already in use. Please stop the"
 				    " application using it and "
 				    "run JACK again",
-				    is_capture ? driver->alsa_name_capture : driver->alsa_name_playback);
+				    is_capture ? device->alsa_name_capture : device->alsa_name_playback);
 #else
 			current_apps = discover_alsa_using_apps ();
 			if (current_apps) {
@@ -2453,7 +2484,7 @@ alsa_driver_open (alsa_driver_t *driver, bool is_capture)
 					    " are using your soundcard(s) so you should "
 					    " check them and stop them as necessary before "
 					    " trying to start JACK again:\n\n%s",
-					    is_capture ? driver->alsa_name_capture : driver->alsa_name_playback,
+					    is_capture ? device->capture_name : device->playback_name,
 					    current_apps);
 				free (current_apps);
 			} else {
@@ -2461,7 +2492,7 @@ alsa_driver_open (alsa_driver_t *driver, bool is_capture)
 					    "already in use. Please stop the"
 					    " application using it and "
 					    "run JACK again",
-					    is_capture ? driver->alsa_name_capture : driver->alsa_name_playback);
+					    is_capture ? device->capture_name : device->playback_name);
 			}
 #endif
 			break;
@@ -2469,53 +2500,52 @@ alsa_driver_open (alsa_driver_t *driver, bool is_capture)
 		case EPERM:
 			jack_error ("you do not have permission to open "
 				    "the audio device \"%s\" for playback",
-				    is_capture ? driver->alsa_name_capture : driver->alsa_name_playback);
+				    is_capture ? device->capture_name : device->playback_name);
 			break;
 
 		case EINVAL:
 			jack_error ("the state of handle or the mode is invalid "
 				"or invalid state change occured \"%s\" for %s",
-				is_capture ? driver->alsa_name_capture : driver->alsa_name_playback,
+				is_capture ? device->capture_name : device->playback_name,
 				is_capture ? "capture" : "playback");
 			break;
 
 		case ENOENT:
 			jack_error ("device \"%s\"  does not exist for %s",
-				is_capture ? driver->alsa_name_capture : driver->alsa_name_playback,
+				is_capture ? device->capture_name : device->playback_name,
 				is_capture ? "capture" : "playback");
 			break;
 
 		case ENOMEM:
 			jack_error ("Not enough memory available for allocation for \"%s\" for %s",
-				is_capture ? driver->alsa_name_capture : driver->alsa_name_playback,
+				is_capture ? device->capture_name : device->playback_name,
 				is_capture ? "capture" : "playback");
 			break;
 
 		case SND_ERROR_INCOMPATIBLE_VERSION:
 			jack_error ("Version mismatch \"%s\" for %s",
-				is_capture ? driver->alsa_name_capture : driver->alsa_name_playback,
+				is_capture ? device->capture_name : device->playback_name,
 				is_capture ? "capture" : "playback");
 			break;
 		}
-		alsa_driver_delete (driver);
 		if(is_capture) {
-			driver->capture_handle = NULL;
+			device->capture_handle = NULL;
 		} else {
-			driver->playback_handle = NULL;
+			device->playback_handle = NULL;
 		}
 	}
 
-	if (is_capture && driver->capture_handle) {
+	if (is_capture && device->capture_handle) {
 #ifdef __QNXNTO__
-		snd_pcm_nonblock_mode (driver->capture_handle, 0);
+		snd_pcm_nonblock_mode (device->capture_handle, 0);
 #else
-		snd_pcm_nonblock (driver->capture_handle, 0);
+		snd_pcm_nonblock (device->capture_handle, 0);
 #endif
-	} else if(!is_capture && driver->playback_handle) {
+	} else if(!is_capture && device->playback_handle) {
 #ifdef __QNXNTO__
-		snd_pcm_nonblock_mode (driver->playback_handle, 0);
+		snd_pcm_nonblock_mode (device->playback_handle, 0);
 #else
-		snd_pcm_nonblock (driver->playback_handle, 0);
+		snd_pcm_nonblock (device->playback_handle, 0);
 #endif
 	}
 
@@ -2523,16 +2553,18 @@ alsa_driver_open (alsa_driver_t *driver, bool is_capture)
 }
 
 jack_driver_t *
-alsa_driver_new (char *name, char *playback_alsa_device,
-		 char *capture_alsa_device,
+alsa_driver_new (char *name, char **capture_alsa_devices,
+		 char **playback_alsa_devices,
+		 const char *capture_names,
+		 const char *playback_names,
 		 jack_client_t *client,
 		 jack_nframes_t frames_per_cycle,
 		 jack_nframes_t user_nperiods,
 		 jack_nframes_t rate,
 		 int hw_monitoring,
 		 int hw_metering,
-		 int capturing,
-		 int playing,
+		 int capturing_count,
+		 int playing_count,
 		 DitherAlgorithm dither,
 		 int soft_mode,
 		 int monitor,
@@ -2547,10 +2579,12 @@ alsa_driver_new (char *name, char *playback_alsa_device,
 	int err;
 	alsa_driver_t *driver;
 
-	jack_info ("creating alsa driver ... %s|%s|%" PRIu32 "|%" PRIu32
+	jack_info ("creating alsa driver ... %s|%" PRIu32 "|%s|%" PRIu32 "|%" PRIu32 "|%" PRIu32
 		"|%" PRIu32"|%" PRIu32"|%" PRIu32 "|%s|%s|%s|%s",
-		playing ? playback_alsa_device : "-",
-		capturing ? capture_alsa_device : "-",
+		capturing_count > 0 ? capture_names : "-",
+		capturing_count,
+		playing_count > 0 ? playback_names : "-",
+		playing_count,
 		frames_per_cycle, user_nperiods, rate,
 		user_capture_nchnls,user_playback_nchnls,
 		hw_monitoring ? "hwmon": "nomon",
@@ -2575,42 +2609,15 @@ alsa_driver_new (char *name, char *playback_alsa_device,
 	driver->nt_run_cycle = (JackDriverNTRunCycleFunction) alsa_driver_run_cycle;
     */
 
-	driver->playback_handle = NULL;
-	driver->capture_handle = NULL;
 	driver->ctl_handle = 0;
-	driver->hw = 0;
-	driver->capture_and_playback_not_synced = FALSE;
-	driver->max_nchannels = 0;
-	driver->user_nchannels = 0;
-	driver->playback_nchannels = user_playback_nchnls;
-	driver->capture_nchannels = user_capture_nchnls;
-	driver->playback_sample_bytes = (shorts_first ? 2:4);
-	driver->capture_sample_bytes = (shorts_first ? 2:4);
 	driver->capture_frame_latency = capture_latency;
 	driver->playback_frame_latency = playback_latency;
 
-	driver->playback_addr = 0;
-	driver->capture_addr = 0;
-	driver->playback_interleave_skip = NULL;
-	driver->capture_interleave_skip = NULL;
-#ifdef __QNXNTO__
-	driver->playback_areas = NULL;
-	driver->playback_areas_ptr = NULL;
-	driver->capture_areas = NULL;
-	driver->capture_areas_ptr = NULL;
-#endif
-
-
-	driver->silent = 0;
 	driver->all_monitor_in = FALSE;
 	driver->with_monitor_ports = monitor;
 
 	driver->clock_mode = ClockMaster; /* XXX is it? */
 	driver->input_monitor_mask = 0;   /* XXX is it? */
-
-	driver->capture_ports = 0;
-	driver->playback_ports = 0;
-	driver->monitor_ports = 0;
 
 	driver->pfd = 0;
 	driver->playback_nfds = 0;
@@ -2619,8 +2626,6 @@ alsa_driver_new (char *name, char *playback_alsa_device,
 	driver->dither = dither;
 	driver->soft_mode = soft_mode;
 
-	driver->quirk_bswap = 0;
-
 	pthread_mutex_init (&driver->clock_sync_lock, 0);
 	driver->clock_sync_listeners = 0;
 
@@ -2628,73 +2633,51 @@ alsa_driver_new (char *name, char *playback_alsa_device,
 	driver->xrun_count = 0;
 	driver->process_count = 0;
 
-	driver->alsa_name_playback = strdup (playback_alsa_device);
-	driver->alsa_name_capture = strdup (capture_alsa_device);
-
 	driver->midi = midi_driver;
 	driver->xrun_recovery = 0;
 
-#ifndef __QNXNTO__
-	if (alsa_driver_check_card_type (driver)) {
-		alsa_driver_delete (driver);
-		return NULL;
+	driver->devices_c_count = capturing_count;
+	driver->devices_p_count = playing_count;
+	driver->devices_count = capturing_count > playing_count ? capturing_count : playing_count;
+	driver->devices = (alsa_device_t*) calloc(driver->devices_count, sizeof(*driver->devices));
+
+	if (driver->devices_count == 1) {
+		driver->devices[0].capture_nchannels = user_capture_nchnls;
+		driver->devices[0].playback_nchannels = user_playback_nchnls;
 	}
 
-	alsa_driver_hw_specific (driver, hw_monitoring, hw_metering);
+	for (int i = 0; i < driver->devices_c_count; ++i) {
+		driver->devices[i].capture_sample_bytes = (shorts_first ? 2:4);
+		driver->devices[i].capture_name = strdup(capture_alsa_devices[i]);
+
+		err = alsa_driver_open(driver, &driver->devices[i], SND_PCM_STREAM_CAPTURE);
+		if (err < 0) {
+			jack_error ("\n\nATTENTION: Opening of the capture device \"%s\" failed.",
+				    driver->devices[i].capture_name);
+			alsa_driver_delete (driver);
+			return NULL;
+		}
+	}
+
+	for (int i = 0; i < driver->devices_p_count; ++i) {
+		driver->devices[i].playback_sample_bytes = (shorts_first ? 2:4);
+		driver->devices[i].playback_name = strdup(playback_alsa_devices[i]);
+
+#ifndef __QNXNTO__
+		if (alsa_driver_check_card_type (driver, &driver->devices[i])) {
+			alsa_driver_delete (driver);
+			return NULL;
+		}
+
+		alsa_driver_hw_specific (driver, &driver->devices[i], hw_monitoring, hw_metering);
 #endif
 
-	if (playing) {
-		err = alsa_driver_open(driver, SND_PCM_STREAM_PLAYBACK);
-		if(err < 0) {
+		err = alsa_driver_open(driver, &driver->devices[i], SND_PCM_STREAM_PLAYBACK);
+		if (err < 0) {
 			jack_error ("\n\nATTENTION: Opening of the playback device \"%s\" failed.",
-				    playback_alsa_device);
+				    driver->devices[i].playback_name);
+			alsa_driver_delete (driver);
 			return NULL;
-		}
-	}
-	if(capturing) {
-		err = alsa_driver_open(driver, SND_PCM_STREAM_CAPTURE);
-		if(err < 0) {
-			jack_error ("\n\nATTENTION: Opening of the capture device \"%s\" failed.",
-				    capture_alsa_device);
-			return NULL;
-		}
-	}
-
-	if (driver->playback_handle == NULL) {
-		if (playing) {
-
-			/* they asked for playback, but we can't do it */
-
-			jack_error ("ALSA: Cannot open PCM device %s for "
-				    "playback. Falling back to capture-only"
-				    " mode", name);
-
-			if (driver->capture_handle == NULL) {
-				/* can't do anything */
-				alsa_driver_delete (driver);
-				return NULL;
-			}
-
-			playing = FALSE;
-		}
-	}
-
-	if (driver->capture_handle == NULL) {
-		if (capturing) {
-
-			/* they asked for capture, but we can't do it */
-
-			jack_error ("ALSA: Cannot open PCM device %s for "
-				    "capture. Falling back to playback-only"
-				    " mode", name);
-
-			if (driver->playback_handle == NULL) {
-				/* can't do anything */
-				alsa_driver_delete (driver);
-				return NULL;
-			}
-
-			capturing = FALSE;
 		}
 	}
 
@@ -2704,7 +2687,7 @@ alsa_driver_new (char *name, char *playback_alsa_device,
 	driver->playback_sw_params = 0;
 	driver->capture_sw_params = 0;
 
-	if (driver->playback_handle) {
+	if (driver->devices[0].playback_handle) {
 		if ((err = snd_pcm_hw_params_malloc (
 			     &driver->playback_hw_params)) < 0) {
 			jack_error ("ALSA: could not allocate playback hw"
@@ -2722,7 +2705,7 @@ alsa_driver_new (char *name, char *playback_alsa_device,
 		}
 	}
 
-	if (driver->capture_handle) {
+	if (driver->devices[0].capture_handle) {
 		if ((err = snd_pcm_hw_params_malloc (
 			     &driver->capture_hw_params)) < 0) {
 			jack_error ("ALSA: could not allocate capture hw"
@@ -2740,19 +2723,50 @@ alsa_driver_new (char *name, char *playback_alsa_device,
 		}
 	}
 #endif
-	if (alsa_driver_set_parameters (driver, frames_per_cycle,
-					user_nperiods, rate)) {
-		alsa_driver_delete (driver);
-		return NULL;
+	for (int i = 0; i < driver->devices_count; ++i) {
+		alsa_device_t *device = &driver->devices[i];
+
+		if (alsa_driver_set_parameters (driver, device, frames_per_cycle, user_nperiods, rate)) {
+			jack_error ("ALSA: failed to set parameters");
+			alsa_driver_delete (driver);
+			return NULL;
+		}
 	}
 
-	driver->capture_and_playback_not_synced = FALSE;
+	for (int i = 0; i < driver->devices_c_count; ++i) {
+		alsa_device_t *device = &driver->devices[i];
 
-	if (driver->capture_handle && driver->playback_handle) {
-		if (snd_pcm_link (driver->playback_handle,
-				  driver->capture_handle) != 0) {
-			driver->capture_and_playback_not_synced = TRUE;
+		device->capture_linked = 0;
+
+		if (i == 0) {
+			continue;
 		}
+
+		if (snd_pcm_link (driver->devices[0].capture_handle, device->capture_handle) != 0) {
+			jack_error ("failed to add device to link group C: '%s'", device->capture_name);
+			continue;
+		}
+		device->capture_linked = 1;
+	}
+
+	for (int i = 0; i < driver->devices_p_count; ++i) {
+		alsa_device_t *device = &driver->devices[i];
+
+		device->playback_linked = 0;
+
+		snd_pcm_t *handle = driver->devices[0].capture_handle;
+		if (!handle) {
+			if (i == 0) {
+				continue;
+			}
+			handle = driver->devices[0].playback_handle;
+		}
+
+		if (snd_pcm_link (handle, device->playback_handle) != 0) {
+			jack_error ("failed to add device to link group P: '%s'", device->playback_name);
+			continue;
+		}
+		device->playback_linked = 1;
 	}
 
 	driver->client = client;

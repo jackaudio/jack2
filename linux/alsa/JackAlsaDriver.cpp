@@ -32,6 +32,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <sys/types.h>
 #include <sys/time.h>
 #include <string.h>
+#include <sstream>
+#include <fstream>
+#include <algorithm>
+#include <cctype>
+#include <vector>
 
 #include "JackAlsaDriver.h"
 #include "JackEngineControl.h"
@@ -126,7 +131,7 @@ void JackAlsaDriver::UpdateLatencies()
 int JackAlsaDriver::Attach()
 {
     JackPort* port;
-    jack_port_id_t port_index;
+    jack_port_id_t port_id;
     unsigned long port_flags = (unsigned long)CaptureDriverFlags;
     char name[REAL_JACK_PORT_NAME_SIZE+1];
     char alias[REAL_JACK_PORT_NAME_SIZE+1];
@@ -145,41 +150,47 @@ int JackAlsaDriver::Attach()
 
     jack_log("JackAlsaDriver::Attach fBufferSize %ld fSampleRate %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
 
-    for (int i = 0; i < fCaptureChannels; i++) {
-        snprintf(alias, sizeof(alias), "%s:%s:out%d", fAliasName, fCaptureDriverName, i + 1);
-        snprintf(name, sizeof(name), "%s:capture_%d", fClientControl.fName, i + 1);
-        if (fEngine->PortRegister(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize, &port_index) < 0) {
+    for (int i = 0, port_list_index = 0; i < alsa_driver->devices_c_count; ++i) {
+        alsa_device_t *device = &alsa_driver->devices[i];
+        for (int j = 0; j < device->capture_nchannels; ++j, ++port_list_index) {
+            snprintf(name, sizeof(name), "%s:capture_%d", fClientControl.fName, port_list_index + 1);
+            snprintf(alias, sizeof(alias), "%s:%s:capture_%d", fAliasName, device->capture_name, j + 1);
+            if (fEngine->PortRegister(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize, &port_id) < 0) {
             jack_error("driver: cannot register port for %s", name);
-            return -1;
+                return -1;
+            }
+            port = fGraphManager->GetPort(port_id);
+            port->SetAlias(alias);
+            fCapturePortList[port_list_index] = port_id;
+            jack_log("JackAlsaDriver::Attach fCapturePortList[i] %ld ", port_id);
         }
-        port = fGraphManager->GetPort(port_index);
-        port->SetAlias(alias);
-        fCapturePortList[i] = port_index;
-        jack_log("JackAlsaDriver::Attach fCapturePortList[i] %ld ", port_index);
     }
 
     port_flags = (unsigned long)PlaybackDriverFlags;
 
-    for (int i = 0; i < fPlaybackChannels; i++) {
-        snprintf(alias, sizeof(alias), "%s:%s:in%d", fAliasName, fPlaybackDriverName, i + 1);
-        snprintf(name, sizeof(name), "%s:playback_%d", fClientControl.fName, i + 1);
-        if (fEngine->PortRegister(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize, &port_index) < 0) {
-            jack_error("driver: cannot register port for %s", name);
-            return -1;
-        }
-        port = fGraphManager->GetPort(port_index);
-        port->SetAlias(alias);
-        fPlaybackPortList[i] = port_index;
-        jack_log("JackAlsaDriver::Attach fPlaybackPortList[i] %ld ", port_index);
+    for (int i = 0, port_list_index = 0; i < alsa_driver->devices_p_count; ++i) {
+        alsa_device_t *device = &alsa_driver->devices[i];
+        for (int j = 0; j < device->playback_nchannels; ++j, ++port_list_index) {
+            snprintf(name, sizeof(name), "%s:playback_%d", fClientControl.fName, port_list_index + 1);
+            snprintf(alias, sizeof(alias), "%s:%s:playback_%d", fAliasName, device->playback_name, j + 1);
+            if (fEngine->PortRegister(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize, &port_id) < 0) {
+                jack_error("driver: cannot register port for %s", name);
+                return -1;
+            }
+            port = fGraphManager->GetPort(port_id);
+            port->SetAlias(alias);
+            fPlaybackPortList[port_list_index] = port_id;
+            jack_log("JackAlsaDriver::Attach fPlaybackPortList[i] %ld ", port_id);
 
-        // Monitor ports
-        if (fWithMonitorPorts) {
-            jack_log("Create monitor port");
-            snprintf(name, sizeof(name), "%s:monitor_%d", fClientControl.fName, i + 1);
-            if (fEngine->PortRegister(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, MonitorDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
-                jack_error("ALSA: cannot register monitor port for %s", name);
-            } else {
-                fMonitorPortList[i] = port_index;
+            // Monitor ports
+            if (fWithMonitorPorts) {
+                jack_log("Create monitor port");
+                snprintf(name, sizeof(name), "%s:monitor_%d", fClientControl.fName, port_list_index + 1);
+                if (fEngine->PortRegister(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, MonitorDriverFlags, fEngineControl->fBufferSize, &port_id) < 0) {
+                    jack_error("ALSA: cannot register monitor port for %s", name);
+                } else {
+                    fMonitorPortList[port_list_index] = port_id;
+                }
             }
         }
     }
@@ -297,12 +308,22 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
                          jack_nframes_t playback_latency,
                          const char* midi_driver_name)
 {
+    struct array_string_t capture_drivers = array_string_split(capture_driver_name, ' ');
+    struct array_string_t playback_drivers = array_string_split(playback_driver_name, ' ');
+
     // Generic JackAudioDriver Open
     if (JackAudioDriver::Open(nframes, samplerate, capturing, playing,
-                              inchannels, outchannels, monitor, capture_driver_name, playback_driver_name,
+                              inchannels, outchannels, monitor,
+                              capture_drivers.size > 1 ? capture_drivers.data[0] : capture_driver_name,
+                              playback_drivers.size > 1 ? playback_drivers.data[0] : playback_driver_name,
                               capture_latency, playback_latency) != 0) {
+        array_string_free(&capture_drivers);
+        array_string_free(&playback_drivers);
         return -1;
     }
+
+    jack_log("JackAlsaDriver::Open capture_driver_name = %s", capture_driver_name);
+    jack_log("JackAlsaDriver::Open playback_driver_name = %s", playback_driver_name);
 
     alsa_midi_t *midi = 0;
 
@@ -314,15 +335,18 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
         midi = alsa_rawmidi_new((jack_client_t*)this);
 #endif
 
+    // FIXME: needs adaptation for multiple drivers
     if (JackServerGlobals::on_device_acquire != NULL) {
-        int capture_card = card_to_num(capture_driver_name);
-        int playback_card = card_to_num(playback_driver_name);
+        int capture_card = card_to_num(capture_drivers.data[0]);
+        int playback_card = card_to_num(playback_drivers.data[0]);
         char audio_name[32];
 
         if (capture_card >= 0) {
             snprintf(audio_name, sizeof(audio_name), "Audio%d", capture_card);
             if (!JackServerGlobals::on_device_acquire(audio_name)) {
-                jack_error("Audio device %s cannot be acquired...", capture_driver_name);
+                jack_error("Audio device %s cannot be acquired...", capture_drivers.data[0]);
+                array_string_free(&capture_drivers);
+                array_string_free(&playback_drivers);
                 return -1;
             }
         }
@@ -330,26 +354,32 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
         if (playback_card >= 0 && playback_card != capture_card) {
             snprintf(audio_name, sizeof(audio_name), "Audio%d", playback_card);
             if (!JackServerGlobals::on_device_acquire(audio_name)) {
-                jack_error("Audio device %s cannot be acquired...", playback_driver_name);
+                jack_error("Audio device %s cannot be acquired...", playback_drivers.data[0]);
                 if (capture_card >= 0) {
                     snprintf(audio_name, sizeof(audio_name), "Audio%d", capture_card);
                     JackServerGlobals::on_device_release(audio_name);
                 }
+                array_string_free(&capture_drivers);
+                array_string_free(&playback_drivers);
                 return -1;
             }
         }
     }
 #endif
 
-    fDriver = alsa_driver_new ((char*)"alsa_pcm", (char*)playback_driver_name, (char*)capture_driver_name,
+    fDriver = alsa_driver_new ((char*)"alsa_pcm",
+                               capture_drivers.data,
+                               playback_drivers.data,
+                               capture_driver_name,
+                               playback_driver_name,
                                NULL,
                                nframes,
                                user_nperiods,
                                samplerate,
                                hw_monitoring,
                                hw_metering,
-                               capturing,
-                               playing,
+                               capturing ? capture_drivers.size : 0,
+                               playing ? playback_drivers.size : 0,
                                dither,
                                soft_mode,
                                monitor,
@@ -359,6 +389,10 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
                                capture_latency,
                                playback_latency,
                                midi);
+
+    array_string_free(&capture_drivers);
+    array_string_free(&playback_drivers);
+
     if (fDriver) {
         // ALSA driver may have changed the in/out values
         fCaptureChannels = ((alsa_driver_t *)fDriver)->capture_nchannels;
@@ -393,6 +427,7 @@ int JackAlsaDriver::Close()
         JackPosixThread::StopImp(fReservationLoopThread);
     }
 
+    // FIXME: needs adaptation for multiple drivers
     if (JackServerGlobals::on_device_release != NULL)
     {
         char audio_name[32];
@@ -471,12 +506,15 @@ int JackAlsaDriver::Write()
     return alsa_driver_write((alsa_driver_t *)fDriver, fEngineControl->fBufferSize);
 }
 
-void JackAlsaDriver::ReadInputAux(jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nread)
+void JackAlsaDriver::ReadInputAux(alsa_device_t *device, jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nread)
 {
-    for (int chn = 0; chn < fCaptureChannels; chn++) {
-        if (fGraphManager->GetConnectionsNum(fCapturePortList[chn]) > 0) {
-            jack_default_audio_sample_t* buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fCapturePortList[chn], orig_nframes);
-            alsa_driver_read_from_channel((alsa_driver_t *)fDriver, chn, buf + nread, contiguous);
+    /* global channel offset to fCapturePortList of this capture alsa device */
+    channel_t port_n = device->capture_channel_offset;
+
+    for (channel_t chn = 0; chn < device->capture_nchannels; ++chn, ++port_n) {
+        if (fGraphManager->GetConnectionsNum(fCapturePortList[port_n]) > 0) {
+            jack_default_audio_sample_t* buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fCapturePortList[port_n], orig_nframes);
+            alsa_driver_read_from_channel((alsa_driver_t *)fDriver, device, chn, buf + nread, contiguous);
         }
     }
 }
@@ -510,16 +548,19 @@ int JackAlsaDriver::PortSetDefaultMetadata(jack_port_id_t port_id, const char* p
     return fEngine->PortSetDefaultMetadata(fClientControl.fRefNum, port_id, pretty_name);
 }
 
-void JackAlsaDriver::WriteOutputAux(jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nwritten)
+void JackAlsaDriver::WriteOutputAux(alsa_device_t *device, jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nwritten)
 {
-    for (int chn = 0; chn < fPlaybackChannels; chn++) {
+    /* global channel offset to fPlaybackPortList of this playback alsa device */
+    channel_t port_n = device->playback_channel_offset;
+
+    for (channel_t chn = 0; chn < device->playback_nchannels; ++chn, ++port_n) {
         // Output ports
-        if (fGraphManager->GetConnectionsNum(fPlaybackPortList[chn]) > 0) {
-            jack_default_audio_sample_t* buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fPlaybackPortList[chn], orig_nframes);
-            alsa_driver_write_to_channel(((alsa_driver_t *)fDriver), chn, buf + nwritten, contiguous);
+        if (fGraphManager->GetConnectionsNum(fPlaybackPortList[port_n]) > 0) {
+            jack_default_audio_sample_t* buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fPlaybackPortList[port_n], orig_nframes);
+            alsa_driver_write_to_channel(((alsa_driver_t *)fDriver), device, chn, buf + nwritten, contiguous);
             // Monitor ports
-            if (fWithMonitorPorts && fGraphManager->GetConnectionsNum(fMonitorPortList[chn]) > 0) {
-                jack_default_audio_sample_t* monbuf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fMonitorPortList[chn], orig_nframes);
+            if (fWithMonitorPorts && fGraphManager->GetConnectionsNum(fMonitorPortList[port_n]) > 0) {
+                jack_default_audio_sample_t* monbuf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fMonitorPortList[port_n], orig_nframes);
                 memcpy(monbuf + nwritten, buf + nwritten, contiguous * sizeof(jack_default_audio_sample_t));
             }
         }
@@ -797,6 +838,63 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
     return desc;
 }
 
+struct array_string_t
+{
+    uint64_t size;
+    char **data;
+};
+
+void array_string_free(struct array_string_t *obj)
+{
+    if (obj == NULL) {
+        return;
+    }
+    if (obj->data == NULL) {
+        return;
+    }
+    for (size_t i = 0; i < obj->size; ++i) {
+        free(obj->data[i]);
+    }
+    free(obj->data);
+    obj->data = NULL;
+    obj->size = 0;
+}
+
+struct array_string_t array_string_split(const char *str, const char sep)
+{
+    struct array_string_t result;
+    result.size = 0;
+
+    std::stringstream stream;
+    stream << std::string(str);
+    if (stream.str().find(sep) == std::string::npos) {
+        result.data = (char**) calloc(1, sizeof(char*));
+        result.data[0] = (char*) calloc(JACK_CLIENT_NAME_SIZE + 1, sizeof(char));
+        result.size = 1;
+        strncpy(result.data[0], str, JACK_CLIENT_NAME_SIZE);
+        result.data[0][JACK_CLIENT_NAME_SIZE] = '\0';
+        return result;
+    }
+
+    std::string driver;
+    std::vector<char*> drivers;
+    while (std::getline(stream, driver, sep)) {
+        driver.erase(std::remove_if(driver.begin(), driver.end(), isspace), driver.end());
+        if (std::find(drivers.begin(), drivers.end(), driver) != drivers.end())
+            continue;
+        char *str = (char*) calloc(JACK_CLIENT_NAME_SIZE + 1, sizeof(char));
+        strncpy(str, driver.c_str(), JACK_CLIENT_NAME_SIZE);
+        str[JACK_CLIENT_NAME_SIZE] = '\0';
+        drivers.push_back(str);
+    }
+
+    result.data = (char**) calloc(driver.size(), sizeof(char*));
+    result.size = drivers.size();
+    memcpy(result.data, drivers.data(), result.size * sizeof(char*));
+
+    return result;
+}
+
 static Jack::JackAlsaDriver* g_alsa_driver;
 
 SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)
@@ -943,9 +1041,9 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
 
 // Code to be used in alsa_driver.c
 
-void ReadInput(jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nread)
+void ReadInput(alsa_device_t *device, jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nread)
 {
-    g_alsa_driver->ReadInputAux(orig_nframes, contiguous, nread);
+    g_alsa_driver->ReadInputAux(device, orig_nframes, contiguous, nread);
 }
 void MonitorInput()
 {
@@ -955,9 +1053,9 @@ void ClearOutput()
 {
     g_alsa_driver->ClearOutputAux();
 }
-void WriteOutput(jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nwritten)
+void WriteOutput(alsa_device_t *device, jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nwritten)
 {
-    g_alsa_driver->WriteOutputAux(orig_nframes, contiguous, nwritten);
+    g_alsa_driver->WriteOutputAux(device, orig_nframes, contiguous, nwritten);
 }
 void SetTime(jack_time_t time)
 {

@@ -88,10 +88,10 @@ class JackAlsaDriver : public JackAudioDriver
 
         int SetBufferSize(jack_nframes_t buffer_size);
 
-        void ReadInputAux(jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nread);
+        void ReadInputAux(alsa_device_t *device, jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nread);
         void MonitorInputAux();
         void ClearOutputAux();
-        void WriteOutputAux(jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nwritten);
+        void WriteOutputAux(alsa_device_t *device, jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nwritten);
         void SetTimetAux(jack_time_t time);
 
         int PortSetDefaultMetadata(jack_port_id_t port_id, const char* pretty_name);
