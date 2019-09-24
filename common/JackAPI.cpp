@@ -1174,8 +1174,8 @@ LIB_EXPORT IJackPortConverter* jack_port_create_converter(jack_port_t* port, con
         return new ForwardJackPortConverter(port);
     }
     else if(dst_type == (typeid(int32_t))) {
-        return new IntegerJackPortConverter(sample_move_dS_s32,
-                                            sample_move_d32_sS, sizeof(int32_t),
+        return new IntegerJackPortConverter(sample_move_dS_s32u24,
+                                            sample_move_d32u24_sS, sizeof(int32_t),
                                             port);
     }
     else if(dst_type == (typeid(int16_t))) {
