@@ -77,9 +77,10 @@ class JackMetadata
     #if HAVE_DB
         DB* fDB;
         DB_ENV* fDBenv;
+        const bool fIsEngine;
     #endif
 
-        int PropertyInit(const char* server_name);
+        int PropertyInit();
         int PropertyChangeNotify(JackClient* client, jack_uuid_t subject, const char* key, jack_property_change_t change);
 
     #if HAVE_DB
@@ -88,7 +89,7 @@ class JackMetadata
 
     public:
 
-        JackMetadata(const char* server_name = NULL);
+        JackMetadata(bool isEngine);
         ~JackMetadata();
 
         int GetProperty(jack_uuid_t subject, const char* key, char** value, char** type);
