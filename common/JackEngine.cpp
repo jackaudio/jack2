@@ -773,14 +773,14 @@ int JackEngine::ClientCloseAux(int refnum, bool wait)
         }
     }
 
-    // Notify running clients
-    NotifyRemoveClient(client->GetClientControl()->fName, refnum);
-
     fMetadata.RemoveProperties(NULL, uuid);
     /* have to do the notification ourselves, since the client argument
        to fMetadata->RemoveProperties() was NULL
      */
     PropertyChangeNotify(uuid, NULL, PropertyDeleted);
+
+    // Notify running clients
+    NotifyRemoveClient(client->GetClientControl()->fName, refnum);
 
     // Cleanup...
     fSynchroTable[refnum].Destroy();
@@ -909,6 +909,13 @@ int JackEngine::PortUnRegister(int refnum, jack_port_id_t port_index)
     PortDisconnect(-1, port_index, ALL_PORTS);
 
     if (fGraphManager->ReleasePort(refnum, port_index) == 0) {
+        const jack_uuid_t uuid = jack_port_uuid_generate(port_index);
+        if (!jack_uuid_empty(uuid))
+        {
+            fMetadata.RemoveProperties(NULL, uuid);
+            PropertyChangeNotify(uuid, NULL, PropertyDeleted);
+        }
+
         if (client->GetClientControl()->fActive) {
             NotifyPortRegistation(port_index, false);
         }
