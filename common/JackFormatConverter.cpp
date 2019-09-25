@@ -25,9 +25,9 @@
 #include <jack/format_converter.h>
 #include "JackCompilerDeps.h"
 #include "JackError.h"
-#include "memops.h"
 
 #define SAMPLE_32BIT_SCALING    0x7FFFFFFF
+#define SAMPLE_16BIT_SCALING    0x7FFF
 #define NORMALIZED_FLOAT_MIN    -1.0f
 #define NORMALIZED_FLOAT_MAX    1.0f
 
@@ -64,7 +64,7 @@ class IntegerJackPortConverter : public BaseJackPortConverter {
     typedef void (*WriteCopyFunction) (char *dst, jack_default_audio_sample_t *src,
                                        unsigned long src_bytes,
                                        unsigned long dst_skip_bytes,
-                                       dither_state_t *state);
+                                       void*);
 
     private:
         int32_t buffer[BUFFER_SIZE_MAX + 8];
@@ -126,6 +126,37 @@ static void sample_move_d32_sS (char *dst, jack_default_audio_sample_t *src,
             *dst32 = scaling;
         } else {
             *dst32 = lrintf(*src * scaling);
+        }
+        dst += dst_skip;
+        src++;
+    }
+}
+
+static void sample_move_dS_s16 (jack_default_audio_sample_t *dst, char *src,
+                                unsigned long nsamples, unsigned long src_skip)
+{
+    const jack_default_audio_sample_t scaling = 1.0 / SAMPLE_16BIT_SCALING;
+
+    while (nsamples--) {
+        const int16_t src16 = *((int16_t*)src);
+        *dst = src16 * scaling;
+        dst++;
+        src += src_skip;
+    }
+}
+
+static void sample_move_d16_sS (char *dst, jack_default_audio_sample_t *src,
+                                unsigned long nsamples, unsigned long dst_skip,
+                                void*)
+{
+    while (nsamples--) {
+        int16_t* const dst16 = (int16_t*) dst;
+        if (*src <= NORMALIZED_FLOAT_MIN) {
+            *dst16 = -SAMPLE_16BIT_SCALING;
+        } else if (*src >= NORMALIZED_FLOAT_MAX) {
+            *dst16 = SAMPLE_16BIT_SCALING;
+        } else {
+            *dst16 = lrintf(*src * SAMPLE_16BIT_SCALING);
         }
         dst += dst_skip;
         src++;

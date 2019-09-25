@@ -69,7 +69,6 @@ def build(bld):
         'JackTools.cpp',
         'JackMessageBuffer.cpp',
         'JackEngineProfiling.cpp',
-        'memops.c',
         'JackFormatConverter.cpp'
         ]
 
