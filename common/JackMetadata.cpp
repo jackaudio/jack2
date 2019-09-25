@@ -1,6 +1,7 @@
 /*
   Copyright (C) 2011 David Robillard
   Copyright (C) 2013 Paul Davis
+  Copyright (C) 2019 Filipe Coelho
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU Lesser General Public License as published by
@@ -22,6 +23,7 @@
 #include "JackClient.h"
 
 #include <string.h>
+#include <sys/stat.h>
 #include <limits.h>
 
 
@@ -32,33 +34,54 @@ LIB_EXPORT const char* JACK_METADATA_PORT_GROUP = "http://jackaudio.org/metadata
 LIB_EXPORT const char* JACK_METADATA_ICON_SMALL = "http://jackaudio.org/metadata/icon-small";
 LIB_EXPORT const char* JACK_METADATA_ICON_LARGE = "http://jackaudio.org/metadata/icon-large";
 
-
 namespace Jack
 {
 
-JackMetadata::JackMetadata(const char* server_name)
+JackMetadata::JackMetadata(bool isEngine)
 #if HAVE_DB
-    : fDB(NULL), fDBenv(NULL)
+    : fDB(NULL), fDBenv(NULL), fIsEngine(isEngine)
 #endif
 {
-    PropertyInit(server_name);
+    PropertyInit();
 }
 
 JackMetadata::~JackMetadata()
 {
 #if HAVE_DB
+    char dbpath[PATH_MAX + 1];
+
     if (fDB) {
         fDB->close (fDB, 0);
         fDB = NULL;
     }
     if (fDBenv) {
         fDBenv->close (fDBenv, 0);
-        fDBenv = 0;
+        fDBenv = NULL;
+    }
+
+    if (fIsEngine)
+    {
+        // cleanup after libdb, nasty!
+        snprintf (dbpath, sizeof(dbpath), "%s/jack_db/metadata.db", jack_server_dir);
+        remove (dbpath);
+
+        snprintf (dbpath, sizeof(dbpath), "%s/jack_db/__db.001", jack_server_dir);
+        remove (dbpath);
+
+        snprintf (dbpath, sizeof(dbpath), "%s/jack_db/__db.002", jack_server_dir);
+        remove (dbpath);
+
+        snprintf (dbpath, sizeof(dbpath), "%s/jack_db/__db.003", jack_server_dir);
+        remove (dbpath);
+
+        // remove our custom dir
+        snprintf (dbpath, sizeof(dbpath), "%s/jack_db", jack_server_dir);
+        rmdir (dbpath);
     }
 #endif
 }
 
-int JackMetadata::PropertyInit(const char* server_name)
+int JackMetadata::PropertyInit()
 {
 #if HAVE_DB
 
@@ -76,7 +99,10 @@ int JackMetadata::PropertyInit(const char* server_name)
         return -1;
     }
 
-    if ((ret = fDBenv->open (fDBenv, jack_server_dir /*FIXME:(server_name, server_dir)*/, DB_CREATE | DB_INIT_LOCK | DB_INIT_MPOOL | DB_THREAD, 0)) != 0) {
+    snprintf (dbpath, sizeof(dbpath), "%s/jack_db", jack_server_dir);
+    mkdir (dbpath, S_IRWXU | S_IRWXG);
+
+    if ((ret = fDBenv->open (fDBenv, dbpath, DB_CREATE | DB_INIT_LOCK | DB_INIT_MPOOL | DB_THREAD, 0)) != 0) {
         jack_error ("cannot open DB environment: %s", db_strerror (ret));
         return -1;
     }
@@ -86,8 +112,7 @@ int JackMetadata::PropertyInit(const char* server_name)
         return -1;
     }
 
-    snprintf (dbpath, sizeof(dbpath), "%s/%s", jack_server_dir /*FIXME:(server_name, server_dir)*/, "metadata.db");
-
+    snprintf (dbpath, sizeof(dbpath), "%s/jack_db/metadata.db", jack_server_dir);
     if ((ret = fDB->open (fDB, NULL, dbpath, NULL, DB_HASH, DB_CREATE | DB_THREAD, 0666)) != 0) {
         jack_error ("Cannot open metadata DB at %s: %s", dbpath, db_strerror (ret));
         fDB->close (fDB, 0);
@@ -152,7 +177,7 @@ int JackMetadata::SetProperty(JackClient* client, jack_uuid_t subject, const cha
         return -1;
     }
 
-    if (PropertyInit(NULL)) {
+    if (PropertyInit()) {
         return -1;
     }
 
@@ -227,7 +252,7 @@ int JackMetadata::GetProperty(jack_uuid_t subject, const char* key, char** value
         return -1;
     }
 
-    if (PropertyInit(NULL)) {
+    if (PropertyInit()) {
         return -1;
     }
 
@@ -319,7 +344,7 @@ int JackMetadata::GetProperties(jack_uuid_t subject, jack_description_t* desc)
     memset (ustr, 0, JACK_UUID_STRING_SIZE);
     jack_uuid_unparse (subject, ustr);
 
-    if (PropertyInit(NULL)) {
+    if (PropertyInit()) {
         return -1;
     }
 
@@ -447,7 +472,7 @@ int JackMetadata::GetAllProperties(jack_description_t** descriptions)
     jack_property_t* current_prop = NULL;
     size_t len1, len2;
 
-    if (PropertyInit(NULL)) {
+    if (PropertyInit()) {
         return -1;
     }
 
@@ -604,7 +629,7 @@ int JackMetadata::RemoveProperty(JackClient* client, jack_uuid_t subject, const 
     DBT d_key;
     int ret;
 
-    if (PropertyInit(NULL)) {
+    if (PropertyInit()) {
         return -1;
     }
 
@@ -645,7 +670,7 @@ int JackMetadata::RemoveProperties(JackClient* client, jack_uuid_t subject)
     memset (ustr, 0, JACK_UUID_STRING_SIZE);
     jack_uuid_unparse (subject, ustr);
 
-    if (PropertyInit(NULL)) {
+    if (PropertyInit() || fDB == NULL) {
         return -1;
     }
 
@@ -720,7 +745,7 @@ int JackMetadata::RemoveAllProperties(JackClient* client)
     int ret;
     jack_uuid_t empty_uuid = JACK_UUID_EMPTY_INITIALIZER;
 
-    if (PropertyInit(NULL)) {
+    if (PropertyInit()) {
         return -1;
     }
 

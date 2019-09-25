@@ -46,7 +46,7 @@ JackEngine::JackEngine(JackGraphManager* manager,
                        char self_connect_mode)
                     : JackLockAble(control->fServerName), 
                     fSignal(control->fServerName),
-                    fMetadata(NULL) // FIXME use control->fServerName?
+                    fMetadata(true)
 {
     fGraphManager = manager;
     fSynchroTable = table;
