@@ -20,11 +20,16 @@
 */
 
 #include <cstring>
+#include <math.h>
 #include <jack/jack.h>
 #include <jack/format_converter.h>
 #include "JackCompilerDeps.h"
 #include "JackError.h"
 #include "memops.h"
+
+#define SAMPLE_32BIT_SCALING    0x7FFFFFFF
+#define NORMALIZED_FLOAT_MIN    -1.0f
+#define NORMALIZED_FLOAT_MAX    1.0f
 
 
 class BaseJackPortConverter : public IJackPortConverter {
@@ -97,6 +102,40 @@ class IntegerJackPortConverter : public BaseJackPortConverter {
             to_jack (dst,(char *) src, frames, sample_size);
         }
 };
+
+static void sample_move_dS_s32(jack_default_audio_sample_t *dst, char *src,
+                               unsigned long nsamples, unsigned long src_skip)
+{
+    const jack_default_audio_sample_t scaling = 1.0 / SAMPLE_32BIT_SCALING;
+
+    while (nsamples--) {
+        const int32_t src32 = *((int32_t *) src);
+        *dst = src32 * scaling;
+        dst++;
+        src += src_skip;
+    }
+}
+
+static void sample_move_d32_sS (char *dst, jack_default_audio_sample_t *src,
+                                unsigned long nsamples, unsigned long dst_skip,
+                                dither_state_t*)
+{
+    const int32_t scaling = SAMPLE_32BIT_SCALING;
+
+    while (nsamples--) {
+        int32_t* const dst32 = (int32_t*)dst;
+
+        if (*src <= NORMALIZED_FLOAT_MIN) {
+            *dst32 = -scaling;
+        } else if (*src >= NORMALIZED_FLOAT_MAX) {
+            *dst32 = scaling;
+        } else {
+            *dst32 = lrintf(*src * scaling);
+        }
+        dst += dst_skip;
+        src++;
+    }
+}
 
 LIB_EXPORT IJackPortConverter* jack_port_create_converter(jack_port_t* port, const std::type_info& dst_type, const bool init_output_silence)
 {
