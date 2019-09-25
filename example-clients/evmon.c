@@ -69,8 +69,8 @@ graph_callback (void* arg)
 	return 0;
 }
 
-void
-propchange (jack_uuid_t subject, const char* key, jack_property_change_t change)
+static void
+propchange (jack_uuid_t subject, const char* key, jack_property_change_t change, void* arg)
 {
         char buf[JACK_UUID_STRING_SIZE];
         const char* action = "";
@@ -137,7 +137,7 @@ main (int argc, char *argv[])
 		fprintf (stderr, "cannot set graph order registration callback\n");
 		return 1;
 	}
-	if (jack_set_property_change_callback (client, (JackPropertyChangeCallback) propchange, 0)) {
+	if (jack_set_property_change_callback (client, propchange, NULL)) {
 		fprintf (stderr, "cannot set property change callback\n");
 		return 1;
 	}
