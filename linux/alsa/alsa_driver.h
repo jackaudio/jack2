@@ -72,7 +72,6 @@ typedef struct _alsa_driver {
     unsigned long                *capture_interleave_skip;
     unsigned long                *playback_interleave_skip;
     channel_t                     max_nchannels;
-    channel_t                     user_nchannels;
     channel_t                     playback_nchannels;
     channel_t                     capture_nchannels;
     unsigned long                 playback_sample_bytes;
