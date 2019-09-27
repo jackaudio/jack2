@@ -90,7 +90,7 @@ struct JackRequest
         kGetUUIDByClient = 37,
         kClientHasSessionCallback = 38,
         kComputeTotalLatencies = 39,
-        kPropertyChangeNotify = 40
+        kPropertyChangeNotify = 40,
     };
 
     RequestType fType;
