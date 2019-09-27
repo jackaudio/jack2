@@ -98,6 +98,7 @@ class SERVER_EXPORT JackServer
         JackDriverInfo* AddSlave(jack_driver_desc_t* driver_desc, JSList* driver_params);
         void RemoveSlave(JackDriverInfo* info);
         int SwitchMaster(jack_driver_desc_t* driver_desc, JSList* driver_params);
+        int ReloadMaster();
 
         // Object access
         JackLockedEngine* GetEngine();

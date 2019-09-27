@@ -145,6 +145,8 @@ class SERVER_EXPORT JackClient : public JackClientInterface, public JackRunnable
         virtual int Activate();
         virtual int Deactivate();
 
+        virtual int ClientReloadMaster();
+
         // Context
         virtual int SetBufferSize(jack_nframes_t buffer_size);
         virtual int SetFreeWheel(int onoff);

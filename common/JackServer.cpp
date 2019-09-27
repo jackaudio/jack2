@@ -430,6 +430,11 @@ error:
     return -1;
 }
 
+int JackServer::ReloadMaster()
+{
+    return fAudioDriver->Reload();
+}
+
 //----------------------
 // Transport management
 //----------------------

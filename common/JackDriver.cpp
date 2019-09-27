@@ -351,6 +351,11 @@ int JackDriver::Stop()
     return StopSlaves();
 }
 
+int JackDriver::Reload()
+{
+    return 0;
+}
+
 int JackDriver::StartSlaves()
 {
     int res = 0;

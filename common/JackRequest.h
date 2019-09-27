@@ -91,6 +91,7 @@ struct JackRequest
         kClientHasSessionCallback = 38,
         kComputeTotalLatencies = 39,
         kPropertyChangeNotify = 40,
+        kClientReloadMaster = 41,
     };
 
     RequestType fType;
@@ -1734,6 +1735,31 @@ struct JackClientNotification
 
     int Size() { return sizeof(int) + sizeof(fName) + 5 * sizeof(int) + sizeof(fMessage); }
 
+};
+
+/*!
+\brief Restart Master Backend Request.
+*/
+
+struct JackClientReloadMasterRequest : public JackRequest
+{
+    JackClientReloadMasterRequest(): JackRequest(JackRequest::kClientReloadMaster)
+    {
+    }
+
+    int Read(detail::JackChannelTransactionInterface* trans)
+    {
+        CheckSize();
+        return 0;
+    }
+
+    int Write(detail::JackChannelTransactionInterface* trans)
+    {
+        CheckRes(JackRequest::Write(trans, Size()));
+        return 0;
+    }
+
+    int Size() { return 0; }
 };
 
 } // end of namespace

@@ -502,6 +502,13 @@ int JackClient::Deactivate()
     if (IsRealTime()) {
         fThread.Kill();
     }
+	return result;
+}
+
+int JackClient::ClientReloadMaster()
+{
+    int result = -1;
+    fChannel->ClientReloadMaster(&result);
     return result;
 }
 
