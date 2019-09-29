@@ -494,9 +494,9 @@ port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const s
 	}
 
 	if (jack_caps & JackPortIsOutput)
-		snprintf(name, sizeof(name), "system_midi:capture_%d", ++self->midi_in_cnt);
+		snprintf(name, sizeof(name), "system:midi_capture_%d", ++self->midi_in_cnt);
 	else
-		snprintf(name, sizeof(name), "system_midi:playback_%d", ++self->midi_out_cnt);
+		snprintf(name, sizeof(name), "system:midi_playback_%d", ++self->midi_out_cnt);
 
 	port->jack_port = jack_port_register(self->jack,
 		name, JACK_DEFAULT_MIDI_TYPE, jack_caps, 0);
