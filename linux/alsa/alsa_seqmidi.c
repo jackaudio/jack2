@@ -476,8 +476,9 @@ port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const s
 	snd_seq_client_info_alloca (&client_info);
 	snd_seq_get_any_client_info (self->seq, addr.client, client_info);
 
+	const char *device_name = snd_seq_client_info_get_name(client_info);
 	snprintf(port->name, sizeof(port->name), "alsa_pcm:%s/midi_%s_%d",
-		 snd_seq_client_info_get_name(client_info), port_type[type].name, addr.port+1);
+		 device_name, port_type[type].name, addr.port+1);
 
 	// replace all offending characters by -
 	for (c = port->name; *c; ++c)
@@ -493,9 +494,9 @@ port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const s
 	}
 
 	if (jack_caps & JackPortIsOutput)
-		snprintf(name, sizeof(name), "system:midi_capture_%d", ++self->midi_in_cnt);
+		snprintf(name, sizeof(name), "system_midi:capture_%d", ++self->midi_in_cnt);
 	else
-		snprintf(name, sizeof(name), "system:midi_playback_%d", ++self->midi_out_cnt);
+		snprintf(name, sizeof(name), "system_midi:playback_%d", ++self->midi_out_cnt);
 
 	port->jack_port = jack_port_register(self->jack,
 		name, JACK_DEFAULT_MIDI_TYPE, jack_caps, 0);
@@ -503,6 +504,7 @@ port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const s
 		goto failed;
 
 	jack_port_set_alias (port->jack_port, port->name);
+	jack_port_set_device_metadata (port->jack_port, device_name);
 
 	/* generate an alias */
 
@@ -515,6 +517,7 @@ port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const s
 			*c = '-';
 
 	jack_port_set_alias (port->jack_port, port->name);
+	jack_port_set_device_metadata (port->jack_port, device_name);
 
 	if (type == PORT_INPUT)
 		err = alsa_connect_from(self, port->remote.client, port->remote.port);
