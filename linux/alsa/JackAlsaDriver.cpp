@@ -471,6 +471,11 @@ void JackAlsaDriver::SetTimetAux(jack_time_t time)
     fBeginDateUst = time;
 }
 
+int JackAlsaDriver::PortSetDeviceMetadata(jack_port_id_t port_id, const char* pretty_name)
+{
+    return fEngine->PortSetDeviceMetadata(fClientControl.fRefNum, port_id, pretty_name);
+}
+
 void JackAlsaDriver::WriteOutputAux(jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nwritten)
 {
     for (int chn = 0; chn < fPlaybackChannels; chn++) {
