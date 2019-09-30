@@ -871,6 +871,11 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
 
 struct array_string_t
 {
+    enum flags {
+        none,
+        discard_duplicate,
+    };
+
     uint64_t size;
     char **data;
 };
@@ -891,7 +896,7 @@ void array_string_free(struct array_string_t *obj)
     obj->size = 0;
 }
 
-struct array_string_t array_string_split(const char *str, const char sep)
+struct array_string_t array_string_split(const char *str, const char sep, array_string_t::flags flags = array_string_t::none)
 {
     struct array_string_t result;
     result.size = 0;
@@ -911,7 +916,7 @@ struct array_string_t array_string_split(const char *str, const char sep)
     std::vector<char*> drivers;
     while (std::getline(stream, driver, sep)) {
         driver.erase(std::remove_if(driver.begin(), driver.end(), isspace), driver.end());
-        if (std::find(drivers.begin(), drivers.end(), driver) != drivers.end())
+        if (std::find(drivers.begin(), drivers.end(), driver) != drivers.end() && (flags & array_string_t::discard_duplicate))
             continue;
         char *str = (char*) calloc(JACK_CLIENT_NAME_SIZE + 1, sizeof(char));
         strncpy(str, driver.c_str(), JACK_CLIENT_NAME_SIZE);
@@ -1078,13 +1083,13 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
 
     struct array_string_t capture_names = {};
     if (capture_names_param) {
-        capture_names = array_string_split(capture_names_param, ' ');
+        capture_names = array_string_split(capture_names_param, ' ', array_string_t::discard_duplicate);
         free(capture_names_param);
     }
 
     struct array_string_t playback_names = {};
     if (playback_names_param) {
-        playback_names = array_string_split(playback_names_param, ' ');
+        playback_names = array_string_split(playback_names_param, ' ', array_string_t::discard_duplicate);
         free(playback_names_param);
     }
 
