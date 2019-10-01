@@ -58,13 +58,18 @@
 #define SND_PCM_STATE_SUSPENDED    SND_PCM_STATUS_SUSPENDED
 #define SND_PCM_STATE_XRUN         SND_PCM_STATUS_UNDERRUN
 #define SND_PCM_STATE_RUNNING      SND_PCM_STATUS_RUNNING
+#define SND_PCM_STATE_NOTREADY     SND_PCM_STATUS_NOTREADY
 #define SND_PCM_STREAM_PLAYBACK    SND_PCM_CHANNEL_PLAYBACK
 #define SND_PCM_STREAM_CAPTURE     SND_PCM_CHANNEL_CAPTURE
 
 typedef unsigned long              snd_pcm_uframes_t;
 typedef signed long                snd_pcm_sframes_t;
 typedef int32_t                    alsa_driver_default_format_t;
+#else
+#define SND_PCM_STATE_NOTREADY     (SND_PCM_STATE_LAST + 1)
 #endif
+
+#define ALSA_DRIVER_FEAT_CLOSE_IDLE_DEVS   (1 << 1)
 
 #ifdef __cplusplus
 extern "C"

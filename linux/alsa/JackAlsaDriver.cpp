@@ -564,6 +564,8 @@ int JackAlsaDriver::TargetState(int init, int connections_count)
         state = SND_PCM_STATE_RUNNING;
     } else if (init) {
         state = SND_PCM_STATE_RUNNING;
+    } else if (driver->features & ALSA_DRIVER_FEAT_CLOSE_IDLE_DEVS) {
+        state = SND_PCM_STATE_NOTREADY;
     } else {
         state = SND_PCM_STATE_PREPARED;
     }
@@ -858,6 +860,9 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
         "ALSA MIDI driver",
         NULL);
 
+    value.i = 0;
+    jack_driver_descriptor_add_parameter(desc, &filler, "close-idle-devs", 'c', JackDriverParamBool, &value, NULL, "Close idle devices on alsa driver restart request", NULL);
+
     return desc;
 }
 
@@ -1043,6 +1048,11 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
                 free(info.midi_name);
                 info.midi_name = strdup(param->value.str);
                 break;
+
+            case 'c':
+                info.features |= param->value.i ? ALSA_DRIVER_FEAT_CLOSE_IDLE_DEVS : 0;
+                break;
+
         }
     }
 
