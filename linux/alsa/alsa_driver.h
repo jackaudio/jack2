@@ -70,6 +70,7 @@ typedef int32_t                    alsa_driver_default_format_t;
 #endif
 
 #define ALSA_DRIVER_FEAT_CLOSE_IDLE_DEVS   (1 << 1)
+#define ALSA_DRIVER_FEAT_UNLINKED_DEVS     (1 << 2)
 
 #ifdef __cplusplus
 extern "C"

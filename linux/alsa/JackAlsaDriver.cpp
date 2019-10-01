@@ -863,6 +863,9 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
     value.i = 0;
     jack_driver_descriptor_add_parameter(desc, &filler, "close-idle-devs", 'c', JackDriverParamBool, &value, NULL, "Close idle devices on alsa driver restart request", NULL);
 
+    value.i = 0;
+    jack_driver_descriptor_add_parameter(desc, &filler, "unlinked-devs", 'u', JackDriverParamBool, &value, NULL, "Do not link devices", NULL);
+
     return desc;
 }
 
@@ -1053,6 +1056,9 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
                 info.features |= param->value.i ? ALSA_DRIVER_FEAT_CLOSE_IDLE_DEVS : 0;
                 break;
 
+            case 'u':
+                info.features |= param->value.i ? ALSA_DRIVER_FEAT_UNLINKED_DEVS : 0;
+                break;
         }
     }
 
