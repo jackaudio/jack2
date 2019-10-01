@@ -54,8 +54,10 @@
 #define SND_PCM_FORMAT_S32_LE      SND_PCM_SFMT_S32_LE
 #define SND_PCM_FORMAT_S32_BE      SND_PCM_SFMT_S32_BE
 #define SND_PCM_FORMAT_FLOAT_LE    SND_PCM_SFMT_FLOAT_LE
+#define SND_PCM_STATE_PREPARED     SND_PCM_STATUS_PREPARED
 #define SND_PCM_STATE_SUSPENDED    SND_PCM_STATUS_SUSPENDED
 #define SND_PCM_STATE_XRUN         SND_PCM_STATUS_UNDERRUN
+#define SND_PCM_STATE_RUNNING      SND_PCM_STATUS_RUNNING
 #define SND_PCM_STREAM_PLAYBACK    SND_PCM_CHANNEL_PLAYBACK
 #define SND_PCM_STREAM_CAPTURE     SND_PCM_CHANNEL_CAPTURE
 
@@ -128,12 +130,16 @@ typedef struct _alsa_device {
     unsigned long playback_sample_bytes;
     unsigned long capture_sample_bytes;
 
-    /* is this device linked to first device */
+    /* device is 'snd_pcm_link' to a group, only 1 group of linked devices is allowed */
     int capture_linked;
     int playback_linked;
 
     int capture_xrun_count;
     int playback_xrun_count;
+
+    /* desired state of device, decided by JackAlsaDriver */
+    int capture_target_state;
+    int playback_target_state;
 
     jack_hardware_t *hw;
     char *alsa_driver;
@@ -198,6 +204,8 @@ typedef struct _alsa_driver {
     int devices_count;
     int devices_c_count;
     int devices_p_count;
+
+    int features;
 } alsa_driver_t;
 
 typedef struct _alsa_device_info {
@@ -232,6 +240,8 @@ typedef struct _alsa_driver_info {
     int hw_metering;
     int monitor;
     int soft_mode;
+
+    int features;
 } alsa_driver_info_t;
 
 static inline void
@@ -312,10 +322,16 @@ void
 alsa_driver_delete (alsa_driver_t *driver);
 
 int
+alsa_driver_open (alsa_driver_t *driver);
+
+int
 alsa_driver_start (alsa_driver_t *driver);
 
 int
 alsa_driver_stop (alsa_driver_t *driver);
+
+int
+alsa_driver_close (alsa_driver_t *driver);
 
 jack_nframes_t
 alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
@@ -334,6 +350,7 @@ void MonitorInput();
 void ClearOutput();
 void WriteOutput(alsa_device_t *device, jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nwritten);
 void SetTime(jack_time_t time);
+
 int Restart();
 
 #ifdef __cplusplus
