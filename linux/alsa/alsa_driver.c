@@ -2547,44 +2547,23 @@ alsa_driver_open (alsa_driver_t *driver, alsa_device_t *device, bool is_capture)
 }
 
 jack_driver_t *
-alsa_driver_new (char *name, char **capture_alsa_devices,
-		 char **playback_alsa_devices,
-		 const char *capture_names,
-		 const char *playback_names,
-		 jack_client_t *client,
-		 jack_nframes_t frames_per_cycle,
-		 jack_nframes_t user_nperiods,
-		 jack_nframes_t rate,
-		 int hw_monitoring,
-		 int hw_metering,
-		 int capturing_count,
-		 int playing_count,
-		 DitherAlgorithm dither,
-		 int soft_mode,
-		 int monitor,
-		 int user_capture_nchnls,
-		 int user_playback_nchnls,
-		 int shorts_first,
-		 jack_nframes_t capture_latency,
-		 jack_nframes_t playback_latency,
-		 alsa_midi_t *midi_driver
-		 )
+alsa_driver_new (char *name, alsa_driver_info_t info, jack_client_t *client)
 {
 	int err;
 	alsa_driver_t *driver;
 
 	jack_info ("creating alsa driver ... %s|%" PRIu32 "|%s|%" PRIu32 "|%" PRIu32 "|%" PRIu32
 		"|%" PRIu32"|%" PRIu32"|%" PRIu32 "|%s|%s|%s|%s",
-		capturing_count > 0 ? capture_names : "-",
-		capturing_count,
-		playing_count > 0 ? playback_names : "-",
-		playing_count,
-		frames_per_cycle, user_nperiods, rate,
-		user_capture_nchnls,user_playback_nchnls,
-		hw_monitoring ? "hwmon": "nomon",
-		hw_metering ? "hwmeter":"swmeter",
-		soft_mode ? "soft-mode":"-",
-		shorts_first ? "16bit":"32bit");
+		info.devices_capture_size > 0 ? info.devices[0].capture_name : "-",
+		info.devices_capture_size,
+		info.devices_playback_size > 0 ? info.devices[0].playback_name : "-",
+		info.devices_playback_size,
+		info.frames_per_period, info.periods_n, info.frame_rate,
+		info.devices[0].capture_channels, info.devices[0].playback_channels,
+		info.hw_monitoring ? "hwmon": "nomon",
+		info.hw_metering ? "hwmeter":"swmeter",
+		info.soft_mode ? "soft-mode":"-",
+		info.shorts_first ? "16bit":"32bit");
 
 	driver = (alsa_driver_t *) calloc (1, sizeof (alsa_driver_t));
 
@@ -2604,11 +2583,11 @@ alsa_driver_new (char *name, char **capture_alsa_devices,
     */
 
 	driver->ctl_handle = 0;
-	driver->capture_frame_latency = capture_latency;
-	driver->playback_frame_latency = playback_latency;
+	driver->capture_frame_latency = info.capture_latency;
+	driver->playback_frame_latency = info.playback_latency;
 
 	driver->all_monitor_in = FALSE;
-	driver->with_monitor_ports = monitor;
+	driver->with_monitor_ports = info.monitor;
 
 	driver->clock_mode = ClockMaster; /* XXX is it? */
 	driver->input_monitor_mask = 0;   /* XXX is it? */
@@ -2617,8 +2596,8 @@ alsa_driver_new (char *name, char **capture_alsa_devices,
 	driver->playback_nfds = 0;
 	driver->capture_nfds = 0;
 
-	driver->dither = dither;
-	driver->soft_mode = soft_mode;
+	driver->dither = info.dither;
+	driver->soft_mode = info.soft_mode;
 
 	pthread_mutex_init (&driver->clock_sync_lock, 0);
 	driver->clock_sync_listeners = 0;
@@ -2627,22 +2606,22 @@ alsa_driver_new (char *name, char **capture_alsa_devices,
 	driver->xrun_count = 0;
 	driver->process_count = 0;
 
-	driver->midi = midi_driver;
+	driver->midi = info.midi_driver;
 	driver->xrun_recovery = 0;
 
-	driver->devices_c_count = capturing_count;
-	driver->devices_p_count = playing_count;
-	driver->devices_count = capturing_count > playing_count ? capturing_count : playing_count;
+	driver->devices_c_count = info.devices_capture_size;
+	driver->devices_p_count = info.devices_playback_size;
+	driver->devices_count = info.devices_capture_size > info.devices_playback_size ? info.devices_capture_size : info.devices_playback_size;
 	driver->devices = (alsa_device_t*) calloc(driver->devices_count, sizeof(*driver->devices));
 
 	if (driver->devices_count == 1) {
-		driver->devices[0].capture_nchannels = user_capture_nchnls;
-		driver->devices[0].playback_nchannels = user_playback_nchnls;
+		driver->devices[0].capture_nchannels = info.devices[0].capture_channels;
+		driver->devices[0].playback_nchannels = info.devices[0].playback_channels;
 	}
 
 	for (int i = 0; i < driver->devices_c_count; ++i) {
-		driver->devices[i].capture_sample_bytes = (shorts_first ? 2:4);
-		driver->devices[i].capture_name = strdup(capture_alsa_devices[i]);
+		driver->devices[i].capture_sample_bytes = (info.shorts_first ? 2:4);
+		driver->devices[i].capture_name = strdup(info.devices[i].capture_name);
 
 		err = alsa_driver_open(driver, &driver->devices[i], SND_PCM_STREAM_CAPTURE);
 		if (err < 0) {
@@ -2654,8 +2633,8 @@ alsa_driver_new (char *name, char **capture_alsa_devices,
 	}
 
 	for (int i = 0; i < driver->devices_p_count; ++i) {
-		driver->devices[i].playback_sample_bytes = (shorts_first ? 2:4);
-		driver->devices[i].playback_name = strdup(playback_alsa_devices[i]);
+		driver->devices[i].playback_sample_bytes = (info.shorts_first ? 2:4);
+		driver->devices[i].playback_name = strdup(info.devices[i].playback_name);
 
 #ifndef __QNXNTO__
 		if (alsa_driver_check_card_type (driver, &driver->devices[i])) {
@@ -2663,7 +2642,7 @@ alsa_driver_new (char *name, char **capture_alsa_devices,
 			return NULL;
 		}
 
-		alsa_driver_hw_specific (driver, &driver->devices[i], hw_monitoring, hw_metering);
+		alsa_driver_hw_specific (driver, &driver->devices[i], driver->hw_monitoring, driver->hw_metering);
 #endif
 
 		err = alsa_driver_open(driver, &driver->devices[i], SND_PCM_STREAM_PLAYBACK);
@@ -2720,7 +2699,7 @@ alsa_driver_new (char *name, char **capture_alsa_devices,
 	for (int i = 0; i < driver->devices_count; ++i) {
 		alsa_device_t *device = &driver->devices[i];
 
-		if (alsa_driver_set_parameters (driver, device, frames_per_cycle, user_nperiods, rate)) {
+		if (alsa_driver_set_parameters (driver, device, info.frames_per_period, info.periods_n, info.frame_rate)) {
 			jack_error ("ALSA: failed to set parameters");
 			alsa_driver_delete (driver);
 			return NULL;

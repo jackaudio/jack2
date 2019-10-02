@@ -289,64 +289,45 @@ fail:
 }
 #endif
 
-int JackAlsaDriver::Open(jack_nframes_t nframes,
-                         jack_nframes_t user_nperiods,
-                         jack_nframes_t samplerate,
-                         bool hw_monitoring,
-                         bool hw_metering,
-                         bool capturing,
-                         bool playing,
-                         DitherAlgorithm dither,
-                         bool soft_mode,
-                         bool monitor,
-                         int inchannels,
-                         int outchannels,
-                         bool shorts_first,
-                         const char* capture_driver_name,
-                         const char* playback_driver_name,
-                         jack_nframes_t capture_latency,
-                         jack_nframes_t playback_latency,
-                         const char* midi_driver_name)
+int JackAlsaDriver::Open(alsa_driver_info_t info)
 {
-    struct array_string_t capture_drivers = array_string_split(capture_driver_name, ' ');
-    struct array_string_t playback_drivers = array_string_split(playback_driver_name, ' ');
-
     // Generic JackAudioDriver Open
-    if (JackAudioDriver::Open(nframes, samplerate, capturing, playing,
-                              inchannels, outchannels, monitor,
-                              capture_drivers.size > 1 ? capture_drivers.data[0] : capture_driver_name,
-                              playback_drivers.size > 1 ? playback_drivers.data[0] : playback_driver_name,
-                              capture_latency, playback_latency) != 0) {
-        array_string_free(&capture_drivers);
-        array_string_free(&playback_drivers);
+    if (JackAudioDriver::Open(
+            info.frames_per_period,
+            info.frame_rate,
+            info.devices_capture_size > 0,
+            info.devices_playback_size > 0,
+            -1,
+            -1,
+            info.monitor,
+            info.devices_capture_size > 0 ? info.devices[0].capture_name : "-",
+            info.devices_playback_size > 0 ? info.devices[0].playback_name : "-",
+            info.capture_latency,
+            info.playback_latency) != 0) {
         return -1;
     }
 
-    jack_log("JackAlsaDriver::Open capture_driver_name = %s", capture_driver_name);
-    jack_log("JackAlsaDriver::Open playback_driver_name = %s", playback_driver_name);
-
-    alsa_midi_t *midi = 0;
+    jack_log("JackAlsaDriver::Open capture_driver_name = %s", info.devices_capture_size > 0 ? info.devices[0].capture_name : "-");
+    jack_log("JackAlsaDriver::Open playback_driver_name = %s", info.devices_playback_size > 0 ? info.devices[0].playback_name : "-");
 
 #ifndef __QNXNTO__
 #ifndef __ANDROID__
-    if (strcmp(midi_driver_name, "seq") == 0)
-        midi = alsa_seqmidi_new((jack_client_t*)this, 0);
-    else if (strcmp(midi_driver_name, "raw") == 0)
-        midi = alsa_rawmidi_new((jack_client_t*)this);
+    if (strcmp(info.midi_name, "seq") == 0)
+        info.midi_driver = alsa_seqmidi_new((jack_client_t*)this, 0);
+    else if (strcmp(info.midi_name, "raw") == 0)
+        info.midi_driver = alsa_rawmidi_new((jack_client_t*)this);
 #endif
 
     // FIXME: needs adaptation for multiple drivers
     if (JackServerGlobals::on_device_acquire != NULL) {
-        int capture_card = card_to_num(capture_drivers.data[0]);
-        int playback_card = card_to_num(playback_drivers.data[0]);
+        int capture_card = card_to_num(info.devices_capture_size > 0 ? info.devices[0].capture_name : "-");
+        int playback_card = card_to_num(info.devices_playback_size > 0 ? info.devices[0].playback_name : "-");
         char audio_name[32];
 
         if (capture_card >= 0) {
             snprintf(audio_name, sizeof(audio_name), "Audio%d", capture_card);
             if (!JackServerGlobals::on_device_acquire(audio_name)) {
-                jack_error("Audio device %s cannot be acquired...", capture_drivers.data[0]);
-                array_string_free(&capture_drivers);
-                array_string_free(&playback_drivers);
+                jack_error("Audio device %s cannot be acquired...", info.devices_capture_size > 0 ? info.devices[0].capture_name : "-");
                 return -1;
             }
         }
@@ -354,44 +335,18 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
         if (playback_card >= 0 && playback_card != capture_card) {
             snprintf(audio_name, sizeof(audio_name), "Audio%d", playback_card);
             if (!JackServerGlobals::on_device_acquire(audio_name)) {
-                jack_error("Audio device %s cannot be acquired...", playback_drivers.data[0]);
+                jack_error("Audio device %s cannot be acquired...",info.devices_playback_size > 0 ? info.devices[0].playback_name : "-" );
                 if (capture_card >= 0) {
                     snprintf(audio_name, sizeof(audio_name), "Audio%d", capture_card);
                     JackServerGlobals::on_device_release(audio_name);
                 }
-                array_string_free(&capture_drivers);
-                array_string_free(&playback_drivers);
                 return -1;
             }
         }
     }
 #endif
 
-    fDriver = alsa_driver_new ((char*)"alsa_pcm",
-                               capture_drivers.data,
-                               playback_drivers.data,
-                               capture_driver_name,
-                               playback_driver_name,
-                               NULL,
-                               nframes,
-                               user_nperiods,
-                               samplerate,
-                               hw_monitoring,
-                               hw_metering,
-                               capturing ? capture_drivers.size : 0,
-                               playing ? playback_drivers.size : 0,
-                               dither,
-                               soft_mode,
-                               monitor,
-                               inchannels,
-                               outchannels,
-                               shorts_first,
-                               capture_latency,
-                               playback_latency,
-                               midi);
-
-    array_string_free(&capture_drivers);
-    array_string_free(&playback_drivers);
+    fDriver = alsa_driver_new ((char*)"alsa_pcm", info, NULL);
 
     if (fDriver) {
         // ALSA driver may have changed the in/out values
@@ -810,9 +765,9 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
         "Dithering mode",
         NULL);
 
-    value.ui = 0;
-    jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamUInt, &value, NULL, "Number of capture channels (defaults to hardware max)", NULL);
-    jack_driver_descriptor_add_parameter(desc, &filler, "outchannels", 'o', JackDriverParamUInt, &value, NULL, "Number of playback channels (defaults to hardware max)", NULL);
+    strcpy(value.str, "none");
+    jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamString, &value, NULL, "List of device capture channels (defaults to hardware max)", NULL);
+    jack_driver_descriptor_add_parameter(desc, &filler, "outchannels", 'o', JackDriverParamString, &value, NULL, "List of device playback channels (defaults to hardware max)", NULL);
 
     value.i = FALSE;
     jack_driver_descriptor_add_parameter(desc, &filler, "shorts", 'S', JackDriverParamBool, &value, NULL, "Try 16-bit samples before 32-bit", NULL);
@@ -899,26 +854,31 @@ static Jack::JackAlsaDriver* g_alsa_driver;
 
 SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)
 {
-    jack_nframes_t srate = 48000;
-    jack_nframes_t frames_per_interrupt = 1024;
-    unsigned long user_nperiods = 2;
-    const char *playback_pcm_name = "hw:0";
-    const char *capture_pcm_name = "hw:0";
-    int hw_monitoring = FALSE;
-    int hw_metering = FALSE;
-    int capture = FALSE;
-    int playback = FALSE;
-    int soft_mode = FALSE;
-    int monitor = FALSE;
-    DitherAlgorithm dither = None;
-    int user_capture_nchnls = 0;
-    int user_playback_nchnls = 0;
-    int shorts_first = FALSE;
-    jack_nframes_t systemic_input_latency = 0;
-    jack_nframes_t systemic_output_latency = 0;
     const JSList * node;
     const jack_driver_param_t * param;
-    const char *midi_driver = "none";
+
+    alsa_driver_info_t info = {};
+    info.devices = NULL;
+    info.midi_name = strdup("none");
+    info.hw_monitoring = FALSE;
+    info.hw_metering = FALSE;
+    info.monitor = FALSE;
+    info.soft_mode = FALSE;
+    info.frame_rate = 48000;
+    info.frames_per_period = 1024;
+    info.periods_n = 2;
+    info.dither = None;
+    info.shorts_first = FALSE;
+    info.capture_latency = 0;
+    info.playback_latency = 0;
+
+    char *capture_names_param = NULL;
+    char *playback_names_param = NULL;
+
+    char *capture_channels_param = NULL;
+    char *playback_channels_param = NULL;
+
+    int duplex = FALSE;
 
     for (node = params; node; node = jack_slist_next (node)) {
         param = (const jack_driver_param_t *) node->data;
@@ -926,112 +886,163 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
         switch (param->character) {
 
             case 'C':
-                capture = TRUE;
                 if (strcmp (param->value.str, "none") != 0) {
-                    capture_pcm_name = strdup (param->value.str);
-                    jack_log("capture device %s", capture_pcm_name);
+                    capture_names_param = strdup (param->value.str);
+                    jack_log("capture device %s", capture_names_param);
                 }
                 break;
 
             case 'P':
-                playback = TRUE;
                 if (strcmp (param->value.str, "none") != 0) {
-                    playback_pcm_name = strdup (param->value.str);
-                    jack_log("playback device %s", playback_pcm_name);
+                    playback_names_param = strdup (param->value.str);
+                    jack_log("playback device %s", playback_names_param);
                 }
                 break;
 
             case 'D':
-                playback = TRUE;
-                capture = TRUE;
+                duplex = TRUE;
                 break;
 
             case 'd':
                 if (strcmp (param->value.str, "none") != 0) {
-                    playback_pcm_name = strdup (param->value.str);
-                    capture_pcm_name = strdup (param->value.str);
-                    jack_log("playback device %s", playback_pcm_name);
-                    jack_log("capture device %s", capture_pcm_name);
+                    playback_names_param = strdup (param->value.str);
+                    capture_names_param = strdup (param->value.str);
+                    jack_log("playback device %s", playback_names_param);
+                    jack_log("capture device %s", capture_names_param);
                 }
                 break;
 
             case 'H':
-                hw_monitoring = param->value.i;
+                info.hw_monitoring = param->value.i;
                 break;
 
             case 'm':
-                monitor = param->value.i;
+                info.monitor = param->value.i;
                 break;
 
             case 'M':
-                hw_metering = param->value.i;
+                info.hw_metering = param->value.i;
                 break;
 
             case 'r':
-                srate = param->value.ui;
-                jack_log("apparent rate = %d", srate);
+                info.frame_rate = param->value.ui;
+                jack_log("apparent rate = %d", info.frame_rate);
                 break;
 
             case 'p':
-                frames_per_interrupt = param->value.ui;
-                jack_log("frames per period = %d", frames_per_interrupt);
+                info.frames_per_period = param->value.ui;
+                jack_log("frames per period = %d", info.frames_per_period);
                 break;
 
             case 'n':
-                user_nperiods = param->value.ui;
-                if (user_nperiods < 2) {    /* enforce minimum value */
-                    user_nperiods = 2;
+                info.periods_n = param->value.ui;
+                if (info.periods_n < 2) {    /* enforce minimum value */
+                    info.periods_n = 2;
                 }
                 break;
 
             case 's':
-                soft_mode = param->value.i;
+                info.soft_mode = param->value.i;
                 break;
 
             case 'z':
-                if (dither_opt (param->value.c, &dither)) {
+                if (dither_opt (param->value.c, &info.dither)) {
                     return NULL;
                 }
                 break;
 
             case 'i':
-                user_capture_nchnls = param->value.ui;
+                capture_channels_param = strdup(param->value.str);
                 break;
 
             case 'o':
-                user_playback_nchnls = param->value.ui;
+                playback_channels_param = strdup(param->value.str);
                 break;
 
             case 'S':
-                shorts_first = param->value.i;
+                info.shorts_first = param->value.i;
                 break;
 
             case 'I':
-                systemic_input_latency = param->value.ui;
+                info.capture_latency = param->value.ui;
                 break;
 
             case 'O':
-                systemic_output_latency = param->value.ui;
+                info.playback_latency = param->value.ui;
                 break;
 
             case 'X':
-                midi_driver = strdup(param->value.str);
+                free(info.midi_name);
+                info.midi_name = strdup(param->value.str);
                 break;
         }
     }
 
     /* duplex is the default */
-    if (!capture && !playback) {
-        capture = TRUE;
-        playback = TRUE;
+    if (!capture_names_param && !playback_names_param) {
+        duplex = TRUE;
     }
+
+    if (duplex) {
+        if (!capture_names_param) {
+            capture_names_param = strdup("hw:0");
+        }
+        if (!playback_names_param) {
+            playback_names_param = strdup("hw:0");
+        }
+    }
+
+    struct array_string_t capture_names = {};
+    if (capture_names_param) {
+        capture_names = array_string_split(capture_names_param, ' ');
+        free(capture_names_param);
+    }
+
+    struct array_string_t playback_names = {};
+    if (playback_names_param) {
+        playback_names = array_string_split(playback_names_param, ' ');
+        free(playback_names_param);
+    }
+
+    struct array_string_t capture_channels = {};
+    if (capture_channels_param) {
+        capture_channels = array_string_split(capture_channels_param, ' ');
+        free(capture_channels_param);
+    }
+
+    struct array_string_t playback_channels = {};
+    if (playback_channels_param) {
+        playback_channels = array_string_split(playback_channels_param, ' ');
+        free(playback_channels_param);
+    }
+
+    info.devices_capture_size = capture_names.size;
+    info.devices_playback_size = playback_names.size;
+    info.devices = (alsa_device_info_t*) calloc(std::max(info.devices_capture_size, info.devices_playback_size), sizeof(alsa_device_info_t));
+    for (size_t i = 0; i < std::max(info.devices_capture_size, info.devices_playback_size); ++i) {
+        if (i < capture_names.size) {
+            info.devices[i].capture_name = strdup(capture_names.data[i]);
+        }
+        if (i < capture_channels.size) {
+            info.devices[i].capture_channels = atoi(capture_channels.data[i]);
+        }
+        if (i < playback_names.size) {
+            info.devices[i].playback_name = strdup(playback_names.data[i]);
+        }
+        if (i < playback_channels.size) {
+            info.devices[i].playback_channels = atoi(playback_channels.data[i]);
+        }
+    }
+
+    array_string_free(&capture_names);
+    array_string_free(&playback_names);
+    array_string_free(&capture_channels);
+    array_string_free(&playback_channels);
 
     g_alsa_driver = new Jack::JackAlsaDriver("system", "alsa_pcm", engine, table);
     Jack::JackDriverClientInterface* threaded_driver = new Jack::JackThreadedDriver(g_alsa_driver);
     // Special open for ALSA driver...
-    if (g_alsa_driver->Open(frames_per_interrupt, user_nperiods, srate, hw_monitoring, hw_metering, capture, playback, dither, soft_mode, monitor,
-                          user_capture_nchnls, user_playback_nchnls, shorts_first, capture_pcm_name, playback_pcm_name,
-                          systemic_input_latency, systemic_output_latency, midi_driver) == 0) {
+    if (g_alsa_driver->Open(info) == 0) {
         return threaded_driver;
     } else {
         delete threaded_driver; // Delete the decorated driver

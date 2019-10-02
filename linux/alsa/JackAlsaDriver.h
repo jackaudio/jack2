@@ -51,24 +51,7 @@ class JackAlsaDriver : public JackAudioDriver
         virtual ~JackAlsaDriver()
         {}
 
-        int Open(jack_nframes_t buffer_size,
-                 jack_nframes_t user_nperiods,
-                 jack_nframes_t samplerate,
-                 bool hw_monitoring,
-                 bool hw_metering,
-                 bool capturing,
-                 bool playing,
-                 DitherAlgorithm dither,
-                 bool soft_mode,
-                 bool monitor,
-                 int inchannels,
-                 int outchannels,
-                 bool shorts_first,
-                 const char* capture_driver_name,
-                 const char* playback_driver_name,
-                 jack_nframes_t capture_latency,
-                 jack_nframes_t playback_latency,
-                 const char* midi_driver_name);
+        int Open(alsa_driver_info_t info);
 
         int Close();
         int Attach();

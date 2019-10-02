@@ -200,6 +200,40 @@ typedef struct _alsa_driver {
     int devices_p_count;
 } alsa_driver_t;
 
+typedef struct _alsa_device_info {
+    char *capture_name;
+    char *playback_name;
+
+    int capture_channels;
+    int playback_channels;
+} alsa_device_info_t;
+
+typedef struct _alsa_driver_info {
+    alsa_device_info_t *devices;
+    uint32_t devices_capture_size;
+    uint32_t devices_playback_size;
+
+    char *midi_name;
+    alsa_midi_t *midi_driver;
+
+    jack_nframes_t frame_rate;
+    jack_nframes_t frames_per_period;
+    int periods_n;
+
+    DitherAlgorithm dither;
+
+    int shorts_first;
+
+    jack_nframes_t capture_latency;
+    jack_nframes_t playback_latency;
+
+    // these 4 should be reworked as struct.features
+    int hw_monitoring;
+    int hw_metering;
+    int monitor;
+    int soft_mode;
+} alsa_driver_info_t;
+
 static inline void
 alsa_driver_mark_channel_done (alsa_driver_t *driver, alsa_device_t *device, channel_t chn) {
 	bitset_remove (device->channels_not_done, chn);
@@ -272,28 +306,8 @@ alsa_driver_reset_parameters (alsa_driver_t *driver,
 			      jack_nframes_t rate);
 
 jack_driver_t *
-alsa_driver_new (char *name, char **capture_alsa_devices,
-		 char **playback_alsa_devices,
-		 const char *capture_names,
-		 const char *playback_names,
-		 jack_client_t *client,
-		 jack_nframes_t frames_per_cycle,
-		 jack_nframes_t user_nperiods,
-		 jack_nframes_t rate,
-		 int hw_monitoring,
-		 int hw_metering,
-		 int capturing_count,
-		 int playing_count,
-		 DitherAlgorithm dither,
-		 int soft_mode,
-		 int monitor,
-		 int user_capture_nchnls,
-		 int user_playback_nchnls,
-		 int shorts_first,
-		 jack_nframes_t capture_latency,
-		 jack_nframes_t playback_latency,
-		 alsa_midi_t *midi_driver
-		 );
+alsa_driver_new (char *name, alsa_driver_info_t info, jack_client_t *client);
+
 void
 alsa_driver_delete (alsa_driver_t *driver);
 
