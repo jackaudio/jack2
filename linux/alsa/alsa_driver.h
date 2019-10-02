@@ -69,6 +69,7 @@ typedef int32_t                    alsa_driver_default_format_t;
 #define SND_PCM_STATE_NOTREADY     (SND_PCM_STATE_LAST + 1)
 #endif
 
+#define ALSA_DRIVER_FEAT_START_CLOSED      (1 << 0)
 #define ALSA_DRIVER_FEAT_CLOSE_IDLE_DEVS   (1 << 1)
 #define ALSA_DRIVER_FEAT_UNLINKED_DEVS     (1 << 2)
 
