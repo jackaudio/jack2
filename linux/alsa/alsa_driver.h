@@ -149,7 +149,12 @@ typedef struct _alsa_device {
     int playback_target_state;
 
     jack_hardware_t *hw;
+    snd_ctl_t *ctl_handle;
     char *alsa_driver;
+
+    JSList *clock_sync_listeners;
+    pthread_mutex_t clock_sync_lock;
+    unsigned long next_clock_sync_listener_id;
 } alsa_device_t;
 
 typedef struct _alsa_driver {
@@ -179,7 +184,6 @@ typedef struct _alsa_driver {
     unsigned long                 user_nperiods;
     unsigned int                  playback_nperiods;
     unsigned int                  capture_nperiods;
-    snd_ctl_t                    *ctl_handle;
     jack_client_t                *client;
 
     unsigned long input_monitor_mask;
@@ -197,8 +201,6 @@ typedef struct _alsa_driver {
     dither_state_t *dither_state;
 
     SampleClockMode clock_mode;
-    JSList *clock_sync_listeners;
-    pthread_mutex_t clock_sync_lock;
 
     int poll_late;
     int xrun_count;

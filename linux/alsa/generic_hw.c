@@ -38,7 +38,7 @@ generic_release (jack_hardware_t *hw)
 }
 
 jack_hardware_t *
-jack_alsa_generic_hw_new (alsa_driver_t *driver)
+jack_alsa_generic_hw_new (alsa_device_t *device)
 
 {
 	jack_hardware_t *hw;

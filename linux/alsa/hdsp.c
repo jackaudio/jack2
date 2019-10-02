@@ -115,7 +115,7 @@ static int hdsp_set_mixer_gain(jack_hardware_t *hw, int input_channel,
 	snd_ctl_elem_value_set_integer (ctl, 2, gain);
 
 	/* Commit the mixer value and check for errors */
-	if ((err = snd_ctl_elem_write (h->driver->ctl_handle, ctl)) != 0) {
+	if ((err = snd_ctl_elem_write (h->device->ctl_handle, ctl)) != 0) {
 	  jack_error ("ALSA/HDSP: cannot set mixer gain (%s)", snd_strerror (err));
 	  return -1;
 	}
@@ -206,7 +206,7 @@ hdsp_release (jack_hardware_t *hw)
 
 /* Mostly copied directly from hammerfall.c */
 jack_hardware_t *
-jack_alsa_hdsp_hw_new (alsa_driver_t *driver)
+jack_alsa_hdsp_hw_new (alsa_device_t *device)
 {
 	jack_hardware_t *hw;
 	hdsp_t *h;
@@ -227,7 +227,7 @@ jack_alsa_hdsp_hw_new (alsa_driver_t *driver)
 	hw->get_hardware_power = hdsp_get_hardware_power;
 	
 	h = (hdsp_t *) malloc (sizeof (hdsp_t));
-	h->driver = driver;
+	h->device = device;
 	hw->private_hw = h;
 
 	return hw;

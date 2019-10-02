@@ -198,13 +198,13 @@ alsa_driver_check_card_type (alsa_driver_t *driver, alsa_device_t *device)
 
 	// XXX: I don't know the "right" way to do this. Which to use
 	// driver->alsa_name_playback or driver->alsa_name_capture.
-	if ((err = snd_ctl_open (&driver->ctl_handle, ctl_name, 0)) < 0) {
+	if ((err = snd_ctl_open (&device->ctl_handle, ctl_name, 0)) < 0) {
 		jack_error ("control open \"%s\" (%s)", ctl_name,
 			    snd_strerror(err));
-	} else if ((err = snd_ctl_card_info(driver->ctl_handle, card_info)) < 0) {
+	} else if ((err = snd_ctl_card_info(device->ctl_handle, card_info)) < 0) {
 		jack_error ("control hardware info \"%s\" (%s)",
 			    device->playback_name, snd_strerror (err));
-		snd_ctl_close (driver->ctl_handle);
+		snd_ctl_close (device->ctl_handle);
 	}
 
 	device->alsa_driver = strdup(snd_ctl_card_info_get_driver (card_info));
@@ -217,30 +217,30 @@ alsa_driver_check_card_type (alsa_driver_t *driver, alsa_device_t *device)
 static int
 alsa_driver_hammerfall_hardware (alsa_driver_t *driver, alsa_device_t *device)
 {
-	device->hw = jack_alsa_hammerfall_hw_new (driver);
+	device->hw = jack_alsa_hammerfall_hw_new (device);
 	return 0;
 }
 
 static int
 alsa_driver_hdsp_hardware (alsa_driver_t *driver, alsa_device_t *device)
 {
-	device->hw = jack_alsa_hdsp_hw_new (driver);
+	device->hw = jack_alsa_hdsp_hw_new (device);
 	return 0;
 }
 
 static int
 alsa_driver_ice1712_hardware (alsa_driver_t *driver, alsa_device_t *device)
 {
-        device->hw = jack_alsa_ice1712_hw_new (driver);
+        device->hw = jack_alsa_ice1712_hw_new (device);
         return 0;
 }
 
 // JACK2
 /*
 static int
-alsa_driver_usx2y_hardware (alsa_driver_t *driver)
+alsa_driver_usx2y_hardware (alsa_driver_t *driver, alsa_device_t *device)
 {
-    driver->hw = jack_alsa_usx2y_hw_new (driver);
+    driver->hw = jack_alsa_usx2y_hw_new (device);
     return 0;
 }
 */
@@ -248,7 +248,7 @@ alsa_driver_usx2y_hardware (alsa_driver_t *driver)
 static int
 alsa_driver_generic_hardware (alsa_driver_t *driver, alsa_device_t *device)
 {
-	device->hw = jack_alsa_generic_hw_new (driver);
+	device->hw = jack_alsa_generic_hw_new (device);
 	return 0;
 }
 
@@ -2635,21 +2635,8 @@ alsa_driver_clock_sync_status (channel_t chn)
 void
 alsa_driver_delete (alsa_driver_t *driver)
 {
-	JSList *node;
-
 	if (driver->midi)
 		(driver->midi->destroy)(driver->midi);
-
-	for (node = driver->clock_sync_listeners; node;
-	     node = jack_slist_next (node)) {
-		free (node->data);
-	}
-	jack_slist_free (driver->clock_sync_listeners);
-
-	if (driver->ctl_handle) {
-		snd_ctl_close (driver->ctl_handle);
-		driver->ctl_handle = 0;
-	}
 
 	for (int i = 0; i < driver->devices_count; ++i) {
 		if (driver->devices[i].capture_handle) {
@@ -2660,6 +2647,12 @@ alsa_driver_delete (alsa_driver_t *driver)
 		if (driver->devices[i].playback_handle) {
 			snd_pcm_close (driver->devices[i].playback_handle);
 			driver->devices[i].playback_handle = 0;
+#ifndef __QNXNTO__
+			for (JSList *node = driver->devices[i].clock_sync_listeners; node; node = jack_slist_next (node)) {
+				free (node->data);
+			}
+			jack_slist_free (driver->devices[i].clock_sync_listeners);
+#endif
 		}
 
 		free(driver->devices[i].capture_name);
@@ -2671,6 +2664,11 @@ alsa_driver_delete (alsa_driver_t *driver)
 		if (driver->devices[i].hw) {
 			driver->devices[i].hw->release (driver->devices[i].hw);
 			driver->devices[i].hw = 0;
+		}
+
+		if (driver->devices[i].ctl_handle) {
+			snd_ctl_close (driver->devices[i].ctl_handle);
+			driver->devices[i].ctl_handle = 0;
 		}
 	}
 
@@ -2955,7 +2953,6 @@ alsa_driver_new (char *name, alsa_driver_info_t info, jack_client_t *client)
 	driver->nt_run_cycle = (JackDriverNTRunCycleFunction) alsa_driver_run_cycle;
     */
 
-	driver->ctl_handle = 0;
 	driver->capture_frame_latency = info.capture_latency;
 	driver->playback_frame_latency = info.playback_latency;
 
@@ -2971,9 +2968,6 @@ alsa_driver_new (char *name, alsa_driver_info_t info, jack_client_t *client)
 
 	driver->dither = info.dither;
 	driver->soft_mode = info.soft_mode;
-
-	pthread_mutex_init (&driver->clock_sync_lock, 0);
-	driver->clock_sync_listeners = 0;
 
 	driver->poll_late = 0;
 	driver->xrun_count = 0;
@@ -3054,7 +3048,10 @@ alsa_driver_new (char *name, alsa_driver_info_t info, jack_client_t *client)
 
 
 #ifndef __QNXNTO__
-	for (int i = 0; i < driver->devices_count; ++i) {
+	for (int i = 0; i < driver->devices_p_count; ++i) {
+		pthread_mutex_init (&driver->devices[i].clock_sync_lock, 0);
+		driver->devices[i].clock_sync_listeners = 0;
+
 		if (alsa_driver_check_card_type (driver, &driver->devices[i])) {
 			alsa_driver_delete(driver);
 			return NULL;
@@ -3068,27 +3065,60 @@ alsa_driver_new (char *name, alsa_driver_info_t info, jack_client_t *client)
 }
 
 int
-alsa_driver_stop_listening_to_clock_sync_status (alsa_driver_t *driver,
-						 unsigned int which)
+alsa_driver_listen_for_clock_sync_status (alsa_device_t *device,
+					  ClockSyncListenerFunction func,
+					  void *arg)
+{
+	ClockSyncListener *csl;
 
+	csl = (ClockSyncListener *) malloc (sizeof (ClockSyncListener));
+	csl->function = func;
+	csl->arg = arg;
+	csl->id = device->next_clock_sync_listener_id++;
+
+	pthread_mutex_lock (&device->clock_sync_lock);
+	device->clock_sync_listeners =
+		jack_slist_prepend (device->clock_sync_listeners, csl);
+	pthread_mutex_unlock (&device->clock_sync_lock);
+	return csl->id;
+}
+
+int
+alsa_driver_stop_listening_to_clock_sync_status (alsa_device_t *device,
+						 unsigned int which)
 {
 	JSList *node;
 	int ret = -1;
-	pthread_mutex_lock (&driver->clock_sync_lock);
-	for (node = driver->clock_sync_listeners; node;
+	pthread_mutex_lock (&device->clock_sync_lock);
+	for (node = device->clock_sync_listeners; node;
 	     node = jack_slist_next (node)) {
 		if (((ClockSyncListener *) node->data)->id == which) {
-			driver->clock_sync_listeners =
+			device->clock_sync_listeners =
 				jack_slist_remove_link (
-					driver->clock_sync_listeners, node);
+					device->clock_sync_listeners, node);
 			free (node->data);
 			jack_slist_free_1 (node);
 			ret = 0;
 			break;
 		}
 	}
-	pthread_mutex_unlock (&driver->clock_sync_lock);
+	pthread_mutex_unlock (&device->clock_sync_lock);
 	return ret;
+}
+
+void
+alsa_device_clock_sync_notify (alsa_device_t *device, channel_t chn,
+			       ClockSyncStatus status)
+{
+	JSList *node;
+
+	pthread_mutex_lock (&device->clock_sync_lock);
+	for (node = device->clock_sync_listeners; node;
+	     node = jack_slist_next (node)) {
+		ClockSyncListener *csl = (ClockSyncListener *) node->data;
+		csl->function (chn, status, csl->arg);
+	}
+	pthread_mutex_unlock (&device->clock_sync_lock);
 }
 
 /* DRIVER "PLUGIN" INTERFACE */

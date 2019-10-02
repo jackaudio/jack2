@@ -47,7 +47,7 @@ ice1712_hw_monitor_toggle(jack_hardware_t *hw, int idx, int onoff)
 	} else {
 		snd_ctl_elem_value_set_enumerated (val, 0, 0);
 	}
-	if ((err = snd_ctl_elem_write (h->driver->ctl_handle, val)) != 0) {
+	if ((err = snd_ctl_elem_write (h->device->ctl_handle, val)) != 0) {
 		jack_error ("ALSA/ICE1712: (%d) cannot set input monitoring (%s)",
 			    idx,snd_strerror (err));
 		return -1;
@@ -94,7 +94,7 @@ ice1712_release (jack_hardware_t *hw)
 
 
 jack_hardware_t *
-jack_alsa_ice1712_hw_new (alsa_driver_t *driver)
+jack_alsa_ice1712_hw_new (alsa_device_t *device)
 {
 	jack_hardware_t *hw;
 	ice1712_t *h;
@@ -113,14 +113,14 @@ jack_alsa_ice1712_hw_new (alsa_driver_t *driver)
 
 	h = (ice1712_t *) malloc (sizeof (ice1712_t));
 
-	h->driver = driver;
+	h->device = device;
 
 	/* Get the EEPROM (adopted from envy24control) */
 	h->eeprom = (ice1712_eeprom_t *) malloc (sizeof (ice1712_eeprom_t));
 	snd_ctl_elem_value_alloca (&val);
 	snd_ctl_elem_value_set_interface (val, SND_CTL_ELEM_IFACE_CARD);
         snd_ctl_elem_value_set_name (val, "ICE1712 EEPROM");
-        if ((err = snd_ctl_elem_read (driver->ctl_handle, val)) < 0) {
+        if ((err = snd_ctl_elem_read (device->ctl_handle, val)) < 0) {
                 jack_error( "ALSA/ICE1712: Unable to read EEPROM contents (%s)\n", snd_strerror (err));
                 /* Recover? */
         }
