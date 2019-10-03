@@ -267,6 +267,7 @@ int mrp_thread(avb_driver_state_t **avb_ctx)
     int rc;
     FILE* filepointer2;
     struct timespec tim, tim2;
+    int cnt_sec_to_listener_ready = 0;
 
     if( ! (filepointer2 = fopen("mrp.log", "w"))){
         printf("Error Opening file %d\n", errno);
@@ -337,6 +338,25 @@ int mrp_thread(avb_driver_state_t **avb_ctx)
 
         process_mrp_msg(filepointer2, avb_ctx, msgbuf, bytes);
         fprintf( filepointer2,  "\n\n");fflush(filepointer2);
+
+
+
+
+        if( 900 == cnt_sec_to_listener_ready++) {
+            if ( mrp_client_listener_send_ready( filepointer2, avb_ctx, mrp_ctx ) > RETURN_VALUE_FAILURE) {
+                fprintf(filepointer2,  "send_ready success\n");fflush(filepointer2);
+            }
+        }
+
+
+
+
+
+
+
+
+
+
 
         nanosleep(&tim , &tim2);
     }
