@@ -40,6 +40,15 @@ extern "C" {
 
 /**
  * A single property (key:value pair).
+ *
+ * Although there is no semantics imposed on metadata keys and values, it is
+ * much less useful to use it to associate highly structured data with a port
+ * (or client), since this then implies the need for some (presumably
+ * library-based) code to parse the structure and be able to use it.
+ *
+ * The real goal of the metadata API is to be able to tag ports (and clients)
+ * with small amounts of data that is outside of the core JACK API but
+ * nevertheless useful.
  */
 typedef struct {
     /** The key of this property (URI string). */
@@ -205,7 +214,8 @@ int jack_set_property_change_callback (jack_client_t*             client,
                                        void*                      arg);
 
 /**
- * ...
+ * A value that identifies what the hardware port is connected to (an external
+ * device of some kind). Possible values might be "E-Piano" or "Master 2 Track".
  */
 extern const char* JACK_METADATA_CONNECTED;
 
@@ -223,12 +233,16 @@ extern const char* JACK_METADATA_CONNECTED;
 extern const char* JACK_METADATA_EVENT_TYPES;
 
 /**
- * ...
+ * A value that should be shown when attempting to identify the
+ * specific hardware outputs of a client. Typical values might be
+ * "ADAT1", "S/PDIF L" or "MADI 43".
  */
 extern const char* JACK_METADATA_HARDWARE;
 
 /**
- * ...
+ * A value with a MIME type of "image/png;base64" that is an encoding of an
+ * NxN (with 32 < N <= 128) image to be used when displaying a visual
+ * representation of that client or port.
  */
 extern const char* JACK_METADATA_ICON_LARGE;
 
@@ -244,7 +258,9 @@ extern const char* JACK_METADATA_ICON_LARGE;
 extern const char* JACK_METADATA_ICON_NAME;
 
 /**
- * ...
+ * A value with a MIME type of "image/png;base64" that is an encoding of an
+ * NxN (with N <=32) image to be used when displaying a visual representation
+ * of that client or port.
  */
 extern const char* JACK_METADATA_ICON_SMALL;
 
@@ -256,16 +272,19 @@ extern const char* JACK_METADATA_ICON_SMALL;
  * be gaps in the orders for several ports.  Applications should compare the
  * orders of ports to determine their relative order, but must not assign any
  * other relevance to order values.
+ *
+ * It is encouraged to use http://www.w3.org/2001/XMLSchema#int as the type.
  */
 extern const char* JACK_METADATA_ORDER;
 
 /**
- * ...
+ * A value that should be shown to the user when displaying a port to the user,
+ * unless the user has explicitly overridden that a request to show the port
+ * name, or some other key value.
  */
 extern const char* JACK_METADATA_PRETTY_NAME;
 
 /**
- * ...
  */
 extern const char* JACK_METADATA_PORT_GROUP;
 
