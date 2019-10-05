@@ -47,6 +47,7 @@
 #include <pthread.h>
 #include <time.h>
 #include <ctype.h>
+#include <limits.h>
 
 #include "midiport.h"
 #include "ringbuffer.h"
@@ -95,6 +96,7 @@ typedef struct alsa_seqmidi {
 	jack_client_t *jack;
 
 	snd_seq_t *seq;
+	snd_seq_queue_timer_t* timer;
 	int client_id;
 	int port_id;
 	int queue;
@@ -275,6 +277,10 @@ int alsa_seqmidi_attach(alsa_midi_t *m)
 		error_log("failed to open alsa seq");
 		return err;
 	}
+	if ((err = snd_seq_queue_timer_malloc(&self->timer)) < 0) {
+		error_log("failed to allocate timer");
+		return err;
+	}
 	snd_seq_set_client_name(self->seq, self->alsa_name);
 	self->port_id = snd_seq_create_simple_port(self->seq, "port",
 		SND_SEQ_PORT_CAP_READ|SND_SEQ_PORT_CAP_WRITE
@@ -284,8 +290,17 @@ int alsa_seqmidi_attach(alsa_midi_t *m)
 		,SND_SEQ_PORT_TYPE_APPLICATION);
 	self->client_id = snd_seq_client_id(self->seq);
 
-  	self->queue = snd_seq_alloc_queue(self->seq);
-  	snd_seq_start_queue(self->seq, self->queue, 0);
+	self->queue = snd_seq_alloc_queue(self->seq);
+
+	// set high resolution
+	if (snd_seq_get_queue_timer(self->seq, self->queue, self->timer) == 0) {
+		snd_seq_queue_timer_set_resolution(self->timer, UINT_MAX);
+		snd_seq_set_queue_timer(self->seq, self->queue, self->timer);
+	} else {
+		error_log("failed to set alsa timer in high resolution");
+    }
+
+	snd_seq_start_queue(self->seq, self->queue, 0);
 
 	stream_attach(self, PORT_INPUT);
 	stream_attach(self, PORT_OUTPUT);
@@ -312,6 +327,8 @@ int alsa_seqmidi_detach(alsa_midi_t *m)
 
 	stream_detach(self, PORT_INPUT);
 	stream_detach(self, PORT_OUTPUT);
+
+	snd_seq_queue_timer_free(self->timer);
 
 	snd_seq_close(self->seq);
 	self->seq = NULL;
