@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2011 David Robillard
+  Copyright (C) 2011-2014 David Robillard
   Copyright (C) 2013 Paul Davis
 
   This program is free software; you can redistribute it and/or modify it
@@ -40,6 +40,15 @@ extern "C" {
 
 /**
  * A single property (key:value pair).
+ *
+ * Although there is no semantics imposed on metadata keys and values, it is
+ * much less useful to use it to associate highly structured data with a port
+ * (or client), since this then implies the need for some (presumably
+ * library-based) code to parse the structure and be able to use it.
+ *
+ * The real goal of the metadata API is to be able to tag ports (and clients)
+ * with small amounts of data that is outside of the core JACK API but
+ * nevertheless useful.
  */
 typedef struct {
     /** The key of this property (URI string). */
@@ -204,19 +213,98 @@ int jack_set_property_change_callback (jack_client_t*             client,
                                        JackPropertyChangeCallback callback,
                                        void*                      arg);
 
-#ifdef __cplusplus
-} /* namespace */
-#endif
+/**
+ * A value that identifies what the hardware port is connected to (an external
+ * device of some kind). Possible values might be "E-Piano" or "Master 2 Track".
+ */
+extern const char* JACK_METADATA_CONNECTED;
+
+/**
+ * The supported event types of an event port.
+ *
+ * This is a kludge around Jack only supporting MIDI, particularly for OSC.
+ * This property is a comma-separated list of event types, currently "MIDI" or
+ * "OSC".  If this contains "OSC", the port may carry OSC bundles (first byte
+ * '#') or OSC messages (first byte '/').  Note that the "status byte" of both
+ * OSC events is not a valid MIDI status byte, so MIDI clients that check the
+ * status byte will gracefully ignore OSC messages if the user makes an
+ * inappropriate connection.
+ */
+extern const char* JACK_METADATA_EVENT_TYPES;
+
+/**
+ * A value that should be shown when attempting to identify the
+ * specific hardware outputs of a client. Typical values might be
+ * "ADAT1", "S/PDIF L" or "MADI 43".
+ */
+extern const char* JACK_METADATA_HARDWARE;
+
+/**
+ * A value with a MIME type of "image/png;base64" that is an encoding of an
+ * NxN (with 32 < N <= 128) image to be used when displaying a visual
+ * representation of that client or port.
+ */
+extern const char* JACK_METADATA_ICON_LARGE;
+
+/**
+ * The name of the icon for the subject (typically client).
+ *
+ * This is used for looking up icons on the system, possibly with many sizes or
+ * themes.  Icons should be searched for according to the freedesktop Icon
+ *
+ * Theme Specification:
+ * http://standards.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
+ */
+extern const char* JACK_METADATA_ICON_NAME;
+
+/**
+ * A value with a MIME type of "image/png;base64" that is an encoding of an
+ * NxN (with N <=32) image to be used when displaying a visual representation
+ * of that client or port.
+ */
+extern const char* JACK_METADATA_ICON_SMALL;
+
+/**
+ * Order for a port.
+ *
+ * This is used to specify the best order to show ports in user interfaces.
+ * The value MUST be an integer.  There are no other requirements, so there may
+ * be gaps in the orders for several ports.  Applications should compare the
+ * orders of ports to determine their relative order, but must not assign any
+ * other relevance to order values.
+ *
+ * It is encouraged to use http://www.w3.org/2001/XMLSchema#int as the type.
+ */
+extern const char* JACK_METADATA_ORDER;
+
+/**
+ * A value that should be shown to the user when displaying a port to the user,
+ * unless the user has explicitly overridden that a request to show the port
+ * name, or some other key value.
+ */
+extern const char* JACK_METADATA_PRETTY_NAME;
+
+/**
+ */
+extern const char* JACK_METADATA_PORT_GROUP;
+
+/**
+ * The type of an audio signal.
+ *
+ * This property allows audio ports to be tagged with a "meaning".  The value
+ * is a simple string.  Currently, the only type is "CV", for "control voltage"
+ * ports.  Hosts SHOULD be take care to not treat CV ports as audibile and send
+ * their output directly to speakers.  In particular, CV ports are not
+ * necessarily periodic at all and may have very high DC.
+ */
+extern const char* JACK_METADATA_SIGNAL_TYPE;
 
 /**
  * @}
  */
 
-extern const char* JACK_METADATA_PRETTY_NAME;
-extern const char* JACK_METADATA_HARDWARE;
-extern const char* JACK_METADATA_CONNECTED;
-extern const char* JACK_METADATA_PORT_GROUP;
-extern const char* JACK_METADATA_ICON_SMALL;
-extern const char* JACK_METADATA_ICON_LARGE;
+#ifdef __cplusplus
+} /* namespace */
+#endif
 
 #endif  /* __jack_metadata_h__ */
