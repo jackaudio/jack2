@@ -47,20 +47,6 @@ extern "C"
     LIB_EXPORT int jack_client_close (jack_client_t *client);
     LIB_EXPORT int jack_get_client_pid (const char *name);
 
-    // Metadata API
-    #define JACK_METADATA_PREFIX "http://jackaudio.org/metadata/"
-    LIB_EXPORT const char* JACK_METADATA_CONNECTED   = JACK_METADATA_PREFIX "connected";
-    LIB_EXPORT const char* JACK_METADATA_EVENT_TYPES = JACK_METADATA_PREFIX "event-types";
-    LIB_EXPORT const char* JACK_METADATA_HARDWARE    = JACK_METADATA_PREFIX "hardware";
-    LIB_EXPORT const char* JACK_METADATA_ICON_LARGE  = JACK_METADATA_PREFIX "icon-large";
-    LIB_EXPORT const char* JACK_METADATA_ICON_NAME   = JACK_METADATA_PREFIX "icon-name";
-    LIB_EXPORT const char* JACK_METADATA_ICON_SMALL  = JACK_METADATA_PREFIX "icon-small";
-    LIB_EXPORT const char* JACK_METADATA_ORDER       = JACK_METADATA_PREFIX "order";
-    LIB_EXPORT const char* JACK_METADATA_PORT_GROUP  = JACK_METADATA_PREFIX "port-group";
-    LIB_EXPORT const char* JACK_METADATA_PRETTY_NAME = JACK_METADATA_PREFIX "pretty-name";
-    LIB_EXPORT const char* JACK_METADATA_SIGNAL_TYPE = JACK_METADATA_PREFIX "signal-type";
-    #undef JACK_METADATA_PREFIX
-
     LIB_EXPORT int jack_set_property(jack_client_t*, jack_uuid_t subject, const char* key, const char* value, const char* type);
     LIB_EXPORT int jack_get_property(jack_uuid_t subject, const char* key, char** value, char** type);
     LIB_EXPORT void jack_free_description(jack_description_t* desc, int free_description_itself);

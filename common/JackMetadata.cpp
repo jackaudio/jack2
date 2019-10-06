@@ -27,12 +27,18 @@
 #include <limits.h>
 
 
-LIB_EXPORT const char* JACK_METADATA_PRETTY_NAME = "http://jackaudio.org/metadata/pretty-name";
-LIB_EXPORT const char* JACK_METADATA_HARDWARE = "http://jackaudio.org/metadata/hardware";
-LIB_EXPORT const char* JACK_METADATA_CONNECTED = "http://jackaudio.org/metadata/connected";
-LIB_EXPORT const char* JACK_METADATA_PORT_GROUP = "http://jackaudio.org/metadata/port-group";
-LIB_EXPORT const char* JACK_METADATA_ICON_SMALL = "http://jackaudio.org/metadata/icon-small";
-LIB_EXPORT const char* JACK_METADATA_ICON_LARGE = "http://jackaudio.org/metadata/icon-large";
+#define JACK_METADATA_PREFIX "http://jackaudio.org/metadata/"
+LIB_EXPORT const char* JACK_METADATA_CONNECTED   = JACK_METADATA_PREFIX "connected";
+LIB_EXPORT const char* JACK_METADATA_EVENT_TYPES = JACK_METADATA_PREFIX "event-types";
+LIB_EXPORT const char* JACK_METADATA_HARDWARE    = JACK_METADATA_PREFIX "hardware";
+LIB_EXPORT const char* JACK_METADATA_ICON_LARGE  = JACK_METADATA_PREFIX "icon-large";
+LIB_EXPORT const char* JACK_METADATA_ICON_NAME   = JACK_METADATA_PREFIX "icon-name";
+LIB_EXPORT const char* JACK_METADATA_ICON_SMALL  = JACK_METADATA_PREFIX "icon-small";
+LIB_EXPORT const char* JACK_METADATA_ORDER       = JACK_METADATA_PREFIX "order";
+LIB_EXPORT const char* JACK_METADATA_PORT_GROUP  = JACK_METADATA_PREFIX "port-group";
+LIB_EXPORT const char* JACK_METADATA_PRETTY_NAME = JACK_METADATA_PREFIX "pretty-name";
+LIB_EXPORT const char* JACK_METADATA_SIGNAL_TYPE = JACK_METADATA_PREFIX "signal-type";
+#undef JACK_METADATA_PREFIX
 
 namespace Jack
 {
