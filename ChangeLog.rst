@@ -1,9 +1,9 @@
 ChangeLog
 #########
 
-* 1.9.13 (2019-xx-xx)
+* 1.9.13 (2019-10-06)
 
-  * Meta-data API implementation.
+  * Meta-data API implementation. (and a few tools updated with support for it)
 
   * Correct GPL licence to LGPL for files needed to build libjack.
 
@@ -13,7 +13,13 @@ ChangeLog
 
   * Mark jack_midi_reset_buffer as deprecated.
 
+  * Add example systemd unit file
+
   * Signal to systemd when jackd is ready.
+
+  * Set "seq" alsa midi driver to maximum resolution possible.
+
+  * Fix loading internal clients from another internal client.
 
   * Code cleanup and various fixes. (too many to mention here, see git log for details)
 
