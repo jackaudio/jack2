@@ -411,7 +411,7 @@ void midi_port_init(const alsa_rawmidi_t *midi, midi_port_t *port, snd_rawmidi_i
 
 	port->id = *id;
 	snprintf(port->dev, sizeof(port->dev), "hw:%d,%d,%d", id->id[0], id->id[1], id->id[3]);
-	snprintf(port->device_name, sizeof(port->device_name), snd_rawmidi_info_get_name(info));
+	strncpy(port->device_name, snd_rawmidi_info_get_name(info), sizeof(port->device_name));
 	name = snd_rawmidi_info_get_subdevice_name(info);
 	if (!strlen(name))
 		name = port->device_name;
@@ -468,7 +468,7 @@ int midi_port_open(alsa_rawmidi_t *midi, midi_port_t *port)
 
 	/* Some devices (emu10k1) have subdevs with the same name,
 	 * and we need to generate unique port name for jack */
-	snprintf(name, sizeof(name), "%s", port->name);
+	strncpy(name, port->name, sizeof(name));
 	if (midi_port_open_jack(midi, port, type, name)) {
 		int num;
 		num = port->id.id[3] ? port->id.id[3] : port->id.id[1];
