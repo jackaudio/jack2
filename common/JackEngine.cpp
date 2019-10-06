@@ -44,7 +44,7 @@ JackEngine::JackEngine(JackGraphManager* manager,
                        JackSynchro* table,
                        JackEngineControl* control,
                        char self_connect_mode)
-                    : JackLockAble(control->fServerName), 
+                    : JackLockAble(control->fServerName),
                     fSignal(control->fServerName),
                     fMetadata(true)
 {
@@ -168,7 +168,7 @@ bool JackEngine::Process(jack_time_t cur_cycle_begin, jack_time_t prev_cycle_end
 
     // Cycle  begin
     fEngineControl->CycleBegin(fClientTable, fGraphManager, cur_cycle_begin, prev_cycle_end);
-  
+
     // Graph
     if (fGraphManager->IsFinishedGraph()) {
         ProcessNext(cur_cycle_begin);
@@ -284,15 +284,15 @@ int JackEngine::PropertyChangeNotify(jack_uuid_t subject, const char* key, jack_
 //---------------
 
 int JackEngine::ClientNotify(JackClientInterface* client, int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2)
-{   
+{
     // Check if notification is needed
     if (!client->GetClientControl()->fCallback[notify]) {
         jack_log("JackEngine::ClientNotify: no callback for notification = %ld", notify);
         return 0;
     }
-    
+
     int res1;
-   
+
     // External client
     if (dynamic_cast<JackExternalClient*>(client)) {
        res1 = client->ClientNotify(refnum, name, notify, sync, message, value1, value2);
@@ -304,7 +304,7 @@ int JackEngine::ClientNotify(JackClientInterface* client, int refnum, const char
             Lock();
         }
     }
-    
+
     if (res1 < 0) {
         jack_error("ClientNotify fails name = %s notification = %ld val1 = %ld val2 = %ld", name, notify, value1, value2);
     }
@@ -329,7 +329,7 @@ void JackEngine::NotifyClients(int event, int sync, const char* message, int val
 int JackEngine::NotifyAddClient(JackClientInterface* new_client, const char* new_name, int refnum)
 {
     jack_log("JackEngine::NotifyAddClient: name = %s", new_name);
-    
+
     // Notify existing clients of the new client and new client of existing clients.
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* old_client = fClientTable[i];
@@ -739,7 +739,7 @@ int JackEngine::ClientInternalClose(int refnum, bool wait)
 int JackEngine::ClientCloseAux(int refnum, bool wait)
 {
     jack_log("JackEngine::ClientCloseAux ref = %ld", refnum);
-    
+
     JackClientInterface* client = fClientTable[refnum];
     fEngineControl->fTransport.ResetTimebase(refnum);
 
@@ -1085,7 +1085,7 @@ int JackEngine::PortSetDeviceMetadata(jack_port_id_t port, const char* pretty_na
 {
     static const char* type = "text/plain";
     jack_uuid_t uuid = jack_port_uuid_generate(port);
-    
+
     int res = fMetadata.SetProperty(NULL, uuid, JACK_METADATA_HARDWARE, pretty_name, type);
     if (res == -1) {
         return -1;
@@ -1096,7 +1096,7 @@ int JackEngine::PortSetDeviceMetadata(jack_port_id_t port, const char* pretty_na
     if (res == -1) {
         res = fMetadata.SetProperty(NULL, uuid, JACK_METADATA_PRETTY_NAME, pretty_name, type);
     }
-    
+
     return res;
 }
 
@@ -1188,7 +1188,7 @@ int JackEngine::SessionReply(int refnum)
         }
         fSessionResult = NULL;
     }
-    
+
     return 0;
 }
 
