@@ -194,6 +194,18 @@ typedef enum {
         PropertyDeleted
 } jack_property_change_t;
 
+/**
+ * Prototype for the client supplied function that is called by the
+ * engine anytime a property or properties have been modified.
+ *
+ * Note that when the key is empty, it means all properties have been
+ * modified. This is often used to indicate that the removal of all keys.
+ *
+ * @param subject The subject the change relates to, this can be either a client or port
+ * @param key The key of the modified property (URI string)
+ * @param change Wherever the key has been created, changed or deleted
+ * @param arg pointer to a client supplied structure
+ */
 typedef void (*JackPropertyChangeCallback)(jack_uuid_t            subject,
                                            const char*            key,
                                            jack_property_change_t change,

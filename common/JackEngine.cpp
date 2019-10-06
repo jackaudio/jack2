@@ -773,11 +773,12 @@ int JackEngine::ClientCloseAux(int refnum, bool wait)
         }
     }
 
-    fMetadata.RemoveProperties(NULL, uuid);
-    /* have to do the notification ourselves, since the client argument
-       to fMetadata->RemoveProperties() was NULL
-     */
-    PropertyChangeNotify(uuid, NULL, PropertyDeleted);
+    if (fMetadata.RemoveProperties(NULL, uuid) > 0) {
+        /* have to do the notification ourselves, since the client argument
+          to fMetadata->RemoveProperties() was NULL
+        */
+        PropertyChangeNotify(uuid, NULL, PropertyDeleted);
+    }
 
     // Notify running clients
     NotifyRemoveClient(client->GetClientControl()->fName, refnum);
@@ -912,8 +913,12 @@ int JackEngine::PortUnRegister(int refnum, jack_port_id_t port_index)
         const jack_uuid_t uuid = jack_port_uuid_generate(port_index);
         if (!jack_uuid_empty(uuid))
         {
-            fMetadata.RemoveProperties(NULL, uuid);
-            PropertyChangeNotify(uuid, NULL, PropertyDeleted);
+            if (fMetadata.RemoveProperties(NULL, uuid) > 0) {
+                /* have to do the notification ourselves, since the client argument
+                   to fMetadata->RemoveProperties() was NULL
+                */
+                PropertyChangeNotify(uuid, NULL, PropertyDeleted);
+            }
         }
 
         if (client->GetClientControl()->fActive) {
