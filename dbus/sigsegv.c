@@ -64,7 +64,7 @@ static void signal_segv(int signum, siginfo_t* info, void*ptr) {
     const char *si_code_str;
     ucontext_t *ucontext = (ucontext_t*)ptr;
 
-#if defined(HAVE_UCONTEXT) && defined(HAVE_NGREG)
+#if (defined(HAVE_UCONTEXT) && defined(HAVE_NGREG)) || defined(HAVE_EXECINFO_H)
     size_t i;
 #endif
 #if defined(SIGSEGV_STACK_X86) || defined(SIGSEGV_STACK_IA64)
