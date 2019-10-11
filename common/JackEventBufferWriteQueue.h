@@ -55,6 +55,11 @@ namespace Jack {
         void
         ResetEventBuffer(JackEventBuffer *buffer, jack_nframes_t frames);
 
+        void
+        ResetMidiBuffer(JackEventBuffer *buffer, jack_nframes_t frames) {
+            ResetEventBuffer(buffer, frames);
+        }
+
     };
 
 }

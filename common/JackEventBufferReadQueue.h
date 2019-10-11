@@ -53,6 +53,11 @@ namespace Jack {
         void
         ResetEventBuffer(JackEventBuffer *buffer);
 
+        void
+        ResetMidiBuffer(JackEventBuffer *buffer) {
+            ResetEventBuffer(buffer);
+        }
+
     };
 
 }
