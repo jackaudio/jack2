@@ -22,8 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackALSARawMidiPort.h"
 #include "JackALSARawMidiSendQueue.h"
-#include "JackMidiAsyncQueue.h"
-#include "JackMidiBufferReadQueue.h"
+#include "JackMidi.h"
 #include "JackMidiRawOutputWriteQueue.h"
 
 namespace Jack {

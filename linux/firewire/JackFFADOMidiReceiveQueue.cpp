@@ -20,6 +20,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackFFADOMidiReceiveQueue.h"
 #include "JackMidiUtil.h"
 
+/* Somehow the compiler doesn't accept my typedef in JackMidi.h */
+typedef jack_event_data_t            jack_midi_data_t;
+typedef jack_event_t                 jack_midi_event_t;
+
 using Jack::JackFFADOMidiReceiveQueue;
 
 JackFFADOMidiReceiveQueue::JackFFADOMidiReceiveQueue()
