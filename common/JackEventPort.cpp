@@ -167,4 +167,12 @@ const JackPortType gOscPortType =
     EventBufferMixdown
 };
 
+const JackPortType gEventPortType =
+{
+    JACK_DEFAULT_EVENT_TYPE,
+    EventBufferSize,
+    EventBufferInit,
+    EventBufferMixdown
+};
+
 } // namespace Jack

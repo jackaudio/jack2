@@ -43,6 +43,7 @@ extern const struct JackPortType* GetPortType(jack_port_type_id_t port_type_id);
 extern const struct JackPortType gAudioPortType;
 extern const struct JackPortType gMidiPortType;
 extern const struct JackPortType gOscPortType;
+extern const struct JackPortType gEventPortType;
 
 } // namespace Jack
 

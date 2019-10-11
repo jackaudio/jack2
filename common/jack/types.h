@@ -446,11 +446,12 @@ typedef void (*JackInfoShutdownCallback)(jack_status_t code, const char* reason,
 
 /**
  * Used for the type argument of jack_port_register() for default
- * audio ports and midi ports.
+ * audio ports and event ports.
  */
 #define JACK_DEFAULT_AUDIO_TYPE "32 bit float mono audio"
 #define JACK_DEFAULT_MIDI_TYPE "8 bit raw midi"
 #define JACK_DEFAULT_OSC_TYPE "32 bit OSC"
+#define JACK_DEFAULT_EVENT_TYPE "generic binary data"
 
 /**
  * For convenience, use this typedef if you want to be able to change
