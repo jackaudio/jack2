@@ -245,6 +245,14 @@ extern const char* JACK_METADATA_CONNECTED;
 extern const char* JACK_METADATA_EVENT_TYPES;
 
 /**
+ * OSC allows for arbitrary paths and function names. A namespace is an interface
+ * that gives certain paths and functions a semantic meaning. Currently, the only
+ * standardized interface is "SYN" (<http://opensoundcontrol.org/implementation/syn-namespace>).
+ * Multiple namespaces (if supported) are specified as comma separated list.
+ */
+extern const char* JACK_METADATA_EVENT_OSC_NAMESPACE;
+
+/**
  * A value that should be shown when attempting to identify the
  * specific hardware outputs of a client. Typical values might be
  * "ADAT1", "S/PDIF L" or "MADI 43".
