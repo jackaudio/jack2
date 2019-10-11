@@ -69,8 +69,8 @@ namespace Jack
             void EncodeTransportData();
             void DecodeTransportData();
 
-            JackMidiBuffer* GetMidiInputBuffer(int port_index);
-            JackMidiBuffer* GetMidiOutputBuffer(int port_index);
+            JackEventBuffer* GetMidiInputBuffer(int port_index);
+            JackEventBuffer* GetMidiOutputBuffer(int port_index);
 
             void SaveConnections(int alias);
 

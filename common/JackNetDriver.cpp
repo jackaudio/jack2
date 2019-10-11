@@ -453,14 +453,14 @@ namespace Jack
         }
     }
 
-    JackMidiBuffer* JackNetDriver::GetMidiInputBuffer(int port_index)
+    JackEventBuffer* JackNetDriver::GetMidiInputBuffer(int port_index)
     {
-        return static_cast<JackMidiBuffer*>(fGraphManager->GetBuffer(fMidiCapturePortList[port_index], fEngineControl->fBufferSize));
+        return static_cast<JackEventBuffer*>(fGraphManager->GetBuffer(fMidiCapturePortList[port_index], fEngineControl->fBufferSize));
     }
 
-    JackMidiBuffer* JackNetDriver::GetMidiOutputBuffer(int port_index)
+    JackEventBuffer* JackNetDriver::GetMidiOutputBuffer(int port_index)
     {
-        return static_cast<JackMidiBuffer*>(fGraphManager->GetBuffer(fMidiPlaybackPortList[port_index], fEngineControl->fBufferSize));
+        return static_cast<JackEventBuffer*>(fGraphManager->GetBuffer(fMidiPlaybackPortList[port_index], fEngineControl->fBufferSize));
     }
 
 //transport---------------------------------------------------------------------------
