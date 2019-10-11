@@ -19,34 +19,34 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include <new>
 
-#include "JackMidiAsyncWaitQueue.h"
+#include "JackEventAsyncWaitQueue.h"
 #include "JackMidiUtil.h"
 #include "JackTime.h"
 
-using Jack::JackMidiAsyncWaitQueue;
+using Jack::JackEventAsyncWaitQueue;
 
-JackMidiAsyncWaitQueue::JackMidiAsyncWaitQueue(size_t max_bytes,
+JackEventAsyncWaitQueue::JackEventAsyncWaitQueue(size_t max_bytes,
                                                size_t max_messages):
-    JackMidiAsyncQueue(max_bytes, max_messages)
+    JackEventAsyncQueue(max_bytes, max_messages)
 {
-    if (semaphore.Allocate("JackMidiAsyncWaitQueue", "midi-thread", 0)) {
+    if (semaphore.Allocate("JackEventAsyncWaitQueue", "event-thread", 0)) {
         throw std::bad_alloc();
     }
 }
 
-JackMidiAsyncWaitQueue::~JackMidiAsyncWaitQueue()
+JackEventAsyncWaitQueue::~JackEventAsyncWaitQueue()
 {
     semaphore.Destroy();
 }
 
-jack_midi_event_t *
-JackMidiAsyncWaitQueue::DequeueEvent()
+jack_event_t *
+JackEventAsyncWaitQueue::DequeueEvent()
 {
     return DequeueEvent((long) 0);
 }
 
-jack_midi_event_t *
-JackMidiAsyncWaitQueue::DequeueEvent(jack_nframes_t frame)
+jack_event_t *
+JackEventAsyncWaitQueue::DequeueEvent(jack_nframes_t frame)
 {
 
     // XXX: I worry about timer resolution on Solaris and Windows.  When the
@@ -65,18 +65,18 @@ JackMidiAsyncWaitQueue::DequeueEvent(jack_nframes_t frame)
                         (long) (frame_time - current_time));
 }
 
-jack_midi_event_t *
-JackMidiAsyncWaitQueue::DequeueEvent(long usec)
+jack_event_t *
+JackEventAsyncWaitQueue::DequeueEvent(long usec)
 {
     return ((usec < 0) ? semaphore.Wait() : semaphore.TimedWait(usec)) ?
-        JackMidiAsyncQueue::DequeueEvent() : 0;
+        JackEventAsyncQueue::DequeueEvent() : 0;
 }
 
-Jack::JackMidiWriteQueue::EnqueueResult
-JackMidiAsyncWaitQueue::EnqueueEvent(jack_nframes_t time, size_t size,
-                                     jack_midi_data_t *buffer)
+Jack::JackEventWriteQueue::EnqueueResult
+JackEventAsyncWaitQueue::EnqueueEvent(jack_nframes_t time, size_t size,
+                                     jack_event_data_t *buffer)
 {
-    EnqueueResult result = JackMidiAsyncQueue::EnqueueEvent(time, size,
+    EnqueueResult result = JackEventAsyncQueue::EnqueueEvent(time, size,
                                                             buffer);
     if (result == OK) {
         semaphore.Signal();

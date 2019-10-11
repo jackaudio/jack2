@@ -29,13 +29,13 @@ using Jack::JackMidiRawOutputWriteQueue;
 #define STILL_TIME(c, b) ((! (b)) || ((c) < (b)))
 
 JackMidiRawOutputWriteQueue::
-JackMidiRawOutputWriteQueue(JackMidiSendQueue *send_queue, size_t non_rt_size,
+JackMidiRawOutputWriteQueue(JackEventSendQueue *send_queue, size_t non_rt_size,
                             size_t max_non_rt_messages, size_t max_rt_messages)
 {
-    non_rt_queue = new JackMidiAsyncQueue(non_rt_size, max_non_rt_messages);
-    std::unique_ptr<JackMidiAsyncQueue> non_rt_ptr(non_rt_queue);
-    rt_queue = new JackMidiAsyncQueue(max_rt_messages, max_rt_messages);
-    std::unique_ptr<JackMidiAsyncQueue> rt_ptr(rt_queue);
+    non_rt_queue = new JackEventAsyncQueue(non_rt_size, max_non_rt_messages);
+    std::unique_ptr<JackEventAsyncQueue> non_rt_ptr(non_rt_queue);
+    rt_queue = new JackEventAsyncQueue(max_rt_messages, max_rt_messages);
+    std::unique_ptr<JackEventAsyncQueue> rt_ptr(rt_queue);
     non_rt_event = 0;
     rt_event = 0;
     running_status = 0;
@@ -69,18 +69,18 @@ JackMidiRawOutputWriteQueue::DequeueRealtimeEvent()
     }
 }
 
-Jack::JackMidiWriteQueue::EnqueueResult
+Jack::JackEventWriteQueue::EnqueueResult
 JackMidiRawOutputWriteQueue::EnqueueEvent(jack_nframes_t time, size_t size,
-                                          jack_midi_data_t *buffer)
+                                          jack_event_data_t *buffer)
 {
-    JackMidiAsyncQueue *queue = (size == 1) && (*buffer >= 0xf8) ? rt_queue :
+    JackEventAsyncQueue *queue = (size == 1) && (*buffer >= 0xf8) ? rt_queue :
         non_rt_queue;
     return queue->EnqueueEvent(time, size, buffer);
 }
 
 void
 JackMidiRawOutputWriteQueue::HandleWriteQueueBug(jack_nframes_t time,
-                                                 jack_midi_data_t byte)
+                                                 jack_event_data_t byte)
 {
     jack_error("JackMidiRawOutputWriteQueue::HandleWriteQueueBug - **BUG** "
                "The write queue told us that it couldn't enqueue a 1-byte "
@@ -123,7 +123,7 @@ JackMidiRawOutputWriteQueue::Process(jack_nframes_t boundary_frame)
 
 bool
 JackMidiRawOutputWriteQueue::SendByte(jack_nframes_t time,
-                                      jack_midi_data_t byte)
+                                      jack_event_data_t byte)
 {
     switch (send_queue->EnqueueEvent(time, 1, &byte)) {
     case BUFFER_TOO_SMALL:

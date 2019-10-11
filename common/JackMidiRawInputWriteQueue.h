@@ -20,8 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef __JackMidiRawInputWriteQueue__
 #define __JackMidiRawInputWriteQueue__
 
-#include "JackMidiAsyncQueue.h"
-#include "JackMidiWriteQueue.h"
+#include "JackEventAsyncQueue.h"
+#include "JackEventWriteQueue.h"
 
 namespace Jack {
 
@@ -33,22 +33,22 @@ namespace Jack {
      * MIDI bytes that must be parsed.
      */
 
-    class SERVER_EXPORT JackMidiRawInputWriteQueue: public JackMidiWriteQueue {
+    class SERVER_EXPORT JackMidiRawInputWriteQueue: public JackEventWriteQueue {
 
     private:
 
-        jack_midi_event_t event;
-        jack_midi_data_t event_byte;
+        jack_event_t event;
+        jack_event_data_t event_byte;
         bool event_pending;
         size_t expected_bytes;
-        jack_midi_data_t *input_buffer;
+        jack_event_data_t *input_buffer;
         size_t input_buffer_size;
-        jack_midi_event_t *packet;
+        jack_event_t *packet;
         JackMidiAsyncQueue *packet_queue;
-        jack_midi_data_t status_byte;
+        jack_event_data_t status_byte;
         size_t total_bytes;
         size_t unbuffered_bytes;
-        JackMidiWriteQueue *write_queue;
+        JackEventWriteQueue *write_queue;
 
         void
         Clear();
@@ -57,17 +57,17 @@ namespace Jack {
         PrepareBufferedEvent(jack_nframes_t time);
 
         bool
-        PrepareByteEvent(jack_nframes_t time, jack_midi_data_t byte);
+        PrepareByteEvent(jack_nframes_t time, jack_event_data_t byte);
 
         void
         PrepareEvent(jack_nframes_t time, size_t size,
-                     jack_midi_data_t *buffer);
+                     jack_event_data_t *buffer);
 
         bool
-        ProcessByte(jack_nframes_t time, jack_midi_data_t byte);
+        ProcessByte(jack_nframes_t time, jack_event_data_t byte);
 
         void
-        RecordByte(jack_midi_data_t byte);
+        RecordByte(jack_event_data_t byte);
 
         bool
         WriteEvent(jack_nframes_t boundary_frame);
@@ -120,7 +120,7 @@ namespace Jack {
 
     public:
 
-        using JackMidiWriteQueue::EnqueueEvent;
+        using JackEventWriteQueue::EnqueueEvent;
 
         /**
          * Called to create a new raw input write queue.  The `write_queue`
@@ -132,7 +132,7 @@ namespace Jack {
          * written to the write queue.
          */
 
-        JackMidiRawInputWriteQueue(JackMidiWriteQueue *write_queue,
+        JackMidiRawInputWriteQueue(JackEventWriteQueue *write_queue,
                                    size_t max_packet_data=4096,
                                    size_t max_packets=1024);
 
@@ -140,7 +140,7 @@ namespace Jack {
 
         EnqueueResult
         EnqueueEvent(jack_nframes_t time, size_t size,
-                     jack_midi_data_t *buffer);
+                     jack_event_data_t *buffer);
 
         /**
          * Returns the maximum size event that can be enqueued right *now*.

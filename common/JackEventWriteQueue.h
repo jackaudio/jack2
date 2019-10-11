@@ -17,19 +17,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#ifndef __JackMidiWriteQueue__
-#define __JackMidiWriteQueue__
+#ifndef __JackEventWriteQueue__
+#define __JackEventWriteQueue__
 
-#include "JackMidiPort.h"
+#include "JackEventPort.h"
 
 namespace Jack {
 
     /**
-     * Interface for classes that act as write queues for MIDI messages.  Write
+     * Interface for classes that act as write queues for event messages.  Write
      * queues are used by processors to transfer data to the next processor.
      */
 
-    class SERVER_EXPORT JackMidiWriteQueue {
+    class SERVER_EXPORT JackEventWriteQueue {
 
     public:
 
@@ -41,7 +41,7 @@ namespace Jack {
             OK
         };
 
-        virtual ~JackMidiWriteQueue();
+        virtual ~JackEventWriteQueue();
 
         /**
          * Enqueues a data packet in the write queue of `size` bytes contained
@@ -60,7 +60,7 @@ namespace Jack {
 
         virtual EnqueueResult
         EnqueueEvent(jack_nframes_t time, size_t size,
-                     jack_midi_data_t *buffer) = 0;
+                     jack_event_data_t *buffer) = 0;
 
         /**
          * A wrapper method for the `EnqueueEvent` method above.  The optional
@@ -69,7 +69,7 @@ namespace Jack {
          */
 
         inline EnqueueResult
-        EnqueueEvent(jack_midi_event_t *event, jack_nframes_t frame_offset=0)
+        EnqueueEvent(jack_event_t *event, jack_nframes_t frame_offset=0)
         {
             return EnqueueEvent(event->time + frame_offset, event->size,
                                 event->buffer);

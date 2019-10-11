@@ -17,41 +17,41 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#ifndef __JackMidiBufferReadQueue__
-#define __JackMidiBufferReadQueue__
+#ifndef __JackEventBufferReadQueue__
+#define __JackEventBufferReadQueue__
 
-#include "JackMidiReadQueue.h"
+#include "JackEventReadQueue.h"
 
 namespace Jack {
 
     /**
-     * Wrapper class to present a JackMidiBuffer in a read queue interface.
+     * Wrapper class to present a JackEventBuffer in a read queue interface.
      */
 
-    class SERVER_EXPORT JackMidiBufferReadQueue: public JackMidiReadQueue {
+    class SERVER_EXPORT JackEventBufferReadQueue: public JackEventReadQueue {
 
     private:
 
-        JackMidiBuffer *buffer;
+        JackEventBuffer *buffer;
         jack_nframes_t event_count;
         jack_nframes_t index;
         jack_nframes_t last_frame_time;
-        jack_midi_event_t midi_event;
+        jack_event_t midi_event;
 
     public:
 
-        JackMidiBufferReadQueue();
+        JackEventBufferReadQueue();
 
-        jack_midi_event_t *
+        jack_event_t *
         DequeueEvent();
 
         /**
-         * This method must be called each period to reset the MIDI buffer for
+         * This method must be called each period to reset the buffer for
          * processing.
          */
 
         void
-        ResetMidiBuffer(JackMidiBuffer *buffer);
+        ResetEventBuffer(JackEventBuffer *buffer);
 
     };
 

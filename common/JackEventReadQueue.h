@@ -17,23 +17,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#ifndef __JackMidiReadQueue__
-#define __JackMidiReadQueue__
+#ifndef __JackEventReadQueue__
+#define __JackEventReadQueue__
 
-#include "JackMidiPort.h"
+#include "JackEventPort.h"
 
 namespace Jack {
 
     /**
-     * Interface for objects that MIDI events can be read from.
+     * Interface for objects that events can be read from.
      */
 
-    class SERVER_EXPORT JackMidiReadQueue {
+    class SERVER_EXPORT JackEventReadQueue {
 
     public:
 
         virtual
-        ~JackMidiReadQueue();
+        ~JackEventReadQueue();
 
         /**
          * Dequeues an event from the queue.  Returns the event, or 0 if no
@@ -45,7 +45,7 @@ namespace Jack {
          * next event.
          */
 
-        virtual jack_midi_event_t *
+        virtual jack_event_t *
         DequeueEvent() = 0;
 
     };
