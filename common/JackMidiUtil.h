@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef __JackMidiUtil__
 #define __JackMidiUtil__
 
-#include "JackMidiPort.h"
+#include "JackEventPort.h"
 
 namespace Jack {
 
@@ -41,17 +41,17 @@ namespace Jack {
      * message for each message that can be optimized.
      */
 
-    SERVER_EXPORT jack_midi_data_t
-    ApplyRunningStatus(size_t *size, jack_midi_data_t **buffer,
-                       jack_midi_data_t running_status=0);
+    SERVER_EXPORT jack_event_data_t
+    ApplyRunningStatus(size_t *size, jack_event_data_t **buffer,
+                       jack_event_data_t running_status=0);
 
     /**
      * A wrapper function for the above `ApplyRunningStatus` function.
      */
 
-    SERVER_EXPORT jack_midi_data_t
-    ApplyRunningStatus(jack_midi_event_t *event,
-                       jack_midi_data_t running_status);
+    SERVER_EXPORT jack_event_data_t
+    ApplyRunningStatus(jack_event_t *event,
+                       jack_event_data_t running_status);
 
     /**
      * Gets the estimated current time in frames.  This function has the same
@@ -86,7 +86,7 @@ namespace Jack {
      */
 
     SERVER_EXPORT int
-    GetMessageLength(jack_midi_data_t status_byte);
+    GetMessageLength(jack_event_data_t status_byte);
 
     /**
      * Gets the estimated time at which the given frame will occur.  This
