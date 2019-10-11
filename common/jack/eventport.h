@@ -18,8 +18,8 @@
 */
 
 
-#ifndef __JACK_MIDIPORT_H
-#define __JACK_MIDIPORT_H
+#ifndef __JACK_EVENTPORT_H
+#define __JACK_EVENTPORT_H
 
 #ifdef __cplusplus
 extern "C" {

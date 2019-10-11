@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 #include "JackError.h"
-#include "JackEventType.h"
+#include "JackPortType.h"
 #include "JackEventPort.h"
 #include <assert.h>
 #include <string.h>
@@ -74,11 +74,11 @@ SERVER_EXPORT jack_event_data_t* JackEventBuffer::ReserveEvent(jack_nframes_t ti
 
 void EventBufferInit(void* buffer, size_t buffer_size, jack_nframes_t nframes)
 {
-    JackEventBuffer* buffer = (JackEventBuffer*)buffer;
-    buffer->magic = JackEventBuffer::MAGIC;
+    JackEventBuffer* event_buffer = (JackEventBuffer*)buffer;
+    event_buffer->magic = JackEventBuffer::MAGIC;
     /* Since port buffer has actually always BUFFER_SIZE_MAX frames, we can safely use all the size */
-    buffer->buffer_size = BUFFER_SIZE_MAX * sizeof(jack_default_audio_sample_t);
-    buffer->Reset(nframes);
+    event_buffer->buffer_size = BUFFER_SIZE_MAX * sizeof(jack_default_audio_sample_t);
+    event_buffer->Reset(nframes);
 }
 
 /*

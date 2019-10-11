@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 #include "JackError.h"
-#include "JackMidiPort.h"
+#include "JackEventPort.h"
 #include <errno.h>
 #include <string.h>
 

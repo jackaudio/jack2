@@ -44,7 +44,7 @@ namespace Jack {
         jack_event_data_t *input_buffer;
         size_t input_buffer_size;
         jack_event_t *packet;
-        JackMidiAsyncQueue *packet_queue;
+        JackEventAsyncQueue *packet_queue;
         jack_event_data_t status_byte;
         size_t total_bytes;
         size_t unbuffered_bytes;
@@ -91,7 +91,7 @@ namespace Jack {
          */
 
         virtual void
-        HandleEventLoss(jack_midi_event_t *event);
+        HandleEventLoss(jack_event_t *event);
 
         /**
          * Override this method to specify what happens when an incomplete MIDI
@@ -107,7 +107,7 @@ namespace Jack {
          */
 
         virtual void
-        HandleInvalidStatusByte(jack_midi_data_t byte);
+        HandleInvalidStatusByte(jack_event_data_t byte);
 
         /**
          * Override this method to specify what happens when a sysex end byte

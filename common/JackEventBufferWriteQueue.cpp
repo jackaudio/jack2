@@ -30,7 +30,7 @@ JackEventBufferWriteQueue::JackEventBufferWriteQueue()
 
 Jack::JackEventWriteQueue::EnqueueResult
 JackEventBufferWriteQueue::EnqueueEvent(jack_nframes_t time, size_t size,
-                                       jack_evemt_data_t *data)
+                                       jack_event_data_t *data)
 {
     if (time >= next_frame_time) {
         return EVENT_EARLY;
@@ -38,7 +38,7 @@ JackEventBufferWriteQueue::EnqueueEvent(jack_nframes_t time, size_t size,
     if (time < last_frame_time) {
         time = last_frame_time;
     }
-    jack_evemt_data_t *dst = buffer->ReserveEvent(time - last_frame_time, size);
+    jack_event_data_t *dst = buffer->ReserveEvent(time - last_frame_time, size);
     if (! dst) {
         return size > max_bytes ? BUFFER_TOO_SMALL : BUFFER_FULL;
     }

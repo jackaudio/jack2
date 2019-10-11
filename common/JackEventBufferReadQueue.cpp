@@ -34,10 +34,10 @@ JackEventBufferReadQueue::DequeueEvent()
 {
     jack_event_t *e = 0;
     if (index < event_count) {
-        JackEvent *event = &(buffer->events[index]);
-        event.buffer = event->GetData(buffer);
-        event.size = event->size;
-        event.time = last_frame_time + event->time;
+        JackEvent *jack_event = &(buffer->events[index]);
+        event.buffer = jack_event->GetData(buffer);
+        event.size = jack_event->size;
+        event.time = last_frame_time + jack_event->time;
         e = &event;
         index++;
     }

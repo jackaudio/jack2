@@ -36,7 +36,7 @@ namespace Jack {
         jack_nframes_t event_count;
         jack_nframes_t index;
         jack_nframes_t last_frame_time;
-        jack_event_t midi_event;
+        jack_event_t event;
 
     public:
 
