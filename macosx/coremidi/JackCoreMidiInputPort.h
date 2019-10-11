@@ -21,8 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackCoreMidiInputPort__
 
 #include "JackCoreMidiPort.h"
-#include "JackMidiAsyncQueue.h"
-#include "JackMidiBufferWriteQueue.h"
+#include "JackMidi.h"
 
 namespace Jack {
 
