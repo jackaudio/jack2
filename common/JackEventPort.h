@@ -41,15 +41,9 @@ struct jack_event_t
 typedef jack_event_data_t jack_midi_data_t;
 typedef jack_event_t jack_midi_event_t;
 
-/** A Jack MIDI port type. */
+/** A Jack MIDI port type. Use @ref JACK_DEFAULT_MESSAGE_TYPE instead if possible */
 #define JACK_DEFAULT_MIDI_TYPE "8 bit raw midi"
-/** A Jack OSC port type. */
-#define JACK_DEFAULT_OSC_TYPE "32 bit OSC"
-/** If you want to toy around with a custom
- * event protocol (maybe MIDI 3.0?). Please put details
- * about it into the metadata.
- */
-#define JACK_DEFAULT_EVENT_TYPE "generic binary data"
+#define JACK_DEFAULT_MESSAGE_TYPE "binary message data"
 
 namespace Jack
 {

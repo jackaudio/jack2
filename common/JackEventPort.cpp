@@ -151,28 +151,14 @@ static size_t EventBufferSize()
     return BUFFER_SIZE_MAX * sizeof(jack_default_audio_sample_t);
 }
 
-const JackPortType gMidiPortType =
+const JackPortType gMessagePortType =
 {
-    JACK_DEFAULT_MIDI_TYPE,
+    JACK_DEFAULT_MESSAGE_TYPE,
     EventBufferSize,
     EventBufferInit,
     EventBufferMixdown
 };
 
-const JackPortType gOscPortType =
-{
-    JACK_DEFAULT_OSC_TYPE,
-    EventBufferSize,
-    EventBufferInit,
-    EventBufferMixdown
-};
-
-const JackPortType gEventPortType =
-{
-    JACK_DEFAULT_EVENT_TYPE,
-    EventBufferSize,
-    EventBufferInit,
-    EventBufferMixdown
-};
+const JackPortType gMidiPortType = gMessagePortType;
 
 } // namespace Jack

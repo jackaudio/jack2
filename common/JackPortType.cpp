@@ -27,9 +27,7 @@ namespace Jack
 static const JackPortType* gPortTypes[] =
 {
     &gAudioPortType,
-    &gMidiPortType,
-    &gOscPortType,
-    &gEventPortType,
+    &gMessagePortType,
 };
 
 jack_port_type_id_t PORT_TYPES_MAX = sizeof(gPortTypes) / sizeof(gPortTypes[0]);
