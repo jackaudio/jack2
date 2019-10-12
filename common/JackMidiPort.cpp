@@ -151,12 +151,14 @@ static size_t MidiBufferSize()
     return BUFFER_SIZE_MAX * sizeof(jack_default_audio_sample_t);
 }
 
-const JackPortType gMidiPortType =
+const JackPortType gMessagePortType =
 {
-    JACK_DEFAULT_MIDI_TYPE,
+    JACK_DEFAULT_MESSAGE_TYPE,
     MidiBufferSize,
     MidiBufferInit,
     MidiBufferMixdown
 };
+
+const JackPortType gMidiPortType = gMessagePortType;
 
 } // namespace Jack

@@ -37,8 +37,9 @@ struct jack_midi_event_t
     jack_midi_data_t *buffer; /**< Raw MIDI data */
 };
 
-/** A Jack MIDI port type. */
+/** A Jack MIDI port type. Use @ref JACK_DEFAULT_MESSAGE_TYPE instead if possible */
 #define JACK_DEFAULT_MIDI_TYPE "8 bit raw midi"
+#define JACK_DEFAULT_MESSAGE_TYPE "binary message data"
 
 namespace Jack
 {
