@@ -29,6 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackServerLaunch.h"
 #include "JackMetadata.h"
 #include <assert.h>
+#include <jack/jack.h>
 
 using namespace Jack;
 
@@ -330,4 +331,19 @@ LIB_EXPORT int jack_set_property_change_callback(jack_client_t* ext_client, Jack
     } else {
         return client->SetPropertyChangeCallback(callback, arg);
     }
+}
+
+// Message API
+
+LIB_EXPORT
+jack_port_t * jack_port_register_message (jack_client_t *client,
+                                     const char *port_name,
+                                     const char *protocol,
+                                     unsigned long flags,
+                                     unsigned long buffer_size) {
+    jack_port_t * port = jack_port_register(client, port_name, JACK_DEFAULT_MESSAGE_TYPE, flags, buffer_size);
+    jack_uuid_t uuid = jack_port_uuid(port);
+
+    jack_set_property(client, uuid, JACK_METADATA_EVENT_TYPES, protocol, "text/plain");
+    return port;
 }

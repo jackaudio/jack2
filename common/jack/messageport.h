@@ -191,6 +191,38 @@ jack_message_get_lost_event_count(void *port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
 
 /*@}*/
 
+/** \addtogroup PortFunctions 
+ *  @{
+ */
+
+/**
+ * Create a new message port for the client. This is a wrapper method
+ * for @ref jack_port_register that will automatically set additional
+ * metadata.
+ * 
+ * Every message client sends or receives data using a specific communication
+ * protocol. For most older clients, this will be "MIDI", but it might be
+ * "OSC" or something custom/new. The protocol can be set and asked through
+ * the metadata API with the key @ref JACK_METADATA_EVENT_TYPES.
+ *
+ * @param client pointer to JACK client structure.
+ * @param port_name non-empty short name for the new port (not
+ * including the leading @a "client_name:"). Must be unique.
+ * @param protocol Specify which protocol this port supports.
+ * @param flags @ref JackPortFlags bit mask.
+ * @param buffer_size must be non-zero if this is not a built-in @a
+ * port_type.  Otherwise, it is ignored.
+ *
+ * @return jack_port_t pointer on success, otherwise NULL.
+ */
+jack_port_t * jack_port_register_message (jack_client_t *client,
+                                  const char *port_name,
+                                  const char *protocol,
+                                  unsigned long flags,
+                                  unsigned long buffer_size) JACK_OPTIONAL_WEAK_EXPORT;
+
+/** @}*/
+
 #ifdef __cplusplus
 }
 #endif

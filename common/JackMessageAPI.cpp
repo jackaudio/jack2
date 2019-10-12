@@ -45,6 +45,13 @@ extern "C"
 
     LIB_EXPORT jack_nframes_t jack_message_get_lost_event_count(void* port_buffer);
 
+
+    LIB_EXPORT jack_port_t * jack_port_register_message (jack_client_t *client,
+                                     const char *port_name,
+                                     const char *protocol,
+                                     unsigned long flags,
+                                     unsigned long buffer_size);
+
 #ifdef __cplusplus
 }
 #endif
