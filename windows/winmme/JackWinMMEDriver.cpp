@@ -71,7 +71,7 @@ JackWinMMEDriver::Attach()
         port = fGraphManager->GetPort(index);
         port->SetAlias(input_port->GetAlias());
         port->SetLatencyRange(JackCaptureLatency, &latency_range);
-        fEngine->PortSetDeviceMetadata(fClientControl.fRefNum, index,
+        fEngine->PortSetDefaultMetadata(fClientControl.fRefNum, index,
                                         input_port->GetDeviceName());
         fCapturePortList[i] = index;
     }
@@ -97,7 +97,7 @@ JackWinMMEDriver::Attach()
         port = fGraphManager->GetPort(index);
         port->SetAlias(output_port->GetAlias());
         port->SetLatencyRange(JackPlaybackLatency, &latency_range);
-        fEngine->PortSetDeviceMetadata(fClientControl.fRefNum, index,
+        fEngine->PortSetDefaultMetadata(fClientControl.fRefNum, index,
                                         output_port->GetDeviceName());
         fPlaybackPortList[i] = index;
     }
