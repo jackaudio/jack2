@@ -232,15 +232,7 @@ int jack_set_property_change_callback (jack_client_t*             client,
 extern const char* JACK_METADATA_CONNECTED;
 
 /**
- * The supported event types of an event port.
- *
- * This is a kludge around Jack only supporting MIDI, particularly for OSC.
- * This property is a comma-separated list of event types, currently "MIDI" or
- * "OSC".  If this contains "OSC", the port may carry OSC bundles (first byte
- * '#') or OSC messages (first byte '/').  Note that the "status byte" of both
- * OSC events is not a valid MIDI status byte, so MIDI clients that check the
- * status byte will gracefully ignore OSC messages if the user makes an
- * inappropriate connection.
+ * @deprecated Use @ref JACK_METADATA_PORT_CONTENT instead.
  */
 extern const char* JACK_METADATA_EVENT_TYPES;
 
@@ -305,17 +297,33 @@ extern const char* JACK_METADATA_ORDER;
 extern const char* JACK_METADATA_PRETTY_NAME;
 
 /**
+ * This property allows audio ports to be tagged with a "meaning". For audio ports,
+ * it specifies the type of the signal. For message ports, it specifies the communication
+ * protocol. The value is a simple "text/plain" string. The default value, an empty/null
+ * string, has a different meaning depending on the port's type.
+ * 
+ * Currently known values for audio ports are "PCM" and "CV". PCM is the default and
+ * represents plain audio, CV encodes control voltage.
+ *
+ * Currently known values for message ports are "MIDI" and "OSC". If not set, MIDI must
+ * be assumed for backwards compatibility. Old clients that create ports with the type
+ * @ref JACK_DEFAULT_MIDI_TYPE must be treated like message ports.
+ * 
+ * Two ports with different content should not be connected, but this <i>can</i> happen if they
+ * have the same type. Patchbays should prevent accidental port mismatches. Clients should
+ * be lenient regarding invalid data.
+ * 
+ * A port should only have one content type. Clients that accept multiple protocols should create
+ * separate ports for each.
+ */
+extern const char* JACK_METADATA_PORT_CONTENT;
+
+/**
  */
 extern const char* JACK_METADATA_PORT_GROUP;
 
 /**
- * The type of an audio signal.
- *
- * This property allows audio ports to be tagged with a "meaning".  The value
- * is a simple string.  Currently, the only type is "CV", for "control voltage"
- * ports.  Hosts SHOULD be take care to not treat CV ports as audibile and send
- * their output directly to speakers.  In particular, CV ports are not
- * necessarily periodic at all and may have very high DC.
+ * @deprecated Use @ref JACK_METADATA_PORT_CONTENT instead.
  */
 extern const char* JACK_METADATA_SIGNAL_TYPE;
 

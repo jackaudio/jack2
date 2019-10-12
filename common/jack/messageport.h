@@ -203,7 +203,7 @@ jack_message_get_lost_event_count(void *port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
  * Every message client sends or receives data using a specific communication
  * protocol. For most older clients, this will be "MIDI", but it might be
  * "OSC" or something custom/new. The protocol can be set and asked through
- * the metadata API with the key @ref JACK_METADATA_EVENT_TYPES.
+ * the metadata API with the key @ref JACK_METADATA_PORT_CONTENT.
  *
  * @param client pointer to JACK client structure.
  * @param port_name non-empty short name for the new port (not

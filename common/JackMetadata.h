@@ -65,6 +65,7 @@ extern const char* JACK_METADATA_ICON_NAME;
 extern const char* JACK_METADATA_ICON_SMALL;
 extern const char* JACK_METADATA_ORDER;
 extern const char* JACK_METADATA_PRETTY_NAME;
+extern const char* JACK_METADATA_PORT_CONTENT;
 extern const char* JACK_METADATA_PORT_GROUP;
 extern const char* JACK_METADATA_SIGNAL_TYPE;
 
