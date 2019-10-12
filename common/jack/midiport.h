@@ -27,20 +27,8 @@ extern "C" {
 
 #include <jack/weakmacros.h>
 #include <jack/types.h>
+#include <jack/messageport.h>
 #include <stdlib.h>
-
-
-/** Type for raw event data contained in @ref jack_midi_event_t. */
-typedef unsigned char jack_midi_data_t;
-
-
-/** A Jack MIDI event. */
-typedef struct _jack_midi_event
-{
-	jack_nframes_t    time;   /**< Sample index at which event is valid */
-	size_t            size;   /**< Number of bytes of data in \a buffer */
-	jack_midi_data_t *buffer; /**< Raw MIDI data */
-} jack_midi_event_t;
 
 
 /**
