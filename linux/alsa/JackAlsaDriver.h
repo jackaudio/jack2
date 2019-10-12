@@ -94,7 +94,7 @@ class JackAlsaDriver : public JackAudioDriver
         void WriteOutputAux(jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nwritten);
         void SetTimetAux(jack_time_t time);
 
-        int PortSetDeviceMetadata(jack_port_id_t port_id, const char* pretty_name);
+        int PortSetDefaultMetadata(jack_port_id_t port_id, const char* pretty_name);
 
         // JACK API emulation for the midi driver
         int is_realtime() const;

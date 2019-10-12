@@ -440,7 +440,7 @@ inline int midi_port_open_jack(alsa_rawmidi_t *midi, midi_port_t *port, int type
 
 	if (port->jack) {
 		jack_port_set_alias(port->jack, alias);
-		jack_port_set_device_metadata(port->jack, port->device_name);
+		jack_port_set_default_metadata(port->jack, port->device_name);
 	}
 
 	return port->jack == NULL;

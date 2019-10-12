@@ -521,7 +521,7 @@ port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const s
 		goto failed;
 
 	jack_port_set_alias (port->jack_port, port->name);
-	jack_port_set_device_metadata (port->jack_port, device_name);
+	jack_port_set_default_metadata (port->jack_port, device_name);
 
 	/* generate an alias */
 
@@ -534,7 +534,7 @@ port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const s
 			*c = '-';
 
 	jack_port_set_alias (port->jack_port, port->name);
-	jack_port_set_device_metadata (port->jack_port, device_name);
+	jack_port_set_default_metadata (port->jack_port, device_name);
 
 	if (type == PORT_INPUT)
 		err = alsa_connect_from(self, port->remote.client, port->remote.port);
