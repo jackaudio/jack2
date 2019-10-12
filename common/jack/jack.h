@@ -710,6 +710,13 @@ float jack_cpu_load (jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
  */
 
 /**
+ * @return the UUID of the jack_port_t
+ *
+ * @see jack_uuid_to_string() to convert into a string representation
+ */
+jack_uuid_t jack_port_uuid (const jack_port_t *port) JACK_OPTIONAL_WEAK_EXPORT;
+
+/**
  * Create a new port for the client. This is an object used for moving
  * data of any type in or out of the client.  Ports may be connected
  * in various ways.
@@ -723,9 +730,9 @@ float jack_cpu_load (jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
  * The @a port_name must be unique among all ports owned by this client.
  * If the name is not unique, the registration will fail.
  *
- * All ports have a type, which may be any non-NULL and non-zero
- * length string, passed as an argument.  Some port types are built
- * into the JACK API, currently only JACK_DEFAULT_AUDIO_TYPE.
+ * All ports have a type. It is strongly encouraged to use @ref jack_port_register_audio
+ * for signal channels and @ref jack_port_register_message for message (MIDI, OSC, …)
+ * channels instead of this method.
  *
  * @param client pointer to JACK client structure.
  * @param port_name non-empty short name for the new port (not
@@ -743,6 +750,43 @@ jack_port_t * jack_port_register (jack_client_t *client,
                                   const char *port_type,
                                   unsigned long flags,
                                   unsigned long buffer_size) JACK_OPTIONAL_WEAK_EXPORT;
+
+
+/**
+ * Create a new message port as documented in @ref jack_port_register. Use the metadata API
+ * to specify what type of data this port is sending/receiving. The default is "PCM" for plain
+ * audio. To create a port containing voltage control instead of audio, you need to call
+ * @code
+ * jack_uuid_t uuid = jack_port_uuid(port);
+ * jack_set_property(client, uuid, JACK_METADATA_EVENT_TYPE, "VC", "text/plain");
+ * @endcode
+ */
+inline jack_port_t * jack_port_register_audio (jack_client_t *client,
+                                  const char *port_name,
+                                  unsigned long flags,
+                                  unsigned long buffer_size) JACK_OPTIONAL_WEAK_EXPORT
+{
+    return jack_port_register(client, port_name, JACK_DEFAULT_AUDIO_TYPE, flags, buffer_size);
+}
+
+
+/**
+ * Create a new message port as documented in @ref jack_port_register. Use the metadata API
+ * to specify which communication protocols this port understands. The default is "MIDI". To
+ * create an OSC port for example, you need to call
+ * @code
+ * jack_uuid_t uuid = jack_port_uuid(port);
+ * jack_set_property(client, uuid, JACK_METADATA_EVENT_TYPE, "OSC", "text/plain");
+ * @endcode
+ */
+inline jack_port_t * jack_port_register_message (jack_client_t *client,
+                                  const char *port_name,
+                                  unsigned long flags,
+                                  unsigned long buffer_size) JACK_OPTIONAL_WEAK_EXPORT
+{
+    return jack_port_register(client, port_name, JACK_DEFAULT_MESSAGE_TYPE, flags, buffer_size);
+}
+
 
 /**
  * Remove the port from the client, disconnecting any existing
@@ -772,13 +816,6 @@ int jack_port_unregister (jack_client_t *client, jack_port_t *port) JACK_OPTIONA
  * Port buffers have to be retrieved in each callback for proper functioning.
  */
 void * jack_port_get_buffer (jack_port_t *port, jack_nframes_t) JACK_OPTIONAL_WEAK_EXPORT;
-
-/**
- * @return the UUID of the jack_port_t
- *
- * @see jack_uuid_to_string() to convert into a string representation
- */
-jack_uuid_t jack_port_uuid (const jack_port_t *port) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return the full name of the jack_port_t (including the @a
