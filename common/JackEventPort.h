@@ -37,6 +37,10 @@ struct jack_event_t
     jack_event_data_t *buffer; /**< Raw event data */
 };
 
+/** Backwards compability */
+typedef jack_event_data_t jack_midi_data_t;
+typedef jack_event_t jack_midi_event_t;
+
 /** A Jack MIDI port type. */
 #define JACK_DEFAULT_MIDI_TYPE "8 bit raw midi"
 /** A Jack OSC port type. */

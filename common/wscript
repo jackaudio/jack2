@@ -58,6 +58,7 @@ def build(bld):
         'JackAudioPort.cpp',
         'JackEventPort.cpp',
         'JackEventAPI.cpp',
+        'JackMidiAPI.cpp',
         'JackEngineControl.cpp',
         'JackShmMem.cpp',
         'JackGenericClientChannel.cpp',

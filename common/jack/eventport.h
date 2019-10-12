@@ -29,19 +29,21 @@ extern "C" {
 #include <jack/types.h>
 #include <stdlib.h>
 
-
-/** Type for raw event data contained in @ref jack_event_event_t. */
-typedef unsigned char jack_event_data_t;
-
+/** Type for raw event data contained in @ref jack_midi_event_t. */
+typedef unsigned char jack_midi_data_t;
 
 /** A Jack event. */
-typedef struct _jack_event
+typedef struct _jack_midi_event
 {
-	jack_nframes_t     time;   /**< Sample index at which event is valid */
-	size_t             size;   /**< Number of bytes of data in \a buffer */
-	jack_event_data_t *buffer; /**< Raw event data */
-} jack_event_t;
+	jack_nframes_t    time;   /**< Sample index at which event is valid */
+	size_t            size;   /**< Number of bytes of data in \a buffer */
+	jack_midi_data_t *buffer; /**< Raw event data */
+} jack_midi_event_t;
 
+/** Type for raw event data contained in @ref jack_event_t. */
+typedef jack_midi_data_t jack_event_data_t;
+
+typedef jack_midi_event_t jack_event_t;
 
 /**
  * @defgroup EVENTAPI Reading and writing event data
