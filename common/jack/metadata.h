@@ -315,6 +315,9 @@ extern const char* JACK_METADATA_PRETTY_NAME;
  * 
  * A port should only have one content type. Clients that accept multiple protocols should create
  * separate ports for each.
+ * 
+ * This property has a few edge cases for historical reasons. You should not query this property directly. 
+ * Instead, you may want to use @ref jack_get_property_port_content.
  */
 extern const char* JACK_METADATA_PORT_CONTENT;
 
@@ -326,6 +329,59 @@ extern const char* JACK_METADATA_PORT_GROUP;
  * @deprecated Use @ref JACK_METADATA_PORT_CONTENT instead.
  */
 extern const char* JACK_METADATA_SIGNAL_TYPE;
+
+/**
+ * Get the @ref JACK_METADATA_PORT_CONTENT property of a @p port. This helper
+ * method handles default values and outdated clients for you.
+ *
+ * @return The port's content type, a sane default value if appropriate or NULL. If non-null,
+ *         the caller of this method must deallocate the memory using @ref jack_free.
+ */
+inline char*
+jack_get_property_port_content(jack_port_t *port) {
+    /* Simply ask for the property */
+    jack_uuid_t uuid = jack_port_uuid(port);
+    char* port_content;
+    char* unused;
+    jack_get_property(uuid, JACK_METADATA_PORT_CONTENT, &port_content, &unused);
+    jack_free(&unused); /* We don't care about the type, since we know its "text/plain" */
+    
+    /* Default values and legacy stuff, the interesting part */
+    if (port_content == NULL) {
+        /** 
+         * First off, check the legacy metadata keys depending on the port's type. If we 
+         * find nothing, return the default value for that port type instead.
+         */
+        const char* port_type = jack_port_type(port);
+
+        if (strcmp(port_type, JACK_DEFAULT_AUDIO_TYPE) == 0) {
+            /* Try the legacy key first */
+            jack_get_property(uuid, JACK_METADATA_SIGNAL_TYPE, &port_content, &unused);
+            jack_free(&unused);
+            
+            /* Set the default value */
+            if (port_content == NULL) {
+                port_content = strdup("PCM");
+            }
+        } else if (strcmp(port_type, JACK_DEFAULT_MIDI_TYPE) == 0) {
+            /* Try the legacy key first */
+            jack_get_property(uuid, JACK_METADATA_EVENT_TYPES, &port_content, &unused);
+            jack_free(&unused);
+
+            /* Set the default value */
+            if (port_content == NULL) {
+                port_content = strdup("MIDI");
+            }
+        } else if (strcmp(port_type, JACK_DEFAULT_MESSAGE_TYPE) == 0) {
+            /* There are no legacy keys to check here, simply set the default */
+            port_content = strdup("MIDI");
+        } else {
+            /* Unknown port, so no default value */
+        }
+    }
+    
+    return port_content;
+}
 
 /**
  * @}
