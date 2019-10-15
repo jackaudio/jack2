@@ -1544,36 +1544,31 @@ alsa_driver_restart (alsa_driver_t *driver)
 static int
 alsa_driver_get_status (alsa_driver_t *driver)
 {
-	int res;
 	snd_pcm_t *pcm_handle;
 
 #ifdef __QNXNTO__
+	int res;
 	snd_pcm_channel_status_t status;
-#else
-	snd_pcm_status_t *status;
-	snd_pcm_status_alloca(&status);
 #endif
+
 	if (driver->capture_handle) {
 		pcm_handle = driver->capture_handle;
 	} else {
 		pcm_handle = driver->playback_handle;
 	}
+
 #ifdef __QNXNTO__
 	memset (&status, 0, sizeof (status));
 	status.channel = driver->capture_handle ? SND_PCM_CHANNEL_CAPTURE :
 	                                          SND_PCM_CHANNEL_PLAYBACK;
 	res = snd_pcm_plugin_status(pcm_handle, &status);
-#else
-	res = snd_pcm_status(pcm_handle, status);
-#endif
 	if (res < 0) {
 		jack_error("status error: %s", snd_strerror(res));
 		return -1;
 	}
-#ifdef __QNXNTO__
 	return status.status;
 #else
-	return snd_pcm_status_get_state(status);
+	return snd_pcm_state(pcm_handle);
 #endif
 }
 
