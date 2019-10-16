@@ -584,16 +584,21 @@ int JackAlsaDriver::TargetState(int init, int connections_count)
 
     if (connections_count > 0) {
         state = SND_PCM_STATE_RUNNING;
-    } else if (init) {
+        return state;
+    }
+
+    if (init) {
         if (driver->features & ALSA_DRIVER_FEAT_START_CLOSED) {
             state = SND_PCM_STATE_NOTREADY;
         } else {
             state = SND_PCM_STATE_RUNNING;
         }
-    } else if (driver->features & ALSA_DRIVER_FEAT_CLOSE_IDLE_DEVS) {
+        return state;
+    }
+
+    if (driver->features & ALSA_DRIVER_FEAT_CLOSE_IDLE_DEVS) {
         state = SND_PCM_STATE_NOTREADY;
-    } else {
-        state = SND_PCM_STATE_PREPARED;
+        return state;
     }
 
     return state;
