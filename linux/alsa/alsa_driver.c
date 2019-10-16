@@ -59,6 +59,7 @@ char* strcasestr(const char* haystack, const char* needle);
 /* Max re-try count for Alsa poll timeout handling */
 #define MAX_RETRY_COUNT 5
 
+static int alsa_driver_link (alsa_driver_t *driver);
 static int alsa_driver_open_device (alsa_driver_t *driver, alsa_device_t *device, bool is_capture);
 
 void
@@ -1422,6 +1423,14 @@ alsa_driver_open (alsa_driver_t *driver)
 		jack_info ("alsa driver linking enabled");
 	}
 
+	alsa_driver_link(driver);
+
+	return 0;
+}
+
+static int
+alsa_driver_link (alsa_driver_t *driver)
+{
 	snd_pcm_t *group_handle = NULL;
 
 	for (int i = 0; i < driver->devices_c_count; ++i) {
