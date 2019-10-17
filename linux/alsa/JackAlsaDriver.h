@@ -38,6 +38,11 @@ class JackAlsaDriver : public JackAudioDriver
 
     private:
 
+        enum DriverMode {
+            Init,
+            Runtime,
+        };
+
         jack_driver_t* fDriver;
         jack_native_thread_t fReservationLoopThread;
 
@@ -80,9 +85,9 @@ class JackAlsaDriver : public JackAudioDriver
 
         int PortSetDefaultMetadata(jack_port_id_t port_id, const char* pretty_name);
 
-        int UpdateDriverTargetState(int init = 0);
+        int UpdateDriverTargetState(DriverMode mode);
 
-        int TargetState(int init, int connections_count);
+        int TargetState(DriverMode mode, int connections_count);
 
         // JACK API emulation for the midi driver
         int is_realtime() const;

@@ -353,7 +353,7 @@ int JackAlsaDriver::Open(alsa_driver_info_t info)
     }
 
     /* we need to initialize variables for all devices, mainly channels count since this is required by Jack to setup ports */
-    UpdateDriverTargetState(1);
+    UpdateDriverTargetState(DriverMode::Init);
 
     if (alsa_driver_open((alsa_driver_t *)fDriver) < 0) {
         Close();
@@ -457,7 +457,7 @@ int JackAlsaDriver::Stop()
 
 int JackAlsaDriver::Reload()
 {
-    UpdateDriverTargetState();
+    UpdateDriverTargetState(DriverMode::Runtime);
 
     alsa_driver_t* driver = (alsa_driver_t*) fDriver;
     if (alsa_driver_close (driver) < 0) {
@@ -551,7 +551,7 @@ int JackAlsaDriver::PortSetDefaultMetadata(jack_port_id_t port_id, const char* p
     return fEngine->PortSetDefaultMetadata(fClientControl.fRefNum, port_id, pretty_name);
 }
 
-int JackAlsaDriver::UpdateDriverTargetState(int init)
+int JackAlsaDriver::UpdateDriverTargetState(DriverMode mode)
 {
     int c_list_index = 0, p_list_index = 0;
     alsa_driver_t* driver = (alsa_driver_t*) fDriver;
@@ -564,44 +564,40 @@ int JackAlsaDriver::UpdateDriverTargetState(int init)
             capture_connections_count += fGraphManager->GetConnectionsNum(fCapturePortList[c_list_index]);
             c_list_index++;
         }
-        device->capture_target_state = TargetState(init, capture_connections_count);
+        device->capture_target_state = TargetState(mode, capture_connections_count);
 
         int playback_connections_count = 0;
         for (int j = 0; j < device->playback_nchannels; ++j) {
             playback_connections_count += fGraphManager->GetConnectionsNum(fPlaybackPortList[p_list_index]);
             p_list_index++;
         }
-        device->playback_target_state = TargetState(init, playback_connections_count);
+        device->playback_target_state = TargetState(mode, playback_connections_count);
     }
 
     return 0;
 }
 
-int JackAlsaDriver::TargetState(int init, int connections_count)
+int JackAlsaDriver::TargetState(DriverMode mode, int connections_count)
 {
     alsa_driver_t* driver = (alsa_driver_t*) fDriver;
-    int state = SND_PCM_STATE_PREPARED;
 
     if (connections_count > 0) {
-        state = SND_PCM_STATE_RUNNING;
-        return state;
+        return SND_PCM_STATE_RUNNING;
     }
 
-    if (init) {
+    if (mode == DriverMode::Init) {
         if (driver->features & ALSA_DRIVER_FEAT_START_CLOSED) {
-            state = SND_PCM_STATE_NOTREADY;
+            return SND_PCM_STATE_NOTREADY;
         } else {
-            state = SND_PCM_STATE_RUNNING;
+            return SND_PCM_STATE_RUNNING;
         }
-        return state;
     }
 
     if (driver->features & ALSA_DRIVER_FEAT_CLOSE_IDLE_DEVS) {
-        state = SND_PCM_STATE_NOTREADY;
-        return state;
+        return SND_PCM_STATE_NOTREADY;
     }
 
-    return state;
+    return SND_PCM_STATE_PREPARED;
 }
 
 void JackAlsaDriver::WriteOutputAux(alsa_device_t *device, jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nwritten)
