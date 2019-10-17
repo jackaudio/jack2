@@ -1416,14 +1416,12 @@ alsa_driver_open (alsa_driver_t *driver)
 		}
 	}
 
-	if (driver->features & ALSA_DRIVER_FEAT_UNLINKED_DEVS) {
-		jack_info ("alsa driver linking disabled");
-		return 0;
-	} else {
+	if (!(driver->features & ALSA_DRIVER_FEAT_UNLINKED_DEVS)) {
 		jack_info ("alsa driver linking enabled");
+		alsa_driver_link(driver);
+	} else {
+		jack_info ("alsa driver linking disabled");
 	}
-
-	alsa_driver_link(driver);
 
 	return 0;
 }
