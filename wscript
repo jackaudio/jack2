@@ -397,6 +397,13 @@ def configure(conf):
             conf.env['LIBDIR'] = Options.options.libdir32
         else:
             conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib32'
+        # libdb does not work in mixed mode
+        conf.env['HAVE_DB'] = 0
+        conf.env['HAVE_DB_H'] = 0
+        conf.env['LIB_DB'] = []
+        # no need for opus in 32bit mixed mode clients
+        conf.env['LIB_OPUS'] = []
+        # someone tell me where this file gets written please..
         conf.write_config_header('config.h')
 
     print()
