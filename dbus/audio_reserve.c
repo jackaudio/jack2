@@ -128,8 +128,7 @@ SERVER_EXPORT void audio_release(const char * device_name)
 SERVER_EXPORT void audio_reserve_loop()
 {
     if (gConnection != NULL) {
-       while (dbus_connection_read_write_dispatch (gConnection, -1))
-         ; // empty loop body
+       dbus_connection_read_write_dispatch (gConnection, 200);
     }
 }
 

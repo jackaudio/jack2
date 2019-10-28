@@ -39,6 +39,7 @@ class JackAlsaDriver : public JackAudioDriver
     private:
 
         jack_driver_t* fDriver;
+        jack_native_thread_t fReservationLoopThread;
 
         void UpdateLatencies();
 
