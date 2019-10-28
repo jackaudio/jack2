@@ -94,6 +94,12 @@ jackctl_server_create(
     bool (* on_device_acquire)(const char * device_name),
     void (* on_device_release)(const char * device_name));
 
+SERVER_EXPORT jackctl_server_t *
+jackctl_server_create2(
+    bool (* on_device_acquire)(const char * device_name),
+    void (* on_device_release)(const char * device_name),
+    void (* on_device_reservation_loop)(void));
+
 SERVER_EXPORT void
 jackctl_server_destroy(
 	jackctl_server_t * server);

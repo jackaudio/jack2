@@ -548,7 +548,7 @@ jack_controller_create(
 
     INIT_LIST_HEAD(&controller_ptr->session_pending_commands);
 
-    controller_ptr->server = jackctl_server_create(on_device_acquire, on_device_release);
+    controller_ptr->server = jackctl_server_create2(on_device_acquire, on_device_release, NULL);
     if (controller_ptr->server == NULL)
     {
         jack_error("Failed to create server object");

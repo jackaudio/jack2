@@ -328,11 +328,11 @@ int main(int argc, char** argv)
     copyright(stdout);
 #if defined(JACK_DBUS) && defined(__linux__)
     if (getenv("JACK_NO_AUDIO_RESERVATION"))
-        server_ctl = jackctl_server_create(NULL, NULL);
+        server_ctl = jackctl_server_create2(NULL, NULL, NULL);
     else
-        server_ctl = jackctl_server_create(audio_acquire, audio_release);
+        server_ctl = jackctl_server_create2(audio_acquire, audio_release, audio_reserve_loop);
 #else
-    server_ctl = jackctl_server_create(NULL, NULL);
+    server_ctl = jackctl_server_create2(NULL, NULL, NULL);
 #endif
     if (server_ctl == NULL) {
         fprintf(stderr, "Failed to create server object\n");

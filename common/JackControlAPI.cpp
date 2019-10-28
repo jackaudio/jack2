@@ -747,6 +747,14 @@ SERVER_EXPORT jackctl_server_t * jackctl_server_create(
     bool (* on_device_acquire)(const char * device_name),
     void (* on_device_release)(const char * device_name))
 {
+    return jackctl_server_create2(on_device_acquire, on_device_release, NULL);
+}
+
+SERVER_EXPORT jackctl_server_t * jackctl_server_create2(
+    bool (* on_device_acquire)(const char * device_name),
+    void (* on_device_release)(const char * device_name),
+    void (* on_device_reservation_loop)(void))
+{
     struct jackctl_server * server_ptr;
     union jackctl_parameter_value value;
 
@@ -922,6 +930,7 @@ SERVER_EXPORT jackctl_server_t * jackctl_server_create(
 
     JackServerGlobals::on_device_acquire = on_device_acquire;
     JackServerGlobals::on_device_release = on_device_release;
+    JackServerGlobals::on_device_reservation_loop = on_device_reservation_loop;
 
     if (!jackctl_drivers_load(server_ptr))
     {
