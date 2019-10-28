@@ -4,7 +4,7 @@ ChangeLog
 * 1.9.14 (2019-10-28)
 
   * Fix ARM build
-  * Fix mixed mode build with meta-data is enabled
+  * Fix mixed mode build when meta-data is enabled
   * Fix blocking DBus device reservation, so it plays nice with others (like PipeWire)
   * Use python3 for the waf build scripts
 
