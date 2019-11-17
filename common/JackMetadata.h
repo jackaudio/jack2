@@ -20,6 +20,10 @@
 #ifndef __JackMetadata__
 #define __JackMetadata__
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdint.h>
 
 #if HAVE_DB
