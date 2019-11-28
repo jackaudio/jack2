@@ -107,6 +107,20 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		01A77E47239084C800B41249 /* JackCoreMidiInputPort.mm in Sources */ = {isa = PBXBuildFile; fileRef = 01FAA5EB23907EEA00DB4D91 /* JackCoreMidiInputPort.mm */; };
+		01A77E482390851100B41249 /* JackCoreMidiDriver.mm in Sources */ = {isa = PBXBuildFile; fileRef = 01FAA5E923907ED400DB4D91 /* JackCoreMidiDriver.mm */; };
+		01A77E492390853800B41249 /* JackCoreAudioDriver.mm in Sources */ = {isa = PBXBuildFile; fileRef = 01FAA5F323907F8D00DB4D91 /* JackCoreAudioDriver.mm */; };
+		01A77E4A2390868E00B41249 /* JackCoreMidiOutputPort.mm in Sources */ = {isa = PBXBuildFile; fileRef = 01FAA5ED23907F0000DB4D91 /* JackCoreMidiOutputPort.mm */; };
+		01FAA5E223907E2500DB4D91 /* JackCoreMidiPort.mm in Sources */ = {isa = PBXBuildFile; fileRef = 01FAA5E123907E2500DB4D91 /* JackCoreMidiPort.mm */; };
+		01FAA5E423907E4300DB4D91 /* JackCoreMidiUtil.mm in Sources */ = {isa = PBXBuildFile; fileRef = 01FAA5E323907E4300DB4D91 /* JackCoreMidiUtil.mm */; };
+		01FAA5E623907E5C00DB4D91 /* JackCoreMidiVirtualInputPort.mm in Sources */ = {isa = PBXBuildFile; fileRef = 01FAA5E523907E5B00DB4D91 /* JackCoreMidiVirtualInputPort.mm */; };
+		01FAA5E823907EB900DB4D91 /* JackCoreMidiVirtualOutputPort.mm in Sources */ = {isa = PBXBuildFile; fileRef = 01FAA5E723907EB900DB4D91 /* JackCoreMidiVirtualOutputPort.mm */; };
+		01FAA5EA23907ED400DB4D91 /* JackCoreMidiDriver.mm in Sources */ = {isa = PBXBuildFile; fileRef = 01FAA5E923907ED400DB4D91 /* JackCoreMidiDriver.mm */; };
+		01FAA5EC23907EEA00DB4D91 /* JackCoreMidiInputPort.mm in Sources */ = {isa = PBXBuildFile; fileRef = 01FAA5EB23907EEA00DB4D91 /* JackCoreMidiInputPort.mm */; };
+		01FAA5EE23907F0000DB4D91 /* JackCoreMidiOutputPort.mm in Sources */ = {isa = PBXBuildFile; fileRef = 01FAA5ED23907F0000DB4D91 /* JackCoreMidiOutputPort.mm */; };
+		01FAA5F023907F1600DB4D91 /* JackCoreMidiPhysicalInputPort.mm in Sources */ = {isa = PBXBuildFile; fileRef = 01FAA5EF23907F1600DB4D91 /* JackCoreMidiPhysicalInputPort.mm */; };
+		01FAA5F223907F2D00DB4D91 /* JackCoreMidiPhysicalOutputPort.mm in Sources */ = {isa = PBXBuildFile; fileRef = 01FAA5F123907F2D00DB4D91 /* JackCoreMidiPhysicalOutputPort.mm */; };
+		01FAA5F423907F8D00DB4D91 /* JackCoreAudioDriver.mm in Sources */ = {isa = PBXBuildFile; fileRef = 01FAA5F323907F8D00DB4D91 /* JackCoreAudioDriver.mm */; };
 		4B0A28ED0D520852002EFF74 /* tw.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B0A28EC0D520852002EFF74 /* tw.c */; };
 		4B0A29260D52108E002EFF74 /* tw.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B0A28EC0D520852002EFF74 /* tw.c */; };
 		4B1499F014BDA5B300A51A3C /* JackGenericClientChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B1499EE14BDA5B300A51A3C /* JackGenericClientChannel.cpp */; };
@@ -347,37 +361,21 @@
 		4B363F230DEB0AB0001F72D9 /* monitor_client.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B363F220DEB0AB0001F72D9 /* monitor_client.c */; };
 		4B363F3E0DEB0C31001F72D9 /* showtime.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B363F3D0DEB0C31001F72D9 /* showtime.c */; };
 		4B363F760DEB0D7D001F72D9 /* impulse_grabber.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B363F750DEB0D7D001F72D9 /* impulse_grabber.c */; };
-		4B370A24133DD7E300237B68 /* JackCoreMidiInputPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A14133DD7E200237B68 /* JackCoreMidiInputPort.cpp */; };
 		4B370A25133DD7E300237B68 /* JackCoreMidiInputPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A15133DD7E200237B68 /* JackCoreMidiInputPort.h */; };
-		4B370A26133DD7E300237B68 /* JackCoreMidiOutputPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A16133DD7E200237B68 /* JackCoreMidiOutputPort.cpp */; };
 		4B370A27133DD7E300237B68 /* JackCoreMidiOutputPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A17133DD7E200237B68 /* JackCoreMidiOutputPort.h */; };
-		4B370A28133DD7E300237B68 /* JackCoreMidiPhysicalInputPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A18133DD7E200237B68 /* JackCoreMidiPhysicalInputPort.cpp */; };
 		4B370A29133DD7E300237B68 /* JackCoreMidiPhysicalInputPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A19133DD7E200237B68 /* JackCoreMidiPhysicalInputPort.h */; };
-		4B370A2A133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A1A133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.cpp */; };
 		4B370A2B133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A1B133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.h */; };
-		4B370A2C133DD7E300237B68 /* JackCoreMidiPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A1C133DD7E300237B68 /* JackCoreMidiPort.cpp */; };
 		4B370A2D133DD7E300237B68 /* JackCoreMidiPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A1D133DD7E300237B68 /* JackCoreMidiPort.h */; };
-		4B370A2E133DD7E300237B68 /* JackCoreMidiUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A1E133DD7E300237B68 /* JackCoreMidiUtil.cpp */; };
 		4B370A2F133DD7E300237B68 /* JackCoreMidiUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A1F133DD7E300237B68 /* JackCoreMidiUtil.h */; };
-		4B370A30133DD7E300237B68 /* JackCoreMidiVirtualInputPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A20133DD7E300237B68 /* JackCoreMidiVirtualInputPort.cpp */; };
 		4B370A31133DD7E300237B68 /* JackCoreMidiVirtualInputPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A21133DD7E300237B68 /* JackCoreMidiVirtualInputPort.h */; };
-		4B370A32133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A22133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.cpp */; };
 		4B370A33133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A23133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.h */; };
-		4B370A34133DD7E300237B68 /* JackCoreMidiInputPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A14133DD7E200237B68 /* JackCoreMidiInputPort.cpp */; };
 		4B370A35133DD7E300237B68 /* JackCoreMidiInputPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A15133DD7E200237B68 /* JackCoreMidiInputPort.h */; };
-		4B370A36133DD7E300237B68 /* JackCoreMidiOutputPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A16133DD7E200237B68 /* JackCoreMidiOutputPort.cpp */; };
 		4B370A37133DD7E300237B68 /* JackCoreMidiOutputPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A17133DD7E200237B68 /* JackCoreMidiOutputPort.h */; };
-		4B370A38133DD7E300237B68 /* JackCoreMidiPhysicalInputPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A18133DD7E200237B68 /* JackCoreMidiPhysicalInputPort.cpp */; };
 		4B370A39133DD7E300237B68 /* JackCoreMidiPhysicalInputPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A19133DD7E200237B68 /* JackCoreMidiPhysicalInputPort.h */; };
-		4B370A3A133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A1A133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.cpp */; };
 		4B370A3B133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A1B133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.h */; };
-		4B370A3C133DD7E300237B68 /* JackCoreMidiPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A1C133DD7E300237B68 /* JackCoreMidiPort.cpp */; };
 		4B370A3D133DD7E300237B68 /* JackCoreMidiPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A1D133DD7E300237B68 /* JackCoreMidiPort.h */; };
-		4B370A3E133DD7E300237B68 /* JackCoreMidiUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A1E133DD7E300237B68 /* JackCoreMidiUtil.cpp */; };
 		4B370A3F133DD7E300237B68 /* JackCoreMidiUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A1F133DD7E300237B68 /* JackCoreMidiUtil.h */; };
-		4B370A40133DD7E300237B68 /* JackCoreMidiVirtualInputPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A20133DD7E300237B68 /* JackCoreMidiVirtualInputPort.cpp */; };
 		4B370A41133DD7E300237B68 /* JackCoreMidiVirtualInputPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A21133DD7E300237B68 /* JackCoreMidiVirtualInputPort.h */; };
-		4B370A42133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A22133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.cpp */; };
 		4B370A43133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A23133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.h */; };
 		4B3811FB13269C8300C61B14 /* latent_client.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B3811FA13269C8300C61B14 /* latent_client.c */; };
 		4B3811FC13269C8300C61B14 /* latent_client.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B3811FA13269C8300C61B14 /* latent_client.c */; };
@@ -876,7 +874,6 @@
 		4BA339A310B2E36800190E3B /* JackWaitThreadedDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BBC93B80DF9736C002DF220 /* JackWaitThreadedDriver.cpp */; };
 		4BA339A410B2E36800190E3B /* JackArgParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF284160F31B4BC00B05BE3 /* JackArgParser.cpp */; };
 		4BA339A710B2E36800190E3B /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BCC87950D57168300A7FEB1 /* Accelerate.framework */; };
-		4BA4ADB40E87AB2500F26C85 /* JackCoreAudioDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE5FECB0E725C090020B576 /* JackCoreAudioDriver.cpp */; };
 		4BA4ADB50E87AB2600F26C85 /* JackCoreAudioDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BE5FECC0E725C090020B576 /* JackCoreAudioDriver.h */; };
 		4BA692B30CBE4C2D00EAD520 /* ipload.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BA692B20CBE4C2D00EAD520 /* ipload.c */; };
 		4BA692D70CBE4CC600EAD520 /* ipunload.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BA692D60CBE4CC600EAD520 /* ipunload.c */; };
@@ -954,7 +951,6 @@
 		4BD4B4D909BACD9600750C0F /* JackTransportEngine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BD4B4D509BACD9600750C0F /* JackTransportEngine.cpp */; };
 		4BD6240D0CBCF16600DE782F /* inprocess.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BD6240C0CBCF16600DE782F /* inprocess.c */; };
 		4BDCDB951001FB9C00B15929 /* JackCoreMidiDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF339140F8B86DC0080FB5B /* JackCoreMidiDriver.h */; };
-		4BDCDB971001FB9C00B15929 /* JackCoreMidiDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF339150F8B86DC0080FB5B /* JackCoreMidiDriver.cpp */; };
 		4BDCDBB91001FCC000B15929 /* JackNetDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = BA222ADD0DC882A5001A17F4 /* JackNetDriver.h */; };
 		4BDCDBBD1001FCC000B15929 /* JackNetDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BA222ADC0DC882A5001A17F4 /* JackNetDriver.cpp */; };
 		4BDCDBD11001FD0100B15929 /* JackWaitThreadedDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BBC93B80DF9736C002DF220 /* JackWaitThreadedDriver.cpp */; };
@@ -988,7 +984,6 @@
 		4BE4CC020CDA153500CCF5BB /* JackTools.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BE4CC000CDA153400CCF5BB /* JackTools.h */; };
 		4BE4CC030CDA153500CCF5BB /* JackTools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE4CBFF0CDA153400CCF5BB /* JackTools.cpp */; };
 		4BE4CC040CDA153500CCF5BB /* JackTools.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BE4CC000CDA153400CCF5BB /* JackTools.h */; };
-		4BE5FECD0E725C090020B576 /* JackCoreAudioDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE5FECB0E725C090020B576 /* JackCoreAudioDriver.cpp */; };
 		4BE5FECE0E725C090020B576 /* JackCoreAudioDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BE5FECC0E725C090020B576 /* JackCoreAudioDriver.h */; };
 		4BE5FED10E725C320020B576 /* JackCoreAudioAdapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE5FECF0E725C320020B576 /* JackCoreAudioAdapter.cpp */; };
 		4BE5FED20E725C320020B576 /* JackCoreAudioAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BE5FED00E725C320020B576 /* JackCoreAudioAdapter.h */; };
@@ -998,7 +993,6 @@
 		4BF2841A0F31B4BC00B05BE3 /* JackArgParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF284160F31B4BC00B05BE3 /* JackArgParser.cpp */; };
 		4BF2841B0F31B4BC00B05BE3 /* JackArgParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF284170F31B4BC00B05BE3 /* JackArgParser.h */; };
 		4BF3391A0F8B86DC0080FB5B /* JackCoreMidiDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF339140F8B86DC0080FB5B /* JackCoreMidiDriver.h */; };
-		4BF3391B0F8B86DC0080FB5B /* JackCoreMidiDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF339150F8B86DC0080FB5B /* JackCoreMidiDriver.cpp */; };
 		4BF339210F8B873E0080FB5B /* JackMidiDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF3391F0F8B873E0080FB5B /* JackMidiDriver.cpp */; };
 		4BF339220F8B873E0080FB5B /* JackMidiDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF339200F8B873E0080FB5B /* JackMidiDriver.h */; };
 		4BF339230F8B873E0080FB5B /* JackMidiDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF3391F0F8B873E0080FB5B /* JackMidiDriver.cpp */; };
@@ -1600,6 +1594,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		01FAA5E123907E2500DB4D91 /* JackCoreMidiPort.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = JackCoreMidiPort.mm; path = coremidi/JackCoreMidiPort.mm; sourceTree = "<group>"; };
+		01FAA5E323907E4300DB4D91 /* JackCoreMidiUtil.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = JackCoreMidiUtil.mm; path = coremidi/JackCoreMidiUtil.mm; sourceTree = "<group>"; };
+		01FAA5E523907E5B00DB4D91 /* JackCoreMidiVirtualInputPort.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = JackCoreMidiVirtualInputPort.mm; path = coremidi/JackCoreMidiVirtualInputPort.mm; sourceTree = "<group>"; };
+		01FAA5E723907EB900DB4D91 /* JackCoreMidiVirtualOutputPort.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = JackCoreMidiVirtualOutputPort.mm; path = coremidi/JackCoreMidiVirtualOutputPort.mm; sourceTree = "<group>"; };
+		01FAA5E923907ED400DB4D91 /* JackCoreMidiDriver.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = JackCoreMidiDriver.mm; path = coremidi/JackCoreMidiDriver.mm; sourceTree = "<group>"; };
+		01FAA5EB23907EEA00DB4D91 /* JackCoreMidiInputPort.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = JackCoreMidiInputPort.mm; path = coremidi/JackCoreMidiInputPort.mm; sourceTree = "<group>"; };
+		01FAA5ED23907F0000DB4D91 /* JackCoreMidiOutputPort.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = JackCoreMidiOutputPort.mm; path = coremidi/JackCoreMidiOutputPort.mm; sourceTree = "<group>"; };
+		01FAA5EF23907F1600DB4D91 /* JackCoreMidiPhysicalInputPort.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = JackCoreMidiPhysicalInputPort.mm; path = coremidi/JackCoreMidiPhysicalInputPort.mm; sourceTree = "<group>"; };
+		01FAA5F123907F2D00DB4D91 /* JackCoreMidiPhysicalOutputPort.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = JackCoreMidiPhysicalOutputPort.mm; path = coremidi/JackCoreMidiPhysicalOutputPort.mm; sourceTree = "<group>"; };
+		01FAA5F323907F8D00DB4D91 /* JackCoreAudioDriver.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = JackCoreAudioDriver.mm; path = coreaudio/JackCoreAudioDriver.mm; sourceTree = "<group>"; };
 		4B003AB008E2B2BA0060EFDC /* ringbuffer.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = ringbuffer.c; path = ../common/ringbuffer.c; sourceTree = SOURCE_ROOT; };
 		4B05A04D0DF72BC000840F4C /* alsa_driver.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = alsa_driver.h; path = ../linux/alsa/alsa_driver.h; sourceTree = SOURCE_ROOT; };
 		4B05A04E0DF72BC000840F4C /* alsa_midi.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = alsa_midi.h; path = ../linux/alsa/alsa_midi.h; sourceTree = SOURCE_ROOT; };
@@ -1738,21 +1742,13 @@
 		4B363F3D0DEB0C31001F72D9 /* showtime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = showtime.c; path = "../example-clients/showtime.c"; sourceTree = SOURCE_ROOT; };
 		4B363F720DEB0D4E001F72D9 /* jack_impulse_grabber */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_impulse_grabber; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B363F750DEB0D7D001F72D9 /* impulse_grabber.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = impulse_grabber.c; path = "../example-clients/impulse_grabber.c"; sourceTree = SOURCE_ROOT; };
-		4B370A14133DD7E200237B68 /* JackCoreMidiInputPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackCoreMidiInputPort.cpp; path = ../../coremidi/JackCoreMidiInputPort.cpp; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B370A15133DD7E200237B68 /* JackCoreMidiInputPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackCoreMidiInputPort.h; path = ../../coremidi/JackCoreMidiInputPort.h; sourceTree = BUILT_PRODUCTS_DIR; };
-		4B370A16133DD7E200237B68 /* JackCoreMidiOutputPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackCoreMidiOutputPort.cpp; path = ../../coremidi/JackCoreMidiOutputPort.cpp; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B370A17133DD7E200237B68 /* JackCoreMidiOutputPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackCoreMidiOutputPort.h; path = ../../coremidi/JackCoreMidiOutputPort.h; sourceTree = BUILT_PRODUCTS_DIR; };
-		4B370A18133DD7E200237B68 /* JackCoreMidiPhysicalInputPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackCoreMidiPhysicalInputPort.cpp; path = ../../coremidi/JackCoreMidiPhysicalInputPort.cpp; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B370A19133DD7E200237B68 /* JackCoreMidiPhysicalInputPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackCoreMidiPhysicalInputPort.h; path = ../../coremidi/JackCoreMidiPhysicalInputPort.h; sourceTree = BUILT_PRODUCTS_DIR; };
-		4B370A1A133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackCoreMidiPhysicalOutputPort.cpp; path = ../../coremidi/JackCoreMidiPhysicalOutputPort.cpp; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B370A1B133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackCoreMidiPhysicalOutputPort.h; path = ../../coremidi/JackCoreMidiPhysicalOutputPort.h; sourceTree = BUILT_PRODUCTS_DIR; };
-		4B370A1C133DD7E300237B68 /* JackCoreMidiPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackCoreMidiPort.cpp; path = ../../coremidi/JackCoreMidiPort.cpp; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B370A1D133DD7E300237B68 /* JackCoreMidiPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackCoreMidiPort.h; path = ../../coremidi/JackCoreMidiPort.h; sourceTree = BUILT_PRODUCTS_DIR; };
-		4B370A1E133DD7E300237B68 /* JackCoreMidiUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackCoreMidiUtil.cpp; path = ../../coremidi/JackCoreMidiUtil.cpp; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B370A1F133DD7E300237B68 /* JackCoreMidiUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackCoreMidiUtil.h; path = ../../coremidi/JackCoreMidiUtil.h; sourceTree = BUILT_PRODUCTS_DIR; };
-		4B370A20133DD7E300237B68 /* JackCoreMidiVirtualInputPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackCoreMidiVirtualInputPort.cpp; path = ../../coremidi/JackCoreMidiVirtualInputPort.cpp; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B370A21133DD7E300237B68 /* JackCoreMidiVirtualInputPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackCoreMidiVirtualInputPort.h; path = ../../coremidi/JackCoreMidiVirtualInputPort.h; sourceTree = BUILT_PRODUCTS_DIR; };
-		4B370A22133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackCoreMidiVirtualOutputPort.cpp; path = ../../coremidi/JackCoreMidiVirtualOutputPort.cpp; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B370A23133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackCoreMidiVirtualOutputPort.h; path = ../../coremidi/JackCoreMidiVirtualOutputPort.h; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B38115F1326878E00C61B14 /* jack_latent_client */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_latent_client; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B3811971326884E00C61B14 /* jack_latent_client */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_latent_client; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1949,7 +1945,6 @@
 		4BDCDC251001FDE300B15929 /* netadapter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = netadapter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BE4CBFF0CDA153400CCF5BB /* JackTools.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackTools.cpp; path = ../common/JackTools.cpp; sourceTree = SOURCE_ROOT; };
 		4BE4CC000CDA153400CCF5BB /* JackTools.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackTools.h; path = ../common/JackTools.h; sourceTree = SOURCE_ROOT; };
-		4BE5FECB0E725C090020B576 /* JackCoreAudioDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackCoreAudioDriver.cpp; path = coreaudio/JackCoreAudioDriver.cpp; sourceTree = SOURCE_ROOT; };
 		4BE5FECC0E725C090020B576 /* JackCoreAudioDriver.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackCoreAudioDriver.h; path = coreaudio/JackCoreAudioDriver.h; sourceTree = SOURCE_ROOT; };
 		4BE5FECF0E725C320020B576 /* JackCoreAudioAdapter.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackCoreAudioAdapter.cpp; path = coreaudio/JackCoreAudioAdapter.cpp; sourceTree = SOURCE_ROOT; };
 		4BE5FED00E725C320020B576 /* JackCoreAudioAdapter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackCoreAudioAdapter.h; path = coreaudio/JackCoreAudioAdapter.h; sourceTree = SOURCE_ROOT; };
@@ -1960,7 +1955,6 @@
 		4BF284170F31B4BC00B05BE3 /* JackArgParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackArgParser.h; path = ../common/JackArgParser.h; sourceTree = SOURCE_ROOT; };
 		4BF3390C0F8B864B0080FB5B /* jack_coremidi.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = jack_coremidi.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BF339140F8B86DC0080FB5B /* JackCoreMidiDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackCoreMidiDriver.h; path = coremidi/JackCoreMidiDriver.h; sourceTree = SOURCE_ROOT; };
-		4BF339150F8B86DC0080FB5B /* JackCoreMidiDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackCoreMidiDriver.cpp; path = coremidi/JackCoreMidiDriver.cpp; sourceTree = SOURCE_ROOT; };
 		4BF3391F0F8B873E0080FB5B /* JackMidiDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackMidiDriver.cpp; path = ../common/JackMidiDriver.cpp; sourceTree = SOURCE_ROOT; };
 		4BF339200F8B873E0080FB5B /* JackMidiDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackMidiDriver.h; path = ../common/JackMidiDriver.h; sourceTree = SOURCE_ROOT; };
 		4BF4BAB00E3480AB00403CDF /* JackAudioAdapterFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackAudioAdapterFactory.cpp; path = ../common/JackAudioAdapterFactory.cpp; sourceTree = SOURCE_ROOT; };
@@ -2025,7 +2019,7 @@
 		4BF8D2470834F20600C94B91 /* testSem.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testSem.cpp; path = ../tests/testSem.cpp; sourceTree = SOURCE_ROOT; };
 		4BF8FB0D08AC88EF00D1A344 /* JackFrameTimer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackFrameTimer.cpp; path = ../common/JackFrameTimer.cpp; sourceTree = SOURCE_ROOT; };
 		4BF8FB0E08AC88EF00D1A344 /* JackFrameTimer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackFrameTimer.h; path = ../common/JackFrameTimer.h; sourceTree = SOURCE_ROOT; };
-		4BFA5E980DEC4D9C00FA4CDB /* testMutex */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testMutex; sourceTree = BUILT_PRODUCTS_DIR; };
+		4BFA5E980DEC4D9C00FA4CDB /* testSem */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testSem; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BFA5E9E0DEC4DD900FA4CDB /* testMutex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testMutex.cpp; path = ../tests/testMutex.cpp; sourceTree = SOURCE_ROOT; };
 		4BFA828C0DF6A9E40087B4E1 /* jack_evmon */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_evmon; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BFA829F0DF6A9E40087B4E1 /* jack_bufsize */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_bufsize; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2822,7 +2816,6 @@
 				4B0A28E60D52073D002EFF74 /* jack_thread_wait */,
 				4B0A292D0D52108E002EFF74 /* jack_thread_wait */,
 				4B57F5950D72C27900B4E719 /* jack_thread_wait */,
-				4BA7FEC30D8E76270017FF73 /* jack_server_control */,
 				BA222ACF0DC88132001A17F4 /* jack_net.so */,
 				BA222AE90DC882DB001A17F4 /* netmanager.so */,
 				4BA7FEC30D8E76270017FF73 /* jack_server_control */,
@@ -2833,7 +2826,7 @@
 				4B363F1E0DEB0A6A001F72D9 /* jack_monitor_client */,
 				4B363F350DEB0BD1001F72D9 /* jack_showtime */,
 				4B363F720DEB0D4E001F72D9 /* jack_impulse_grabber */,
-				4BFA5E980DEC4D9C00FA4CDB /* testMutex */,
+				4BFA5E980DEC4D9C00FA4CDB /* testSem */,
 				4BFA828C0DF6A9E40087B4E1 /* jack_evmon */,
 				4BFA829F0DF6A9E40087B4E1 /* jack_bufsize */,
 				4BFA82AB0DF6A9E40087B4E1 /* jack_rec */,
@@ -3358,7 +3351,7 @@
 				4BBB00D00E72614F0018AB1B /* JackPortAudioDevices.h */,
 				4BBB00D10E72614F0018AB1B /* JackPortAudioDriver.cpp */,
 				4BBB00D20E72614F0018AB1B /* JackPortAudioDriver.h */,
-				4BE5FECB0E725C090020B576 /* JackCoreAudioDriver.cpp */,
+				01FAA5F323907F8D00DB4D91 /* JackCoreAudioDriver.mm */,
 				4BE5FECC0E725C090020B576 /* JackCoreAudioDriver.h */,
 				4B940B9B06DDDE5B00D77F60 /* AudioHardware.h */,
 				4BF8D2290834F07D00C94B91 /* JackAudioDriver.h */,
@@ -3403,26 +3396,26 @@
 				4B19393C133F313000547810 /* JackMidiAsyncWaitQueue.h */,
 				4B193931133F311400547810 /* JackMidiAsyncQueue.cpp */,
 				4B193932133F311400547810 /* JackMidiAsyncQueue.h */,
-				4B370A14133DD7E200237B68 /* JackCoreMidiInputPort.cpp */,
 				4B370A15133DD7E200237B68 /* JackCoreMidiInputPort.h */,
-				4B370A16133DD7E200237B68 /* JackCoreMidiOutputPort.cpp */,
+				01FAA5EB23907EEA00DB4D91 /* JackCoreMidiInputPort.mm */,
 				4B370A17133DD7E200237B68 /* JackCoreMidiOutputPort.h */,
-				4B370A18133DD7E200237B68 /* JackCoreMidiPhysicalInputPort.cpp */,
+				01FAA5ED23907F0000DB4D91 /* JackCoreMidiOutputPort.mm */,
 				4B370A19133DD7E200237B68 /* JackCoreMidiPhysicalInputPort.h */,
-				4B370A1A133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.cpp */,
+				01FAA5EF23907F1600DB4D91 /* JackCoreMidiPhysicalInputPort.mm */,
 				4B370A1B133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.h */,
-				4B370A1C133DD7E300237B68 /* JackCoreMidiPort.cpp */,
+				01FAA5F123907F2D00DB4D91 /* JackCoreMidiPhysicalOutputPort.mm */,
 				4B370A1D133DD7E300237B68 /* JackCoreMidiPort.h */,
-				4B370A1E133DD7E300237B68 /* JackCoreMidiUtil.cpp */,
+				01FAA5E123907E2500DB4D91 /* JackCoreMidiPort.mm */,
 				4B370A1F133DD7E300237B68 /* JackCoreMidiUtil.h */,
-				4B370A20133DD7E300237B68 /* JackCoreMidiVirtualInputPort.cpp */,
+				01FAA5E323907E4300DB4D91 /* JackCoreMidiUtil.mm */,
 				4B370A21133DD7E300237B68 /* JackCoreMidiVirtualInputPort.h */,
-				4B370A22133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.cpp */,
+				01FAA5E523907E5B00DB4D91 /* JackCoreMidiVirtualInputPort.mm */,
 				4B370A23133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.h */,
+				01FAA5E723907EB900DB4D91 /* JackCoreMidiVirtualOutputPort.mm */,
 				4BF3391F0F8B873E0080FB5B /* JackMidiDriver.cpp */,
 				4BF339200F8B873E0080FB5B /* JackMidiDriver.h */,
 				4BF339140F8B86DC0080FB5B /* JackCoreMidiDriver.h */,
-				4BF339150F8B86DC0080FB5B /* JackCoreMidiDriver.cpp */,
+				01FAA5E923907ED400DB4D91 /* JackCoreMidiDriver.mm */,
 			);
 			name = MIDI;
 			sourceTree = "<group>";
@@ -6183,7 +6176,7 @@
 			name = "testMutex Universal";
 			productInstallPath = /usr/local/bin;
 			productName = testSem;
-			productReference = 4BFA5E980DEC4D9C00FA4CDB /* testMutex */;
+			productReference = 4BFA5E980DEC4D9C00FA4CDB /* testSem */;
 			productType = "com.apple.product-type.tool";
 		};
 		4BFA82820DF6A9E40087B4E1 /* jack_evmon 64 bits */ = {
@@ -6359,6 +6352,8 @@
 /* Begin PBXProject section */
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+			};
 			buildConfigurationList = 4B699DD5097D427F00A18468 /* Build configuration list for PBXProject "Jackdmp" */;
 			compatibilityVersion = "Xcode 2.4";
 			developmentRegion = English;
@@ -7390,7 +7385,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4BA4ADB40E87AB2500F26C85 /* JackCoreAudioDriver.cpp in Sources */,
+				01A77E492390853800B41249 /* JackCoreAudioDriver.mm in Sources */,
 				4BAA150514F04FB600402512 /* JackAC3Encoder.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -7802,7 +7797,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4BE5FECD0E725C090020B576 /* JackCoreAudioDriver.cpp in Sources */,
+				01FAA5F423907F8D00DB4D91 /* JackCoreAudioDriver.mm in Sources */,
 				4BAA150314F04FB600402512 /* JackAC3Encoder.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -7970,15 +7965,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4BDCDB971001FB9C00B15929 /* JackCoreMidiDriver.cpp in Sources */,
-				4B370A34133DD7E300237B68 /* JackCoreMidiInputPort.cpp in Sources */,
-				4B370A36133DD7E300237B68 /* JackCoreMidiOutputPort.cpp in Sources */,
-				4B370A38133DD7E300237B68 /* JackCoreMidiPhysicalInputPort.cpp in Sources */,
-				4B370A3A133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.cpp in Sources */,
-				4B370A3C133DD7E300237B68 /* JackCoreMidiPort.cpp in Sources */,
-				4B370A3E133DD7E300237B68 /* JackCoreMidiUtil.cpp in Sources */,
-				4B370A40133DD7E300237B68 /* JackCoreMidiVirtualInputPort.cpp in Sources */,
-				4B370A42133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.cpp in Sources */,
+				01A77E4A2390868E00B41249 /* JackCoreMidiOutputPort.mm in Sources */,
+				01A77E482390851100B41249 /* JackCoreMidiDriver.mm in Sources */,
+				01A77E47239084C800B41249 /* JackCoreMidiInputPort.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8043,15 +8032,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4BF3391B0F8B86DC0080FB5B /* JackCoreMidiDriver.cpp in Sources */,
-				4B370A24133DD7E300237B68 /* JackCoreMidiInputPort.cpp in Sources */,
-				4B370A26133DD7E300237B68 /* JackCoreMidiOutputPort.cpp in Sources */,
-				4B370A28133DD7E300237B68 /* JackCoreMidiPhysicalInputPort.cpp in Sources */,
-				4B370A2A133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.cpp in Sources */,
-				4B370A2C133DD7E300237B68 /* JackCoreMidiPort.cpp in Sources */,
-				4B370A2E133DD7E300237B68 /* JackCoreMidiUtil.cpp in Sources */,
-				4B370A30133DD7E300237B68 /* JackCoreMidiVirtualInputPort.cpp in Sources */,
-				4B370A32133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.cpp in Sources */,
+				01FAA5EA23907ED400DB4D91 /* JackCoreMidiDriver.mm in Sources */,
+				01FAA5EC23907EEA00DB4D91 /* JackCoreMidiInputPort.mm in Sources */,
+				01FAA5EE23907F0000DB4D91 /* JackCoreMidiOutputPort.mm in Sources */,
+				01FAA5F023907F1600DB4D91 /* JackCoreMidiPhysicalInputPort.mm in Sources */,
+				01FAA5F223907F2D00DB4D91 /* JackCoreMidiPhysicalOutputPort.mm in Sources */,
+				01FAA5E223907E2500DB4D91 /* JackCoreMidiPort.mm in Sources */,
+				01FAA5E423907E4300DB4D91 /* JackCoreMidiUtil.mm in Sources */,
+				01FAA5E623907E5C00DB4D91 /* JackCoreMidiVirtualInputPort.mm in Sources */,
+				01FAA5E823907EB900DB4D91 /* JackCoreMidiVirtualOutputPort.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8639,8 +8628,7 @@
 		4B0A292A0D52108E002EFF74 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -8669,8 +8657,7 @@
 		4B0A292B0D52108E002EFF74 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -8698,8 +8685,7 @@
 		4B0A292C0D52108E002EFF74 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_OPTIMIZATION_LEVEL = 3;
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
@@ -8776,8 +8762,7 @@
 		4B19B2FE0E23620F00DD4A82 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -8872,8 +8857,7 @@
 		4B2021E3133A9BA40019E213 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -8905,8 +8889,7 @@
 		4B2021E4133A9BA40019E213 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -8936,8 +8919,7 @@
 		4B2021E5133A9BA40019E213 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
@@ -9109,8 +9091,7 @@
 		4B32252810A316B200838A8E /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DEBUGGING_SYMBOLS = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -9158,8 +9139,7 @@
 		4B32252910A316B200838A8E /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -9375,8 +9355,7 @@
 		4B32257810A3190C00838A8E /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -9417,8 +9396,7 @@
 		4B32257910A3190C00838A8E /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -9457,8 +9435,7 @@
 		4B32257A10A3190C00838A8E /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = (
@@ -9492,8 +9469,7 @@
 		4B35C4220D4731D1000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				FRAMEWORK_SEARCH_PATHS = "";
@@ -9547,8 +9523,7 @@
 		4B35C4230D4731D1000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				FRAMEWORK_SEARCH_PATHS = "";
@@ -9601,8 +9576,7 @@
 		4B35C4240D4731D1000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
@@ -9651,8 +9625,7 @@
 		4B35C4800D4731D1000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DEBUGGING_SYMBOLS = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -9715,8 +9688,7 @@
 		4B35C4810D4731D1000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -9781,8 +9753,7 @@
 		4B35C4820D4731D1000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -9836,8 +9807,7 @@
 		4B35C4F90D4731D1000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DEBUGGING_SYMBOLS = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -9901,8 +9871,7 @@
 		4B35C4FA0D4731D1000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -9969,8 +9938,7 @@
 		4B35C4FB0D4731D1000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -10024,8 +9992,7 @@
 		4B35C5110D4731D1000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -10057,8 +10024,7 @@
 		4B35C5120D4731D1000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -10088,8 +10054,7 @@
 		4B35C5130D4731D1000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
@@ -10115,8 +10080,7 @@
 		4B35C51D0D4731D1000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -10148,8 +10112,7 @@
 		4B35C51E0D4731D1000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -10179,8 +10142,7 @@
 		4B35C51F0D4731D1000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
@@ -10206,8 +10168,7 @@
 		4B35C5290D4731D1000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -10239,8 +10200,7 @@
 		4B35C52A0D4731D1000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -10270,8 +10230,7 @@
 		4B35C52B0D4731D1000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
@@ -10297,8 +10256,7 @@
 		4B35C5350D4731D1000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -10328,8 +10286,7 @@
 		4B35C5360D4731D1000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -10357,8 +10314,7 @@
 		4B35C5370D4731D1000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
@@ -10382,8 +10338,7 @@
 		4B35C5410D4731D1000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -10413,8 +10368,7 @@
 		4B35C5420D4731D1000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				HEADER_SEARCH_PATHS = ../common;
@@ -10442,8 +10396,7 @@
 		4B35C5430D4731D1000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
@@ -10467,8 +10420,7 @@
 		4B35C54D0D4731D1000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -10497,8 +10449,7 @@
 		4B35C54E0D4731D1000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				HEADER_SEARCH_PATHS = ../common;
@@ -10525,8 +10476,7 @@
 		4B35C54F0D4731D1000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
@@ -10549,8 +10499,7 @@
 		4B35C55B0D4731D2000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -10581,8 +10530,7 @@
 		4B35C55C0D4731D2000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				HEADER_SEARCH_PATHS = ../common;
@@ -10611,8 +10559,7 @@
 		4B35C55D0D4731D2000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
@@ -10637,8 +10584,7 @@
 		4B35C5670D4731D2000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -10668,8 +10614,7 @@
 		4B35C5680D4731D2000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -10697,8 +10642,7 @@
 		4B35C5690D4731D2000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
@@ -10722,8 +10666,7 @@
 		4B35C5730D4731D2000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -10756,8 +10699,7 @@
 		4B35C5740D4731D2000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -10788,8 +10730,7 @@
 		4B35C5750D4731D2000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
@@ -10816,8 +10757,7 @@
 		4B35C5830D4731D2000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -10855,8 +10795,7 @@
 		4B35C5840D4731D2000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -10893,8 +10832,7 @@
 		4B35C5850D4731D2000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
@@ -10922,8 +10860,7 @@
 		4B35C5970D4731D2000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -10956,8 +10893,7 @@
 		4B35C5980D4731D2000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -10989,8 +10925,7 @@
 		4B35C5990D4731D2000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_OPTIMIZATION_LEVEL = 3;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
@@ -11015,8 +10950,7 @@
 		4B35C5A30D4731D2000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -11046,8 +10980,7 @@
 		4B35C5A40D4731D2000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				HEADER_SEARCH_PATHS = ../common;
@@ -11075,8 +11008,7 @@
 		4B35C5A50D4731D2000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
@@ -11100,8 +11032,7 @@
 		4B35C5AF0D4731D2000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -11130,8 +11061,7 @@
 		4B35C5B00D4731D2000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -11159,8 +11089,7 @@
 		4B35C5B10D4731D2000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_OPTIMIZATION_LEVEL = 3;
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
@@ -11184,8 +11113,7 @@
 		4B35C5BB0D4731D2000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -11214,8 +11142,7 @@
 		4B35C5BC0D4731D2000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -11243,8 +11170,7 @@
 		4B35C5BD0D4731D2000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_OPTIMIZATION_LEVEL = 3;
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
@@ -11268,8 +11194,7 @@
 		4B35C5C70D4731D2000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -11298,8 +11223,7 @@
 		4B35C5C80D4731D2000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -11327,8 +11251,7 @@
 		4B35C5C90D4731D2000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_OPTIMIZATION_LEVEL = 3;
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
@@ -11352,8 +11275,7 @@
 		4B35C5D30D4731D2000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -11382,8 +11304,7 @@
 		4B35C5D40D4731D2000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -11411,8 +11332,7 @@
 		4B35C5D50D4731D2000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_OPTIMIZATION_LEVEL = 3;
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
@@ -11436,8 +11356,7 @@
 		4B35C5E70D4731D2000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -11475,8 +11394,7 @@
 		4B35C5E80D4731D2000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				HEADER_SEARCH_PATHS = (
@@ -11513,8 +11431,7 @@
 		4B35C5E90D4731D2000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
@@ -11544,8 +11461,7 @@
 		4B35C5FB0D4731D2000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -11583,8 +11499,7 @@
 		4B35C5FC0D4731D2000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				HEADER_SEARCH_PATHS = (
@@ -11620,8 +11535,7 @@
 		4B35C5FD0D4731D2000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
@@ -11651,8 +11565,7 @@
 		4B35C60F0D4731D2000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -11690,8 +11603,7 @@
 		4B35C6100D4731D2000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				HEADER_SEARCH_PATHS = (
@@ -11727,8 +11639,7 @@
 		4B35C6110D4731D2000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
@@ -11758,8 +11669,7 @@
 		4B35C61B0D4731D2000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DEBUGGING_SYMBOLS = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -11813,8 +11723,7 @@
 		4B35C61C0D4731D2000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -11866,8 +11775,7 @@
 		4B35C61D0D4731D2000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_EXTENSION = so;
@@ -11908,8 +11816,7 @@
 		4B35C6260D4731D2000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DEBUGGING_SYMBOLS = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -11957,8 +11864,7 @@
 		4B35C6270D4731D2000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -12003,8 +11909,7 @@
 		4B35C6280D4731D2000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_EXTENSION = so;
@@ -12046,8 +11951,7 @@
 		4B35C6310D4731D2000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DEBUGGING_SYMBOLS = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -12098,8 +12002,7 @@
 		4B35C6320D4731D2000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -12144,8 +12047,7 @@
 		4B35C6330D4731D2000DE7AE /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_EXTENSION = so;
@@ -12184,8 +12086,7 @@
 		4B35C63B0D4731D3000DE7AE /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DEBUGGING_SYMBOLS = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -12230,8 +12131,7 @@
 		4B35C63C0D4731D3000DE7AE /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -13164,8 +13064,7 @@
 		4B3811941326884E00C61B14 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -13197,8 +13096,7 @@
 		4B3811951326884E00C61B14 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -13228,8 +13126,7 @@
 		4B3811961326884E00C61B14 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
@@ -13395,8 +13292,7 @@
 		4B43A8E41014615800E52943 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DEBUGGING_SYMBOLS = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -13445,8 +13341,7 @@
 		4B43A8E51014615800E52943 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -13491,8 +13386,7 @@
 		4B43A8E61014615800E52943 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_EXTENSION = so;
@@ -13531,8 +13425,7 @@
 		4B47ACD410B5890100469C67 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DEBUGGING_SYMBOLS = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -13595,8 +13488,7 @@
 		4B47ACD510B5890100469C67 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -13661,8 +13553,7 @@
 		4B47ACD610B5890100469C67 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -13965,8 +13856,7 @@
 		4B5E08D30E5B66EE00BEE4E0 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -14063,8 +13953,7 @@
 		4B6654F4127C34AE00753A79 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -14093,8 +13982,7 @@
 		4B6654F5127C34AE00753A79 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
@@ -14122,8 +14010,7 @@
 		4B6654F6127C34AE00753A79 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_OPTIMIZATION_LEVEL = 3;
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
@@ -16329,8 +16216,7 @@
 		4B8692D81371DB4700D2D11B /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DEBUGGING_SYMBOLS = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -16394,8 +16280,7 @@
 		4B8692D91371DB4700D2D11B /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -16461,8 +16346,7 @@
 		4B8692DA1371DB4700D2D11B /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -16613,8 +16497,7 @@
 		4B8F16EF13290E0E0002AD73 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -16646,8 +16529,7 @@
 		4B8F16F013290E0E0002AD73 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -16677,8 +16559,7 @@
 		4B8F16F113290E0E0002AD73 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
@@ -16850,8 +16731,7 @@
 		4BA339A910B2E36800190E3B /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DEBUGGING_SYMBOLS = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -16916,8 +16796,7 @@
 		4BA339AA10B2E36800190E3B /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -16986,8 +16865,7 @@
 		4BA339AB10B2E36800190E3B /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -17450,8 +17328,7 @@
 		4BDCDB9A1001FB9C00B15929 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DEBUGGING_SYMBOLS = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -17503,8 +17380,7 @@
 		4BDCDB9B1001FB9C00B15929 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -17554,8 +17430,7 @@
 		4BDCDB9C1001FB9C00B15929 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_EXTENSION = so;
@@ -17597,8 +17472,7 @@
 		4BDCDBC21001FCC000B15929 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DEBUGGING_SYMBOLS = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -17647,8 +17521,7 @@
 		4BDCDBC31001FCC000B15929 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -17695,8 +17568,7 @@
 		4BDCDBC41001FCC000B15929 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_EXTENSION = so;
@@ -17735,8 +17607,7 @@
 		4BDCDBE51001FD2D00B15929 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DEBUGGING_SYMBOLS = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -17786,8 +17657,7 @@
 		4BDCDBE61001FD2D00B15929 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -18638,8 +18508,7 @@
 		4BFA82890DF6A9E40087B4E1 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -18671,8 +18540,7 @@
 		4BFA828A0DF6A9E40087B4E1 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -18702,8 +18570,7 @@
 		4BFA828B0DF6A9E40087B4E1 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
@@ -18729,8 +18596,7 @@
 		4BFA829C0DF6A9E40087B4E1 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -18762,8 +18628,7 @@
 		4BFA829D0DF6A9E40087B4E1 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -18793,8 +18658,7 @@
 		4BFA829E0DF6A9E40087B4E1 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
@@ -18820,8 +18684,7 @@
 		4BFA82A80DF6A9E40087B4E1 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -18858,8 +18721,7 @@
 		4BFA82A90DF6A9E40087B4E1 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -18894,8 +18756,7 @@
 		4BFA82AA0DF6A9E40087B4E1 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
@@ -18921,8 +18782,7 @@
 		4BFA82B40DF6A9E40087B4E1 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -18954,8 +18814,7 @@
 		4BFA82B50DF6A9E40087B4E1 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -18985,8 +18844,7 @@
 		4BFA82B60DF6A9E40087B4E1 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
@@ -19012,8 +18870,7 @@
 		4BFA82C00DF6A9E40087B4E1 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -19045,8 +18902,7 @@
 		4BFA82C10DF6A9E40087B4E1 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -19076,8 +18932,7 @@
 		4BFA82C20DF6A9E40087B4E1 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
@@ -19103,8 +18958,7 @@
 		4BFA82CC0DF6A9E40087B4E1 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -19136,8 +18990,7 @@
 		4BFA82CD0DF6A9E40087B4E1 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -19167,8 +19020,7 @@
 		4BFA82CE0DF6A9E40087B4E1 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
