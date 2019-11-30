@@ -107,6 +107,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		011D0C002392F87E007950CD /* JackAC3Encoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 011D0BFF2392F87D007950CD /* JackAC3Encoder.cpp */; };
 		01A77E47239084C800B41249 /* JackCoreMidiInputPort.mm in Sources */ = {isa = PBXBuildFile; fileRef = 01FAA5EB23907EEA00DB4D91 /* JackCoreMidiInputPort.mm */; };
 		01A77E482390851100B41249 /* JackCoreMidiDriver.mm in Sources */ = {isa = PBXBuildFile; fileRef = 01FAA5E923907ED400DB4D91 /* JackCoreMidiDriver.mm */; };
 		01A77E492390853800B41249 /* JackCoreAudioDriver.mm in Sources */ = {isa = PBXBuildFile; fileRef = 01FAA5F323907F8D00DB4D91 /* JackCoreAudioDriver.mm */; };
@@ -966,7 +967,6 @@
 		4BDCDBF61001FD7300B15929 /* JackLibSampleRateResampler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B19B30E0E2362E700DD4A82 /* JackLibSampleRateResampler.cpp */; };
 		4BDCDBF71001FD7300B15929 /* JackResampler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B19B3120E2362E700DD4A82 /* JackResampler.cpp */; };
 		4BDCDBF81001FD7300B15929 /* JackAudioAdapterFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF4BAB00E3480AB00403CDF /* JackAudioAdapterFactory.cpp */; };
-		4BDCDBF91001FD7300B15929 /* JackCoreAudioAdapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE5FECF0E725C320020B576 /* JackCoreAudioAdapter.cpp */; };
 		4BDCDC091001FDA800B15929 /* JackArgParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF284160F31B4BC00B05BE3 /* JackArgParser.cpp */; };
 		4BDCDC0A1001FDA800B15929 /* JackArgParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF284170F31B4BC00B05BE3 /* JackArgParser.h */; };
 		4BDCDC111001FDE300B15929 /* JackAudioAdapterInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19B3090E2362E700DD4A82 /* JackAudioAdapterInterface.h */; };
@@ -985,7 +985,6 @@
 		4BE4CC030CDA153500CCF5BB /* JackTools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE4CBFF0CDA153400CCF5BB /* JackTools.cpp */; };
 		4BE4CC040CDA153500CCF5BB /* JackTools.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BE4CC000CDA153400CCF5BB /* JackTools.h */; };
 		4BE5FECE0E725C090020B576 /* JackCoreAudioDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BE5FECC0E725C090020B576 /* JackCoreAudioDriver.h */; };
-		4BE5FED10E725C320020B576 /* JackCoreAudioAdapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE5FECF0E725C320020B576 /* JackCoreAudioAdapter.cpp */; };
 		4BE5FED20E725C320020B576 /* JackCoreAudioAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BE5FED00E725C320020B576 /* JackCoreAudioAdapter.h */; };
 		4BE6C6AD0A3E0A65005A203A /* test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE6C6AC0A3E0A65005A203A /* test.cpp */; };
 		4BF1007C15135D8200B88F80 /* JackPosixMutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B327BA614B4B50400976483 /* JackPosixMutex.cpp */; };
@@ -1594,6 +1593,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		011D0BFF2392F87D007950CD /* JackAC3Encoder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackAC3Encoder.cpp; path = ../common/JackAC3Encoder.cpp; sourceTree = "<group>"; };
 		01FAA5E123907E2500DB4D91 /* JackCoreMidiPort.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = JackCoreMidiPort.mm; path = coremidi/JackCoreMidiPort.mm; sourceTree = "<group>"; };
 		01FAA5E323907E4300DB4D91 /* JackCoreMidiUtil.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = JackCoreMidiUtil.mm; path = coremidi/JackCoreMidiUtil.mm; sourceTree = "<group>"; };
 		01FAA5E523907E5B00DB4D91 /* JackCoreMidiVirtualInputPort.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = JackCoreMidiVirtualInputPort.mm; path = coremidi/JackCoreMidiVirtualInputPort.mm; sourceTree = "<group>"; };
@@ -1946,7 +1946,6 @@
 		4BE4CBFF0CDA153400CCF5BB /* JackTools.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackTools.cpp; path = ../common/JackTools.cpp; sourceTree = SOURCE_ROOT; };
 		4BE4CC000CDA153400CCF5BB /* JackTools.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackTools.h; path = ../common/JackTools.h; sourceTree = SOURCE_ROOT; };
 		4BE5FECC0E725C090020B576 /* JackCoreAudioDriver.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackCoreAudioDriver.h; path = coreaudio/JackCoreAudioDriver.h; sourceTree = SOURCE_ROOT; };
-		4BE5FECF0E725C320020B576 /* JackCoreAudioAdapter.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackCoreAudioAdapter.cpp; path = coreaudio/JackCoreAudioAdapter.cpp; sourceTree = SOURCE_ROOT; };
 		4BE5FED00E725C320020B576 /* JackCoreAudioAdapter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackCoreAudioAdapter.h; path = coreaudio/JackCoreAudioAdapter.h; sourceTree = SOURCE_ROOT; };
 		4BE6C6A30A3E096F005A203A /* jack_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BE6C6AC0A3E0A65005A203A /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = test.cpp; path = ../tests/test.cpp; sourceTree = SOURCE_ROOT; };
@@ -2981,7 +2980,7 @@
 		4B19B3010E23629800DD4A82 /* Adapter */ = {
 			isa = PBXGroup;
 			children = (
-				4BE5FECF0E725C320020B576 /* JackCoreAudioAdapter.cpp */,
+				011D0BFF2392F87D007950CD /* JackAC3Encoder.cpp */,
 				4BE5FED00E725C320020B576 /* JackCoreAudioAdapter.h */,
 				4BF4BAB00E3480AB00403CDF /* JackAudioAdapterFactory.cpp */,
 				4B19B3060E2362E700DD4A82 /* JackAudioAdapter.cpp */,
@@ -7053,7 +7052,6 @@
 				4B19B31B0E2362E800DD4A82 /* JackLibSampleRateResampler.cpp in Sources */,
 				4B19B31F0E2362E800DD4A82 /* JackResampler.cpp in Sources */,
 				4BF4BAB10E3480AB00403CDF /* JackAudioAdapterFactory.cpp in Sources */,
-				4BE5FED10E725C320020B576 /* JackCoreAudioAdapter.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7582,6 +7580,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B699BAA097D421600A18468 /* Jackdmp.cpp in Sources */,
+				011D0C002392F87E007950CD /* JackAC3Encoder.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7996,7 +7995,6 @@
 				4BDCDBF61001FD7300B15929 /* JackLibSampleRateResampler.cpp in Sources */,
 				4BDCDBF71001FD7300B15929 /* JackResampler.cpp in Sources */,
 				4BDCDBF81001FD7300B15929 /* JackAudioAdapterFactory.cpp in Sources */,
-				4BDCDBF91001FD7300B15929 /* JackCoreAudioAdapter.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
