@@ -6,4 +6,4 @@ __pycache__
 android/.server/
 android/.client/
 codeBlocks
-*.xcuserdatad
+xcuserdata
