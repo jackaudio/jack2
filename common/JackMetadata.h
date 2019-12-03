@@ -24,6 +24,12 @@
 #include "config.h"
 #endif
 
+// libdb does not work in 32bit mixed mode
+#ifdef BUILD_WITH_32_64
+#undef HAVE_DB
+#define HAVE_DB 0
+#endif
+
 #include <stdint.h>
 
 #if HAVE_DB
