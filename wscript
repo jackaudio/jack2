@@ -212,11 +212,13 @@ def configure(conf):
         conf.env.append_unique('CCDEFINES', '_POSIX')
         conf.env.append_unique('CXXDEFINES', '_POSIX')
 
+    conf.env.append_unique('CFLAGS', '-Wall')
     conf.env.append_unique('CXXFLAGS', '-Wall')
     conf.env.append_unique('CXXFLAGS', '-std=gnu++11')
-    conf.env.append_unique('CFLAGS', '-Wall')
 
-    if conf.env['IS_MACOSX']:
+    if not conf.env['IS_MACOSX']:
+        conf.env.append_unique('LDFLAGS', '-Wl,--no-undefined')
+    else:
         conf.check(lib='aften', uselib='AFTEN', define_name='AFTEN')
         conf.check_cxx(
             fragment=''
@@ -524,14 +526,10 @@ def build_jackd(bld):
 
 # FIXME: Is SERVER_SIDE needed?
 def create_driver_obj(bld, **kw):
-    if bld.env['IS_MACOSX'] or bld.env['IS_WINDOWS']:
-        # On MacOSX this is necessary.
-        # I do not know if this is necessary on Windows.
-        # Note added on 2015-12-13 by karllinden.
-        if 'use' in kw:
-            kw['use'] += ['serverlib']
-        else:
-            kw['use'] = ['serverlib']
+    if 'use' in kw:
+        kw['use'] += ['serverlib']
+    else:
+        kw['use'] = ['serverlib']
 
     driver = bld(
         features = ['c', 'cxx', 'cshlib', 'cxxshlib'],
