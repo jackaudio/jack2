@@ -265,7 +265,7 @@ extern const char* JACK_METADATA_ICON_LARGE;
  * themes.  Icons should be searched for according to the freedesktop Icon
  *
  * Theme Specification:
- * http://standards.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
+ * https://specifications.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
  */
 extern const char* JACK_METADATA_ICON_NAME;
 
