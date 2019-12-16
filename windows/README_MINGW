@@ -3,6 +3,7 @@ HOW TO COMPILE JACK USING WAF AND MINGW
 
 Rev. 1 - 2019-09-01 - First version
 Rev. 2 - 2019-09-18 - Include contributions from @Schroedingers-Cat
+Rev. 3 - 2019-12-14 - Include contributions from @Schroedingers-Cat
 
 
 
@@ -141,8 +142,9 @@ needs to be patched so configure is called with the necessary flags for ASIO:
 --with-winapi=wmme,directx,wasapi,vdmks,asio   <- append 'asio' to existing
 
 Both static and shared library versions of portaudio are built. To prevent
-errors while building the shared version, also insert the following lines in
-PKGBUILD after the first make call (between lines 60 and 61):
+errors while building the shared version or recompiling static, also insert the
+following lines in PKGBUILD after the first make call (around line 60) and after
+second make (around line 70):
 
 find /opt/asiosdk -name "*.lo" -type f -delete
 find /opt/asiosdk -name "*.o" -type f -delete
