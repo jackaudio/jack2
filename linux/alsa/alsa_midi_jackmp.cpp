@@ -71,6 +71,12 @@ int JACK_port_set_alias(jack_port_t *port, const char* name)
     return real->driver->port_set_alias(real->port_id, name);
 }
 
+int jack_port_set_default_metadata(jack_port_t* port, const char* pretty_name)
+{
+    fake_port_t* real = (fake_port_t*)port;
+    return real->driver->PortSetDefaultMetadata(real->port_id, pretty_name);
+}
+
 jack_nframes_t JACK_get_sample_rate(jack_client_t *client)
 {
     return ((JackAlsaDriver*)client)->get_sample_rate();

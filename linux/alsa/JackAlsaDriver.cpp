@@ -67,6 +67,18 @@ static struct jack_constraint_enum_char_descriptor dither_constraint_descr_array
 namespace Jack
 {
 
+static volatile bool device_reservation_loop_running = false;
+
+static void* on_device_reservation_loop(void*)
+{
+    while (device_reservation_loop_running && JackServerGlobals::on_device_reservation_loop != NULL) {
+        JackServerGlobals::on_device_reservation_loop();
+        usleep(50*1000);
+    }
+
+    return NULL;
+}
+
 int JackAlsaDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
     jack_log("JackAlsaDriver::SetBufferSize %ld", buffer_size);
@@ -344,6 +356,12 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
         // ALSA driver may have changed the in/out values
         fCaptureChannels = ((alsa_driver_t *)fDriver)->capture_nchannels;
         fPlaybackChannels = ((alsa_driver_t *)fDriver)->playback_nchannels;
+        if (JackServerGlobals::on_device_reservation_loop != NULL) {
+            device_reservation_loop_running = true;
+            if (JackPosixThread::StartImp(&fReservationLoopThread, 0, 0, on_device_reservation_loop, NULL) != 0) {
+                device_reservation_loop_running = false;
+            }
+        }
         return 0;
     } else {
         Close();
@@ -358,6 +376,11 @@ int JackAlsaDriver::Close()
 
     if (fDriver) {
         alsa_driver_delete((alsa_driver_t*)fDriver);
+    }
+
+    if (device_reservation_loop_running) {
+        device_reservation_loop_running = false;
+        JackPosixThread::StopImp(fReservationLoopThread);
     }
 
     if (JackServerGlobals::on_device_release != NULL)
@@ -469,6 +492,11 @@ void JackAlsaDriver::ClearOutputAux()
 void JackAlsaDriver::SetTimetAux(jack_time_t time)
 {
     fBeginDateUst = time;
+}
+
+int JackAlsaDriver::PortSetDefaultMetadata(jack_port_id_t port_id, const char* pretty_name)
+{
+    return fEngine->PortSetDefaultMetadata(fClientControl.fRefNum, port_id, pretty_name);
 }
 
 void JackAlsaDriver::WriteOutputAux(jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nwritten)

@@ -43,7 +43,7 @@ bool JackFifo::Signal()
     char c = 0;
 
     if (fFifo < 0) {
-        jack_error("JackFifo::Signal name = %s already desallocated!!", fName);
+        jack_error("JackFifo::Signal name = %s already deallocated!!", fName);
         return false;
     }
 
@@ -62,7 +62,7 @@ bool JackFifo::SignalAll()
     char c = 0;
 
     if (fFifo < 0) {
-        jack_error("JackFifo::SignalAll name = %s already desallocated!!", fName);
+        jack_error("JackFifo::SignalAll name = %s already deallocated!!", fName);
         return false;
     }
 
@@ -81,7 +81,7 @@ bool JackFifo::Wait()
     char c;
 
     if (fFifo < 0) {
-        jack_error("JackFifo::Wait name = %s already desallocated!!", fName);
+        jack_error("JackFifo::Wait name = %s already deallocated!!", fName);
         return false;
     }
 
@@ -104,7 +104,7 @@ bool JackFifo::TimedWait(long usec)
     int res;
     
     if (fFifo < 0) {
-        jack_error("JackFifo::TimedWait name = %s already desallocated!!", fName);
+        jack_error("JackFifo::TimedWait name = %s already deallocated!!", fName);
         return false;
     }
    

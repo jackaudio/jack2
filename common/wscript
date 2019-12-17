@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/python3
 # encoding: utf-8
 
 import re
@@ -394,12 +394,12 @@ def build(bld):
     if bld.env['BUILD_ADAPTER'] and bld.env['IS_LINUX'] and bld.env['BUILD_DRIVER_ALSA']:
          audio_adapter_sources += ['../linux/alsa/JackAlsaAdapter.cpp']
          process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
-         process.use = ['ALSA', 'SAMPLERATE']
+         process.use += ['ALSA', 'SAMPLERATE']
 
     if bld.env['BUILD_ADAPTER'] and bld.env['IS_SUN']:
          audio_adapter_sources += ['../solaris/oss/JackOSSAdapter.cpp', 'memops.c']
          process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
-         process.use = 'SAMPLERATE'
+         process.use += 'SAMPLERATE'
 
     if bld.env['BUILD_ADAPTER'] and bld.env['IS_WINDOWS']:
          audio_adapter_sources += ['../windows/portaudio/JackPortAudioAdapter.cpp', '../windows/portaudio/JackPortAudioDevices.cpp']

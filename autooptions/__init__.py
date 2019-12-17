@@ -66,7 +66,7 @@ class AutoOption:
     wrappers around their configuration context counterparts and behave
     identically. Note that adding dependencies is done in the options
     phase and not in the configure phase, although the checks are
-    acutally executed during the configure phase.
+    actually executed during the configure phase.
 
     Custom check functions can be added using the add_function method.
     As with the other checks the check function will be invoked during
@@ -194,7 +194,7 @@ class AutoOption:
         Add a custom function to be invoked as part of the
         configuration. During the configuration the function will be
         invoked with the configuration context as first argument
-        followed by the arugments to this method, except for the func
+        followed by the arguments to this method, except for the func
         argument. The function must print a 'Checking for...' message,
         because it is referred to if the check fails and this option is
         requested.
@@ -311,7 +311,7 @@ def opt(f):
 def add_auto_option(self, *k, **kw):
     """
     This function adds an AutoOption to the options context. It takes
-    the same arguments as the initializer funtion of the AutoOptions
+    the same arguments as the initializer function of the AutoOptions
     class.
     """
     option = AutoOption(self, *k, **kw)

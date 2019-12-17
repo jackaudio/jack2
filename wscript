@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/python3
 # encoding: utf-8
 from __future__ import print_function
 
@@ -11,7 +11,7 @@ import sys
 from waflib import Logs, Options, Task, Utils
 from waflib.Build import BuildContext, CleanContext, InstallContext, UninstallContext
 
-VERSION='1.9.13'
+VERSION='1.9.14'
 APPNAME='jack'
 JACK_API_VERSION = '0.1.0'
 
@@ -220,11 +220,13 @@ def configure(conf):
                 define_name='HAVE_ASIO',
                 mandatory=False)
 
+    conf.env.append_unique('CFLAGS', '-Wall')
     conf.env.append_unique('CXXFLAGS', '-Wall')
     conf.env.append_unique('CXXFLAGS', '-std=gnu++11')
-    conf.env.append_unique('CFLAGS', '-Wall')
 
-    if conf.env['IS_MACOSX']:
+    if not conf.env['IS_MACOSX']:
+        conf.env.append_unique('LDFLAGS', '-Wl,--no-undefined')
+    else:
         conf.check(lib='aften', uselib='AFTEN', define_name='AFTEN')
         conf.check_cxx(
             fragment=''
@@ -365,7 +367,7 @@ def configure(conf):
     conf.define('PORT_NUM_FOR_CLIENT', Options.options.application_ports)
 
     if conf.env['IS_WINDOWS']:
-        # we define this in the environment to maintain compatability with
+        # we define this in the environment to maintain compatibility with
         # existing install paths that use ADDON_DIR rather than have to
         # have special cases for windows each time.
         conf.env['ADDON_DIR'] = conf.env['BINDIR'] + '/jack'
@@ -403,13 +405,21 @@ def configure(conf):
 
     if Options.options.mixed:
         conf.setenv(lib32, env=conf.env.derive())
-        conf.env.append_unique('CXXFLAGS', '-m32')
         conf.env.append_unique('CFLAGS', '-m32')
+        conf.env.append_unique('CXXFLAGS', '-m32')
+        conf.env.append_unique('CXXFLAGS', '-DBUILD_WITH_32_64')
         conf.env.append_unique('LINKFLAGS', '-m32')
         if Options.options.libdir32:
             conf.env['LIBDIR'] = Options.options.libdir32
         else:
             conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib32'
+        # libdb does not work in mixed mode
+        conf.all_envs[lib32]['HAVE_DB'] = 0
+        conf.all_envs[lib32]['HAVE_DB_H'] = 0
+        conf.all_envs[lib32]['LIB_DB'] = []
+        # no need for opus in 32bit mixed mode clients
+        conf.all_envs[lib32]['LIB_OPUS'] = []
+        # someone tell me where this file gets written please..
         conf.write_config_header('config.h')
 
     print()
@@ -530,14 +540,10 @@ def build_jackd(bld):
 
 # FIXME: Is SERVER_SIDE needed?
 def create_driver_obj(bld, **kw):
-    if bld.env['IS_MACOSX'] or bld.env['IS_WINDOWS']:
-        # On MacOSX this is necessary.
-        # I do not know if this is necessary on Windows.
-        # Note added on 2015-12-13 by karllinden.
-        if 'use' in kw:
-            kw['use'] += ['serverlib']
-        else:
-            kw['use'] = ['serverlib']
+    if 'use' in kw:
+        kw['use'] += ['serverlib']
+    else:
+        kw['use'] = ['serverlib']
 
     driver = bld(
         features = ['c', 'cxx', 'cshlib', 'cxxshlib'],

@@ -37,6 +37,7 @@ extern "C"
     int JACK_port_unregister(jack_client_t *, jack_port_t*);
     void* JACK_port_get_buffer(jack_port_t*, jack_nframes_t);
     int JACK_port_set_alias(jack_port_t* port, const char* name);
+    int jack_port_set_default_metadata(jack_port_t* port, const char* pretty_name);
 
     jack_nframes_t JACK_get_sample_rate(jack_client_t *);
     jack_nframes_t JACK_frame_time(jack_client_t *);
@@ -49,6 +50,7 @@ extern "C"
 #define jack_port_unregister JACK_port_unregister
 #define jack_port_get_buffer JACK_port_get_buffer
 #define jack_port_set_alias JACK_port_set_alias
+#define jack_port_set_default_metadata jack_port_set_default_metadata
 
 #define jack_get_sample_rate JACK_get_sample_rate
 #define jack_frame_time JACK_frame_time

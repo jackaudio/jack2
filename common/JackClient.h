@@ -130,6 +130,8 @@ class SERVER_EXPORT JackClient : public JackClientInterface, public JackRunnable
 
         JackClient(JackSynchro* table);
         virtual ~JackClient();
+        
+        char* GetServerName() { return fServerName; }
 
         virtual int Open(const char* server_name, const char* name, jack_uuid_t uuid, jack_options_t options, jack_status_t* status) = 0;
         virtual int Close();

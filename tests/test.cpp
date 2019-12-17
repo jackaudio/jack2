@@ -1027,7 +1027,7 @@ int main (int argc, char *argv[])
         printf("!!! ERROR !!! Jack_Thread_Init_Callback was not called !!.\n");
     }
 
-    jack_sleep(10 * 1000); // test see the clock in the graph at the begining...
+    jack_sleep(10 * 1000); // test see the clock in the graph at the beginning...
 
     /**
      * Stress Freewheel mode...
@@ -1103,7 +1103,7 @@ int main (int argc, char *argv[])
     cur_buffer_size = jack_get_buffer_size(client1);
 
     /**
-     * Test the last regestered port to see if port_is_mine function the right value.
+     * Test the last registered port to see if port_is_mine function the right value.
      * A second test will be performed later.
      * The result will be printed at the end.
      *
@@ -1193,10 +1193,10 @@ int main (int argc, char *argv[])
     inports = jack_get_ports(client1, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
 
     if (outports == NULL) {
-        printf("!!! WARNING !!! no physical capture ports founded !\n");
+        printf("!!! WARNING !!! no physical capture ports found !\n");
     }
     if (inports == NULL) {
-        printf("!!! WARNING !!! no physical output ports founded !\n");
+        printf("!!! WARNING !!! no physical output ports found !\n");
     }
 
     /**
@@ -1305,11 +1305,11 @@ int main (int argc, char *argv[])
     if (is_mine == 1) {
         Log("Checking jack_port_is_mine()... ok\n");
     } else {
-        printf("!!! ERROR !!! jack_port_is_mine() function seems to send non-valid datas !\n");
+        printf("!!! ERROR !!! jack_port_is_mine() function seems to send non-valid data !\n");
     }
     /**
-     * Free the array of the physical input and ouput ports.
-     * (as mentionned in the doc of jack_get_ports)
+     * Free the array of the physical input and output ports.
+     * (as mentioned in the doc of jack_get_ports)
      *
      */
     jack_free(inports);
@@ -1354,7 +1354,7 @@ int main (int argc, char *argv[])
         printf("!!! ERROR !!! %i ports have been created, and %i callback reg ports have been received !\n", j, port_callback_reg);
     }
 
-    jack_free(inports); // free array of ports (as mentionned in the doc of jack_get_ports)
+    jack_free(inports); // free array of ports (as mentioned in the doc of jack_get_ports)
 
     /**
      *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -1567,16 +1567,16 @@ int main (int argc, char *argv[])
      * establishing a link between client1.out1 --> client2.in2
      * Send the signal1 test on out1. Record the result into signal2. (see process functions).
     ---------------------------------------------------------------------------*/
-    Log("Testing connections datas between clients...\n");
+    Log("Testing connections data between clients...\n");
     jack_connect(client2, jack_port_name(output_port1), jack_port_name(input_port2) );
     process2_activated = -1;
     process1_activated = -1;
     Log("process 2 : idle mode...\n");
-    Log("Sending datas...");
+    Log("Sending data...");
     index1 = 0;
     index2 = 0;
     process1_activated = 1; // We start emitting first.
-    process2_activated = 1; // So record begin at least when we just begin to emitt the signal, else at next call of process with
+    process2_activated = 1; // So record begins at least when we just begin to emit the signal, else at next call of process with
     // nframe = jack buffersize shifting.
 
     while (process2_activated == 1) {
@@ -1584,7 +1584,7 @@ int main (int argc, char *argv[])
         Log(".");
     }
     index2 = 0;
-    Log("\nAnalysing datas...\n"); // search the first occurence of the first element of the reference signal in the recorded signal
+    Log("\nAnalysing data...\n"); // search the first occurrence of the first element of the reference signal in the recorded signal
     while (signal2[index2] != signal1[1] ) {
         index2++;
         if (index2 == 95999) {
@@ -1593,12 +1593,12 @@ int main (int argc, char *argv[])
         }
     }
     index1 = index2;
-    Log("Data founded at offset %i.\n", index2);
-    // And now we founded were the recorded data are, we can see if the two signals matches...
+    Log("Data found at offset %i.\n", index2);
+    // Now that we've found where the recorded data is, we can see if the two signals match...
     while ( (signal2[index2] == signal1[index2 - index1 + 1]) || (index2 == 95999) || ((index2 - index1 + 1) == 47999) ) {
         index2++;
     }
-    Log("Checking difference between datas... %i have the same value...\n", index2 - index1);
+    Log("Checking difference between data... %i have the same value...\n", index2 - index1);
     if ((index2 - index1) == 48000) {
         Log("Data received are valid...\n");
     } else {
@@ -1627,7 +1627,7 @@ int main (int argc, char *argv[])
         printf("!!! ERROR !!! port_tie has allowed a connexion between two different clients !\n");
         jack_port_untie(output_port2);
     }
-    Log("Testing connections datas in tie mode...\n");
+    Log("Testing connections data in tie mode...\n");
     int g;
     for (g = 0; g < 96000; g++)
         signal2[g] = 0.0;
@@ -1645,8 +1645,8 @@ int main (int argc, char *argv[])
         process1_activated = -1;
         process2_activated = -1;
 
-        //		We can manualy check here that the tie is effective.
-        //		ie : playing a wav with a client, connecting ports manualy with qjackctl, and listen...
+        //		We can manually check here that the tie is effective.
+        //		ie : playing a wav with a client, connecting ports manually with qjackctl, and listen...
         // 		printf("manual test\n");
         // 		jack_sleep(50);
         // 		printf("end of manual test\n");
@@ -1656,7 +1656,7 @@ int main (int argc, char *argv[])
         process1_activated = -1;
         process2_activated = 2;
 
-        Log("Sending datas...");
+        Log("Sending data...");
 
         while (process2_activated == 2) {
             jack_sleep(1 * 1000);
@@ -1665,7 +1665,7 @@ int main (int argc, char *argv[])
         process1_activated = -1;
         process2_activated = -1;
         index2 = 0;
-        Log("\nAnalysing datas...\n");
+        Log("\nAnalysing data...\n");
         // We must find at least 2 identical values to ensure we are at the right place in the siusoidal array...
         while (!((signal2[index2] == signal1[1]) && (signal2[index2 + 1] == signal1[2]))) {
             index2++;
@@ -1675,20 +1675,20 @@ int main (int argc, char *argv[])
             }
         }
         index1 = index2;
-        Log("Tie mode : Data founded at offset %i.\n", index2);
+        Log("Tie mode : Data found at offset %i.\n", index2);
         while (signal2[index2] == signal1[index2 - index1 + 1]) {
             index2++;
             if ((index2 == 95999) || ((index2 - index1 + 1) == 47999)) {
                 break;
             }
         }
-        Log("Checking difference between datas... %i have the same value...\n", index2 - index1);
+        Log("Checking difference between data... %i have the same value...\n", index2 - index1);
         if ((index2 - index1) > 47995) {
             Log("Data received in tie mode are valid...\n");
         } else {
-            // in tie mode, the buffers adress should be the same for the two tied ports.
+            // in tie mode, the buffers address should be the same for the two tied ports.
             printf("!!! ERROR !!! data transmission seems not to be valid !\n");
-            printf("Links topology : (emitt) client2.out2 ----> client1.in1--(tie)--client1.out1----->client2.in2 (recive)\n");
+            printf("Links topology : (emitt) client2.out2 ----> client1.in1--(tie)--client1.out1----->client2.in2 (receive)\n");
             printf("  port_name    : Port_adress \n");
             printf("  output_port1 : %px\n", jack_port_get_buffer(output_port1, cur_buffer_size));
             printf("  input_port2  : %px\n", jack_port_get_buffer(input_port2, cur_buffer_size));
@@ -1729,7 +1729,7 @@ int main (int argc, char *argv[])
     index1 = 0;
     index2 = 0;
 
-    Log("Sending datas...");
+    Log("Sending data...");
     process2_activated = 3;
 
     while (process2_activated == 3) {
@@ -1739,7 +1739,7 @@ int main (int argc, char *argv[])
     process1_activated = -1;
     process2_activated = -1;
     index2 = 0;
-    Log("\nAnalysing datas...\n"); // same idea as above, with first data check...
+    Log("\nAnalysing data...\n"); // same idea as above, with first data check...
     while (!((signal2[index2] == 0.0 ) && (signal2[(index2 + 1)] == 0.0 ))) {
         index2++;
         if (index2 == 95999) {
@@ -1748,7 +1748,7 @@ int main (int argc, char *argv[])
         }
     }
     index1 = index2;
-    Log("Data founded at offset %i.\n", index2);
+    Log("Data found at offset %i.\n", index2);
 
     while ( signal2[index2] == 0.0 ) {
         index2++;
@@ -1756,7 +1756,7 @@ int main (int argc, char *argv[])
             break;
         }
     }
-    Log("Checking difference between datas...\n");
+    Log("Checking difference between data...\n");
     if ((index2 - index1) > 47996) {
         Log("Data mixed received are valid...\nSummation is well done.\n");
     } else {
@@ -1793,17 +1793,20 @@ int main (int argc, char *argv[])
 
     /**
      * Checking latency issues
-     * here are simple latency check
+     * here is a simple latency check
      * We simply check that the value returned by jack seems ok
      * Latency compensation is a difficult point.
      * Actually, jack is not able to see "thru" client to build a full latency chain.
-     * Ardour use theses informations to do internally his compensations.
+     * Ardour use this information to internally do its compensations.
      *
-     * 3 test are done : one with no connections between client, one with a serial connection, and one with parallel connection
+     * Three tests are done: 
+     * 1) with no connections between client, 
+     * 2) with a serial connection, and 
+     * 3) with parallel connection
      */
 
 #ifndef TEST_EXCLUDE_DEPRECATED
-    Log("Checking about latency functions...\n");
+    Log("Checking latency functions...\n");
     t_error = 0;
     jack_recompute_total_latencies(client1);
     Log("jack_recompute_total_latencies...\n");
@@ -1886,7 +1889,7 @@ int main (int argc, char *argv[])
             Log("get_latency & get_total_latency seems quite ok...\n");
         }
     } else {
-        printf("No physical port founded : not able to test latency functions...");
+        printf("No physical port found : not able to test latency functions...");
     }
 
     jack_port_disconnect(client1, input_port1);
@@ -1935,7 +1938,7 @@ int main (int argc, char *argv[])
             jack_sleep(1 * 1000);
         }
 
-        // Wait untill rolling : simulate sync time out
+        // Wait until rolling : simulate sync time out
         Log("Simulate a slow-sync client exceeding the time-out\n");
         wait_count = 0;
 
@@ -1976,7 +1979,7 @@ int main (int argc, char *argv[])
         jack_sleep(500);
         starting_state = 0; // Simulate end of starting state after 0.5 sec
 
-        // Wait untill rolling
+        // Wait until rolling
         ts = jack_transport_query(client2, &pos);
         while (ts != JackTransportRolling) {
             jack_sleep(100); // Wait 100 ms each cycle
@@ -2127,7 +2130,7 @@ int main (int argc, char *argv[])
     jack_sleep(2 * 1000);
 
     /**
-     * Checking callback exiting : when the return code is != 0, the client is desactivated.
+     * Checking callback exiting : when the return code is != 0, the client is deactivated.
     */
     Log("Testing callback exiting...\n");
     jack_deactivate(client1);

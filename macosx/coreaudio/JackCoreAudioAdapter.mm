@@ -979,7 +979,7 @@ int JackCoreAudioAdapter::OpenAUHAL(bool capturing,
         jack_log("AudioUnitGetPropertyCurrentDevice = %d", currAudioDeviceID);
     }
 
-    // Setup up choosen device, in both input and output cases
+    // Setup up chosen device, in both input and output cases
     err1 = AudioUnitSetProperty(fAUHAL, kAudioOutputUnitProperty_CurrentDevice, kAudioUnitScope_Global, 0, &fDeviceID, sizeof(AudioDeviceID));
     if (err1 != noErr) {
         jack_error("Error calling AudioUnitSetProperty - kAudioOutputUnitProperty_CurrentDevice");

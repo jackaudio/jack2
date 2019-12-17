@@ -26,7 +26,7 @@ The \fIidentifier\fR is normally a UUID (UUIDs for ports and clients can be show
 be interpreted as a client name, and its UUID will be looked up internally and used for the relevant metadata operation. If the \fB-p\fR option is used, then \fIidentifier\fR will
 be interpreted as a port name and its UUID  will be looked up internally and used for the relevant metadata operation.
 .P
-The \fIkey\fR is an arbitary string that identifies the metadata to be operated upon.
+The \fIkey\fR is an arbitrary string that identifies the metadata to be operated upon.
 .P
 The \fIvalue\fR is an arbitrary string that defines the value of the metadata to be created.
 .P

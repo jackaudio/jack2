@@ -90,6 +90,7 @@ struct midi_port_t {
 	alsa_id_t id;
 	char dev[16];
 	char name[64];
+	char device_name[64];
 
 	jack_port_t *jack;
 	snd_rawmidi_t *rawmidi;
@@ -410,9 +411,10 @@ void midi_port_init(const alsa_rawmidi_t *midi, midi_port_t *port, snd_rawmidi_i
 
 	port->id = *id;
 	snprintf(port->dev, sizeof(port->dev), "hw:%d,%d,%d", id->id[0], id->id[1], id->id[3]);
+	strncpy(port->device_name, snd_rawmidi_info_get_name(info), sizeof(port->device_name));
 	name = snd_rawmidi_info_get_subdevice_name(info);
 	if (!strlen(name))
-		name = snd_rawmidi_info_get_name(info);
+		name = port->device_name;
 	snprintf(port->name, sizeof(port->name), "%s %s %s", port->id.id[2] ? "out":"in", port->dev, name);
 
 	// replace all offending characters with '-'
@@ -436,8 +438,11 @@ inline int midi_port_open_jack(alsa_rawmidi_t *midi, midi_port_t *port, int type
 	port->jack = jack_port_register(midi->client, name, JACK_DEFAULT_MIDI_TYPE,
 		type | JackPortIsPhysical | JackPortIsTerminal, 0);
 
-	if (port->jack)
+	if (port->jack) {
 		jack_port_set_alias(port->jack, alias);
+		jack_port_set_default_metadata(port->jack, port->device_name);
+	}
+
 	return port->jack == NULL;
 }
 
@@ -463,7 +468,7 @@ int midi_port_open(alsa_rawmidi_t *midi, midi_port_t *port)
 
 	/* Some devices (emu10k1) have subdevs with the same name,
 	 * and we need to generate unique port name for jack */
-	snprintf(name, sizeof(name), "%s", port->name);
+	strncpy(name, port->name, sizeof(name));
 	if (midi_port_open_jack(midi, port, type, name)) {
 		int num;
 		num = port->id.id[3] ? port->id.id[3] : port->id.id[1];

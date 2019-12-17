@@ -61,12 +61,12 @@ static const unsigned char midi_system_len[] =
     {
         0, /*0xF0 System Exclusive Start*/
         2, /*0xF1 MTC Quarter Frame*/
-        3, /*0xF2 Song Postion*/
+        3, /*0xF2 Song Position*/
         2, /*0xF3 Song Select*/
         0, /*0xF4 undefined*/
         0, /*0xF5 undefined*/
         1, /*0xF6 Tune Request*/
-        1  /*0xF7 System Exlusive End*/
+        1  /*0xF7 System Exclusive End*/
     };
 
 static

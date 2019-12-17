@@ -47,7 +47,7 @@ We have:
 	the request takes precedence on the pending one. The server atomically switches to the new position.
 	The current position can be read by clients.
 
-	We use a JackAtomicArrayState pattern that allows to manage several "next" states independantly.
+	We use a JackAtomicArrayState pattern that allows to manage several "next" states independently.
 
     In jack1 implementation, transport code (jack_transport_cycle_end) was not called if the graph could not be locked (see jack_run_one_cycle).
     Here transport cycle (CycleBegin, CycleEnd) has to run in the RT thread concurrently with code executed from the "command" thread.
@@ -68,7 +68,7 @@ We have:
     Slow-sync cb calls stops when:
 
         - the cb return true (client)
-        - desactivate (client)
+        - deactivate (client)
         - transport stop (server)
 
     Several operations set the "timebase cb" flag to true:
@@ -81,7 +81,7 @@ We have:
     Timebase cb "new_pos" argument calls stops when:
 
         - after one cb call with "new_pos" argument true (client)
-        - desactivate (client)
+        - deactivate (client)
         - release (client)
         - transport stop (server)
 

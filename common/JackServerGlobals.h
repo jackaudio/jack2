@@ -44,6 +44,7 @@ struct SERVER_EXPORT JackServerGlobals
 
     static bool (* on_device_acquire)(const char* device_name);
     static void (* on_device_release)(const char* device_name);
+    static void (* on_device_reservation_loop)(void);
 
     JackServerGlobals();
     ~JackServerGlobals();

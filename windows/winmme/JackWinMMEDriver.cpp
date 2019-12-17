@@ -71,6 +71,8 @@ JackWinMMEDriver::Attach()
         port = fGraphManager->GetPort(index);
         port->SetAlias(input_port->GetAlias());
         port->SetLatencyRange(JackCaptureLatency, &latency_range);
+        fEngine->PortSetDefaultMetadata(fClientControl.fRefNum, index,
+                                        input_port->GetDeviceName());
         fCapturePortList[i] = index;
     }
 
@@ -95,6 +97,8 @@ JackWinMMEDriver::Attach()
         port = fGraphManager->GetPort(index);
         port->SetAlias(output_port->GetAlias());
         port->SetLatencyRange(JackPlaybackLatency, &latency_range);
+        fEngine->PortSetDefaultMetadata(fClientControl.fRefNum, index,
+                                        output_port->GetDeviceName());
         fPlaybackPortList[i] = index;
     }
 
@@ -424,22 +428,3 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
-
-
-/*
-jack_connect system:midi_capture_1 system_midi:playback_1
-jack_connect system:midi_capture_1 system_midi:playback_2
-
-jack_connect system:midi_capture_1 system_midi:playback_1
-
-jack_connect system:midi_capture_1 system_midi:playback_1
-
-jack_connect system:midi_capture_1 system_midi:playback_1
-
-jack_connect system_midi:capture_1 system:midi_playback_1
-jack_connect system_midi:capture_2 system:midi_playback_1
-
-jack_connect system_midi:capture_1  system_midi:playback_1
-
-*/
-

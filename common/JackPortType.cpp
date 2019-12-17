@@ -36,7 +36,7 @@ jack_port_type_id_t GetPortTypeId(const char* port_type)
 {
     for (jack_port_type_id_t i = 0; i < PORT_TYPES_MAX; ++i) {
         const JackPortType* type = gPortTypes[i];
-        assert(type != 0);
+        assert(type != NULL);
         if (strcmp(port_type, type->fName) == 0) {
             return i;
         }
@@ -46,9 +46,10 @@ jack_port_type_id_t GetPortTypeId(const char* port_type)
 
 const JackPortType* GetPortType(jack_port_type_id_t type_id)
 {
-    assert(type_id >= 0 && type_id <= PORT_TYPES_MAX);
+    if (type_id >= PORT_TYPES_MAX)
+        return NULL;
     const JackPortType* type = gPortTypes[type_id];
-    assert(type != 0);
+    assert(type != NULL);
     return type;
 }
 

@@ -332,7 +332,7 @@ void JackRouter::shutdownCallback(void* arg)
 	/*
 	char errstr[128];
 	memset(errstr,0,128);
-	sprintf(errstr,"JACK server has quitted");
+	sprintf(errstr,"JACK server has quit");
 	MessageBox(0,(LPCTSTR)errstr,(LPCTSTR)"JackRouter",MB_OK);
 	*/
 }

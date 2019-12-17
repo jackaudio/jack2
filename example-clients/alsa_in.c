@@ -411,7 +411,7 @@ int process (jack_nframes_t nframes, void *arg) {
 
     // Clamp offset.
     // the smooth offset still contains unwanted noise
-    // which would go straigth onto the resample coeff.
+    // which would go straight onto the resample coeff.
     // it only used in the P component and the I component is used for the fine tuning anyways.
     if( fabs( smooth_offset ) < pclamp )
 	    smooth_offset = 0.0;
@@ -421,7 +421,7 @@ int process (jack_nframes_t nframes, void *arg) {
     // K = 1/catch_factor and T = catch_factor2
     double current_resample_factor = static_resample_factor - smooth_offset / (double) catch_factor - offset_integral / (double) catch_factor / (double)catch_factor2;
 
-    // now quantize this value around resample_mean, so that the noise which is in the integral component doesnt hurt.
+    // now quantize this value around resample_mean, so that the noise which is in the integral component doesn't hurt.
     current_resample_factor = floor( (current_resample_factor - resample_mean) * controlquant + 0.5 ) / controlquant + resample_mean;
 
     // Output "instrumentatio" gonna change that to real instrumentation in a few.
@@ -781,11 +781,11 @@ int main (int argc, char *argv[]) {
 	max_diff = num_periods*period_size - target_delay ;	
 
     if( max_diff > target_delay ) {
-	    fprintf( stderr, "target_delay (%d) cant be smaller than max_diff(%d)\n", target_delay, max_diff );
+	    fprintf( stderr, "target_delay (%d) can not be smaller than max_diff(%d)\n", target_delay, max_diff );
 	    exit(20);
     }
     if( (target_delay+max_diff) > (num_periods*period_size) ) {
-	    fprintf( stderr, "target_delay+max_diff (%d) cant be bigger than buffersize(%d)\n", target_delay+max_diff, num_periods*period_size );
+	    fprintf( stderr, "target_delay+max_diff (%d) can not be bigger than buffersize(%d)\n", target_delay+max_diff, num_periods*period_size );
 	    exit(20);
     }
     // alloc input ports, which are blasted out to alsa...
@@ -844,4 +844,3 @@ int main (int argc, char *argv[]) {
     jack_client_close (client);
     exit (0);
 }
-

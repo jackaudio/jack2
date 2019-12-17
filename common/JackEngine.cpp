@@ -34,6 +34,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackChannel.h"
 #include "JackError.h"
 
+extern const char* JACK_METADATA_HARDWARE;
+extern const char* JACK_METADATA_PRETTY_NAME;
+
 namespace Jack
 {
 
@@ -41,9 +44,9 @@ JackEngine::JackEngine(JackGraphManager* manager,
                        JackSynchro* table,
                        JackEngineControl* control,
                        char self_connect_mode)
-                    : JackLockAble(control->fServerName), 
+                    : JackLockAble(control->fServerName),
                     fSignal(control->fServerName),
-                    fMetadata(NULL) // FIXME use control->fServerName?
+                    fMetadata(true)
 {
     fGraphManager = manager;
     fSynchroTable = table;
@@ -104,7 +107,7 @@ void JackEngine::NotifyQuit()
 
 
 //-----------------------------
-// Client ressource management
+// Client resource management
 //-----------------------------
 
 int JackEngine::AllocateRefnum()
@@ -130,7 +133,7 @@ void JackEngine::ReleaseRefnum(int refnum)
             }
         }
         if (i == CLIENT_NUM) {
-            // Last client and temporay case: quit the server
+            // Last client and temporary case: quit the server
             jack_log("JackEngine::ReleaseRefnum server quit");
             fEngineControl->fTemporary = false;
             throw JackTemporaryException();
@@ -165,7 +168,7 @@ bool JackEngine::Process(jack_time_t cur_cycle_begin, jack_time_t prev_cycle_end
 
     // Cycle  begin
     fEngineControl->CycleBegin(fClientTable, fGraphManager, cur_cycle_begin, prev_cycle_end);
-  
+
     // Graph
     if (fGraphManager->IsFinishedGraph()) {
         ProcessNext(cur_cycle_begin);
@@ -281,15 +284,15 @@ int JackEngine::PropertyChangeNotify(jack_uuid_t subject, const char* key, jack_
 //---------------
 
 int JackEngine::ClientNotify(JackClientInterface* client, int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2)
-{   
+{
     // Check if notification is needed
     if (!client->GetClientControl()->fCallback[notify]) {
         jack_log("JackEngine::ClientNotify: no callback for notification = %ld", notify);
         return 0;
     }
-    
+
     int res1;
-   
+
     // External client
     if (dynamic_cast<JackExternalClient*>(client)) {
        res1 = client->ClientNotify(refnum, name, notify, sync, message, value1, value2);
@@ -301,7 +304,7 @@ int JackEngine::ClientNotify(JackClientInterface* client, int refnum, const char
             Lock();
         }
     }
-    
+
     if (res1 < 0) {
         jack_error("ClientNotify fails name = %s notification = %ld val1 = %ld val2 = %ld", name, notify, value1, value2);
     }
@@ -326,7 +329,7 @@ void JackEngine::NotifyClients(int event, int sync, const char* message, int val
 int JackEngine::NotifyAddClient(JackClientInterface* new_client, const char* new_name, int refnum)
 {
     jack_log("JackEngine::NotifyAddClient: name = %s", new_name);
-    
+
     // Notify existing clients of the new client and new client of existing clients.
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* old_client = fClientTable[i];
@@ -348,7 +351,7 @@ int JackEngine::NotifyAddClient(JackClientInterface* new_client, const char* new
 
 void JackEngine::NotifyRemoveClient(const char* name, int refnum)
 {
-    // Notify existing clients (including the one beeing suppressed) of the removed client
+    // Notify existing clients (including the one being suppressed) of the removed client
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
         if (client) {
@@ -736,7 +739,7 @@ int JackEngine::ClientInternalClose(int refnum, bool wait)
 int JackEngine::ClientCloseAux(int refnum, bool wait)
 {
     jack_log("JackEngine::ClientCloseAux ref = %ld", refnum);
-    
+
     JackClientInterface* client = fClientTable[refnum];
     fEngineControl->fTransport.ResetTimebase(refnum);
 
@@ -770,14 +773,15 @@ int JackEngine::ClientCloseAux(int refnum, bool wait)
         }
     }
 
+    if (fMetadata.RemoveProperties(NULL, uuid) > 0) {
+        /* have to do the notification ourselves, since the client argument
+          to fMetadata->RemoveProperties() was NULL
+        */
+        PropertyChangeNotify(uuid, NULL, PropertyDeleted);
+    }
+
     // Notify running clients
     NotifyRemoveClient(client->GetClientControl()->fName, refnum);
-
-    fMetadata.RemoveProperties(NULL, uuid);
-    /* have to do the notification ourselves, since the client argument
-       to fMetadata->RemoveProperties() was NULL
-     */
-    PropertyChangeNotify(uuid, NULL, PropertyDeleted);
 
     // Cleanup...
     fSynchroTable[refnum].Destroy();
@@ -906,6 +910,17 @@ int JackEngine::PortUnRegister(int refnum, jack_port_id_t port_index)
     PortDisconnect(-1, port_index, ALL_PORTS);
 
     if (fGraphManager->ReleasePort(refnum, port_index) == 0) {
+        const jack_uuid_t uuid = jack_port_uuid_generate(port_index);
+        if (!jack_uuid_empty(uuid))
+        {
+            if (fMetadata.RemoveProperties(NULL, uuid) > 0) {
+                /* have to do the notification ourselves, since the client argument
+                   to fMetadata->RemoveProperties() was NULL
+                */
+                PropertyChangeNotify(uuid, NULL, PropertyDeleted);
+            }
+        }
+
         if (client->GetClientControl()->fActive) {
             NotifyPortRegistation(port_index, false);
         }
@@ -1071,6 +1086,25 @@ int JackEngine::PortRename(int refnum, jack_port_id_t port, const char* name)
     return 0;
 }
 
+int JackEngine::PortSetDefaultMetadata(jack_port_id_t port, const char* pretty_name)
+{
+    static const char* type = "text/plain";
+    jack_uuid_t uuid = jack_port_uuid_generate(port);
+
+    int res = fMetadata.SetProperty(NULL, uuid, JACK_METADATA_HARDWARE, pretty_name, type);
+    if (res == -1) {
+        return -1;
+    }
+
+    char *v, *t;
+    res = fMetadata.GetProperty(uuid, JACK_METADATA_PRETTY_NAME, &v, &t);
+    if (res == -1) {
+        res = fMetadata.SetProperty(NULL, uuid, JACK_METADATA_PRETTY_NAME, pretty_name, type);
+    }
+
+    return res;
+}
+
 //--------------------
 // Session management
 //--------------------
@@ -1159,7 +1193,7 @@ int JackEngine::SessionReply(int refnum)
         }
         fSessionResult = NULL;
     }
-    
+
     return 0;
 }
 

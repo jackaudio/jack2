@@ -70,7 +70,7 @@ struct JackLibGlobals
         fGraphManager = -1;
         fEngineControl = -1;
 
-        fMetadata = new JackMetadata(NULL);
+        fMetadata = new JackMetadata(false);
 
         // Filter SIGPIPE to avoid having client get a SIGPIPE when trying to access a died server.
     #ifdef WIN32
@@ -92,6 +92,7 @@ struct JackLibGlobals
         JackMessageBuffer::Destroy();
 
         delete fMetadata;
+        fMetadata = NULL;
 
        // Restore old signal mask
     #ifdef WIN32

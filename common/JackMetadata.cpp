@@ -1,6 +1,7 @@
 /*
   Copyright (C) 2011 David Robillard
   Copyright (C) 2013 Paul Davis
+  Copyright (C) 2019 Filipe Coelho
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU Lesser General Public License as published by
@@ -22,40 +23,86 @@
 #include "JackClient.h"
 
 #include <string.h>
+#include <sys/stat.h>
 #include <limits.h>
 
+
+#define JACK_METADATA_PREFIX "http://jackaudio.org/metadata/"
+LIB_EXPORT const char* JACK_METADATA_CONNECTED   = JACK_METADATA_PREFIX "connected";
+LIB_EXPORT const char* JACK_METADATA_EVENT_TYPES = JACK_METADATA_PREFIX "event-types";
+LIB_EXPORT const char* JACK_METADATA_HARDWARE    = JACK_METADATA_PREFIX "hardware";
+LIB_EXPORT const char* JACK_METADATA_ICON_LARGE  = JACK_METADATA_PREFIX "icon-large";
+LIB_EXPORT const char* JACK_METADATA_ICON_NAME   = JACK_METADATA_PREFIX "icon-name";
+LIB_EXPORT const char* JACK_METADATA_ICON_SMALL  = JACK_METADATA_PREFIX "icon-small";
+LIB_EXPORT const char* JACK_METADATA_ORDER       = JACK_METADATA_PREFIX "order";
+LIB_EXPORT const char* JACK_METADATA_PORT_GROUP  = JACK_METADATA_PREFIX "port-group";
+LIB_EXPORT const char* JACK_METADATA_PRETTY_NAME = JACK_METADATA_PREFIX "pretty-name";
+LIB_EXPORT const char* JACK_METADATA_SIGNAL_TYPE = JACK_METADATA_PREFIX "signal-type";
+#undef JACK_METADATA_PREFIX
 
 namespace Jack
 {
 
-JackMetadata::JackMetadata(const char* server_name)
+JackMetadata::JackMetadata(bool isEngine)
 #if HAVE_DB
-    : fDB(NULL), fDBenv(NULL)
+    : fDB(NULL), fDBenv(NULL), fIsEngine(isEngine)
 #endif
 {
-    PropertyInit(server_name);
+    PropertyInit();
 }
 
 JackMetadata::~JackMetadata()
 {
 #if HAVE_DB
+    char dbpath[PATH_MAX + 1];
+
     if (fDB) {
         fDB->close (fDB, 0);
         fDB = NULL;
     }
     if (fDBenv) {
         fDBenv->close (fDBenv, 0);
-        fDBenv = 0;
+        fDBenv = NULL;
+    }
+
+    if (fIsEngine)
+    {
+        // cleanup after libdb, nasty!
+        snprintf (dbpath, sizeof(dbpath), "%s/jack_db/metadata.db", fDBFilesDir);
+        remove (dbpath);
+
+        snprintf (dbpath, sizeof(dbpath), "%s/jack_db/__db.001", fDBFilesDir);
+        remove (dbpath);
+
+        snprintf (dbpath, sizeof(dbpath), "%s/jack_db/__db.002", fDBFilesDir);
+        remove (dbpath);
+
+        snprintf (dbpath, sizeof(dbpath), "%s/jack_db/__db.003", fDBFilesDir);
+        remove (dbpath);
+
+        // remove our custom dir
+        snprintf (dbpath, sizeof(dbpath), "%s/jack_db", fDBFilesDir);
+        rmdir (dbpath);
     }
 #endif
 }
 
-int JackMetadata::PropertyInit(const char* server_name)
+int JackMetadata::PropertyInit()
 {
 #if HAVE_DB
 
     int ret;
     char dbpath[PATH_MAX + 1];
+
+#ifdef WIN32
+    ret = GetTempPathA (MAX_PATH, fDBFilesDir);
+    if ((ret > MAX_PATH) || (ret == 0)) {
+        jack_error ("cannot get path for temp files");
+        return -1;
+    }
+#else
+    strncpy (fDBFilesDir, jack_server_dir, PATH_MAX);
+#endif
 
     /* idempotent */
 
@@ -68,19 +115,14 @@ int JackMetadata::PropertyInit(const char* server_name)
         return -1;
     }
 
+    snprintf (dbpath, sizeof(dbpath), "%s/jack_db", fDBFilesDir);
 #ifdef WIN32
-/* jack_server_dir is set to 'server' and a relative path
- * makes fDBenv->open() and fDB->open() calls fail
- */
-#define jack_db_tmp_dir "c:\\windows\\temp\\jack"
-    // FIXME - directory not created despite DB_CREATE flag
-    if (CreateDirectory (jack_db_tmp_dir, NULL) == ERROR_PATH_NOT_FOUND) {
-        jack_error ("cannot create DB files directory");
-    }
-    if ((ret = fDBenv->open (fDBenv, jack_db_tmp_dir, DB_CREATE | DB_INIT_LOCK | DB_INIT_MPOOL | DB_THREAD, 0)) != 0) {
+    mkdir (dbpath);
 #else
-    if ((ret = fDBenv->open (fDBenv, jack_server_dir /*FIXME:(server_name, server_dir)*/, DB_CREATE | DB_INIT_LOCK | DB_INIT_MPOOL | DB_THREAD, 0)) != 0) {
+    mkdir (dbpath, S_IRWXU | S_IRWXG);
 #endif
+
+    if ((ret = fDBenv->open (fDBenv, dbpath, DB_CREATE | DB_INIT_LOCK | DB_INIT_MPOOL | DB_THREAD, 0)) != 0) {
         jack_error ("cannot open DB environment: %s", db_strerror (ret));
         return -1;
     }
@@ -90,11 +132,7 @@ int JackMetadata::PropertyInit(const char* server_name)
         return -1;
     }
 
-#ifdef WIN32
-    snprintf (dbpath, sizeof(dbpath), "%s\\%s", jack_db_tmp_dir, "metadata.db");
-#else
-    snprintf (dbpath, sizeof(dbpath), "%s/%s", jack_server_dir /*FIXME:(server_name, server_dir)*/, "metadata.db");
-#endif
+    snprintf (dbpath, sizeof(dbpath), "%s/jack_db/metadata.db", fDBFilesDir);
     if ((ret = fDB->open (fDB, NULL, dbpath, NULL, DB_HASH, DB_CREATE | DB_THREAD, 0666)) != 0) {
         jack_error ("Cannot open metadata DB at %s: %s", dbpath, db_strerror (ret));
         fDB->close (fDB, 0);
@@ -159,7 +197,7 @@ int JackMetadata::SetProperty(JackClient* client, jack_uuid_t subject, const cha
         return -1;
     }
 
-    if (PropertyInit(NULL)) {
+    if (PropertyInit()) {
         return -1;
     }
 
@@ -234,7 +272,7 @@ int JackMetadata::GetProperty(jack_uuid_t subject, const char* key, char** value
         return -1;
     }
 
-    if (PropertyInit(NULL)) {
+    if (PropertyInit()) {
         return -1;
     }
 
@@ -326,7 +364,7 @@ int JackMetadata::GetProperties(jack_uuid_t subject, jack_description_t* desc)
     memset (ustr, 0, JACK_UUID_STRING_SIZE);
     jack_uuid_unparse (subject, ustr);
 
-    if (PropertyInit(NULL)) {
+    if (PropertyInit()) {
         return -1;
     }
 
@@ -454,7 +492,7 @@ int JackMetadata::GetAllProperties(jack_description_t** descriptions)
     jack_property_t* current_prop = NULL;
     size_t len1, len2;
 
-    if (PropertyInit(NULL)) {
+    if (PropertyInit()) {
         return -1;
     }
 
@@ -611,7 +649,7 @@ int JackMetadata::RemoveProperty(JackClient* client, jack_uuid_t subject, const 
     DBT d_key;
     int ret;
 
-    if (PropertyInit(NULL)) {
+    if (PropertyInit()) {
         return -1;
     }
 
@@ -652,7 +690,7 @@ int JackMetadata::RemoveProperties(JackClient* client, jack_uuid_t subject)
     memset (ustr, 0, JACK_UUID_STRING_SIZE);
     jack_uuid_unparse (subject, ustr);
 
-    if (PropertyInit(NULL)) {
+    if (PropertyInit() || fDB == NULL) {
         return -1;
     }
 
@@ -727,7 +765,7 @@ int JackMetadata::RemoveAllProperties(JackClient* client)
     int ret;
     jack_uuid_t empty_uuid = JACK_UUID_EMPTY_INITIALIZER;
 
-    if (PropertyInit(NULL)) {
+    if (PropertyInit()) {
         return -1;
     }
 

@@ -44,7 +44,7 @@ void JackWinNamedPipeServerNotifyChannel::Close()
 /*
 The requirement is that the Notification from RT thread can be delivered... not sure using a pipe is adequate here...
 Can the write operation block?
-A non blocking write operation shoud be used : check if write can succeed, and ignore the notification otherwise
+A non blocking write operation should be used : check if write can succeed, and ignore the notification otherwise
 (since its mainly used for XRun, ignoring a notification is OK, successive XRun will come...)
 */
 void JackWinNamedPipeServerNotifyChannel::Notify(int refnum, int notify, int value)

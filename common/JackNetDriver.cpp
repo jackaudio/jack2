@@ -723,7 +723,7 @@ Deactivated for now..
             char net_name[JACK_CLIENT_NAME_SIZE+1] = {0};
             int udp_port;
             int mtu = DEFAULT_MTU;
-            // Desactivated for now...
+            // Deactivated for now...
             uint transport_sync = 0;
             jack_nframes_t period_size = 1024;  // to be used while waiting for master period_size
             jack_nframes_t sample_rate = 48000; // to be used while waiting for master sample_rate

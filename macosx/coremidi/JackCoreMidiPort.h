@@ -33,6 +33,7 @@ namespace Jack {
 
         char alias[REAL_JACK_PORT_NAME_SIZE+1];
         char name[REAL_JACK_PORT_NAME_SIZE+1];
+        char device_name[REAL_JACK_PORT_NAME_SIZE+1];
         bool initialized;
 
     protected:
@@ -62,7 +63,10 @@ namespace Jack {
 
         const char *
         GetName();
-        
+
+        const char *
+        GetDeviceName();
+
         static bool IsInternalPort(MIDIObjectRef port_aux);
 
     };

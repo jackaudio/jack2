@@ -36,6 +36,7 @@ std::map<std::string, int> JackServerGlobals::fInternalsList;
 
 bool (* JackServerGlobals::on_device_acquire)(const char * device_name) = NULL;
 void (* JackServerGlobals::on_device_release)(const char * device_name) = NULL;
+void (* JackServerGlobals::on_device_reservation_loop)(void) = NULL;
 
 int JackServerGlobals::Start(const char* server_name,
                              jack_driver_desc_t* driver_desc,
@@ -168,7 +169,7 @@ bool JackServerGlobals::Init()
         if (!fp) {
             fp = fopen("/etc/jackdrc", "r");
         }
-        // if still not found, check old config name for backwards compatability
+        // if still not found, check old config name for backwards compatibility
         if (!fp) {
             fp = fopen("/etc/jackd.conf", "r");
         }

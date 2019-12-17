@@ -288,7 +288,7 @@ cache_packet_reset (cache_packet *pack)
     pack->valid = 0;
 
     // XXX: i don't think this is necessary here...
-    //      fragement array is cleared in _set_framecnt()
+    //      fragment array is cleared in _set_framecnt()
 
     for (i = 0; i < pack->num_fragments; i++)
         pack->fragment_array[i] = 0;
@@ -586,7 +586,7 @@ packet_cache_retreive_packet_pointer( packet_cache *pcache, jack_nframes_t frame
     }
 
     if( cpack == NULL ) {
-        //printf( "retreive packet: %d....not found\n", framecnt );
+        //printf( "retrieve packet: %d....not found\n", framecnt );
         return -1;
     }
 
@@ -620,7 +620,7 @@ packet_cache_release_packet( packet_cache *pcache, jack_nframes_t framecnt )
     }
 
     if( cpack == NULL ) {
-        //printf( "retreive packet: %d....not found\n", framecnt );
+        //printf( "retrieve packet: %d....not found\n", framecnt );
         return -1;
     }
 

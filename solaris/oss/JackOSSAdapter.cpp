@@ -563,13 +563,13 @@ int JackOSSAdapter::Write()
 {
     ssize_t count;
 
-    // Maybe necessay to write an empty output buffer first time : see http://manuals.opensound.com/developer/fulldup.c.html
+    // Maybe necessary to write an empty output buffer first time : see http://manuals.opensound.com/developer/fulldup.c.html
     if (fFirstCycle) {
 
         fFirstCycle = false;
         memset(fOutputBuffer, 0, fOutputBufferSize);
 
-        // Prefill ouput buffer
+        // Prefill output buffer
         for (int i = 0; i < fNperiods; i++) {
            count = ::write(fOutFD, fOutputBuffer, fOutputBufferSize);
            if (count < fOutputBufferSize) {

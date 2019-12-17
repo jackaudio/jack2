@@ -26,6 +26,8 @@
 #include <stdlib.h>
 
 #include <jack/jack.h>
+#include <jack/metadata.h>
+#include <jack/uuid.h>
 
 jack_client_t *client;
 
@@ -34,6 +36,12 @@ static void signal_handler(int sig)
 	jack_client_close(client);
 	fprintf(stderr, "signal received, exiting ...\n");
 	exit(0);
+}
+
+static void
+port_rename_callback (jack_port_id_t port, const char* old_name, const char* new_name, void* arg)
+{
+	printf ("Port %d renamed from %s to %s\n", port, old_name, new_name);
 }
 
 static void
@@ -61,6 +69,39 @@ graph_callback (void* arg)
 	return 0;
 }
 
+static void
+propchange (jack_uuid_t subject, const char* key, jack_property_change_t change, void* arg)
+{
+        char buf[JACK_UUID_STRING_SIZE];
+        const char* action = "";
+
+        switch (change) {
+        case PropertyCreated:
+                action = "created";
+                break;
+
+        case PropertyChanged:
+                action = "changed";
+                break;
+
+        case PropertyDeleted:
+                action = "deleted";
+                break;
+        }
+
+        if (jack_uuid_empty (subject)) {
+                printf ("All properties changed!\n");
+        } else {
+                jack_uuid_unparse (subject, buf);
+                
+                if (key) {
+                        printf ("key [%s] for %s %s\n", key, buf, action);
+                } else {
+                        printf ("all keys for %s %s\n", buf, action);
+                }
+        }
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -80,6 +121,10 @@ main (int argc, char *argv[])
 		fprintf (stderr, "cannot set port registration callback\n");
 		return 1;
 	}
+	if (jack_set_port_rename_callback (client, port_rename_callback, NULL)) {
+		fprintf (stderr, "cannot set port registration callback\n");
+		return 1;
+	}
 	if (jack_set_port_connect_callback (client, connect_callback, NULL)) {
 		fprintf (stderr, "cannot set port connect callback\n");
 		return 1;
@@ -90,6 +135,10 @@ main (int argc, char *argv[])
 	}
 	if (jack_set_graph_order_callback (client, graph_callback, NULL)) {
 		fprintf (stderr, "cannot set graph order registration callback\n");
+		return 1;
+	}
+	if (jack_set_property_change_callback (client, propchange, NULL)) {
+		fprintf (stderr, "cannot set property change callback\n");
 		return 1;
 	}
 	if (jack_activate (client)) {

@@ -25,7 +25,7 @@
 #include "../posix/JackSystemDeps_os.h"
 
 /**
- *  bionic c dependant functions
+ *  bionic c dependent functions
  */
 #define pthread_setcanceltype(x,y)  (0)
 

@@ -276,7 +276,7 @@ int JackServer::SetBufferSize(jack_nframes_t buffer_size)
 Freewheel mode is implemented by switching from the (audio [slaves] + freewheel) driver to the freewheel driver only:
 
     - "global" connection state is saved
-    - all audio driver and slaves ports are deconnected, thus there is no more dependancies with the audio driver and slaves
+    - all audio driver and slaves ports are deconnected, thus there is no more dependencies with the audio driver and slaves
     - the freewheel driver will be synchronized with the end of graph execution : all clients are connected to the freewheel driver
     - the freewheel driver becomes the "master"
 

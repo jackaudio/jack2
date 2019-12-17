@@ -1356,7 +1356,7 @@ namespace Jack
         }
 
         if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) {
-            jack_error("Could not find a useable version of Winsock.dll\n");
+            jack_error("Could not find a usable version of Winsock.dll\n");
             WSACleanup();
             return -1;
         }

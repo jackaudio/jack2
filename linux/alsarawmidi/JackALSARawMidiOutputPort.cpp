@@ -25,12 +25,13 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 using Jack::JackALSARawMidiOutputPort;
 
-JackALSARawMidiOutputPort::JackALSARawMidiOutputPort(snd_rawmidi_info_t *info,
+JackALSARawMidiOutputPort::JackALSARawMidiOutputPort(const char* client_name,
+                                                     snd_rawmidi_info_t *info,
                                                      size_t index,
                                                      size_t max_bytes_per_poll,
                                                      size_t max_bytes,
                                                      size_t max_messages):
-    JackALSARawMidiPort(info, index, POLLOUT)
+    JackALSARawMidiPort(client_name, info, index, POLLOUT)
 {
     alsa_event = 0;
     read_queue = new JackMidiBufferReadQueue();
