@@ -95,8 +95,8 @@ int JackMetadata::PropertyInit()
     char dbpath[PATH_MAX + 1];
 
 #ifdef WIN32
-    ret = GetTempPathA (MAX_PATH, fDBFilesDir);
-    if ((ret > MAX_PATH) || (ret == 0)) {
+    ret = GetTempPathA (PATH_MAX, fDBFilesDir);
+    if ((ret > PATH_MAX) || (ret == 0)) {
         jack_error ("cannot get path for temp files");
         return -1;
     }
