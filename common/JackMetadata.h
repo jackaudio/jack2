@@ -31,6 +31,7 @@
 #endif
 
 #include <stdint.h>
+#include <limits.h>
 
 #if HAVE_DB
 #include <db.h>
