@@ -360,8 +360,8 @@ int JackAlsaDriver::Open(alsa_driver_info_t info)
         return -1;
     }
 
-    /* this feature caused driver to skip opening alsa devices, therefore populate channels from user input */
-    if (info.features & ALSA_DRIVER_FEAT_START_CLOSED) {
+    /* we are starting with all alsa devices closed, therfore populate jack channels based on user hint */
+    if (info.features & ALSA_DRIVER_FEAT_BACKEND_EVAL_ON_INIT && info.features & ALSA_DRIVER_FEAT_BACKEND_CLOSE_IDLE) {
         for (size_t i = 0; i < std::max(info.devices_capture_size, info.devices_playback_size); ++i) {
             if (i < info.devices_capture_size && info.devices[i].capture_channels < 1) {
                 jack_error ("invalid or missing channels parameter with '-x' option 'start-closed' for device C: '%s'", info.devices[i].capture_name);
@@ -590,15 +590,12 @@ int JackAlsaDriver::TargetState(DriverMode mode, int connections_count)
         return SND_PCM_STATE_RUNNING;
     }
 
-    if (mode == DriverMode::Init) {
-        if (driver->features & ALSA_DRIVER_FEAT_START_CLOSED) {
-            return SND_PCM_STATE_NOTREADY;
-        } else {
-            return SND_PCM_STATE_RUNNING;
-        }
+    // evaluation during init is disabled by user option
+    if (mode == DriverMode::Init && !(driver->features & ALSA_DRIVER_FEAT_BACKEND_EVAL_ON_INIT)) {
+        return SND_PCM_STATE_RUNNING;
     }
 
-    if (driver->features & ALSA_DRIVER_FEAT_CLOSE_IDLE_DEVS) {
+    if (driver->features & ALSA_DRIVER_FEAT_BACKEND_CLOSE_IDLE) {
         return SND_PCM_STATE_NOTREADY;
     }
 
@@ -893,10 +890,10 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
         NULL);
 
     value.i = 0;
-    jack_driver_descriptor_add_parameter(desc, &filler, "start-closed", 'x', JackDriverParamBool, &value, NULL, "Start with all devices closed", NULL);
+    jack_driver_descriptor_add_parameter(desc, &filler, "eval-on-init", 'x', JackDriverParamBool, &value, NULL, "Do not start ALSA devices on jack startup", NULL);
 
     value.i = 0;
-    jack_driver_descriptor_add_parameter(desc, &filler, "close-idle-devs", 'c', JackDriverParamBool, &value, NULL, "Close idle devices on alsa driver restart request", NULL);
+    jack_driver_descriptor_add_parameter(desc, &filler, "close-idle", 'c', JackDriverParamBool, &value, NULL, "Close idle devices on alsa driver restart request", NULL);
 
     value.i = 0;
     jack_driver_descriptor_add_parameter(desc, &filler, "unlinked-devs", 'u', JackDriverParamBool, &value, NULL, "Do not link devices", NULL);
@@ -1078,11 +1075,11 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
                 break;
 
             case 'x':
-                info.features |= param->value.i ? ALSA_DRIVER_FEAT_START_CLOSED : 0;
+                info.features |= param->value.i ? ALSA_DRIVER_FEAT_BACKEND_EVAL_ON_INIT : 0;
                 break;
 
             case 'c':
-                info.features |= param->value.i ? ALSA_DRIVER_FEAT_CLOSE_IDLE_DEVS : 0;
+                info.features |= param->value.i ? ALSA_DRIVER_FEAT_BACKEND_CLOSE_IDLE : 0;
                 break;
 
             case 'u':
