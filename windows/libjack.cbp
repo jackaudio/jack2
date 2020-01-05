@@ -4,13 +4,13 @@
 	<Project>
 		<Option title="libjack" />
 		<Option pch_mode="2" />
-		<Option compiler="mingw_64" />
+		
 		<Build>
 			<Target title="Win32 Release 64bits">
 				<Option output="Release64\bin\libjack64" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release64\libjack" />
 				<Option type="3" />
-				<Option compiler="mingw_64" />
+				
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
@@ -52,7 +52,7 @@
 				<Option output="Debug64\bin\libjack64" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Debug64\libjack" />
 				<Option type="3" />
-				<Option compiler="mingw_64" />
+				
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
@@ -94,7 +94,7 @@
 				<Option output="Release64\bin\libjack64" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release64\libjack" />
 				<Option type="3" />
-				<Option compiler="mingw_64" />
+				
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
@@ -137,7 +137,7 @@
 				<Option output="Release\bin\libjack" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release\libjack" />
 				<Option type="3" />
-				<Option compiler="mingw_64" />
+				
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
@@ -184,7 +184,7 @@
 				<Option output="Debug\bin\libjack" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Debug\libjack" />
 				<Option type="3" />
-				<Option compiler="mingw_64" />
+				
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
@@ -231,7 +231,7 @@
 				<Option output="Release\bin\libjack" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release\libjack" />
 				<Option type="3" />
-				<Option compiler="mingw_64" />
+				
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>

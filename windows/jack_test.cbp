@@ -4,13 +4,13 @@
 	<Project>
 		<Option title="jack_test" />
 		<Option pch_mode="2" />
-		<Option compiler="mingw_64" />
+		
 		<Build>
 			<Target title="Win32 Release 64bits">
 				<Option output="Release64\bin\jack_test" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release64\" />
 				<Option type="1" />
-				<Option compiler="mingw_64" />
+				
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
@@ -28,7 +28,7 @@
 				<Option output="Debug64\bin\jack_test" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Debug64\" />
 				<Option type="1" />
-				<Option compiler="mingw_64" />
+				
 				<Compiler>
 					<Add option="-Wall" />
 					<Add option="-g" />
@@ -46,7 +46,7 @@
 				<Option output="Release64\bin\jack_test" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release64\" />
 				<Option type="1" />
-				<Option compiler="mingw_64" />
+				
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
@@ -65,7 +65,7 @@
 				<Option output="Release\bin\jack_test" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release\" />
 				<Option type="1" />
-				<Option compiler="mingw_64" />
+				
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
@@ -85,7 +85,7 @@
 				<Option output="Debug\bin\jack_test" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Debug\" />
 				<Option type="1" />
-				<Option compiler="mingw_64" />
+				
 				<Compiler>
 					<Add option="-Wall" />
 					<Add option="-g" />
@@ -105,7 +105,7 @@
 				<Option output="Release\bin\jack_test" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release\" />
 				<Option type="1" />
-				<Option compiler="mingw_64" />
+				
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />

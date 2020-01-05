@@ -4,13 +4,13 @@
 	<Project>
 		<Option title="jackd" />
 		<Option pch_mode="2" />
-		<Option compiler="mingw_64" />
+		
 		<Build>
 			<Target title="Win32 Release 64bits">
 				<Option output="Release64\bin\jackd" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release64" />
 				<Option type="1" />
-				<Option compiler="mingw_64" />
+				
 				<Option parameters="-R -S -d net" />
 				<Option host_application="jackdmp.exe" />
 				<Compiler>
@@ -36,7 +36,7 @@
 				<Option output="Debug64\bin\jackd" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Debug64" />
 				<Option type="1" />
-				<Option compiler="mingw_64" />
+				
 				<Option parameters="-R -S -d net" />
 				<Compiler>
 					<Add option="-Wall" />
@@ -60,7 +60,7 @@
 				<Option output="Release64\bin\jackd" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release64" />
 				<Option type="1" />
-				<Option compiler="mingw_64" />
+				
 				<Option parameters="-R -S -d net" />
 				<Option host_application="jackdmp.exe" />
 				<Compiler>
@@ -86,7 +86,7 @@
 				<Option output="Release\bin\jackd" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release" />
 				<Option type="1" />
-				<Option compiler="mingw_64" />
+				
 				<Option parameters="-R -S -d net" />
 				<Option host_application="jackdmp.exe" />
 				<Compiler>
@@ -117,7 +117,7 @@
 				<Option output="Debug\bin\jackd" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Debug" />
 				<Option type="1" />
-				<Option compiler="mingw_64" />
+				
 				<Option parameters="-R -S -d net" />
 				<Compiler>
 					<Add option="-Wall" />
@@ -146,7 +146,7 @@
 				<Option output="Release\bin\jackd" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release" />
 				<Option type="1" />
-				<Option compiler="mingw_64" />
+				
 				<Option parameters="-R -S -d net" />
 				<Option host_application="jackdmp.exe" />
 				<Compiler>
