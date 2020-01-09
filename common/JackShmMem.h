@@ -39,45 +39,6 @@ void UnlockMemoryImp(void* ptr, size_t size);
 void LockAllMemory();
 void UnlockAllMemory();
 
-class JackMem
-{
-    private:
-
-        size_t fSize;
-        static size_t gSize;
-
-    protected:
-
-        JackMem(): fSize(gSize)
-        {}
-        ~JackMem()
-        {}
-
-    public:
-
-        void* operator new(size_t size)
-        {
-            gSize = size;
-            return calloc(1, size);
-        }
-
-        void operator delete(void* ptr, size_t size)
-        {
-            free(ptr);
-        }
-
-        void LockMemory()
-        {
-            LockMemoryImp(this, fSize);
-        }
-
-        void UnlockMemory()
-        {
-            UnlockMemoryImp(this, fSize);
-        }
-
-};
-
 /*!
 \brief
 
