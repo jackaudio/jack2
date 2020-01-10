@@ -30,7 +30,7 @@ static const JackPortType* gPortTypes[] =
     &gMidiPortType,
 };
 
-jack_port_type_id_t PORT_TYPES_MAX = sizeof(gPortTypes) / sizeof(gPortTypes[0]);
+const jack_port_type_id_t PORT_TYPES_MAX = sizeof(gPortTypes) / sizeof(gPortTypes[0]);
 
 jack_port_type_id_t GetPortTypeId(const char* port_type)
 {
