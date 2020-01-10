@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
-extern jack_port_type_id_t PORT_TYPES_MAX;
+extern const jack_port_type_id_t PORT_TYPES_MAX;
 
 struct JackPortType
 {
