@@ -500,7 +500,6 @@ alsa_driver_configure_stream (alsa_driver_t *driver, alsa_device_t *device, char
 	/*Set the configurable parameters for a PCM channel*/
 	if ((err = snd_pcm_plugin_params(handle, &ch_params)) < 0) {
 		jack_error("snd_pcm_plugin_params failed for %s %s with err = (%s)", snd_strerror(err), stream_name, device_name);
-		alsa_driver_delete(driver);
 		return -1;
 	}
 
