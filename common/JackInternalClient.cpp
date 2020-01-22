@@ -77,6 +77,7 @@ int JackInternalClient::Open(const char* server_name, const char* name, jack_uui
     }
 
     strncpy(fServerName, server_name, sizeof(fServerName));
+    fServerName[sizeof(fServerName) - 1] = 0;
 
     // Open server/client direct channel
     char name_res[JACK_CLIENT_NAME_SIZE + 1];
