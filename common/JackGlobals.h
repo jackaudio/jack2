@@ -57,6 +57,12 @@ class JackGlobals
 #endif
         static void CheckContext(const char* name);
 
+        inline static jack_port_id_t PortId(const jack_port_t* port)
+        {
+            uintptr_t port_aux = (uintptr_t)port;
+            jack_port_id_t port_id = (jack_port_id_t)port_aux;
+            return port_id;
+        }
 };
 
 // Each "side" server and client will implement this to get the shared graph manager, engine control and inter-process synchro table.
