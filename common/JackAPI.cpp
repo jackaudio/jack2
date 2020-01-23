@@ -348,8 +348,7 @@ LIB_EXPORT void* jack_port_get_buffer(jack_port_t* port, jack_nframes_t frames)
 {
     JackGlobals::CheckContext("jack_port_get_buffer");
 
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (!CheckPort(myport)) {
         jack_error("jack_port_get_buffer called with an incorrect port %ld", myport);
         return NULL;
@@ -363,8 +362,7 @@ LIB_EXPORT jack_uuid_t jack_port_uuid(const jack_port_t* port)
 {
     JackGlobals::CheckContext("jack_port_uuid");
 
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (!CheckPort(myport)) {
         jack_error("jack_port_uuid called with an incorrect port %ld", myport);
         return 0;
@@ -377,8 +375,7 @@ LIB_EXPORT const char* jack_port_name(const jack_port_t* port)
 {
     JackGlobals::CheckContext("jack_port_name");
 
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (!CheckPort(myport)) {
         jack_error("jack_port_name called with an incorrect port %ld", myport);
         return NULL;
@@ -392,8 +389,7 @@ LIB_EXPORT const char* jack_port_short_name(const jack_port_t* port)
 {
     JackGlobals::CheckContext("jack_port_short_name");
 
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (!CheckPort(myport)) {
         jack_error("jack_port_short_name called with an incorrect port %ld", myport);
         return NULL;
@@ -407,8 +403,7 @@ LIB_EXPORT int jack_port_flags(const jack_port_t* port)
 {
     JackGlobals::CheckContext("jack_port_flags");
 
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (!CheckPort(myport)) {
         jack_error("jack_port_flags called with an incorrect port %ld", myport);
         return -1;
@@ -422,8 +417,7 @@ LIB_EXPORT const char* jack_port_type(const jack_port_t* port)
 {
     JackGlobals::CheckContext("jack_port_type");
 
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (!CheckPort(myport)) {
         jack_error("jack_port_flags called an incorrect port %ld", myport);
         return NULL;
@@ -437,8 +431,7 @@ LIB_EXPORT jack_port_type_id_t jack_port_type_id(const jack_port_t *port)
 {
     JackGlobals::CheckContext("jack_port_type_id");
 
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (!CheckPort(myport)) {
         jack_error("jack_port_type_id called an incorrect port %ld", myport);
         return 0;
@@ -452,8 +445,7 @@ LIB_EXPORT int jack_port_connected(const jack_port_t* port)
 {
     JackGlobals::CheckContext("jack_port_connected");
 
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (!CheckPort(myport)) {
         jack_error("jack_port_connected called with an incorrect port %ld", myport);
         return -1;
@@ -468,8 +460,7 @@ LIB_EXPORT int jack_port_connected_to(const jack_port_t* port, const char* port_
 {
     JackGlobals::CheckContext("jack_port_connected_to");
 
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t src = (jack_port_id_t)port_aux;
+    jack_port_id_t src = JackGlobals::PortId(port);
     if (!CheckPort(src)) {
         jack_error("jack_port_connected_to called with an incorrect port %ld", src);
         return -1;
@@ -493,14 +484,12 @@ LIB_EXPORT int jack_port_tie(jack_port_t* src, jack_port_t* dst)
 {
     JackGlobals::CheckContext("jack_port_tie");
 
-    uintptr_t src_aux = (uintptr_t)src;
-    jack_port_id_t mysrc = (jack_port_id_t)src_aux;
+    jack_port_id_t mysrc = JackGlobals::PortId(src);
     if (!CheckPort(mysrc)) {
         jack_error("jack_port_tie called with a NULL src port");
         return -1;
     }
-    uintptr_t dst_aux = (uintptr_t)dst;
-    jack_port_id_t mydst = (jack_port_id_t)dst_aux;
+    jack_port_id_t mydst = JackGlobals::PortId(dst);
     if (!CheckPort(mydst)) {
         jack_error("jack_port_tie called with a NULL dst port");
         return -1;
@@ -518,8 +507,7 @@ LIB_EXPORT int jack_port_untie(jack_port_t* port)
 {
     JackGlobals::CheckContext("jack_port_untie");
 
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (!CheckPort(myport)) {
         jack_error("jack_port_untie called with an incorrect port %ld", myport);
         return -1;
@@ -533,8 +521,7 @@ LIB_EXPORT jack_nframes_t jack_port_get_latency(jack_port_t* port)
 {
     JackGlobals::CheckContext("jack_port_get_latency");
 
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (!CheckPort(myport)) {
         jack_error("jack_port_get_latency called with an incorrect port %ld", myport);
         return 0;
@@ -549,8 +536,7 @@ LIB_EXPORT void jack_port_set_latency(jack_port_t* port, jack_nframes_t frames)
 {
     JackGlobals::CheckContext("jack_port_set_latency");
 
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (!CheckPort(myport)) {
         jack_error("jack_port_set_latency called with an incorrect port %ld", myport);
     } else {
@@ -564,8 +550,7 @@ LIB_EXPORT void jack_port_get_latency_range(jack_port_t *port, jack_latency_call
 {
     JackGlobals::CheckContext("jack_port_get_latency_range");
 
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (!CheckPort(myport)) {
         jack_error("jack_port_get_latency_range called with an incorrect port %ld", myport);
     } else {
@@ -580,8 +565,7 @@ LIB_EXPORT void jack_port_set_latency_range(jack_port_t *port, jack_latency_call
 {
     JackGlobals::CheckContext("jack_port_set_latency_range");
 
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (!CheckPort(myport)) {
         jack_error("jack_port_set_latency_range called with an incorrect port %ld", myport);
     } else {
@@ -598,8 +582,7 @@ LIB_EXPORT int jack_recompute_total_latency(jack_client_t* ext_client, jack_port
 
 
     JackClient* client = (JackClient*)ext_client;
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (client == NULL) {
         jack_error("jack_recompute_total_latency called with a NULL client");
         return -1;
@@ -647,8 +630,7 @@ LIB_EXPORT int jack_port_rename(jack_client_t* ext_client, jack_port_t* port, co
     JackGlobals::CheckContext("jack_port_rename");
 
     JackClient* client = (JackClient*)ext_client;
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (client == NULL) {
         jack_error("jack_port_rename called with a NULL client");
         return -1;
@@ -667,8 +649,7 @@ LIB_EXPORT int jack_port_set_alias(jack_port_t* port, const char* name)
 {
     JackGlobals::CheckContext("jack_port_set_alias");
 
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (!CheckPort(myport)) {
         jack_error("jack_port_set_alias called with an incorrect port %ld", myport);
         return -1;
@@ -685,8 +666,7 @@ LIB_EXPORT int jack_port_unset_alias(jack_port_t* port, const char* name)
 {
     JackGlobals::CheckContext("jack_port_unset_alias");
 
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (!CheckPort(myport)) {
         jack_error("jack_port_unset_alias called with an incorrect port %ld", myport);
         return -1;
@@ -703,8 +683,7 @@ LIB_EXPORT int jack_port_get_aliases(const jack_port_t* port, char* const aliase
 {
     JackGlobals::CheckContext("jack_port_get_aliases");
 
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (!CheckPort(myport)) {
         jack_error("jack_port_get_aliases called with an incorrect port %ld", myport);
         return -1;
@@ -718,8 +697,7 @@ LIB_EXPORT int jack_port_request_monitor(jack_port_t* port, int onoff)
 {
     JackGlobals::CheckContext("jack_port_request_monitor");
 
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (!CheckPort(myport)) {
         jack_error("jack_port_request_monitor called with an incorrect port %ld", myport);
         return -1;
@@ -755,8 +733,7 @@ LIB_EXPORT int jack_port_ensure_monitor(jack_port_t* port, int onoff)
 {
     JackGlobals::CheckContext("jack_port_ensure_monitor");
 
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (!CheckPort(myport)) {
         jack_error("jack_port_ensure_monitor called with an incorrect port %ld", myport);
         return -1;
@@ -770,8 +747,7 @@ LIB_EXPORT int jack_port_monitoring_input(jack_port_t* port)
 {
     JackGlobals::CheckContext("jack_port_monitoring_input");
 
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (!CheckPort(myport)) {
         jack_error("jack_port_monitoring_input called with an incorrect port %ld", myport);
         return -1;
@@ -1108,8 +1084,7 @@ LIB_EXPORT int jack_port_unregister(jack_client_t* ext_client, jack_port_t* port
         jack_error("jack_port_unregister called with a NULL client");
         return -1;
     }
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (!CheckPort(myport)) {
         jack_error("jack_port_unregister called with an incorrect port %ld", myport);
         return -1;
@@ -1126,8 +1101,7 @@ LIB_EXPORT int jack_port_is_mine(const jack_client_t* ext_client, const jack_por
         jack_error("jack_port_is_mine called with a NULL client");
         return -1;
     }
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (!CheckPort(myport)) {
         jack_error("jack_port_is_mine called with an incorrect port %ld", myport);
         return -1;
@@ -1139,8 +1113,7 @@ LIB_EXPORT const char** jack_port_get_connections(const jack_port_t* port)
 {
     JackGlobals::CheckContext("jack_port_get_connections");
 
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (!CheckPort(myport)) {
         jack_error("jack_port_get_connections called with an incorrect port %ld", myport);
         return NULL;
@@ -1162,8 +1135,7 @@ LIB_EXPORT const char** jack_port_get_all_connections(const jack_client_t* ext_c
         return NULL;
     }
 
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (!CheckPort(myport)) {
         jack_error("jack_port_get_all_connections called with an incorrect port %ld", myport);
         return NULL;
@@ -1184,8 +1156,7 @@ LIB_EXPORT jack_nframes_t jack_port_get_total_latency(jack_client_t* ext_client,
         return 0;
     }
 
-    uintptr_t port_aux = (uintptr_t)port;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(port);
     if (!CheckPort(myport)) {
         jack_error("jack_port_get_total_latency called with an incorrect port %ld", myport);
         return 0;
@@ -1242,8 +1213,7 @@ LIB_EXPORT int jack_port_disconnect(jack_client_t* ext_client, jack_port_t* src)
         jack_error("jack_port_disconnect called with a NULL client");
         return -1;
     }
-    uintptr_t port_aux = (uintptr_t)src;
-    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    jack_port_id_t myport = JackGlobals::PortId(src);
     if (!CheckPort(myport)) {
         jack_error("jack_port_disconnect called with an incorrect port %ld", myport);
         return -1;
