@@ -28,10 +28,12 @@
 #define PATH_MAX   512
 #endif
 
+#ifndef UINT32_MAX
 #define UINT32_MAX 4294967295U
+#endif
 
 #define DRIVER_HANDLE HINSTANCE
-#define LoadDriverModule(name) LoadLibrary((name))
+#define LoadDriverModule(name) LoadLibraryW((name))
 #define UnloadDriverModule(handle) (FreeLibrary(((HMODULE)handle)))
 #define GetDriverProc(handle, name) GetProcAddress(((HMODULE)handle), (name))
 
