@@ -35,36 +35,39 @@ class JackClient;
 \brief Global server static structure: singleton kind of pattern.
 */
 
-struct SERVER_EXPORT JackServerGlobals
+class SERVER_EXPORT JackServerGlobals
 {
-    static JackServer* fInstance;
-    static unsigned int fUserCount;
-    static std::map<std::string, JackDriverInfo*> fSlavesList;
-    static std::map<std::string, int> fInternalsList;
 
-    static bool (* on_device_acquire)(const char* device_name);
-    static void (* on_device_release)(const char* device_name);
-    static void (* on_device_reservation_loop)(void);
+    public:
 
-    JackServerGlobals();
-    ~JackServerGlobals();
+        static JackServer* fInstance;
+        static unsigned int fUserCount;
+        static std::map<std::string, JackDriverInfo*> fSlavesList;
+        static std::map<std::string, int> fInternalsList;
 
-    static bool Init();
-    static void Destroy();
-    static int Start(const char* server_name,
-                     jack_driver_desc_t* driver_desc,
-                     JSList* driver_params,
-                     int sync,
-                     int temporary,
-                     int time_out_ms,
-                     int rt,
-                     int priority,
-                     int port_max,
-                     int verbose,
-                     jack_timer_type_t clock,
-                     char self_connect_mode);
-    static void Stop();
-    static void Delete();
+        static bool (* on_device_acquire)(const char* device_name);
+        static void (* on_device_release)(const char* device_name);
+        static void (* on_device_reservation_loop)(void);
+
+        JackServerGlobals();
+        ~JackServerGlobals();
+
+        static bool Init();
+        static void Destroy();
+        static int Start(const char* server_name,
+                         jack_driver_desc_t* driver_desc,
+                         JSList* driver_params,
+                         int sync,
+                         int temporary,
+                         int time_out_ms,
+                         int rt,
+                         int priority,
+                         int port_max,
+                         int verbose,
+                         jack_timer_type_t clock,
+                         char self_connect_mode);
+        static void Stop();
+        static void Delete();
 };
 
 } // end of namespace
