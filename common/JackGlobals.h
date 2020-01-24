@@ -35,24 +35,28 @@ namespace Jack
 {
 
 // Globals used for client management on server or library side.
-struct JackGlobals {
+class JackGlobals
+{
 
-    static jack_tls_key fRealTimeThread;
-    static jack_tls_key fNotificationThread;
-    static jack_tls_key fKeyLogFunction;
-    static JackMutex* fOpenMutex;
-    static JackMutex* fSynchroMutex;
-    static volatile bool fServerRunning;
-    static JackClient* fClientTable[CLIENT_NUM];
-    static bool fVerbose;
+    public:
+
+        static jack_tls_key fRealTimeThread;
+        static jack_tls_key fNotificationThread;
+        static jack_tls_key fKeyLogFunction;
+        static JackMutex* fOpenMutex;
+        static JackMutex* fSynchroMutex;
+        static volatile bool fServerRunning;
+        static JackClient* fClientTable[CLIENT_NUM];
+        static bool fVerbose;
 #ifndef WIN32
-    static jack_thread_creator_t fJackThreadCreator;
+        static jack_thread_creator_t fJackThreadCreator;
 #endif
 
 #ifdef __CLIENTDEBUG__
-    static std::ofstream* fStream;
+        static std::ofstream* fStream;
 #endif
-     static void CheckContext(const char* name);
+        static void CheckContext(const char* name);
+
 };
 
 // Each "side" server and client will implement this to get the shared graph manager, engine control and inter-process synchro table.
