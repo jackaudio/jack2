@@ -133,7 +133,11 @@ typedef struct {
     char name[JACK_DRIVER_NAME_MAX + 1];      /**< The driver's canonical name */
     jack_driver_type_t type;               /**< The driver's type */
     char desc[JACK_DRIVER_PARAM_DESC + 1];    /**< The driver's extended description */
+#ifdef WIN32
+    wchar_t file[JACK_PATH_MAX + 1];             /**< The filename of the driver's shared object file */
+#else
     char file[JACK_PATH_MAX + 1];             /**< The filename of the driver's shared object file */
+#endif
     uint32_t nparams;                         /**< The number of parameters the driver has */
     jack_driver_param_desc_t * params;        /**< An array of parameter descriptors */
 }

@@ -30,6 +30,11 @@
     #define ADDON_DIR "jack"
 #endif
 
+#define MAKE_WIDECHAR_CONSTANT2(Quote) L##Quote
+#define MAKE_WIDECHAR_CONSTANT(Quote) MAKE_WIDECHAR_CONSTANT2(Quote)
+#define ADDON_DIRW MAKE_WIDECHAR_CONSTANT(ADDON_DIR)
+
+
 namespace Jack
 {
     struct JackRequest;
