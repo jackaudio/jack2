@@ -33,6 +33,12 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 #ifdef WIN32
+typedef wchar_t file_char_t;
+#else
+typedef char file_char_t;
+#endif
+
+#ifdef WIN32
 
 static wchar_t* locate_dll_driver_dir()
 {
@@ -412,13 +418,17 @@ jack_driver_desc_t* jack_find_driver_descriptor (JSList * drivers, const char* n
     return desc;
 }
 
-static void* check_symbol(const wchar_t* sofile, const char* symbol, const wchar_t* driver_dir, void** res_dllhandle = NULL)
+static void* check_symbol(const file_char_t* sofile, const char* symbol, const file_char_t* driver_dir, void** res_dllhandle = NULL)
 {
     void* dlhandle;
     void* res = NULL;
-    wchar_t filename[1024];
+    file_char_t filename[1024];
+#ifdef WIN32
     swprintf(filename, 1022, L"%S/%S", driver_dir, sofile);
-
+#else
+    snprintf(filename, 1022, "%s/%s", driver_dir, sofile);
+#endif
+    
     if ((dlhandle = LoadDriverModule(filename)) == NULL) {
 #ifdef WIN32
         jack_error ("Could not open component .dll '%S': %ld", filename, GetLastError());
@@ -437,16 +447,21 @@ static void* check_symbol(const wchar_t* sofile, const char* symbol, const wchar
     return res;
 }
 
-static jack_driver_desc_t* jack_get_descriptor (JSList* drivers, const wchar_t* sofile, const char* symbol, const wchar_t* driver_dir)
+static jack_driver_desc_t* jack_get_descriptor (JSList* drivers, const file_char_t* sofile, const char* symbol, const file_char_t* driver_dir)
 {
     jack_driver_desc_t* descriptor = NULL;
     jack_driver_desc_t* other_descriptor;
     JackDriverDescFunction so_get_descriptor = NULL;
-    wchar_t filename[1024];
+    file_char_t filename[1024];
     JSList* node;
     void* dlhandle = NULL;
 
+#ifdef WIN32
     swprintf(filename, 1022, L"%S/%S", driver_dir, sofile);
+#else
+    snprintf(filename, 1022, "%s/%s", driver_dir, sofile);
+#endif
+    
     so_get_descriptor = (JackDriverDescFunction)check_symbol(sofile, symbol, driver_dir, &dlhandle);
 
     if (so_get_descriptor == NULL) {
@@ -470,8 +485,12 @@ static jack_driver_desc_t* jack_get_descriptor (JSList* drivers, const wchar_t* 
         }
     }
 
+#ifdef WIN32
     wcsncpy(descriptor->file, filename, JACK_PATH_MAX);
-
+#else
+    strncpy(descriptor->file, filename, JACK_PATH_MAX);
+#endif
+    
 error:
     if (dlhandle) {
         UnloadDriverModule(dlhandle);
