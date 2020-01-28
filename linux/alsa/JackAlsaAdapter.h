@@ -35,8 +35,8 @@ namespace Jack
 
     inline void* aligned_calloc ( size_t nmemb, size_t size ) { return ( void* ) calloc ( nmemb, size ); }
 
-#define max(x,y) (((x)>(y)) ? (x) : (y))
-#define min(x,y) (((x)<(y)) ? (x) : (y))
+#define jack_max(x,y) (((x)>(y)) ? (x) : (y))
+#define jack_min(x,y) (((x)<(y)) ? (x) : (y))
 
 #define check_error(err) if (err) { jack_error("%s:%d, alsa error %d : %s", __FILE__, __LINE__, err, snd_strerror(err)); return err; }
 #define check_error_msg(err,msg) if (err) { jack_error("%s:%d, %s : %s(%d)", __FILE__, __LINE__, msg, snd_strerror(err), err); return err; }
@@ -259,9 +259,9 @@ namespace Jack
                 }
 
                 //set floating point buffers needed by the dsp code
-                fSoftInputs = max ( fSoftInputs, fCardInputs );
+                fSoftInputs = jack_max ( fSoftInputs, fCardInputs );
                 assert ( fSoftInputs < 256 );
-                fSoftOutputs = max ( fSoftOutputs, fCardOutputs );
+                fSoftOutputs = jack_max ( fSoftOutputs, fCardOutputs );
                 assert ( fSoftOutputs < 256 );
 
                 for ( unsigned int i = 0; i < fSoftInputs; i++ )
@@ -447,7 +447,7 @@ namespace Jack
                                 for ( unsigned int c = 0; c < fCardOutputs; c++ )
                                 {
                                     jack_default_audio_sample_t x = fOutputSoftChannels[c][f];
-                                    buffer16b[c + f * fCardOutputs] = short(max(min (x, jack_default_audio_sample_t(1.0)), jack_default_audio_sample_t(-1.0)) * jack_default_audio_sample_t(SHRT_MAX));
+                                    buffer16b[c + f * fCardOutputs] = short(jack_max(jack_min (x, jack_default_audio_sample_t(1.0)), jack_default_audio_sample_t(-1.0)) * jack_default_audio_sample_t(SHRT_MAX));
                                 }
                             }
                         }
@@ -459,7 +459,7 @@ namespace Jack
                                 for ( unsigned int c = 0; c < fCardOutputs; c++ )
                                 {
                                     jack_default_audio_sample_t x = fOutputSoftChannels[c][f];
-                                    buffer32b[c + f * fCardOutputs] = int32_t(max(min(x, jack_default_audio_sample_t(1.0)), jack_default_audio_sample_t(-1.0)) * jack_default_audio_sample_t(INT_MAX));
+                                    buffer32b[c + f * fCardOutputs] = int32_t(jack_max(jack_min(x, jack_default_audio_sample_t(1.0)), jack_default_audio_sample_t(-1.0)) * jack_default_audio_sample_t(INT_MAX));
                                 }
                             }
                         }
@@ -481,7 +481,7 @@ namespace Jack
                                 for ( f = 0; f < fBuffering; f++ )
                                 {
                                     jack_default_audio_sample_t x = fOutputSoftChannels[c][f];
-                                    chan16b[f] = short(max(min (x, jack_default_audio_sample_t(1.0)), jack_default_audio_sample_t(-1.0)) * jack_default_audio_sample_t(SHRT_MAX));
+                                    chan16b[f] = short(jack_max(jack_min (x, jack_default_audio_sample_t(1.0)), jack_default_audio_sample_t(-1.0)) * jack_default_audio_sample_t(SHRT_MAX));
                                 }
                             }
                         }
@@ -493,7 +493,7 @@ namespace Jack
                                 for ( f = 0; f < fBuffering; f++ )
                                 {
                                     jack_default_audio_sample_t x = fOutputSoftChannels[c][f];
-                                    chan32b[f] = int32_t(max(min(x, jack_default_audio_sample_t(1.0)), jack_default_audio_sample_t(-1.0)) * jack_default_audio_sample_t(INT_MAX));
+                                    chan32b[f] = int32_t(jack_max(jack_min(x, jack_default_audio_sample_t(1.0)), jack_default_audio_sample_t(-1.0)) * jack_default_audio_sample_t(INT_MAX));
                                 }
                             }
                         }
