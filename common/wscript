@@ -408,7 +408,7 @@ def build(bld):
         features = 'subst_pc',
         source = '../jack.pc.in',
         target = 'jack.pc',
-        install_path = '${LIBDIR}/pkgconfig/',
+        install_path = '${PKGCONFDIR}',
         INCLUDEDIR = os.path.normpath(bld.env['PREFIX'] + '/include'),
         SERVERLIB = serverlib.target,
         )

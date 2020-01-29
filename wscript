@@ -61,6 +61,7 @@ def options(opt):
     opt.add_option('--htmldir', type='string', default=None, help='HTML documentation directory [Default: <prefix>/share/jack-audio-connection-kit/reference/html/')
     opt.add_option('--libdir', type='string', help='Library directory [Default: <prefix>/lib]')
     opt.add_option('--libdir32', type='string', help='32bit Library directory [Default: <prefix>/lib32]')
+    opt.add_option('--pkgconfigdir', type='string', help='pkg-config file directory [Default: <libdir>/pkgconfig]')
     opt.add_option('--mandir', type='string', help='Manpage directory [Default: <prefix>/share/man/man1]')
 
     # options affecting binaries
@@ -323,6 +324,11 @@ def configure(conf):
         conf.env['LIBDIR'] = Options.options.libdir
     else:
         conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib'
+
+    if Options.options.pkgconfigdir:
+        conf.env['PKGCONFDIR'] = Options.options.pkgconfigdir
+    else:
+        conf.env['PKGCONFDIR'] = conf.env['LIBDIR'] + '/pkgconfig'
 
     if Options.options.mandir:
         conf.env['MANDIR'] = Options.options.mandir
