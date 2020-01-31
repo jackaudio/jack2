@@ -34,7 +34,9 @@ using namespace std;
 namespace Jack
 {
 
-JackTransportEngine::JackTransportEngine(): JackAtomicArrayState<jack_position_t>()
+JackTransportEngine::JackTransportEngine(JackGlobals *global)
+    : JackAtomicArrayState<jack_position_t>()
+    , JackGlobalsInterface(global)
 {
     fTransportState = JackTransportStopped;
     fTransportCmd = fPreviousCmd = TransportCommandStop;
@@ -92,7 +94,7 @@ int JackTransportEngine::SetTimebaseMaster(int refnum, bool conditionnal)
 // RT
 bool JackTransportEngine::CheckAllRolling(JackClientInterface** table)
 {
-    for (int i = GetEngineControl()->fDriverNum; i < CLIENT_NUM; i++) {
+    for (int i = GetGlobal()->GetEngineControl()->fDriverNum; i < CLIENT_NUM; i++) {
         JackClientInterface* client = table[i];
         if (client && client->GetClientControl()->fTransportState != JackTransportRolling) {
             jack_log("CheckAllRolling ref = %ld is not rolling", i);
@@ -106,7 +108,7 @@ bool JackTransportEngine::CheckAllRolling(JackClientInterface** table)
 // RT
 void JackTransportEngine::MakeAllStartingLocating(JackClientInterface** table)
 {
-    for (int i = GetEngineControl()->fDriverNum; i < CLIENT_NUM; i++) {
+    for (int i = GetGlobal()->GetEngineControl()->fDriverNum; i < CLIENT_NUM; i++) {
         JackClientInterface* client = table[i];
         if (client) {
             JackClientControl* control = client->GetClientControl();
@@ -122,7 +124,7 @@ void JackTransportEngine::MakeAllStartingLocating(JackClientInterface** table)
 // RT
 void JackTransportEngine::MakeAllStopping(JackClientInterface** table)
 {
-    for (int i = GetEngineControl()->fDriverNum; i < CLIENT_NUM; i++) {
+    for (int i = GetGlobal()->GetEngineControl()->fDriverNum; i < CLIENT_NUM; i++) {
         JackClientInterface* client = table[i];
         if (client) {
             JackClientControl* control = client->GetClientControl();
@@ -137,7 +139,7 @@ void JackTransportEngine::MakeAllStopping(JackClientInterface** table)
 // RT
 void JackTransportEngine::MakeAllLocating(JackClientInterface** table)
 {
-    for (int i = GetEngineControl()->fDriverNum; i < CLIENT_NUM; i++) {
+    for (int i = GetGlobal()->GetEngineControl()->fDriverNum; i < CLIENT_NUM; i++) {
         JackClientInterface* client = table[i];
         if (client) {
             JackClientControl* control = client->GetClientControl();

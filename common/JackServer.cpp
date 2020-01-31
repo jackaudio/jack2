@@ -43,7 +43,8 @@ namespace Jack
 //----------------
 // Server control 
 //----------------
-JackServer::JackServer(bool sync, bool temporary, int timeout, bool rt, int priority, int port_max, bool verbose, jack_timer_type_t clock, char self_connect_mode, const char* server_name)
+JackServer::JackServer(bool sync, bool temporary, int timeout, bool rt, int priority, int port_max, bool verbose, jack_timer_type_t clock, char self_connect_mode, const char* server_name, JackServerGlobals *global)
+    : fGlobal(global)
 {
     if (rt) {
         jack_info("JACK server starting in realtime mode with priority %ld", priority);
@@ -53,8 +54,9 @@ JackServer::JackServer(bool sync, bool temporary, int timeout, bool rt, int prio
 
     jack_info("self-connect-mode is \"%s\"", jack_get_self_connect_mode_description(self_connect_mode));
 
-    fGraphManager = JackGraphManager::Allocate(port_max);
-    fEngineControl = new JackEngineControl(sync, temporary, timeout, rt, priority, verbose, clock, server_name);
+    fConnectionState.SetGlobal(global);
+    fGraphManager = JackGraphManager::Allocate(port_max, global);
+    fEngineControl = new JackEngineControl(sync, temporary, timeout, rt, priority, verbose, clock, server_name, global);
     fEngine = new JackLockedEngine(fGraphManager, GetSynchroTable(), fEngineControl, self_connect_mode);
 
     // A distinction is made between the threaded freewheel driver and the
@@ -196,14 +198,14 @@ bool JackServer::IsRunning()
 
 int JackServer::InternalClientLoad1(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, jack_uuid_t uuid, int* status)
 {
-    JackLoadableInternalClient* client = new JackLoadableInternalClient1(JackServerGlobals::fInstance, GetSynchroTable(), objet_data);
+    JackLoadableInternalClient* client = new JackLoadableInternalClient1(fGlobal, objet_data);
     assert(client);
     return InternalClientLoadAux(client, so_name, client_name, options, int_ref, uuid, status);
  }
 
 int JackServer::InternalClientLoad2(const char* client_name, const char* so_name, const JSList * parameters, int options, int* int_ref, jack_uuid_t uuid, int* status)
 {
-    JackLoadableInternalClient* client = new JackLoadableInternalClient2(JackServerGlobals::fInstance, GetSynchroTable(), parameters);
+    JackLoadableInternalClient* client = new JackLoadableInternalClient2(fGlobal, parameters);
     assert(client);
     return InternalClientLoadAux(client, so_name, client_name, options, int_ref, uuid, status);
 }

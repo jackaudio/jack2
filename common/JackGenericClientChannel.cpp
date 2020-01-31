@@ -25,8 +25,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
-JackGenericClientChannel::JackGenericClientChannel()
-{}
+JackGenericClientChannel::JackGenericClientChannel(JackGlobals *global)
+{
+    fGlobals = global;
+}
 
 JackGenericClientChannel::~JackGenericClientChannel()
 {}
@@ -52,8 +54,8 @@ void JackGenericClientChannel::ServerSyncCall(JackRequest* req, JackResult* res,
         *result = -1;
         return;
     }
-    
-    if (!JackGlobals::fServerRunning) {
+
+    if (!fGlobals->fServerRunning) {
         jack_error("Server is not running");
         *result = -1;
         return;
@@ -83,7 +85,7 @@ void JackGenericClientChannel::ServerAsyncCall(JackRequest* req, JackResult* res
         return;
     }
     
-    if (!JackGlobals::fServerRunning) {
+    if (!fGlobals->fServerRunning) {
         jack_error("Server is not running");
         *result = -1;
         return;

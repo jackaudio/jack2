@@ -65,9 +65,6 @@ static jack_client_t * jack_client_open_aux (const char *client_name,
             jack_options_t options,
             jack_status_t *status, va_list ap);
 
-JackLibGlobals* JackLibGlobals::fGlobals = NULL;
-int JackLibGlobals::fClientCount = 0;
-
 jack_client_t* jack_client_new_aux(const char* client_name, jack_options_t options, jack_status_t* status)
 {
     jack_varargs_t va;          /* variable arguments */
@@ -95,24 +92,28 @@ jack_client_t* jack_client_new_aux(const char* client_name, jack_options_t optio
     /* parse variable arguments */
     jack_varargs_init(&va);
 
-    JackLibGlobals::Init(); // jack library initialisation
+    JackLibGlobals *global = JackGlobalsManager::Instance()->CreateGlobal<JackLibGlobals>(va.server_name);
+    if (global == nullptr) {
+        jack_error("jack failed to create global context");
+        return 0;
+    }
 
     if (try_start_server(&va, options, status)) {
         jack_error("jack server is not running or cannot be started");
-        JackLibGlobals::Destroy(); // jack library destruction
+        JackGlobalsManager::Instance()->DestroyGlobal(va.server_name); // jack library destruction
         return 0;
     }
 
     if (JACK_DEBUG) {
-        client = new JackDebugClient(new JackLibClient(GetSynchroTable())); // Debug mode
+        client = new JackDebugClient(new JackLibClient(global)); // Debug mode
     } else {
-        client = new JackLibClient(GetSynchroTable());
+        client = new JackLibClient(global);
     }
 
     int res = client->Open(va.server_name, client_name, va.session_id, options, status);
     if (res < 0) {
         delete client;
-        JackLibGlobals::Destroy(); // jack library destruction
+        JackGlobalsManager::Instance()->DestroyGlobal(va.server_name); // jack library destruction
         int my_status1 = (JackFailure | JackServerError);
         *status = (jack_status_t)my_status1;
         return NULL;
@@ -148,24 +149,28 @@ static jack_client_t* jack_client_open_aux(const char* client_name, jack_options
     /* parse variable arguments */
     jack_varargs_parse(options, ap, &va);
 
-    JackLibGlobals::Init(); // jack library initialisation
+    JackLibGlobals *global = JackGlobalsManager::Instance()->CreateGlobal<JackLibGlobals>(va.server_name);
+    if (global == nullptr) {
+        jack_error("jack failed to create global context");
+        return 0;
+    }
 
     if (try_start_server(&va, options, status)) {
         jack_error("jack server is not running or cannot be started");
-        JackLibGlobals::Destroy(); // jack library destruction
+        JackGlobalsManager::Instance()->DestroyGlobal(va.server_name); // jack library destruction
         return 0;
     }
 
     if (JACK_DEBUG) {
-        client = new JackDebugClient(new JackLibClient(GetSynchroTable())); // Debug mode
+        client = new JackDebugClient(new JackLibClient(global)); // Debug mode
     } else {
-        client = new JackLibClient(GetSynchroTable());
+        client = new JackLibClient(global);
     }
 
     int res = client->Open(va.server_name, client_name, va.session_id, options, status);
     if (res < 0) {
         delete client;
-        JackLibGlobals::Destroy(); // jack library destruction
+        JackGlobalsManager::Instance()->DestroyGlobal(va.server_name); // jack library destruction
         int my_status1 = (JackFailure | JackServerError);
         *status = (jack_status_t)my_status1;
         return NULL;
@@ -209,8 +214,8 @@ LIB_EXPORT int jack_client_close(jack_client_t* ext_client)
         jack_error("jack_client_close called with a NULL client");
     } else {
         res = client->Close();
+        JackGlobalsManager::Instance()->DestroyGlobal(client->GetGlobal()->fServerName); // jack library destruction
         delete client;
-        JackLibGlobals::Destroy(); // jack library destruction
         jack_log("jack_client_close res = %d", res);
     }
     JackGlobals::fOpenMutex->Unlock();

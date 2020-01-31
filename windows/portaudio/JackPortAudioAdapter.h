@@ -26,6 +26,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 namespace Jack
 {
+    class JackClient;
 
     /*!
     \brief Audio adapter using PortAudio API.
@@ -49,7 +50,7 @@ namespace Jack
 
     public:
 
-        JackPortAudioAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params);
+        JackPortAudioAdapter(JackClient &jack_client, jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params);
         ~JackPortAudioAdapter()
         {}
 

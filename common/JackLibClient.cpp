@@ -27,40 +27,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
-// Used for external C API (JackAPI.cpp)
-JackGraphManager* GetGraphManager()
-{
-    if (JackLibGlobals::fGlobals) {
-        return JackLibGlobals::fGlobals->fGraphManager;
-    } else {
-        return NULL;
-    }
-}
-
-JackEngineControl* GetEngineControl()
-{
-    if (JackLibGlobals::fGlobals) {
-        return JackLibGlobals::fGlobals->fEngineControl;
-    } else {
-        return NULL;
-    }
-}
-
-JackSynchro* GetSynchroTable()
-{
-    return (JackLibGlobals::fGlobals ? JackLibGlobals::fGlobals->fSynchroTable : 0);
-}
-
-// Used for client-side Metadata API (JackLibAPI.cpp)
-JackMetadata* GetMetadata()
-{
-    if (JackLibGlobals::fGlobals) {
-        return JackLibGlobals::fGlobals->fMetadata;
-    } else {
-        return NULL;
-    }
-}
-
 //-------------------
 // Client management
 //-------------------
@@ -75,14 +41,14 @@ ShutDown is called:
 void JackLibClient::ShutDown(jack_status_t code, const char* message)
 {
     jack_log("JackLibClient::ShutDown");
-    JackGlobals::fServerRunning = false;
+    GetGlobal()->fServerRunning = false;
     JackClient::ShutDown(code, message);
 }
 
-JackLibClient::JackLibClient(JackSynchro* table): JackClient(table)
+JackLibClient::JackLibClient(JackGlobals* global): JackClient(global)
 {
-    jack_log("JackLibClient::JackLibClient table = %x", table);
-    fChannel = new JackClientChannel();
+    jack_log("JackLibClient::JackLibClient table = %x", global->GetSynchroTable());
+    fChannel = new JackClientChannel(global);
 }
 
 JackLibClient::~JackLibClient()
@@ -129,8 +95,10 @@ int JackLibClient::Open(const char* server_name, const char* name, jack_uuid_t u
 
     try {
         // Map shared memory segments
-        JackLibGlobals::fGlobals->fEngineControl.SetShmIndex(shared_engine, fServerName);
-        JackLibGlobals::fGlobals->fGraphManager.SetShmIndex(shared_graph, fServerName);
+        JackLibGlobals *lib_globals = dynamic_cast<Jack::JackLibGlobals*>(GetGlobal());
+        assert(lib_globals);
+        lib_globals->fEngineControl.SetShmIndex(shared_engine, fServerName);
+        lib_globals->fGraphManager.SetShmIndex(shared_graph, fServerName);
         fClientControl.SetShmIndex(shared_client, fServerName);
         JackGlobals::fVerbose = GetEngineControl()->fVerbose;
     } catch (...) {
@@ -141,16 +109,16 @@ int JackLibClient::Open(const char* server_name, const char* name, jack_uuid_t u
     SetupDriverSync(false);
 
     // Connect shared synchro : the synchro must be usable in I/O mode when several clients live in the same process
-    assert(JackGlobals::fSynchroMutex);
-    JackGlobals::fSynchroMutex->Lock();
+    assert(GetGlobal()->fSynchroMutex);
+    GetGlobal()->fSynchroMutex->Lock();
     res = fSynchroTable[GetClientControl()->fRefNum].Connect(name_res, fServerName);
-    JackGlobals::fSynchroMutex->Unlock();
+    GetGlobal()->fSynchroMutex->Unlock();
     if (!res) {
         jack_error("Cannot ConnectSemaphore %s client", name_res);
         goto error;
     }
 
-    JackGlobals::fClientTable[GetClientControl()->fRefNum] = this;
+    GetGlobal()->fClientTable[GetClientControl()->fRefNum] = this;
     SetClockSource(GetEngineControl()->fClockSource);
     jack_log("JackLibClient::Open name = %s refnum = %ld", name_res, GetClientControl()->fRefNum);
     return 0;
@@ -167,8 +135,8 @@ error:
 int JackLibClient::ClientNotifyImp(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2)
 {
     int res = 0;
-    assert(JackGlobals::fSynchroMutex);
-    JackGlobals::fSynchroMutex->Lock();
+    assert(GetGlobal()->fSynchroMutex);
+    GetGlobal()->fSynchroMutex->Lock();
 
     // Done all time
     switch (notify) {
@@ -187,20 +155,20 @@ int JackLibClient::ClientNotifyImp(int refnum, const char* name, int notify, int
             break;
     }
 
-    JackGlobals::fSynchroMutex->Unlock();
+    GetGlobal()->fSynchroMutex->Unlock();
     return res;
 }
 
 JackGraphManager* JackLibClient::GetGraphManager() const
 {
-    assert(JackLibGlobals::fGlobals->fGraphManager);
-    return JackLibGlobals::fGlobals->fGraphManager;
+    assert(GetGlobal()->GetGraphManager());
+    return GetGlobal()->GetGraphManager();
 }
 
 JackEngineControl* JackLibClient::GetEngineControl() const
 {
-    assert(JackLibGlobals::fGlobals->fEngineControl);
-    return JackLibGlobals::fGlobals->fEngineControl;
+    assert(GetGlobal()->GetEngineControl());
+    return GetGlobal()->GetEngineControl();
 }
 
 JackClientControl* JackLibClient::GetClientControl() const

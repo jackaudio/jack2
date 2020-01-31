@@ -21,6 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackServerGlobals.h"
 #include "JackEngineControl.h"
 #include "JackArgParser.h"
+#include "JackClient.h"
 #include <assert.h>
 
 namespace Jack
@@ -245,9 +246,10 @@ namespace Jack
         SetAdaptedSampleRate(fParams.fSampleRate);
 
         // Will do "something" on OSX only...
-        fThread.SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
+        JackEngineControl *control = ((JackClient*)fClient)->GetGlobal()->GetEngineControl();
+        fThread.SetParams(control->fPeriod, control->fComputation, control->fConstraint);
 
-        if (fThread.AcquireSelfRealTime(GetEngineControl()->fClientPriority) < 0) {
+        if (fThread.AcquireSelfRealTime(control->fClientPriority) < 0) {
             jack_error("AcquireSelfRealTime error");
         } else {
             set_threaded_log_function();

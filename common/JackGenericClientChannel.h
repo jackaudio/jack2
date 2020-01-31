@@ -27,6 +27,7 @@ namespace Jack
 
 struct JackRequest;
 struct JackResult;
+class JackGlobals;
 
 /*!
 \brief Generic JackClientChannel class.
@@ -37,6 +38,8 @@ class JackGenericClientChannel : public detail::JackClientChannelInterface
 
     protected:
 
+        JackGlobals *fGlobals;
+
         detail::JackClientRequestInterface* fRequest;
 
         void ServerSyncCall(JackRequest* req, JackResult* res, int* result);
@@ -44,7 +47,7 @@ class JackGenericClientChannel : public detail::JackClientChannelInterface
 
     public:
 
-        JackGenericClientChannel();
+        JackGenericClientChannel(JackGlobals *global);
         virtual ~JackGenericClientChannel();
 
         virtual int Open(const char* server_name, const char* name, jack_uuid_t uuid, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status) { return -1; }

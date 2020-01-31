@@ -26,7 +26,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackDriverLoader.h"
 #include "JackDriverInfo.h"
 #include "JackConnectionManager.h"
-#include "JackGlobals.h"
 #include "JackPlatformPlug.h"
 #include "jslist.h"
 
@@ -38,6 +37,7 @@ class JackDriverClientInterface;
 struct JackEngineControl;
 class JackLockedEngine;
 class JackLoadableInternalClient;
+class JackServerGlobals;
 
 /*!
 \brief The Jack server.
@@ -60,11 +60,13 @@ class SERVER_EXPORT JackServer
         JackSynchro fSynchroTable[CLIENT_NUM];
         bool fFreewheel;
 
+        JackServerGlobals *fGlobal;
+
         int InternalClientLoadAux(JackLoadableInternalClient* client, const char* so_name, const char* client_name, int options, int* int_ref, jack_uuid_t uuid, int* status);
 
     public:
 
-        JackServer(bool sync, bool temporary, int timeout, bool rt, int priority, int port_max, bool verbose, jack_timer_type_t clock, char self_connect_mode, const char* server_name);
+        JackServer(bool sync, bool temporary, int timeout, bool rt, int priority, int port_max, bool verbose, jack_timer_type_t clock, char self_connect_mode, const char* server_name, JackServerGlobals* global);
         ~JackServer();
 
         // Server control

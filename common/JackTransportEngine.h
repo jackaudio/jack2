@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "JackAtomicArrayState.h"
 #include "JackCompilerDeps.h"
+#include "JackGlobals.h"
 #include "types.h"
 
 namespace Jack
@@ -90,7 +91,7 @@ We have:
 class JackClientInterface;
 
 PRE_PACKED_STRUCTURE
-class SERVER_EXPORT JackTransportEngine : public JackAtomicArrayState<jack_position_t>
+class SERVER_EXPORT JackTransportEngine : public JackAtomicArrayState<jack_position_t>, public JackGlobalsInterface
 {
 
     private:
@@ -115,7 +116,7 @@ class SERVER_EXPORT JackTransportEngine : public JackAtomicArrayState<jack_posit
 
     public:
 
-        JackTransportEngine();
+        JackTransportEngine(JackGlobals *global);
 
         ~JackTransportEngine()
         {}

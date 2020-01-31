@@ -24,6 +24,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackDriverLoader.h"
 #include "JackCompilerDeps.h"
 #include "JackServer.h"
+#include "JackGlobals.h"
 #include <map>
 
 namespace Jack
@@ -35,8 +36,16 @@ class JackClient;
 \brief Global server static structure: singleton kind of pattern.
 */
 
-class SERVER_EXPORT JackServerGlobals
+class SERVER_EXPORT JackServerGlobals : public JackGlobals
 {
+
+    /* This object is managed by JackGlobalsManager */
+    friend class JackGlobalsManager;
+
+    private:
+
+    JackServerGlobals(const std::string &server_name) : JackGlobals(server_name) {}
+    ~JackServerGlobals() override {}
 
     public:
 
@@ -49,25 +58,38 @@ class SERVER_EXPORT JackServerGlobals
         static void (* on_device_release)(const char* device_name);
         static void (* on_device_reservation_loop)(void);
 
-        JackServerGlobals();
-        ~JackServerGlobals();
+        bool Init();
+        void Deinit();
+        int Start(const char* server_name,
+                  jack_driver_desc_t* driver_desc,
+                  JSList* driver_params,
+                  int sync,
+                  int temporary,
+                  int time_out_ms,
+                  int rt,
+                  int priority,
+                  int port_max,
+                  int verbose,
+                  jack_timer_type_t clock,
+                  char self_connect_mode);
+        void Stop();
+        void Destroy();
 
-        static bool Init();
-        static void Destroy();
-        static int Start(const char* server_name,
-                         jack_driver_desc_t* driver_desc,
-                         JSList* driver_params,
-                         int sync,
-                         int temporary,
-                         int time_out_ms,
-                         int rt,
-                         int priority,
-                         int port_max,
-                         int verbose,
-                         jack_timer_type_t clock,
-                         char self_connect_mode);
-        static void Stop();
-        static void Delete();
+        bool AddContext(const uint32_t &context_num, const std::string &server_name) override
+        {
+            return true;
+        }
+
+        bool DelContext(const uint32_t &context_num) override
+        {
+            return true;
+        }
+
+        JackGraphManager* GetGraphManager() override;
+        JackEngineControl* GetEngineControl() override;
+        JackSynchro* GetSynchroTable() override;
+        JackServer* GetServer() override;
+
 };
 
 } // end of namespace

@@ -74,22 +74,32 @@ jack_client_t* jack_client_new_aux(const char* client_name, jack_options_t optio
     /* parse variable arguments */
     jack_varargs_init(&va);
 
-    if (!JackServerGlobals::Init()) { // jack server initialisation
+    // jack server init and start
+    JackServerGlobals *global = JackGlobalsManager::Instance()->CreateGlobal<JackServerGlobals>(va.server_name);
+    if (global == nullptr) {
+        int my_status1 = (JackFailure | JackServerError);
+        *status = (jack_status_t)my_status1;
+        return NULL;
+    }
+
+    if (!global->Init()) {
+        JackGlobalsManager::Instance()->DestroyGlobal(va.server_name);
         int my_status1 = (JackFailure | JackServerError);
         *status = (jack_status_t)my_status1;
         return NULL;
     }
 
     if (JACK_DEBUG) {
-        client = new JackDebugClient(new JackInternalClient(JackServerGlobals::fInstance, GetSynchroTable())); // Debug mode
+        client = new JackDebugClient(new JackInternalClient(global)); // Debug mode
     } else {
-        client = new JackInternalClient(JackServerGlobals::fInstance, GetSynchroTable());
+        client = new JackInternalClient(global);
     }
 
     int res = client->Open(va.server_name, client_name, va.session_id, options, status);
     if (res < 0) {
         delete client;
-        JackServerGlobals::Destroy(); // jack server destruction
+        // jack server stop and destruction
+        JackGlobalsManager::Instance()->DestroyGlobal(va.server_name);
         int my_status1 = (JackFailure | JackServerError);
         *status = (jack_status_t)my_status1;
         return NULL;
@@ -125,22 +135,30 @@ jack_client_t* jack_client_open_aux(const char* client_name, jack_options_t opti
     /* parse variable arguments */
     jack_varargs_parse(options, ap, &va);
 
-    if (!JackServerGlobals::Init()) { // jack server initialisation
+    JackServerGlobals *global = JackGlobalsManager::Instance()->CreateGlobal<JackServerGlobals>(va.server_name);
+    if (global == nullptr) {
+        int my_status1 = (JackFailure | JackServerError);
+        *status = (jack_status_t)my_status1;
+        return NULL;
+    }
+
+    if (!global->Init()) {
+        JackGlobalsManager::Instance()->DestroyGlobal(va.server_name);
         int my_status1 = (JackFailure | JackServerError);
         *status = (jack_status_t)my_status1;
         return NULL;
     }
 
     if (JACK_DEBUG) {
-        client = new JackDebugClient(new JackInternalClient(JackServerGlobals::fInstance, GetSynchroTable())); // Debug mode
+        client = new JackDebugClient(new JackInternalClient(global)); // Debug mode
     } else {
-        client = new JackInternalClient(JackServerGlobals::fInstance, GetSynchroTable());
+        client = new JackInternalClient(global);
     }
 
     int res = client->Open(va.server_name, client_name, va.session_id, options, status);
     if (res < 0) {
         delete client;
-        JackServerGlobals::Destroy(); // jack server destruction
+        JackGlobalsManager::Instance()->DestroyGlobal(va.server_name);
         int my_status1 = (JackFailure | JackServerError);
         *status = (jack_status_t)my_status1;
         return NULL;
@@ -184,8 +202,8 @@ SERVER_EXPORT int jack_client_close(jack_client_t* ext_client)
         jack_error("jack_client_close called with a NULL client");
     } else {
         res = client->Close();
+        JackGlobalsManager::Instance()->DestroyGlobal(client->GetGlobal()->fServerName);
         delete client;
-        JackServerGlobals::Destroy();   // jack server destruction
         jack_log("jack_client_close res = %d", res);
     }
     JackGlobals::fOpenMutex->Unlock();

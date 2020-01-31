@@ -24,6 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackTypes.h"
 #include "JackConstants.h"
 #include "JackShmMem.h"
+#include "JackGlobals.h"
 
 namespace Jack
 {
@@ -111,6 +112,8 @@ class SERVER_EXPORT JackEngineProfiling
 
     private:
 
+        JackGlobals* fGlobal;
+
         JackTimingMeasure fProfileTable[TIME_POINTS];
         JackTimingClientInterval fIntervalTable[MEASURED_CLIENTS];
 
@@ -121,7 +124,7 @@ class SERVER_EXPORT JackEngineProfiling
 
     public:
 
-        JackEngineProfiling();
+        JackEngineProfiling(JackGlobals *global);
         ~JackEngineProfiling();
 
         void Profile(JackClientInterface** table, 

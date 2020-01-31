@@ -291,7 +291,7 @@ static inline bool CheckBufferSize(jack_nframes_t buffer_size)
     return (buffer_size >= 1 && buffer_size <= BUFFER_SIZE_MAX);
 }
 
-static inline void WaitGraphChange()
+static inline void WaitGraphChange(JackGlobals *globals)
 {
     /*
     TLS key that is set only in RT thread, so never waits for pending
@@ -299,8 +299,8 @@ static inline void WaitGraphChange()
     */
 
     if (jack_tls_get(JackGlobals::fRealTimeThread) == NULL) {
-        JackGraphManager* manager = GetGraphManager();
-        JackEngineControl* control = GetEngineControl();
+        JackGraphManager* manager = globals->GetGraphManager();
+        JackEngineControl* control = globals->GetEngineControl();
         assert(manager);
         assert(control);
         if (manager->IsPendingChange()) {
@@ -353,7 +353,12 @@ LIB_EXPORT void* jack_port_get_buffer(jack_port_t* port, jack_nframes_t frames)
         jack_error("jack_port_get_buffer called with an incorrect port %ld", myport);
         return NULL;
     } else {
-        JackGraphManager* manager = GetGraphManager();
+        JackGlobals *global = JackGlobals::PortGlobal(port);
+        if (!global) {
+            jack_error("jack_port_get_buffer called with invalid context (port %ld)", myport);
+            return NULL;
+        }
+        JackGraphManager* manager = global->GetGraphManager();
         return (manager ? manager->GetBuffer(myport, frames) : NULL);
     }
 }
@@ -380,7 +385,8 @@ LIB_EXPORT const char* jack_port_name(const jack_port_t* port)
         jack_error("jack_port_name called with an incorrect port %ld", myport);
         return NULL;
     } else {
-        JackGraphManager* manager = GetGraphManager();
+        JackGlobals *global = JackGlobals::PortGlobal(port);
+        JackGraphManager* manager = global->GetGraphManager();
         return (manager ? manager->GetPort(myport)->GetName() : NULL);
     }
 }
@@ -394,7 +400,8 @@ LIB_EXPORT const char* jack_port_short_name(const jack_port_t* port)
         jack_error("jack_port_short_name called with an incorrect port %ld", myport);
         return NULL;
     } else {
-        JackGraphManager* manager = GetGraphManager();
+        JackGlobals *global = JackGlobals::PortGlobal(port);
+        JackGraphManager* manager = global->GetGraphManager();
         return (manager ? manager->GetPort(myport)->GetShortName() : NULL);
     }
 }
@@ -408,7 +415,8 @@ LIB_EXPORT int jack_port_flags(const jack_port_t* port)
         jack_error("jack_port_flags called with an incorrect port %ld", myport);
         return -1;
     } else {
-        JackGraphManager* manager = GetGraphManager();
+        JackGlobals *global = JackGlobals::PortGlobal(port);
+        JackGraphManager* manager = global->GetGraphManager();
         return (manager ? manager->GetPort(myport)->GetFlags() : -1);
     }
 }
@@ -422,7 +430,8 @@ LIB_EXPORT const char* jack_port_type(const jack_port_t* port)
         jack_error("jack_port_flags called an incorrect port %ld", myport);
         return NULL;
     } else {
-        JackGraphManager* manager = GetGraphManager();
+        JackGlobals *global = JackGlobals::PortGlobal(port);
+        JackGraphManager* manager = global->GetGraphManager();
         return (manager ? manager->GetPort(myport)->GetType() : NULL);
     }
 }
@@ -436,7 +445,8 @@ LIB_EXPORT jack_port_type_id_t jack_port_type_id(const jack_port_t *port)
         jack_error("jack_port_type_id called an incorrect port %ld", myport);
         return 0;
     } else {
-        JackGraphManager* manager = GetGraphManager();
+        JackGlobals *global = JackGlobals::PortGlobal(port);
+        JackGraphManager* manager = global->GetGraphManager();
         return (manager ? GetPortTypeId(manager->GetPort(myport)->GetType()) : 0);
     }
 }
@@ -450,8 +460,9 @@ LIB_EXPORT int jack_port_connected(const jack_port_t* port)
         jack_error("jack_port_connected called with an incorrect port %ld", myport);
         return -1;
     } else {
-        WaitGraphChange();
-        JackGraphManager* manager = GetGraphManager();
+        JackGlobals *global = JackGlobals::PortGlobal(port);
+        WaitGraphChange(global);
+        JackGraphManager* manager = global->GetGraphManager();
         return (manager ? manager->GetConnectionsNum(myport) : -1);
     }
 }
@@ -468,8 +479,9 @@ LIB_EXPORT int jack_port_connected_to(const jack_port_t* port, const char* port_
         jack_error("jack_port_connected_to called with a NULL port name");
         return -1;
     } else {
-        WaitGraphChange();
-        JackGraphManager* manager = GetGraphManager();
+        JackGlobals *global = JackGlobals::PortGlobal(port);
+        WaitGraphChange(global);
+        JackGraphManager* manager = global->GetGraphManager();
         jack_port_id_t dst = (manager ? manager->GetPort(port_name) : NO_PORT);
         if (dst == NO_PORT) {
             jack_error("Unknown destination port port_name = %s", port_name);
@@ -494,7 +506,12 @@ LIB_EXPORT int jack_port_tie(jack_port_t* src, jack_port_t* dst)
         jack_error("jack_port_tie called with a NULL dst port");
         return -1;
     }
-    JackGraphManager* manager = GetGraphManager();
+    if (JackGlobals::PortContext(src) != JackGlobals::PortContext(dst)) {
+        jack_error("jack_port_tie called with ports not belonging to the same context");
+        return -1;
+    }
+    JackGlobals *global = JackGlobals::PortGlobal(src);
+    JackGraphManager* manager = global->GetGraphManager();
     if (manager && manager->GetPort(mysrc)->GetRefNum() != manager->GetPort(mydst)->GetRefNum()) {
         jack_error("jack_port_tie called with ports not belonging to the same client");
         return -1;
@@ -512,7 +529,8 @@ LIB_EXPORT int jack_port_untie(jack_port_t* port)
         jack_error("jack_port_untie called with an incorrect port %ld", myport);
         return -1;
     } else {
-        JackGraphManager* manager = GetGraphManager();
+        JackGlobals *global = JackGlobals::PortGlobal(port);
+        JackGraphManager* manager = global->GetGraphManager();
         return (manager ? manager->GetPort(myport)->UnTie() : -1);
     }
 }
@@ -526,8 +544,9 @@ LIB_EXPORT jack_nframes_t jack_port_get_latency(jack_port_t* port)
         jack_error("jack_port_get_latency called with an incorrect port %ld", myport);
         return 0;
     } else {
-        WaitGraphChange();
-        JackGraphManager* manager = GetGraphManager();
+        JackGlobals *global = JackGlobals::PortGlobal(port);
+        WaitGraphChange(global);
+        JackGraphManager* manager = global->GetGraphManager();
         return (manager ? manager->GetPort(myport)->GetLatency() : 0);
     }
 }
@@ -540,7 +559,8 @@ LIB_EXPORT void jack_port_set_latency(jack_port_t* port, jack_nframes_t frames)
     if (!CheckPort(myport)) {
         jack_error("jack_port_set_latency called with an incorrect port %ld", myport);
     } else {
-        JackGraphManager* manager = GetGraphManager();
+        JackGlobals *global = JackGlobals::PortGlobal(port);
+        JackGraphManager* manager = global->GetGraphManager();
         if (manager)
             manager->GetPort(myport)->SetLatency(frames);
     }
@@ -554,8 +574,9 @@ LIB_EXPORT void jack_port_get_latency_range(jack_port_t *port, jack_latency_call
     if (!CheckPort(myport)) {
         jack_error("jack_port_get_latency_range called with an incorrect port %ld", myport);
     } else {
-        WaitGraphChange();
-        JackGraphManager* manager = GetGraphManager();
+        JackGlobals *global = JackGlobals::PortGlobal(port);
+        WaitGraphChange(global);
+        JackGraphManager* manager = global->GetGraphManager();
         if (manager)
             manager->GetPort(myport)->GetLatencyRange(mode, range);
     }
@@ -569,8 +590,9 @@ LIB_EXPORT void jack_port_set_latency_range(jack_port_t *port, jack_latency_call
     if (!CheckPort(myport)) {
         jack_error("jack_port_set_latency_range called with an incorrect port %ld", myport);
     } else {
-        WaitGraphChange();
-        JackGraphManager* manager = GetGraphManager();
+        JackGlobals *global = JackGlobals::PortGlobal(port);
+        WaitGraphChange(global);
+        JackGraphManager* manager = global->GetGraphManager();
         if (manager)
             manager->GetPort(myport)->SetLatencyRange(mode, range);
     }
@@ -590,8 +612,9 @@ LIB_EXPORT int jack_recompute_total_latency(jack_client_t* ext_client, jack_port
         jack_error("jack_recompute_total_latency called with a NULL port");
         return -1;
     } else {
-        WaitGraphChange();
-        JackGraphManager* manager = GetGraphManager();
+        JackGlobals *global = JackGlobals::PortGlobal(port);
+        WaitGraphChange(global);
+        JackGraphManager* manager = global->GetGraphManager();
         return (manager ? manager->ComputeTotalLatency(myport) : -1);
     }
 }
@@ -617,7 +640,8 @@ LIB_EXPORT int jack_port_set_name(jack_port_t* port, const char* name)
     // Find a valid client
     jack_client_t* client = NULL;
     for (int i = 0; i < CLIENT_NUM; i++) {
-        if ((client = (jack_client_t*)JackGlobals::fClientTable[i])) {
+        JackGlobals *global = JackGlobals::PortGlobal(port);
+        if ((client = (jack_client_t*)global->fClientTable[i])) {
             break;
         }
     }
@@ -657,7 +681,8 @@ LIB_EXPORT int jack_port_set_alias(jack_port_t* port, const char* name)
         jack_error("jack_port_set_alias called with a NULL port name");
         return -1;
     } else {
-        JackGraphManager* manager = GetGraphManager();
+        JackGlobals *global = JackGlobals::PortGlobal(port);
+        JackGraphManager* manager = global->GetGraphManager();
         return (manager ? manager->GetPort(myport)->SetAlias(name) : -1);
     }
 }
@@ -674,7 +699,8 @@ LIB_EXPORT int jack_port_unset_alias(jack_port_t* port, const char* name)
         jack_error("jack_port_unset_alias called with a NULL port name");
         return -1;
     } else {
-        JackGraphManager* manager = GetGraphManager();
+        JackGlobals *global = JackGlobals::PortGlobal(port);
+        JackGraphManager* manager = global->GetGraphManager();
         return (manager ? manager->GetPort(myport)->UnsetAlias(name) : -1);
     }
 }
@@ -688,7 +714,8 @@ LIB_EXPORT int jack_port_get_aliases(const jack_port_t* port, char* const aliase
         jack_error("jack_port_get_aliases called with an incorrect port %ld", myport);
         return -1;
     } else {
-        JackGraphManager* manager = GetGraphManager();
+        JackGlobals *global = JackGlobals::PortGlobal(port);
+        JackGraphManager* manager = global->GetGraphManager();
         return (manager ? manager->GetPort(myport)->GetAliases(aliases) : -1);
     }
 }
@@ -702,7 +729,8 @@ LIB_EXPORT int jack_port_request_monitor(jack_port_t* port, int onoff)
         jack_error("jack_port_request_monitor called with an incorrect port %ld", myport);
         return -1;
     } else {
-        JackGraphManager* manager = GetGraphManager();
+        JackGlobals *global = JackGlobals::PortGlobal(port);
+        JackGraphManager* manager = global->GetGraphManager();
         return (manager ? manager->RequestMonitor(myport, onoff) : -1);
     }
 }
@@ -716,7 +744,7 @@ LIB_EXPORT int jack_port_request_monitor_by_name(jack_client_t* ext_client, cons
         jack_error("jack_port_request_monitor_by_name called with a NULL client");
         return -1;
     } else {
-        JackGraphManager* manager = GetGraphManager();
+        JackGraphManager* manager = client->GetGlobal()->GetGraphManager();
         if (!manager)
             return -1;
         jack_port_id_t myport = manager->GetPort(port_name);
@@ -738,7 +766,8 @@ LIB_EXPORT int jack_port_ensure_monitor(jack_port_t* port, int onoff)
         jack_error("jack_port_ensure_monitor called with an incorrect port %ld", myport);
         return -1;
     } else {
-        JackGraphManager* manager = GetGraphManager();
+        JackGlobals *global = JackGlobals::PortGlobal(port);
+        JackGraphManager* manager = global ? global->GetGraphManager() : nullptr;
         return (manager ? manager->GetPort(myport)->EnsureMonitor(onoff) : -1);
     }
 }
@@ -752,7 +781,8 @@ LIB_EXPORT int jack_port_monitoring_input(jack_port_t* port)
         jack_error("jack_port_monitoring_input called with an incorrect port %ld", myport);
         return -1;
     } else {
-        JackGraphManager* manager = GetGraphManager();
+        JackGlobals *global = JackGlobals::PortGlobal(port);
+        JackGraphManager* manager = global ? global->GetGraphManager() : nullptr;
         return (manager ? manager->GetPort(myport)->MonitoringInput() : -1);
     }
 }
@@ -766,7 +796,7 @@ LIB_EXPORT int jack_is_realtime(jack_client_t* ext_client)
         jack_error("jack_is_realtime called with a NULL client");
         return -1;
     } else {
-        JackEngineControl* control = GetEngineControl();
+        JackEngineControl* control = client->GetGlobal()->GetEngineControl();
         return (control ? control->fRealTime : -1);
     }
 }
@@ -1071,7 +1101,9 @@ LIB_EXPORT jack_port_t* jack_port_register(jack_client_t* ext_client, const char
         jack_error("jack_port_register called with a NULL port name or a NULL port_type");
         return NULL;
     } else {
-        return (jack_port_t *)((uintptr_t)client->PortRegister(port_name, port_type, flags, buffer_size));
+        JackGlobals* global =client->GetGlobal();
+        jack_port_id_t port_id = (jack_port_id_t)((uintptr_t)client->PortRegister(port_name, port_type, flags, buffer_size));
+        return global->PortById(port_id);
     }
 }
 
@@ -1118,8 +1150,9 @@ LIB_EXPORT const char** jack_port_get_connections(const jack_port_t* port)
         jack_error("jack_port_get_connections called with an incorrect port %ld", myport);
         return NULL;
     } else {
-        WaitGraphChange();
-        JackGraphManager* manager = GetGraphManager();
+        JackGlobals *global = JackGlobals::PortGlobal(port);
+        WaitGraphChange(global);
+        JackGraphManager* manager = global->GetGraphManager();
         return (manager ? manager->GetConnections(myport) : NULL);
     }
 }
@@ -1140,8 +1173,9 @@ LIB_EXPORT const char** jack_port_get_all_connections(const jack_client_t* ext_c
         jack_error("jack_port_get_all_connections called with an incorrect port %ld", myport);
         return NULL;
     } else {
-        WaitGraphChange();
-        JackGraphManager* manager = GetGraphManager();
+        JackGlobals *global = JackGlobals::PortGlobal(port);
+        WaitGraphChange(global);
+        JackGraphManager* manager = global->GetGraphManager();
         return (manager ? manager->GetConnections(myport) : NULL);
     }
 }
@@ -1161,8 +1195,9 @@ LIB_EXPORT jack_nframes_t jack_port_get_total_latency(jack_client_t* ext_client,
         jack_error("jack_port_get_total_latency called with an incorrect port %ld", myport);
         return 0;
     } else {
-        WaitGraphChange();
-        JackGraphManager* manager = GetGraphManager();
+        JackGlobals *global = JackGlobals::PortGlobal(port);
+        WaitGraphChange(global);
+        JackGraphManager* manager = global->GetGraphManager();
         if (manager) {
             manager->ComputeTotalLatency(myport);
             return manager->GetPort(myport)->GetTotalLatency();
@@ -1230,7 +1265,7 @@ LIB_EXPORT jack_nframes_t jack_get_sample_rate(jack_client_t* ext_client)
         jack_error("jack_get_sample_rate called with a NULL client");
         return 0;
     } else {
-        JackEngineControl* control = GetEngineControl();
+        JackEngineControl* control = client->GetGlobal()->GetEngineControl();
         return (control ? control->fSampleRate : 0);
     }
 }
@@ -1244,7 +1279,7 @@ LIB_EXPORT jack_nframes_t jack_get_buffer_size(jack_client_t* ext_client)
         jack_error("jack_get_buffer_size called with a NULL client");
         return 0;
     } else {
-        JackEngineControl* control = GetEngineControl();
+        JackEngineControl* control = client->GetGlobal()->GetEngineControl();
         return (control ? control->fBufferSize : 0);
     }
 }
@@ -1258,7 +1293,7 @@ LIB_EXPORT const char** jack_get_ports(jack_client_t* ext_client, const char* po
         jack_error("jack_get_ports called with a NULL client");
         return NULL;
     }
-    JackGraphManager* manager = GetGraphManager();
+    JackGraphManager* manager = client->GetGlobal()->GetGraphManager();
     return (manager ? manager->GetPorts(port_name_pattern, type_name_pattern, flags) : NULL);
 }
 
@@ -1277,10 +1312,11 @@ LIB_EXPORT jack_port_t* jack_port_by_name(jack_client_t* ext_client, const char*
         return NULL;
     }
     
-    JackGraphManager* manager = GetGraphManager();
+    JackGlobals *global = client->GetGlobal();
+    JackGraphManager* manager = global->GetGraphManager();
     if (manager) {
-        int res = manager->GetPort(portname); // returns a port index at least > 1
-        return (res == NO_PORT) ? NULL : (jack_port_t*)((uintptr_t)res);
+        jack_port_id_t port_id = manager->GetPort(portname); // returns a port index at least > 1
+        return (port_id == NO_PORT) ? NULL : global->PortById(port_id);
     } else {
         return NULL;
     }
@@ -1313,7 +1349,7 @@ LIB_EXPORT jack_nframes_t jack_frames_since_cycle_start(const jack_client_t* ext
     JackGlobals::CheckContext("jack_frames_since_cycle_start");
 
     JackTimer timer;
-    JackEngineControl* control = GetEngineControl();
+    JackEngineControl* control = ((JackClient*)ext_client)->GetGlobal()->GetEngineControl();
     if (control) {
         control->ReadFrameTime(&timer);
         return timer.FramesSinceCycleStart(GetMicroSeconds(), control->fSampleRate);
@@ -1339,7 +1375,7 @@ LIB_EXPORT jack_time_t jack_frames_to_time(const jack_client_t* ext_client, jack
         return 0;
     } else {
         JackTimer timer;
-        JackEngineControl* control = GetEngineControl();
+        JackEngineControl* control = client->GetGlobal()->GetEngineControl();
         if (control) {
             control->ReadFrameTime(&timer);
             return timer.Frames2Time(frames, control->fBufferSize);
@@ -1359,7 +1395,7 @@ LIB_EXPORT jack_nframes_t jack_time_to_frames(const jack_client_t* ext_client, j
         return 0;
     } else {
         JackTimer timer;
-        JackEngineControl* control = GetEngineControl();
+        JackEngineControl* control = client->GetGlobal()->GetEngineControl();
         if (control) {
             control->ReadFrameTime(&timer);
             return timer.Time2Frames(usecs, control->fBufferSize);
@@ -1380,7 +1416,7 @@ LIB_EXPORT jack_nframes_t jack_last_frame_time(const jack_client_t* ext_client)
 {
     JackGlobals::CheckContext("jack_last_frame_time");
 
-    JackEngineControl* control = GetEngineControl();
+    JackEngineControl* control = ((JackClient*)ext_client)->GetGlobal()->GetEngineControl();
     return (control) ? control->fFrameTimer.ReadCurrentState()->CurFrame() : 0;
 }
 
@@ -1392,7 +1428,7 @@ LIB_EXPORT int jack_get_cycle_times(const jack_client_t *client,
 {
     JackGlobals::CheckContext("jack_get_cycle_times");
 
-    JackEngineControl* control = GetEngineControl();
+    JackEngineControl* control = ((JackClient*)client)->GetGlobal()->GetEngineControl();
     if (control) {
         JackTimer timer;
         control->ReadFrameTime(&timer);
@@ -1411,7 +1447,7 @@ LIB_EXPORT float jack_cpu_load(jack_client_t* ext_client)
         jack_error("jack_cpu_load called with a NULL client");
         return 0.0f;
     } else {
-        JackEngineControl* control = GetEngineControl();
+        JackEngineControl* control = client->GetGlobal()->GetEngineControl();
         return (control ? control->fCPULoad : 0.0f);
     }
 }
@@ -1471,7 +1507,7 @@ LIB_EXPORT size_t jack_port_type_get_buffer_size(jack_client_t* ext_client, cons
             jack_error("jack_port_type_get_buffer_size called with an unknown port type = %s", port_type);
             return 0;
         } else {
-            return GetPortType(port_id)->size();
+            return GetPortType(port_id)->size(client->GetGlobal());
         }
     }
 }
@@ -1636,7 +1672,7 @@ LIB_EXPORT float jack_get_max_delayed_usecs(jack_client_t* ext_client)
         jack_error("jack_get_max_delayed_usecs called with a NULL client");
         return 0.f;
     } else {
-        JackEngineControl* control = GetEngineControl();
+        JackEngineControl* control = client->GetGlobal()->GetEngineControl();
         return (control ? control->fMaxDelayedUsecs : 0.f);
     }
  }
@@ -1650,7 +1686,7 @@ LIB_EXPORT float jack_get_xrun_delayed_usecs(jack_client_t* ext_client)
         jack_error("jack_get_xrun_delayed_usecs called with a NULL client");
         return 0.f;
     } else {
-        JackEngineControl* control = GetEngineControl();
+        JackEngineControl* control = client->GetGlobal()->GetEngineControl();
         return (control ? control->fXrunDelayedUsecs : 0.f);
     }
 }
@@ -1663,7 +1699,7 @@ LIB_EXPORT void jack_reset_max_delayed_usecs(jack_client_t* ext_client)
     if (client == NULL) {
         jack_error("jack_reset_max_delayed_usecs called with a NULL client");
     } else {
-        JackEngineControl* control = GetEngineControl();
+        JackEngineControl* control = client->GetGlobal()->GetEngineControl();
         control->ResetXRun();
     }
 }
@@ -1678,7 +1714,7 @@ LIB_EXPORT int jack_client_real_time_priority(jack_client_t* ext_client)
         jack_error("jack_client_real_time_priority called with a NULL client");
         return -1;
     } else {
-        JackEngineControl* control = GetEngineControl();
+        JackEngineControl* control = client->GetGlobal()->GetEngineControl();
         return (control->fRealTime) ? control->fClientPriority : -1;
     }
 }
@@ -1692,7 +1728,7 @@ LIB_EXPORT int jack_client_max_real_time_priority(jack_client_t* ext_client)
         jack_error("jack_client_max_real_time_priority called with a NULL client");
         return -1;
     } else {
-        JackEngineControl* control = GetEngineControl();
+        JackEngineControl* control = client->GetGlobal()->GetEngineControl();
         return (control->fRealTime) ? control->fMaxClientPriority : -1;
     }
 }
@@ -1716,7 +1752,7 @@ LIB_EXPORT int jack_client_create_thread(jack_client_t* client,
 {
     JackGlobals::CheckContext("jack_client_create_thread");
 
-    JackEngineControl* control = GetEngineControl();
+    JackEngineControl* control = ((JackClient*)client)->GetGlobal()->GetEngineControl();
     int res = JackThread::StartImp(thread, priority, realtime, routine, arg);
     return (res == 0)
         ? ((realtime ? JackThread::AcquireRealTimeImp(*thread, priority, control->fPeriod, control->fComputation, control->fConstraint) : res))

@@ -20,6 +20,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackServerGlobals.h"
 #include "JackLockedEngine.h"
 #include "JackTools.h"
+#include "JackServer.h"
 #include "shm.h"
 #include <getopt.h>
 #include <errno.h>
@@ -52,7 +53,7 @@ int JackServerGlobals::Start(const char* server_name,
                              char self_connect_mode)
 {
     jack_log("Jackdmp: sync = %ld timeout = %ld rt = %ld priority = %ld verbose = %ld ", sync, time_out_ms, rt, priority, verbose);
-    new JackServer(sync, temporary, time_out_ms, rt, priority, port_max, verbose, clock, self_connect_mode, server_name);  // Will setup fInstance and fUserCount globals
+    new JackServer(sync, temporary, time_out_ms, rt, priority, port_max, verbose, clock, self_connect_mode, server_name, this);  // Will setup fInstance and fUserCount globals
     int res = fInstance->Open(driver_desc, driver_params);
     return (res < 0) ? res : fInstance->Start();
 }
@@ -64,7 +65,7 @@ void JackServerGlobals::Stop()
     fInstance->Close();
 }
 
-void JackServerGlobals::Delete()
+void JackServerGlobals::Destroy()
 {
     jack_log("Jackdmp: delete server");
 
@@ -351,7 +352,7 @@ bool JackServerGlobals::Init()
         int res = Start(server_name, driver_desc, master_driver_params, sync, temporary, client_timeout, realtime, realtime_priority, port_max, verbose_aux, clock_source, JACK_DEFAULT_SELF_CONNECT_MODE);
         if (res < 0) {
             jack_error("Cannot start server... exit");
-            Delete();
+            Destroy();
             jack_cleanup_shm();
             JackTools::CleanupFiles(server_name);
             jack_unregister_server(server_name);
@@ -400,20 +401,40 @@ error:
     if (master_driver_params) {
         jack_free_driver_params(master_driver_params);
     }
-    Destroy();
+    Deinit();
     return false;
 }
 
-void JackServerGlobals::Destroy()
+void JackServerGlobals::Deinit()
 {
     if (--fUserCount == 0) {
         jack_log("JackServerGlobals Destroy");
         Stop();
-        Delete();
+        Destroy();
         jack_cleanup_shm();
         JackTools::CleanupFiles(server_name);
         jack_unregister_server(server_name);
     }
+}
+
+JackGraphManager *JackServerGlobals::GetGraphManager()
+{
+    return fInstance->GetGraphManager();
+}
+
+JackEngineControl *JackServerGlobals::GetEngineControl()
+{
+    return fInstance->GetEngineControl();
+}
+
+JackSynchro *JackServerGlobals::GetSynchroTable()
+{
+    return fInstance->GetSynchroTable();
+}
+
+JackServer *JackServerGlobals::GetServer()
+{
+    return fInstance;
 }
 
 } // end of namespace

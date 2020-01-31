@@ -23,6 +23,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackClient.h"
 #include "JackClientControl.h"
+#include "JackServerGlobals.h"
 #include "driver_interface.h"
 
 namespace Jack
@@ -43,7 +44,7 @@ class JackInternalClient : public JackClient
 
     public:
 
-        JackInternalClient(JackServer* server, JackSynchro* table);
+        JackInternalClient(JackServerGlobals *globals);
         virtual ~JackInternalClient();
 
         int Open(const char* server_name, const char* name, jack_uuid_t uuid, jack_options_t options, jack_status_t* status);
@@ -76,8 +77,8 @@ class JackLoadableInternalClient : public JackInternalClient
 
     public:
 
-        JackLoadableInternalClient(JackServer* server, JackSynchro* table)
-            :JackInternalClient(server, table), fHandle(NULL), fFinish(NULL), fDescriptor(NULL)
+        JackLoadableInternalClient(JackServerGlobals* global)
+            :JackInternalClient(global), fHandle(NULL), fFinish(NULL), fDescriptor(NULL)
         {}
         virtual ~JackLoadableInternalClient();
 
@@ -95,7 +96,7 @@ class JackLoadableInternalClient1 : public JackLoadableInternalClient
 
     public:
 
-        JackLoadableInternalClient1(JackServer* server, JackSynchro* table, const char* object_data);
+        JackLoadableInternalClient1(JackServerGlobals *global, const char* object_data);
         virtual ~JackLoadableInternalClient1()
         {}
 
@@ -114,7 +115,7 @@ class JackLoadableInternalClient2 : public JackLoadableInternalClient
 
     public:
 
-        JackLoadableInternalClient2(JackServer* server, JackSynchro* table, const JSList*  parameters);
+        JackLoadableInternalClient2(JackServerGlobals *global, const JSList*  parameters);
         virtual ~JackLoadableInternalClient2()
         {}
 

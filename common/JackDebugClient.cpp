@@ -35,7 +35,7 @@ namespace Jack
 {
 
 JackDebugClient::JackDebugClient(JackClient * client)
-  : JackClient(client->fSynchroTable)
+  : JackClient(client->GetGlobal())
 {
     fTotalPortNumber = 1;       // The total number of port opened and maybe closed. Historical view.
     fOpenPortNumber = 0;        // The current number of opened port.

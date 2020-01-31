@@ -41,7 +41,7 @@ class JackLibClient : public JackClient
 
     public:
 
-        JackLibClient(JackSynchro* table);
+        JackLibClient(JackGlobals* global);
         virtual ~JackLibClient();
 
         int Open(const char* server_name, const char* name, jack_uuid_t uuid, jack_options_t options, jack_status_t* status);
@@ -53,9 +53,6 @@ class JackLibClient : public JackClient
         JackEngineControl* GetEngineControl() const;
         JackClientControl* GetClientControl() const;
 };
-
-// Used for client-side Metadata API (JackLibAPI.cpp)
-JackMetadata* GetMetadata();
 
 } // end of namespace
 

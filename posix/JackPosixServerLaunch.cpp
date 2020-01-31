@@ -242,7 +242,7 @@ static int start_server(const char* server_name, jack_options_t options)
 
 static int server_connect(char* server_name)
 {
-    JackClientChannel channel;
+    JackClientChannel channel(nullptr);
     int res = channel.ServerCheck(server_name);
     channel.Close();
     JackSleep(2000); // Added by JE - 02-01-2009 (gives

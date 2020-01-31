@@ -34,9 +34,8 @@ jack_tls_key JackGlobals::fKeyLogFunction;
 static bool fKeyLogFunctionInitialized = jack_tls_allocate_key(&JackGlobals::fKeyLogFunction);
 
 JackMutex* JackGlobals::fOpenMutex = new JackMutex();
-JackMutex* JackGlobals::fSynchroMutex = new JackMutex();
-volatile bool JackGlobals::fServerRunning = false;
-JackClient* JackGlobals::fClientTable[CLIENT_NUM] = {};
+
+JackGlobalsManager JackGlobalsManager::fInstance;
 
 #ifndef WIN32
 jack_thread_creator_t JackGlobals::fJackThreadCreator = pthread_create;
@@ -77,5 +76,17 @@ void JackGlobals::CheckContext(const char* name)
 {}
 
 #endif
+
+JackGlobals::JackGlobals(const std::string &server_name)
+    : fServerRunning(false)
+    , fSynchroMutex(new JackMutex)
+    , fServerName(server_name)
+{
+}
+
+JackGlobals::~JackGlobals()
+{
+    delete fSynchroMutex;
+}
 
 } // end of namespace
