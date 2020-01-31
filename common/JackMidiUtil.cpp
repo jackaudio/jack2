@@ -55,26 +55,32 @@ Jack::ApplyRunningStatus(jack_midi_event_t *event,
 jack_nframes_t
 Jack::GetCurrentFrame()
 {
-    jack_time_t time = GetMicroSeconds();
-    JackEngineControl *control = GetEngineControl();
-    JackTimer timer;
-    control->ReadFrameTime(&timer);
-    return timer.Time2Frames(time, control->fBufferSize);
+    jack_error("Jack::GetCurrentFrame is not implemented");
+    abort();
+//    jack_time_t time = GetMicroSeconds();
+//    JackEngineControl *control = GetEngineControl();
+//    JackTimer timer;
+//    control->ReadFrameTime(&timer);
+//    return timer.Time2Frames(time, control->fBufferSize);
 }
 
 jack_nframes_t
 Jack::GetFramesFromTime(jack_time_t time)
 {
-    JackEngineControl* control = GetEngineControl();
-    JackTimer timer;
-    control->ReadFrameTime(&timer);
-    return timer.Time2Frames(time, control->fBufferSize);
+    jack_error("Jack::GetFramesFromTime is not implemented");
+    abort();
+//    JackEngineControl* control = GetEngineControl();
+//    JackTimer timer;
+//    control->ReadFrameTime(&timer);
+//    return timer.Time2Frames(time, control->fBufferSize);
 }
 
 jack_nframes_t
 Jack::GetLastFrame()
 {
-    return GetEngineControl()->fFrameTimer.ReadCurrentState()->CurFrame();
+    jack_error("Jack::GetLastFrame is not implemented");
+    abort();
+//    return GetEngineControl()->fFrameTimer.ReadCurrentState()->CurFrame();
 }
 
 int
@@ -114,8 +120,10 @@ Jack::GetMessageLength(jack_midi_data_t status_byte)
 jack_time_t
 Jack::GetTimeFromFrames(jack_nframes_t frames)
 {
-    JackEngineControl* control = GetEngineControl();
-    JackTimer timer;
-    control->ReadFrameTime(&timer);
-    return timer.Frames2Time(frames, control->fBufferSize);
+    jack_error("Jack::GetTimeFromFrames is not implemented");
+    abort();
+//    JackEngineControl* control = GetEngineControl();
+//    JackTimer timer;
+//    control->ReadFrameTime(&timer);
+//    return timer.Frames2Time(frames, control->fBufferSize);
 }
