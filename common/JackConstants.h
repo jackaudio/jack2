@@ -57,6 +57,12 @@
 #define PORT_NUM_FOR_CLIENT 768
 #endif
 
+// used by JackLib when process has mulitple clients connecting to different Jack Servers
+#define PORT_SERVER_CONTEXT_BITS (8)
+#define PORT_SERVER_CONTEXT_MAX ((1 << PORT_SERVER_CONTEXT_BITS) - 1)
+#define PORT_SERVER_CONTEXT_SHIFT (sizeof(jack_port_id_t) * 8 - PORT_SERVER_CONTEXT_BITS)
+#define PORT_SERVER_CONTEXT_MASK (PORT_SERVER_CONTEXT_MAX << PORT_SERVER_CONTEXT_SHIFT)
+
 #define FIRST_AVAILABLE_PORT 1
 
 #define CONNECTION_NUM_FOR_PORT PORT_NUM_FOR_CLIENT

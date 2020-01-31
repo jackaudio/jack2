@@ -126,6 +126,7 @@ typedef std::list<std::pair<std::string, std::pair<std::string, std::string> > >
 
 class SERVER_EXPORT JackDriver : public JackDriverClientInterface
 {
+    friend class JackThreadedDriver;
 
     protected:
 

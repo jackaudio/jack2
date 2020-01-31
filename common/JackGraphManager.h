@@ -32,6 +32,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
+class JackGlobals;
+
 /*!
 \brief Graph manager: contains the connection manager and the port array.
 */
@@ -57,7 +59,7 @@ class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState
 
     public:
 
-        JackGraphManager(int port_max);
+        JackGraphManager(int port_max, JackGlobals *global);
         ~JackGraphManager()
         {}
 
@@ -134,7 +136,7 @@ class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState
         void Save(JackConnectionManager* dst);
         void Restore(JackConnectionManager* src);
 
-        static JackGraphManager* Allocate(int port_max);
+        static JackGraphManager* Allocate(int port_max, JackGlobals *global);
         static void Destroy(JackGraphManager* manager);
 
 } POST_PACKED_STRUCTURE;

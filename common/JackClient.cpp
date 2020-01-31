@@ -39,9 +39,10 @@ namespace Jack
 
 #define IsRealTime() ((fProcess != NULL) | (fThreadFun != NULL) | (fSync != NULL) | (fTimebase != NULL))
 
-JackClient::JackClient(JackSynchro* table):fThread(this)
+JackClient::JackClient(JackGlobals* globals):fThread(this)
+    , JackGlobalsInterface(globals)
 {
-    fSynchroTable = table;
+    fSynchroTable = globals->GetSynchroTable();
     fProcess = NULL;
     fGraphOrder = NULL;
     fXrun = NULL;
@@ -114,11 +115,12 @@ int JackClient::Close()
     fChannel->ClientClose(GetClientControl()->fRefNum, &result);
   
     fChannel->Close();
-    assert(JackGlobals::fSynchroMutex);
-    JackGlobals::fSynchroMutex->Lock();
+    assert(GetGlobal());
+    assert(GetGlobal()->fSynchroMutex);
+    GetGlobal()->fSynchroMutex->Lock();
     fSynchroTable[GetClientControl()->fRefNum].Disconnect();
-    JackGlobals::fSynchroMutex->Unlock();
-    JackGlobals::fClientTable[GetClientControl()->fRefNum] = NULL;
+    GetGlobal()->fSynchroMutex->Unlock();
+    GetGlobal()->fClientTable[GetClientControl()->fRefNum] = nullptr;
     return result;
 }
 
@@ -1344,7 +1346,6 @@ int JackClient::PropertyChangeNotify(jack_uuid_t subject, const char* key, jack_
     fChannel->PropertyChangeNotify(subject, key, change, &result);
     return result;
 }
-
 
 } // end of namespace
 

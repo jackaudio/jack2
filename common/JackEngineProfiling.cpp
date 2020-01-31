@@ -31,9 +31,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
-JackEngineProfiling::JackEngineProfiling():fAudioCycle(0),fMeasuredClient(0)
+JackEngineProfiling::JackEngineProfiling(JackGlobals *global):fAudioCycle(0),fMeasuredClient(0)
 {
     jack_info("Engine profiling activated, beware %ld MBytes are needed to record profiling points...", sizeof(fProfileTable) / (1024 * 1024));
+
+    fGlobal.SetGlobal(global);
 
     // Force memory page in
     memset(fProfileTable, 0, sizeof(fProfileTable));
@@ -354,7 +356,7 @@ void JackEngineProfiling::Profile(JackClientInterface** table,
     fProfileTable[fAudioCycle].fPrevCycleEnd = prev_cycle_end;
     fProfileTable[fAudioCycle].fAudioCycle = fAudioCycle;
 
-    for (int i = GetEngineControl()->fDriverNum; i < CLIENT_NUM; i++) {
+    for (int i = fGlobal.GetGlobal()->GetEngineControl()->fDriverNum; i < CLIENT_NUM; i++) {
         JackClientInterface* client = table[i];
         JackClientTiming* timing = manager->GetClientTiming(i);
         if (client && client->GetClientControl()->fActive && client->GetClientControl()->fCallback[kRealTimeCallback]) {

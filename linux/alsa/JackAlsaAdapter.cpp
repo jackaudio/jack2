@@ -24,14 +24,16 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackAlsaAdapter.h"
 #include "JackGlobals.h"
 #include "JackEngineControl.h"
+#include "JackClient.h"
 
 namespace Jack
 {
 
-    JackAlsaAdapter::JackAlsaAdapter ( jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params ) :
+    JackAlsaAdapter::JackAlsaAdapter ( JackClient &jack_client, jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params ) :
             JackAudioAdapterInterface ( buffer_size, sample_rate ),
             fThread ( this ),
-            fAudioInterface ( buffer_size, sample_rate )
+            fAudioInterface ( buffer_size, sample_rate ),
+            fClient( jack_client )
     {
         const JSList* node;
         const jack_driver_param_t* param;
@@ -110,7 +112,7 @@ namespace Jack
         fAudioInterface.longinfo();
 
         //turn the thread realtime
-        fThread.AcquireRealTime(GetEngineControl()->fClientPriority);
+        fThread.AcquireRealTime(fClient.GetGlobal()->GetEngineControl()->fClientPriority);
         return 0;
     }
 

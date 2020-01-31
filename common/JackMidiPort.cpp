@@ -146,8 +146,9 @@ static void MidiBufferMixdown(void* mixbuffer, void** src_buffers, int src_count
     mix->lost_events += event_count - events_done;
 }
 
-static size_t MidiBufferSize()
+static size_t MidiBufferSize(JackGlobals *global)
 {
+    (void)(global);
     return BUFFER_SIZE_MAX * sizeof(jack_default_audio_sample_t);
 }
 

@@ -29,6 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackChannel.h"
 #include "JackRequest.h"
 #include "JackMetadata.h"
+#include "JackGlobals.h"
 #include "varargs.h"
 #include <list>
 
@@ -45,7 +46,7 @@ struct JackEngineControl;
 \brief The base class for clients: share part of the implementation for JackInternalClient and JackLibClient.
 */
 
-class SERVER_EXPORT JackClient : public JackClientInterface, public JackRunnableInterface
+class SERVER_EXPORT JackClient : public JackClientInterface, public JackRunnableInterface, public JackGlobalsInterface
 {
         friend class JackDebugClient;
 
@@ -128,7 +129,7 @@ class SERVER_EXPORT JackClient : public JackClientInterface, public JackRunnable
 
     public:
 
-        JackClient(JackSynchro* table);
+        JackClient(JackGlobals* globals);
         virtual ~JackClient();
         
         char* GetServerName() { return fServerName; }

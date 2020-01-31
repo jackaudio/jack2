@@ -26,8 +26,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
-JackSocketClientChannel::JackSocketClientChannel()
-    :JackGenericClientChannel(), fThread(this)
+JackSocketClientChannel::JackSocketClientChannel(JackGlobals *global)
+    :JackGenericClientChannel(global), fThread(this)
 {
     fRequest = new JackClientSocket();
     fNotificationSocket = NULL;
@@ -53,7 +53,7 @@ int JackSocketClientChannel::Open(const char* server_name, const char* name, jac
     }
     
     // OK so server is there...
-    JackGlobals::fServerRunning = true;
+    client->GetGlobal()->fServerRunning = true;
 
     // Check name in server
     ClientCheck(name, uuid, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result, true);

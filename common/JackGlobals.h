@@ -20,9 +20,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef __JackGlobals__
 #define __JackGlobals__
 
+#include <memory>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <mutex>
+
 #include "JackPlatformPlug.h"
 #include "JackSystemDeps.h"
 #include "JackConstants.h"
+#include "JackError.h"
 
 #ifdef __CLIENTDEBUG__
 #include <iostream>
@@ -33,10 +40,49 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 namespace Jack
 {
+    class JackGlobals;
+    class JackGraphManager;
+    class JackServer;
+    struct JackEngineControl;
+
+// Globals used for client management on server or library side.
+class JackGlobalsManager
+{
+
+    /* This object is managed by JackGlobalsManager */
+    private:
+
+        static JackGlobalsManager fInstance;
+
+        JackGlobalsManager() {}
+        ~JackGlobalsManager() {}
+
+    public:
+
+        std::vector<JackGlobals*> fContexts;
+
+        inline static JackGlobalsManager* Instance()
+        {
+            return &fInstance;
+        }
+
+        template <class T>
+        inline T* CreateGlobal(const std::string &server_name);
+
+        inline void DestroyGlobal(const std::string &server_name);
+
+};
 
 // Globals used for client management on server or library side.
 class JackGlobals
 {
+
+    friend class JackGlobalsManager;
+
+    protected:
+
+        JackGlobals(const std::string &server_name);
+        virtual ~JackGlobals();
 
     public:
 
@@ -44,9 +90,6 @@ class JackGlobals
         static jack_tls_key fNotificationThread;
         static jack_tls_key fKeyLogFunction;
         static JackMutex* fOpenMutex;
-        static JackMutex* fSynchroMutex;
-        static volatile bool fServerRunning;
-        static JackClient* fClientTable[CLIENT_NUM];
         static bool fVerbose;
 #ifndef WIN32
         static jack_thread_creator_t fJackThreadCreator;
@@ -57,18 +100,175 @@ class JackGlobals
 #endif
         static void CheckContext(const char* name);
 
+        volatile bool fServerRunning;
+        JackMutex* fSynchroMutex;
+        std::mutex fMutex;
+        std::string fServerName;
+        JackClient* fClientTable[CLIENT_NUM];
+
+        /* is called each time a context for specific server is added */
+        virtual bool AddContext(const uint32_t &cntx_num, const std::string &server_name) = 0;
+
+        /* is called each time a context for specific server is removed */
+        virtual bool DelContext(const uint32_t &cntx_num) = 0;
+
+        virtual JackGraphManager* GetGraphManager() = 0;
+        virtual JackEngineControl* GetEngineControl() = 0;
+        virtual JackSynchro* GetSynchroTable() = 0;
+        virtual JackServer* GetServer() = 0;
+
         inline static jack_port_id_t PortId(const jack_port_t* port)
         {
             uintptr_t port_aux = (uintptr_t)port;
-            jack_port_id_t port_id = (jack_port_id_t)port_aux;
+            jack_port_id_t port_masked = (jack_port_id_t)port_aux;
+            jack_port_id_t port_id = port_masked & ~PORT_SERVER_CONTEXT_MASK;
             return port_id;
         }
+
+        inline static JackGlobals* PortGlobal(const jack_port_t* port)
+        {
+            jack_port_id_t context_id = PortContext(port);
+
+            if (context_id >= JackGlobalsManager::Instance()->fContexts.size())
+            {
+                jack_error("invalid context for port '%p' requested", port);
+                return nullptr;
+            }
+
+            return JackGlobalsManager::Instance()->fContexts[context_id];
+        }
+
+        inline static jack_port_id_t PortContext(const jack_port_t* port)
+        {
+            uintptr_t port_aux = (uintptr_t)port;
+            jack_port_id_t port_masked = (jack_port_id_t)port_aux;
+            jack_port_id_t port_context = (port_masked & PORT_SERVER_CONTEXT_MASK) >> PORT_SERVER_CONTEXT_SHIFT;
+            return port_context;
+        }
+
+        inline jack_port_id_t PortContext()
+        {
+            std::vector<JackGlobals*> &contexts = JackGlobalsManager::Instance()->fContexts;
+
+            auto it = std::find_if(contexts.begin(), contexts.end(), [this] (JackGlobals* i) {
+                return (i && i->fServerName.compare(this->fServerName) == 0);
+            });
+
+            if (it == contexts.end()) {
+                return PORT_SERVER_CONTEXT_MAX;
+            }
+
+            return it - contexts.begin();
+        }
+
+        inline jack_port_t* PortById(const jack_port_id_t &port_id)
+        {
+            jack_port_id_t context_id = PortContext();
+            if (context_id > PORT_SERVER_CONTEXT_MAX) {
+                return NULL;
+            }
+
+            return (jack_port_t*) ((context_id << PORT_SERVER_CONTEXT_SHIFT) | port_id);
+        }
+
 };
 
-// Each "side" server and client will implement this to get the shared graph manager, engine control and inter-process synchro table.
-extern SERVER_EXPORT JackGraphManager* GetGraphManager();
-extern SERVER_EXPORT JackEngineControl* GetEngineControl();
-extern SERVER_EXPORT JackSynchro* GetSynchroTable();
+class JackGlobalsInterface
+{
+
+    private:
+
+        JackGlobals *fGlobal;
+
+    public:
+
+        JackGlobalsInterface(JackGlobals *global = nullptr)
+            : fGlobal(global)
+        {
+
+        }
+
+        ~JackGlobalsInterface()
+        {
+
+        }
+
+        inline JackGlobals* GetGlobal() const
+        {
+            return fGlobal;
+        }
+
+        inline void SetGlobal(JackGlobals *global)
+        {
+            fGlobal = global;
+        }
+
+};
+
+template <class T>
+inline T* JackGlobalsManager::CreateGlobal(const std::string &server_name)
+{
+    uint32_t context_num = fContexts.size();
+
+    std::vector<JackGlobals*>::iterator it = std::find_if(fContexts.begin(), fContexts.end(), [&server_name] (JackGlobals* i) {
+        return (i && (i->fServerName.compare(server_name) == 0));
+    });
+
+    T* global = nullptr;
+
+    if (it == fContexts.end()) {
+        global = new T(server_name);
+        it = std::find(fContexts.begin(), fContexts.end(), nullptr);
+        if (it == fContexts.end()) {
+            fContexts.push_back(static_cast<JackGlobals*>(global));
+        } else {
+            *it = global;
+        }
+    } else {
+        global = dynamic_cast<T*>(*it);
+    }
+
+    if (global == nullptr) {
+        return global;
+    }
+
+    bool success = false;
+    {
+        std::lock_guard<std::mutex> lock(global->fMutex);
+        success = global->AddContext(context_num, server_name);
+    }
+
+    if (success == false) {
+        DestroyGlobal(server_name);
+        return nullptr;
+    }
+
+    return global;
+}
+
+inline void JackGlobalsManager::DestroyGlobal(const std::string &server_name)
+{
+    std::vector<JackGlobals*>::iterator it = std::find_if(fContexts.begin(), fContexts.end(), [&server_name] (JackGlobals* i) {
+        return (i && (i->fServerName.compare(server_name) == 0));
+    });
+
+    if (it == fContexts.end()) {
+        return;
+    }
+
+    JackGlobals *global = *it;
+
+    {
+        std::lock_guard<std::mutex> lock(global->fMutex);
+
+        if (global->DelContext(fContexts.size()) == false) {
+            return;
+        }
+    }
+
+    delete global;
+    *it = nullptr;
+}
 
 } // end of namespace
 

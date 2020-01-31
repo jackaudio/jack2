@@ -27,8 +27,8 @@
 namespace Jack
 {
 
-JackWinNamedPipeClientChannel::JackWinNamedPipeClientChannel()
-    :JackGenericClientChannel(),fThread(this)
+JackWinNamedPipeClientChannel::JackWinNamedPipeClientChannel(JackGlobals *global)
+    :JackGenericClientChannel(global),fThread(this)
 {
      fRequest = new JackWinNamedPipeClient();
 }
@@ -60,7 +60,7 @@ int JackWinNamedPipeClientChannel::Open(const char* server_name, const char* nam
     }
     
     // OK so server is there...
-    JackGlobals::fServerRunning = true;
+    client->GetGlobal()->fServerRunning = true;
 
     // Check name in server
     ClientCheck(name, uuid, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result, true);

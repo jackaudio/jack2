@@ -1052,6 +1052,12 @@ jackctl_server_open(
             goto fail;
         }
 
+        JackServerGlobals *global = JackGlobalsManager::Instance()->CreateGlobal<JackServerGlobals>(server_ptr->name.str);
+        if (global == nullptr) {
+            jack_error("Failed to create global context");
+            goto fail;
+        }
+
         /* get the engine/driver started */
         server_ptr->engine = new JackServer(
             server_ptr->sync.b,
@@ -1063,7 +1069,8 @@ jackctl_server_open(
             server_ptr->verbose.b,
             (jack_timer_type_t)server_ptr->clock_source.ui,
             server_ptr->self_connect_mode.c,
-            server_ptr->name.str);
+            server_ptr->name.str,
+            global);
         if (server_ptr->engine == NULL)
         {
             jack_error("Failed to create new JackServer object");

@@ -45,11 +45,12 @@ void JackGraphManager::AssertPort(jack_port_id_t port_index)
     }
 }
 
-JackGraphManager* JackGraphManager::Allocate(int port_max)
+JackGraphManager* JackGraphManager::Allocate(int port_max, JackGlobals* global)
 {
     // Using "Placement" new
     void* shared_ptr = JackShmMem::operator new(sizeof(JackGraphManager) + port_max * sizeof(JackPort));
-    return new(shared_ptr) JackGraphManager(port_max);
+    JackGraphManager *manager = new(shared_ptr) JackGraphManager(port_max, global);
+    return manager;
 }
 
 void JackGraphManager::Destroy(JackGraphManager* manager)
@@ -59,7 +60,7 @@ void JackGraphManager::Destroy(JackGraphManager* manager)
     JackShmMem::operator delete(manager);
 }
 
-JackGraphManager::JackGraphManager(int port_max)
+JackGraphManager::JackGraphManager(int port_max, JackGlobals *global)
 {
     assert(port_max <= PORT_NUM_MAX);
 
@@ -68,6 +69,8 @@ JackGraphManager::JackGraphManager(int port_max)
     }
 
     fPortMax = port_max;
+
+    ReadCurrentState()->SetGlobal(global);
 }
 
 JackPort* JackGraphManager::GetPort(jack_port_id_t port_index)

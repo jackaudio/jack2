@@ -37,25 +37,9 @@ namespace Jack
 JackGraphManager* JackInternalClient::fGraphManager = NULL;
 JackEngineControl* JackInternalClient::fEngineControl = NULL;
 
-// Used for external C API (JackAPI.cpp)
-SERVER_EXPORT JackGraphManager* GetGraphManager()
+JackInternalClient::JackInternalClient(JackServerGlobals *globals): JackClient(globals)
 {
-    return JackServerGlobals::fInstance->GetGraphManager();
-}
-
-SERVER_EXPORT JackEngineControl* GetEngineControl()
-{
-    return JackServerGlobals::fInstance->GetEngineControl();
-}
-
-SERVER_EXPORT JackSynchro* GetSynchroTable()
-{
-    return JackServerGlobals::fInstance->GetSynchroTable();
-}
-
-JackInternalClient::JackInternalClient(JackServer* server, JackSynchro* table): JackClient(table)
-{
-    fChannel = new JackInternalClientChannel(server);
+    fChannel = new JackInternalClientChannel(globals->fInstance);
 }
 
 JackInternalClient::~JackInternalClient()
@@ -101,8 +85,8 @@ int JackInternalClient::Open(const char* server_name, const char* name, jack_uui
     }
 
     SetupDriverSync(false);
-    JackGlobals::fClientTable[fClientControl.fRefNum] = this;
-    JackGlobals::fServerRunning = true;
+    GetGlobal()->fClientTable[fClientControl.fRefNum] = this;
+    GetGlobal()->fServerRunning = true;
     jack_log("JackInternalClient::Open name = %s refnum = %ld", name_res, fClientControl.fRefNum);
     return 0;
 
@@ -193,8 +177,8 @@ int JackLoadableInternalClient2::Init(const char* so_name)
     return 0;
 }
 
-JackLoadableInternalClient1::JackLoadableInternalClient1(JackServer* server, JackSynchro* table, const char* object_data)
-        : JackLoadableInternalClient(server, table)
+JackLoadableInternalClient1::JackLoadableInternalClient1(JackServerGlobals *global, const char* object_data)
+        : JackLoadableInternalClient(global)
 {
     if (object_data != NULL)
         strncpy(fObjectData, object_data, JACK_LOAD_INIT_LIMIT);
@@ -202,8 +186,8 @@ JackLoadableInternalClient1::JackLoadableInternalClient1(JackServer* server, Jac
         memset(fObjectData, 0, sizeof(fObjectData));
 }
 
-JackLoadableInternalClient2::JackLoadableInternalClient2(JackServer* server, JackSynchro* table, const JSList*  parameters)
-        : JackLoadableInternalClient(server, table)
+JackLoadableInternalClient2::JackLoadableInternalClient2(JackServerGlobals *global, const JSList*  parameters)
+        : JackLoadableInternalClient(global)
 {
     fParameters = parameters;
 }

@@ -34,7 +34,7 @@ namespace Jack
         return paContinue;
     }
 
-    JackPortAudioAdapter::JackPortAudioAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params)
+    JackPortAudioAdapter::JackPortAudioAdapter(JackClient &jack_client, jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params)
             : JackAudioAdapterInterface(buffer_size, sample_rate)
     {
         jack_log("JackPortAudioAdapter::JackPortAudioAdapter buffer_size = %d, sample_rate = %d", buffer_size, sample_rate);

@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackConstants.h"
 #include "JackActivationCount.h"
 #include "JackError.h"
+#include "JackGlobals.h"
 #include "JackCompilerDeps.h"
 #include <vector>
 #include <assert.h>
@@ -408,7 +409,7 @@ struct JackClientTiming
 */
 
 PRE_PACKED_STRUCTURE
-class SERVER_EXPORT JackConnectionManager
+class SERVER_EXPORT JackConnectionManager : public JackGlobalsInterface
 {
 
     private:
