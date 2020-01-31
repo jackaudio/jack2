@@ -1699,10 +1699,12 @@ LIB_EXPORT int jack_client_max_real_time_priority(jack_client_t* ext_client)
 
 LIB_EXPORT int jack_acquire_real_time_scheduling(jack_native_thread_t thread, int priority)
 {
-    JackEngineControl* control = GetEngineControl();
-    return (control
-        ? JackThread::AcquireRealTimeImp(thread, priority, control->fPeriod, control->fComputation, control->fConstraint)
-        : -1);
+    jack_error("jack_acquire_real_time_scheduling is not implemented");
+    abort();
+//    JackEngineControl* control = GetEngineControl();
+//    return (control
+//        ? JackThread::AcquireRealTimeImp(thread, priority, control->fPeriod, control->fComputation, control->fConstraint)
+//        : -1);
 }
 
 LIB_EXPORT int jack_client_create_thread(jack_client_t* client,
