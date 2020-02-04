@@ -21,7 +21,12 @@
 #ifndef __jack_alsa_driver_h__
 #define __jack_alsa_driver_h__
 
+#ifdef __QNXNTO__
+#include <sys/asoundlib.h>
+#else
 #include <alsa/asoundlib.h>
+#endif
+
 #include "bitset.h"
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
@@ -41,6 +46,24 @@
 #include "memops.h"
 #include "alsa_midi.h"
 
+#ifdef __QNXNTO__
+#define SND_PCM_FORMAT_S16_LE      SND_PCM_SFMT_S16_LE
+#define SND_PCM_FORMAT_S16_BE      SND_PCM_SFMT_S16_BE
+#define SND_PCM_FORMAT_S24_LE      SND_PCM_SFMT_S24_LE
+#define SND_PCM_FORMAT_S24_BE      SND_PCM_SFMT_S24_BE
+#define SND_PCM_FORMAT_S32_LE      SND_PCM_SFMT_S32_LE
+#define SND_PCM_FORMAT_S32_BE      SND_PCM_SFMT_S32_BE
+#define SND_PCM_FORMAT_FLOAT_LE    SND_PCM_SFMT_FLOAT_LE
+#define SND_PCM_STATE_SUSPENDED    SND_PCM_STATUS_SUSPENDED
+#define SND_PCM_STATE_XRUN         SND_PCM_STATUS_UNDERRUN
+#define SND_PCM_STREAM_PLAYBACK    SND_PCM_CHANNEL_PLAYBACK
+#define SND_PCM_STREAM_CAPTURE     SND_PCM_CHANNEL_CAPTURE
+
+typedef unsigned long              snd_pcm_uframes_t;
+typedef signed long                snd_pcm_sframes_t;
+typedef int32_t                    alsa_driver_default_format_t;
+#endif
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -58,13 +81,28 @@ typedef struct _alsa_driver {
 
     JACK_DRIVER_NT_DECL
 
+#ifdef __QNXNTO__
+    unsigned int                  playback_sample_format;
+    unsigned int                  capture_sample_format;
+    void                          *capture_areas;
+    void                          *playback_areas;
+    void                          *capture_areas_ptr;
+    void                          *playback_areas_ptr;
+#else
+    snd_pcm_format_t              playback_sample_format;
+    snd_pcm_format_t              capture_sample_format;
+    const snd_pcm_channel_area_t *capture_areas;
+    const snd_pcm_channel_area_t *playback_areas;
+    snd_pcm_hw_params_t          *playback_hw_params;
+    snd_pcm_sw_params_t          *playback_sw_params;
+    snd_pcm_hw_params_t          *capture_hw_params;
+    snd_pcm_sw_params_t          *capture_sw_params;
+#endif
     int                           poll_timeout;
     jack_time_t                   poll_last;
     jack_time_t                   poll_next;
     char                        **playback_addr;
     char                        **capture_addr;
-    const snd_pcm_channel_area_t *capture_areas;
-    const snd_pcm_channel_area_t *playback_areas;
     struct pollfd                *pfd;
     unsigned int                  playback_nfds;
     unsigned int                  capture_nfds;
@@ -89,8 +127,6 @@ typedef struct _alsa_driver {
     char                         *alsa_driver;
     bitset_t			  channels_not_done;
     bitset_t			  channels_done;
-    snd_pcm_format_t              playback_sample_format;
-    snd_pcm_format_t              capture_sample_format;
     float                         max_sample_val;
     unsigned long                 user_nperiods;
     unsigned int                  playback_nperiods;
@@ -99,10 +135,6 @@ typedef struct _alsa_driver {
     snd_ctl_t                    *ctl_handle;
     snd_pcm_t                    *playback_handle;
     snd_pcm_t                    *capture_handle;
-    snd_pcm_hw_params_t          *playback_hw_params;
-    snd_pcm_sw_params_t          *playback_sw_params;
-    snd_pcm_hw_params_t          *capture_hw_params;
-    snd_pcm_sw_params_t          *capture_sw_params;
     jack_hardware_t              *hw;
     ClockSyncStatus              *clock_sync_data;
     jack_client_t                *client;
@@ -211,18 +243,6 @@ alsa_driver_write_to_channel (alsa_driver_t *driver,
 	alsa_driver_mark_channel_done (driver, channel);
 }
 
-void  alsa_driver_silence_untouched_channels (alsa_driver_t *driver,
-					      jack_nframes_t nframes);
-void  alsa_driver_set_clock_sync_status (alsa_driver_t *driver, channel_t chn,
-					 ClockSyncStatus status);
-int   alsa_driver_listen_for_clock_sync_status (alsa_driver_t *,
-						ClockSyncListenerFunction,
-						void *arg);
-int   alsa_driver_stop_listen_for_clock_sync_status (alsa_driver_t *,
-						     unsigned int);
-void  alsa_driver_clock_sync_notify (alsa_driver_t *, channel_t chn,
-				     ClockSyncStatus);
-
 int
 alsa_driver_reset_parameters (alsa_driver_t *driver,
 			      jack_nframes_t frames_per_cycle,
@@ -268,8 +288,6 @@ alsa_driver_read (alsa_driver_t *driver, jack_nframes_t nframes);
 
 int
 alsa_driver_write (alsa_driver_t* driver, jack_nframes_t nframes);
-
-jack_time_t jack_get_microseconds(void);
 
 // Code implemented in JackAlsaDriver.cpp
 
