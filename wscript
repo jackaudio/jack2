@@ -74,8 +74,8 @@ def options(opt):
     opt.add_option('--dbus', action='store_true', default=False, help='Enable D-Bus JACK (jackdbus)')
     opt.add_option('--autostart', type='string', default='default', help='Autostart method. Possible values: "default", "classic", "dbus", "none"')
     opt.add_option('--profile', action='store_true', default=False, help='Build with engine profiling')
-    opt.add_option('--clients', default=64, type='int', dest='clients', help='Maximum number of JACK clients')
-    opt.add_option('--ports-per-application', default=768, type='int', dest='application_ports', help='Maximum number of ports per application')
+    opt.add_option('--clients', default=256, type='int', dest='clients', help='Maximum number of JACK clients')
+    opt.add_option('--ports-per-application', default=2048, type='int', dest='application_ports', help='Maximum number of ports per application')
     opt.add_option('--systemd-unit', action='store_true', default=False, help='Install systemd units.')
 
     opt.set_auto_options_define('HAVE_%s')
