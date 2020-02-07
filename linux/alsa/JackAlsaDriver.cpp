@@ -476,25 +476,26 @@ int JackAlsaDriver::Reload()
 int JackAlsaDriver::Read()
 {
     /* Taken from alsa_driver_run_cycle */
-    int wait_status;
-    jack_nframes_t nframes;
+    alsa_driver_wait_status_t wait_status;
+    jack_nframes_t nframes = 0;
     fDelayedUsecs = 0.f;
 
-retry:
+    /* wait until all devices have some data available */
+    do {
+        nframes = alsa_driver_wait((alsa_driver_t *)fDriver, -1, &wait_status, &fDelayedUsecs);
 
-    nframes = alsa_driver_wait((alsa_driver_t *)fDriver, -1, &wait_status, &fDelayedUsecs);
+        if (wait_status == ALSA_DRIVER_WAIT_ERROR)
+            return -1;		/* driver failed */
 
-    if (wait_status < 0)
-        return -1;		/* driver failed */
-
-    if (nframes == 0) {
-        /* we detected an xrun and restarted: notify
-         * clients about the delay.
-         */
-        jack_log("ALSA XRun wait_status = %d", wait_status);
-        NotifyXRun(fBeginDateUst, fDelayedUsecs);
-        goto retry; /* recoverable error*/
-    }
+        if (wait_status == ALSA_DRIVER_WAIT_XRUN) {
+            /* we detected an xrun and restarted: notify
+             * clients about the delay.
+             */
+            jack_log("ALSA XRun wait_status = %d", wait_status);
+            NotifyXRun(fBeginDateUst, fDelayedUsecs);
+            continue;
+        }
+    } while (nframes == 0);
 
     if (nframes != fEngineControl->fBufferSize)
         jack_log("JackAlsaDriver::Read warning fBufferSize = %ld nframes = %ld", fEngineControl->fBufferSize, nframes);

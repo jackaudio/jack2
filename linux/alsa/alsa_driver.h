@@ -342,8 +342,14 @@ alsa_driver_stop (alsa_driver_t *driver);
 int
 alsa_driver_close (alsa_driver_t *driver);
 
+typedef enum {
+	ALSA_DRIVER_WAIT_OK = 0,
+	ALSA_DRIVER_WAIT_ERROR = -1,
+	ALSA_DRIVER_WAIT_XRUN = -2,
+} alsa_driver_wait_status_t;
+
 jack_nframes_t
-alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
+alsa_driver_wait (alsa_driver_t *driver, int extra_fd, alsa_driver_wait_status_t *status, float
 		  *delayed_usecs);
 
 int

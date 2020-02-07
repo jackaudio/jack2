@@ -2020,7 +2020,7 @@ alsa_driver_avail(alsa_driver_t *driver, snd_pcm_t *pcm, bool is_capture)
 static int under_gdb = FALSE;
 
 jack_nframes_t
-alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
+alsa_driver_wait (alsa_driver_t *driver, int extra_fd, alsa_driver_wait_status_t *status, float
 		  *delayed_usecs)
 {
 	snd_pcm_sframes_t avail = 0;
@@ -2062,9 +2062,9 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 		SetTime(driver->poll_last);
 		driver->poll_next = driver->poll_last + driver->period_usecs;
 
-		*status = 0;
+		*status = ALSA_DRIVER_WAIT_OK;
 
-		return INT_MAX;
+		return driver->frames_per_cycle;
 	}
 
 	while (pfd_count > 0) {
@@ -2174,13 +2174,13 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 					continue;
 				}
 				jack_error(poll_log);
-				*status = -2;
+				*status = ALSA_DRIVER_WAIT_ERROR;
 				return 0;
 			}
 
 			jack_error ("ALSA: poll call failed (%s)",
 				    strerror (errno));
-			*status = -3;
+			*status = ALSA_DRIVER_WAIT_ERROR;
 			return 0;
 
 		}
@@ -2193,14 +2193,14 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 				jack_error ("ALSA: poll time out, polled for %" PRIu64
 					    " usecs, Reached max retry cnt = %d, Exiting",
 					    poll_ret - poll_enter, MAX_RETRY_COUNT);
-				*status = -5;
+				*status = ALSA_DRIVER_WAIT_ERROR;
 				return 0;
 			}
+
 			jack_error ("ALSA: poll time out, polled for %" PRIu64
 				    " usecs, Retrying with a recovery, retry cnt = %d",
 				    poll_ret - poll_enter, retry_cnt);
-			*status = alsa_driver_xrun_recovery (driver, delayed_usecs);
-			return 0;
+			goto xrun;
 		}
 
         // JACK2
@@ -2217,11 +2217,11 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 			 * to return from poll */
 			if (driver->pfd[pfd_index-1].revents == 0) {
 				/* we timed out on the extra fd */
-				*status = -4;
+				*status = ALSA_DRIVER_WAIT_ERROR;
 				return -1;
 			}
 			/* if POLLIN was the only bit set, we're OK */
-			*status = 0;
+			*status = ALSA_DRIVER_WAIT_OK;
 			return (driver->pfd[pfd_index-1].revents == POLLIN) ? 0 : -1;
 		}
 
@@ -2251,7 +2251,7 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 			if (snd_pcm_poll_descriptors_revents (device->capture_handle, &driver->pfd[pfd_index],
 					pfd_cap_count[i], &collect_revs) != 0) {
 				jack_error ("ALSA: capture revents failed");
-				*status = -6;
+				*status = ALSA_DRIVER_WAIT_ERROR;
 				return 0;
 			}
 
@@ -2260,8 +2260,7 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 				if (collect_revs & POLLERR) {
 					/* optimization, no point in polling more if we already have xrun on one device */
 					jack_error ("xrun C: '%s'", device->capture_name);
-					*status = alsa_driver_xrun_recovery (driver, delayed_usecs);
-					return 0;
+					goto xrun;
 				}
 				if (collect_revs & POLLIN) {
 				}
@@ -2290,7 +2289,7 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 			if (snd_pcm_poll_descriptors_revents (device->playback_handle, &driver->pfd[pfd_index],
 					pfd_play_count[i], &collect_revs) != 0) {
 				jack_error ("ALSA: playback revents failed");
-				*status = -6;
+				*status = ALSA_DRIVER_WAIT_ERROR;
 				return 0;
 			}
 
@@ -2299,12 +2298,11 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 				if (collect_revs & POLLERR) {
 					/* optimization, no point in polling more if we already have xrun on one device */
 					jack_error ("xrun P: '%s'", device->playback_name);
-					*status = alsa_driver_xrun_recovery (driver, delayed_usecs);
-					return 0;
+					goto xrun;
 				}
 				if (collect_revs & POLLNVAL) {
 					jack_error ("ALSA: playback device disconnected");
-					*status = -7;
+					*status = ALSA_DRIVER_WAIT_ERROR;
 					return 0;
 				}
 				if (collect_revs & POLLOUT) {
@@ -2338,8 +2336,7 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 		if ((avail = alsa_driver_avail (driver, device->capture_handle, SND_PCM_STREAM_CAPTURE)) < 0) {
 			if (avail == -EPIPE) {
 				jack_error ("ALSA: avail_update xrun on capture dev '%s'", device->capture_name);
-				*status = alsa_driver_xrun_recovery (driver, delayed_usecs);
-				return 0;
+				goto xrun;
 			} else {
 				jack_error ("unknown ALSA avail_update return value (%u)", capture_avail);
 			}
@@ -2364,8 +2361,7 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 		if ((avail = alsa_driver_avail (driver, device->playback_handle, SND_PCM_STREAM_PLAYBACK)) < 0) {
 			if (avail == -EPIPE) {
 				jack_error ("ALSA: avail_update xrun on playback dev '%s'", device->playback_name);
-				*status = alsa_driver_xrun_recovery (driver, delayed_usecs);
-				return 0;
+				goto xrun;
 			} else {
 				jack_error ("unknown ALSA avail_update return value (%u)", playback_avail);
 			}
@@ -2388,7 +2384,7 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 		bitset_copy (device->channels_not_done, device->channels_done);
 	}
 
-	*status = 0;
+	*status = ALSA_DRIVER_WAIT_OK;
 
 	avail = capture_avail < playback_avail ? capture_avail : playback_avail;
 
@@ -2403,6 +2399,10 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 	*/
 
 	return avail - (avail % driver->frames_per_cycle);
+
+xrun:
+	*status = (alsa_driver_xrun_recovery (driver, delayed_usecs) == 0) ? ALSA_DRIVER_WAIT_XRUN : ALSA_DRIVER_WAIT_ERROR;
+	return 0;
 }
 
 int
