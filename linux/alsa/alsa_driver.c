@@ -1804,12 +1804,6 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 			pfd_index++;
 		}
 
-		/* nothing to poll on */
-		if (pfd_index == 0 && extra_fd < 0) {
-			*status = -1;
-			return 0;
-		}
-
 		poll_enter = jack_get_microseconds ();
 
 		if (poll_enter > driver->poll_next) {
