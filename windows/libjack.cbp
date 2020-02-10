@@ -316,6 +316,7 @@
 		<Unit filename="..\common\JackLibAPI.cpp" />
 		<Unit filename="..\common\JackLibClient.cpp" />
 		<Unit filename="..\common\JackMessageBuffer.cpp" />
+		<Unit filename="..\common\JackMetadata.cpp" />	
 		<Unit filename="..\common\JackMidiAPI.cpp" />
 		<Unit filename="..\common\JackMidiPort.cpp" />
 		<Unit filename="..\common\JackPort.cpp" />
