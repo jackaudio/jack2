@@ -164,6 +164,7 @@
 		<Unit filename="..\common\netjack_packet.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../compat/alloca/alloca.h" />	
 		<Unit filename="jacknetonedriver.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
