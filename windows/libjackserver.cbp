@@ -266,8 +266,10 @@
 		<Unit filename="..\common\JackGlobals.cpp" />
 		<Unit filename="..\common\JackGraphManager.cpp" />
 		<Unit filename="..\common\JackInternalClient.cpp" />
+		<Unit filename="..\common\JackInternalSessionLoader.cpp" />
 		<Unit filename="..\common\JackLoopbackDriver.cpp" />
 		<Unit filename="..\common\JackMessageBuffer.cpp" />
+		<Unit filename="..\common\JackMetadata.cpp" />
 		<Unit filename="..\common\JackMidiAPI.cpp" />
 		<Unit filename="..\common\JackMidiAsyncQueue.cpp" />
 		<Unit filename="..\common\JackMidiBufferReadQueue.cpp" />
