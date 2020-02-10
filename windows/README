@@ -5,7 +5,7 @@ JACK2 on Windows
 This folder contains all the windows specific sources.
 You will also find two sets of files :
 - VisualC++6 workspace and project files, in order to compile JACK with MSVC
-- Code::Blocks (10.05) workspace and project files, in order to compile JACK with MingW
+- Code::Blocks (10.05) workspace and project files, in order to compile JACK with MinGW
 
 The current maintainer focus is on using waf and MSVC for a successful, repeatable build. See the repo for other possibilities. WARNING: The Code::Blocks workspaces are not formally maintained. The last major commit (6803149) was at the end of 2011. 
 
@@ -24,20 +24,23 @@ The TRE build is not fully integrated in the Code::Blocks environment and it is 
 If you do plan to build from source, in-tree, unzip the code and place the "tre-0.8.0" folder into the "windows" folder. 
 Then edit and comment "#define snprintf sprintf_s" at the end off the "tre-0.8.0/win32/config.h" file before building the JACK project. (This #define conflicts with a fix for WIN32 snprintf support made in the main Jack source tree.)
 
+PortAudio libraries are also required if you plan to use the PortAudio backend. 
+
 ---------------------------------
 Notes about MSVC and GCC versions
 ---------------------------------
 
 Using the waf build tools in conjunction with MSVC, jack will build with recent compilers, known good up to 2017 15.9, including #define logic consuming the _MSC_VER macro to support build with older versions. The Visual Studio workspace was last tested at VC6.
 
-You can compile JACK using GCC, with MingW. The project is organized in a Code::Blocks workspace to support this, but see the warning at the start of this README. 
+You can compile JACK using GCC, with MinGW. The project is organized in a Code::Blocks workspace to support this, but see the warning at the start of this README. 
 
-But for some reasons, you need to compile JACK using a version of G++ with SJLJ support (available on MingW website).
+But for some reasons, you need to compile JACK using a version of G++ with SJLJ support (available on MinGW website).
 JACK needs the use of SJLJ exceptions instead of DW2 because exceptions are exchanged between DLL's, and DW2 does not allow to throw an exception out of a DLL, so it wouldn't be caught.
 
-The resources files has been created with ResEdit (ANSI build). VisualStudio uses 'ressource.rc' and 'ressource_vc.h'. The other files are used by MingW.
+The resources files has been created with ResEdit (ANSI build). VisualStudio uses 'ressource.rc' and 'ressource_vc.h'. The other files are used by MinGW.
 
-You can make a small installer ('setup.exe') with CreateInstallFree, a little freeware. For this you have the little script 'jack.ci' for 32 bits version and 'jack64.c' for mixed 64/32 bits version. The installer contains everything jack needs to be integrated in windows (including register entries and shortcuts).
+In the past contributers successfully made a small installer ('setup.exe') with CreateInstallFree, a little freeware. For this you have the little script 'jack.ci' for 32 bits version and 'jack64.c' for mixed 64/32 bits version. The installer contains everything jack needs to be integrated in windows (including register entries and shortcuts). This does not appear to be working with a toolchain that is current in January 2020 but the files are included until an alternate way of packaging for Windows has been created.
+
 A binary version of QJAckCtl is also included.
 
 -------------------------------
