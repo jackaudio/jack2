@@ -140,6 +140,7 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add directory="..\compat\alloca" />
 		</Compiler>
 		<Linker>
 			<Add option="-enable-auto-import" />

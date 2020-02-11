@@ -149,6 +149,7 @@
 			<Add directory="..\windows" />
 			<Add directory="..\common\jack" />
 			<Add directory="..\common" />
+			<Add directory="..\compat\alloca" />
 		</Compiler>
 		<Linker>
 			<Add option="-enable-auto-import" />
