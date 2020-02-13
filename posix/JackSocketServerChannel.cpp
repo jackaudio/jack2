@@ -229,7 +229,6 @@ bool JackSocketServerChannel::Execute()
             // Poll all clients
             for (unsigned int i = 1; i < fSocketTable.size() + 1; i++) {
                 int fd = fPollTable[i].fd;
-                jack_log("JackSocketServerChannel::Execute : fPollTable i = %ld fd = %ld", i, fd);
                 if (fPollTable[i].revents & ~POLLIN) {
                     jack_log("JackSocketServerChannel::Execute : poll client error err = %s", strerror(errno));
                     ClientKill(fd);
