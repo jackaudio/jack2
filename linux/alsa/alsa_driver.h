@@ -58,7 +58,7 @@ typedef struct _alsa_driver {
 
     JACK_DRIVER_NT_DECL
 
-    int                           poll_timeout;
+    int                           poll_timeout_ms;
     jack_time_t                   poll_last;
     jack_time_t                   poll_next;
     char                        **playback_addr;
