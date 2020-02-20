@@ -1766,14 +1766,14 @@ alsa_driver_stop (alsa_driver_t *driver)
 			continue;
 		}
 
-		if (device->capture_linked) {
-			group_done = 1;
-		}
-
 #ifdef __QNXNTO__
 		/* In case of capture: Flush discards the frames */
 		err = snd_pcm_plugin_flush(device->capture_handle, SND_PCM_CHANNEL_CAPTURE);
 #else
+		if (device->capture_linked) {
+			group_done = 1;
+		}
+
 		err = snd_pcm_drop (device->capture_handle);
 #endif
 		if (err < 0) {
@@ -1796,14 +1796,14 @@ alsa_driver_stop (alsa_driver_t *driver)
 			continue;
 		}
 
-		if (device->playback_linked) {
-			group_done = 1;
-		}
-
 #ifdef __QNXNTO__
 		/* In case of playback: Drain discards the frames */
 		err = snd_pcm_plugin_playback_drain(device->playback_handle);
 #else
+		if (device->playback_linked) {
+			group_done = 1;
+		}
+
 		err = snd_pcm_drop (device->playback_handle);
 #endif
 		if (err < 0) {
