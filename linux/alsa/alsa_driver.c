@@ -59,6 +59,44 @@ char* strcasestr(const char* haystack, const char* needle);
 /* Max re-try count for Alsa poll timeout handling */
 #define MAX_RETRY_COUNT 5
 
+#ifdef __QNXNTO__
+
+char qnx_channel_error_str[9][35] = {
+	"SND_PCM_STATUS_NOTREADY",
+	"SND_PCM_STATUS_READY",
+	"SND_PCM_STATUS_PREPARED",
+	"SND_PCM_STATUS_RUNNING",
+	"SND_PCM_STATUS_PAUSED",
+	"SND_PCM_STATUS_SUSPENDED",
+	"SND_PCM_STATUS_UNDERRUN",
+	"SND_PCM_STATUS_OVERRUN",
+	"SND_PCM_STATUS_UNKNOWN",
+};
+
+static char* alsa_channel_status_error_str(int code)
+{
+	switch(code) {
+		case SND_PCM_STATUS_NOTREADY:
+			return qnx_channel_error_str[0];
+		case SND_PCM_STATUS_READY:
+			return qnx_channel_error_str[1];
+		case SND_PCM_STATUS_PREPARED:
+			return qnx_channel_error_str[2];
+		case SND_PCM_STATUS_RUNNING:
+			return qnx_channel_error_str[3];
+		case SND_PCM_STATUS_PAUSED:
+			return qnx_channel_error_str[4];
+		case SND_PCM_STATUS_SUSPENDED:
+			return qnx_channel_error_str[5];
+		case SND_PCM_STATUS_UNDERRUN:
+			return qnx_channel_error_str[6];
+		case SND_PCM_STATUS_OVERRUN:
+			return qnx_channel_error_str[7];
+	}
+	return qnx_channel_error_str[8];
+}
+#endif
+
 static int alsa_driver_link (alsa_driver_t *driver);
 static int alsa_driver_open_device (alsa_driver_t *driver, alsa_device_t *device, bool is_capture);
 static int alsa_driver_get_state (snd_pcm_t *handle, int is_capture);
@@ -1390,6 +1428,8 @@ alsa_driver_open (alsa_driver_t *driver)
 		int do_capture = 0, do_playback = 0;
 
 		if (!device->capture_handle && (i < driver->devices_c_count) && (device->capture_target_state != SND_PCM_STATE_NOTREADY)) {
+			jack_info("open C: %s", device->capture_name);
+
 			err = alsa_driver_open_device (driver, &driver->devices[i], SND_PCM_STREAM_CAPTURE);
 			if (err < 0) {
 				jack_error ("\n\nATTENTION: Opening of the capture device \"%s\" failed.",
@@ -1401,6 +1441,8 @@ alsa_driver_open (alsa_driver_t *driver)
 		}
 
 		if (!device->playback_handle && (i < driver->devices_p_count) && (device->playback_target_state != SND_PCM_STATE_NOTREADY)) {
+			jack_info("open P: %s", device->playback_name);
+
 			err = alsa_driver_open_device (driver, &driver->devices[i], SND_PCM_STREAM_PLAYBACK);
 			if (err < 0) {
 				jack_error ("\n\nATTENTION: Opening of the playback device \"%s\" failed.",
@@ -1439,21 +1481,27 @@ alsa_driver_link (alsa_driver_t *driver)
 			continue;
 		}
 
+		jack_info("link C: %s", device->capture_name);
+
 		if (device->capture_target_state != SND_PCM_STATE_RUNNING) {
+			jack_info("link skipped, device unused");
 			continue;
 		}
 
 		if (group_handle == NULL) {
+			jack_info("link, device is group master");
 			group_handle = device->capture_handle;
 			device->capture_linked = 1;
 			continue;
 		}
 
 		if (device->capture_linked) {
+			jack_info("link skipped, already done");
 			continue;
 		}
 
 		if (group_handle == device->capture_handle) {
+			jack_info("link skipped, master already done");
 			device->capture_linked = 1;
 			continue;
 		}
@@ -1472,21 +1520,27 @@ alsa_driver_link (alsa_driver_t *driver)
 			continue;
 		}
 
+		jack_info("link P: %s", device->playback_name);
+
 		if (device->playback_target_state != SND_PCM_STATE_RUNNING) {
+			jack_info("link skipped, device unused");
 			continue;
 		}
 
 		if (group_handle == NULL) {
+			jack_info("link, device is group master");
 			group_handle = device->playback_handle;
 			device->playback_linked = 1;
 			continue;
 		}
 
 		if (device->playback_linked) {
+			jack_info("link skipped, already done");
 			continue;
 		}
 
 		if (group_handle == device->playback_handle) {
+			jack_info("link skipped, master already done");
 			device->playback_linked = 1;
 			continue;
 		}
@@ -1520,7 +1574,10 @@ alsa_driver_start (alsa_driver_t *driver)
 			continue;
 		}
 
+		jack_info("prepare C: %s", device->capture_name);
+
 		if (device->capture_target_state == SND_PCM_STATE_NOTREADY) {
+			jack_info("prepare skipped, device unused");
 			continue;
 		}
 
@@ -1529,10 +1586,12 @@ alsa_driver_start (alsa_driver_t *driver)
 		}
 
 		if (group_done && device->capture_linked) {
+			jack_info("prepare skipped, already done by link group");
 			continue;
 		}
 
 		if (alsa_driver_get_state(device->capture_handle, 1) == SND_PCM_STATE_PREPARED) {
+			jack_info("prepare skipped, already prepared");
 			continue;
 		}
 
@@ -1553,7 +1612,10 @@ alsa_driver_start (alsa_driver_t *driver)
 			continue;
 		}
 
+		jack_info("prepare P: %s", device->playback_name);
+
 		if (device->playback_target_state == SND_PCM_STATE_NOTREADY) {
+			jack_info("prepare skipped, device unused");
 			continue;
 		}
 
@@ -1562,10 +1624,12 @@ alsa_driver_start (alsa_driver_t *driver)
 		}
 
 		if (group_done && device->playback_linked) {
+			jack_info("prepare skipped, already done by link group");
 			continue;
 		}
 
 		if (alsa_driver_get_state(device->playback_handle, 0) == SND_PCM_STATE_PREPARED) {
+			jack_info("prepare skipped, already prepared");
 			continue;
 		}
 
@@ -1612,7 +1676,10 @@ alsa_driver_start (alsa_driver_t *driver)
 			continue;
 		}
 
+		jack_info("silence P: %s", device->playback_name);
+
 		if (device->playback_target_state != SND_PCM_STATE_RUNNING) {
+			jack_info("silence skipped, device unused");
 			continue;
 		}
 
@@ -1655,8 +1722,8 @@ alsa_driver_start (alsa_driver_t *driver)
 		        device->playback_sample_bytes;
 		if ((err = snd_pcm_plugin_write(device->playback_handle,
 					       device->playback_areas, bytes)) < bytes) {
-			jack_error ("ALSA: could not complete write of %"
-				PRIu32 " frames: error = %d", silence_frames, err);
+			jack_error ("ALSA: could not complete silence %s of %"
+				PRIu32 " frames: %u, error = %d", device->playback_name, silence_frames, err, errno);
 			return -1;
 		}
 #else
@@ -1673,11 +1740,15 @@ alsa_driver_start (alsa_driver_t *driver)
 			continue;
 		}
 
+		jack_info("start C: %s", device->capture_name);
+
 		if (device->capture_target_state != SND_PCM_STATE_RUNNING) {
+			jack_info("start skipped, device unused");
 			continue;
 		}
 
 		if (group_done && device->capture_linked) {
+			jack_info("start skipped, already done by link group");
 			continue;
 		}
 
@@ -1699,11 +1770,15 @@ alsa_driver_start (alsa_driver_t *driver)
 			continue;
 		}
 
+		jack_info("start P: %s", device->playback_name);
+
 		if (device->playback_target_state != SND_PCM_STATE_RUNNING) {
+			jack_info("start skipped, device unused");
 			continue;
 		}
 
 		if (group_done && device->playback_linked) {
+			jack_info("start skipped, already done by link group");
 			continue;
 		}
 
@@ -1758,11 +1833,15 @@ alsa_driver_stop (alsa_driver_t *driver)
 			continue;
 		}
 
+		jack_info("stop C: %s", device->capture_name);
+
 		if (group_done && device->capture_linked) {
+			jack_info("stop skipped, already done by link group");
 			continue;
 		}
 
 		if (alsa_driver_get_state(device->capture_handle, 1) != SND_PCM_STATE_RUNNING) {
+			jack_info("stop skipped, device not running");
 			continue;
 		}
 
@@ -1788,11 +1867,15 @@ alsa_driver_stop (alsa_driver_t *driver)
 			continue;
 		}
 
+		jack_info("stop P: %s", device->playback_name);
+
 		if (group_done && device->playback_linked) {
+			jack_info("stop skipped, already done by link group");
 			continue;
 		}
 
 		if (alsa_driver_get_state(device->playback_handle, 0) != SND_PCM_STATE_RUNNING) {
+			jack_info("stop skipped, device not running");
 			continue;
 		}
 
@@ -1938,7 +2021,6 @@ alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs)
 
 		if (device->playback_handle) {
 			state = alsa_driver_get_state(device->playback_handle, SND_PCM_STREAM_PLAYBACK);
-
 			// TODO overrun
 			if (state == SND_PCM_STATE_XRUN) {
 				driver->xrun_count++;
@@ -2092,12 +2174,13 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, alsa_driver_wait_status_t
 				pfd_count - pfd_index,
 				SND_PCM_STREAM_CAPTURE);
 			if (pfd_cap_count[i] < 0) {
-				jack_log ("alsa_driver_poll_descriptors failed pfd_cap_count[%d]=%d", i ,pfd_cap_count[i] );
 				/* In case of xrun -EPIPE is returned perform xrun recovery*/
 				if (pfd_cap_count[i] == -EPIPE) {
+					jack_error("poll descriptors xrun C: %s pfd_cap_count[%d]=%d", device->capture_name, i, pfd_cap_count[i]);
 					goto xrun;
 				}
 				/* for any other error return negative wait status to caller */
+				jack_error("poll descriptors error C: %s pfd_cap_count[%d]=%d", device->capture_name, i, pfd_cap_count[i]);
 				*status = ALSA_DRIVER_WAIT_ERROR;
 				return 0;
 			} else {
@@ -2126,12 +2209,13 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, alsa_driver_wait_status_t
 				pfd_count - pfd_index,
 				SND_PCM_STREAM_PLAYBACK);
 			if (pfd_play_count[i] < 0) {
-				jack_log ("alsa_driver_poll_descriptors failed pfd_play_count[%d]=%d", i ,pfd_play_count[i] );
 				/* In case of xrun -EPIPE is returned perform xrun recovery*/
 				if (pfd_cap_count[i] == -EPIPE) {
+					jack_error("poll descriptors xrun P: %s pfd_cap_count[%d]=%d", device->playback_name, i, pfd_play_count[i]);
 					goto xrun;
 				}
 				/* for any other error return negative wait status to caller */
+				jack_error("poll descriptors error P: %s pfd_cap_count[%d]=%d", device->playback_name, i, pfd_play_count[i]);
 				*status = ALSA_DRIVER_WAIT_ERROR;
 				return 0;
 			} else {
@@ -2200,6 +2284,14 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, alsa_driver_wait_status_t
 			jack_error ("ALSA: poll time out, polled for %" PRIu64
 				    " usecs, Retrying with a recovery, retry cnt = %d",
 				    poll_ret - poll_enter, retry_cnt);
+			for (int i = 0; i < driver->devices_count; ++i) {
+				if (driver->devices[i].capture_handle && i < driver->devices_c_count && cap_revents[i] == 0) {
+					jack_log("device C: %s poll was requested", driver->devices[i].capture_name);
+				}
+				if (driver->devices[i].playback_handle && i < driver->devices_p_count && play_revents[i] == 0) {
+					jack_log("device P: %s poll was requested", driver->devices[i].playback_name);
+				}
+			}
 			goto xrun;
 		}
 
@@ -2217,6 +2309,7 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, alsa_driver_wait_status_t
 			 * to return from poll */
 			if (driver->pfd[pfd_index-1].revents == 0) {
 				/* we timed out on the extra fd */
+				jack_error("extra fd error");
 				*status = ALSA_DRIVER_WAIT_ERROR;
 				return -1;
 			}
@@ -2449,8 +2542,12 @@ alsa_driver_read (alsa_driver_t *driver, jack_nframes_t nframes)
 			const size_t bytes = contiguous * device->capture_nchannels * device->capture_sample_bytes;
 			if ((err = snd_pcm_plugin_read(device->capture_handle,
 							   device->capture_areas, bytes)) < bytes) {
-				jack_error ("ALSA: could not complete read of %"
-						PRIu32 " frames: error = %d", contiguous, err);
+				jack_error("read C: %s, requested %d, got %d, snd error %s, errno %d",
+					device->capture_name,
+					bytes,
+					err,
+					alsa_channel_status_error_str(alsa_driver_get_state(device->capture_handle, 1)),
+					errno);
 				return -1;
 			}
 #endif
@@ -2476,8 +2573,8 @@ alsa_driver_read (alsa_driver_t *driver, jack_nframes_t nframes)
 #ifndef __QNXNTO__
 			if ((err = snd_pcm_mmap_commit (device->capture_handle,
 					offset, contiguous)) < 0) {
-				jack_error ("ALSA: could not complete read of %"
-					PRIu32 " frames: error = %d", contiguous, err);
+				jack_error ("ALSA: could not complete read commit %s of %"
+					PRIu32 " frames: error = %d", device->capture_name, contiguous, err);
 				return -1;
 			}
 #endif
@@ -2586,15 +2683,19 @@ alsa_driver_write (alsa_driver_t* driver, jack_nframes_t nframes)
 			const size_t bytes = contiguous * device->playback_nchannels * device->playback_sample_bytes;
 			if ((err = snd_pcm_plugin_write(device->playback_handle,
 							   device->playback_areas, bytes)) < bytes) {
-				jack_error ("ALSA: could not complete write of %"
-					PRIu32 " frames: error = %d", contiguous, err);
+				jack_error("write P: %s, requested %d, got %d, snd error %s, errno %d",
+					device->playback_name,
+					bytes,
+					err,
+					alsa_channel_status_error_str(alsa_driver_get_state(device->playback_handle, 0)),
+					errno);
 				return -1;
 			}
 #else
 			if ((err = snd_pcm_mmap_commit (device->playback_handle,
 					offset, contiguous)) < 0) {
-				jack_error ("ALSA: could not complete playback of %"
-					PRIu32 " frames: error = %d", contiguous, err);
+				jack_error ("ALSA: could not complete playback commit %s of %"
+					PRIu32 " frames: error = %d", device->playback_name, contiguous, err);
 				if (err != -EPIPE && err != -ESTRPIPE)
 					return -1;
 			}
@@ -2888,8 +2989,9 @@ alsa_driver_open_device (alsa_driver_t *driver, alsa_device_t *device, bool is_c
 
 		case EPERM:
 			jack_error ("you do not have permission to open "
-				    "the audio device \"%s\" for playback",
-				    is_capture ? device->capture_name : device->playback_name);
+				    "the audio device \"%s\" for %s",
+				    is_capture ? device->capture_name : device->playback_name,
+                    is_capture ? "capture" : "playback");
 			break;
 
 		case EINVAL:
