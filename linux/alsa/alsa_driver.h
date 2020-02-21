@@ -358,6 +358,9 @@ alsa_driver_read (alsa_driver_t *driver, jack_nframes_t nframes);
 int
 alsa_driver_write (alsa_driver_t* driver, jack_nframes_t nframes);
 
+int
+alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs);
+
 // Code implemented in JackAlsaDriver.cpp
 
 void ReadInput(alsa_device_t *device, jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nread);

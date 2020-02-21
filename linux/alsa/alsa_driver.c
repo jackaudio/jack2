@@ -1990,7 +1990,7 @@ alsa_driver_get_state (snd_pcm_t *handle, int is_capture)
 #endif
 }
 
-static int
+int
 alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs)
 {
 	int state;
