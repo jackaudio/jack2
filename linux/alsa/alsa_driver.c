@@ -56,8 +56,6 @@ char* strcasestr(const char* haystack, const char* needle);
 
 /* Delay (in process calls) before jackd will report an xrun */
 #define XRUN_REPORT_DELAY 0
-/* Max re-try count for Alsa poll timeout handling */
-#define MAX_RETRY_COUNT 5
 
 #ifdef __QNXNTO__
 
@@ -2108,7 +2106,6 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, alsa_driver_wait_status_t
 	snd_pcm_sframes_t avail = 0;
 	snd_pcm_sframes_t capture_avail = 0;
 	snd_pcm_sframes_t playback_avail = 0;
-	int retry_cnt = 0;
 	jack_time_t poll_enter;
 	jack_time_t poll_ret = 0;
 
@@ -2177,7 +2174,8 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, alsa_driver_wait_status_t
 				/* In case of xrun -EPIPE is returned perform xrun recovery*/
 				if (pfd_cap_count[i] == -EPIPE) {
 					jack_error("poll descriptors xrun C: %s pfd_cap_count[%d]=%d", device->capture_name, i, pfd_cap_count[i]);
-					goto xrun;
+					*status = ALSA_DRIVER_WAIT_XRUN;
+					return 0;
 				}
 				/* for any other error return negative wait status to caller */
 				jack_error("poll descriptors error C: %s pfd_cap_count[%d]=%d", device->capture_name, i, pfd_cap_count[i]);
@@ -2212,7 +2210,8 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, alsa_driver_wait_status_t
 				/* In case of xrun -EPIPE is returned perform xrun recovery*/
 				if (pfd_cap_count[i] == -EPIPE) {
 					jack_error("poll descriptors xrun P: %s pfd_cap_count[%d]=%d", device->playback_name, i, pfd_play_count[i]);
-					goto xrun;
+					*status = ALSA_DRIVER_WAIT_XRUN;
+					return 0;
 				}
 				/* for any other error return negative wait status to caller */
 				jack_error("poll descriptors error P: %s pfd_cap_count[%d]=%d", device->playback_name, i, pfd_play_count[i]);
@@ -2272,18 +2271,9 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, alsa_driver_wait_status_t
 		poll_ret = jack_get_microseconds ();
 
 		if (poll_result == 0) {
-			retry_cnt++;
-			if(retry_cnt > MAX_RETRY_COUNT) {
-				jack_error ("ALSA: poll time out, polled for %" PRIu64
-					    " usecs, Reached max retry cnt = %d, Exiting",
-					    poll_ret - poll_enter, MAX_RETRY_COUNT);
-				*status = ALSA_DRIVER_WAIT_ERROR;
-				return 0;
-			}
-
 			jack_error ("ALSA: poll time out, polled for %" PRIu64
-				    " usecs, Retrying with a recovery, retry cnt = %d",
-				    poll_ret - poll_enter, retry_cnt);
+				    " usecs, Retrying with a recovery",
+				    poll_ret - poll_enter);
 			for (int i = 0; i < driver->devices_count; ++i) {
 				if (driver->devices[i].capture_handle && i < driver->devices_c_count && cap_revents[i] == 0) {
 					jack_log("device C: %s poll was requested", driver->devices[i].capture_name);
@@ -2292,7 +2282,8 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, alsa_driver_wait_status_t
 					jack_log("device P: %s poll was requested", driver->devices[i].playback_name);
 				}
 			}
-			goto xrun;
+			*status = ALSA_DRIVER_WAIT_XRUN;
+			return 0;
 		}
 
         // JACK2
@@ -2353,7 +2344,8 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, alsa_driver_wait_status_t
 				if (collect_revs & POLLERR) {
 					/* optimization, no point in polling more if we already have xrun on one device */
 					jack_error ("xrun C: '%s'", device->capture_name);
-					goto xrun;
+					*status = ALSA_DRIVER_WAIT_XRUN;
+					return 0;
 				}
 				if (collect_revs & POLLIN) {
 				}
@@ -2391,7 +2383,8 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, alsa_driver_wait_status_t
 				if (collect_revs & POLLERR) {
 					/* optimization, no point in polling more if we already have xrun on one device */
 					jack_error ("xrun P: '%s'", device->playback_name);
-					goto xrun;
+					*status = ALSA_DRIVER_WAIT_XRUN;
+					return 0;
 				}
 				if (collect_revs & POLLNVAL) {
 					jack_error ("ALSA: playback device disconnected");
@@ -2429,7 +2422,8 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, alsa_driver_wait_status_t
 		if ((avail = alsa_driver_avail (driver, device->capture_handle, SND_PCM_STREAM_CAPTURE)) < 0) {
 			if (avail == -EPIPE) {
 				jack_error ("ALSA: avail_update xrun on capture dev '%s'", device->capture_name);
-				goto xrun;
+				*status = ALSA_DRIVER_WAIT_XRUN;
+				return 0;
 			} else {
 				jack_error ("unknown ALSA avail_update return value (%u)", capture_avail);
 			}
@@ -2454,7 +2448,8 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, alsa_driver_wait_status_t
 		if ((avail = alsa_driver_avail (driver, device->playback_handle, SND_PCM_STREAM_PLAYBACK)) < 0) {
 			if (avail == -EPIPE) {
 				jack_error ("ALSA: avail_update xrun on playback dev '%s'", device->playback_name);
-				goto xrun;
+				*status = ALSA_DRIVER_WAIT_XRUN;
+				return 0;
 			} else {
 				jack_error ("unknown ALSA avail_update return value (%u)", playback_avail);
 			}
@@ -2492,10 +2487,6 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, alsa_driver_wait_status_t
 	*/
 
 	return avail - (avail % driver->frames_per_cycle);
-
-xrun:
-	*status = (alsa_driver_xrun_recovery (driver, delayed_usecs) == 0) ? ALSA_DRIVER_WAIT_XRUN : ALSA_DRIVER_WAIT_ERROR;
-	return 0;
 }
 
 int
