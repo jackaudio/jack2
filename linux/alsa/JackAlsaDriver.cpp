@@ -484,16 +484,9 @@ int JackAlsaDriver::Read()
     do {
         nframes = alsa_driver_wait((alsa_driver_t *)fDriver, -1, &wait_status, &fDelayedUsecs);
 
-        if (wait_status == ALSA_DRIVER_WAIT_ERROR)
-            return -1;		/* driver failed */
-
-        if (wait_status == ALSA_DRIVER_WAIT_XRUN) {
-            /* we detected an xrun and restarted: notify
-             * clients about the delay.
-             */
-            jack_log("ALSA XRun wait_status = %d", wait_status);
-            NotifyXRun(fBeginDateUst, fDelayedUsecs);
-            continue;
+        if (wait_status != ALSA_DRIVER_WAIT_OK) {
+            jack_error("JackAlsaDriver::Read wait failed, xrun recovery");
+            goto retry;
         }
     } while (nframes == 0);
 
@@ -503,12 +496,34 @@ int JackAlsaDriver::Read()
     // Has to be done before read
     JackDriver::CycleIncTime();
 
-    return alsa_driver_read((alsa_driver_t *)fDriver, fEngineControl->fBufferSize);
+    if (alsa_driver_read((alsa_driver_t *)fDriver, fEngineControl->fBufferSize) != 0) {
+        jack_error("JackAlsaDriver::Read read failed, xrun recovery");
+        goto retry;
+    }
+
+    return 0;
+
+retry:
+    /* we detected an xrun and restarted: notify
+     * clients about the delay.
+     */
+    jack_error("JackAlsaDriver::Read failed, xrun recovery");
+    alsa_driver_xrun_recovery((alsa_driver_t *)fDriver, &fDelayedUsecs);
+    NotifyXRun(fBeginDateUst, fDelayedUsecs);
+
+    return -1;
 }
 
 int JackAlsaDriver::Write()
 {
-    return alsa_driver_write((alsa_driver_t *)fDriver, fEngineControl->fBufferSize);
+    if (alsa_driver_write((alsa_driver_t *)fDriver, fEngineControl->fBufferSize) != 0) {
+        jack_error("JackAlsaDriver::Write failed, xrun recovery");
+        alsa_driver_xrun_recovery((alsa_driver_t *)fDriver, &fDelayedUsecs);
+        NotifyXRun(fBeginDateUst, fDelayedUsecs);
+        return -1;
+    }
+
+    return 0;
 }
 
 void JackAlsaDriver::ReadInputAux(alsa_device_t *device, jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nread)
