@@ -755,8 +755,8 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 		if (c_period_size != driver->frames_per_cycle) {
 			jack_error ("alsa_pcm: requested an interrupt every %"
 				    PRIu32
-				    " frames but got %uc frames for capture",
-				    driver->frames_per_cycle, p_period_size);
+				    " frames but got %u frames for capture",
+				    driver->frames_per_cycle, c_period_size);
 			return -1;
 		}
 	}
