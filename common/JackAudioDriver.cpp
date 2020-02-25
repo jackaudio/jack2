@@ -199,7 +199,19 @@ int JackAudioDriver::Write()
 
 int JackAudioDriver::Process()
 {
-    return (fEngineControl->fSyncMode) ? ProcessSync() : ProcessAsync();
+    int err = 0;
+    int retries = -1;
+
+    while (retries++ < fMaxRetryCount) {
+        err = (fEngineControl->fSyncMode) ? ProcessSync() : ProcessAsync();
+        if (err == 0) {
+            break;
+        }
+
+        jack_error("JackAudioDriver::Process failed, retry %d", retries);
+    }
+
+    return err;
 }
 
 /*
@@ -211,13 +223,13 @@ int JackAudioDriver::ProcessAsync()
 {
     // Read input buffers for the current cycle
     if (Read() < 0) {
-        jack_error("JackAudioDriver::ProcessAsync: read error, stopping...");
+        jack_error("JackAudioDriver::ProcessAsync: read error");
         return -1;
     }
 
     // Write output buffers from the previous cycle
     if (Write() < 0) {
-        jack_error("JackAudioDriver::ProcessAsync: write error, stopping...");
+        jack_error("JackAudioDriver::ProcessAsync: write error");
         return -1;
     }
 
@@ -285,7 +297,7 @@ int JackAudioDriver::ProcessSync()
 {
     // Read input buffers for the current cycle
     if (Read() < 0) {
-        jack_error("JackAudioDriver::ProcessSync: read error, stopping...");
+        jack_error("JackAudioDriver::ProcessSync: read error");
         return -1;
     }
 
@@ -294,7 +306,7 @@ int JackAudioDriver::ProcessSync()
 
     // Write output buffers from the current cycle
     if (Write() < 0) {
-        jack_error("JackAudioDriver::ProcessSync: write error, stopping...");
+        jack_error("JackAudioDriver::ProcessSync: write error");
         return -1;
     }
 

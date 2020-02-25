@@ -61,6 +61,8 @@ class SERVER_EXPORT JackAudioDriver : public JackDriver
         void ProcessGraphSyncMaster();
         void ProcessGraphSyncSlave();
 
+        static const int fMaxRetryCount = 5;
+
     public:
 
         JackAudioDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table);
