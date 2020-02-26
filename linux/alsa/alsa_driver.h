@@ -54,6 +54,7 @@
 #define SND_PCM_FORMAT_S32_LE      SND_PCM_SFMT_S32_LE
 #define SND_PCM_FORMAT_S32_BE      SND_PCM_SFMT_S32_BE
 #define SND_PCM_FORMAT_FLOAT_LE    SND_PCM_SFMT_FLOAT_LE
+#define SND_PCM_FORMAT_UNKNOWN     SND_PCM_SFMT_SPECIAL
 #define SND_PCM_STATE_PREPARED     SND_PCM_STATUS_PREPARED
 #define SND_PCM_STATE_SUSPENDED    SND_PCM_STATUS_SUSPENDED
 #define SND_PCM_STATE_XRUN         SND_PCM_STATUS_UNDERRUN
@@ -196,6 +197,8 @@ typedef struct _alsa_driver {
     char has_clock_sync_reporting;
     char has_hw_monitoring;
     char has_hw_metering;
+
+    int preferred_sample_bytes;
 
     int             dither;
     dither_state_t *dither_state;

@@ -492,7 +492,7 @@ alsa_driver_configure_stream (alsa_driver_t *driver, alsa_device_t *device, char
 			      snd_pcm_t *handle,
 			      unsigned int *nperiodsp,
 			      channel_t *nchns,
-			      unsigned long sample_width,
+			      unsigned long preferred_sample_bytes,
 			      bool is_capture)
 {
 	int err = 0;
@@ -516,10 +516,12 @@ alsa_driver_configure_stream (alsa_driver_t *driver, alsa_device_t *device, char
 		*nchns = ch_info.max_voices;
 	}
 
+	ch_params.format.format = (preferred_sample_bytes == 4) ? SND_PCM_SFMT_S32_LE : SND_PCM_SFMT_S16_LE;
+
 	ch_params.mode = SND_PCM_MODE_BLOCK;
 	ch_params.start_mode = SND_PCM_START_GO;
 	ch_params.stop_mode = SND_PCM_STOP_STOP;
-	ch_params.buf.block.frag_size = driver->frames_per_cycle * *nchns * sample_size;
+	ch_params.buf.block.frag_size = driver->frames_per_cycle * *nchns * snd_pcm_format_width(ch_params.format.format) / 8;
 
 	*nperiodsp = driver->user_nperiods;
 	ch_params.buf.block.frags_min = 1;
@@ -532,7 +534,6 @@ alsa_driver_configure_stream (alsa_driver_t *driver, alsa_device_t *device, char
 	ch_params.format.voices = *nchns;
 	ch_params.channel = is_capture;
 
-	ch_params.format.format = (sample_width == 4) ? SND_PCM_SFMT_S32_LE : SND_PCM_SFMT_S16_LE;
 	/*Set the configurable parameters for a PCM channel*/
 	if ((err = snd_pcm_plugin_params(handle, &ch_params)) < 0) {
 		jack_error("snd_pcm_plugin_params failed for %s %s with err = (%s)", snd_strerror(err), stream_name, device_name);
@@ -555,7 +556,7 @@ alsa_driver_configure_stream (alsa_driver_t *driver, alsa_device_t *device, char
 			      snd_pcm_sw_params_t *sw_params,
 			      unsigned int *nperiodsp,
 			      channel_t *nchns,
-			      unsigned long sample_width)
+			      unsigned long preferred_sample_bytes)
 {
 	int err, format;
 	unsigned int frame_rate;
@@ -605,13 +606,13 @@ alsa_driver_configure_stream (alsa_driver_t *driver, alsa_device_t *device, char
 		}
 	}
 
-	format = (sample_width == 4) ? 0 : NUMFORMATS - 1;
+	format = (preferred_sample_bytes == 4) ? 0 : NUMFORMATS - 1;
 
 	while (1) {
 		if ((err = snd_pcm_hw_params_set_format (
 			     handle, hw_params, formats[format].format)) < 0) {
 
-			if ((sample_width == 4
+			if ((preferred_sample_bytes == 4
 			     ? format++ >= NUMFORMATS - 1
 			     : format-- <= 0)) {
 				jack_error ("Sorry. The audio interface \"%s\""
@@ -841,26 +842,6 @@ alsa_driver_check_format (snd_pcm_format_t format)
 	return 0;
 }
 
-static void
-alsa_driver_set_sample_bytes (alsa_driver_t *driver, alsa_device_t *device)
-{
-#ifdef __QNXNTO__
-	device->playback_sample_bytes =
-		snd_pcm_format_width (device->playback_sample_format)
-		/ 8;
-	device->capture_sample_bytes =
-		snd_pcm_format_width (device->capture_sample_format)
-		/ 8;
-#else
-	device->playback_sample_bytes =
-		snd_pcm_format_physical_width (device->playback_sample_format)
-		/ 8;
-	device->capture_sample_bytes =
-		snd_pcm_format_physical_width (device->capture_sample_format)
-		/ 8;
-#endif
-}
-
 static int
 alsa_driver_set_parameters (alsa_driver_t *driver,
 			    alsa_device_t *device,
@@ -908,7 +889,7 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 			device->capture_handle,
 			&driver->capture_nperiods,
 			&device->capture_nchannels,
-			device->capture_sample_bytes,
+			driver->preferred_sample_bytes,
 			SND_PCM_CHANNEL_CAPTURE);
 
 		if (err) {
@@ -923,11 +904,11 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 		}
 
 		cr = c_setup.format.rate;
-		c_period_size = c_setup.buf.block.frag_size / device->capture_nchannels
-		        / device->capture_sample_bytes;
 		c_periods = c_setup.buf.block.frags;
 		device->capture_sample_format = c_setup.format.format;
 		device->capture_interleaved = c_setup.format.interleave;
+		device->capture_sample_bytes = snd_pcm_format_width (c_setup.format.format) / 8;
+		c_period_size = c_setup.buf.block.frag_size / device->capture_nchannels / device->capture_sample_bytes;
 #else
 		err = alsa_driver_configure_stream (
 			driver,
@@ -939,7 +920,7 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 			driver->capture_sw_params,
 			&driver->capture_nperiods,
 			&device->capture_nchannels,
-			device->capture_sample_bytes);
+			driver->preferred_sample_bytes);
 
 		if (err) {
 			jack_error ("ALSA: cannot configure capture channel");
@@ -961,6 +942,7 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 		device->capture_interleaved =
 			(access == SND_PCM_ACCESS_MMAP_INTERLEAVED)
 			|| (access == SND_PCM_ACCESS_MMAP_COMPLEX);
+		device->capture_sample_bytes = snd_pcm_format_physical_width (device->capture_sample_format) / 8;
 #endif
 		if (err) {
 			jack_error ("ALSA: cannot configure capture channel");
@@ -982,7 +964,7 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 			device->playback_handle,
 			&driver->playback_nperiods,
 			&device->playback_nchannels,
-			device->playback_sample_bytes,
+			driver->preferred_sample_bytes,
 			SND_PCM_CHANNEL_PLAYBACK);
 
 		if (err) {
@@ -997,11 +979,11 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 		}
 
 		pr = p_setup.format.rate;
-		p_period_size = p_setup.buf.block.frag_size  / device->playback_nchannels
-		        / device->playback_sample_bytes;
 		p_periods = p_setup.buf.block.frags;
 		device->playback_sample_format = p_setup.format.format;
 		device->playback_interleaved = p_setup.format.interleave;
+		device->playback_sample_bytes = snd_pcm_format_width (p_setup.format.format) / 8;
+		p_period_size = p_setup.buf.block.frag_size / device->playback_nchannels / device->playback_sample_bytes;
 #else
 
 		err = alsa_driver_configure_stream (
@@ -1014,7 +996,7 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 			driver->playback_sw_params,
 			&driver->playback_nperiods,
 			&device->playback_nchannels,
-			device->playback_sample_bytes);
+			driver->preferred_sample_bytes);
 
 		if (err) {
 			jack_error ("ALSA: cannot configure playback channel");
@@ -1037,6 +1019,7 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 		device->playback_interleaved =
 			(access == SND_PCM_ACCESS_MMAP_INTERLEAVED)
 			|| (access == SND_PCM_ACCESS_MMAP_COMPLEX);
+		device->playback_sample_bytes = snd_pcm_format_physical_width (device->playback_sample_format) / 8;
 #endif
 	}
 
@@ -1135,8 +1118,6 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 		}
 #endif
 	}
-
-	alsa_driver_set_sample_bytes(driver, device);
 
 	if (do_playback) {
 		err = alsa_driver_check_format(device->playback_sample_format);
@@ -1922,6 +1903,9 @@ alsa_driver_close (alsa_driver_t *driver)
 			continue;
 		}
 
+		device->capture_sample_bytes = 0;
+		device->capture_sample_format = SND_PCM_FORMAT_UNKNOWN;
+
 		snd_pcm_close(device->capture_handle);
 		device->capture_handle = NULL;
 	}
@@ -1932,6 +1916,7 @@ alsa_driver_close (alsa_driver_t *driver)
 			continue;
 		}
 
+
 		if (device->playback_linked) {
 			snd_pcm_unlink(device->playback_handle);
 			device->playback_linked = 0;
@@ -1940,6 +1925,9 @@ alsa_driver_close (alsa_driver_t *driver)
 		if (device->playback_target_state != SND_PCM_STATE_NOTREADY) {
 			continue;
 		}
+
+		device->playback_sample_bytes = 0;
+		device->playback_sample_format = SND_PCM_FORMAT_UNKNOWN;
 
 		snd_pcm_close(device->playback_handle);
 		device->playback_handle = NULL;
@@ -3102,17 +3090,21 @@ alsa_driver_new (char *name, alsa_driver_info_t info, jack_client_t *client)
 	driver->frames_per_cycle = info.frames_per_period;
 	driver->user_nperiods = info.periods_n;
 
+	driver->preferred_sample_bytes = info.shorts_first ? 2 : 4;
+
 	driver->features = info.features;
 
 	for (int i = 0; i < driver->devices_count; ++i) {
 		alsa_device_t *device = &driver->devices[i];
 		if (i < driver->devices_c_count) {
-			device->capture_sample_bytes = (info.shorts_first ? 2:4);
+			device->capture_sample_bytes = 0;
+			device->capture_sample_format = SND_PCM_FORMAT_UNKNOWN;
 			device->capture_name = strdup(info.devices[i].capture_name);
 			device->capture_nchannels = info.devices[i].capture_channels;
 		}
 		if (i < driver->devices_p_count) {
-			device->playback_sample_bytes = (info.shorts_first ? 2:4);
+			device->playback_sample_bytes = 0;
+			device->playback_sample_format = SND_PCM_FORMAT_UNKNOWN;
 			device->playback_name = strdup(info.devices[i].playback_name);
 			device->playback_nchannels = info.devices[i].playback_channels;
 		}
