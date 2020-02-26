@@ -1025,7 +1025,7 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 
 	/* original checks done for single device mode */
 	if (driver->devices_count == 1) {
-		if (device->capture_handle && device->playback_handle) {
+		if (do_capture && do_playback) {
 			if (cr != pr) {
 				jack_error ("playback and capture sample rates do "
 						"not match (%d vs. %d)", pr, cr);
@@ -1042,13 +1042,13 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 				driver->frame_rate = cr;
 			}
 		}
-		else if (device->capture_handle && cr != driver->frame_rate) {
+		else if (do_capture && cr != driver->frame_rate) {
 			jack_error ("capture sample rate in use (%d Hz) does not "
 					"match requested rate (%d Hz)",
 					cr, driver->frame_rate);
 			driver->frame_rate = cr;
 		}
-		else if (device->playback_handle && pr != driver->frame_rate) {
+		else if (do_playback && pr != driver->frame_rate) {
 			jack_error ("playback sample rate in use (%d Hz) does not "
 					"match requested rate (%d Hz)",
 					pr, driver->frame_rate);
