@@ -1367,12 +1367,14 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 		if (poll_result < 0) {
 
 			if (errno == EINTR) {
-				jack_info ("poll interrupt");
+				const char poll_log[] = "ALSA: poll interrupt";
 				// this happens mostly when run
 				// under gdb, or when exiting due to a signal
 				if (under_gdb) {
+					jack_info(poll_log);
 					goto again;
 				}
+				jack_error(poll_log);
 				*status = -2;
 				return 0;
 			}
