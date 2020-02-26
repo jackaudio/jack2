@@ -1397,9 +1397,9 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 				*status = -5;
 				return 0;
 			}
-			jack_log ("ALSA: poll time out, polled for %" PRIu64
-				  " usecs, Retrying with a recovery, retry cnt = %d",
-				  poll_ret - poll_enter, retry_cnt);
+			jack_error ("ALSA: poll time out, polled for %" PRIu64
+				    " usecs, Retrying with a recovery, retry cnt = %d",
+				    poll_ret - poll_enter, retry_cnt);
 			*status = alsa_driver_xrun_recovery (driver, delayed_usecs);
 			if(*status != 0) {
 				jack_error ("ALSA: poll time out, recovery failed with status = %d", *status);
