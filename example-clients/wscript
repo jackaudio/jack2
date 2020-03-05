@@ -31,6 +31,7 @@ example_programs = {
     'jack_midi_latency_test' : 'midi_latency_test.c',
     'jack_simdtests' : 'simdtests.cpp',
     'jack_property' : 'property.c',
+    'jack_reload' : 'reload.c',
     }
 
 example_libs = {
