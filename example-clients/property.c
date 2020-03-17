@@ -17,7 +17,7 @@ static char* subject = NULL;
 static void
 show_usage (void)
 {
-	fprintf (stderr, "\nUsage: jack_property [options] UUID [ key [ value [ type  ] ] ]\n");
+	fprintf (stderr, "\nUsage: jack_property [options] UUID [ key [ value [ type ] ] ]\n");
 	fprintf (stderr, "Set/Display JACK properties (metadata).\n\n");
 	fprintf (stderr, "Set options:\n");
 	fprintf (stderr, "        -s, --set		Set property \"key\" to \"value\" for \"UUID\" with optional MIME type \"type\"\n");
@@ -28,9 +28,9 @@ show_usage (void)
         fprintf (stderr, "        --port		\tInterpret UUID as a port name, not a UUID\n");
 	fprintf (stderr, "\nDisplay options:\n");
 	fprintf (stderr, "        -l			Show all properties\n");
-	fprintf (stderr, "        -l, --list UUID	\tShow value all properties of UUID\n");
+	fprintf (stderr, "        -l, --list UUID	\tShow value for all properties of UUID\n");
 	fprintf (stderr, "        -l, --list UUID key	Show value for key of UUID\n");
-	fprintf (stderr, "\nFor more information see http://jackaudio.org/\n");
+	fprintf (stderr, "\nFor more information see https://jackaudio.org/\n");
 }
 
 static int
@@ -222,7 +222,7 @@ int main (int argc, char* argv[])
                 }
 
                 if (jack_set_property (client, uuid, key, value, type)) {
-                        fprintf (stderr, "cannot set value for key %s of %s\n", value, subject);
+                        fprintf (stderr, "cannot set value for key %s of %s\n", key, subject);
                         exit (1);
                 }
 
