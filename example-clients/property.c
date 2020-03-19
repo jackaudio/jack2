@@ -264,7 +264,7 @@ int main (int argc, char* argv[])
                                 return -1;
                         }
 
-                        if ((cnt = jack_get_properties (uuid, &description)) < 0) {
+                        if ((int)(cnt = jack_get_properties (uuid, &description)) < 0) {
                                 fprintf (stderr, "could not retrieve properties for %s\n", subject);
                                 exit (1);
                         }
