@@ -39,7 +39,7 @@ Alternatively, you can build and install jack2 using [vcpkg](https://github.com/
 
     git clone https://github.com/Microsoft/vcpkg.git
     cd vcpkg
-    ./bootstrap-vcpkg.sh
+    ./bootstrap-vcpkg.bat
     ./vcpkg integrate install
     ./vcpkg install jack2
 
