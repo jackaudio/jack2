@@ -35,6 +35,17 @@ The resources files has been created with ResEdit (ANSI build). VisualStudio use
 You can make a small installer ('setup.exe') with CreateInstallFree, a little freeware. For this you have the little script 'jack.ci' for 32 bits version and 'jack64.c' for mixed 64/32 bits version. The installer contains everything jack needs to be integrated in windows (including register entries and shortcuts).
 A binary version of QJAckCtl is also included.
 
+Alternatively, you can build and install jack2 using [vcpkg](https://github.com/microsoft/vcpkg/) dependency manager:
+
+    git clone https://github.com/Microsoft/vcpkg.git
+    cd vcpkg
+    ./bootstrap-vcpkg.sh
+    ./vcpkg integrate install
+    ./vcpkg install jack2
+
+The jack2 port in vcpkg is kept up to date by microsoft team members and community contributors.
+If the version is out of date, please [create an issue or pull request](https://github.com/Microsoft/vcpkg) on the vcpkg repository.
+
 -------------------------------
 Running JACK on Windows
 -------------------------------
