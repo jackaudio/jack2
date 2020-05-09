@@ -198,16 +198,16 @@ int JackMidiDriver::ProcessWriteAsync()
     return 0;
 }
 
-JackMidiBuffer* JackMidiDriver::GetInputBuffer(int port_index)
+JackEventBuffer* JackMidiDriver::GetInputBuffer(int port_index)
 {
     assert(fCapturePortList[port_index]);
-    return (JackMidiBuffer*)fGraphManager->GetBuffer(fCapturePortList[port_index], fEngineControl->fBufferSize);
+    return (JackEventBuffer*)fGraphManager->GetBuffer(fCapturePortList[port_index], fEngineControl->fBufferSize);
 }
 
-JackMidiBuffer* JackMidiDriver::GetOutputBuffer(int port_index)
+JackEventBuffer* JackMidiDriver::GetOutputBuffer(int port_index)
 {
     assert(fPlaybackPortList[port_index]);
-    return (JackMidiBuffer*)fGraphManager->GetBuffer(fPlaybackPortList[port_index], fEngineControl->fBufferSize);
+    return (JackEventBuffer*)fGraphManager->GetBuffer(fPlaybackPortList[port_index], fEngineControl->fBufferSize);
 }
 
 } // end of namespace

@@ -390,8 +390,8 @@ struct JackNetExtMaster : public JackNetMasterInterface {
             }
 
             for (int midi_port_index = 0; midi_port_index < midi_input; midi_port_index++) {
-                assert(((JackMidiBuffer**)midi_input_buffer)[midi_port_index]);
-                fNetMidiPlaybackBuffer->SetBuffer(midi_port_index, ((JackMidiBuffer**)midi_input_buffer)[midi_port_index]);
+                assert(((JackEventBuffer**)midi_input_buffer)[midi_port_index]);
+                fNetMidiPlaybackBuffer->SetBuffer(midi_port_index, ((JackEventBuffer**)midi_input_buffer)[midi_port_index]);
             }
          
             int res1 = SyncRecv();
@@ -443,8 +443,8 @@ struct JackNetExtMaster : public JackNetMasterInterface {
             }
 
             for (int midi_port_index = 0; midi_port_index < midi_output; midi_port_index++) {
-                assert(((JackMidiBuffer**)midi_output_buffer)[midi_port_index]);
-                fNetMidiCaptureBuffer->SetBuffer(midi_port_index, ((JackMidiBuffer**)midi_output_buffer)[midi_port_index]);
+                assert(((JackEventBuffer**)midi_output_buffer)[midi_port_index]);
+                fNetMidiCaptureBuffer->SetBuffer(midi_port_index, ((JackEventBuffer**)midi_output_buffer)[midi_port_index]);
             }
             
             EncodeSyncPacket(frames);
@@ -481,8 +481,8 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
     float** fAudioCaptureBuffer;
     float** fAudioPlaybackBuffer;
 
-    JackMidiBuffer** fMidiCaptureBuffer;
-    JackMidiBuffer** fMidiPlaybackBuffer;
+    JackEventBuffer** fMidiCaptureBuffer;
+    JackEventBuffer** fMidiPlaybackBuffer;
    
     JackThread fThread;
 
@@ -567,9 +567,9 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
         }
 
         if (fParams.fSendMidiChannels > 0) {
-            fMidiCaptureBuffer = new JackMidiBuffer*[fParams.fSendMidiChannels];
+            fMidiCaptureBuffer = new JackEventBuffer*[fParams.fSendMidiChannels];
             for (int midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++) {
-                fMidiCaptureBuffer[midi_port_index] = (JackMidiBuffer*)new float[fParams.fPeriodSize];
+                fMidiCaptureBuffer[midi_port_index] = (JackEventBuffer*)new float[fParams.fPeriodSize];
                 memset(fMidiCaptureBuffer[midi_port_index], 0, sizeof(float) * fParams.fPeriodSize);
                 fNetMidiCaptureBuffer->SetBuffer(midi_port_index, fMidiCaptureBuffer[midi_port_index]);
             }
@@ -585,9 +585,9 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
         }
 
         if (fParams.fReturnMidiChannels > 0) {
-            fMidiPlaybackBuffer = new JackMidiBuffer*[fParams.fReturnMidiChannels];
+            fMidiPlaybackBuffer = new JackEventBuffer*[fParams.fReturnMidiChannels];
             for (int midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++) {
-                fMidiPlaybackBuffer[midi_port_index] = (JackMidiBuffer*)new float[fParams.fPeriodSize];
+                fMidiPlaybackBuffer[midi_port_index] = (JackEventBuffer*)new float[fParams.fPeriodSize];
                 memset(fMidiPlaybackBuffer[midi_port_index], 0, sizeof(float) * fParams.fPeriodSize);
                 fNetMidiPlaybackBuffer->SetBuffer(midi_port_index, fMidiPlaybackBuffer[midi_port_index]);
             }

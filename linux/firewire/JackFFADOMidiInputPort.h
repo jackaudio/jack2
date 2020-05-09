@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define __JackFFADOMidiInputPort__
 
 #include "JackFFADOMidiReceiveQueue.h"
-#include "JackMidiBufferWriteQueue.h"
+#include "JackMidi.h"
 #include "JackMidiRawInputWriteQueue.h"
 
 namespace Jack {

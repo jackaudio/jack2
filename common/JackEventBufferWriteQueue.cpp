@@ -17,20 +17,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#include "JackMidiBufferWriteQueue.h"
+#include "JackEventBufferWriteQueue.h"
 #include "JackMidiUtil.h"
 #include "JackError.h"
 
-using Jack::JackMidiBufferWriteQueue;
+using Jack::JackEventBufferWriteQueue;
 
-JackMidiBufferWriteQueue::JackMidiBufferWriteQueue()
+JackEventBufferWriteQueue::JackEventBufferWriteQueue()
 {
     // Empty
 }
 
-Jack::JackMidiWriteQueue::EnqueueResult
-JackMidiBufferWriteQueue::EnqueueEvent(jack_nframes_t time, size_t size,
-                                       jack_midi_data_t *data)
+Jack::JackEventWriteQueue::EnqueueResult
+JackEventBufferWriteQueue::EnqueueEvent(jack_nframes_t time, size_t size,
+                                       jack_event_data_t *data)
 {
     if (time >= next_frame_time) {
         return EVENT_EARLY;
@@ -38,7 +38,7 @@ JackMidiBufferWriteQueue::EnqueueEvent(jack_nframes_t time, size_t size,
     if (time < last_frame_time) {
         time = last_frame_time;
     }
-    jack_midi_data_t *dst = buffer->ReserveEvent(time - last_frame_time, size);
+    jack_event_data_t *dst = buffer->ReserveEvent(time - last_frame_time, size);
     if (! dst) {
         return size > max_bytes ? BUFFER_TOO_SMALL : BUFFER_FULL;
     }
@@ -47,14 +47,14 @@ JackMidiBufferWriteQueue::EnqueueEvent(jack_nframes_t time, size_t size,
 }
 
 void
-JackMidiBufferWriteQueue::ResetMidiBuffer(JackMidiBuffer *buffer,
+JackEventBufferWriteQueue::ResetEventBuffer(JackEventBuffer *buffer,
                                           jack_nframes_t frames)
 {
     if (! buffer) {
-        jack_error("JackMidiBufferWriteQueue::ResetMidiBuffer - buffer reset "
+        jack_error("JackEventBufferWriteQueue::ResetEventBuffer - buffer reset "
                    "to NULL");
     } else if (! buffer->IsValid()) {
-        jack_error("JackMidiBufferWriteQueue::ResetMidiBuffer - buffer reset "
+        jack_error("JackEventBufferWriteQueue::ResetEventBuffer - buffer reset "
                    "to invalid buffer");
     } else {
         this->buffer = buffer;

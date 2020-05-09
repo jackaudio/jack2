@@ -97,7 +97,7 @@ namespace Jack
         fMaxBufsize = fNPorts * sizeof(sample_t) * params->fPeriodSize;
         fMaxPcktSize = params->fMtu - sizeof(packet_header_t);
         fBuffer = new char[fMaxBufsize];
-        fPortBuffer = new JackMidiBuffer* [fNPorts];
+        fPortBuffer = new JackEventBuffer* [fNPorts];
         for (int port_index = 0; port_index < fNPorts; port_index++) {
             fPortBuffer[port_index] = NULL;
         }
@@ -125,12 +125,12 @@ namespace Jack
         return (res1) ? res2 + 1 : res2;
     }
 
-    void NetMidiBuffer::SetBuffer(int index, JackMidiBuffer* buffer)
+    void NetMidiBuffer::SetBuffer(int index, JackEventBuffer* buffer)
     {
         fPortBuffer[index] = buffer;
     }
 
-    JackMidiBuffer* NetMidiBuffer::GetBuffer(int index)
+    JackEventBuffer* NetMidiBuffer::GetBuffer(int index)
     {
         return fPortBuffer[index];
     }
@@ -155,14 +155,14 @@ namespace Jack
 
         for (int port_index = 0; port_index < fNPorts; port_index++) {
             char* write_pos = fBuffer + pos;
-            copy_size = sizeof(JackMidiBuffer) + fPortBuffer[port_index]->event_count * sizeof(JackMidiEvent);
+            copy_size = sizeof(JackEventBuffer) + fPortBuffer[port_index]->event_count * sizeof(JackEvent);
             memcpy(fBuffer + pos, fPortBuffer[port_index], copy_size);
             pos += copy_size;
             memcpy(fBuffer + pos,
                     fPortBuffer[port_index] + (fPortBuffer[port_index]->buffer_size - fPortBuffer[port_index]->write_pos),
                     fPortBuffer[port_index]->write_pos);
             pos += fPortBuffer[port_index]->write_pos;
-            JackMidiBuffer* midi_buffer = reinterpret_cast<JackMidiBuffer*>(write_pos);
+            JackEventBuffer* midi_buffer = reinterpret_cast<JackEventBuffer*>(write_pos);
             MidiBufferHToN(midi_buffer, midi_buffer);
         }
         return pos;
@@ -174,9 +174,9 @@ namespace Jack
         size_t copy_size;
 
         for (int port_index = 0; port_index < fNPorts; port_index++) {
-            JackMidiBuffer* midi_buffer = reinterpret_cast<JackMidiBuffer*>(fBuffer + pos);
+            JackEventBuffer* midi_buffer = reinterpret_cast<JackEventBuffer*>(fBuffer + pos);
             MidiBufferNToH(midi_buffer, midi_buffer);
-            copy_size = sizeof(JackMidiBuffer) + reinterpret_cast<JackMidiBuffer*>(fBuffer + pos)->event_count * sizeof(JackMidiEvent);
+            copy_size = sizeof(JackEventBuffer) + reinterpret_cast<JackEventBuffer*>(fBuffer + pos)->event_count * sizeof(JackEvent);
             memcpy(fPortBuffer[port_index], fBuffer + pos, copy_size);
             pos += copy_size;
             memcpy(fPortBuffer[port_index] + (fPortBuffer[port_index]->buffer_size - fPortBuffer[port_index]->write_pos),
@@ -1270,7 +1270,7 @@ namespace Jack
         jack_info("**********************************************");
     }
   
-    SERVER_EXPORT void MidiBufferHToN(JackMidiBuffer* src_buffer, JackMidiBuffer* dst_buffer)
+    SERVER_EXPORT void MidiBufferHToN(JackEventBuffer* src_buffer, JackEventBuffer* dst_buffer)
     {
         dst_buffer->magic = htonl(src_buffer->magic);
         dst_buffer->buffer_size = htonl(src_buffer->buffer_size);
@@ -1280,7 +1280,7 @@ namespace Jack
         dst_buffer->lost_events = htonl(src_buffer->lost_events);
     }
 
-    SERVER_EXPORT void MidiBufferNToH(JackMidiBuffer* src_buffer, JackMidiBuffer* dst_buffer)
+    SERVER_EXPORT void MidiBufferNToH(JackEventBuffer* src_buffer, JackEventBuffer* dst_buffer)
     {
         dst_buffer->magic = ntohl(src_buffer->magic);
         dst_buffer->buffer_size = ntohl(src_buffer->buffer_size);

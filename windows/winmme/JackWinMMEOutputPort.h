@@ -20,8 +20,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackWinMMEOutputPort__
 #define __JackWinMMEOutputPort__
 
-#include "JackMidiAsyncQueue.h"
-#include "JackMidiBufferReadQueue.h"
+#include "JackMidi.h"
 #include "JackThread.h"
 #include "JackWinMMEPort.h"
 

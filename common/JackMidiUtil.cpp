@@ -23,14 +23,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackMidiUtil.h"
 #include "JackTime.h"
 
-jack_midi_data_t
-Jack::ApplyRunningStatus(size_t *size, jack_midi_data_t **buffer,
-                         jack_midi_data_t running_status)
+jack_event_data_t
+Jack::ApplyRunningStatus(size_t *size, jack_event_data_t **buffer,
+                         jack_event_data_t running_status)
 {
 
     // Stolen and modified from alsa/midi_pack.h
 
-    jack_midi_data_t status = **buffer;
+    jack_event_data_t status = **buffer;
     if ((status >= 0x80) && (status < 0xf0)) {
         if (status == running_status) {
             (*buffer)++;
@@ -44,9 +44,9 @@ Jack::ApplyRunningStatus(size_t *size, jack_midi_data_t **buffer,
     return running_status;
 }
 
-jack_midi_data_t
-Jack::ApplyRunningStatus(jack_midi_event_t *event,
-                         jack_midi_data_t running_status)
+jack_event_data_t
+Jack::ApplyRunningStatus(jack_event_t *event,
+                         jack_event_data_t running_status)
 {
     return ApplyRunningStatus(&(event->size), &(event->buffer),
                               running_status);
@@ -78,7 +78,7 @@ Jack::GetLastFrame()
 }
 
 int
-Jack::GetMessageLength(jack_midi_data_t status_byte)
+Jack::GetMessageLength(jack_event_data_t status_byte)
 {
     switch (status_byte & 0xf0) {
     case 0x80:

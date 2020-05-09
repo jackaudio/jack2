@@ -241,8 +241,19 @@ extern const char* JACK_METADATA_CONNECTED;
  * OSC events is not a valid MIDI status byte, so MIDI clients that check the
  * status byte will gracefully ignore OSC messages if the user makes an
  * inappropriate connection.
+ * 
+ * This property may contain values other than "MIDI" and "OSC" for custom (or
+ * newer) protocols. If it is not set, the contained data should be treated as "MIDI".
  */
 extern const char* JACK_METADATA_EVENT_TYPES;
+
+/**
+ * OSC allows for arbitrary paths and function names. A namespace is an interface
+ * that gives certain paths and functions a semantic meaning. Currently, the only
+ * standardized interface is "SYN" (<http://opensoundcontrol.org/implementation/syn-namespace>).
+ * Multiple namespaces (if supported) are specified as comma separated list.
+ */
+extern const char* JACK_METADATA_EVENT_OSC_NAMESPACE;
 
 /**
  * A value that should be shown when attempting to identify the
@@ -304,10 +315,11 @@ extern const char* JACK_METADATA_PORT_GROUP;
  * The type of an audio signal.
  *
  * This property allows audio ports to be tagged with a "meaning".  The value
- * is a simple string.  Currently, the only type is "CV", for "control voltage"
- * ports.  Hosts SHOULD be take care to not treat CV ports as audibile and send
- * their output directly to speakers.  In particular, CV ports are not
- * necessarily periodic at all and may have very high DC.
+ * is a simple string.  Currently, the only types are "PCM" for normal audio and
+ * "CV", for "control voltage"  ports.  Hosts SHOULD be take care to not treat CV ports 
+ * as audibile and send their output directly to speakers.  In particular, CV ports
+ * are not necessarily periodic at all and may have very high DC. Not setting this property 
+ * implies the default value "PCM".
  */
 extern const char* JACK_METADATA_SIGNAL_TYPE;
 

@@ -17,48 +17,48 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#include "JackMidiBufferReadQueue.h"
+#include "JackEventBufferReadQueue.h"
 #include "JackMidiUtil.h"
 #include "JackError.h"
 
-using Jack::JackMidiBufferReadQueue;
+using Jack::JackEventBufferReadQueue;
 
-JackMidiBufferReadQueue::JackMidiBufferReadQueue()
+JackEventBufferReadQueue::JackEventBufferReadQueue()
 {
     event_count = 0;
     index = 0;
 }
 
-jack_midi_event_t *
-JackMidiBufferReadQueue::DequeueEvent()
+jack_event_t *
+JackEventBufferReadQueue::DequeueEvent()
 {
-    jack_midi_event_t *e = 0;
+    jack_event_t *e = 0;
     if (index < event_count) {
-        JackMidiEvent *event = &(buffer->events[index]);
-        midi_event.buffer = event->GetData(buffer);
-        midi_event.size = event->size;
-        midi_event.time = last_frame_time + event->time;
-        e = &midi_event;
+        JackEvent *jack_event = &(buffer->events[index]);
+        event.buffer = jack_event->GetData(buffer);
+        event.size = jack_event->size;
+        event.time = last_frame_time + jack_event->time;
+        e = &event;
         index++;
     }
     return e;
 }
 
 void
-JackMidiBufferReadQueue::ResetMidiBuffer(JackMidiBuffer *buffer)
+JackEventBufferReadQueue::ResetEventBuffer(JackEventBuffer *buffer)
 {
     event_count = 0;
     index = 0;
     if (! buffer) {
-        jack_error("JackMidiBufferReadQueue::ResetMidiBuffer - buffer reset "
+        jack_error("JackEventBufferReadQueue::ResetEventBuffer - buffer reset "
                    "to NULL");
     } else if (! buffer->IsValid()) {
-        jack_error("JackMidiBufferReadQueue::ResetMidiBuffer - buffer reset "
+        jack_error("JackEventBufferReadQueue::ResetEventBuffer - buffer reset "
                    "to invalid buffer");
     } else {
         uint32_t lost_events = buffer->lost_events;
         if (lost_events) {
-            jack_error("JackMidiBufferReadQueue::ResetMidiBuffer - %d events "
+            jack_error("JackEventBufferReadQueue::ResetEventBuffer - %d events "
                        "lost during mixdown", lost_events);
         }
         this->buffer = buffer;

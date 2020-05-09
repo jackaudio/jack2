@@ -21,7 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackMidiDriver__
 
 #include "JackDriver.h"
-#include "JackMidiPort.h"
+#include "JackEventPort.h"
 #include "JackLockedEngine.h"
 #include "ringbuffer.h"
 
@@ -29,7 +29,7 @@ namespace Jack
 {
 
 /*!
-\brief The base class for MIDI drivers: drivers with MIDI ports.
+\brief The base class for event drivers: drivers with MIDI ports.
 
 A concrete derived class will have to be defined with a real MIDI driver API, 
 either callback based one (like CoreMIDI..) ones or blocking ones (like ALSA MIDI).
@@ -41,8 +41,8 @@ class SERVER_EXPORT JackMidiDriver : public JackDriver
 
      protected:
 
-        JackMidiBuffer* GetInputBuffer(int port_index);
-        JackMidiBuffer* GetOutputBuffer(int port_index);
+        JackEventBuffer* GetInputBuffer(int port_index);
+        JackEventBuffer* GetOutputBuffer(int port_index);
 
         virtual int ProcessReadSync();
         virtual int ProcessWriteSync();

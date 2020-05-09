@@ -17,11 +17,26 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#include "JackMidiWriteQueue.h"
+#ifndef __JackEventReceiveQueue__
+#define __JackEventReceiveQueue__
 
-using Jack::JackMidiWriteQueue;
+#include "JackEventReadQueue.h"
 
-JackMidiWriteQueue::~JackMidiWriteQueue()
-{
-    // Empty
+namespace Jack {
+
+    /**
+     * Implemented by MIDI input connections.
+     */
+
+    class SERVER_EXPORT JackEventReceiveQueue: public JackEventReadQueue {
+
+    public:
+
+        virtual
+        ~JackEventReceiveQueue();
+
+    };
+
 }
+
+#endif

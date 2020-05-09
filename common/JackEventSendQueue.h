@@ -17,28 +17,28 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#ifndef __JackMidiSendQueue__
-#define __JackMidiSendQueue__
+#ifndef __JackEventSendQueue__
+#define __JackEventSendQueue__
 
-#include "JackMidiWriteQueue.h"
+#include "JackEventWriteQueue.h"
 
 namespace Jack {
 
     /**
-     * Implemented by MIDI output connections.
+     * Implemented by event output connections.
      */
 
-    class SERVER_EXPORT JackMidiSendQueue: public JackMidiWriteQueue {
+    class SERVER_EXPORT JackEventSendQueue: public JackEventWriteQueue {
 
     public:
 
-        using JackMidiWriteQueue::EnqueueEvent;
+        using JackEventWriteQueue::EnqueueEvent;
 
         virtual
-        ~JackMidiSendQueue();
+        ~JackEventSendQueue();
 
         /**
-         * Returns the next frame that a MIDI message can be sent at.  The
+         * Returns the next frame that a message can be sent at.  The
          * default method returns the current frame.
          */
 

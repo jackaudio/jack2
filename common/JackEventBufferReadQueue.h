@@ -17,36 +17,46 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#ifndef __JackMidiReadQueue__
-#define __JackMidiReadQueue__
+#ifndef __JackEventBufferReadQueue__
+#define __JackEventBufferReadQueue__
 
-#include "JackMidiPort.h"
+#include "JackEventReadQueue.h"
 
 namespace Jack {
 
     /**
-     * Interface for objects that MIDI events can be read from.
+     * Wrapper class to present a JackEventBuffer in a read queue interface.
      */
 
-    class SERVER_EXPORT JackMidiReadQueue {
+    class SERVER_EXPORT JackEventBufferReadQueue: public JackEventReadQueue {
+
+    private:
+
+        JackEventBuffer *buffer;
+        jack_nframes_t event_count;
+        jack_nframes_t index;
+        jack_nframes_t last_frame_time;
+        jack_event_t event;
 
     public:
 
-        virtual
-        ~JackMidiReadQueue();
+        JackEventBufferReadQueue();
+
+        jack_event_t *
+        DequeueEvent();
 
         /**
-         * Dequeues an event from the queue.  Returns the event, or 0 if no
-         * events are available for reading.
-         *
-         * An event dequeued from the read queue is guaranteed to be valid up
-         * until another event is dequeued, at which all bets are off.  Make
-         * sure that you handle each event you dequeue before dequeueing the
-         * next event.
+         * This method must be called each period to reset the buffer for
+         * processing.
          */
 
-        virtual jack_midi_event_t *
-        DequeueEvent() = 0;
+        void
+        ResetEventBuffer(JackEventBuffer *buffer);
+
+        void
+        ResetMidiBuffer(JackEventBuffer *buffer) {
+            ResetEventBuffer(buffer);
+        }
 
     };
 

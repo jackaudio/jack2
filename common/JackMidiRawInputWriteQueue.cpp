@@ -27,12 +27,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 using Jack::JackMidiRawInputWriteQueue;
 
 JackMidiRawInputWriteQueue::
-JackMidiRawInputWriteQueue(JackMidiWriteQueue *write_queue,
+JackMidiRawInputWriteQueue(JackEventWriteQueue *write_queue,
                            size_t max_packet_data, size_t max_packets)
 {
-    packet_queue = new JackMidiAsyncQueue(max_packet_data, max_packets);
-    std::unique_ptr<JackMidiAsyncQueue> packet_queue_ptr(packet_queue);
-    input_buffer = new jack_midi_data_t[max_packet_data];
+    packet_queue = new JackEventAsyncQueue(max_packet_data, max_packets);
+    std::unique_ptr<JackEventAsyncQueue> packet_queue_ptr(packet_queue);
+    input_buffer = new jack_event_data_t[max_packet_data];
     Clear();
     expected_bytes = 0;
     event_pending = false;
@@ -56,9 +56,9 @@ JackMidiRawInputWriteQueue::Clear()
     unbuffered_bytes = 0;
 }
 
-Jack::JackMidiWriteQueue::EnqueueResult
+Jack::JackEventWriteQueue::EnqueueResult
 JackMidiRawInputWriteQueue::EnqueueEvent(jack_nframes_t time, size_t size,
-                                         jack_midi_data_t *buffer)
+                                         jack_event_data_t *buffer)
 {
     return packet_queue->EnqueueEvent(time, size, buffer);
 }
@@ -79,7 +79,7 @@ JackMidiRawInputWriteQueue::HandleBufferFailure(size_t unbuffered_bytes,
 }
 
 void
-JackMidiRawInputWriteQueue::HandleEventLoss(jack_midi_event_t *event)
+JackMidiRawInputWriteQueue::HandleEventLoss(jack_event_t *event)
 {
     jack_error("JackMidiRawInputWriteQueue::HandleEventLoss - A %d byte MIDI "
                "event scheduled for frame '%d' could not be processed because "
@@ -96,7 +96,7 @@ JackMidiRawInputWriteQueue::HandleIncompleteMessage(size_t total_bytes)
 }
 
 void
-JackMidiRawInputWriteQueue::HandleInvalidStatusByte(jack_midi_data_t byte)
+JackMidiRawInputWriteQueue::HandleInvalidStatusByte(jack_event_data_t byte)
 {
     jack_error("JackMidiRawInputWriteQueue::HandleInvalidStatusByte - "
                "Dropping invalid MIDI status byte '%x'.", (unsigned int) byte);
@@ -130,7 +130,7 @@ JackMidiRawInputWriteQueue::PrepareBufferedEvent(jack_nframes_t time)
 
 bool
 JackMidiRawInputWriteQueue::PrepareByteEvent(jack_nframes_t time,
-                                             jack_midi_data_t byte)
+                                             jack_event_data_t byte)
 {
     event_byte = byte;
     PrepareEvent(time, 1, &event_byte);
@@ -139,7 +139,7 @@ JackMidiRawInputWriteQueue::PrepareByteEvent(jack_nframes_t time,
 
 void
 JackMidiRawInputWriteQueue::PrepareEvent(jack_nframes_t time, size_t size,
-                                         jack_midi_data_t *buffer)
+                                         jack_event_data_t *buffer)
 {
     event.buffer = buffer;
     event.size = size;
@@ -174,7 +174,7 @@ JackMidiRawInputWriteQueue::Process(jack_nframes_t boundary_frame)
 
 bool
 JackMidiRawInputWriteQueue::ProcessByte(jack_nframes_t time,
-                                        jack_midi_data_t byte)
+                                        jack_event_data_t byte)
 {
     if (byte >= 0xf8) {
         // Realtime
@@ -269,7 +269,7 @@ JackMidiRawInputWriteQueue::ProcessByte(jack_nframes_t time,
 }
 
 void
-JackMidiRawInputWriteQueue::RecordByte(jack_midi_data_t byte)
+JackMidiRawInputWriteQueue::RecordByte(jack_event_data_t byte)
 {
     if (total_bytes < input_buffer_size) {
         input_buffer[total_bytes] = byte;

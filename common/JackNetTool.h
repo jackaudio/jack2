@@ -17,7 +17,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#include "JackMidiPort.h"
+#include "JackEventPort.h"
 #include "JackTools.h"
 #include "types.h"
 #include "transport.h"
@@ -224,7 +224,7 @@ namespace Jack
     \Brief Midi buffer and operations class
 
     This class is a toolset to manipulate Midi buffers.
-    A JackMidiBuffer has a fixed size, which is the same than an audio buffer size.
+    A JackEventBuffer has a fixed size, which is the same than an audio buffer size.
     An intermediate fixed size buffer allows to uninterleave midi data (from jack ports).
     But for a big majority of the process cycles, this buffer is filled less than 1%,
     Sending over a network 99% of useless data seems completely unappropriate.
@@ -245,7 +245,7 @@ namespace Jack
 
             char* fBuffer;
             char* fNetBuffer;
-            JackMidiBuffer** fPortBuffer;
+            JackEventBuffer** fPortBuffer;
 
             size_t fCycleBytesSize;  // needed size in bytes ofr an entire cycle
 
@@ -260,8 +260,8 @@ namespace Jack
             size_t GetCycleSize();
             int GetNumPackets(int data_sizen, int max_size);
 
-            void SetBuffer(int index, JackMidiBuffer* buffer);
-            JackMidiBuffer* GetBuffer(int index);
+            void SetBuffer(int index, JackEventBuffer* buffer);
+            JackEventBuffer* GetBuffer(int index);
 
             //utility
             void DisplayEvents();
@@ -492,8 +492,8 @@ namespace Jack
     SERVER_EXPORT void SessionParamsNToH(session_params_t* src_params, session_params_t* dst_params);
     SERVER_EXPORT void PacketHeaderHToN(packet_header_t* src_header, packet_header_t* dst_header);
     SERVER_EXPORT void PacketHeaderNToH(packet_header_t* src_header, packet_header_t* dst_header);
-    SERVER_EXPORT void MidiBufferHToN(JackMidiBuffer* src_buffer, JackMidiBuffer* dst_buffer);
-    SERVER_EXPORT void MidiBufferNToH(JackMidiBuffer* src_buffer, JackMidiBuffer* dst_buffer);
+    SERVER_EXPORT void MidiBufferHToN(JackEventBuffer* src_buffer, JackEventBuffer* dst_buffer);
+    SERVER_EXPORT void MidiBufferNToH(JackEventBuffer* src_buffer, JackEventBuffer* dst_buffer);
     SERVER_EXPORT void TransportDataHToN(net_transport_data_t* src_params, net_transport_data_t* dst_params);
     SERVER_EXPORT void TransportDataNToH(net_transport_data_t* src_params, net_transport_data_t* dst_params);
     //display session parameters

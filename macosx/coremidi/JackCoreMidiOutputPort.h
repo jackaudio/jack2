@@ -23,8 +23,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <semaphore.h>
 
 #include "JackCoreMidiPort.h"
-#include "JackMidiAsyncQueue.h"
-#include "JackMidiBufferReadQueue.h"
+#include "JackMidi.h"
 #include "JackThread.h"
 
 namespace Jack {

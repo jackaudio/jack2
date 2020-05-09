@@ -17,11 +17,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#include "JackMidiReadQueue.h"
+#include "JackEventSendQueue.h"
+#include "JackMidiUtil.h"
 
-using Jack::JackMidiReadQueue;
+using Jack::JackEventSendQueue;
 
-JackMidiReadQueue::~JackMidiReadQueue()
+JackEventSendQueue::~JackEventSendQueue()
 {
     // Empty
+}
+
+jack_nframes_t
+JackEventSendQueue::GetNextScheduleFrame()
+{
+    return GetCurrentFrame();
 }

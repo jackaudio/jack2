@@ -462,7 +462,7 @@ namespace Jack
         //buffers
         for (int midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++) {
             fNetMidiCaptureBuffer->SetBuffer(midi_port_index,
-                                            static_cast<JackMidiBuffer*>(jack_port_get_buffer(fMidiCapturePorts[midi_port_index],
+                                            static_cast<JackEventBuffer*>(jack_port_get_buffer(fMidiCapturePorts[midi_port_index],
                                             fParams.fPeriodSize)));
         }
         for (int audio_port_index = 0; audio_port_index < fParams.fSendAudioChannels; audio_port_index++) {
@@ -487,7 +487,7 @@ namespace Jack
 
         for (int midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++) {
             fNetMidiPlaybackBuffer->SetBuffer(midi_port_index,
-                                                static_cast<JackMidiBuffer*>(jack_port_get_buffer(fMidiPlaybackPorts[midi_port_index],
+                                                static_cast<JackEventBuffer*>(jack_port_get_buffer(fMidiPlaybackPorts[midi_port_index],
                                                 fParams.fPeriodSize)));
         }
         for (int audio_port_index = 0; audio_port_index < fParams.fReturnAudioChannels; audio_port_index++) {

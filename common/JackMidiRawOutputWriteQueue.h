@@ -20,8 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef __JackMidiRawOutputWriteQueue__
 #define __JackMidiRawOutputWriteQueue__
 
-#include "JackMidiAsyncQueue.h"
-#include "JackMidiSendQueue.h"
+#include "JackEventAsyncQueue.h"
+#include "JackEventSendQueue.h"
 
 namespace Jack {
 
@@ -44,18 +44,18 @@ namespace Jack {
      */
 
     class SERVER_EXPORT JackMidiRawOutputWriteQueue:
-        public JackMidiWriteQueue {
+        public JackEventWriteQueue {
 
     private:
 
-        jack_midi_event_t *non_rt_event;
+        jack_event_t *non_rt_event;
         jack_nframes_t non_rt_event_time;
-        JackMidiAsyncQueue *non_rt_queue;
-        jack_midi_event_t *rt_event;
+        JackEventAsyncQueue *non_rt_queue;
+        jack_event_t *rt_event;
         jack_nframes_t rt_event_time;
-        JackMidiAsyncQueue *rt_queue;
-        jack_midi_data_t running_status;
-        JackMidiSendQueue *send_queue;
+        JackEventAsyncQueue *rt_queue;
+        jack_event_data_t running_status;
+        JackEventSendQueue *send_queue;
 
         void
         DequeueNonRealtimeEvent();
@@ -64,7 +64,7 @@ namespace Jack {
         DequeueRealtimeEvent();
 
         bool
-        SendByte(jack_nframes_t time, jack_midi_data_t byte);
+        SendByte(jack_nframes_t time, jack_event_data_t byte);
 
         bool
         SendNonRTBytes(jack_nframes_t boundary_frame);
@@ -78,11 +78,11 @@ namespace Jack {
          */
 
         virtual void
-        HandleWriteQueueBug(jack_nframes_t time, jack_midi_data_t byte);
+        HandleWriteQueueBug(jack_nframes_t time, jack_event_data_t byte);
 
     public:
 
-        using JackMidiWriteQueue::EnqueueEvent;
+        using JackEventWriteQueue::EnqueueEvent;
 
         /**
          * Called to create a new raw write queue.  The `send_queue` argument
@@ -95,7 +95,7 @@ namespace Jack {
          * the non-realtime queue.
          */
 
-        JackMidiRawOutputWriteQueue(JackMidiSendQueue *send_queue,
+        JackMidiRawOutputWriteQueue(JackEventSendQueue *send_queue,
                                     size_t non_rt_size=4096,
                                     size_t max_non_rt_messages=1024,
                                     size_t max_rt_messages=128);
@@ -104,7 +104,7 @@ namespace Jack {
 
         EnqueueResult
         EnqueueEvent(jack_nframes_t time, size_t size,
-                     jack_midi_data_t *buffer);
+                     jack_event_data_t *buffer);
 
         /**
          * The `Process()` method should be called each time the

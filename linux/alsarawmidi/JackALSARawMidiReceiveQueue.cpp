@@ -21,6 +21,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackError.h"
 #include "JackMidiUtil.h"
 
+/* Somehow the compiler doesn't accept my typedef in JackMidi.h */
+typedef jack_event_data_t            jack_midi_data_t;
+typedef jack_event_t                 jack_midi_event_t;
+
 using Jack::JackALSARawMidiReceiveQueue;
 
 JackALSARawMidiReceiveQueue::

@@ -17,43 +17,48 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#ifndef __JackMidiBufferWriteQueue__
-#define __JackMidiBufferWriteQueue__
+#ifndef __JackEventBufferWriteQueue__
+#define __JackEventBufferWriteQueue__
 
-#include "JackMidiWriteQueue.h"
+#include "JackEventWriteQueue.h"
 
 namespace Jack {
 
     /**
-     * Wrapper class to present a JackMidiBuffer in a write queue interface.
+     * Wrapper class to present a JackEventBuffer in a write queue interface.
      */
 
-    class SERVER_EXPORT JackMidiBufferWriteQueue: public JackMidiWriteQueue {
+    class SERVER_EXPORT JackEventBufferWriteQueue: public JackEventWriteQueue {
 
     private:
 
-        JackMidiBuffer *buffer;
+        JackEventBuffer *buffer;
         jack_nframes_t last_frame_time;
         size_t max_bytes;
         jack_nframes_t next_frame_time;
 
     public:
 
-        using JackMidiWriteQueue::EnqueueEvent;
+        using JackEventWriteQueue::EnqueueEvent;
 
-        JackMidiBufferWriteQueue();
+        JackEventBufferWriteQueue();
 
         EnqueueResult
         EnqueueEvent(jack_nframes_t time, size_t size,
-                     jack_midi_data_t *buffer);
+                     jack_event_data_t *buffer);
 
         /**
-         * This method must be called each period to reset the MIDI buffer for
+         * This method must be called each period to reset the buffer for
          * processing.
          */
 
         void
-        ResetMidiBuffer(JackMidiBuffer *buffer, jack_nframes_t frames);
+        ResetEventBuffer(JackEventBuffer *buffer, jack_nframes_t frames);
+
+        void
+        ResetMidiBuffer(JackEventBuffer *buffer, jack_nframes_t frames) {
+            ResetEventBuffer(buffer, frames);
+        }
 
     };
 

@@ -1094,9 +1094,20 @@ LIB_EXPORT jack_port_t* jack_port_register(jack_client_t* ext_client, const char
     } else if ((port_name == NULL) || (port_type == NULL)) {
         jack_error("jack_port_register called with a NULL port name or a NULL port_type");
         return NULL;
-    } else {
-        return (jack_port_t *)((uintptr_t)client->PortRegister(port_name, port_type, flags, buffer_size));
     }
+    
+    if (strcmp(port_type, JACK_DEFAULT_AUDIO_TYPE) == 0) {
+        // Don't change anything
+    } else if (strcmp(port_type, JACK_DEFAULT_MESSAGE_TYPE) == 0) {
+        // Don't change anything
+    } else if (strcmp(port_type, JACK_DEFAULT_MIDI_TYPE) == 0) {
+        // Rename the old port type
+        port_type = JACK_DEFAULT_MESSAGE_TYPE;
+    } else {
+        jack_info("jack_port_register called with a non-default port_type: '%s'.", port_type);
+    }
+    
+    return (jack_port_t *)((uintptr_t)client->PortRegister(port_name, port_type, flags, buffer_size));
 }
 
 LIB_EXPORT int jack_port_unregister(jack_client_t* ext_client, jack_port_t* port)
