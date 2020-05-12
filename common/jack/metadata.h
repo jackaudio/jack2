@@ -229,7 +229,7 @@ int jack_set_property_change_callback (jack_client_t*             client,
  * A value that identifies what the hardware port is connected to (an external
  * device of some kind). Possible values might be "E-Piano" or "Master 2 Track".
  */
-extern const char* JACK_METADATA_CONNECTED;
+extern const char JACK_METADATA_CONNECTED[];
 
 /**
  * The supported event types of an event port.
@@ -242,21 +242,21 @@ extern const char* JACK_METADATA_CONNECTED;
  * status byte will gracefully ignore OSC messages if the user makes an
  * inappropriate connection.
  */
-extern const char* JACK_METADATA_EVENT_TYPES;
+extern const char JACK_METADATA_EVENT_TYPES[];
 
 /**
  * A value that should be shown when attempting to identify the
  * specific hardware outputs of a client. Typical values might be
  * "ADAT1", "S/PDIF L" or "MADI 43".
  */
-extern const char* JACK_METADATA_HARDWARE;
+extern const char JACK_METADATA_HARDWARE[];
 
 /**
  * A value with a MIME type of "image/png;base64" that is an encoding of an
  * NxN (with 32 < N <= 128) image to be used when displaying a visual
  * representation of that client or port.
  */
-extern const char* JACK_METADATA_ICON_LARGE;
+extern const char JACK_METADATA_ICON_LARGE[];
 
 /**
  * The name of the icon for the subject (typically client).
@@ -267,14 +267,14 @@ extern const char* JACK_METADATA_ICON_LARGE;
  * Theme Specification:
  * https://specifications.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
  */
-extern const char* JACK_METADATA_ICON_NAME;
+extern const char JACK_METADATA_ICON_NAME[];
 
 /**
  * A value with a MIME type of "image/png;base64" that is an encoding of an
  * NxN (with N <=32) image to be used when displaying a visual representation
  * of that client or port.
  */
-extern const char* JACK_METADATA_ICON_SMALL;
+extern const char JACK_METADATA_ICON_SMALL[];
 
 /**
  * Order for a port.
@@ -287,18 +287,18 @@ extern const char* JACK_METADATA_ICON_SMALL;
  *
  * It is encouraged to use http://www.w3.org/2001/XMLSchema#int as the type.
  */
-extern const char* JACK_METADATA_ORDER;
+extern const char JACK_METADATA_ORDER[];
 
 /**
  * A value that should be shown to the user when displaying a port to the user,
  * unless the user has explicitly overridden that a request to show the port
  * name, or some other key value.
  */
-extern const char* JACK_METADATA_PRETTY_NAME;
+extern const char JACK_METADATA_PRETTY_NAME[];
 
 /**
  */
-extern const char* JACK_METADATA_PORT_GROUP;
+extern const char JACK_METADATA_PORT_GROUP[];
 
 /**
  * The type of an audio signal.
@@ -309,7 +309,7 @@ extern const char* JACK_METADATA_PORT_GROUP;
  * their output directly to speakers.  In particular, CV ports are not
  * necessarily periodic at all and may have very high DC.
  */
-extern const char* JACK_METADATA_SIGNAL_TYPE;
+extern const char JACK_METADATA_SIGNAL_TYPE[];
 
 /**
  * @}
