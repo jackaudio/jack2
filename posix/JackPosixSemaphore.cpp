@@ -17,6 +17,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
+#define _POSIX_C_SOURCE 200112L
+
 #include "JackPosixSemaphore.h"
 #include "JackTools.h"
 #include "JackConstants.h"
@@ -111,8 +113,6 @@ bool JackPosixSemaphore::Wait()
     return (res == 0);
 }
 
-#if (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600) // glibc feature test
-
 bool JackPosixSemaphore::TimedWait(long usec)
 {
 	int res;
@@ -139,15 +139,6 @@ bool JackPosixSemaphore::TimedWait(long usec)
     }
     return (res == 0);
 }
-
-#else
-#warning "JackPosixSemaphore::TimedWait is not supported: Jack in SYNC mode with JackPosixSemaphore will not run properly !!"
-
-bool JackPosixSemaphore::TimedWait(long usec)
-{
-	return Wait();
-}
-#endif
 
 // Server side : publish the semaphore in the global namespace
 bool JackPosixSemaphore::Allocate(const char* name, const char* server_name, int value)
