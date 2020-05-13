@@ -128,7 +128,12 @@ def options(opt):
     winmme.check(
             header_name=['windows.h', 'mmsystem.h'],
             msg='Checking for header mmsystem.h')
-
+    avbmcl = opt.add_auto_option(
+           'avbmcl',
+           help='Enable AVB Media Clock Listener driver',
+           conf_dest='BUILD_DRIVER_AVBMCL')
+    avbmcl.check(header_name='linux/if_packet.h')
+    avbmcl.check(lib='igb')
     celt = opt.add_auto_option(
             'celt',
             help='Build with CELT')
@@ -556,6 +561,17 @@ def create_driver_obj(bld, **kw):
 
 def build_drivers(bld):
     # Non-hardware driver sources. Lexically sorted.
+
+    avbmcl_src = [
+        'linux/avbmcl/JackAVBDriver.cpp',
+        'linux/avbmcl/avb.c',
+        'linux/avbmcl/avb_sockets.c',
+        'linux/avbmcl/media_clock_listener.c',
+        'linux/avbmcl/mrp_client_control_socket.c',
+        'linux/avbmcl/mrp_client_interface.c',
+        'linux/avbmcl/mrp_client_send_msg.c'
+    ]
+
     dummy_src = [
         'common/JackDummyDriver.cpp'
     ]
@@ -654,6 +670,13 @@ def build_drivers(bld):
     ]
 
     # Create non-hardware driver objects. Lexically sorted.
+
+    if bld.env['BUILD_DRIVER_AVBMCL']:
+        create_driver_obj(
+            bld,
+            target = 'avbmcl',
+            source = avbmcl_src)
+
     create_driver_obj(
         bld,
         target = 'dummy',

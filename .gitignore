@@ -6,3 +6,5 @@ __pycache__
 android/.server/
 android/.client/
 codeBlocks
+linux/avbmcl/JackAVBDriver
+*~
