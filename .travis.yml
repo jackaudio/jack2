@@ -99,12 +99,13 @@ script:
     - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
         ./waf configure --prefix=/usr --alsa --classic --dbus --systemd-unit;
         ./waf -v build;
+        sudo ./waf -v install;
       fi
     - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
         CXXFLAGS="${CXXFLAGS} -flax-vector-conversions" python2 ./waf configure;
         CXXFLAGS="${CXXFLAGS} -flax-vector-conversions" python2 ./waf -v build;
+        sudo python2 ./waf -v install;
       fi
-    - sudo python2 ./waf -v install
 # run very basic tests
     - sudo .ci/test_run.sh
 
