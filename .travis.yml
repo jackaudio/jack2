@@ -85,7 +85,7 @@ before_install:
     # uninstalling oclint, as it's preinstalled and conflicts with all versions of gcc
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     brew cask uninstall oclint || true
-    brew update;
+    brew update
     fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update; fi
 
@@ -101,10 +101,10 @@ script:
         ./waf -v build;
       fi
     - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-        CXXFLAGS="${CXXFLAGS} -flax-vector-conversions" ./waf configure;
-        CXXFLAGS="${CXXFLAGS} -flax-vector-conversions" ./waf -v build;
+        CXXFLAGS="${CXXFLAGS} -flax-vector-conversions" python2 ./waf configure;
+        CXXFLAGS="${CXXFLAGS} -flax-vector-conversions" python2 ./waf -v build;
       fi
-    - sudo ./waf -v install
+    - sudo python2 ./waf -v install
 # run very basic tests
     - sudo .ci/test_run.sh
 
