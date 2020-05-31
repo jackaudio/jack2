@@ -31,6 +31,7 @@
 #endif
 
 #include <stdint.h>
+#include <limits.h>
 
 #if HAVE_DB
 #include <db.h>
@@ -88,6 +89,7 @@ class JackMetadata
         DB* fDB;
         DB_ENV* fDBenv;
         const bool fIsEngine;
+        char fDBFilesDir[PATH_MAX + 1];
     #endif
 
         int PropertyInit();

@@ -68,20 +68,20 @@ JackMetadata::~JackMetadata()
     if (fIsEngine)
     {
         // cleanup after libdb, nasty!
-        snprintf (dbpath, sizeof(dbpath), "%s/jack_db/metadata.db", jack_server_dir);
+        snprintf (dbpath, sizeof(dbpath), "%s/jack_db/metadata.db", fDBFilesDir);
         remove (dbpath);
 
-        snprintf (dbpath, sizeof(dbpath), "%s/jack_db/__db.001", jack_server_dir);
+        snprintf (dbpath, sizeof(dbpath), "%s/jack_db/__db.001", fDBFilesDir);
         remove (dbpath);
 
-        snprintf (dbpath, sizeof(dbpath), "%s/jack_db/__db.002", jack_server_dir);
+        snprintf (dbpath, sizeof(dbpath), "%s/jack_db/__db.002", fDBFilesDir);
         remove (dbpath);
 
-        snprintf (dbpath, sizeof(dbpath), "%s/jack_db/__db.003", jack_server_dir);
+        snprintf (dbpath, sizeof(dbpath), "%s/jack_db/__db.003", fDBFilesDir);
         remove (dbpath);
 
         // remove our custom dir
-        snprintf (dbpath, sizeof(dbpath), "%s/jack_db", jack_server_dir);
+        snprintf (dbpath, sizeof(dbpath), "%s/jack_db", fDBFilesDir);
         rmdir (dbpath);
     }
 #endif
@@ -94,6 +94,16 @@ int JackMetadata::PropertyInit()
     int ret;
     char dbpath[PATH_MAX + 1];
 
+#ifdef WIN32
+    ret = GetTempPathA (PATH_MAX, fDBFilesDir);
+    if ((ret > PATH_MAX) || (ret == 0)) {
+        jack_error ("cannot get path for temp files");
+        return -1;
+    }
+#else
+    strncpy (fDBFilesDir, jack_server_dir, PATH_MAX);
+#endif
+
     /* idempotent */
 
     if (fDBenv) {
@@ -105,8 +115,12 @@ int JackMetadata::PropertyInit()
         return -1;
     }
 
-    snprintf (dbpath, sizeof(dbpath), "%s/jack_db", jack_server_dir);
+    snprintf (dbpath, sizeof(dbpath), "%s/jack_db", fDBFilesDir);
+#ifdef WIN32
+    mkdir (dbpath);
+#else
     mkdir (dbpath, S_IRWXU | S_IRWXG);
+#endif
 
     if ((ret = fDBenv->open (fDBenv, dbpath, DB_CREATE | DB_INIT_LOCK | DB_INIT_MPOOL | DB_THREAD, 0)) != 0) {
         jack_error ("cannot open DB environment: %s", db_strerror (ret));
@@ -118,7 +132,7 @@ int JackMetadata::PropertyInit()
         return -1;
     }
 
-    snprintf (dbpath, sizeof(dbpath), "%s/jack_db/metadata.db", jack_server_dir);
+    snprintf (dbpath, sizeof(dbpath), "%s/jack_db/metadata.db", fDBFilesDir);
     if ((ret = fDB->open (fDB, NULL, dbpath, NULL, DB_HASH, DB_CREATE | DB_THREAD, 0666)) != 0) {
         jack_error ("Cannot open metadata DB at %s: %s", dbpath, db_strerror (ret));
         fDB->close (fDB, 0);

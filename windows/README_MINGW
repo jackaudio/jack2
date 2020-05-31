@@ -1,0 +1,270 @@
+HOW TO COMPILE JACK USING WAF AND MINGW
+=======================================
+
+Rev. 1 - 2019-09-01 - First version
+Rev. 2 - 2019-09-18 - Include contributions from @Schroedingers-Cat
+Rev. 3 - 2019-12-14 - Include contributions from @Schroedingers-Cat
+
+
+
+Introduction
+------------
+
+This guide contains detailed instructions for building JACK on a modern MinGW
+installation. It was conceived as the starting point for unifying the JACK build
+process across all platforms.
+
+As this is work in progress, there are still a couple of caveats:
+
+- Asynchronous mode is unusable with low latencies
+- JackRouter still builds using a Visual Studio project
+- Lots of real world testing is needed
+
+
+
+Creating the development environment
+------------------------------------
+
+This guide uses MSYS2 as the toolchain, it can be found at https://www.msys2.org/
+It comes as a handy installer called msys2-x86_64-{version}.exe. Once installed:
+
+- Open "MSYS2 MinGW 64-bit terminal" from the MSYS2 start menu shortcuts
+
+- Upgrade base MSYS2 packages
+
+pacman -Suy
+
+It is possible pacman ends with the following banner:
+
+warning: terminate MSYS2 without returning to shell and check for updates again
+warning: for example close your terminal window instead of calling exit
+
+In such case close the MSYS2 window, re-open, and run pacman -Suy again.
+
+- Install required packages
+
+pacman -S mingw-w64-x86_64-toolchain patch autoconf make \
+gettext-devel automake libtool pkgconfig p7zip unzip git python
+
+- Replace the GCC compiler with a version configured for SJLJ exceptions, as
+instructed by the original Windows build instructions (windows/README)
+
+Prebuilt binaries can be found at
+https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/
+
+Look for "x86_64-posix-sjlj" under "MinGW-W64 GCC-{version}", the file should be
+called x86_64-{version}-release-posix-sjlj-rt_v6-rev0.7z
+
+Or just download from a direct link (GCC 8.1.0):
+
+wget https://downloads.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/sjlj/x86_64-8.1.0-release-posix-sjlj-rt_v6-rev0.7z
+
+Once downloaded:
+
+p7zip -d x86_64-8.1.0-release-posix-sjlj-rt_v6-rev0.7z
+
+That will decompress to a folder called mingw64 in the working directory.
+Now replace the files from the previous mingw-w64-x86_64-toolchain package
+installation:
+
+mv /mingw64 /mingw64.bak   -> backup original
+rm /mingw64                -> see explanation below
+mv mingw64 /               -> sjlj toolchain
+
+The first step results in a new file called mingw64 file being created in /. The
+file is not visible to the Windows File Explorer when inspecting C:\msys64, so
+it is probably an artifact and safe to delete it in the second step. Otherwise
+the last mv step will fail with:
+
+mv: cannot overwrite non-directory '/mingw64' with directory 'mingw64'
+
+An alternate solution consists in closing the MSYS2 window and replicating the
+above procedure using the File Explorer. The following assumes the toolchain 7z
+file was decompressed to the home directory:
+
+Rename C:\msys64\mingw64 to C:\msys64\mingw64.bak
+Move C:\msys64\home\{username}\mingw64 to C:\msys64
+
+Make sure gcc runs and it is the expected version:
+
+$ gcc --version
+gcc.exe (x86_64-posix-sjlj-rev0, Built by MinGW-W64 project) {version}
+
+
+
+Preparing JACK dependencies
+---------------------------
+
+There are prebuilt MinGW binaries for all the libraries that can be installed
+using the pacman package manager, but since we are using a compiler that is not
+the default version shipped by MinGW, it seems better idea to build from source
+to avoid any linker and runtime issues. A good technical explanation and/or
+evidence for this statement is currently missing from this guide.
+
+Fortunately there are PKGBUILD files for doing so together with a nice guide at
+https://github.com/msys2/MINGW-packages
+
+git clone https://github.com/msys2/MINGW-packages.git
+
+Before building libraries, adjust the includes path:
+
+export C_INCLUDE_PATH=/mingw64/include
+
+The basic procedure for building and installing libraries is:
+
+cd MINGW-packages/mingw-w64-{libname}
+MINGW_INSTALLS=mingw64 makepkg-mingw -sLf
+pacman -U mingw-w64-{libname}-{suffix}.pkg.tar.xz
+
+Repeat the procedure for each library listed below replacing {libname} with the
+appropriate name and {suffix} with whatever the above process creates. Keep the
+recommended build order, for example libsamplerate depends on libsndfile, and
+libsystre depends on libtre-git. libsystre is a wrapper around libtre that
+allows including <regex.h> later.
+
+Some libraries like libsndfile and libsamplerate will ask for installing extra
+dependencies, it is ok to do so.
+
+For low latency audio it is recommended to build portaudio with ASIO support, so
+the Steinberg ASIO SDK should be manually downloaded beforehand. It can be found
+at https://www.steinberg.net/en/company/developers.html. The waf script will
+later check if the SDK is present at /opt/asiosdk
+
+wget https://www.steinberg.net/asiosdk -O /tmp/asiosdk.zip
+unzip /tmp/asiosdk.zip -d /tmp
+mkdir /opt   <- MinGW does not create /opt during installation
+mv /tmp/asiosdk_{version}_{date} /opt/asiosdk
+
+The description file in portaudio (MINGW-packages/mingw-w64-portaudio/PKGBUILD)
+needs to be patched so configure is called with the necessary flags for ASIO:
+
+--with-asiodir=/opt/asiosdk   <- new option     
+--with-winapi=wmme,directx,wasapi,vdmks,asio   <- append 'asio' to existing
+
+Both static and shared library versions of portaudio are built. To prevent
+errors while building the shared version or recompiling static, also insert the
+following lines in PKGBUILD after the first make call (around line 60) and after
+second make (around line 70):
+
+find /opt/asiosdk -name "*.lo" -type f -delete
+find /opt/asiosdk -name "*.o" -type f -delete
+
+Finally here is the list of libraries to build:
+
+db
+libsndfile
+libsamplerate
+libtre-git
+libsystre
+portaudio
+
+
+
+Compiling JACK
+--------------
+
+- Clone repo
+
+git clone https://github.com/jackaudio/jack2
+
+- Build and install
+
+cd jack2
+./waf configure --prefix=/opt/jack && ./waf -p install
+
+The resulting files can be found at /c/opt/jack/bin, or C:\msys64\opt\jack\bin
+
+
+
+Compiling JackRouter
+--------------------
+
+Visual Studio with MFC support is needed to build the included JackRouter VS
+project. The project was tested to successfully generate a 64bit version of
+JackRouter.dll using Visual Studio 2017 and 2019. MFC support can be added from
+the VS installer, by selecting Workloads/Visual C++ build tools/Visual C++ MFC
+for x86 and x64 (valid for VS 2017). Once ready, just open and build the project
+
+windows/JackRouter/JackRouter_MinGW_deps.vcxproj
+
+Differences from the original JackRouter.vcxproj:
+
+- Depends on the asiosdk files from the previous MinGW JACK installation (i.e.,
+  it points to absolute paths starting with C:\msys64\opt)
+- Links to the jack.dll.a created by the previous build, instead of libjack.lib
+  This means JackRouter.dll will currently depend on libjack-0.dll
+- Force includes stdint.h and defines _STDINT_H to avoid int8_t, int32_t and
+  uint32_t basic types redefinition during compilation
+
+
+
+Running and distributing
+------------------------
+
+An automated installation process should copy files to two destinations. One for
+the JACK server binary and standalone tools, and another for the client library.
+The latter is needed by JACK enabled applications in order to be able to connect
+to the server.
+
+- Create a directory named C:\Program Files\Jack (can be anything else)
+- Copy all files in C:\msys64\opt\jack\bin to C:\Program Files\Jack
+- Copy the following DLLs from C:\msys64\mingw64\bin to C:\Program Files\Jack,
+these are dependencies for the JACK server and tools:
+
+libstdc++-6.dll
+libdb-6.0.dll
+libsndfile-1.dll
+libsamplerate-0.dll
+libportaudio-2.dll
+libgcc_s_sjlj-1.dll
+libwinpthread-1.dll
+libtre-5.dll
+libsystre-0.dll
+
+- Copy and rename the following files from C:\msys64\opt\jack\bin to C:\Windows
+to make libjack available to clients:
+
+libjackserver-0.dll   -> libjackserver64.dll
+libjack-0.dll         -> libjack64.dll
+
+- Copy the following files from C:\msys64\mingw64\bin to C:\Windows, these are
+dependencies for libjack. C:\Windows is the directory the current official JACK
+1.9.11 binary installer targets, a better solution should be devised to avoid
+cluttering the Windows directory:
+
+libgcc_s_sjlj-1.dll
+libwinpthread-1.dll
+libtre-5.dll
+libsystre-0.dll
+
+- Copy JackRouter.dll from windows\JackRouter\Release64 to C:\Program Files\Jack
+This allows non-JACK applications to connect to the server through a special
+ASIO driver that routes audio to JACK instead of a physical audio device.
+Also copy libjack-0.dll from C:\msys64\mingw64\bin to C:\Program Files\Jack
+because JackRouter depends on libjack but will check for libjack-0.dll instead
+of the system-wide libjack64.dll previously copied to C:\Windows. Once done,
+JackRouter needs to be registered:
+
+regsvr32 JackRouter.dll
+
+Tested working clients:
+Ardour
+Bitwig Studio
+QJackCtl
+JackRouter
+
+Example of starting the JACK server including MIDI support for a Focusrite USB
+audio device using ASIO:
+jackd -R -S -X winmme -d portaudio -p 32 -r 48000 -d "ASIO::Focusrite USB ASIO"
+
+
+
+Development tools and links
+---------------------------
+
+http://www.dependencywalker.com/
+https://docs.microsoft.com/en-us/sysinternals/downloads/procmon
+https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/gflags
+https://blogs.msdn.microsoft.com/junfeng/2006/11/20/debugging-loadlibrary-failures/
+https://stackoverflow.com/questions/15852677/static-and-dynamic-shared-linking-with-mingw
+https://github.com/EddieRingle/portaudio/blob/master/src/hostapi/asio/ASIO-README.txt
