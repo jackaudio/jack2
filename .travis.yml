@@ -4,6 +4,18 @@ sudo: required
 
 matrix:
   include:
+    # linux with gcc 9
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          install:
+            - gcc-9
+      dist: bionic
+      env:
+        - MATRIX_EVAL="CC=gcc-9 CXX=g++-9"
+      compiler: gcc
     # linux with gcc 8
     - os: linux
       addons:
@@ -12,7 +24,7 @@ matrix:
             - ubuntu-toolchain-r-test
           install:
             - gcc-8
-      dist: xenial
+      dist: bionic
       env:
         - MATRIX_EVAL="CC=gcc-8 CXX=g++-8"
       compiler: gcc
@@ -24,7 +36,7 @@ matrix:
             - ubuntu-toolchain-r-test
           install:
             - gcc-7
-      dist: xenial
+      dist: bionic
       env:
         - MATRIX_EVAL="CC=gcc-7 CXX=g++-7"
       compiler: gcc
@@ -36,17 +48,51 @@ matrix:
             - ubuntu-toolchain-r-test
           install:
             - gcc-6
-      dist: xenial
+      dist: bionic
       env:
         - MATRIX_EVAL="CC=gcc-6 CXX=g++-6"
       compiler: gcc
-    # linux with gcc default (4.8)
+    # linux with gcc 5
     - os: linux
-      dist: xenial
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          install:
+            - gcc-5
+      dist: bionic
+      env:
+        - MATRIX_EVAL="CC=gcc-5 CXX=g++-5"
       compiler: gcc
-    # linux with clang default (3.5)
+    # linux with gcc 4
     - os: linux
       dist: xenial
+      env:
+        - MATRIX_EVAL="CC=gcc-4 CXX=g++-4"
+      compiler: gcc
+    # linux with clang 8
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          install:
+            - clang-8
+      dist: bionic
+      env:
+        - MATRIX_EVAL="CC=clang-8 CXX=clang++-8"
+      compiler: clang
+    # linux with clang 6
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          install:
+            - clang-6.0
+      dist: bionic
+      env:
+        - MATRIX_EVAL="CC=clang-6.0 CXX=clang++-6.0"
       compiler: clang
     # linux with clang 3.8
     - os: linux
@@ -59,6 +105,12 @@ matrix:
       dist: xenial
       env:
         - MATRIX_EVAL="CC=clang-3.8 CXX=clang++-3.8"
+      compiler: clang
+    # linux with clang 3.5
+    - os: linux
+      dist: xenial
+      env:
+        - MATRIX_EVAL="CC=clang-3.5 CXX=clang++-3.5"
       compiler: clang
     # osx with xcode8.3/clang
     - os: osx
