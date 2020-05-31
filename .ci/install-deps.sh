@@ -23,6 +23,10 @@ if [ "$TRAVIS_OS_NAME" == "osx" ]; then
   if [ "${CC}" == "gcc-8" ]; then
     brew install gcc@8
   fi
+  # force installation of gcc-9 if required
+  if [ "${CC}" == "gcc-9" ]; then
+    brew install gcc@9
+  fi
 fi
 
 if [ "$TRAVIS_OS_NAME" == "linux" ]; then
@@ -34,7 +38,6 @@ if [ "$TRAVIS_OS_NAME" == "linux" ]; then
     libsndfile-dev \
     libasound2-dev \
     libdb-dev \
-    systemd-services \
     systemd \
     libsystemd-dev \
     libpam-systemd \
@@ -73,9 +76,25 @@ if [ "$TRAVIS_OS_NAME" == "linux" ]; then
   if [ "${CC}" == "gcc-8" ]; then
     sudo apt-get install gcc-8 g++-8
   fi
+  # force installation of gcc-9 if required
+  if [ "${CC}" == "gcc-9" ]; then
+    sudo apt-get install gcc-9 g++-9
+  fi
+  # force installation of clang-3.5 if required
+  if [ "${CC}" == "clang-3.5" ]; then
+    sudo apt-get install clang-3.5
+  fi
   # force installation of clang-3.8 if required
   if [ "${CC}" == "clang-3.8" ]; then
     sudo apt-get install clang-3.8
+  fi
+  # force installation of clang-6.0 if required
+  if [ "${CC}" == "clang-6.0" ]; then
+    sudo apt-get install clang-6.0
+  fi
+  # force installation of clang-8 if required
+  if [ "${CC}" == "clang-8" ]; then
+    sudo apt-get install clang-8
   fi
 fi
 
