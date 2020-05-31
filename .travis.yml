@@ -54,21 +54,15 @@ matrix:
       compiler: gcc
     # linux with gcc 5
     - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          install:
-            - gcc-5
       dist: bionic
       env:
-        - MATRIX_EVAL="CC=gcc-5 CXX=g++-5"
+        - MATRIX_EVAL="CC=gcc CXX=g++"
       compiler: gcc
     # linux with gcc 4
     - os: linux
       dist: xenial
       env:
-        - MATRIX_EVAL="CC=gcc-4 CXX=g++-4"
+        - MATRIX_EVAL="CC=gcc CXX=g++"
       compiler: gcc
     # linux with clang 8
     - os: linux
