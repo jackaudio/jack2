@@ -57,7 +57,7 @@ bool JackConnectionManager::IsLoopPathAux(int ref1, int ref2) const
 {
     jack_log("JackConnectionManager::IsLoopPathAux ref1 = %ld ref2 = %ld", ref1, ref2);
 
-    if (ref1 < GetEngineControl()->fDriverNum || ref2 < GetEngineControl()->fDriverNum) {
+    if (ref1 < GetGlobal()->GetEngineControl()->fDriverNum || ref2 < GetGlobal()->GetEngineControl()->fDriverNum) {
         return false;
     } else if (ref1 == ref2) {	// Same refnum
         return true;

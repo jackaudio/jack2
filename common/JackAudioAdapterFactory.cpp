@@ -60,9 +60,15 @@ extern "C"
         jack_nframes_t buffer_size = jack_get_buffer_size(jack_client);
         jack_nframes_t sample_rate = jack_get_sample_rate(jack_client);
 
+
+        if (jack_client == NULL) {
+            jack_error("jack_internal_initialize called with NULL jack_client");
+            return 1;
+        }
+
         try {
 
-            adapter = new Jack::JackAudioAdapter(jack_client, new Jack::JackPlatformAdapter(buffer_size, sample_rate, params), params);
+            adapter = new Jack::JackAudioAdapter(jack_client, new Jack::JackPlatformAdapter(*((JackClient*) jack_client), buffer_size, sample_rate, params), params);
             assert(adapter);
 
             if (adapter->Open() == 0) {

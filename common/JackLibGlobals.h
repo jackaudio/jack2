@@ -50,96 +50,126 @@ class JackClient;
 \brief Global library static structure: singleton kind of pattern.
 */
 
-struct JackLibGlobals
+class JackLibGlobals : public JackGlobals
 {
-    JackShmReadWritePtr<JackGraphManager> fGraphManager;	/*! Shared memory Port manager */
-    JackShmReadWritePtr<JackEngineControl> fEngineControl;	/*! Shared engine control */  // transport engine has to be writable
-    JackSynchro fSynchroTable[CLIENT_NUM];                  /*! Shared synchro table */
-    JackMetadata *fMetadata;                                /*! Shared metadata base */
-    sigset_t fProcessSignals;
 
-    static int fClientCount;
-    static JackLibGlobals* fGlobals;
+    /* This object is managed by JackGlobalsManager */
+    friend class JackGlobalsManager;
 
-    JackLibGlobals()
-    {
-        jack_log("JackLibGlobals");
-        if (!JackMessageBuffer::Create()) {
-            jack_error("Cannot create message buffer");
+    private:
+
+        /* is called when first context for specific server is created */
+        JackLibGlobals(const std::string &server_name)
+            : JackGlobals(server_name)
+            , fMetadata(server_name.c_str())
+        {
+            fGraphManager = -1;
+            fEngineControl = -1;
+            fClientCount = 0;
+
+            InitTime();
         }
-        fGraphManager = -1;
-        fEngineControl = -1;
 
-        fMetadata = new JackMetadata(false);
+        /* is called when last context for specific server is removed */
+        ~JackLibGlobals() override
+        {
+            EndTime();
 
-        // Filter SIGPIPE to avoid having client get a SIGPIPE when trying to access a died server.
-    #ifdef WIN32
-        // TODO
-    #else
-        sigset_t signals;
-        sigemptyset(&signals);
-        sigaddset(&signals, SIGPIPE);
-        sigprocmask(SIG_BLOCK, &signals, &fProcessSignals);
-    #endif
-    }
-
-    ~JackLibGlobals()
-    {
-        jack_log("~JackLibGlobals");
-        for (int i = 0; i < CLIENT_NUM; i++) {
-            fSynchroTable[i].Disconnect();
-        }
-        JackMessageBuffer::Destroy();
-
-        delete fMetadata;
-        fMetadata = NULL;
-
-       // Restore old signal mask
-    #ifdef WIN32
-       // TODO
-    #else
-       sigprocmask(SIG_BLOCK, &fProcessSignals, 0);
-    #endif
-    }
-
-    static void Init()
-    {
-        if (!JackGlobals::fServerRunning && fClientCount > 0) {
-
-            // Cleanup remaining clients
-            jack_error("Jack server was closed but clients are still allocated, cleanup...");
             for (int i = 0; i < CLIENT_NUM; i++) {
-                JackClient* client = JackGlobals::fClientTable[i];
-                if (client) {
-                    jack_error("Cleanup client ref = %d", i);
-                    client->Close();
-                    delete client;
+                fSynchroTable[i].Disconnect();
+            }
+        }
+
+    public:
+
+        JackShmReadWritePtr<JackGraphManager> fGraphManager;	/*! Shared memory Port manager */
+        JackShmReadWritePtr<JackEngineControl> fEngineControl;	/*! Shared engine control */  // transport engine has to be writable
+        JackSynchro fSynchroTable[CLIENT_NUM];                  /*! Shared synchro table */
+        JackMetadata fMetadata;                                 /*! Shared metadata base */
+        sigset_t fProcessSignals;
+
+        int fClientCount;
+
+        /* is called each time a context for specific server is added */
+        bool AddContext(const uint32_t &context_num, const std::string &server_name) override
+        {
+            if (!fServerRunning && fClientCount > 0) {
+                // Cleanup remaining clients
+                jack_error("Jack server was closed but clients are still allocated, cleanup...");
+                for (int i = 0; i < CLIENT_NUM; i++) {
+                    JackClient* client = fClientTable[i];
+                    if (client) {
+                        jack_error("Cleanup client ref = %d", i);
+                        client->Close();
+                        delete client;
+                    }
                 }
+
+                // run destructors for all included objects, keeping the behaviour to previous revisions of JackGlobals source
+                this->~JackLibGlobals();
+                // construct in place
+                new(this) JackLibGlobals(server_name);
             }
 
-            // Cleanup global context
-            fClientCount = 0;
-            delete fGlobals;
-            fGlobals = NULL;
+            fClientCount++;
+
+            if (context_num == 0 && !JackMessageBuffer::Create()) {
+                jack_error("Cannot create message buffer");
+            }
+
+            // Filter SIGPIPE to avoid having client get a SIGPIPE when trying to access a died server.
+#ifdef WIN32
+            // TODO
+#else
+            sigset_t signals;
+            sigemptyset(&signals);
+            sigaddset(&signals, SIGPIPE);
+            sigprocmask(SIG_BLOCK, &signals, &fProcessSignals);
+#endif
+            return true;
         }
 
-        if (fClientCount++ == 0 && !fGlobals) {
-            jack_log("JackLibGlobals Init %x", fGlobals);
-            InitTime();
-            fGlobals = new JackLibGlobals();
-        }
-    }
+        /* is called each time a context for specific server is removed */
+        bool DelContext(const uint32_t &context_num) override
+        {
+#ifdef WIN32
+           // TODO
+#else
+            sigprocmask(SIG_BLOCK, &fProcessSignals, nullptr);
+#endif
+            if (context_num == 0 && !JackMessageBuffer::Destroy()) {
+                jack_error("Cannot destroy message buffer");
+            }
 
-    static void Destroy()
-    {
-        if (--fClientCount == 0 && fGlobals) {
-            jack_log("JackLibGlobals Destroy %x", fGlobals);
-            EndTime();
-            delete fGlobals;
-            fGlobals = NULL;
+            return --fClientCount == 0;
         }
-    }
 
+        JackGraphManager *GetGraphManager() override
+        {
+            return fGraphManager;
+        }
+
+        JackEngineControl *GetEngineControl() override
+        {
+            return fEngineControl;
+        }
+
+        JackSynchro *GetSynchroTable() override
+        {
+            return fSynchroTable;
+        }
+
+        /* must not be used in JackLibGlobals */
+        JackServer *GetServer() override
+        {
+            assert(false);
+            return nullptr;
+        }
+
+        JackMetadata* GetMetadata()
+        {
+            return &fMetadata;
+        }
 };
 
 } // end of namespace

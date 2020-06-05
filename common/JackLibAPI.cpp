@@ -65,9 +65,6 @@ static jack_client_t * jack_client_open_aux (const char *client_name,
             jack_options_t options,
             jack_status_t *status, va_list ap);
 
-JackLibGlobals* JackLibGlobals::fGlobals = NULL;
-int JackLibGlobals::fClientCount = 0;
-
 jack_client_t* jack_client_new_aux(const char* client_name, jack_options_t options, jack_status_t* status)
 {
     jack_varargs_t va;          /* variable arguments */
@@ -95,24 +92,28 @@ jack_client_t* jack_client_new_aux(const char* client_name, jack_options_t optio
     /* parse variable arguments */
     jack_varargs_init(&va);
 
-    JackLibGlobals::Init(); // jack library initialisation
+    JackLibGlobals *global = JackGlobalsManager::Instance()->CreateGlobal<JackLibGlobals>(va.server_name);
+    if (global == nullptr) {
+        jack_error("jack failed to create global context");
+        return 0;
+    }
 
     if (try_start_server(&va, options, status)) {
         jack_error("jack server is not running or cannot be started");
-        JackLibGlobals::Destroy(); // jack library destruction
+        JackGlobalsManager::Instance()->DestroyGlobal(va.server_name); // jack library destruction
         return 0;
     }
 
     if (JACK_DEBUG) {
-        client = new JackDebugClient(new JackLibClient(GetSynchroTable())); // Debug mode
+        client = new JackDebugClient(new JackLibClient(global)); // Debug mode
     } else {
-        client = new JackLibClient(GetSynchroTable());
+        client = new JackLibClient(global);
     }
 
     int res = client->Open(va.server_name, client_name, va.session_id, options, status);
     if (res < 0) {
         delete client;
-        JackLibGlobals::Destroy(); // jack library destruction
+        JackGlobalsManager::Instance()->DestroyGlobal(va.server_name); // jack library destruction
         int my_status1 = (JackFailure | JackServerError);
         *status = (jack_status_t)my_status1;
         return NULL;
@@ -148,24 +149,28 @@ static jack_client_t* jack_client_open_aux(const char* client_name, jack_options
     /* parse variable arguments */
     jack_varargs_parse(options, ap, &va);
 
-    JackLibGlobals::Init(); // jack library initialisation
+    JackLibGlobals *global = JackGlobalsManager::Instance()->CreateGlobal<JackLibGlobals>(va.server_name);
+    if (global == nullptr) {
+        jack_error("jack failed to create global context");
+        return 0;
+    }
 
     if (try_start_server(&va, options, status)) {
         jack_error("jack server is not running or cannot be started");
-        JackLibGlobals::Destroy(); // jack library destruction
+        JackGlobalsManager::Instance()->DestroyGlobal(va.server_name); // jack library destruction
         return 0;
     }
 
     if (JACK_DEBUG) {
-        client = new JackDebugClient(new JackLibClient(GetSynchroTable())); // Debug mode
+        client = new JackDebugClient(new JackLibClient(global)); // Debug mode
     } else {
-        client = new JackLibClient(GetSynchroTable());
+        client = new JackLibClient(global);
     }
 
     int res = client->Open(va.server_name, client_name, va.session_id, options, status);
     if (res < 0) {
         delete client;
-        JackLibGlobals::Destroy(); // jack library destruction
+        JackGlobalsManager::Instance()->DestroyGlobal(va.server_name); // jack library destruction
         int my_status1 = (JackFailure | JackServerError);
         *status = (jack_status_t)my_status1;
         return NULL;
@@ -209,8 +214,8 @@ LIB_EXPORT int jack_client_close(jack_client_t* ext_client)
         jack_error("jack_client_close called with a NULL client");
     } else {
         res = client->Close();
+        JackGlobalsManager::Instance()->DestroyGlobal(client->GetGlobal()->fServerName); // jack library destruction
         delete client;
-        JackLibGlobals::Destroy(); // jack library destruction
         jack_log("jack_client_close res = %d", res);
     }
     JackGlobals::fOpenMutex->Unlock();
@@ -229,93 +234,117 @@ LIB_EXPORT int jack_set_property(jack_client_t* ext_client, jack_uuid_t subject,
 {
     JackGlobals::CheckContext("jack_set_property");
 
-    JackClient* client = (JackClient*)ext_client;
-    jack_log("jack_set_property ext_client %x client %x ", ext_client, client);
-    if (client == NULL) {
-        jack_error("jack_set_property called with a NULL client");
-        return -1;
-    } else {
-        JackMetadata* metadata = GetMetadata();
-        return (metadata ? metadata->SetProperty(client, subject, key, value, type) : -1);
-    }
+    jack_error("jack_set_property is not implemented");
+    return -1;
+
+//    JackClient* client = (JackClient*)ext_client;
+//    jack_log("jack_set_property ext_client %x client %x ", ext_client, client);
+//    if (client == NULL) {
+//        jack_error("jack_set_property called with a NULL client");
+//        return -1;
+//    } else {
+//        JackMetadata* metadata = GetMetadata();
+//        return (metadata ? metadata->SetProperty(client, subject, key, value, type) : -1);
+//    }
 }
 
 LIB_EXPORT int jack_get_property(jack_uuid_t subject, const char* key, char** value, char** type)
 {
     JackGlobals::CheckContext("jack_get_property");
 
-    JackMetadata* metadata = GetMetadata();
-    return (metadata ? metadata->GetProperty(subject, key, value, type) : -1);
+    jack_error("jack_get_property is not implemented");
+    return -1;
+
+//    JackMetadata* metadata = GetMetadata();
+//    return (metadata ? metadata->GetProperty(subject, key, value, type) : -1);
 }
 
 LIB_EXPORT void jack_free_description(jack_description_t* desc, int free_actual_description_too)
 {
     JackGlobals::CheckContext("jack_free_description");
 
-    JackMetadata* metadata = GetMetadata();
-    if (metadata)
-        metadata->FreeDescription(desc, free_actual_description_too);
+    jack_error("jack_free_description is not implemented");
+    return;
+
+//    JackMetadata* metadata = GetMetadata();
+//    if (metadata)
+//        metadata->FreeDescription(desc, free_actual_description_too);
 }
 
 LIB_EXPORT int jack_get_properties(jack_uuid_t subject, jack_description_t* desc)
 {
     JackGlobals::CheckContext("jack_get_properties");
 
-    JackMetadata* metadata = GetMetadata();
-    return (metadata ? metadata->GetProperties(subject, desc) : -1);
+    jack_error("jack_get_properties is not implemented");
+    return -1;
+
+//    JackMetadata* metadata = GetMetadata();
+//    return (metadata ? metadata->GetProperties(subject, desc) : -1);
 }
 
 LIB_EXPORT int jack_get_all_properties(jack_description_t** descriptions)
 {
     JackGlobals::CheckContext("jack_get_all_properties");
 
-    JackMetadata* metadata = GetMetadata();
-    return (metadata ? metadata->GetAllProperties(descriptions) : -1);
+    jack_error("jack_get_all_properties is not implemented");
+    return -1;
+
+//    JackMetadata* metadata = GetMetadata();
+//    return (metadata ? metadata->GetAllProperties(descriptions) : -1);
 }
 
 LIB_EXPORT int jack_remove_property(jack_client_t* ext_client, jack_uuid_t subject, const char* key)
 {
     JackGlobals::CheckContext("jack_remove_property");
 
-    JackClient* client = (JackClient*)ext_client;
-    jack_log("jack_remove_property ext_client %x client %x ", ext_client, client);
-    if (client == NULL) {
-        jack_error("jack_remove_property called with a NULL client");
-        return -1;
-    } else {
-        JackMetadata* metadata = GetMetadata();
-        return (metadata ? metadata->RemoveProperty(client, subject, key) : -1);
-    }
+    jack_error("jack_remove_property is not implemented");
+    return -1;
+
+//    JackClient* client = (JackClient*)ext_client;
+//    jack_log("jack_remove_property ext_client %x client %x ", ext_client, client);
+//    if (client == NULL) {
+//        jack_error("jack_remove_property called with a NULL client");
+//        return -1;
+//    } else {
+//        JackMetadata* metadata = GetMetadata();
+//        return (metadata ? metadata->RemoveProperty(client, subject, key) : -1);
+//    }
 }
 
 LIB_EXPORT int jack_remove_properties(jack_client_t* ext_client, jack_uuid_t subject)
 {
     JackGlobals::CheckContext("jack_remove_properties");
 
-    JackClient* client = (JackClient*)ext_client;
-    jack_log("jack_remove_properties ext_client %x client %x ", ext_client, client);
-    if (client == NULL) {
-        jack_error("jack_remove_properties called with a NULL client");
-        return -1;
-    } else {
-        JackMetadata* metadata = GetMetadata();
-        return (metadata ? metadata->RemoveProperties(client, subject) : -1);
-    }
+    jack_error("jack_remove_properties is not implemented");
+    return -1;
+
+//    JackClient* client = (JackClient*)ext_client;
+//    jack_log("jack_remove_properties ext_client %x client %x ", ext_client, client);
+//    if (client == NULL) {
+//        jack_error("jack_remove_properties called with a NULL client");
+//        return -1;
+//    } else {
+//        JackMetadata* metadata = GetMetadata();
+//        return (metadata ? metadata->RemoveProperties(client, subject) : -1);
+//    }
 }
 
 LIB_EXPORT int jack_remove_all_properties(jack_client_t* ext_client)
 {
     JackGlobals::CheckContext("jack_remove_all_properties");
 
-    JackClient* client = (JackClient*)ext_client;
-    jack_log("jack_remove_all_properties ext_client %x client %x ", ext_client, client);
-    if (client == NULL) {
-        jack_error("jack_remove_all_properties called with a NULL client");
-        return -1;
-    } else {
-        JackMetadata* metadata = GetMetadata();
-        return (metadata ? metadata->RemoveAllProperties(client) : -1);
-    }
+    jack_error("jack_remove_all_properties is not implemented");
+    return -1;
+
+//    JackClient* client = (JackClient*)ext_client;
+//    jack_log("jack_remove_all_properties ext_client %x client %x ", ext_client, client);
+//    if (client == NULL) {
+//        jack_error("jack_remove_all_properties called with a NULL client");
+//        return -1;
+//    } else {
+//        JackMetadata* metadata = GetMetadata();
+//        return (metadata ? metadata->RemoveAllProperties(client) : -1);
+//    }
 }
 
 LIB_EXPORT int jack_set_property_change_callback(jack_client_t* ext_client, JackPropertyChangeCallback callback, void* arg)

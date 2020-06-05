@@ -32,6 +32,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
+class JackClient;
+
 typedef jack_default_audio_sample_t jack_sample_t;
 
 #define OSS_DRIVER_DEF_DEV	"/dev/dsp"
@@ -86,9 +88,11 @@ class JackOSSAdapter : public JackAudioAdapterInterface, public JackRunnableInte
         void SetSampleFormat();
         void DisplayDeviceInfo();
 
+        JackClient &fClient;
+
     public:
 
-        JackOSSAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params);
+        JackOSSAdapter(JackClient &jack_client, jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params);
         ~JackOSSAdapter()
         {}
 

@@ -321,7 +321,7 @@ OSStatus JackCoreAudioAdapter::Render(AudioUnitRenderActionFlags *ioActionFlags,
     }
 }
 
-JackCoreAudioAdapter::JackCoreAudioAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params)
+JackCoreAudioAdapter::JackCoreAudioAdapter(JackClient &jack_client, jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params)
                 :JackAudioAdapterInterface(buffer_size, sample_rate), fInputData(0), fCapturing(false), fPlaying(false), fState(false)
 {
     const JSList* node;

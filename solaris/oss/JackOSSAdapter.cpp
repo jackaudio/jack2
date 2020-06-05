@@ -20,6 +20,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackOSSAdapter.h"
 #include "JackServerGlobals.h"
 #include "JackEngineControl.h"
+#include "JackClient.h"
 #include "memops.h"
 
 #include <sys/ioctl.h>
@@ -103,13 +104,14 @@ void JackOSSAdapter::SetSampleFormat()
     }
 }
 
-JackOSSAdapter::JackOSSAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params)
+JackOSSAdapter::JackOSSAdapter(JackClient &jack_client, jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params)
                 :JackAudioAdapterInterface(buffer_size, sample_rate)
                 ,fThread(this),
                 fInFD(-1), fOutFD(-1), fBits(OSS_DRIVER_DEF_BITS),
                 fSampleFormat(0), fNperiods(OSS_DRIVER_DEF_NPERIODS), fRWMode(0), fIgnoreHW(true), fExcl(false),
                 fInputBufferSize(0), fOutputBufferSize(0),
-                fInputBuffer(NULL), fOutputBuffer(NULL), fFirstCycle(true)
+                fInputBuffer(NULL), fOutputBuffer(NULL), fFirstCycle(true),
+                fClient(jack_client)
 {
     const JSList* node;
     const jack_driver_param_t* param;
@@ -496,7 +498,7 @@ int JackOSSAdapter::Open()
     }
 
     //turn the thread realtime
-    fThread.AcquireRealTime(JackServerGlobals::fInstance->GetEngineControl()->fClientPriority);
+    fThread.AcquireRealTime(fClient.GetGlobal()->GetEngineControl()->fClientPriority);
     return 0;
 
 error:

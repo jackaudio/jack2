@@ -602,9 +602,10 @@ namespace Jack
         private:
             JackThread fThread;
             AudioInterface fAudioInterface;
+            JackClient &fClient;
 
         public:
-            JackAlsaAdapter ( jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params );
+            JackAlsaAdapter ( JackClient &client, jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params );
             ~JackAlsaAdapter()
             {}
 

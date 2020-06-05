@@ -92,7 +92,11 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
     JackEngineProfiling fProfiler;
 #endif
 
-    JackEngineControl(bool sync, bool temporary, long timeout, bool rt, long priority, bool verbose, jack_timer_type_t clock, const char* server_name)
+    JackEngineControl(bool sync, bool temporary, long timeout, bool rt, long priority, bool verbose, jack_timer_type_t clock, const char* server_name, JackGlobals *global)
+        : fTransport(global)
+#ifdef JACK_MONITOR
+        , fProfiler(global)
+#endif
     {
         fBufferSize = 512;
         fSampleRate = 48000;
