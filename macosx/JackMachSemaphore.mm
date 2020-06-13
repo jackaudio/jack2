@@ -30,7 +30,7 @@ void JackMachSemaphore::BuildName(const char* client_name, const char* server_na
 {
     char ext_client_name[SYNC_MAX_NAME_SIZE + 1];
     JackTools::RewriteName(client_name, ext_client_name);
-    snprintf(res, size, "jack_mach_sem.%d_%s_%s", JackTools::GetUID(), server_name, ext_client_name);
+    snprintf(res, size, "jacksem.%d_%s_%s", JackTools::GetUID(), server_name, ext_client_name);
 }
 
 bool JackMachSemaphore::Signal()
@@ -117,28 +117,46 @@ bool JackMachSemaphore::Allocate(const char* name, const char* server_name, int 
     }
 
     if ((res = semaphore_create(task, &fSemaphore, SYNC_POLICY_FIFO, value)) != KERN_SUCCESS) {
-        jack_error("Allocate: can create semaphore err = %s", mach_error_string(res));
+        jack_error("Allocate: can create semaphore err = %i:%s", res, mach_error_string(res));
         return false;
     }
 
     if ((res = bootstrap_register(fBootPort, fName, fSemaphore)) != KERN_SUCCESS) {
-        jack_error("Allocate: can't check in mach semaphore name = %s err = %s", fName, mach_error_string(res));
-
         switch (res) {
             case BOOTSTRAP_SUCCESS :
+                jack_log("bootstrap_register(): bootstrap success");
                 /* service not currently registered, "a good thing" (tm) */
                 break;
+
             case BOOTSTRAP_NOT_PRIVILEGED :
                 jack_log("bootstrap_register(): bootstrap not privileged");
+                /* might belong to a previously running jack process that crashed, let's try to connect */
+                {
+                    semaphore_t sem;
+                    if (semaphore_create(task, &sem, SYNC_POLICY_FIFO, value) == KERN_SUCCESS)
+                    {
+                        const bool ok = (bootstrap_look_up(fBootPort, fName, &sem) == KERN_SUCCESS);
+                        semaphore_destroy(mach_task_self(), sem);
+
+                        if (ok)
+                        {
+                            jack_error("bootstrap_register(): forced connection");
+                            return true;
+                        }
+                    }
+                }
                 break;
+
             case BOOTSTRAP_SERVICE_ACTIVE :
                 jack_log("bootstrap_register(): bootstrap service active");
                 break;
+
             default :
-                jack_log("bootstrap_register() err = %s", mach_error_string(res));
+                jack_log("bootstrap_register() err = %i:%s", res, mach_error_string(res));
                 break;
         }
 
+        jack_error("Allocate: can't check in mach semaphore name = %s err = %i:%s", fName, res, mach_error_string(res));
         return false;
     }
 
