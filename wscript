@@ -225,9 +225,6 @@ def configure(conf):
     conf.env.append_unique('CXXFLAGS', '-Wall')
     conf.env.append_unique('CXXFLAGS', '-std=gnu++11')
 
-    # TODO
-    conf.env.append_unique('CXXFLAGS', '-Wno-deprecated-register')
-
     if not conf.env['IS_MACOSX']:
         conf.env.append_unique('LDFLAGS', '-Wl,--no-undefined')
     else:
@@ -248,6 +245,9 @@ def configure(conf):
             msg='Checking for aften_encode_frame()',
             define_name='HAVE_AFTEN_NEW_API',
             mandatory=False)
+
+        # TODO
+        conf.env.append_unique('CXXFLAGS', '-Wno-deprecated-register')
 
     conf.load('autooptions')
 
