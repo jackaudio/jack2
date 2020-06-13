@@ -22,6 +22,9 @@
 #define __JackWinSemaphore__
 
 #include "JackSynchro.h"
+#ifdef __MINGW32__
+#include <winsock2.h>
+#endif
 #include <windows.h>
 #include <assert.h>
 

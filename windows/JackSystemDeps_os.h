@@ -21,6 +21,9 @@
 #ifndef __JackSystemDeps_WIN32__
 #define __JackSystemDeps_WIN32__
 
+#ifdef __MINGW32__
+#include <winsock2.h>
+#endif
 #include <windows.h>
 #include "JackCompilerDeps.h"
 

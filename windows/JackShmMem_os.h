@@ -20,6 +20,9 @@
 #ifndef __JackShmMem_WIN32__
 #define __JackShmMem_WIN32__
 
+#ifdef __MINGW32__
+#include <winsock2.h>
+#endif
 #include <windows.h>
 
 inline bool CHECK_MLOCK(void* ptr, size_t size)
