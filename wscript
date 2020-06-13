@@ -225,6 +225,9 @@ def configure(conf):
     conf.env.append_unique('CXXFLAGS', '-Wall')
     conf.env.append_unique('CXXFLAGS', '-std=gnu++11')
 
+    # TODO
+    conf.env.append_unique('CXXFLAGS', '-Wno-deprecated-register')
+
     if not conf.env['IS_MACOSX']:
         conf.env.append_unique('LDFLAGS', '-Wl,--no-undefined')
     else:
