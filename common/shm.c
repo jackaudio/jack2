@@ -114,7 +114,8 @@ static jack_shm_id_t   registry_id;	/* SHM id for the registry */
 #ifdef WIN32
 static jack_shm_info_t registry_info = {/* SHM info for the registry */
 	JACK_SHM_NULL_INDEX,
-	NULL
+	0,
+	{ NULL }
 };
 #else
 static jack_shm_info_t registry_info = { /* SHM info for the registry */
@@ -1020,7 +1021,7 @@ jack_create_registry (jack_shm_info_t *ri)
 }
 
 static void
-jack_remove_shm (jack_shm_id_t id)
+jack_remove_shm (const jack_shm_id_t id)
 {
 	/* nothing to do */
 }

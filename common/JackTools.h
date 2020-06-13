@@ -60,8 +60,8 @@ namespace Jack
         static void KillServer();
 
         static int MkDir(const char* path);
-        static char* UserDir();
-        static char* ServerDir(const char* server_name, char* server_dir);
+        static const char* UserDir();
+        static const char* ServerDir(const char* server_name, char* server_dir);
         static const char* DefaultServerName();
         static void CleanupFiles(const char* server_name);
         static int GetTmpdir();
