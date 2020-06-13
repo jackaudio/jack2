@@ -116,8 +116,7 @@ def build(bld):
             '../posix/JackPosixThread.cpp',
             '../posix/JackPosixMutex.cpp',
             '../macosx/JackMachThread.mm',
-            #'../macosx/JackMachSemaphore.mm',
-            '../posix/JackPosixSemaphore.cpp',
+            '../macosx/JackMachSemaphore.mm',
             '../posix/JackSocket.cpp',
             '../macosx/JackMachTime.c',
             ]
