@@ -60,31 +60,31 @@ matrix:
       env:
         - MATRIX_EVAL="CC=clang-3.8 CXX=clang++-3.8"
       compiler: clang
-    # osx with xcode8.3/clang
-    - os: osx
-      osx_image: xcode8.3
-      compiler: clang
-    # osx with xcode9.2/clang
-    - os: osx
-      osx_image: xcode9.2
-      compiler: clang
-    # osx with xcode10.0/clang
-    - os: osx
-      osx_image: xcode10
-      compiler: clang
-    # osx with xcode10.1/clang
-    - os: osx
-      osx_image: xcode10.1
-      compiler: clang
-    # osx with xcode/clang (default)
-    - os: osx
-      compiler: clang
+    ## osx with xcode8.3/clang
+    #- os: osx
+      #osx_image: xcode8.3
+      #compiler: clang
+    ## osx with xcode9.2/clang
+    #- os: osx
+      #osx_image: xcode9.2
+      #compiler: clang
+    ## osx with xcode10.0/clang
+    #- os: osx
+      #osx_image: xcode10
+      #compiler: clang
+    ## osx with xcode10.1/clang
+    #- os: osx
+      #osx_image: xcode10.1
+      #compiler: clang
+    ## osx with xcode/clang (default)
+    #- os: osx
+      #compiler: clang
 
 before_install:
   - eval "${MATRIX_EVAL}"
     # uninstalling oclint, as it's preinstalled and conflicts with all versions of gcc
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-    brew cask uninstall oclint || true
+    brew cask uninstall oclint || true;
     brew update;
     fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update; fi
