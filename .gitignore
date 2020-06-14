@@ -1,8 +1,11 @@
 build/
 man/*.1
 .lock*
+.stamp_*
+.DS_Store
 __pycache__
 *.pyc
+*.pkg
 android/.server/
 android/.client/
 codeBlocks

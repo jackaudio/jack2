@@ -1,0 +1,10 @@
+JACK2 is a low-latency audio server for multi-processor machines.
+It provides a basic infrastructure for audio applications to communicate with each other and with audio hardware.
+Through JACK, users are enabled to build powerful systems for signal processing and music production.
+
+This package installs jackd and the command-line tools for JACK2.
+
+It also includes the necessary files for developers to build with JACK support.
+
+
+The previously packaged JackRouter plugin is not available at this point.
