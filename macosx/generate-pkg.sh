@@ -17,17 +17,17 @@ fi
 
 VERSION=$(cat ../wscript | awk 'sub("VERSION=","")' | tr -d "'")
 
-#rm -f jack2-osx-root.pkg
+rm -f jack2-osx-root.pkg
 rm -f jack2-osx-${VERSION}.pkg
 rm -f package.xml
 
 # ---------------------------------------------------------------------------------------------------------------------
 
-#pkgbuild \
-#	--identifier org.jackaudio.jack2 \
-#	--install-location "/usr/local/" \
-#	--root "${installed_prefix}/" \
-#	jack2-osx-root.pkg
+pkgbuild \
+	--identifier org.jackaudio.jack2 \
+	--install-location "/usr/local/" \
+	--root "${installed_prefix}/" \
+	jack2-osx-root.pkg
 
 # ---------------------------------------------------------------------------------------------------------------------
 
