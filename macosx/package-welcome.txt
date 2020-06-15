@@ -3,8 +3,9 @@ It provides a basic infrastructure for audio applications to communicate with ea
 Through JACK, users are enabled to build powerful systems for signal processing and music production.
 
 This package installs jackd and the command-line tools for JACK2.
-
 It also includes the necessary files for developers to build with JACK support.
+
+All files will be installed under /usr/local/.
 
 
 The previously packaged JackRouter plugin is not available at this point.
