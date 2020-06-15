@@ -21,7 +21,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackConstants.h"
 #include "JackTools.h"
 #include "JackError.h"
+#include <fcntl.h>
 #include <stdio.h>
+#include <sys/mman.h>
 
 namespace Jack
 {
@@ -30,7 +32,12 @@ void JackMachSemaphore::BuildName(const char* client_name, const char* server_na
 {
     char ext_client_name[SYNC_MAX_NAME_SIZE + 1];
     JackTools::RewriteName(client_name, ext_client_name);
-    snprintf(res, size, "jacksem.%d_%s_%s", JackTools::GetUID(), server_name, ext_client_name);
+
+    // make the name as small as possible, as macos has issues with long semaphore names
+    if (strcmp(server_name, "default") == 0)
+        server_name = "";
+
+    snprintf(res, size, "js%d.%s%s", JackTools::GetUID(), server_name, ext_client_name);
 }
 
 bool JackMachSemaphore::Signal()
@@ -102,6 +109,39 @@ bool JackMachSemaphore::TimedWait(long usec)
     return (res == KERN_SUCCESS);
 }
 
+bool JackMachSemaphore::recursiveBootstrapRegister(int counter)
+{
+    if (counter == 99)
+        return false;
+
+    kern_return_t res;
+
+    if ((res = bootstrap_register(fBootPort, fSharedName, fSemaphore)) != KERN_SUCCESS) {
+        switch (res) {
+            case BOOTSTRAP_SUCCESS :
+                break;
+
+            case BOOTSTRAP_NOT_PRIVILEGED :
+            case BOOTSTRAP_NAME_IN_USE :
+            case BOOTSTRAP_UNKNOWN_SERVICE :
+            case BOOTSTRAP_SERVICE_ACTIVE :
+                // try again with next suffix 
+                snprintf(fSharedName, sizeof(fName), "%s-%d", fName, ++counter);
+                return recursiveBootstrapRegister(counter);
+                break;
+
+            default :
+                jack_log("bootstrap_register() err = %i:%s", res, bootstrap_strerror(res));
+                break;
+        }
+
+        jack_error("Allocate: can't check in mach semaphore name = %s err = %i:%s", fName, res, bootstrap_strerror(res));
+        return false;
+    }
+
+    return true;
+}
+
 // Server side : publish the semaphore in the global namespace
 bool JackMachSemaphore::Allocate(const char* name, const char* server_name, int value)
 {
@@ -116,52 +156,36 @@ bool JackMachSemaphore::Allocate(const char* name, const char* server_name, int 
         }
     }
 
+    if ((fSharedMem = shm_open(fName, O_CREAT | O_RDWR, 0777)) < 0) {
+        jack_error("Allocate: can't check in named futex name = %s err = %s", fName, strerror(errno));
+        return false;
+    }
+
+    if (ftruncate(fSharedMem, SYNC_MAX_NAME_SIZE+1) != 0) {
+        jack_error("Allocate: can't set shared memory size in named futex name = %s err = %s", fName, strerror(errno));
+        return false;
+    }
+
+    char* const sharedName = (char*)mmap(NULL, SYNC_MAX_NAME_SIZE+1, PROT_READ|PROT_WRITE, MAP_SHARED, fSharedMem, 0);
+
+    if (sharedName == NULL || sharedName == MAP_FAILED) {
+        jack_error("Allocate: can't check in named futex name = %s err = %s", fName, strerror(errno));
+        close(fSharedMem);
+        fSharedMem = -1;
+        shm_unlink(fName);
+        return false;
+    }
+
+    fSharedName = sharedName;
+    strcpy(fSharedName, fName);
+
     if ((res = semaphore_create(task, &fSemaphore, SYNC_POLICY_FIFO, value)) != KERN_SUCCESS) {
         jack_error("Allocate: can create semaphore err = %i:%s", res, mach_error_string(res));
         return false;
     }
 
-    if ((res = bootstrap_register(fBootPort, fName, fSemaphore)) != KERN_SUCCESS) {
-        switch (res) {
-            case BOOTSTRAP_SUCCESS :
-                jack_log("bootstrap_register(): bootstrap success");
-                /* service not currently registered, "a good thing" (tm) */
-                break;
-
-            case BOOTSTRAP_NOT_PRIVILEGED :
-                jack_log("bootstrap_register(): bootstrap not privileged");
-                /* might belong to a previously running jack process that crashed, let's try to connect */
-                {
-                    semaphore_t sem;
-                    if (semaphore_create(task, &sem, SYNC_POLICY_FIFO, value) == KERN_SUCCESS)
-                    {
-                        const bool ok = (bootstrap_look_up(fBootPort, fName, &sem) == KERN_SUCCESS);
-                        semaphore_destroy(mach_task_self(), sem);
-
-                        if (ok)
-                        {
-                            jack_error("bootstrap_register(): forced connection");
-                            return true;
-                        }
-                    }
-                }
-                break;
-
-            case BOOTSTRAP_SERVICE_ACTIVE :
-                jack_log("bootstrap_register(): bootstrap service active");
-                break;
-
-            default :
-                jack_log("bootstrap_register() err = %i:%s", res, mach_error_string(res));
-                break;
-        }
-
-        jack_error("Allocate: can't check in mach semaphore name = %s err = %i:%s", fName, res, mach_error_string(res));
-        return false;
-    }
-
     jack_log("JackMachSemaphore::Allocate name = %s", fName);
-    return true;
+    return recursiveBootstrapRegister(1);
 }
 
 // Client side : get the published semaphore from server
@@ -170,6 +194,12 @@ bool JackMachSemaphore::ConnectInput(const char* name, const char* server_name)
     BuildName(name, server_name, fName, sizeof(fName));
     kern_return_t res;
 
+    // Temporary...
+    if (fSharedName) {
+        jack_log("Already connected name = %s", name);
+        return true;
+    }
+
     if (fBootPort == 0) {
         if ((res = task_get_bootstrap_port(mach_task_self(), &fBootPort)) != KERN_SUCCESS) {
             jack_error("Connect: can't find bootstrap port err = %s", mach_error_string(res));
@@ -177,10 +207,28 @@ bool JackMachSemaphore::ConnectInput(const char* name, const char* server_name)
         }
     }
 
-    if ((res = bootstrap_look_up(fBootPort, fName, &fSemaphore)) != KERN_SUCCESS) {
-        jack_error("Connect: can't find mach semaphore name = %s err = %s", fName, mach_error_string(res));
+    if ((fSharedMem = shm_open(fName, O_RDWR, 0)) < 0) {
+        jack_error("Connect: can't connect named futex name = %s err = %s", fName, strerror(errno));
         return false;
     }
+
+    char* const sharedName = (char*)mmap(NULL, SYNC_MAX_NAME_SIZE+1, PROT_READ|PROT_WRITE, MAP_SHARED, fSharedMem, 0);
+
+    if (sharedName == NULL || sharedName == MAP_FAILED) {
+        jack_error("Connect: can't connect named futex name = %s err = %s", fName, strerror(errno));
+        close(fSharedMem);
+        fSharedMem = -1;
+        return false;
+    }
+
+    if ((res = bootstrap_look_up(fBootPort, sharedName, &fSemaphore)) != KERN_SUCCESS) {
+        jack_error("Connect: can't find mach semaphore name = %s, sname = %s, err = %s", fName, sharedName, bootstrap_strerror(res));
+        close(fSharedMem);
+        fSharedMem = -1;
+        return false;
+    }
+
+    fSharedName = sharedName;
 
     jack_log("JackMachSemaphore::Connect name = %s ", fName);
     return true;
@@ -202,7 +250,16 @@ bool JackMachSemaphore::Disconnect()
         jack_log("JackMachSemaphore::Disconnect name = %s", fName);
         fSemaphore = 0;
     }
-    // Nothing to do
+
+    if (!fSharedName) {
+        return true;
+    }
+
+    munmap(fSharedName, SYNC_MAX_NAME_SIZE+1);
+    fSharedName = NULL;
+
+    close(fSharedMem);
+    fSharedMem = -1;
     return true;
 }
 
@@ -220,6 +277,18 @@ void JackMachSemaphore::Destroy()
     } else {
         jack_error("JackMachSemaphore::Destroy semaphore < 0");
     }
+
+    if (!fSharedName) {
+        return;
+    }
+
+    munmap(fSharedName, SYNC_MAX_NAME_SIZE+1);
+    fSharedName = NULL;
+
+    close(fSharedMem);
+    fSharedMem = -1;
+
+    shm_unlink(fName);
 }
 
 } // end of namespace

@@ -41,13 +41,18 @@ class SERVER_EXPORT JackMachSemaphore : public detail::JackSynchro
         semaphore_t fSemaphore;
         mach_port_t fBootPort;
 
+        int fSharedMem;
+        char* fSharedName;
+
+        bool recursiveBootstrapRegister(int counter);
+
     protected:
 
         void BuildName(const char* name, const char* server_name, char* res, int size);
 
     public:
 
-        JackMachSemaphore():JackSynchro(), fSemaphore(0), fBootPort(0)
+        JackMachSemaphore():JackSynchro(), fSemaphore(0), fBootPort(0), fSharedMem(0), fSharedName(NULL)
         {}
 
         bool Signal();
