@@ -157,19 +157,19 @@ bool JackMachSemaphore::Allocate(const char* name, const char* server_name, int 
     }
 
     if ((fSharedMem = shm_open(fName, O_CREAT | O_RDWR, 0777)) < 0) {
-        jack_error("Allocate: can't check in named futex name = %s err = %s", fName, strerror(errno));
+        jack_error("Allocate: can't check in mach shared name = %s err = %s", fName, strerror(errno));
         return false;
     }
 
     if (ftruncate(fSharedMem, SYNC_MAX_NAME_SIZE+1) != 0) {
-        jack_error("Allocate: can't set shared memory size in named futex name = %s err = %s", fName, strerror(errno));
+        jack_error("Allocate: can't set shared memory size in mach shared name = %s err = %s", fName, strerror(errno));
         return false;
     }
 
     char* const sharedName = (char*)mmap(NULL, SYNC_MAX_NAME_SIZE+1, PROT_READ|PROT_WRITE, MAP_SHARED, fSharedMem, 0);
 
     if (sharedName == NULL || sharedName == MAP_FAILED) {
-        jack_error("Allocate: can't check in named futex name = %s err = %s", fName, strerror(errno));
+        jack_error("Allocate: can't check in mach shared name = %s err = %s", fName, strerror(errno));
         close(fSharedMem);
         fSharedMem = -1;
         shm_unlink(fName);
@@ -208,14 +208,14 @@ bool JackMachSemaphore::ConnectInput(const char* name, const char* server_name)
     }
 
     if ((fSharedMem = shm_open(fName, O_RDWR, 0)) < 0) {
-        jack_error("Connect: can't connect named futex name = %s err = %s", fName, strerror(errno));
+        jack_error("Connect: can't connect mach shared name = %s err = %s", fName, strerror(errno));
         return false;
     }
 
     char* const sharedName = (char*)mmap(NULL, SYNC_MAX_NAME_SIZE+1, PROT_READ|PROT_WRITE, MAP_SHARED, fSharedMem, 0);
 
     if (sharedName == NULL || sharedName == MAP_FAILED) {
-        jack_error("Connect: can't connect named futex name = %s err = %s", fName, strerror(errno));
+        jack_error("Connect: can't connect mach shared name = %s err = %s", fName, strerror(errno));
         close(fSharedMem);
         fSharedMem = -1;
         return false;
