@@ -37,7 +37,7 @@ void JackMachSemaphore::BuildName(const char* client_name, const char* server_na
     if (strcmp(server_name, "default") == 0)
         server_name = "";
 
-    snprintf(res, size, "js%d.%s%s", JackTools::GetUID(), server_name, ext_client_name);
+    snprintf(res, std::min(size, 32), "js%d.%s%s", JackTools::GetUID(), server_name, ext_client_name);
 }
 
 bool JackMachSemaphore::Signal()
@@ -161,9 +161,12 @@ bool JackMachSemaphore::Allocate(const char* name, const char* server_name, int 
         return false;
     }
 
-    if (ftruncate(fSharedMem, SYNC_MAX_NAME_SIZE+1) != 0) {
-        jack_error("Allocate: can't set shared memory size in mach shared name = %s err = %s", fName, strerror(errno));
-        return false;
+    struct stat st;
+    if (fstat(fSharedMem, &st) != -1 && st.st_size == 0) {
+        if (ftruncate(fSharedMem, SYNC_MAX_NAME_SIZE+1) != 0) {
+            jack_error("Allocate: can't set shared memory size in mach shared name = %s err = %s", fName, strerror(errno));
+            return false;
+        }
     }
 
     char* const sharedName = (char*)mmap(NULL, SYNC_MAX_NAME_SIZE+1, PROT_READ|PROT_WRITE, MAP_SHARED, fSharedMem, 0);
