@@ -7,5 +7,5 @@ server_libs=-L@LIBDIR@ -l@SERVERLIB@
 Name: jack
 Description: the Jack Audio Connection Kit: a low-latency synchronous callback-based media server
 Version: @JACK_VERSION@
-Libs: -L@LIBDIR@ -ljack
+Libs: -L@LIBDIR@ -l@CLIENTLIB@
 Cflags: -I@INCLUDEDIR@
