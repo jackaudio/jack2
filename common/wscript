@@ -143,9 +143,7 @@ def build(bld):
     clientlib.use = uselib
     if bld.env['IS_WINDOWS']:
          clientlib.env['cxxshlib_PATTERN'] = 'lib%s.dll'
-         clientlib.install_path = '${BINDIR}'
-    else:
-         clientlib.install_path = '${LIBDIR}'
+    clientlib.install_path = '${LIBDIR}'
     if bld.env['AUTOSTART_METHOD'] == 'dbus':
         clientlib.use.append('DBUS-1')
     clientlib.includes = includes
@@ -217,9 +215,7 @@ def build(bld):
     serverlib.use = uselib
     if bld.env['IS_WINDOWS']:
          serverlib.env['cxxshlib_PATTERN'] = 'lib%s.dll'
-         serverlib.install_path = '${BINDIR}'
-    else:
-         serverlib.install_path = '${LIBDIR}'
+    serverlib.install_path = '${LIBDIR}'
     serverlib.source = [] + common_libsources
     serverlib.source += [
         'JackAudioDriver.cpp',
@@ -315,13 +311,10 @@ def build(bld):
         netlib.use = ['SAMPLERATE', 'CELT', 'OPUS', 'PTHREAD']
         if bld.env['IS_WINDOWS']:
              netlib.env['cxxshlib_PATTERN'] = 'lib%s.dll'
-             netlib.install_path = '${BINDIR}'
              netlib.use += ['WS2_32', 'WINMM']
-        elif bld.env['IS_MACOSX']:
-             netlib.install_path = '${LIBDIR}'
-        else:
+        elif not bld.env['IS_MACOSX']:
              netlib.use += ['RT']
-             netlib.install_path = '${LIBDIR}'
+        netlib.install_path = '${LIBDIR}'
         netlib.source = [
             'JackNetAPI.cpp',
             'JackNetInterface.cpp',
