@@ -258,7 +258,7 @@ int main (int argc, char* argv[])
                         /* list all properties for a given UUID */
 
                         jack_description_t description;
-                        size_t cnt, n;
+                        int cnt, n;
 
                         if (get_subject (client, argv, &optind)) {
                                 return -1;
@@ -289,9 +289,8 @@ int main (int argc, char* argv[])
                         /* list all properties */
 
                         jack_description_t* description;
-                        int cnt;
+                        int cnt, n;
                         size_t p;
-                        int n;
                         char buf[JACK_UUID_STRING_SIZE];
 
                         if ((cnt = jack_get_all_properties (&description)) < 0) {
