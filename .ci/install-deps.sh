@@ -10,7 +10,7 @@ if [ "$TRAVIS_OS_NAME" == "osx" ]; then
     libsndfile \
     opus \
     readline \
-    doxygen
+    doxygen || true
   # force installation of gcc-6 if required
   if [ "${CC}" == "gcc-6" ]; then
     brew install gcc@6

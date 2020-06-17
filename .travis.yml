@@ -116,9 +116,11 @@ matrix:
     #- os: osx
       #osx_image: xcode10.1
       #compiler: clang
-    ## osx with xcode/clang (default)
-    #- os: osx
-      #compiler: clang
+    # osx with xcode/clang (default)
+    - os: osx
+      compiler: clang
+    # windows
+    - os: windows
 
 before_install:
   - eval "${MATRIX_EVAL}"
@@ -128,6 +130,29 @@ before_install:
     brew update;
     fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update; fi
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+      [[ ! -f C:/tools/msys64/msys2_shell.cmd ]] && rm -rf C:/tools/msys64;
+      choco uninstall -y mingw;
+      choco upgrade --no-progress -y msys2;
+      export msys2='cmd //C RefreshEnv.cmd ';
+      export msys2+='& set MSYS=winsymlinks:nativestrict ';
+      export msys2+='& C:\\tools\\msys64\\msys2_shell.cmd -defterm -no-start';
+      export mingw64="$msys2 -mingw64 -full-path -here -c \$\* --";
+      export msys2+=" -msys2 -c \$\* --";
+      $msys2 pacman --sync --noconfirm --needed mingw-w64-x86_64-toolchain mingw-w64-x86_64-libsamplerate mingw-w64-x86_64-portaudio mingw-w64-x86_64-gcc;
+      taskkill //IM gpg-agent.exe //F || true;
+      export PATH=/C/tools/msys64/mingw64/bin:$PATH;
+    fi
+
+before_cache:
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+      $msys2 pacman --sync --clean --noconfirm;
+    fi
+
+cache:
+  directories:
+  - $HOME/AppData/Local/Temp/chocolatey
+  - /C/tools/msys64
 
 install:
   - ./.ci/install-deps.sh
@@ -145,6 +170,13 @@ script:
         CXXFLAGS="${CXXFLAGS} -flax-vector-conversions" python2 ./waf configure;
         CXXFLAGS="${CXXFLAGS} -flax-vector-conversions" python2 ./waf -v build;
         sudo python2 ./waf -v install;
+      fi
+    - if [ "$TRAVIS_OS_NAME" == "windows" ]; then
+        $mingw64 [[ -x ./waf ]] || python ./bootstrap.py;
+        $mingw64 sed -i 's:bin/env python$:bin/env python:' waf;
+        $mingw64 ./waf configure --check-c-compiler=gcc --check-cxx-compiler=g++;
+        $mingw64 ./waf -v build;
+        $mingw64 ./waf -v install;
       fi
 # run very basic tests
     - sudo .ci/test_run.sh
