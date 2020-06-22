@@ -379,7 +379,7 @@ def configure(conf):
         # we define this in the environment to maintain compatibility with
         # existing install paths that use ADDON_DIR rather than have to
         # have special cases for windows each time.
-        conf.env['ADDON_DIR'] = conf.env['BINDIR'] + '/jack'
+        conf.env['ADDON_DIR'] = conf.env['LIBDIR'] + '/jack'
         if Options.options.platform == 'msys':
             conf.define('ADDON_DIR', 'jack')
             conf.define('__STDC_FORMAT_MACROS', 1) # for PRIu64

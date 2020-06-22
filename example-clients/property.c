@@ -17,20 +17,20 @@ static char* subject = NULL;
 static void
 show_usage (void)
 {
-	fprintf (stderr, "\nUsage: jack_property [options] UUID [ key [ value [ type ] ] ]\n");
-	fprintf (stderr, "Set/Display JACK properties (metadata).\n\n");
-	fprintf (stderr, "Set options:\n");
-	fprintf (stderr, "        -s, --set		Set property \"key\" to \"value\" for \"UUID\" with optional MIME type \"type\"\n");
-	fprintf (stderr, "        -d, --delete		Remove/delete property \"key\" for \"UUID\"\n");
-	fprintf (stderr, "        -d, --delete UUID	Remove/delete all properties for \"UUID\"\n");
-	fprintf (stderr, "        -D, --delete-all	Remove/delete all properties\n");
+        fprintf (stderr, "\nUsage: jack_property [options] UUID [ key [ value [ type ] ] ]\n");
+        fprintf (stderr, "Set/Display JACK properties (metadata).\n\n");
+        fprintf (stderr, "Set options:\n");
+        fprintf (stderr, "        -s, --set		Set property \"key\" to \"value\" for \"UUID\" with optional MIME type \"type\"\n");
+        fprintf (stderr, "        -d, --delete		Remove/delete property \"key\" for \"UUID\"\n");
+        fprintf (stderr, "        -d, --delete UUID	Remove/delete all properties for \"UUID\"\n");
+        fprintf (stderr, "        -D, --delete-all	Remove/delete all properties\n");
         fprintf (stderr, "        --client		Interpret UUID as a client name, not a UUID\n");
         fprintf (stderr, "        --port		\tInterpret UUID as a port name, not a UUID\n");
-	fprintf (stderr, "\nDisplay options:\n");
-	fprintf (stderr, "        -l			Show all properties\n");
-	fprintf (stderr, "        -l, --list UUID	\tShow value for all properties of UUID\n");
-	fprintf (stderr, "        -l, --list UUID key	Show value for key of UUID\n");
-	fprintf (stderr, "\nFor more information see https://jackaudio.org/\n");
+        fprintf (stderr, "\nDisplay options:\n");
+        fprintf (stderr, "        -l			Show all properties\n");
+        fprintf (stderr, "        -l, --list UUID	\tShow value for all properties of UUID\n");
+        fprintf (stderr, "        -l, --list UUID key	Show value for key of UUID\n");
+        fprintf (stderr, "\nFor more information see https://jackaudio.org/\n");
 }
 
 static int
@@ -82,7 +82,7 @@ get_subject (jack_client_t* client, char* argv[], int* optind)
 int main (int argc, char* argv[])
 {
         jack_client_t* client = NULL;
-	jack_options_t options = JackNoStartServer;
+        jack_options_t options = JackNoStartServer;
         char* key = NULL;
         char* value = NULL;
         char* type = NULL;
@@ -90,32 +90,32 @@ int main (int argc, char* argv[])
         int delete = 0;
         int delete_all = 0;
         int c;
-	int option_index;
-	extern int optind;
-	struct option long_options[] = {
-		{ "set", 0, 0, 's' },
-		{ "delete", 0, 0, 'd' },
-		{ "delete-all", 0, 0, 'D' },
-		{ "list", 0, 0, 'l' },
-                { "client", 0, 0, 'c' },
-                { "port", 0, 0, 'p' },
-		{ 0, 0, 0, 0 }
-	};
+        int option_index;
+        extern int optind;
+        struct option long_options[] = {
+            { "set", 0, 0, 's' },
+            { "delete", 0, 0, 'd' },
+            { "delete-all", 0, 0, 'D' },
+            { "list", 0, 0, 'l' },
+            { "client", 0, 0, 'c' },
+            { "port", 0, 0, 'p' },
+            { 0, 0, 0, 0 }
+        };
 
         if (argc < 2) {
                 show_usage ();
                 exit (1);
         }
 
-	while ((c = getopt_long (argc, argv, "sdDlaApc", long_options, &option_index)) >= 0) {
-		switch (c) {
-		case 's':
+        while ((c = getopt_long (argc, argv, "sdDlaApc", long_options, &option_index)) >= 0) {
+            switch (c) {
+            case 's':
                         if (argc < 5) {
                                 show_usage ();
                                 exit (1);
                         }
-			set = 1;
-			break;
+                        set = 1;
+                        break;
                 case 'd':
                         if (argc < 3) {
                                 show_usage ();
@@ -258,7 +258,7 @@ int main (int argc, char* argv[])
                         /* list all properties for a given UUID */
 
                         jack_description_t description;
-                        size_t cnt, n;
+                        int cnt, n;
 
                         if (get_subject (client, argv, &optind)) {
                                 return -1;
@@ -289,9 +289,8 @@ int main (int argc, char* argv[])
                         /* list all properties */
 
                         jack_description_t* description;
-                        int cnt;
+                        int cnt, n;
                         size_t p;
-                        int n;
                         char buf[JACK_UUID_STRING_SIZE];
 
                         if ((cnt = jack_get_all_properties (&description)) < 0) {
