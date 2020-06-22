@@ -33,7 +33,14 @@ pkgbuild \
 
 # https://developer.apple.com/library/content/documentation/DeveloperTools/Reference/DistributionDefinitionRef/Chapters/Distribution_XML_Ref.html
 
+pushd "${installed_prefix}"
+mkdir -p share/jack2
+touch share/jack2/jack2-osx-files.txt
+find -sL . -type f | awk 'sub("./","/usr/local/")' > share/jack2/jack2-osx-files.txt
+popd
+
 sed -e "s|@CURDIR@|${PWD}|" package.xml.in > package.xml
+cat package-welcome.txt.in "${installed_prefix}/share/jack2/jack2-osx-files.txt" > package-welcome.txt
 
 productbuild \
 	--distribution package.xml \

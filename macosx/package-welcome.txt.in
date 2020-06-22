@@ -8,4 +8,11 @@ It also includes the necessary files for developers to build with JACK support.
 All files will be installed under /usr/local/.
 
 
-The previously packaged JackRouter plugin is not available at this point.
+Please note that this package will not delete previously installed jackosx contents.
+If you used that before, please run its own uninstaller before installing this package!
+
+Also, the previously packaged JackRouter plugin is not available at this point.
+
+
+For advanced/curious users, here is the full file list that this package provides:
+

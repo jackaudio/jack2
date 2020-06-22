@@ -10,9 +10,7 @@ android/.server/
 android/.client/
 codeBlocks
 
-# Visual Studio files
-*.vcxproj.user
-windows/JackRouter/.vs
-windows/JackRouter/Debug
-windows/JackRouter/Release
-windows/JackRouter/Release64
+# macos release files
+macos/package.xml
+macos/package-welcome.txt
+
