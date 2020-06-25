@@ -760,15 +760,15 @@ int jack_port_unregister (jack_client_t *client, jack_port_t *port) JACK_OPTIONA
  * zero-filled. if there are multiple inbound connections, the data
  * will be mixed appropriately.
  *
- * FOR OUTPUT PORTS ONLY : DEPRECATED in Jack 2.0 !!
- * ---------------------------------------------------
+ * FOR OUTPUT PORTS ONLY
+ * ---------------------
  * You may cache the value returned, but only between calls to
  * your "blocksize" callback. For this reason alone, you should
  * either never cache the return value or ensure you have
  * a "blocksize" callback and be sure to invalidate the cached
  * address from there.
  *
- * Caching output ports is DEPRECATED in Jack 2.0, due to some new optimization (like "pipelining").
+ * Caching input ports is not allowed, due to some new optimization (like "pipelining").
  * Port buffers have to be retrieved in each callback for proper functioning.
  */
 void * jack_port_get_buffer (jack_port_t *port, jack_nframes_t) JACK_OPTIONAL_WEAK_EXPORT;
