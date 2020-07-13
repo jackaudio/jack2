@@ -127,7 +127,18 @@ libsystre depends on libtre-git. libsystre is a wrapper around libtre that
 allows including <regex.h> later.
 
 Some libraries like libsndfile and libsamplerate will ask for installing extra
-dependencies, it is ok to do so.
+dependencies, it is ok to do so. The build processes seem to be slow or even
+freeze occasionally probably due to Windows Defender real-time protection. In
+case of a halt simply interrupt and restart the respective build command.
+
+Here is the list of libraries to build (see remarks for portaudio below):
+
+db
+libsndfile
+libsamplerate
+libtre-git
+libsystre
+portaudio
 
 For low latency audio it is recommended to build portaudio with ASIO support, so
 the Steinberg ASIO SDK should be manually downloaded beforehand. It can be found
@@ -140,27 +151,22 @@ mkdir /opt   <- MinGW does not create /opt during installation
 mv /tmp/asiosdk_{version}_{date} /opt/asiosdk
 
 The description file in portaudio (MINGW-packages/mingw-w64-portaudio/PKGBUILD)
-needs to be patched so configure is called with the necessary flags for ASIO:
+needs to be patched so configure is called with the necessary flags and
+modifications for a successful build with ASIO. Both static and shared library
+versions of portaudio are built.
 
---with-asiodir=/opt/asiosdk   <- new option
---with-winapi=wmme,directx,wasapi,vdmks,asio   <- append 'asio' to existing
+Replace the last line in the respective static and shared configure calls by:
 
-Both static and shared library versions of portaudio are built. To prevent
-errors while building the shared version or recompiling static, also insert the
-following lines in PKGBUILD after the first make call (around line 60) and after
-second make (around line 70):
+	--with-asiodir=/opt/asiosdk \
+    --with-winapi=wmme,directx,wasapi,wdmks,asio
 
-find /opt/asiosdk -name "*.lo" -type f -delete
-find /opt/asiosdk -name "*.o" -type f -delete
+To prevent errors while building the shared version or recompiling static, also
+insert the following lines in MINGW-packages/mingw-w64-portaudio/PKGBUILD before
+the first make call (around line 59) and before the second make call (around
+line 75):
 
-Finally here is the list of libraries to build:
-
-db
-libsndfile
-libsamplerate
-libtre-git
-libsystre
-portaudio
+  find /opt/asiosdk -name "*.o" -type f -delete
+  find /opt/asiosdk -name "*.lo" -type f -delete
 
 
 
