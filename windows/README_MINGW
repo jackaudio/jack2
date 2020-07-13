@@ -90,6 +90,9 @@ Make sure gcc runs and it is the expected version:
 $ gcc --version
 gcc.exe (x86_64-posix-sjlj-rev0, Built by MinGW-W64 project) {version}
 
+In case gcc is not recognized in the step before, add mingw64 directory to PATH
+
+export PATH=/mingw64/bin:$PATH
 
 
 Preparing JACK dependencies
@@ -165,12 +168,23 @@ Compiling JACK
 
 - Clone repo
 
+cd ~
 git clone https://github.com/jackaudio/jack2
 
-- Build and install
+Configure build (including the pre-built libraries in order to receive a warning
+if they are not recognized):
 
 cd jack2
-./waf configure --prefix=/opt/jack && ./waf -p install
+./waf configure --prefix=/opt/jack --portaudio --samplerate --sndfile --db
+
+In case the pre-built libraries are not recognized in the step before, add
+mingw64 directory to PKG_CONFIG_PATH:
+
+export PKG_CONFIG_PATH=/mingw64/lib/pkgconfig:$PKG_CONFIG_PATH
+
+Build and install:
+
+./waf -p install
 
 The resulting files can be found at /c/opt/jack/bin, or C:\msys64\opt\jack\bin
 
@@ -218,6 +232,10 @@ mkdir 'C:\Program Files\Jack'
 
 cp C:\msys64\opt\jack\bin\* 'C:\Program Files\Jack'
 
+- Add JACK executables to path
+
+$env:Path += ';C:\Program Files\Jack'
+
 - Copy the following DLLs from C:\msys64\mingw64\bin to C:\Program Files\Jack,
 these are dependencies for the JACK server and tools:
 
@@ -232,11 +250,12 @@ cp C:\msys64\mingw64\bin\libdb-6.0.dll `
   , C:\msys64\mingw64\bin\libwinpthread-1.dll `
   'C:\Program Files\Jack'
 
-- Copy and rename the following files from C:\msys64\opt\jack\bin to C:\Windows
-to make libjack available to clients:
+- Copy the following files from C:\msys64\opt\jack\lib to C:\Windows to make
+libjack available to clients:
 
-cp C:\msys64\opt\jack\bin\libjack-0.dll C:\Windows\libjack64.dll
-cp C:\msys64\opt\jack\bin\libjackserver-0.dll C:\Windows\libjackserver64.dll
+cp C:\msys64\opt\jack\lib\libjack64.dll `
+  , C:\msys64\opt\jack\lib\libjackserver64.dll `
+  C:\Windows
 
 - Copy the following files from C:\msys64\mingw64\bin to C:\Windows, these are
 dependencies for libjack. C:\Windows is the directory the current official JACK
@@ -249,6 +268,11 @@ cp C:\msys64\mingw64\bin\libgcc_s_sjlj-1.dll `
   , C:\msys64\mingw64\bin\libwinpthread-1.dll `
   C:\Windows
 
+- Copy all dll files from C:\msys64\opt\jack\lib\jack to C:\Windows\jack, these
+are dependencies for libjack:
+
+cp C:\msys64\opt\jack\lib\jack\*.dll C:\Windows\jack
+
 - Copy JackRouter.dll from windows\JackRouter\Release64 to C:\Program Files\Jack
 This allows non-JACK applications to connect to the server through a special
 ASIO driver that routes audio to JACK instead of a physical audio device.
@@ -258,6 +282,12 @@ of the system-wide libjack64.dll previously copied to C:\Windows. Once done,
 JackRouter needs to be registered:
 
 regsvr32 JackRouter.dll
+
+- Start a new Windows Command Prompt or Windows Power Shell session an check if
+the JACK server is recognized (this should not start the JACK server but display
+the list of available PortAudio devices):
+
+jackd -d portaudio --list-devices
 
 Tested working clients:
 Ardour
