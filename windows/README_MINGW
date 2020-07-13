@@ -4,6 +4,7 @@ HOW TO COMPILE JACK USING WAF AND MINGW
 Rev. 1 - 2019-09-01 - First version
 Rev. 2 - 2019-09-18 - Include contributions from @Schroedingers-Cat
 Rev. 3 - 2019-12-14 - Include contributions from @Schroedingers-Cat
+Rev. 4 - 2020-07-13 - Include contributions from @HaHeho
 
 
 
@@ -141,7 +142,7 @@ mv /tmp/asiosdk_{version}_{date} /opt/asiosdk
 The description file in portaudio (MINGW-packages/mingw-w64-portaudio/PKGBUILD)
 needs to be patched so configure is called with the necessary flags for ASIO:
 
---with-asiodir=/opt/asiosdk   <- new option     
+--with-asiodir=/opt/asiosdk   <- new option
 --with-winapi=wmme,directx,wasapi,vdmks,asio   <- append 'asio' to existing
 
 Both static and shared library versions of portaudio are built. To prevent
@@ -166,7 +167,7 @@ portaudio
 Compiling JACK
 --------------
 
-- Clone repo
+Clone repo:
 
 cd ~
 git clone https://github.com/jackaudio/jack2
@@ -190,8 +191,13 @@ The resulting files can be found at /c/opt/jack/bin, or C:\msys64\opt\jack\bin
 
 
 
-Compiling JackRouter
---------------------
+Compiling JackRouter (optional)
+-------------------------------
+
+JackRouter allows non-JACK applications to connect to the server through a
+special ASIO driver that routes audio to JACK instead of a physical audio
+device. Therefore, this is an optional component if you only want to use
+JACK-native application.
 
 Visual Studio with MFC support is needed to build the included JackRouter VS
 project. The project was tested to successfully generate a 64bit version of
@@ -212,8 +218,8 @@ Differences from the original JackRouter.vcxproj:
 
 
 
-Running and distributing
-------------------------
+Distributing JACK
+-----------------
 
 An automated installation process should copy files to two destinations. One for
 the JACK server binary and standalone tools, and another for the client library.
@@ -224,11 +230,11 @@ to the server.
 perform the steps in Windows Explorer or Windows Command Prompt with different
 commands):
 
-- Create a directory named C:\Program Files\Jack (can be anything else)
+- Create a target directory (can be anything else)
 
 mkdir 'C:\Program Files\Jack'
 
-- Copy all files in C:\msys64\opt\jack\bin to C:\Program Files\Jack
+- Copy all files in C:\msys64\opt\jack\bin to target directory
 
 cp C:\msys64\opt\jack\bin\* 'C:\Program Files\Jack'
 
@@ -273,31 +279,41 @@ are dependencies for libjack:
 
 cp C:\msys64\opt\jack\lib\jack\*.dll C:\Windows\jack
 
-- Copy JackRouter.dll from windows\JackRouter\Release64 to C:\Program Files\Jack
-This allows non-JACK applications to connect to the server through a special
-ASIO driver that routes audio to JACK instead of a physical audio device.
-Also copy libjack-0.dll from C:\msys64\mingw64\bin to C:\Program Files\Jack
-because JackRouter depends on libjack but will check for libjack-0.dll instead
-of the system-wide libjack64.dll previously copied to C:\Windows. Once done,
-JackRouter needs to be registered:
-
-regsvr32 JackRouter.dll
-
 - Start a new Windows Command Prompt or Windows Power Shell session an check if
 the JACK server is recognized (this should not start the JACK server but display
 the list of available PortAudio devices):
 
 jackd -d portaudio --list-devices
 
-Tested working clients:
-Ardour
-Bitwig Studio
-QJackCtl
-JackRouter
+
+
+Distributing JackRouter (optional)
+----------------------------------
+
+In case you have built JackRouter.
+
+- Copy JackRouter.dll from windows\JackRouter\Release64 to C:\Program Files\Jack
+- Copy libjack-0.dll from C:\msys64\mingw64\bin to C:\Program Files\Jack, since
+JackRouter depends on libjack but will check for libjack-0.dll instead of the
+system-wide libjack64.dll previously copied to C:\Windows. Once done, JackRouter
+needs to be registered:
+
+regsvr32 JackRouter.dll
+
+
+
+Running JACK
+------------
 
 Example of starting the JACK server including MIDI support for a Focusrite USB
 audio device using ASIO:
 jackd -R -S -X winmme -d portaudio -p 32 -r 48000 -d "ASIO::Focusrite USB ASIO"
+
+Tested working clients:
+Ardour
+Bitwig Studio
+JackRouter
+QJackCtl
 
 
 
