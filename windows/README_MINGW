@@ -206,36 +206,48 @@ the JACK server binary and standalone tools, and another for the client library.
 The latter is needed by JACK enabled applications in order to be able to connect
 to the server.
 
+- Open an elevated (admin rights) Windows Power Shell (alternatively you can
+perform the steps in Windows Explorer or Windows Command Prompt with different
+commands):
+
 - Create a directory named C:\Program Files\Jack (can be anything else)
+
+mkdir 'C:\Program Files\Jack'
+
 - Copy all files in C:\msys64\opt\jack\bin to C:\Program Files\Jack
+
+cp C:\msys64\opt\jack\bin\* 'C:\Program Files\Jack'
+
 - Copy the following DLLs from C:\msys64\mingw64\bin to C:\Program Files\Jack,
 these are dependencies for the JACK server and tools:
 
-libstdc++-6.dll
-libdb-6.0.dll
-libsndfile-1.dll
-libsamplerate-0.dll
-libportaudio-2.dll
-libgcc_s_sjlj-1.dll
-libwinpthread-1.dll
-libtre-5.dll
-libsystre-0.dll
+cp C:\msys64\mingw64\bin\libdb-6.0.dll `
+  , C:\msys64\mingw64\bin\libgcc_s_sjlj-1.dll `
+  , C:\msys64\mingw64\bin\libportaudio-2.dll `
+  , C:\msys64\mingw64\bin\libsamplerate-0.dll `
+  , C:\msys64\mingw64\bin\libsndfile-1.dll `
+  , C:\msys64\mingw64\bin\libstdc++-6.dll `
+  , C:\msys64\mingw64\bin\libsystre-0.dll `
+  , C:\msys64\mingw64\bin\libtre-5.dll `
+  , C:\msys64\mingw64\bin\libwinpthread-1.dll `
+  'C:\Program Files\Jack'
 
 - Copy and rename the following files from C:\msys64\opt\jack\bin to C:\Windows
 to make libjack available to clients:
 
-libjackserver-0.dll   -> libjackserver64.dll
-libjack-0.dll         -> libjack64.dll
+cp C:\msys64\opt\jack\bin\libjack-0.dll C:\Windows\libjack64.dll
+cp C:\msys64\opt\jack\bin\libjackserver-0.dll C:\Windows\libjackserver64.dll
 
 - Copy the following files from C:\msys64\mingw64\bin to C:\Windows, these are
 dependencies for libjack. C:\Windows is the directory the current official JACK
 1.9.11 binary installer targets, a better solution should be devised to avoid
 cluttering the Windows directory:
 
-libgcc_s_sjlj-1.dll
-libwinpthread-1.dll
-libtre-5.dll
-libsystre-0.dll
+cp C:\msys64\mingw64\bin\libgcc_s_sjlj-1.dll `
+  , C:\msys64\mingw64\bin\libsystre-0.dll `
+  , C:\msys64\mingw64\bin\libtre-5.dll `
+  , C:\msys64\mingw64\bin\libwinpthread-1.dll `
+  C:\Windows
 
 - Copy JackRouter.dll from windows\JackRouter\Release64 to C:\Program Files\Jack
 This allows non-JACK applications to connect to the server through a special
