@@ -900,7 +900,7 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 	driver->period_usecs =
 		(jack_time_t) floor ((((float) driver->frames_per_cycle) /
 				      driver->frame_rate) * 1000000.0f);
-	driver->poll_timeout_ms = (int) (1.5f * (driver->period_usecs / 1000.0f));
+	driver->poll_timeout_ms = (int) (1.5f * (driver->period_usecs / 1000.0f) + 0.5f);
 
 // JACK2
 /*
