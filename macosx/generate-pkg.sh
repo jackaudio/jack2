@@ -24,10 +24,10 @@ rm -f package.xml
 # ---------------------------------------------------------------------------------------------------------------------
 
 pkgbuild \
-	--identifier org.jackaudio.jack2 \
-	--install-location "/usr/local/" \
-	--root "${installed_prefix}/" \
-	jack2-osx-root.pkg
+    --identifier org.jackaudio.jack2 \
+    --install-location "/usr/local/" \
+    --root "${installed_prefix}/" \
+    jack2-osx-root.pkg
 
 # ---------------------------------------------------------------------------------------------------------------------
 
@@ -43,12 +43,12 @@ sed -e "s|@CURDIR@|${PWD}|" package.xml.in > package.xml
 cat package-welcome.txt.in "${installed_prefix}/share/jack2/jack2-osx-files.txt" > package-welcome.txt
 
 productbuild \
-	--distribution package.xml \
-	--identifier org.jackaudio.jack2 \
-	--package-path "${PWD}" \
-	--version ${VERSION} \
-	jack2-osx-${VERSION}.pkg
+    --distribution package.xml \
+    --identifier org.jackaudio.jack2 \
+    --package-path "${PWD}" \
+    --version ${VERSION} \
+    jack2-osx-${VERSION}.pkg
 
-rm package.xml
+rm jack2-osx-root.pkg package.xml package-welcome.txt
 
 # ---------------------------------------------------------------------------------------------------------------------
