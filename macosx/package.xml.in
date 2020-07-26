@@ -6,14 +6,14 @@
     <background-darkAqua file="@CURDIR@/package-background.png" mime-type="image/png" alignment="bottomleft" scaling="proportional" />
     -->
     <choice id="org.jackaudio.jack2" title="JACK2" visible="false">
-        <pkg-ref id="org.jackaudio.jack2">jack2-osx-root.pkg</pkg-ref>
+        <pkg-ref id="org.jackaudio.jack2" version="0">jack2-osx-root.pkg</pkg-ref>
     </choice>
     <choices-outline>
-        <line choice="org.jackaudio.jack2"/>
+        <line choice="org.jackaudio.jack2" />
     </choices-outline>
-    <domains enable_anywhere="false" enable_currentUserHome="false" enable_localSystem="true"/>
+    <domains enable_anywhere="false" enable_currentUserHome="false" enable_localSystem="true" />
     <license file="@CURDIR@/../COPYING" mime-type="text/plain" />
-    <options customize="never" hostArchitectures="x86_64" require-scripts="false"/>
-    <pkg-ref id="org.jackaudio.jack2">jack2-osx-root.pkg</pkg-ref>
+    <options customize="never" hostArchitectures="x86_64" require-scripts="false" rootVolumeOnly="true" />
+    <pkg-ref id="org.jackaudio.jack2" />
     <welcome file="@CURDIR@/package-welcome.txt" mime-type="text/plain" />
 </installer-gui-script>
