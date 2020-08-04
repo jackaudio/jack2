@@ -18,8 +18,8 @@
 */
 
 
-#ifndef __JACK_MIDIPORT_H
-#define __JACK_MIDIPORT_H
+#ifndef __JACK_MESSAGEPORT_H
+#define __JACK_MESSAGEPORT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,12 +27,30 @@ extern "C" {
 
 #include <jack/weakmacros.h>
 #include <jack/types.h>
-#include <jack/messageport.h>
 #include <stdlib.h>
 
 
+/** Type for raw event data contained in @ref jack_midi_event_t. */
+typedef unsigned char jack_midi_data_t;
+
+
+/** A Jack MIDI event. */
+typedef struct _jack_midi_event
+{
+	jack_nframes_t    time;   /**< Sample index at which event is valid */
+	size_t            size;   /**< Number of bytes of data in \a buffer */
+	jack_midi_data_t *buffer; /**< Raw MIDI data */
+} jack_midi_event_t;
+
+typedef jack_midi_data_t jack_message_data_t;
+typedef jack_midi_event_t jack_message_event_t;
+
+
 /**
- * @defgroup MIDIAPI Reading and writing MIDI data
+ * @defgroup MESSAGEAPI Reading and writing event data. This supersedes the
+ * older Midi API by extending it to work with arbitrary messsage protocols.
+ * The usage is basically the same except for renaming some methods. Use the
+ * metadata API to specify which protocol a port implements.
  * @{
  */
 
@@ -42,10 +60,15 @@ extern "C" {
  * @return number of events inside @a port_buffer
  */
 uint32_t
-jack_midi_get_event_count(void* port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
+jack_message_get_event_count(void* port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
 
 
-/** Get a MIDI event from an event port buffer.
+/**
+ * Read an event from a message port buffer. It is up to the caller to determine
+ * which protocol to interpret the data with. The port's type and the metadata
+ * API should suffice to do so.
+ * 
+ * If the event represents MIDI data:
  *
  * Jack MIDI is normalised, the MIDI event returned by this function is
  * guaranteed to be a complete MIDI event (the status byte will always be
@@ -68,7 +91,7 @@ jack_midi_get_event_count(void* port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
  * @return 0 on success, ENODATA if buffer is empty.
  */
 int
-jack_midi_event_get(jack_midi_event_t *event,
+jack_message_event_read(jack_message_event_t *event,
                     void        *port_buffer,
                     uint32_t    event_index) JACK_OPTIONAL_WEAK_EXPORT;
 
@@ -76,26 +99,13 @@ jack_midi_event_get(jack_midi_event_t *event,
 /** Clear an event buffer.
  *
  * This should be called at the beginning of each process cycle before calling
- * @ref jack_midi_event_reserve or @ref jack_midi_event_write. This
+ * @ref jack_message_event_reserve or @ref jack_message_event_write. This
  * function may not be called on an input port's buffer.
  *
  * @param port_buffer Port buffer to clear (must be an output port buffer).
  */
 void
-jack_midi_clear_buffer(void *port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
-
-/** Reset an event buffer (from data allocated outside of JACK).
- *
- * This should be called at the beginning of each process cycle before calling
- * @ref jack_midi_event_reserve or @ref jack_midi_event_write. This
- * function may not be called on an input port's buffer.
- *
- * @deprecated Please use jack_midi_clear_buffer().
- *
- * @param port_buffer Port buffer to reset.
- */
-void
-jack_midi_reset_buffer(void *port_buffer) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
+jack_message_clear_buffer(void *port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
 
 
 /** Get the size of the largest event that can be stored by the port.
@@ -106,14 +116,17 @@ jack_midi_reset_buffer(void *port_buffer) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
  * @param port_buffer Port buffer to check size of.
  */
 size_t
-jack_midi_max_event_size(void* port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
+jack_message_get_max_event_size(void* port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
 
 
 /** Allocate space for an event to be written to an event port buffer.
  *
  * Clients are to write the actual event data to be written starting at the
  * pointer returned by this function. Clients must not write more than
- * @a data_size bytes into this buffer.  Clients must write normalised
+ * @a data_size bytes into this buffer. Clients may write arbitrary binary data,
+ * but should only write events using the protocol associated with the port.
+ * 
+ * If this is a MIDI port, clients must write normalised
  * MIDI data to the port - no running status and no (1-byte) realtime
  * messages interspersed with other messages (realtime messages are fine
  * when they occur on their own, like other messages).
@@ -128,19 +141,21 @@ jack_midi_max_event_size(void* port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
  * @return Pointer to the beginning of the reserved event's data buffer, or
  * NULL on error (ie not enough space).
  */
-jack_midi_data_t*
-jack_midi_event_reserve(void *port_buffer,
+jack_message_data_t*
+jack_message_event_reserve(void *port_buffer,
                         jack_nframes_t  time,
                         size_t data_size) JACK_OPTIONAL_WEAK_EXPORT;
 
 
 /** Write an event into an event port buffer.
  *
- * This function is simply a wrapper for @ref jack_midi_event_reserve
+ * This function is simply a wrapper for @ref jack_message_sevent_reserve
  * which writes the event data into the space reserved in the buffer.
  *
  * Clients must not write more than
- * @a data_size bytes into this buffer.  Clients must write normalised
+ * @a data_size bytes into this buffer. Clients may write arbitrary binary data,
+ * but should only write events using the protocol associated with the port. 
+ * If this is a MIDI port, clients must write normalised
  * MIDI data to the port - no running status and no (1-byte) realtime
  * messages interspersed with other messages (realtime messages are fine
  * when they occur on their own, like other messages).
@@ -156,30 +171,63 @@ jack_midi_event_reserve(void *port_buffer,
  * @return 0 on success, ENOBUFS if there's not enough space in buffer for event.
  */
 int
-jack_midi_event_write(void *port_buffer,
+jack_message_event_write(void *port_buffer,
                       jack_nframes_t time,
-                      const jack_midi_data_t *data,
+                      const jack_message_data_t *data,
                       size_t data_size) JACK_OPTIONAL_WEAK_EXPORT;
 
 
 /** Get the number of events that could not be written to @a port_buffer.
  *
  * This function returning a non-zero value implies @a port_buffer is full.
- * Currently the only way this can happen is if events are lost on port mixdown.
+ * Currently the only way this can happen is if events are lost on port mixdown
+ * (when multiple event output ports are connected to one input port).
  *
  * @param port_buffer Port to receive count for.
  * @returns Number of events that could not be written to @a port_buffer.
  */
 uint32_t
-jack_midi_get_lost_event_count(void *port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
+jack_message_get_lost_event_count(void *port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
 
 /*@}*/
+
+/** \addtogroup PortFunctions 
+ *  @{
+ */
+
+/**
+ * Create a new message port for the client. This is a wrapper method
+ * for @ref jack_port_register that will automatically set additional
+ * metadata.
+ * 
+ * Every message client sends or receives data using a specific communication
+ * protocol. For most older clients, this will be "MIDI", but it might be
+ * "OSC" or something custom/new. The protocol can be set and asked through
+ * the metadata API with the key @ref JACK_METADATA_PORT_CONTENT.
+ *
+ * @param client pointer to JACK client structure.
+ * @param port_name non-empty short name for the new port (not
+ * including the leading @a "client_name:"). Must be unique.
+ * @param protocol Specify which protocol this port supports.
+ * @param flags @ref JackPortFlags bit mask.
+ * @param buffer_size must be non-zero if this is not a built-in @a
+ * port_type.  Otherwise, it is ignored.
+ *
+ * @return jack_port_t pointer on success, otherwise NULL.
+ */
+jack_port_t * jack_port_register_message (jack_client_t *client,
+                                  const char *port_name,
+                                  const char *protocol,
+                                  unsigned long flags,
+                                  unsigned long buffer_size) JACK_OPTIONAL_WEAK_EXPORT;
+
+/** @}*/
 
 #ifdef __cplusplus
 }
 #endif
 
 
-#endif /* __JACK_MIDIPORT_H */
+#endif /* __JACK_MESSAGEPORT_H */
 
 

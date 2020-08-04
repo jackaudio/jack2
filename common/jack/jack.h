@@ -725,7 +725,9 @@ float jack_cpu_load (jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
  *
  * All ports have a type, which may be any non-NULL and non-zero
  * length string, passed as an argument.  Some port types are built
- * into the JACK API, currently only JACK_DEFAULT_AUDIO_TYPE.
+ * into the JACK API, see the JACK_DEFAULT_*_TYPE constants. Clients are
+ * strongly encouraged to set the @ref JACK_METADATA_PORT_CONTENT property
+ * regardless of their ports' types.
  *
  * @param client pointer to JACK client structure.
  * @param port_name non-empty short name for the new port (not

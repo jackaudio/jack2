@@ -21,14 +21,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "JackError.h"
 #include "JackPortType.h"
-#include "JackMidiPort.h"
+#include "JackMessagePort.h"
 #include <assert.h>
 #include <string.h>
 
 namespace Jack
 {
 
-SERVER_EXPORT void JackMidiBuffer::Reset(jack_nframes_t nframes)
+SERVER_EXPORT void JackMessageBuffer::Reset(jack_nframes_t nframes)
 {
     /* This line ate 1 hour of my life... dsbaikov */
     this->nframes = nframes;
@@ -37,48 +37,48 @@ SERVER_EXPORT void JackMidiBuffer::Reset(jack_nframes_t nframes)
     lost_events = 0;
 }
 
-SERVER_EXPORT jack_shmsize_t JackMidiBuffer::MaxEventSize() const
+SERVER_EXPORT jack_shmsize_t JackMessageBuffer::MaxEventSize() const
 {
     assert (((jack_shmsize_t) - 1) < 0); // jack_shmsize_t should be signed
-    jack_shmsize_t left = buffer_size - (sizeof(JackMidiBuffer) + sizeof(JackMidiEvent) * (event_count + 1) + write_pos);
+    jack_shmsize_t left = buffer_size - (sizeof(JackMessageBuffer) + sizeof(JackMessageEvent) * (event_count + 1) + write_pos);
     if (left < 0) {
         return 0;
     }
-    if (left <= JackMidiEvent::INLINE_SIZE_MAX) {
-        return JackMidiEvent::INLINE_SIZE_MAX;
+    if (left <= JackMessageEvent::INLINE_SIZE_MAX) {
+        return JackMessageEvent::INLINE_SIZE_MAX;
     }
     return left;
 }
 
-SERVER_EXPORT jack_midi_data_t* JackMidiBuffer::ReserveEvent(jack_nframes_t time, jack_shmsize_t size)
+SERVER_EXPORT jack_message_data_t* JackMessageBuffer::ReserveEvent(jack_nframes_t time, jack_shmsize_t size)
 {
     jack_shmsize_t space = MaxEventSize();
     if (space == 0 || size > space) {
-        jack_error("JackMidiBuffer::ReserveEvent - the buffer does not have "
+        jack_error("JackMessageBuffer::ReserveEvent - the buffer does not have "
                    "enough room to enqueue a %lu byte event", size);
         lost_events++;
         return 0;
     }
-    JackMidiEvent* event = &events[event_count++];
+    JackMessageEvent* event = &events[event_count++];
     event->time = time;
     event->size = size;
     
-    if (size <= JackMidiEvent::INLINE_SIZE_MAX) {
+    if (size <= JackMessageEvent::INLINE_SIZE_MAX) {
         return event->data;
     }
    
     write_pos += size;
     event->offset = buffer_size - write_pos;
-    return (jack_midi_data_t*)this + event->offset;
+    return (jack_message_data_t*)this + event->offset;
 }
 
-void MidiBufferInit(void* buffer, size_t buffer_size, jack_nframes_t nframes)
+void MessageBufferInit(void* buffer, size_t buffer_size, jack_nframes_t nframes)
 {
-    JackMidiBuffer* midi = (JackMidiBuffer*)buffer;
-    midi->magic = JackMidiBuffer::MAGIC;
+    JackMessageBuffer* message = (JackMessageBuffer*)buffer;
+    message->magic = JackMessageBuffer::MAGIC;
     /* Since port buffer has actually always BUFFER_SIZE_MAX frames, we can safely use all the size */
-    midi->buffer_size = BUFFER_SIZE_MAX * sizeof(jack_default_audio_sample_t);
-    midi->Reset(nframes);
+    message->buffer_size = BUFFER_SIZE_MAX * sizeof(jack_default_audio_sample_t);
+    message->Reset(nframes);
 }
 
 /*
@@ -91,11 +91,11 @@ void MidiBufferInit(void* buffer, size_t buffer_size, jack_nframes_t nframes)
  * implementation as is, until it is proved to be a bottleneck.
  * Dmitry Baikov.
  */
-static void MidiBufferMixdown(void* mixbuffer, void** src_buffers, int src_count, jack_nframes_t nframes)
+static void MessageBufferMixdown(void* mixbuffer, void** src_buffers, int src_count, jack_nframes_t nframes)
 {
-    JackMidiBuffer* mix = static_cast<JackMidiBuffer*>(mixbuffer);
+    JackMessageBuffer* mix = static_cast<JackMessageBuffer*>(mixbuffer);
     if (!mix->IsValid()) {
-        jack_error("Jack::MidiBufferMixdown - invalid mix buffer");
+        jack_error("Jack::MessageBufferMixdown - invalid mix buffer");
         return;
     }
     mix->Reset(nframes);
@@ -103,9 +103,9 @@ static void MidiBufferMixdown(void* mixbuffer, void** src_buffers, int src_count
     uint32_t mix_index[src_count];
     int event_count = 0;
     for (int i = 0; i < src_count; ++i) {
-        JackMidiBuffer* buf = static_cast<JackMidiBuffer*>(src_buffers[i]);
+        JackMessageBuffer* buf = static_cast<JackMessageBuffer*>(src_buffers[i]);
         if (!buf->IsValid()) {
-            jack_error("Jack::MidiBufferMixdown - invalid source buffer");
+            jack_error("Jack::MessageBufferMixdown - invalid source buffer");
             return;
         }
         mix_index[i] = 0;
@@ -115,16 +115,16 @@ static void MidiBufferMixdown(void* mixbuffer, void** src_buffers, int src_count
 
     int events_done;
     for (events_done = 0; events_done < event_count; ++events_done) {
-        JackMidiBuffer* next_buf = 0;
-        JackMidiEvent* next_event = 0;
+        JackMessageBuffer* next_buf = 0;
+        JackMessageEvent* next_event = 0;
         uint32_t next_buf_index = 0;
 
         // find the earliest event
         for (int i = 0; i < src_count; ++i) {
-            JackMidiBuffer* buf = static_cast<JackMidiBuffer*>(src_buffers[i]);
+            JackMessageBuffer* buf = static_cast<JackMessageBuffer*>(src_buffers[i]);
             if (mix_index[i] >= buf->event_count)
                 continue;
-            JackMidiEvent* e = &buf->events[mix_index[i]];
+            JackMessageEvent* e = &buf->events[mix_index[i]];
             if (!next_event || e->time < next_event->time) {
                 next_event = e;
                 next_buf = buf;
@@ -132,12 +132,12 @@ static void MidiBufferMixdown(void* mixbuffer, void** src_buffers, int src_count
             }
         }
         if (next_event == 0) {
-            jack_error("Jack::MidiBufferMixdown - got invalid next event");
+            jack_error("Jack::MessageBufferMixdown - got invalid next event");
             break;
         }
 
         // write the event
-        jack_midi_data_t* dest = mix->ReserveEvent(next_event->time, next_event->size);
+        jack_message_data_t* dest = mix->ReserveEvent(next_event->time, next_event->size);
         if (!dest) break;
 
         memcpy(dest, next_event->GetData(next_buf), next_event->size);
@@ -146,17 +146,19 @@ static void MidiBufferMixdown(void* mixbuffer, void** src_buffers, int src_count
     mix->lost_events += event_count - events_done;
 }
 
-static size_t MidiBufferSize()
+static size_t MessageBufferSize()
 {
     return BUFFER_SIZE_MAX * sizeof(jack_default_audio_sample_t);
 }
 
-const JackPortType gMidiPortType =
+const JackPortType gMessagePortType =
 {
-    JACK_DEFAULT_MIDI_TYPE,
-    MidiBufferSize,
-    MidiBufferInit,
-    MidiBufferMixdown
+    JACK_DEFAULT_MESSAGE_TYPE,
+    MessageBufferSize,
+    MessageBufferInit,
+    MessageBufferMixdown
 };
+
+const JackPortType gMidiPortType = gMessagePortType;
 
 } // namespace Jack

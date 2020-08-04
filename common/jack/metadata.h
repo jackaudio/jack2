@@ -232,17 +232,17 @@ int jack_set_property_change_callback (jack_client_t*             client,
 extern const char* JACK_METADATA_CONNECTED;
 
 /**
- * The supported event types of an event port.
- *
- * This is a kludge around Jack only supporting MIDI, particularly for OSC.
- * This property is a comma-separated list of event types, currently "MIDI" or
- * "OSC".  If this contains "OSC", the port may carry OSC bundles (first byte
- * '#') or OSC messages (first byte '/').  Note that the "status byte" of both
- * OSC events is not a valid MIDI status byte, so MIDI clients that check the
- * status byte will gracefully ignore OSC messages if the user makes an
- * inappropriate connection.
+ * @deprecated Use @ref JACK_METADATA_PORT_CONTENT instead.
  */
 extern const char* JACK_METADATA_EVENT_TYPES;
+
+/**
+ * OSC allows for arbitrary paths and function names. A namespace is an interface
+ * that gives certain paths and functions a semantic meaning. Currently, the only
+ * standardized interface is "SYN" (<http://opensoundcontrol.org/implementation/syn-namespace>).
+ * Multiple namespaces (if supported) are specified as comma separated list.
+ */
+extern const char* JACK_METADATA_EVENT_OSC_NAMESPACE;
 
 /**
  * A value that should be shown when attempting to identify the
@@ -297,19 +297,91 @@ extern const char* JACK_METADATA_ORDER;
 extern const char* JACK_METADATA_PRETTY_NAME;
 
 /**
+ * This property allows audio ports to be tagged with a "meaning". For audio ports,
+ * it specifies the type of the signal. For message ports, it specifies the communication
+ * protocol. The value is a simple "text/plain" string. The default value, an empty/null
+ * string, has a different meaning depending on the port's type.
+ * 
+ * Currently known values for audio ports are "PCM" and "CV". PCM is the default and
+ * represents plain audio, CV encodes control voltage.
+ *
+ * Currently known values for message ports are "MIDI" and "OSC". If not set, MIDI must
+ * be assumed for backwards compatibility. Old clients that create ports with the type
+ * @ref JACK_DEFAULT_MIDI_TYPE must be treated like message ports.
+ * 
+ * Two ports with different content should not be connected, but this <i>can</i> happen if they
+ * have the same type. Patchbays should prevent accidental port mismatches. Clients should
+ * be lenient regarding invalid data.
+ * 
+ * A port should only have one content type. Clients that accept multiple protocols should create
+ * separate ports for each.
+ * 
+ * This property has a few edge cases for historical reasons. You should not query this property directly. 
+ * Instead, you may want to use @ref jack_get_property_port_content.
+ */
+extern const char* JACK_METADATA_PORT_CONTENT;
+
+/**
  */
 extern const char* JACK_METADATA_PORT_GROUP;
 
 /**
- * The type of an audio signal.
- *
- * This property allows audio ports to be tagged with a "meaning".  The value
- * is a simple string.  Currently, the only type is "CV", for "control voltage"
- * ports.  Hosts SHOULD be take care to not treat CV ports as audibile and send
- * their output directly to speakers.  In particular, CV ports are not
- * necessarily periodic at all and may have very high DC.
+ * @deprecated Use @ref JACK_METADATA_PORT_CONTENT instead.
  */
 extern const char* JACK_METADATA_SIGNAL_TYPE;
+
+/**
+ * Get the @ref JACK_METADATA_PORT_CONTENT property of a @p port. This helper
+ * method handles default values and outdated clients for you.
+ *
+ * @return The port's content type, a sane default value if appropriate or NULL. If non-null,
+ *         the caller of this method must deallocate the memory using @ref jack_free.
+ */
+inline char*
+jack_get_property_port_content(jack_port_t *port) {
+    /* Simply ask for the property */
+    jack_uuid_t uuid = jack_port_uuid(port);
+    char* port_content;
+    char* unused;
+    jack_get_property(uuid, JACK_METADATA_PORT_CONTENT, &port_content, &unused);
+    jack_free(&unused); /* We don't care about the type, since we know its "text/plain" */
+    
+    /* Default values and legacy stuff, the interesting part */
+    if (port_content == NULL) {
+        /** 
+         * First off, check the legacy metadata keys depending on the port's type. If we 
+         * find nothing, return the default value for that port type instead.
+         */
+        const char* port_type = jack_port_type(port);
+
+        if (strcmp(port_type, JACK_DEFAULT_AUDIO_TYPE) == 0) {
+            /* Try the legacy key first */
+            jack_get_property(uuid, JACK_METADATA_SIGNAL_TYPE, &port_content, &unused);
+            jack_free(&unused);
+            
+            /* Set the default value */
+            if (port_content == NULL) {
+                port_content = strdup("PCM");
+            }
+        } else if (strcmp(port_type, JACK_DEFAULT_MIDI_TYPE) == 0) {
+            /* Try the legacy key first */
+            jack_get_property(uuid, JACK_METADATA_EVENT_TYPES, &port_content, &unused);
+            jack_free(&unused);
+
+            /* Set the default value */
+            if (port_content == NULL) {
+                port_content = strdup("MIDI");
+            }
+        } else if (strcmp(port_type, JACK_DEFAULT_MESSAGE_TYPE) == 0) {
+            /* There are no legacy keys to check here, simply set the default */
+            port_content = strdup("MIDI");
+        } else {
+            /* Unknown port, so no default value */
+        }
+    }
+    
+    return port_content;
+}
 
 /**
  * @}

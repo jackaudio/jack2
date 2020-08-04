@@ -26,7 +26,9 @@
 #include <getopt.h>
 
 #include <jack/jack.h>
+#include <jack/metadata.h>
 #include <jack/session.h>
+#include <jack/types.h>
 
 #define TRUE 1
 #define FALSE 0
@@ -51,6 +53,8 @@ show_usage (char *my_name)
 	fprintf (stderr, "\nusage: %s [options] port1 port2\n", my_name);
 	fprintf (stderr, "Connects two JACK ports together.\n\n");
 	fprintf (stderr, "        -s, --server <name>   Connect to the jack server named <name>\n");
+	fprintf (stderr, "        -u, --uuid            Reference ports by their UUID instead of their name\n");
+	fprintf (stderr, "        -f, --force           Force connect even if the ports may not be compatible\n");
 	fprintf (stderr, "        -v, --version         Output version information and exit\n");
 	fprintf (stderr, "        -h, --help            Display this help message\n\n");
 	fprintf (stderr, "For more information see http://jackaudio.org/\n");
@@ -73,6 +77,7 @@ main (int argc, char *argv[])
 	char portA[300];
 	char portB[300];
 	int use_uuid=0;
+	int force_connect=0;
 	int connecting, disconnecting;
 	int port1_flags, port2_flags;
 	int rc = 1;
@@ -82,10 +87,11 @@ main (int argc, char *argv[])
 		{ "help", 0, 0, 'h' },
 		{ "version", 0, 0, 'v' },
 		{ "uuid", 0, 0, 'u' },
+		{ "force", 0, 0, 'f' },
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((c = getopt_long (argc, argv, "s:hvu", long_options, &option_index)) >= 0) {
+	while ((c = getopt_long (argc, argv, "s:fhvu", long_options, &option_index)) >= 0) {
 		switch (c) {
 		case 's':
 			server_name = (char *) malloc (sizeof (char) * (strlen(optarg) + 1));
@@ -94,6 +100,9 @@ main (int argc, char *argv[])
 			break;
 		case 'u':
 			use_uuid = 1;
+			break;
+		case 'f':
+			force_connect = 1;
 			break;
 		case 'h':
 			show_usage (my_name);
@@ -218,6 +227,45 @@ main (int argc, char *argv[])
 	*/
 
 	if (connecting) {
+		if (!force_connect) {
+			int fail = 0;
+			
+			/* Get the port type to know which proprty to query. */
+			const char* src_port_type = jack_port_type(src_port);
+			const char* dst_port_type = jack_port_type(dst_port);
+			
+			/* Get src's port content */
+			char* src_type;
+			if (strcmp(src_port_type, JACK_DEFAULT_AUDIO_TYPE) == 0)
+				jack_get_property(jack_port_uuid(src_port), JACK_METADATA_SIGNAL_TYPE, &src_type, NULL);
+			else if (strcmp(src_port_type, JACK_DEFAULT_MESSAGE_TYPE) == 0)
+				jack_get_property(jack_port_uuid(src_port), JACK_METADATA_EVENT_TYPES, &src_type, NULL);
+			else
+				fail = 1;
+			
+			/* Get src's port content */
+			char* dst_type;
+			if (strcmp(dst_port_type, JACK_DEFAULT_AUDIO_TYPE) == 0)
+				jack_get_property(jack_port_uuid(dst_port), JACK_METADATA_SIGNAL_TYPE, &dst_type, NULL);
+			else if (strcmp(dst_port_type, JACK_DEFAULT_MESSAGE_TYPE) == 0)
+				jack_get_property(jack_port_uuid(dst_port), JACK_METADATA_EVENT_TYPES, &dst_type, NULL);
+			else
+				fail = 1;
+			
+			/* Finally compare the ports */
+			if (!fail)
+				// TODO this does not handle if multiple content types are supported.
+				fail = strcmp(src_type, dst_type);
+			
+			jack_free(src_type);
+			jack_free(dst_type);
+			
+			if (fail) {
+				fprintf (stderr, "cannot connect ports, since they may have different kinds of data. Run with --force to connect them anyways.\n");
+				goto exit;
+			}
+		}
+		
 		if (jack_connect(client, jack_port_name(src_port), jack_port_name(dst_port))) {
 			fprintf (stderr, "cannot connect client, already connected?\n");
 			goto exit;

@@ -67,6 +67,19 @@ typedef void (*JackPropertyChangeCallback)(jack_uuid_t            subject,
                                            jack_property_change_t change,
                                            void*                  arg);
 
+extern const char* JACK_METADATA_CONNECTED;
+extern const char* JACK_METADATA_EVENT_TYPES;
+extern const char* JACK_METADATA_EVENT_OSC_NAMESPACE;
+extern const char* JACK_METADATA_HARDWARE;
+extern const char* JACK_METADATA_ICON_LARGE;
+extern const char* JACK_METADATA_ICON_NAME;
+extern const char* JACK_METADATA_ICON_SMALL;
+extern const char* JACK_METADATA_ORDER;
+extern const char* JACK_METADATA_PRETTY_NAME;
+extern const char* JACK_METADATA_PORT_CONTENT;
+extern const char* JACK_METADATA_PORT_GROUP;
+extern const char* JACK_METADATA_SIGNAL_TYPE;
+
 #ifdef __cplusplus
 }
 #endif

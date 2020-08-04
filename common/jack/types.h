@@ -450,6 +450,7 @@ typedef void (*JackInfoShutdownCallback)(jack_status_t code, const char* reason,
  */
 #define JACK_DEFAULT_AUDIO_TYPE "32 bit float mono audio"
 #define JACK_DEFAULT_MIDI_TYPE "8 bit raw midi"
+#define JACK_DEFAULT_MESSAGE_TYPE "binary message data"
 
 /**
  * For convenience, use this typedef if you want to be able to change
