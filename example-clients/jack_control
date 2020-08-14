@@ -43,7 +43,7 @@ def python_type_to_jackdbus_type(value, type_char):
     if type_char == "b":
         return bool_convert(value);
     elif type_char == "y":
-        return dbus.Byte(value);
+        return dbus.Byte(ord(value));
     elif type_char == "i":
         return dbus.Int32(value)
     elif type_char == "u":
