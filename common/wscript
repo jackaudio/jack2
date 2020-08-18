@@ -28,6 +28,8 @@ def create_jack_process_obj(bld, target, sources, uselib = None, framework = Non
         env_includes = ['../macosx', '../posix', '../macosx/coreaudio']
     if bld.env['IS_LINUX']:
         env_includes = ['../linux', '../posix', '../linux/alsa']
+    if bld.env['IS_QNX']:
+        env_includes = ['../qnx', '../posix']
     if bld.env['IS_SUN']:
         env_includes = ['../solaris', '../posix', '../solaris/oss']
     if bld.env['IS_WINDOWS']:
@@ -36,7 +38,7 @@ def create_jack_process_obj(bld, target, sources, uselib = None, framework = Non
     process.name     = target
     process.target   = target
     process.source   = sources
-    if bld.env['IS_LINUX'] or bld.env['IS_MACOSX']:
+    if bld.env['IS_LINUX'] or bld.env['IS_MACOSX'] or bld.env['IS_QNX']:
         process.env.append_value('CPPFLAGS', '-fvisibility=hidden')
     process.install_path = '${ADDON_DIR}/'
     process.use = [uselib.name]
@@ -91,6 +93,22 @@ def build(bld):
         includes = ['../linux', '../posix'] + includes
         uselib.append('RT')
         uselib.append('DL')
+
+    if bld.env['IS_QNX']:
+        common_libsources += [
+            'JackDebugClient.cpp',
+            'timestamps.c',
+            'promiscuous.c',
+            '../posix/JackPosixThread.cpp',
+            '../posix/JackPosixProcessSync.cpp',
+            '../posix/JackPosixMutex.cpp',
+            '../posix/JackSocket.cpp',
+            '../posix/JackFifo.cpp',
+            '../linux/JackLinuxTime.c',
+            ]
+        includes = ['../qnx', '../posix'] + includes
+        uselib.append('SOCKET')
+        # libdl and librt is included in libc in QNX
 
     if bld.env['IS_SUN']:
         common_libsources += [
@@ -163,7 +181,7 @@ def build(bld):
         'JackMetadata.cpp',
         ]
 
-    if bld.env['IS_LINUX']:
+    if bld.env['IS_LINUX'] or bld.env['IS_QNX']:
         clientlib.source += [
             '../posix/JackSocketClientChannel.cpp',
             '../posix/JackPosixServerLaunch.cpp',
@@ -192,7 +210,7 @@ def build(bld):
     if not bld.env['IS_WINDOWS']:
         clientlib.vnum = bld.env['JACK_API_VERSION']
 
-    if bld.env['IS_LINUX']:
+    if bld.env['IS_LINUX'] or bld.env['IS_QNX']:
         clientlib.env.append_value('CPPFLAGS', '-fvisibility=hidden')
 
     if bld.env['IS_MACOSX']:
@@ -270,7 +288,7 @@ def build(bld):
         'JackMetadata.cpp',
         ]
 
-    if bld.env['IS_LINUX']:
+    if bld.env['IS_LINUX'] or bld.env['IS_QNX']:
         serverlib.source += [
             '../posix/JackSocketServerChannel.cpp',
             '../posix/JackSocketNotifyChannel.cpp',
@@ -307,7 +325,7 @@ def build(bld):
     if not bld.env['IS_WINDOWS']:
         serverlib.vnum = bld.env['JACK_API_VERSION']
 
-    if bld.env['IS_LINUX']:
+    if bld.env['IS_LINUX'] or bld.env['IS_QNX']:
         serverlib.env.append_value('CPPFLAGS', '-fvisibility=hidden')
 
     if bld.env['IS_MACOSX']:
@@ -333,7 +351,7 @@ def build(bld):
              if skipshared:
                  netlib.env['SHLIB_MARKER'] = ''
              netlib.use += ['WS2_32', 'WINMM']
-        elif not bld.env['IS_MACOSX']:
+        elif not bld.env['IS_MACOSX'] and not bld.env['IS_QNX']:
              netlib.use += ['RT']
         netlib.install_path = '${LIBDIR}'
         netlib.source = [
@@ -347,7 +365,7 @@ def build(bld):
             'JackGlobals.cpp',
             'ringbuffer.c']
 
-        if bld.env['IS_LINUX']:
+        if bld.env['IS_LINUX'] or bld.env['IS_QNX']:
             netlib.source += ['../posix/JackNetUnixSocket.cpp','../posix/JackPosixThread.cpp', '../posix/JackPosixMutex.cpp', '../linux/JackLinuxTime.c']
             netlib.env.append_value('CPPFLAGS', '-fvisibility=hidden')
 

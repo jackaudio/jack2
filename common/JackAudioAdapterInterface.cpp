@@ -22,7 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 #include "JackAudioAdapter.h"
-#ifndef MY_TARGET_OS_IPHONE
+#if !defined(MY_TARGET_OS_IPHONE) && !defined(__QNXNTO__)
 #include "JackLibSampleRateResampler.h"
 #endif
 #include "JackTime.h"
@@ -185,7 +185,7 @@ namespace Jack
         fRunning = false;
     }
 
-#ifdef MY_TARGET_OS_IPHONE
+#if defined(MY_TARGET_OS_IPHONE) || defined(__QNXNTO__)
     void JackAudioAdapterInterface::Create()
     {}
 #else

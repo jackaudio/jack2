@@ -204,6 +204,7 @@ int JackAlsaDriver::Detach()
     return JackAudioDriver::Detach();
 }
 
+#ifndef __QNXNTO__
 extern "C" char* get_control_device_name(const char * device_name)
 {
     char * ctl_name;
@@ -233,7 +234,9 @@ extern "C" char* get_control_device_name(const char * device_name)
 
     return ctl_name;
 }
+#endif
 
+#ifndef __QNXNTO__
 static int card_to_num(const char* device)
 {
     int err;
@@ -273,6 +276,7 @@ free:
 fail:
     return i;
 }
+#endif
 
 int JackAlsaDriver::Open(jack_nframes_t nframes,
                          jack_nframes_t user_nperiods,
@@ -301,6 +305,8 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
     }
 
     alsa_midi_t *midi = 0;
+
+#ifndef __QNXNTO__
 #ifndef __ANDROID__
     if (strcmp(midi_driver_name, "seq") == 0)
         midi = alsa_seqmidi_new((jack_client_t*)this, 0);
@@ -333,6 +339,7 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
             }
         }
     }
+#endif
 
     fDriver = alsa_driver_new ((char*)"alsa_pcm", (char*)playback_driver_name, (char*)capture_driver_name,
                                NULL,
@@ -356,12 +363,14 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
         // ALSA driver may have changed the in/out values
         fCaptureChannels = ((alsa_driver_t *)fDriver)->capture_nchannels;
         fPlaybackChannels = ((alsa_driver_t *)fDriver)->playback_nchannels;
+#ifndef __QNXNTO__
         if (JackServerGlobals::on_device_reservation_loop != NULL) {
             device_reservation_loop_running = true;
             if (JackPosixThread::StartImp(&fReservationLoopThread, 0, 0, on_device_reservation_loop, NULL) != 0) {
                 device_reservation_loop_running = false;
             }
         }
+#endif
         return 0;
     } else {
         Close();
@@ -378,6 +387,7 @@ int JackAlsaDriver::Close()
         alsa_driver_delete((alsa_driver_t*)fDriver);
     }
 
+#ifndef __QNXNTO__
     if (device_reservation_loop_running) {
         device_reservation_loop_running = false;
         JackPosixThread::StopImp(fReservationLoopThread);
@@ -398,6 +408,7 @@ int JackAlsaDriver::Close()
             JackServerGlobals::on_device_release(audio_name);
         }
     }
+#endif
 
     return res;
 }
@@ -578,6 +589,7 @@ extern "C"
 {
 #endif
 
+#ifndef __QNXNTO__
 static
 jack_driver_param_constraint_desc_t *
 enum_alsa_devices()
@@ -667,6 +679,7 @@ fail:
     jack_constraint_free(constraint_ptr);
     return NULL;
 }
+#endif
 
 static int
 dither_opt (char c, DitherAlgorithm* dither)
@@ -705,11 +718,14 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
     desc = jack_driver_descriptor_construct("alsa", JackDriverMaster, "Linux ALSA API based audio backend", &filler);
 
     strcpy(value.str, "hw:0");
+#ifndef __QNXNTO__
 #ifdef __ANDROID__
     jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, NULL, "ALSA device name", NULL);
 #else
     jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, enum_alsa_devices(), "ALSA device name", NULL);
 #endif
+#endif
+
 
     strcpy(value.str, "none");
     jack_driver_descriptor_add_parameter(desc, &filler, "capture", 'C', JackDriverParamString, &value, NULL, "Provide capture ports.  Optionally set device", NULL);
@@ -951,8 +967,13 @@ void SetTime(jack_time_t time)
 int Restart()
 {
     int res;
-    if ((res = g_alsa_driver->Stop()) == 0) {
-        res = g_alsa_driver->Start();
+    if ((res = g_alsa_driver->Stop()) != 0) {
+        jack_error("restart: stop driver failed");
+        return res;
+    }
+    if ((res = g_alsa_driver->Start()) != 0) {
+        jack_error("restart: start driver failed");
+        return res;
     }
     return res;
 }
