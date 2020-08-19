@@ -62,7 +62,7 @@ hammerfall_broadcast_channel_status_change (hammerfall_t *h, int lock, int sync,
 	}
 
 	for (chn = lowchn; chn < highchn; chn++) {
-		alsa_driver_set_clock_sync_status (h->driver, chn, status);
+		alsa_driver_set_clock_sync_status (h->device, chn, status);
 	}
 }
 
@@ -87,8 +87,8 @@ hammerfall_check_sync_state (hammerfall_t *h, int val, int adat_id)
 
 		/* XXX broken! fix for hammerfall light ! */
 
-		alsa_driver_set_clock_sync_status (h->driver, 24, status);
-		alsa_driver_set_clock_sync_status (h->driver, 25, status);
+		alsa_driver_set_clock_sync_status (h->device, 24, status);
+		alsa_driver_set_clock_sync_status (h->device, 25, status);
 
 		h->said_that_spdif_is_fine = TRUE;
 	}
@@ -153,7 +153,7 @@ hammerfall_set_input_monitor_mask (jack_hardware_t *hw, unsigned long mask)
 		snd_ctl_elem_value_set_integer (ctl, i, (mask & (1<<i)) ? 1 : 0);
 	}
 	
-	if ((err = snd_ctl_elem_write (h->driver->ctl_handle, ctl)) != 0) {
+	if ((err = snd_ctl_elem_write (h->device->ctl_handle, ctl)) != 0) {
 		jack_error ("ALSA/Hammerfall: cannot set input monitoring (%s)", snd_strerror (err));
 		return -1;
 	}
@@ -188,7 +188,7 @@ hammerfall_change_sample_clock (jack_hardware_t *hw, SampleClockMode mode)
 		break;
 	}
 
-	if ((err = snd_ctl_elem_write (h->driver->ctl_handle, ctl)) < 0) {
+	if ((err = snd_ctl_elem_write (h->device->ctl_handle, ctl)) < 0) {
 		jack_error ("ALSA-Hammerfall: cannot set clock mode");
 	}
 
@@ -244,17 +244,17 @@ hammerfall_monitor_controls (void *arg)
 	snd_ctl_elem_value_set_id (sw[2], switch_id[2]);
 
 	while (1) {
-		if (snd_ctl_elem_read (h->driver->ctl_handle, sw[0])) {
+		if (snd_ctl_elem_read (h->device->ctl_handle, sw[0])) {
 			jack_error ("cannot read control switch 0 ...");
 		}
 		hammerfall_check_sync (h, sw[0]);
 
-		if (snd_ctl_elem_read (h->driver->ctl_handle, sw[1])) {
+		if (snd_ctl_elem_read (h->device->ctl_handle, sw[1])) {
 			jack_error ("cannot read control switch 0 ...");
 		}
 		hammerfall_check_sync (h, sw[1]);
 
-		if (snd_ctl_elem_read (h->driver->ctl_handle, sw[2])) {
+		if (snd_ctl_elem_read (h->device->ctl_handle, sw[2])) {
 			jack_error ("cannot read control switch 0 ...");
 		}
 		hammerfall_check_sync (h, sw[2]);
@@ -269,7 +269,7 @@ hammerfall_monitor_controls (void *arg)
 #endif /* HAMMERFALL_MONITOR_CONTROLS */
 
 jack_hardware_t *
-jack_alsa_hammerfall_hw_new (alsa_driver_t *driver)
+jack_alsa_hammerfall_hw_new (alsa_device_t *device)
 {
 	jack_hardware_t *hw;
 	hammerfall_t *h;
@@ -293,7 +293,7 @@ jack_alsa_hammerfall_hw_new (alsa_driver_t *driver)
 	h->lock_status[2] = FALSE;
 	h->sync_status[2] = FALSE;
 	h->said_that_spdif_is_fine = FALSE;
-	h->driver = driver;
+	h->device = device;
 
 	h->monitor_interval.tv_sec = 1;
 	h->monitor_interval.tv_nsec = 0;

@@ -22,6 +22,8 @@
 #ifndef __jack_usx2y_h__
 #define __jack_usx2y_h__
 
+ #include <poll.h>
+
 #define USX2Y_MAXPACK		50
 #define USX2Y_MAXBUFFERMS	100
 #define USX2Y_MAXSTRIDE	3
@@ -51,7 +53,9 @@ typedef struct snd_usX2Y_hwdep_pcm_shm snd_usX2Y_hwdep_pcm_shm_t;
 typedef struct
 {
     alsa_driver_t *driver;
+#ifndef __QNXNTO__
     snd_hwdep_t *hwdep_handle;
+#endif
     struct pollfd pfds;
     struct snd_usX2Y_hwdep_pcm_shm *hwdep_pcm_shm;
     int playback_iso_start;

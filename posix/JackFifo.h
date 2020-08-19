@@ -44,7 +44,7 @@ class SERVER_EXPORT JackFifo : public detail::JackSynchro
 
     protected:
 
-        void BuildName(const char* name, const char* server_name, char* res);
+        void BuildName(const char* name, const char* server_name, char* res, int size);
 
     public:
 

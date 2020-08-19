@@ -137,6 +137,9 @@ class JackClientChannelInterface
         virtual void ClientDeactivate(int refnum, int* result)
         {}
 
+        virtual void ClientReloadMaster(int* result)
+        {}
+
         virtual void PortRegister(int refnum, const char* name, const char* type, unsigned int flags, unsigned int buffer_size, jack_port_id_t* port_index, int* result)
         {}
         virtual void PortUnRegister(int refnum, jack_port_id_t port_index, int* result)

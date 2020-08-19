@@ -70,6 +70,7 @@ class SERVER_EXPORT JackThreadedDriver : public JackDriverClientInterface, publi
 
         virtual int Start();
         virtual int Stop();
+        virtual int Reload();
 
         virtual bool IsFixedBufferSize();
         virtual int SetBufferSize(jack_nframes_t buffer_size);

@@ -62,6 +62,8 @@ class JackGenericClientChannel : public detail::JackClientChannelInterface
         void ClientActivate(int refnum, int is_real_time, int* result);
         void ClientDeactivate(int refnum, int* result);
 
+        void ClientReloadMaster(int* result);
+
         void PortRegister(int refnum, const char* name, const char* type, unsigned int flags, unsigned int buffer_size, jack_port_id_t* port_index, int* result);
         void PortUnRegister(int refnum, jack_port_id_t port_index, int* result);
 

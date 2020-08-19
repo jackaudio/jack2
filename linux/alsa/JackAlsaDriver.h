@@ -38,6 +38,12 @@ class JackAlsaDriver : public JackAudioDriver
 
     private:
 
+        enum DriverMode {
+            Init,
+            Runtime,
+            Shutdown,
+        };
+
         jack_driver_t* fDriver;
         jack_native_thread_t fReservationLoopThread;
 
@@ -51,24 +57,7 @@ class JackAlsaDriver : public JackAudioDriver
         virtual ~JackAlsaDriver()
         {}
 
-        int Open(jack_nframes_t buffer_size,
-                 jack_nframes_t user_nperiods,
-                 jack_nframes_t samplerate,
-                 bool hw_monitoring,
-                 bool hw_metering,
-                 bool capturing,
-                 bool playing,
-                 DitherAlgorithm dither,
-                 bool soft_mode,
-                 bool monitor,
-                 int inchannels,
-                 int outchannels,
-                 bool shorts_first,
-                 const char* capture_driver_name,
-                 const char* playback_driver_name,
-                 jack_nframes_t capture_latency,
-                 jack_nframes_t playback_latency,
-                 const char* midi_driver_name);
+        int Open(alsa_driver_info_t info);
 
         int Close();
         int Attach();
@@ -76,6 +65,7 @@ class JackAlsaDriver : public JackAudioDriver
 
         int Start();
         int Stop();
+        int Reload();
 
         int Read();
         int Write();
@@ -88,13 +78,17 @@ class JackAlsaDriver : public JackAudioDriver
 
         int SetBufferSize(jack_nframes_t buffer_size);
 
-        void ReadInputAux(jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nread);
+        void ReadInputAux(alsa_device_t *device, jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nread);
         void MonitorInputAux();
         void ClearOutputAux();
-        void WriteOutputAux(jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nwritten);
+        void WriteOutputAux(alsa_device_t *device, jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nwritten);
         void SetTimetAux(jack_time_t time);
 
         int PortSetDefaultMetadata(jack_port_id_t port_id, const char* pretty_name);
+
+        int UpdateDriverTargetState(DriverMode mode);
+
+        int TargetState(DriverMode mode, int connections_count);
 
         // JACK API emulation for the midi driver
         int is_realtime() const;

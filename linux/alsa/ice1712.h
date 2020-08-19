@@ -59,7 +59,7 @@ ice1712_eeprom_t;
 
 typedef struct
 {
-    alsa_driver_t *driver;
+    alsa_device_t *device;
     ice1712_eeprom_t *eeprom;
     unsigned long active_channels;
 }
@@ -70,7 +70,7 @@ extern "C"
 {
 #endif
 
-    jack_hardware_t *jack_alsa_ice1712_hw_new (alsa_driver_t *driver);
+    jack_hardware_t *jack_alsa_ice1712_hw_new (alsa_device_t *device);
 
 #ifdef __cplusplus
 }

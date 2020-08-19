@@ -29,7 +29,7 @@ typedef struct
     int sync_status[3];
     int said_that_spdif_is_fine;
     pthread_t monitor_thread;
-    alsa_driver_t *driver;
+    alsa_device_t *device;
     struct timespec monitor_interval;
 }
 hammerfall_t;
@@ -39,7 +39,7 @@ extern "C"
 {
 #endif
 
-    jack_hardware_t *jack_alsa_hammerfall_hw_new (alsa_driver_t *driver);
+    jack_hardware_t *jack_alsa_hammerfall_hw_new (alsa_device_t *device);
 
 #ifdef __cplusplus
 }

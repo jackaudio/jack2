@@ -346,6 +346,16 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             break;
         }
 
+        case JackRequest::kClientReloadMaster: {
+            jack_log("JackRequest::ClientReloadMaster");
+            JackClientReloadMasterRequest req;
+            JackResult res;
+            CheckRead(req, socket);
+            res.fResult = fServer->ReloadMaster();
+            CheckWrite("JackRequest::ClientReloadMaster", socket);
+            break;
+        }
+
         default:
             jack_error("Unknown request %ld", type);
             return -1;

@@ -137,6 +137,13 @@ void JackGenericClientChannel::ClientDeactivate(int refnum, int* result)
     ServerSyncCall(&req, &res, result);
 }
 
+void JackGenericClientChannel::ClientReloadMaster(int *result)
+{
+    JackClientReloadMasterRequest req;
+    JackResult res;
+    ServerSyncCall(&req, &res, result);
+}
+
 void JackGenericClientChannel::PortRegister(int refnum, const char* name, const char* type, unsigned int flags, unsigned int buffer_size, jack_port_id_t* port_index, int* result)
 {
     JackPortRegisterRequest req(refnum, name, type, flags, buffer_size);

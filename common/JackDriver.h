@@ -72,6 +72,7 @@ class SERVER_EXPORT JackDriverInterface
 
         virtual int Start() = 0;
         virtual int Stop() = 0;
+        virtual int Reload() = 0;
 
         virtual bool IsFixedBufferSize() = 0;
         virtual int SetBufferSize(jack_nframes_t buffer_size) = 0;
@@ -227,6 +228,7 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
 
         virtual int Start();
         virtual int Stop();
+        virtual int Reload();
 
         // For "master" driver
         int ProcessReadSlaves();

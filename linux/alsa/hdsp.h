@@ -25,7 +25,7 @@
 
 typedef struct
 {
-    alsa_driver_t *driver;
+    alsa_device_t *device;
 }
 hdsp_t;
 
@@ -35,7 +35,7 @@ extern "C"
 #endif
 
     jack_hardware_t *
-    jack_alsa_hdsp_hw_new (alsa_driver_t *driver);
+    jack_alsa_hdsp_hw_new (alsa_device_t *device);
 
 #ifdef __cplusplus
 }

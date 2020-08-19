@@ -140,6 +140,22 @@ int jack_client_close (jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
 int jack_client_name_size (void) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
+ * Reloads audio backend.
+ *
+ * This is useful when client wants audio backend to reload its state.
+ * Currently used only for alsa audio backend.
+ *
+ * Alsa backend will close or open audio devices on reload depending on
+ * the state of the ports asociated with audio device. If all ports
+ * are disconnected audio device is closed, opened otherwise. This
+ * behaviour is modifiable by alsa backend options provided to jackd
+ * on startup.
+ *
+ * @return 0 if successful.
+ */
+int  jack_client_reload_master(jack_client_t* ext_client) JACK_OPTIONAL_WEAK_EXPORT;
+
+/**
  * @return pointer to actual client name.  This is useful when @ref
  * JackUseExactName is not specified on open and @ref
  * JackNameNotUnique status was returned.  In that case, the actual

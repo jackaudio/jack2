@@ -110,6 +110,10 @@ int JackDriver::Open(jack_nframes_t buffer_size,
     fClientControl.fRefNum = refnum;
     fClientControl.fActive = true;
     fEngineControl->fDriverNum++;
+    if (buffer_size > BUFFER_SIZE_MAX) {
+        jack_error("Buffer size %ld exceeds BUFFER_SIZE_MAX %d", buffer_size, BUFFER_SIZE_MAX);
+        return -1;
+    }
     if (buffer_size > 0) {
         fEngineControl->fBufferSize = buffer_size;
     }
@@ -349,6 +353,11 @@ int JackDriver::Stop()
 {
     fIsRunning = false;
     return StopSlaves();
+}
+
+int JackDriver::Reload()
+{
+    return 0;
 }
 
 int JackDriver::StartSlaves()

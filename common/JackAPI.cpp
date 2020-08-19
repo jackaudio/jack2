@@ -277,6 +277,8 @@ extern "C"
     LIB_EXPORT void jack_uuid_unparse(jack_uuid_t, char buf[JACK_UUID_STRING_SIZE]);
     LIB_EXPORT int  jack_uuid_empty(jack_uuid_t);
 
+    LIB_EXPORT int  jack_client_reload_master(jack_client_t* ext_client);
+
 #ifdef __cplusplus
 }
 #endif
@@ -2139,4 +2141,18 @@ LIB_EXPORT void jack_uuid_unparse(jack_uuid_t u, char b[JACK_UUID_STRING_SIZE])
 LIB_EXPORT int jack_uuid_empty(jack_uuid_t u)
 {
     return u == JACK_UUID_EMPTY_INITIALIZER;
+}
+
+LIB_EXPORT int  jack_client_reload_master(jack_client_t* ext_client)
+{
+    JackGlobals::CheckContext("jack_client_reload_master");
+
+    JackClient* client = (JackClient*)ext_client;
+    if (client == NULL) {
+        jack_error("jack_client_reload_master called with a NULL client");
+        return -1;
+    } else {
+        WaitGraphChange();
+        return client->ClientReloadMaster();
+    }
 }
