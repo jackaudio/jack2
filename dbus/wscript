@@ -70,6 +70,9 @@ def build(bld):
         ]
         obj.use += ['PTHREAD', 'DL', 'RT', 'DBUS-1', 'EXPAT', 'STDC++']
     if bld.env['IS_FREEBSD']:
+        obj.source += [
+            '../linux/uptime.c',
+        ]
         obj.use += ['PTHREAD', 'EXECINFO', 'LIBSYSINFO', 'DBUS-1', 'EXPAT']
     if bld.env['IS_MACOSX']:
         obj.source += [
