@@ -900,7 +900,7 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 	driver->period_usecs =
 		(jack_time_t) floor ((((float) driver->frames_per_cycle) /
 				      driver->frame_rate) * 1000000.0f);
-	driver->poll_timeout_ms = (int) floor (1.5f * (driver->period_usecs / 1000.0f));
+	driver->poll_timeout = (int) floor (1.5f * driver->period_usecs);
 
 // JACK2
 /*
@@ -1362,7 +1362,7 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 #ifdef __ANDROID__
 		poll_result = poll (driver->pfd, nfds, -1);  //fix for sleep issue
 #else
-		poll_result = poll (driver->pfd, nfds, driver->poll_timeout_ms);
+		poll_result = poll (driver->pfd, nfds, driver->poll_timeout);
 #endif
 		if (poll_result < 0) {
 
