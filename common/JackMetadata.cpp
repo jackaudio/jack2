@@ -124,11 +124,14 @@ int JackMetadata::PropertyInit()
 
     if ((ret = fDBenv->open (fDBenv, dbpath, DB_CREATE | DB_INIT_LOCK | DB_INIT_MPOOL | DB_THREAD, 0)) != 0) {
         jack_error ("cannot open DB environment: %s", db_strerror (ret));
+        fDBenv = NULL;
         return -1;
     }
 
     if ((ret = db_create (&fDB, fDBenv, 0)) != 0) {
         jack_error ("Cannot initialize metadata DB (%s)", db_strerror (ret));
+        fDBenv->close (fDBenv, 0);
+        fDBenv = NULL;
         return -1;
     }
 
@@ -137,6 +140,8 @@ int JackMetadata::PropertyInit()
         jack_error ("Cannot open metadata DB at %s: %s", dbpath, db_strerror (ret));
         fDB->close (fDB, 0);
         fDB = NULL;
+        fDBenv->close (fDBenv, 0);
+        fDBenv = NULL;
         return -1;
     }
 
