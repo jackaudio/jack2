@@ -21,6 +21,9 @@
 #ifndef __JackWinNamedPipe__
 #define __JackWinNamedPipe__
 
+#ifdef __MINGW32__
+#include <winsock2.h>
+#endif
 #include <windows.h>
 
 #include "JackChannel.h"

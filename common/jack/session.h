@@ -30,6 +30,10 @@ extern "C" {
 
 /**
  * @defgroup SessionClientFunctions Session API for clients.
+ *
+ * @deprecated Use of JACK-Session is currently deprecated and unsupported.
+ * JACK developers recommend the use of NSM instead.
+ * See https://github.com/linuxaudio/new-session-manager
  * @{
  */
 
@@ -156,6 +160,10 @@ typedef struct _jack_session_event jack_session_event_t;
  *
  * The client must promptly call jack_session_reply for this event.
  *
+ * @deprecated Use of JACK-Session is currently deprecated and unsupported.
+ * JACK developers recommend the use of NSM instead.
+ * See https://github.com/linuxaudio/new-session-manager
+ *
  * @param event The event structure.
  * @param arg Pointer to a client supplied structure.
  */
@@ -170,11 +178,15 @@ typedef void (*JackSessionCallback)(jack_session_event_t *event,
  * error. if you have a multiclient application its more sensible to create
  * a jack_client with only a session callback set.
  *
+ * @deprecated Use of JACK-Session is currently deprecated and unsupported.
+ * JACK developers recommend the use of NSM instead.
+ * See https://github.com/linuxaudio/new-session-manager
+ *
  * @return 0 on success, otherwise a non-zero error code
  */
 int jack_set_session_callback (jack_client_t       *client,
                                JackSessionCallback  session_callback,
-                               void                *arg) JACK_WEAK_EXPORT;
+                               void                *arg) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
 
 /**
  * Reply to a session event.
@@ -183,18 +195,26 @@ int jack_set_session_callback (jack_client_t       *client,
  * different thread.  For example, it is possible to push the event through a
  * queue and execute the save code from the GUI thread.
  *
+ * @deprecated Use of JACK-Session is currently deprecated and unsupported.
+ * JACK developers recommend the use of NSM instead.
+ * See https://github.com/linuxaudio/new-session-manager
+ *
  * @return 0 on success, otherwise a non-zero error code
  */
 int jack_session_reply (jack_client_t        *client,
-                        jack_session_event_t *event) JACK_WEAK_EXPORT;
+                        jack_session_event_t *event) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
 
 
 /**
  * Free memory used by a jack_session_event_t.
  *
  * This also frees the memory used by the command_line pointer, if its non NULL.
+ *
+ * @deprecated Use of JACK-Session is currently deprecated and unsupported.
+ * JACK developers recommend the use of NSM instead.
+ * See https://github.com/linuxaudio/new-session-manager
  */
-void jack_session_event_free (jack_session_event_t *event) JACK_WEAK_EXPORT;
+void jack_session_event_free (jack_session_event_t *event) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
 
 
 /**
@@ -238,8 +258,12 @@ jack_session_command_t *jack_session_notify (
 
 /**
  * Free the memory allocated by a session command.
+ *
+ * @deprecated Use of JACK-Session is currently deprecated and unsupported.
+ * JACK developers recommend the use of NSM instead.
+ * See https://github.com/linuxaudio/new-session-manager
  */
-void jack_session_commands_free (jack_session_command_t *cmds) JACK_WEAK_EXPORT;
+void jack_session_commands_free (jack_session_command_t *cmds) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
 
 /**
  * Reserve a client name and associate it with a UUID.
@@ -258,11 +282,19 @@ jack_reserve_client_name (jack_client_t *client,
 /**
  * Find out whether a client has set up a session callback.
  *
+ * @deprecated Use of JACK-Session is currently deprecated and unsupported.
+ * JACK developers recommend the use of NSM instead.
+ * See https://github.com/linuxaudio/new-session-manager
+ *
  * @return 0 when the client has no session callback, 1 when it has one.
  *        -1 on error.
  */
 int
-jack_client_has_session_callback (jack_client_t *client, const char *client_name) JACK_WEAK_EXPORT;
+jack_client_has_session_callback (jack_client_t *client, const char *client_name) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
+
+/**
+ * @}
+ */
 
 #ifdef __cplusplus
 }

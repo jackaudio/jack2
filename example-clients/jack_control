@@ -43,7 +43,7 @@ def python_type_to_jackdbus_type(value, type_char):
     if type_char == "b":
         return bool_convert(value);
     elif type_char == "y":
-        return dbus.Byte(value);
+        return dbus.Byte(ord(value));
     elif type_char == "i":
         return dbus.Int32(value)
     elif type_char == "u":
@@ -154,7 +154,7 @@ def maybe_print_param_constraint(iface, param):
 def main():
     if len(sys.argv) == 1 or sys.argv[1] in ["-h", "--help", "help"]:
         print_help()
-        sys.exit(0)
+        return 0
 
     bus = dbus.SessionBus()
 
@@ -175,10 +175,10 @@ def main():
                 print("--- status")
                 if control_iface.IsStarted():
                     print("started")
-                    sys.exit(0)
+                    return 0
                 else:
                     print("stopped")
-                    sys.exit(1)
+                    return 1
             elif arg == 'start':
                 print("--- start")
                 control_iface.StartServer()
@@ -205,7 +205,7 @@ def main():
             elif arg == 'ds':
                 if index >= len(sys.argv):
                     print("driver select command requires driver name argument")
-                    sys.exit()
+                    return 1
 
                 arg = sys.argv[index]
                 index += 1
@@ -218,7 +218,7 @@ def main():
             elif arg == 'dpd':
                 if index >= len(sys.argv):
                     print("get driver parameter long description command requires parameter name argument")
-                    sys.exit()
+                    return 1
 
                 param = sys.argv[index]
                 index += 1
@@ -230,7 +230,7 @@ def main():
             elif arg == 'dps':
                 if index + 1 >= len(sys.argv):
                     print("driver parameter set command requires parameter name and value arguments")
-                    sys.exit()
+                    return 1
 
                 param = sys.argv[index]
                 index += 1
@@ -244,7 +244,7 @@ def main():
             elif arg == 'dpr':
                 if index >= len(sys.argv):
                     print("driver parameter reset command requires parameter name argument")
-                    sys.exit()
+                    return 1
 
                 param = sys.argv[index]
                 index += 1
@@ -257,7 +257,7 @@ def main():
             elif arg == 'epd':
                 if index >= len(sys.argv):
                     print("get engine parameter long description command requires parameter name argument")
-                    sys.exit()
+                    return 1
 
                 param_name = sys.argv[index]
                 index += 1
@@ -270,7 +270,7 @@ def main():
             elif arg == 'eps':
                 if index + 1 >= len(sys.argv):
                     print("engine parameter set command requires parameter name and value arguments")
-                    sys.exit()
+                    return 1
 
                 param = sys.argv[index]
                 index += 1
@@ -284,7 +284,7 @@ def main():
             elif arg == 'epr':
                 if index >= len(sys.argv):
                     print("engine parameter reset command requires parameter name")
-                    sys.exit()
+                    return 1
 
                 param = sys.argv[index]
                 index += 1
@@ -303,7 +303,7 @@ def main():
 
                 if index >= len(sys.argv):
                     print("internal parameters command requires internal name argument")
-                    sys.exit()
+                    return 1
 
                 internal_name = sys.argv[index]
                 index += 1
@@ -312,7 +312,7 @@ def main():
             elif arg == 'ipd':
                 if index + 1 >= len(sys.argv):
                     print("get internal parameter long description command requires internal and parameter name arguments")
-                    sys.exit()
+                    return 1
 
                 name = sys.argv[index]
                 index += 1
@@ -325,7 +325,7 @@ def main():
             elif arg == 'ips':
                 if index + 2 >= len(sys.argv):
                     print("internal parameter set command requires internal, parameter name and value arguments")
-                    sys.exit()
+                    return 1
 
                 internal_name = sys.argv[index]
                 index += 1
@@ -341,7 +341,7 @@ def main():
             elif arg == 'ipr':
                 if index + 1 >= len(sys.argv):
                     print("reset internal parameter command requires internal and parameter name arguments")
-                    sys.exit()
+                    return 1
 
                 internal_name = sys.argv[index]
                 index += 1
@@ -356,7 +356,7 @@ def main():
 
                 if index >= len(sys.argv):
                     print("load internal command requires internal name argument")
-                    sys.exit()
+                    return 1
 
                 name = sys.argv[index]
                 index += 1
@@ -366,7 +366,7 @@ def main():
 
                 if index >= len(sys.argv):
                     print("unload internal command requires internal name argument")
-                    sys.exit()
+                    return 1
 
                 name = sys.argv[index]
                 index += 1
@@ -376,7 +376,7 @@ def main():
 
                 if index >= len(sys.argv):
                     print("add slave driver command requires driver name argument")
-                    sys.exit()
+                    return 1
 
                 name = sys.argv[index]
                 index += 1
@@ -386,7 +386,7 @@ def main():
 
                 if index >= len(sys.argv):
                     print("remove slave driver command requires driver name argument")
-                    sys.exit()
+                    return 1
 
                 name = sys.argv[index]
                 index += 1
@@ -395,6 +395,9 @@ def main():
                 print("Unknown command '%s'" % arg)
         except dbus.DBusException as e:
             print("DBus exception: %s" % str(e))
+            return 1
+
+        return 0
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())

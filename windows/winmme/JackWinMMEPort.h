@@ -20,6 +20,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackWinMMEPort__
 #define __JackWinMMEPort__
 
+#ifdef __MINGW32__
+#include <winsock2.h>
+#endif
 #include <windows.h>
 #include <mmsystem.h>
 

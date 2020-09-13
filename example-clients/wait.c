@@ -17,6 +17,7 @@ show_usage(void)
 	fprintf(stderr, "Check for jack existence, or wait, until it either quits, or gets started\n");
 	fprintf(stderr, "options:\n");
 	fprintf(stderr, "        -s, --server <name>   Connect to the jack server named <name>\n");
+	fprintf(stderr, "        -n, --name <name>     Set client name to <name>\n");
 	fprintf(stderr, "        -w, --wait            Wait for server to become available\n");
 	fprintf(stderr, "        -q, --quit            Wait until server is quit\n");
 	fprintf(stderr, "        -c, --check           Check whether server is running\n");
@@ -34,6 +35,7 @@ main(int argc, char *argv[])
 	int c;
 	int option_index;
 	char *server_name = NULL;
+	char *client_name = NULL;
 	int wait_for_start = 0;
 	int wait_for_quit = 0;
 	int just_check = 0;
@@ -44,6 +46,7 @@ main(int argc, char *argv[])
 	struct option long_options[] = {
 		{ "server", 1, 0, 's' },
 		{ "wait", 0, 0, 'w' },
+		{ "name", 1, 0, 'n'}, 
 		{ "quit", 0, 0, 'q' },
 		{ "check", 0, 0, 'c' },
 		{ "timeout", 1, 0, 't' },
@@ -58,12 +61,16 @@ main(int argc, char *argv[])
 		my_name ++;
 	}
 
-	while ((c = getopt_long (argc, argv, "s:wqct:hv", long_options, &option_index)) >= 0) {
+	while ((c = getopt_long (argc, argv, "s:n:wqct:hv", long_options, &option_index)) >= 0) {
 		switch (c) {
 		case 's':
-			server_name = (char *) malloc (sizeof (char) * strlen(optarg));
+			server_name = (char *) malloc (sizeof (char) * (strlen(optarg) + 1));
 			strcpy (server_name, optarg);
 			options |= JackServerName;
+			break;
+		case 'n':
+			client_name = (char *) malloc (sizeof (char) * (strlen(optarg) + 1));
+			strcpy (client_name, optarg);
 			break;
 		case 'w':
 			wait_for_start = 1;
@@ -93,7 +100,12 @@ main(int argc, char *argv[])
 	start_timestamp = time(NULL);
 
 	while (1) {
-		client = jack_client_open ("wait", options, &status, server_name);
+		if (client_name) {
+			client = jack_client_open (client_name, options, &status, server_name);
+		}
+		else {
+			client = jack_client_open ("wait", options, &status, server_name);
+		}
 		/* check for some real error and bail out */
 		if ((client == NULL) && !(status & JackServerFailed)) {
 			fprintf (stderr, "jack_client_open() failed, "

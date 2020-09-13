@@ -34,8 +34,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackChannel.h"
 #include "JackError.h"
 
-extern const char* JACK_METADATA_HARDWARE;
-extern const char* JACK_METADATA_PRETTY_NAME;
+extern const char JACK_METADATA_HARDWARE[];
+extern const char JACK_METADATA_PRETTY_NAME[];
 
 namespace Jack
 {

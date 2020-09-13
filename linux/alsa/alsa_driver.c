@@ -755,8 +755,8 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 		if (c_period_size != driver->frames_per_cycle) {
 			jack_error ("alsa_pcm: requested an interrupt every %"
 				    PRIu32
-				    " frames but got %uc frames for capture",
-				    driver->frames_per_cycle, p_period_size);
+				    " frames but got %u frames for capture",
+				    driver->frames_per_cycle, c_period_size);
 			return -1;
 		}
 	}
@@ -1367,12 +1367,14 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 		if (poll_result < 0) {
 
 			if (errno == EINTR) {
-				jack_info ("poll interrupt");
+				const char poll_log[] = "ALSA: poll interrupt";
 				// this happens mostly when run
 				// under gdb, or when exiting due to a signal
 				if (under_gdb) {
+					jack_info(poll_log);
 					goto again;
 				}
+				jack_error(poll_log);
 				*status = -2;
 				return 0;
 			}
@@ -1395,9 +1397,9 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 				*status = -5;
 				return 0;
 			}
-			jack_log ("ALSA: poll time out, polled for %" PRIu64
-				  " usecs, Retrying with a recovery, retry cnt = %d",
-				  poll_ret - poll_enter, retry_cnt);
+			jack_error ("ALSA: poll time out, polled for %" PRIu64
+				    " usecs, Retrying with a recovery, retry cnt = %d",
+				    poll_ret - poll_enter, retry_cnt);
 			*status = alsa_driver_xrun_recovery (driver, delayed_usecs);
 			if(*status != 0) {
 				jack_error ("ALSA: poll time out, recovery failed with status = %d", *status);

@@ -61,20 +61,22 @@ def options(opt):
     opt.add_option('--htmldir', type='string', default=None, help='HTML documentation directory [Default: <prefix>/share/jack-audio-connection-kit/reference/html/')
     opt.add_option('--libdir', type='string', help='Library directory [Default: <prefix>/lib]')
     opt.add_option('--libdir32', type='string', help='32bit Library directory [Default: <prefix>/lib32]')
+    opt.add_option('--pkgconfigdir', type='string', help='pkg-config file directory [Default: <libdir>/pkgconfig]')
     opt.add_option('--mandir', type='string', help='Manpage directory [Default: <prefix>/share/man/man1]')
 
     # options affecting binaries
     opt.add_option('--platform', type='string', default=sys.platform, help='Target platform for cross-compiling, e.g. cygwin or win32')
     opt.add_option('--mixed', action='store_true', default=False, help='Build with 32/64 bits mixed mode')
     opt.add_option('--debug', action='store_true', default=False, dest='debug', help='Build debuggable binaries')
+    opt.add_option('--static', action='store_true', default=False, dest='static', help='Build static binaries (Windows only)')
 
     # options affecting general jack functionality
     opt.add_option('--classic', action='store_true', default=False, help='Force enable standard JACK (jackd) even if D-Bus JACK (jackdbus) is enabled too')
     opt.add_option('--dbus', action='store_true', default=False, help='Enable D-Bus JACK (jackdbus)')
     opt.add_option('--autostart', type='string', default='default', help='Autostart method. Possible values: "default", "classic", "dbus", "none"')
     opt.add_option('--profile', action='store_true', default=False, help='Build with engine profiling')
-    opt.add_option('--clients', default=64, type='int', dest='clients', help='Maximum number of JACK clients')
-    opt.add_option('--ports-per-application', default=768, type='int', dest='application_ports', help='Maximum number of ports per application')
+    opt.add_option('--clients', default=256, type='int', dest='clients', help='Maximum number of JACK clients')
+    opt.add_option('--ports-per-application', default=2048, type='int', dest='application_ports', help='Maximum number of ports per application')
     opt.add_option('--systemd-unit', action='store_true', default=False, help='Install systemd units.')
 
     opt.set_auto_options_define('HAVE_%s')
@@ -211,12 +213,22 @@ def configure(conf):
     if conf.env['IS_WINDOWS']:
         conf.env.append_unique('CCDEFINES', '_POSIX')
         conf.env.append_unique('CXXDEFINES', '_POSIX')
+        if Options.options.platform == 'msys':
+            conf.env.append_value('INCLUDES', ['/mingw64/include'])
+            conf.check(
+                header_name='asio.h',
+                includes='/opt/asiosdk/common',
+                msg='Checking for ASIO SDK',
+                define_name='HAVE_ASIO',
+                mandatory=False)
 
+    conf.env.append_unique('CFLAGS', '-Wall')
     conf.env.append_unique('CXXFLAGS', '-Wall')
     conf.env.append_unique('CXXFLAGS', '-std=gnu++11')
-    conf.env.append_unique('CFLAGS', '-Wall')
 
-    if conf.env['IS_MACOSX']:
+    if not conf.env['IS_MACOSX']:
+        conf.env.append_unique('LDFLAGS', '-Wl,--no-undefined')
+    else:
         conf.check(lib='aften', uselib='AFTEN', define_name='AFTEN')
         conf.check_cxx(
             fragment=''
@@ -234,6 +246,9 @@ def configure(conf):
             msg='Checking for aften_encode_frame()',
             define_name='HAVE_AFTEN_NEW_API',
             mandatory=False)
+
+        # TODO
+        conf.env.append_unique('CXXFLAGS', '-Wno-deprecated-register')
 
     conf.load('autooptions')
 
@@ -302,6 +317,7 @@ def configure(conf):
     conf.env['BUILD_WITH_32_64'] = Options.options.mixed
     conf.env['BUILD_CLASSIC'] = Options.options.classic
     conf.env['BUILD_DEBUG'] = Options.options.debug
+    conf.env['BUILD_STATIC'] = Options.options.static
 
     if conf.env['BUILD_JACKDBUS']:
         conf.env['BUILD_JACKD'] = conf.env['BUILD_CLASSIC']
@@ -321,6 +337,11 @@ def configure(conf):
         conf.env['LIBDIR'] = Options.options.libdir
     else:
         conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib'
+
+    if Options.options.pkgconfigdir:
+        conf.env['PKGCONFDIR'] = Options.options.pkgconfigdir
+    else:
+        conf.env['PKGCONFDIR'] = conf.env['LIBDIR'] + '/pkgconfig'
 
     if Options.options.mandir:
         conf.env['MANDIR'] = Options.options.mandir
@@ -360,9 +381,14 @@ def configure(conf):
         # we define this in the environment to maintain compatibility with
         # existing install paths that use ADDON_DIR rather than have to
         # have special cases for windows each time.
-        conf.env['ADDON_DIR'] = conf.env['BINDIR'] + '/jack'
-        # don't define ADDON_DIR in config.h, use the default 'jack' defined in
-        # windows/JackPlatformPlug_os.h
+        conf.env['ADDON_DIR'] = conf.env['LIBDIR'] + '/jack'
+        if Options.options.platform == 'msys':
+            conf.define('ADDON_DIR', 'jack')
+            conf.define('__STDC_FORMAT_MACROS', 1) # for PRIu64
+        else:
+            # don't define ADDON_DIR in config.h, use the default 'jack' defined in
+            # windows/JackPlatformPlug_os.h
+            pass
     else:
         conf.env['ADDON_DIR'] = os.path.normpath(os.path.join(conf.env['LIBDIR'], 'jack'))
         conf.define('ADDON_DIR', conf.env['ADDON_DIR'])
@@ -390,8 +416,9 @@ def configure(conf):
 
     if Options.options.mixed:
         conf.setenv(lib32, env=conf.env.derive())
-        conf.env.append_unique('CXXFLAGS', '-m32')
         conf.env.append_unique('CFLAGS', '-m32')
+        conf.env.append_unique('CXXFLAGS', '-m32')
+        conf.env.append_unique('CXXFLAGS', '-DBUILD_WITH_32_64')
         conf.env.append_unique('LINKFLAGS', '-m32')
         if Options.options.libdir32:
             conf.env['LIBDIR'] = Options.options.libdir32
@@ -524,14 +551,10 @@ def build_jackd(bld):
 
 # FIXME: Is SERVER_SIDE needed?
 def create_driver_obj(bld, **kw):
-    if bld.env['IS_MACOSX'] or bld.env['IS_WINDOWS']:
-        # On MacOSX this is necessary.
-        # I do not know if this is necessary on Windows.
-        # Note added on 2015-12-13 by karllinden.
-        if 'use' in kw:
-            kw['use'] += ['serverlib']
-        else:
-            kw['use'] = ['serverlib']
+    if 'use' in kw:
+        kw['use'] += ['serverlib']
+    else:
+        kw['use'] = ['serverlib']
 
     driver = bld(
         features = ['c', 'cxx', 'cshlib', 'cxxshlib'],

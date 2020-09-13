@@ -26,7 +26,6 @@ namespace Jack
 
 static unsigned int fSegmentNum = 0;
 static jack_shm_info_t gInfo;
-size_t JackMem::gSize = 0;
 
 JackShmMem::JackShmMem()
 {

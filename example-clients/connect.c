@@ -88,7 +88,7 @@ main (int argc, char *argv[])
 	while ((c = getopt_long (argc, argv, "s:hvu", long_options, &option_index)) >= 0) {
 		switch (c) {
 		case 's':
-			server_name = (char *) malloc (sizeof (char) * strlen(optarg));
+			server_name = (char *) malloc (sizeof (char) * (strlen(optarg) + 1));
 			strcpy (server_name, optarg);
 			options |= JackServerName;
 			break;

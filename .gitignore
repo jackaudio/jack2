@@ -1,8 +1,16 @@
 build/
 man/*.1
 .lock*
+.stamp_*
+.DS_Store
 __pycache__
 *.pyc
+*.pkg
 android/.server/
 android/.client/
 codeBlocks
+
+# macos release files
+macos/package.xml
+macos/package-welcome.txt
+

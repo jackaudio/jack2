@@ -22,7 +22,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackServer.h"
 #include "JackLockedEngine.h"
 #include "JackGlobals.h"
-#include "JackServerGlobals.h"
 #include "JackClient.h"
 #include "JackTools.h"
 #include "JackNotification.h"
@@ -230,7 +229,6 @@ bool JackSocketServerChannel::Execute()
             // Poll all clients
             for (unsigned int i = 1; i < fSocketTable.size() + 1; i++) {
                 int fd = fPollTable[i].fd;
-                jack_log("JackSocketServerChannel::Execute : fPollTable i = %ld fd = %ld", i, fd);
                 if (fPollTable[i].revents & ~POLLIN) {
                     jack_log("JackSocketServerChannel::Execute : poll client error err = %s", strerror(errno));
                     ClientKill(fd);

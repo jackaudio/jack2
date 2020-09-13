@@ -28,6 +28,7 @@
 
 #ifdef WIN32
 #include <process.h>
+#include "JackPlatformPlug_os.h"
 #endif
 
 
@@ -87,12 +88,12 @@ namespace Jack {
     /* returns the name of the per-user subdirectory of jack_tmpdir */
 #ifdef WIN32
 
-    char* JackTools::UserDir()
+    const char* JackTools::UserDir()
     {
         return "";
     }
 
-    char* JackTools::ServerDir(const char* server_name, char* server_dir)
+    const char* JackTools::ServerDir(const char* server_name, char* server_dir)
     {
         return "";
     }
@@ -105,7 +106,7 @@ namespace Jack {
     }
 
 #else
-    char* JackTools::UserDir()
+    const char* JackTools::UserDir()
     {
         static char user_dir[JACK_PATH_MAX + 1] = "";
 
@@ -122,7 +123,7 @@ namespace Jack {
     }
 
     /* returns the name of the per-server subdirectory of jack_user_dir() */
-    char* JackTools::ServerDir(const char* server_name, char* server_dir)
+    const char* JackTools::ServerDir(const char* server_name, char* server_dir)
     {
         /* format the path name into the suppled server_dir char array,
         * assuming that server_dir is at least as large as JACK_PATH_MAX + 1 */
@@ -263,7 +264,7 @@ void PrintLoadError(const char* so_name)
     lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
         (lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)so_name) + 40) * sizeof(TCHAR));
     _snprintf((LPTSTR)lpDisplayBuf, LocalSize(lpDisplayBuf) / sizeof(TCHAR),
-        TEXT("error loading %s err = %s"), so_name, lpMsgBuf);
+        TEXT("error loading %s err = %s"), so_name, (LPCTSTR)lpMsgBuf);
 
     jack_error((LPCTSTR)lpDisplayBuf);
 

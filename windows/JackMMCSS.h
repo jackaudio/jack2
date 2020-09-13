@@ -24,6 +24,9 @@
 
 #include "JackSystemDeps.h"
 #include "JackCompilerDeps.h"
+#ifdef __MINGW32__
+#include <winsock2.h>
+#endif
 #include <windows.h>
 #include <map>
 

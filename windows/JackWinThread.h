@@ -24,6 +24,9 @@
 #include "JackMMCSS.h"
 #include "JackCompilerDeps.h"
 #include "JackSystemDeps.h"
+#ifdef __MINGW32__
+#include <winsock2.h>
+#endif
 #include <windows.h>
 
 namespace Jack

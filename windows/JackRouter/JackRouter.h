@@ -37,10 +37,13 @@ static int	kNumOutputs = 4;
 #include "jack.h"
 #include "rpc.h"
 #include "rpcndr.h"
+
 #ifndef COM_NO_WINDOWS_H
+#ifdef __MINGW32__
+#include <winsock2.h>
+#endif
 #include <windows.h>
 #include "ole2.h"
-
 #endif
 
 #include "combase.h"
