@@ -132,7 +132,7 @@ def build(bld):
             ]
         includes = ['../windows' ] + includes
         libsuffix = "64" if (bld.env['DEST_CPU'] == "x86_64" and not bld.variant) else ""
-        skipshared = bool('HAVE_TRE_REGEX_H' in bld.env)
+        staticbuild = bool('BUILD_STATIC' in bld.env and bld.env['BUILD_STATIC'])
         uselib.append('REGEX')
         uselib.append('WS2_32')
         uselib.append('PSAPI')
@@ -204,7 +204,7 @@ def build(bld):
 
     if bld.env['IS_WINDOWS']:
         # remove switch to shared binaries if possible, as we most likely want static builds on Windows
-        if skipshared:
+        if staticbuild:
             clientlib.env['SHLIB_MARKER'] = ''
         # statically link libjack to libstdc++, some client apps like ardour come
         # with a different version of libstdc++.dll that takes precedence and results
@@ -228,7 +228,7 @@ def build(bld):
         serverlib.env['cxxshlib_PATTERN'] = 'lib%s.dll'
         serverlib.env['cxxstlib_PATTERN'] = 'lib%s.a'
         serverlib.env['implib_PATTERN'] = 'lib%s.dll.a'
-        if skipshared:
+        if staticbuild:
             serverlib.env['SHLIB_MARKER'] = ''
         serverlib.env.append_value('LINKFLAGS', ['-static-libstdc++', '--disable-auto-import'])
     serverlib.install_path = '${LIBDIR}'
@@ -330,7 +330,7 @@ def build(bld):
              netlib.env['cxxshlib_PATTERN'] = 'lib%s.dll'
              netlib.env['cxxstlib_PATTERN'] = 'lib%s.a'
              netlib.env['implib_PATTERN'] = 'lib%s.dll.a'
-             if skipshared:
+             if staticbuild:
                  netlib.env['SHLIB_MARKER'] = ''
              netlib.use += ['WS2_32', 'WINMM']
         elif not bld.env['IS_MACOSX']:

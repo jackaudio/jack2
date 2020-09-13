@@ -68,6 +68,7 @@ def options(opt):
     opt.add_option('--platform', type='string', default=sys.platform, help='Target platform for cross-compiling, e.g. cygwin or win32')
     opt.add_option('--mixed', action='store_true', default=False, help='Build with 32/64 bits mixed mode')
     opt.add_option('--debug', action='store_true', default=False, dest='debug', help='Build debuggable binaries')
+    opt.add_option('--static', action='store_true', default=False, dest='static', help='Build static binaries (Windows only)')
 
     # options affecting general jack functionality
     opt.add_option('--classic', action='store_true', default=False, help='Force enable standard JACK (jackd) even if D-Bus JACK (jackdbus) is enabled too')
@@ -316,6 +317,7 @@ def configure(conf):
     conf.env['BUILD_WITH_32_64'] = Options.options.mixed
     conf.env['BUILD_CLASSIC'] = Options.options.classic
     conf.env['BUILD_DEBUG'] = Options.options.debug
+    conf.env['BUILD_STATIC'] = Options.options.static
 
     if conf.env['BUILD_JACKDBUS']:
         conf.env['BUILD_JACKD'] = conf.env['BUILD_CLASSIC']
