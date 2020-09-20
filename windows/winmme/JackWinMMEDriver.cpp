@@ -204,8 +204,8 @@ JackWinMMEDriver::Open(bool capturing, bool playing, int in_channels,
                     new JackWinMMEOutputPort(fAliasName, client_name,
                                              playback_driver_name, i);
             } catch (std::exception& e) {
-                jack_error("JackWinMMEDriver::Open - while creating output "
-                           "port: %s", e.what());
+                jack_error("JackWinMMEDriver::Open - while creating output port: %s | %s, %s, %s",
+                           e.what(), fAliasName, client_name, playback_driver_name);
                 continue;
             }
             output_count++;
@@ -215,10 +215,7 @@ JackWinMMEDriver::Open(bool capturing, bool playing, int in_channels,
     jack_log("JackWinMMEDriver::Open - input_count  %d", input_count);
     jack_log("JackWinMMEDriver::Open - output_count  %d", output_count);
 
-    if (! (input_count || output_count)) {
-        jack_error("JackWinMMEDriver::Open - no WinMME inputs or outputs "
-                   "allocated.");
-    } else if (! JackMidiDriver::Open(capturing, playing, input_count,
+    if (! JackMidiDriver::Open(capturing, playing, input_count,
                                       output_count, monitor,
                                       capture_driver_name,
                                       playback_driver_name, capture_latency,
@@ -286,7 +283,7 @@ JackWinMMEDriver::Start()
     jack_log("JackWinMMEDriver::Start - Enabling input ports.");
 
     for (; input_count < fCaptureChannels; input_count++) {
-        if (input_ports[input_count]->Start() < 0) {
+        if (! input_ports[input_count]->Start()) {
             jack_error("JackWinMMEDriver::Start - Failed to enable input "
                        "port.");
             goto stop_input_ports;
@@ -296,7 +293,7 @@ JackWinMMEDriver::Start()
     jack_log("JackWinMMEDriver::Start - Enabling output ports.");
 
     for (; output_count < fPlaybackChannels; output_count++) {
-        if (output_ports[output_count]->Start() < 0) {
+        if (! output_ports[output_count]->Start()) {
             jack_error("JackWinMMEDriver::Start - Failed to enable output "
                        "port.");
             goto stop_output_ports;
@@ -308,14 +305,14 @@ JackWinMMEDriver::Start()
 
  stop_output_ports:
     for (int i = 0; i < output_count; i++) {
-        if (output_ports[i]->Stop() < 0) {
+        if (! output_ports[i]->Stop()) {
             jack_error("JackWinMMEDriver::Start - Failed to disable output "
                        "port.");
         }
     }
  stop_input_ports:
     for (int i = 0; i < input_count; i++) {
-        if (input_ports[i]->Stop() < 0) {
+        if (! input_ports[i]->Stop()) {
             jack_error("JackWinMMEDriver::Start - Failed to disable input "
                        "port.");
         }
@@ -334,7 +331,7 @@ JackWinMMEDriver::Stop()
     jack_log("JackWinMMEDriver::Stop - disabling input ports.");
 
     for (int i = 0; i < fCaptureChannels; i++) {
-        if (input_ports[i]->Stop() < 0) {
+        if (! input_ports[i]->Stop()) {
             jack_error("JackWinMMEDriver::Stop - Failed to disable input "
                        "port.");
             result = -1;
@@ -344,7 +341,7 @@ JackWinMMEDriver::Stop()
     jack_log("JackWinMMEDriver::Stop - disabling output ports.");
 
     for (int i = 0; i < fPlaybackChannels; i++) {
-        if (output_ports[i]->Stop() < 0) {
+        if (! output_ports[i]->Stop()) {
             jack_error("JackWinMMEDriver::Stop - Failed to disable output "
                        "port.");
             result = -1;
