@@ -289,6 +289,7 @@ def configure(conf):
 
 
     conf.recurse('example-clients')
+    conf.recurse('tools')
 
     # test for the availability of ucontext, and how it should be used
     for t in ['gp_regs', 'uc_regs', 'mc_gregs', 'gregs']:
@@ -804,6 +805,8 @@ def build(bld):
     build_drivers(bld)
 
     bld.recurse('example-clients')
+    bld.recurse('tools')
+
     if bld.env['IS_LINUX']:
         bld.recurse('man')
         bld.recurse('systemd')
