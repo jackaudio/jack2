@@ -60,6 +60,8 @@ def build(bld):
             prog.use += ['RT', 'M']
         if bld.env['IS_SUN']:
             prog.use += ['M']
+        if bld.env['IS_WINDOWS'] and bld.env['BUILD_STATIC']:
+            prog.env['LIB_PTHREAD'] = [':libwinpthread.a']
         #prog.cflags = ['-Wno-deprecated-declarations', '-Wno-misleading-indentation']
         #prog.cxxflags = ['-Wno-deprecated-declarations', '-Wno-misleading-indentation']
 
@@ -78,6 +80,8 @@ def build(bld):
             prog.use += ['RT', 'SNDFILE']
         if bld.env['IS_WINDOWS']:
             prog.uselib = ['SNDFILE']
+            if bld.env['BUILD_STATIC']:
+                prog.env['LIB_PTHREAD'] = [':libwinpthread.a']
         prog.target = 'jack_rec'
 
     for example_lib, example_lib_source in list(example_libs.items()):
@@ -89,5 +93,7 @@ def build(bld):
         lib.source = example_lib_source
         if bld.env['IS_SUN']:
             lib.env.append_value('LINKFLAGS', '-lm')
+        if bld.env['IS_WINDOWS'] and bld.env['BUILD_STATIC']:
+            prog.env['LIB_PTHREAD'] = [':libwinpthread.a']
         lib.use = 'serverlib'
         lib.install_path = '${ADDON_DIR}/'

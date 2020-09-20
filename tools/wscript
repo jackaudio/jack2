@@ -43,6 +43,8 @@ def build(bld):
             prog.use += ['RT', 'M']
         if bld.env['IS_SUN']:
             prog.use += ['M']
+        if bld.env['IS_WINDOWS'] and bld.env['BUILD_STATIC']:
+            prog.env['LIB_PTHREAD'] = [':libwinpthread.a']
         #prog.cflags = ['-Wno-deprecated-declarations', '-Wno-misleading-indentation']
         #prog.cxxflags = ['-Wno-deprecated-declarations', '-Wno-misleading-indentation']
 
@@ -59,6 +61,8 @@ def build(bld):
             prog.use += ['READLINE']
         if bld.env['IS_WINDOWS']:
             prog.use += ['READLINE']
+            if bld.env['BUILD_STATIC']:
+                prog.env['LIB_PTHREAD'] = [':libwinpthread.a']
         prog.target = 'jack_transport'
 
     if bld.env['IS_LINUX'] or bld.env['IS_MACOSX']:
