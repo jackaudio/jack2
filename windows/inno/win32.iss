@@ -39,7 +39,7 @@ Source: "win32\bin\qjackctl.exe"; DestDir: "{app}\qjackctl"; Components: qjackct
 Source: "Qt5*.dll"; DestDir: "{app}\qjackctl"; Components: qjackctl;
 Source: "qwindows.dll"; DestDir: "{app}\qjackctl\platforms"; Components: qjackctl;
 ; dev
-Source: "win32\include\jack\*.h"; DestDir: "{app}\include"; Components: dev;
+Source: "win32\include\jack\*.h"; DestDir: "{app}\include\jack"; Components: dev;
 Source: "win32\lib\*.a"; DestDir: "{app}\lib"; Components: dev;
 Source: "win32\lib\jack\*.a"; DestDir: "{app}\lib\jack"; Components: dev;
 
