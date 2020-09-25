@@ -41,6 +41,8 @@ Source: "qwindows.dll"; DestDir: "{app}\qjackctl\platforms"; Components: qjackct
 ; dev
 Source: "win32\include\jack\*.h"; DestDir: "{app}\include\jack"; Components: dev;
 Source: "win32\lib\*.a"; DestDir: "{app}\lib"; Components: dev;
+Source: "win32\lib\*.def"; DestDir: "{app}\lib"; Components: dev;
+Source: "win32\lib\*.lib"; DestDir: "{app}\lib"; Components: dev;
 Source: "win32\lib\jack\*.a"; DestDir: "{app}\lib\jack"; Components: dev;
 
 [Icons]
