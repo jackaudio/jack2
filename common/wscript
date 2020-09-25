@@ -145,17 +145,18 @@ def build(bld):
     if bld.env['IS_MACOSX']:
         clientlib.framework = ['CoreAudio', 'Accelerate']
     clientlib.defines = 'HAVE_CONFIG_H'
+    clientlib.includes = includes
+    clientlib.name = 'clientlib'
+    clientlib.target = 'jack'+libsuffix
     clientlib.use = uselib
     if bld.env['IS_WINDOWS']:
          clientlib.env['cxxshlib_PATTERN'] = 'lib%s.dll'
          clientlib.env['cxxstlib_PATTERN'] = 'lib%s.a'
          clientlib.env['implib_PATTERN'] = 'lib%s.dll.a'
-    clientlib.install_path = '${LIBDIR}'
+         clientlib.env.append_value('LINKFLAGS', ['-Wl,--output-def,lib%s.def' % clientlib.target])
     if bld.env['AUTOSTART_METHOD'] == 'dbus':
         clientlib.use.append('DBUS-1')
-    clientlib.includes = includes
-    clientlib.name         = 'clientlib'
-    clientlib.target       = 'jack'+libsuffix
+    clientlib.install_path = '${LIBDIR}'
     clientlib.source = [] + common_libsources
     clientlib.source += [
         'JackLibClient.cpp',
@@ -228,6 +229,7 @@ def build(bld):
         serverlib.env['cxxshlib_PATTERN'] = 'lib%s.dll'
         serverlib.env['cxxstlib_PATTERN'] = 'lib%s.a'
         serverlib.env['implib_PATTERN'] = 'lib%s.dll.a'
+        serverlib.env.append_value('LINKFLAGS', ['-Wl,--output-def,lib%s.def' % serverlib.target])
         if staticbuild:
             serverlib.env['SHLIB_MARKER'] = ''
         serverlib.env.append_value('LINKFLAGS', ['-static-libstdc++', '--disable-auto-import'])
@@ -330,6 +332,7 @@ def build(bld):
              netlib.env['cxxshlib_PATTERN'] = 'lib%s.dll'
              netlib.env['cxxstlib_PATTERN'] = 'lib%s.a'
              netlib.env['implib_PATTERN'] = 'lib%s.dll.a'
+             netlib.env.append_value('LINKFLAGS', ['-Wl,--output-def,lib%s.def' % netlib.target])
              if staticbuild:
                  netlib.env['SHLIB_MARKER'] = ''
              netlib.use += ['WS2_32', 'WINMM']
