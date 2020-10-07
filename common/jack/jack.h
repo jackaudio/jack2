@@ -605,6 +605,10 @@ int jack_set_xrun_callback (jack_client_t *client,
  * Clients that do not meet any of those conditions SHOULD
  * register a latency callback.
  *
+ * Another case is when a client wants to use
+ * @ref jack_port_get_latency_range(), which only returns meaninful
+ * values when ports get connected and latency values change.
+ *
  * See the documentation for  @ref jack_port_set_latency_range()
  * on how the callback should operate. Remember that the @a mode
  * argument given to the latency callback will need to be
@@ -1119,8 +1123,11 @@ void jack_port_set_latency (jack_port_t *port, jack_nframes_t) JACK_OPTIONAL_WEA
  *
  * See @ref LatencyFunctions for the definition of each latency value.
  *
- * This is normally used in the LatencyCallback.
- * and therefor safe to execute from callbacks.
+ * This function is best used from callbacks, specifically the latency callback.
+ * Before a port is connected, this returns the default latency: zero.
+ * Therefore it only makes sense to call jack_port_get_latency_range() when
+ * the port is connected, and that gets signalled by the latency callback.
+ * See @ref jack_set_latency_callback() for details.
  */
 void jack_port_get_latency_range (jack_port_t *port, jack_latency_callback_mode_t mode, jack_latency_range_t *range) JACK_WEAK_EXPORT;
 
