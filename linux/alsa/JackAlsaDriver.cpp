@@ -352,21 +352,22 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
                                capture_latency,
                                playback_latency,
                                midi);
-    if (fDriver) {
-        // ALSA driver may have changed the in/out values
-        fCaptureChannels = ((alsa_driver_t *)fDriver)->capture_nchannels;
-        fPlaybackChannels = ((alsa_driver_t *)fDriver)->playback_nchannels;
-        if (JackServerGlobals::on_device_reservation_loop != NULL) {
-            device_reservation_loop_running = true;
-            if (JackPosixThread::StartImp(&fReservationLoopThread, 0, 0, on_device_reservation_loop, NULL) != 0) {
-                device_reservation_loop_running = false;
-            }
-        }
-        return 0;
-    } else {
+    if (!fDriver) {
         Close();
         return -1;
     }
+
+    // ALSA driver may have changed the in/out values
+    fCaptureChannels = ((alsa_driver_t *)fDriver)->capture_nchannels;
+    fPlaybackChannels = ((alsa_driver_t *)fDriver)->playback_nchannels;
+    if (JackServerGlobals::on_device_reservation_loop != NULL) {
+        device_reservation_loop_running = true;
+        if (JackPosixThread::StartImp(&fReservationLoopThread, 0, 0, on_device_reservation_loop, NULL) != 0) {
+            device_reservation_loop_running = false;
+        }
+    }
+
+    return 0;
 }
 
 int JackAlsaDriver::Close()

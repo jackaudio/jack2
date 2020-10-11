@@ -633,7 +633,7 @@ JackCoreMidiDriver::Start()
     jack_info("JackCoreMidiDriver::Start - Enabling physical input ports.");
 
     for (; pi_count < num_physical_inputs; pi_count++) {
-        if (physical_input_ports[pi_count]->Start() < 0) {
+        if (!physical_input_ports[pi_count]->Start()) {
             jack_error("JackCoreMidiDriver::Start - Failed to enable physical "
                        "input port.");
             goto stop_physical_input_ports;
@@ -643,7 +643,7 @@ JackCoreMidiDriver::Start()
     jack_info("JackCoreMidiDriver::Start - Enabling physical output ports.");
 
     for (; po_count < num_physical_outputs; po_count++) {
-        if (physical_output_ports[po_count]->Start() < 0) {
+        if (!physical_output_ports[po_count]->Start()) {
             jack_error("JackCoreMidiDriver::Start - Failed to enable physical "
                        "output port.");
             goto stop_physical_output_ports;
@@ -653,7 +653,7 @@ JackCoreMidiDriver::Start()
     jack_info("JackCoreMidiDriver::Start - Enabling virtual input ports.");
 
     for (; vi_count < num_virtual_inputs; vi_count++) {
-        if (virtual_input_ports[vi_count]->Start() < 0) {
+        if (!virtual_input_ports[vi_count]->Start()) {
             jack_error("JackCoreMidiDriver::Start - Failed to enable virtual "
                        "input port.");
             goto stop_virtual_input_ports;
@@ -663,7 +663,7 @@ JackCoreMidiDriver::Start()
     jack_info("JackCoreMidiDriver::Start - Enabling virtual output ports.");
 
     for (; vo_count < num_virtual_outputs; vo_count++) {
-        if (virtual_output_ports[vo_count]->Start() < 0) {
+        if (!virtual_output_ports[vo_count]->Start()) {
             jack_error("JackCoreMidiDriver::Start - Failed to enable virtual "
                        "output port.");
             goto stop_virtual_output_ports;
@@ -676,28 +676,28 @@ JackCoreMidiDriver::Start()
 
  stop_virtual_output_ports:
     for (int i = 0; i < vo_count; i++) {
-        if (virtual_output_ports[i]->Stop() < 0) {
+        if (!virtual_output_ports[i]->Stop()) {
             jack_error("JackCoreMidiDriver::Start - Failed to disable virtual "
                        "output port.");
         }
     }
  stop_virtual_input_ports:
     for (int i = 0; i < vi_count; i++) {
-        if (virtual_input_ports[i]->Stop() < 0) {
+        if (!virtual_input_ports[i]->Stop()) {
             jack_error("JackCoreMidiDriver::Start - Failed to disable virtual "
                        "input port.");
         }
     }
  stop_physical_output_ports:
     for (int i = 0; i < po_count; i++) {
-        if (physical_output_ports[i]->Stop() < 0) {
+        if (!physical_output_ports[i]->Stop()) {
             jack_error("JackCoreMidiDriver::Start - Failed to disable "
                        "physical output port.");
         }
     }
  stop_physical_input_ports:
     for (int i = 0; i < pi_count; i++) {
-        if (physical_input_ports[i]->Stop() < 0) {
+        if (!physical_input_ports[i]->Stop()) {
             jack_error("JackCoreMidiDriver::Start - Failed to disable "
                        "physical input port.");
         }
@@ -716,7 +716,7 @@ JackCoreMidiDriver::Stop()
     jack_info("JackCoreMidiDriver::Stop - disabling physical input ports.");
 
     for (int i = 0; i < num_physical_inputs; i++) {
-        if (physical_input_ports[i]->Stop() < 0) {
+        if (!physical_input_ports[i]->Stop()) {
             jack_error("JackCoreMidiDriver::Stop - Failed to disable physical "
                        "input port.");
             result = -1;
@@ -726,7 +726,7 @@ JackCoreMidiDriver::Stop()
     jack_info("JackCoreMidiDriver::Stop - disabling physical output ports.");
 
     for (int i = 0; i < num_physical_outputs; i++) {
-        if (physical_output_ports[i]->Stop() < 0) {
+        if (!physical_output_ports[i]->Stop()) {
             jack_error("JackCoreMidiDriver::Stop - Failed to disable physical "
                        "output port.");
             result = -1;
@@ -736,7 +736,7 @@ JackCoreMidiDriver::Stop()
     jack_info("JackCoreMidiDriver::Stop - disabling virtual input ports.");
 
     for (int i = 0; i < num_virtual_inputs; i++) {
-        if (virtual_input_ports[i]->Stop() < 0) {
+        if (!virtual_input_ports[i]->Stop()) {
             jack_error("JackCoreMidiDriver::Stop - Failed to disable virtual "
                        "input port.");
             result = -1;
@@ -746,7 +746,7 @@ JackCoreMidiDriver::Stop()
     jack_info("JackCoreMidiDriver::Stop - disabling virtual output ports.");
 
     for (int i = 0; i < num_virtual_outputs; i++) {
-        if (virtual_output_ports[i]->Stop() < 0) {
+        if (!virtual_output_ports[i]->Stop()) {
             jack_error("JackCoreMidiDriver::Stop - Failed to disable virtual "
                        "output port.");
             result = -1;
@@ -825,7 +825,7 @@ extern "C" {
 
         desc = jack_driver_descriptor_construct("coremidi", JackDriverSlave, "Apple CoreMIDI API based MIDI backend", &filler);
 
-        value.ui  = 0;
+        value.ui = 0;
         jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamUInt, &value, NULL, "CoreMIDI virtual bus", NULL);
         jack_driver_descriptor_add_parameter(desc, &filler, "outchannels", 'o', JackDriverParamUInt, &value, NULL, "CoreMIDI virtual bus", NULL);
 

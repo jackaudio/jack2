@@ -837,10 +837,8 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 
 	if (driver->playback_nchannels > driver->capture_nchannels) {
 		driver->max_nchannels = driver->playback_nchannels;
-		driver->user_nchannels = driver->capture_nchannels;
 	} else {
 		driver->max_nchannels = driver->capture_nchannels;
-		driver->user_nchannels = driver->playback_nchannels;
 	}
 
 	alsa_driver_setup_io_function_pointers (driver);
@@ -2040,7 +2038,6 @@ alsa_driver_new (char *name, char *playback_alsa_device,
 	driver->hw = 0;
 	driver->capture_and_playback_not_synced = FALSE;
 	driver->max_nchannels = 0;
-	driver->user_nchannels = 0;
 	driver->playback_nchannels = user_playback_nchnls;
 	driver->capture_nchannels = user_capture_nchnls;
 	driver->playback_sample_bytes = (shorts_first ? 2:4);

@@ -289,6 +289,7 @@ def configure(conf):
 
 
     conf.recurse('example-clients')
+    conf.recurse('tools')
 
     # test for the availability of ucontext, and how it should be used
     for t in ['gp_regs', 'uc_regs', 'mc_gregs', 'gregs']:
@@ -424,6 +425,14 @@ def configure(conf):
             conf.env['LIBDIR'] = Options.options.libdir32
         else:
             conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib32'
+
+        if conf.env['IS_WINDOWS'] and conf.env['BUILD_STATIC']:
+            def replaceFor32bit(env):
+                for e in env: yield e.replace('x86_64', 'i686', 1)
+            for env in ('AR', 'CC', 'CXX', 'LINK_CC', 'LINK_CXX'):
+                conf.all_envs[lib32][env] = list(replaceFor32bit(conf.all_envs[lib32][env]))
+            conf.all_envs[lib32]['LIB_REGEX'] = ['tre32']
+
         # libdb does not work in mixed mode
         conf.all_envs[lib32]['HAVE_DB'] = 0
         conf.all_envs[lib32]['HAVE_DB_H'] = 0
@@ -804,6 +813,8 @@ def build(bld):
     build_drivers(bld)
 
     bld.recurse('example-clients')
+    bld.recurse('tools')
+
     if bld.env['IS_LINUX']:
         bld.recurse('man')
         bld.recurse('systemd')

@@ -1,0 +1,94 @@
+#! /usr/bin/python3
+# encoding: utf-8
+
+example_tools = {
+    'jack_alias' : 'alias.c',
+    'jack_bufsize' : 'bufsize.c',
+    'jack_connect' : 'connect.c',
+    'jack_evmon' : 'evmon.c',
+    'jack_freewheel' : 'freewheel.c',
+    'jack_load' : 'ipload.c',
+    'jack_lsp' : 'lsp.c',
+    'jack_midi_dump' : 'midi_dump.c',
+    'jack_monitor_client' : 'monitor_client.c',
+    'jack_property' : 'property.c',
+    'jack_samplerate' : 'samplerate.c',
+    'jack_session_notify' : 'session_notify.c',
+    'jack_unload' : 'ipunload.c',
+    'jack_wait' : 'wait.c',
+    }
+
+def configure(conf):
+    conf.env['BUILD_EXAMPLE_ALSA_IO'] = conf.env['SAMPLERATE'] and conf.env['BUILD_DRIVER_ALSA']
+    conf.env['BUILD_EXAMPLE_CLIENT_TRANSPORT'] = conf.env['READLINE']
+
+def build(bld):
+    if bld.env['IS_LINUX']:
+        os_incdir = ['../linux', '../posix']
+    if bld.env['IS_MACOSX']:
+        os_incdir = ['../macosx', '../posix']
+    if bld.env['IS_SUN']:
+        os_incdir = ['../solaris', '../posix']
+    if bld.env['IS_WINDOWS']:
+        os_incdir = ['../windows']
+    for example_tool, example_tool_source in list(example_tools.items()):
+        if bld.env['IS_MACOSX']:
+            prog = bld(features='c cprogram', framework = ['Foundation'])
+        else:
+            prog = bld(features='c cprogram')
+        prog.includes = os_incdir + ['../common/jack', '../common']
+        prog.source = example_tool_source
+        prog.use = ['clientlib']
+        if bld.env['IS_LINUX']:
+            prog.use += ['RT', 'M']
+        if bld.env['IS_SUN']:
+            prog.use += ['M']
+        if bld.env['IS_WINDOWS'] and bld.env['BUILD_STATIC']:
+            prog.env['LIB_PTHREAD'] = [':libwinpthread.a']
+        #prog.cflags = ['-Wno-deprecated-declarations', '-Wno-misleading-indentation']
+        #prog.cxxflags = ['-Wno-deprecated-declarations', '-Wno-misleading-indentation']
+
+        prog.target = example_tool
+
+    if bld.env['BUILD_EXAMPLE_CLIENT_TRANSPORT']:
+        prog = bld(features = 'c cprogram')
+        prog.includes = os_incdir + ['../common/jack', '../common']
+        prog.source = 'transport.c'
+        prog.use = ['clientlib']
+        if bld.env['IS_LINUX']:
+            prog.use += ['RT', 'READLINE']
+        if bld.env['IS_MACOSX']:
+            prog.use += ['READLINE']
+        if bld.env['IS_WINDOWS']:
+            prog.use += ['READLINE']
+            if bld.env['BUILD_STATIC']:
+                prog.env['LIB_PTHREAD'] = [':libwinpthread.a']
+        prog.target = 'jack_transport'
+
+    if bld.env['IS_LINUX'] or bld.env['IS_MACOSX']:
+        prog = bld(features = 'c cprogram')
+        prog.includes = os_incdir + ['.', '..', '../common/jack', '../common']
+        prog.source = ['netsource.c', '../common/netjack_packet.c']
+        prog.env.append_value('CFLAGS', '-DNO_JACK_ERROR')
+        prog.use = ['CELT', 'SAMPLERATE', 'OPUS', 'M', 'clientlib']
+        prog.target = 'jack_netsource'
+        prog.defines = ['HAVE_CONFIG_H']
+
+    if bld.env['IS_LINUX'] and bld.env['BUILD_EXAMPLE_ALSA_IO']:
+        prog = bld(features = 'c cprogram')
+        prog.includes = os_incdir + ['../common/jack', '../common']
+        prog.source = ['alsa_in.c', '../common/memops.c']
+        prog.env.append_value('CFLAGS', '-DNO_JACK_ERROR')
+        prog.use = ['clientlib', 'ALSA', 'SAMPLERATE', 'M']
+        prog.target = 'alsa_in'
+
+        prog = bld(features = 'c cprogram')
+        prog.includes = os_incdir + ['../common/jack', '../common']
+        prog.source = ['alsa_out.c', '../common/memops.c']
+        prog.env.append_value('CFLAGS', '-DNO_JACK_ERROR')
+        prog.use = ['clientlib', 'ALSA', 'SAMPLERATE', 'M']
+        prog.target = 'alsa_out'
+
+    if not bld.env['IS_WINDOWS']:
+        bld.symlink_as('${PREFIX}/bin/jack_disconnect', 'jack_connect')
+        bld.install_files('${PREFIX}/bin', 'jack_control', chmod=0o755)

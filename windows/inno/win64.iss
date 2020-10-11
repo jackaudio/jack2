@@ -35,13 +35,19 @@ Source: "win64\lib\jack\*.dll"; DestDir: "{app}\jack";
 Source: "win64\bin\jack_*.exe"; DestDir: "{app}\tools";
 ; jack client lib (NOTE goes into windir)
 Source: "win64\lib\libjack64.dll"; DestDir: "{win}";
+Source: "win64\lib32\libjack.dll"; DestDir: "{win}";
 ; qjackctl
 Source: "win64\bin\qjackctl.exe"; DestDir: "{app}\qjackctl"; Components: qjackctl;
 Source: "Qt5*.dll"; DestDir: "{app}\qjackctl"; Components: qjackctl;
 Source: "qwindows.dll"; DestDir: "{app}\qjackctl\platforms"; Components: qjackctl;
 ; dev
-Source: "win64\include\jack\*.h"; DestDir: "{app}\include"; Components: dev;
+Source: "win64\include\jack\*.h"; DestDir: "{app}\include\jack"; Components: dev;
 Source: "win64\lib\*.a"; DestDir: "{app}\lib"; Components: dev;
+Source: "win64\lib\*.def"; DestDir: "{app}\lib"; Components: dev;
+Source: "win64\lib\*.lib"; DestDir: "{app}\lib"; Components: dev;
+Source: "win64\lib32\*.a"; DestDir: "{app}\lib32"; Components: dev;
+Source: "win64\lib32\*.def"; DestDir: "{app}\lib32"; Components: dev;
+Source: "win64\lib32\*.lib"; DestDir: "{app}\lib32"; Components: dev;
 Source: "win64\lib\jack\*.a"; DestDir: "{app}\lib\jack"; Components: dev;
 
 [Icons]

@@ -4,6 +4,7 @@ man/*.1
 .stamp_*
 .DS_Store
 __pycache__
+*.dll
 *.pyc
 *.pkg
 android/.server/
@@ -14,3 +15,7 @@ codeBlocks
 macos/package.xml
 macos/package-welcome.txt
 
+# windows release files
+windows/inno/version.iss
+windows/inno/win32
+windows/inno/win64
