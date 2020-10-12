@@ -9,8 +9,8 @@ ChangeLog
   * Delete various macOS and Windows-related files from the source code (no longer relevant)
   * Mark JACK-Session as deprecated, please use NSM instead
   * Remove unnecessary GPL include from LGPL code
-  * Split example-clients and tools, as done in JACK1 many years ago
-  * Write Windows registry key during installation, so 3rd parties can find jackd.exe (as HKLM\Software\JACK\Location)
+  * Split example-clients and tools, as done in JACK1 many years ago (WIP)
+  * Write Windows registry key during installation, so 3rd parties can find jackd.exe (as HKLM\\Software\\JACK\\Location)
   * jack_control: Fix handling of dbus bytes
   * jack_control: Return a proper exit status on DBus exception
   * jack_property: Fix possible crash with "-l" argument usage
