@@ -1,6 +1,28 @@
 ChangeLog
 #########
 
+* 1.9.15 (2020-10-15)
+
+  * Automated builds for macOS and Windows (see jackaudio/jack2-releases repository)
+  * Adapt wscript Windows build configuration to match old v1.9.11 installer
+  * Bump maximum default number of clients and ports (now 256 clients and 2048 ports)
+  * Delete various macOS and Windows-related files from the source code (no longer relevant)
+  * Mark JACK-Session as deprecated, please use NSM instead
+  * Remove unnecessary GPL include from LGPL code
+  * Split example-clients and tools, as done in JACK1 many years ago
+  * Write Windows registry key during installation, so 3rd parties can find jackd.exe (as HKLM\Software\JACK\Location)
+  * jack_control: Fix handling of dbus bytes
+  * jack_control: Return a proper exit status on DBus exception
+  * jack_property: Fix possible crash with "-l" argument usage
+  * jack_wait: Add client name option -n/--name
+  * Fix compilation of documentation
+  * Fix compilation of mixed mode with meta-data enabled
+  * Fix compilation with mingw
+  * Fix client-side crash if initial meta-data DB setup fails
+  * Fix macOS semaphore usage, so it works again
+  * Several fixes for Windows (with contributions from Kjetil S. Matheussen)
+  * Several minor fixes and grammar corrections (with contributions from Adam Miartus and Timo Wischer)
+
 * 1.9.14 (2019-10-28)
 
   * Fix ARM build
