@@ -10,7 +10,7 @@ AppUpdatesURL=https://github.com/jackaudio/jack2-releases/releases/
 AppVersion={#VERSION}
 DefaultDirName={commonpf64}\JACK2
 DisableDirPage=yes
-OutputBaseFilename=jack2-win64-v{#VERSION}
+OutputBaseFilename=jack2-win64-{#VERSION}
 OutputDir=.
 UsePreviousAppDir=no
 
