@@ -1,9 +1,0 @@
-LIBRARY			JackRouter
-DESCRIPTION		'ASIO Jack Driver'
-PROTMODE
-EXPORTS	
-				DllMain
-				DllGetClassObject
-				DllCanUnloadNow
-				DllRegisterServer
-				DllUnregisterServer
