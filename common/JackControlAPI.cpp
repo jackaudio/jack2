@@ -1283,7 +1283,7 @@ SERVER_EXPORT union jackctl_parameter_value jackctl_parameter_get_value(jackctl_
 SERVER_EXPORT bool jackctl_parameter_reset(jackctl_parameter *parameter_ptr)
 {
     if (!parameter_ptr) {
-        return NULL;
+        return false;
     }
 
     if (!parameter_ptr->is_set)
@@ -1301,7 +1301,7 @@ SERVER_EXPORT bool jackctl_parameter_reset(jackctl_parameter *parameter_ptr)
 SERVER_EXPORT bool jackctl_parameter_set_value(jackctl_parameter *parameter_ptr, const union jackctl_parameter_value * value_ptr)
 {
     if (!parameter_ptr || !value_ptr) {
-        return NULL;
+        return false;
     }
 
     parameter_ptr->is_set = true;
