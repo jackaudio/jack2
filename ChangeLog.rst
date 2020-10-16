@@ -1,6 +1,11 @@
 ChangeLog
 #########
 
+* 1.9.16 (2020-10-16)
+
+  * Fix/revert a change in how meta-data definitions were exposed (regression in 1.9.15)
+  * Remove jack-router Windows code from the repository
+
 * 1.9.15 (2020-10-15)
 
   * Automated builds for macOS and Windows (see jackaudio/jack2-releases repository)
