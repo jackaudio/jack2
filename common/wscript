@@ -196,7 +196,10 @@ def build(bld):
             '../windows/JackMMCSS.cpp',
             ]
 
-    if not bld.env['IS_WINDOWS']:
+    if bld.env['IS_MACOSX']:
+        clientlib.cnum = bld.env['JACK_API_VERSION']
+        clientlib.vnum = bld.env['JACK_VERSION']
+    elif not bld.env['IS_WINDOWS']:
         clientlib.vnum = bld.env['JACK_API_VERSION']
 
     if bld.env['IS_LINUX']:
@@ -304,7 +307,10 @@ def build(bld):
             '../windows/JackNetWinSocket.cpp',
             ]
 
-    if not bld.env['IS_WINDOWS']:
+    if bld.env['IS_MACOSX']:
+        serverlib.cnum = bld.env['JACK_API_VERSION']
+        serverlib.vnum = bld.env['JACK_VERSION']
+    elif not bld.env['IS_WINDOWS']:
         serverlib.vnum = bld.env['JACK_API_VERSION']
 
     if bld.env['IS_LINUX']:
@@ -366,7 +372,10 @@ def build(bld):
         if bld.env['IS_WINDOWS']:
             netlib.source += ['../windows/JackNetWinSocket.cpp','../windows/JackWinThread.cpp', '../windows/JackMMCSS.cpp', '../windows/JackWinTime.c']
 
-        if not bld.env['IS_WINDOWS']:
+        if bld.env['IS_MACOSX']:
+            netlib.cnum = bld.env['JACK_API_VERSION']
+            netlib.vnum = bld.env['JACK_VERSION']
+        elif not bld.env['IS_WINDOWS']:
             netlib.vnum = bld.env['JACK_API_VERSION']
 
     create_jack_process_obj(bld, 'netmanager', 'JackNetManager.cpp', serverlib)
