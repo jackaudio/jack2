@@ -13,7 +13,7 @@ from waflib.Build import BuildContext, CleanContext, InstallContext, UninstallCo
 
 VERSION='1.9.16'
 APPNAME='jack'
-JACK_API_VERSION = '1.0.0'
+JACK_API_VERSION = '0.1.0'
 
 # these variables are mandatory ('/' are converted automatically)
 top = '.'
