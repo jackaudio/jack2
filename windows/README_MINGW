@@ -4,6 +4,7 @@ HOW TO COMPILE JACK USING WAF AND MINGW
 Rev. 1 - 2019-09-01 - First version
 Rev. 2 - 2019-09-18 - Include contributions from @Schroedingers-Cat
 Rev. 3 - 2019-12-14 - Include contributions from @Schroedingers-Cat
+Rev. 4 - 2020-07-13 - Include contributions from @HaHeho
 
 
 
@@ -90,6 +91,9 @@ Make sure gcc runs and it is the expected version:
 $ gcc --version
 gcc.exe (x86_64-posix-sjlj-rev0, Built by MinGW-W64 project) {version}
 
+In case gcc is not recognized in the step before, add mingw64 directory to PATH
+
+export PATH=/mingw64/bin:$PATH
 
 
 Preparing JACK dependencies
@@ -123,7 +127,18 @@ libsystre depends on libtre-git. libsystre is a wrapper around libtre that
 allows including <regex.h> later.
 
 Some libraries like libsndfile and libsamplerate will ask for installing extra
-dependencies, it is ok to do so.
+dependencies, it is ok to do so. The build processes seem to be slow or even
+freeze occasionally probably due to Windows Defender real-time protection. In
+case of a halt simply interrupt and restart the respective build command.
+
+Here is the list of libraries to build (see remarks for portaudio below):
+
+db
+libsndfile
+libsamplerate
+libtre-git
+libsystre
+portaudio
 
 For low latency audio it is recommended to build portaudio with ASIO support, so
 the Steinberg ASIO SDK should be manually downloaded beforehand. It can be found
@@ -136,48 +151,59 @@ mkdir /opt   <- MinGW does not create /opt during installation
 mv /tmp/asiosdk_{version}_{date} /opt/asiosdk
 
 The description file in portaudio (MINGW-packages/mingw-w64-portaudio/PKGBUILD)
-needs to be patched so configure is called with the necessary flags for ASIO:
+needs to be patched so configure is called with the necessary flags and
+modifications for a successful build with ASIO. Both static and shared library
+versions of portaudio are built.
 
---with-asiodir=/opt/asiosdk   <- new option     
---with-winapi=wmme,directx,wasapi,vdmks,asio   <- append 'asio' to existing
+Replace the last line in the respective static and shared configure calls by:
 
-Both static and shared library versions of portaudio are built. To prevent
-errors while building the shared version or recompiling static, also insert the
-following lines in PKGBUILD after the first make call (around line 60) and after
-second make (around line 70):
+	--with-asiodir=/opt/asiosdk \
+    --with-winapi=wmme,directx,wasapi,wdmks,asio
 
-find /opt/asiosdk -name "*.lo" -type f -delete
-find /opt/asiosdk -name "*.o" -type f -delete
+To prevent errors while building the shared version or recompiling static, also
+insert the following lines in MINGW-packages/mingw-w64-portaudio/PKGBUILD before
+the first make call (around line 59) and before the second make call (around
+line 75):
 
-Finally here is the list of libraries to build:
-
-db
-libsndfile
-libsamplerate
-libtre-git
-libsystre
-portaudio
+  find /opt/asiosdk -name "*.o" -type f -delete
+  find /opt/asiosdk -name "*.lo" -type f -delete
 
 
 
 Compiling JACK
 --------------
 
-- Clone repo
+Clone repo:
 
+cd ~
 git clone https://github.com/jackaudio/jack2
 
-- Build and install
+Configure build (including the pre-built libraries in order to receive a warning
+if they are not recognized):
 
 cd jack2
-./waf configure --prefix=/opt/jack && ./waf -p install
+./waf configure --prefix=/opt/jack --portaudio --samplerate --sndfile --db
+
+In case the pre-built libraries are not recognized in the step before, add
+mingw64 directory to PKG_CONFIG_PATH:
+
+export PKG_CONFIG_PATH=/mingw64/lib/pkgconfig:$PKG_CONFIG_PATH
+
+Build and install:
+
+./waf -p install
 
 The resulting files can be found at /c/opt/jack/bin, or C:\msys64\opt\jack\bin
 
 
 
-Compiling JackRouter
---------------------
+Compiling JackRouter (optional)
+-------------------------------
+
+JackRouter allows non-JACK applications to connect to the server through a
+special ASIO driver that routes audio to JACK instead of a physical audio
+device. Therefore, this is an optional component if you only want to use
+JACK-native application.
 
 Visual Studio with MFC support is needed to build the included JackRouter VS
 project. The project was tested to successfully generate a 64bit version of
@@ -198,64 +224,102 @@ Differences from the original JackRouter.vcxproj:
 
 
 
-Running and distributing
-------------------------
+Distributing JACK
+-----------------
 
 An automated installation process should copy files to two destinations. One for
 the JACK server binary and standalone tools, and another for the client library.
 The latter is needed by JACK enabled applications in order to be able to connect
 to the server.
 
-- Create a directory named C:\Program Files\Jack (can be anything else)
-- Copy all files in C:\msys64\opt\jack\bin to C:\Program Files\Jack
+- Open an elevated (admin rights) Windows Power Shell (alternatively you can
+perform the steps in Windows Explorer or Windows Command Prompt with different
+commands):
+
+- Create a target directory (can be anything else)
+
+mkdir 'C:\Program Files\Jack'
+
+- Copy all files in C:\msys64\opt\jack\bin to target directory
+
+cp C:\msys64\opt\jack\bin\* 'C:\Program Files\Jack'
+
+- Add JACK executables to path
+
+$env:Path += ';C:\Program Files\Jack'
+
 - Copy the following DLLs from C:\msys64\mingw64\bin to C:\Program Files\Jack,
 these are dependencies for the JACK server and tools:
 
-libstdc++-6.dll
-libdb-6.0.dll
-libsndfile-1.dll
-libsamplerate-0.dll
-libportaudio-2.dll
-libgcc_s_sjlj-1.dll
-libwinpthread-1.dll
-libtre-5.dll
-libsystre-0.dll
+cp C:\msys64\mingw64\bin\libdb-6.0.dll `
+  , C:\msys64\mingw64\bin\libgcc_s_sjlj-1.dll `
+  , C:\msys64\mingw64\bin\libportaudio-2.dll `
+  , C:\msys64\mingw64\bin\libsamplerate-0.dll `
+  , C:\msys64\mingw64\bin\libsndfile-1.dll `
+  , C:\msys64\mingw64\bin\libstdc++-6.dll `
+  , C:\msys64\mingw64\bin\libsystre-0.dll `
+  , C:\msys64\mingw64\bin\libtre-5.dll `
+  , C:\msys64\mingw64\bin\libwinpthread-1.dll `
+  'C:\Program Files\Jack'
 
-- Copy and rename the following files from C:\msys64\opt\jack\bin to C:\Windows
-to make libjack available to clients:
+- Copy the following files from C:\msys64\opt\jack\lib to C:\Windows to make
+libjack available to clients:
 
-libjackserver-0.dll   -> libjackserver64.dll
-libjack-0.dll         -> libjack64.dll
+cp C:\msys64\opt\jack\lib\libjack64.dll `
+  , C:\msys64\opt\jack\lib\libjackserver64.dll `
+  C:\Windows
 
 - Copy the following files from C:\msys64\mingw64\bin to C:\Windows, these are
 dependencies for libjack. C:\Windows is the directory the current official JACK
 1.9.11 binary installer targets, a better solution should be devised to avoid
 cluttering the Windows directory:
 
-libgcc_s_sjlj-1.dll
-libwinpthread-1.dll
-libtre-5.dll
-libsystre-0.dll
+cp C:\msys64\mingw64\bin\libgcc_s_sjlj-1.dll `
+  , C:\msys64\mingw64\bin\libsystre-0.dll `
+  , C:\msys64\mingw64\bin\libtre-5.dll `
+  , C:\msys64\mingw64\bin\libwinpthread-1.dll `
+  C:\Windows
+
+- Copy all dll files from C:\msys64\opt\jack\lib\jack to C:\Windows\jack, these
+are dependencies for libjack:
+
+cp C:\msys64\opt\jack\lib\jack\*.dll C:\Windows\jack
+
+- Start a new Windows Command Prompt or Windows Power Shell session an check if
+the JACK server is recognized (this should not start the JACK server but display
+the list of available PortAudio devices):
+
+jackd -d portaudio --list-devices
+
+
+
+Distributing JackRouter (optional)
+----------------------------------
+
+In case you have built JackRouter.
 
 - Copy JackRouter.dll from windows\JackRouter\Release64 to C:\Program Files\Jack
-This allows non-JACK applications to connect to the server through a special
-ASIO driver that routes audio to JACK instead of a physical audio device.
-Also copy libjack-0.dll from C:\msys64\mingw64\bin to C:\Program Files\Jack
-because JackRouter depends on libjack but will check for libjack-0.dll instead
-of the system-wide libjack64.dll previously copied to C:\Windows. Once done,
-JackRouter needs to be registered:
+- Copy libjack-0.dll from C:\msys64\mingw64\bin to C:\Program Files\Jack, since
+JackRouter depends on libjack but will check for libjack-0.dll instead of the
+system-wide libjack64.dll previously copied to C:\Windows. Once done, JackRouter
+needs to be registered:
 
 regsvr32 JackRouter.dll
 
-Tested working clients:
-Ardour
-Bitwig Studio
-QJackCtl
-JackRouter
+
+
+Running JACK
+------------
 
 Example of starting the JACK server including MIDI support for a Focusrite USB
 audio device using ASIO:
 jackd -R -S -X winmme -d portaudio -p 32 -r 48000 -d "ASIO::Focusrite USB ASIO"
+
+Tested working clients:
+Ardour
+Bitwig Studio
+JackRouter
+QJackCtl
 
 
 
