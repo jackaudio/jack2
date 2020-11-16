@@ -29,6 +29,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <syscall.h>
 #include <linux/futex.h>
 
+#if !defined(SYS_futex) && defined(SYS_futex_time64)
+#define SYS_futex SYS_futex_time64
+#endif
+
 namespace Jack
 {
 
@@ -67,7 +71,7 @@ bool JackLinuxFutex::Signal()
         if (! fFutex->internal) return true;
     }
 
-    ::syscall(__NR_futex, fFutex, fFutex->internal ? FUTEX_WAKE_PRIVATE : FUTEX_WAKE, 1, NULL, NULL, 0);
+    ::syscall(SYS_futex, fFutex, fFutex->internal ? FUTEX_WAKE_PRIVATE : FUTEX_WAKE, 1, NULL, NULL, 0);
     return true;
 }
 
@@ -94,7 +98,7 @@ bool JackLinuxFutex::Wait()
         if (__sync_bool_compare_and_swap(&fFutex->futex, 1, 0))
             return true;
 
-        if (::syscall(__NR_futex, fFutex, fFutex->internal ? FUTEX_WAIT_PRIVATE : FUTEX_WAIT, 0, NULL, NULL, 0) != 0 && errno != EWOULDBLOCK)
+        if (::syscall(SYS_futex, fFutex, fFutex->internal ? FUTEX_WAIT_PRIVATE : FUTEX_WAIT, 0, NULL, NULL, 0) != 0 && errno != EWOULDBLOCK)
             return false;
     }
 }
@@ -122,7 +126,7 @@ bool JackLinuxFutex::TimedWait(long usec)
         if (__sync_bool_compare_and_swap(&fFutex->futex, 1, 0))
             return true;
 
-        if (::syscall(__NR_futex, fFutex, fFutex->internal ? FUTEX_WAIT_PRIVATE : FUTEX_WAIT, 0, &timeout, NULL, 0) != 0 && errno != EWOULDBLOCK)
+        if (::syscall(SYS_futex, fFutex, fFutex->internal ? FUTEX_WAIT_PRIVATE : FUTEX_WAIT, 0, &timeout, NULL, 0) != 0 && errno != EWOULDBLOCK)
             return false;
     }
 }
