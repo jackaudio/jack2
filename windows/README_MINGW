@@ -1,24 +1,31 @@
-HOW TO COMPILE JACK USING WAF AND MINGW
-=======================================
+HOW TO COMPILE JACK ON WINDOWS/MINGW
+====================================
 
 Rev. 1 - 2019-09-01 - First version
 Rev. 2 - 2019-09-18 - Include contributions from @Schroedingers-Cat
 Rev. 3 - 2019-12-14 - Include contributions from @Schroedingers-Cat
-
+Rev. 4 - 2020-11-27 - Rename, update intro and JackRouter build instructions
 
 
 Introduction
 ------------
 
-This guide contains detailed instructions for building JACK on a modern MinGW
-installation. It was conceived as the starting point for unifying the JACK build
-process across all platforms.
+This guide was originally called "How to compile JACK using WAF and MinGW"
+and later renamed to "How to compile JACK on Windows/MinGW" to avoid confusion
+with the official way of building JACK for Windows, which is cross-compiling
+on Linux. That should be considered the only officially supported method now.
 
-As this is work in progress, there are still a couple of caveats:
+Latest binary releases can be found here: https://jackaudio.org/downloads/
+JackRouter here: https://github.com/jackaudio/jack-router/tree/main/binaries
 
-- Asynchronous mode is unusable with low latencies
-- JackRouter still builds using a Visual Studio project
-- Lots of real world testing is needed
+JACK is primarily targeted at Unix systems and thus the required toolchain is
+Unix-centric. So the majority of the guide is actually about setting up the
+required build tools. Once done, the build process itself does not differ much
+from that found on other platforms.
+
+The information here can be of interest to anyone wishing to contribute to the
+development of Windows specific code in JACK, and wants to avoid double booting,
+VMs, etc. That can be particularly helpful when it comes to debug or testing.
 
 
 
@@ -179,27 +186,37 @@ The resulting files can be found at /c/opt/jack/bin, or C:\msys64\opt\jack\bin
 Compiling JackRouter
 --------------------
 
+Source code for JackRouter is not considered part of JACK anymore so you need to
+clone an additional repository:
+
+git clone https://github.com/jackaudio/jack-router
+
 Visual Studio with MFC support is needed to build the included JackRouter VS
 project. The project was tested to successfully generate a 64bit version of
 JackRouter.dll using Visual Studio 2017 and 2019. MFC support can be added from
 the VS installer, by selecting Workloads/Visual C++ build tools/Visual C++ MFC
-for x86 and x64 (valid for VS 2017). Once ready, just open and build the project
+for x86 and x64 (valid for VS 2017).
 
-windows/JackRouter/JackRouter_MinGW_deps.vcxproj
+Once ready, just open and build the project
 
-Differences from the original JackRouter.vcxproj:
+win/JackRouter.sln
 
-- Depends on the asiosdk files from the previous MinGW JACK installation (i.e.,
-  it points to absolute paths starting with C:\msys64\opt)
-- Links to the jack.dll.a created by the previous build, instead of libjack.lib
-  This means JackRouter.dll will currently depend on libjack-0.dll
-- Force includes stdint.h and defines _STDINT_H to avoid int8_t, int32_t and
-  uint32_t basic types redefinition during compilation
+Notes:
+
+- The project assumes the needed ASIO SDK is located in C:\Program Files\asiosdk
+  you can simply copy the SDK from the MinGW JACK installation, i.e. from
+  C:\msys64\opt to C:\Program Files
+- Links against C:\Program Files\JACK2\lib\libjack64.dll.a which is the libjack
+  version installed by the official installer. You will have to update that path
+  so it points to the jack.dll.a created by the MinGW build instead.
 
 
 
 Running and distributing
 ------------------------
+
+!! This section is kept for historical reasons. The official JACK for Windows
+build method includes the necessary steps to create a installer. !!
 
 An automated installation process should copy files to two destinations. One for
 the JACK server binary and standalone tools, and another for the client library.
