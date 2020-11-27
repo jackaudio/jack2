@@ -191,6 +191,7 @@ def detect_platform(conf):
     platforms = [
         # ('KEY, 'Human readable name', ['strings', 'to', 'check', 'for'])
         ('IS_LINUX',   'Linux',   ['gnu0', 'gnukfreebsd', 'linux', 'posix']),
+        ('IS_FREEBSD', 'FreeBSD', ['freebsd']),
         ('IS_MACOSX',  'MacOS X', ['darwin']),
         ('IS_SUN',     'SunOS',   ['sunos']),
         ('IS_WINDOWS', 'Windows', ['cygwin', 'msys', 'win32'])
@@ -229,6 +230,10 @@ def configure(conf):
     conf.env.append_unique('CFLAGS', '-Wall')
     conf.env.append_unique('CXXFLAGS', ['-Wall', '-Wno-invalid-offsetof'])
     conf.env.append_unique('CXXFLAGS', '-std=gnu++11')
+
+    if conf.env['IS_FREEBSD']:
+        conf.check(lib='execinfo', uselib='EXECINFO', define_name='EXECINFO')
+        conf.check_cfg(package='libsysinfo', args='--cflags --libs')
 
     if not conf.env['IS_MACOSX']:
         conf.env.append_unique('LDFLAGS', '-Wl,--no-undefined')
@@ -524,6 +529,9 @@ def obj_add_includes(bld, obj):
     if bld.env['IS_LINUX']:
         obj.includes += ['linux', 'posix']
 
+    if bld.env['IS_FREEBSD']:
+        obj.includes += ['freebsd', 'posix']
+
     if bld.env['IS_MACOSX']:
         obj.includes += ['macosx', 'posix']
 
@@ -550,6 +558,9 @@ def build_jackd(bld):
 
     if bld.env['IS_LINUX']:
         jackd.use += ['DL', 'M', 'PTHREAD', 'RT', 'STDC++']
+
+    if bld.env['IS_FREEBSD']:
+        jackd.use += ['M', 'PTHREAD']
 
     if bld.env['IS_MACOSX']:
         jackd.use += ['DL', 'PTHREAD']
@@ -768,7 +779,7 @@ def build_drivers(bld):
             use = ['serverlib'], # FIXME: Is this needed?
             framework = ['AudioUnit', 'CoreMIDI', 'CoreServices', 'Foundation'])
 
-    if bld.env['IS_SUN']:
+    if bld.env['IS_SUN'] or bld.env['IS_FREEBSD']:
         create_driver_obj(
             bld,
             target = 'boomer',
@@ -819,7 +830,7 @@ def build(bld):
     bld.recurse('example-clients')
     bld.recurse('tools')
 
-    if bld.env['IS_LINUX']:
+    if bld.env['IS_LINUX'] or bld.env['IS_FREEBSD']:
         bld.recurse('man')
         bld.recurse('systemd')
     if not bld.env['IS_WINDOWS']:
