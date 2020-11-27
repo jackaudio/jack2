@@ -31,6 +31,8 @@ def build(bld):
         os_incdir = ['../linux', '../posix']
     if bld.env['IS_MACOSX']:
         os_incdir = ['../macosx', '../posix']
+    if bld.env['IS_FREEBSD']:
+        os_incdir = ['../freebsd', '../posix']
     if bld.env['IS_SUN']:
         os_incdir = ['../solaris', '../posix']
     if bld.env['IS_WINDOWS']:
@@ -65,6 +67,8 @@ def build(bld):
             prog.use += ['RT', 'M']
         if bld.env['IS_SUN']:
             prog.use += ['M']
+        if bld.env['IS_FREEBSD']:
+            prog.use += ['M']
         if bld.env['IS_WINDOWS'] and bld.env['BUILD_STATIC']:
             prog.env['LIB_PTHREAD'] = [':libwinpthread.a']
         #prog.cflags = ['-Wno-deprecated-declarations', '-Wno-misleading-indentation']
@@ -81,6 +85,8 @@ def build(bld):
             prog.use += ['SNDFILE']
         if bld.env['IS_LINUX']:
             prog.use += ['RT', 'SNDFILE']
+        if bld.env['IS_FREEBSD']:
+            prog.use += ['SNDFILE']
         if bld.env['IS_SUN']:
             prog.use += ['RT', 'SNDFILE']
         if bld.env['IS_WINDOWS']:
