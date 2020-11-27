@@ -17,7 +17,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#define _POSIX_C_SOURCE 200112L
+// #define _POSIX_C_SOURCE 200112L
 
 #include "JackPosixSemaphore.h"
 #include "JackTools.h"
@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackError.h"
 #include <fcntl.h>
 #include <stdio.h>
+#include <ctype.h>
 #include <sys/time.h>
 #ifdef __linux__
 #include "promiscuous.h"
@@ -54,8 +55,8 @@ void JackPosixSemaphore::BuildName(const char* client_name, const char* server_n
 {
     char ext_client_name[SYNC_MAX_NAME_SIZE + 1];
     JackTools::RewriteName(client_name, ext_client_name);
-#if __APPLE__  // POSIX semaphore names are limited to 32 characters... 
-    snprintf(res, 32, "js_%s", ext_client_name); 
+#if __APPLE__  // POSIX semaphore names are limited to 32 characters...
+    snprintf(res, 32, "js_%s", ext_client_name);
 #else
     if (fPromiscuous) {
         snprintf(res, size, JACK_SEM_PREFIX ".%s_%s", server_name, ext_client_name);
