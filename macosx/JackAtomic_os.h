@@ -48,9 +48,7 @@ static inline int CAS(register UInt32 value, register UInt32 newvalue, register 
     return result;
 }
 
-#endif
-
-#if defined(__i386__) || defined(__x86_64__)
+#elif defined(__i386__) || defined(__x86_64__)
 
 #define LOCK "lock ; "
 
@@ -65,6 +63,13 @@ static inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void* ad
         : "c" (addr), "d" (newvalue), "a" (value)
         );
     return ret;
+}
+
+#else
+
+static inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void* addr)
+{
+    return __sync_bool_compare_and_swap ((UInt32*)addr, value, newvalue);
 }
 
 #endif
