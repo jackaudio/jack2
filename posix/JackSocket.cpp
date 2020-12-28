@@ -132,7 +132,7 @@ int JackClientSocket::Connect(const char* dir, const char* name, int which) // A
 
     addr.sun_family = AF_UNIX;
     BuildName(name, addr.sun_path, dir, which, sizeof(addr.sun_path), fPromiscuous);
-    jack_log("JackClientSocket::Connect : addr.sun_path %s", addr.sun_path);
+    jack_log("JackClientSocket::Connect : addr.sun_path %s (fd %d)", addr.sun_path, fSocket);
 
     if (connect(fSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
         jack_error("Cannot connect to server socket err = %s", strerror(errno));
@@ -166,6 +166,8 @@ int JackClientSocket::Close()
 
 int JackClientSocket::Read(void* data, int len)
 {
+    int pos = 0;
+    uint8_t* buffer = (uint8_t*)data;
     int res;
 
 #if defined(__sun__) || defined(sun)
@@ -193,25 +195,31 @@ int JackClientSocket::Read(void* data, int len)
     }
 #endif
 
-    if ((res = read(fSocket, data, len)) != len) {
-        if (errno == EWOULDBLOCK || errno == EAGAIN) {
-            jack_error("JackClientSocket::Read time out");
-            return 0;  // For a non blocking socket, a read failure is not considered as an error
-        } else if (res != 0) {
-            jack_error("Cannot read socket fd = %d err = %s", fSocket, strerror(errno));
-            //return 0;
-            return -1;
-        } else {
-            jack_error("Cannot read socket fd = %d err = %s", fSocket, strerror(errno));
+    while ((res = read(fSocket, &buffer[pos], len)) != len) {
+        if (res < 0) {
+            if (errno == EWOULDBLOCK || errno == EAGAIN) {
+                jack_error("JackClientSocket::Read time out on socket fd = %d", fSocket);
+                return 0;  // For a non blocking socket, a read failure is not considered as an error
+            } else {
+                jack_error("Cannot read socket fd = %d err = %s", fSocket, strerror(errno));
+                return -1;
+            }
+        } else if (res == 0) {
+            jack_error("Cannot read socket fd = %d err = connection closed", fSocket);
             return -1;
         }
-    } else {
-        return 0;
+
+        pos += res;
+        len -= res;
     }
+
+    return 0;
 }
 
 int JackClientSocket::Write(void* data, int len)
 {
+    int pos = 0;
+    uint8_t* buffer = (uint8_t*)data;
     int res;
 
 #if defined(__sun__) || defined(sun)
@@ -239,21 +247,25 @@ int JackClientSocket::Write(void* data, int len)
    }
 #endif
 
-    if ((res = write(fSocket, data, len)) != len) {
-        if (errno == EWOULDBLOCK || errno == EAGAIN) {
-            jack_log("JackClientSocket::Write time out");
-            return 0;  // For a non blocking socket, a write failure is not considered as an error
-        } else if (res != 0) {
-            jack_error("Cannot write socket fd = %ld err = %s", fSocket, strerror(errno));
-            //return 0;
-            return -1;
-        } else {
-            jack_error("Cannot write socket fd = %ld err = %s", fSocket, strerror(errno));
+    while ((res = write(fSocket, &buffer[pos], len)) != len) {
+        if (res < 0) {
+            if (errno == EWOULDBLOCK || errno == EAGAIN) {
+                jack_log("JackClientSocket::Write time out on socket fd = %d", fSocket);
+                return 0;  // For a non blocking socket, a write failure is not considered as an error
+            } else {
+                jack_error("Cannot write socket fd = %ld err = %s", fSocket, strerror(errno));
+                return -1;
+            }
+        } else if (res == 0) {
+            jack_error("Cannot write socket fd = %ld err = connection closed", fSocket);
             return -1;
         }
-    } else {
-        return 0;
+
+        pos += res;
+        len -= res;
     }
+
+    return 0;
 }
 
 JackServerSocket::JackServerSocket(): fSocket( -1)

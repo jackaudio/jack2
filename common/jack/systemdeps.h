@@ -20,10 +20,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __jack_systemdeps_h__
 #define __jack_systemdeps_h__
 
-#ifndef POST_PACKED_STRUCTURE
+#ifndef POST_PACKED_STRUCTURE_ALWAYS
 
     #ifdef __GNUC__
-        /* POST_PACKED_STRUCTURE needs to be a macro which
+        /* POST_PACKED_STRUCTURE_ALWAYS needs to be a macro which
            expands into a compiler directive. The directive must
            tell the compiler to arrange the preceding structure
            declaration so that it is packed on byte-boundaries rather 
@@ -31,27 +31,27 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
            compiler.
         */
 
-        #define PRE_PACKED_STRUCTURE
-        #define POST_PACKED_STRUCTURE __attribute__((__packed__))
+        #define PRE_PACKED_STRUCTURE_ALWAYS
+        #define POST_PACKED_STRUCTURE_ALWAYS __attribute__((__packed__))
 
     #else
     
         #ifdef _MSC_VER
-            #define PRE_PACKED_STRUCTURE1 __pragma(pack(push,1))
-            #define PRE_PACKED_STRUCTURE    PRE_PACKED_STRUCTURE1
-            /* PRE_PACKED_STRUCTURE needs to be a macro which
+            #define PRE_PACKED_STRUCTURE_ALWAYS1 __pragma(pack(push,1))
+            #define PRE_PACKED_STRUCTURE_ALWAYS    PRE_PACKED_STRUCTURE_ALWAYS1
+            /* PRE_PACKED_STRUCTURE_ALWAYS needs to be a macro which
             expands into a compiler directive. The directive must
             tell the compiler to arrange the following structure
             declaration so that it is packed on byte-boundaries rather
             than use the natural alignment of the processor and/or
             compiler.
             */
-            #define POST_PACKED_STRUCTURE ;__pragma(pack(pop))
-            /* and POST_PACKED_STRUCTURE needs to be a macro which
+            #define POST_PACKED_STRUCTURE_ALWAYS ;__pragma(pack(pop))
+            /* and POST_PACKED_STRUCTURE_ALWAYS needs to be a macro which
             restores the packing to its previous setting */
         #else
-            #define PRE_PACKED_STRUCTURE
-            #define POST_PACKED_STRUCTURE
+            #define PRE_PACKED_STRUCTURE_ALWAYS
+            #define POST_PACKED_STRUCTURE_ALWAYS
         #endif /* _MSC_VER */
 
     #endif /* __GNUC__ */
@@ -125,9 +125,12 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif /* __APPLE__ || __linux__ || __sun__ || sun */
 
 #if defined(__arm__) || defined(__aarch64__) || defined(__mips__) || defined(__ppc__) || defined(__powerpc__)
-    #undef POST_PACKED_STRUCTURE
+    #define PRE_PACKED_STRUCTURE
     #define POST_PACKED_STRUCTURE
-#endif /* __arm__ || __aarch64__ || __ppc__ || __powerpc__ */
+#else
+    #define PRE_PACKED_STRUCTURE PRE_PACKED_STRUCTURE_ALWAYS
+    #define POST_PACKED_STRUCTURE POST_PACKED_STRUCTURE_ALWAYS
+#endif /* __arm__ || __aarch64__ || __mips__ || __ppc__ || __powerpc__ */
 
 /** define JACK_LIB_EXPORT, useful for internal clients */
 #if defined(_WIN32)

@@ -128,7 +128,7 @@ int JackSocketServerChannel::GetFd(JackClientSocket* socket_aux)
 void JackSocketServerChannel::ClientAdd(detail::JackChannelTransactionInterface* socket_aux, JackClientOpenRequest* req, JackClientOpenResult *res)
 {
     int refnum = -1;
-    res->fResult = fServer->GetEngine()->ClientExternalOpen(req->fName, req->fPID, req->fUUID, &refnum, &res->fSharedEngine, &res->fSharedClient, &res->fSharedGraph);
+    res->fResult = fServer->GetEngine()->ClientExternalOpen(req->d.fName, req->d.fPID, req->d.fUUID, &refnum, &res->fSharedEngine, &res->fSharedClient, &res->fSharedGraph);
     if (res->fResult == 0) {
         JackClientSocket* socket = dynamic_cast<JackClientSocket*>(socket_aux);
         assert(socket);
@@ -235,14 +235,14 @@ bool JackSocketServerChannel::Execute()
                 } else if (fPollTable[i].revents & POLLIN) {
                     JackClientSocket* socket = fSocketTable[fd].second;
                     // Decode header
-                    JackRequest header;
-                    if (header.Read(socket) < 0) {
+                    JackRequest::RequestType type;
+                    if (JackRequest::ReadType(socket, type) < 0) {
                         jack_log("JackSocketServerChannel::Execute : cannot decode header");
                         ClientKill(fd);
                     // Decode request
                     } else {
                         // Result is not needed here
-                        fDecoder->HandleRequest(socket, header.fType);
+                        fDecoder->HandleRequest(socket, type);
                     }
                 }
             }

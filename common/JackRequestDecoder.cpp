@@ -31,8 +31,8 @@ namespace Jack
 {
 
 #define CheckRead(req, socket)          { if (req.Read(socket) <  0) { jack_error("CheckRead error"); return -1; } }
-#define CheckWriteName(error, socket)   { if (res.Write(socket) < 0) { jack_error("%s write error name = %s", error, req.fName); } }
-#define CheckWriteRefNum(error, socket) { if (res.Write(socket) < 0) { jack_error("%s write error ref = %d", error, req.fRefNum); } }
+#define CheckWriteName(error, socket)   { if (res.Write(socket) < 0) { jack_error("%s write error name = %s", error, req.d.fName); } }
+#define CheckWriteRefNum(error, socket) { if (res.Write(socket) < 0) { jack_error("%s write error ref = %d", error, req.d.fRefNum); } }
 #define CheckWrite(error, socket)       { if (res.Write(socket) < 0) { jack_error("%s write error", error); } }
 
 JackRequestDecoder::JackRequestDecoder(JackServer* server, JackClientHandlerInterface* handler)
@@ -54,13 +54,13 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackClientCheckRequest req;
             JackClientCheckResult res;
             CheckRead(req, socket);
-            res.fResult = fServer->GetEngine()->ClientCheck(req.fName, req.fUUID, res.fName, req.fProtocol, req.fOptions, &res.fStatus);
+            res.fResult = fServer->GetEngine()->ClientCheck(req.d.fName, req.d.fUUID, res.fName, req.d.fProtocol, req.d.fOptions, &res.fStatus);
             CheckWriteName("JackRequest::ClientCheck", socket);
             // Atomic ClientCheck followed by ClientOpen on same socket
-            if (req.fOpen) {
-                JackRequest header;
-                header.Read(socket);
-                return HandleRequest(socket, header.fType);
+            if (req.d.fOpen) {
+                JackRequest::RequestType type;
+                JackRequest::ReadType(socket, type);
+                return HandleRequest(socket, type);
             }
             break;
         }
@@ -80,9 +80,9 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackClientCloseRequest req;
             JackResult res;
             CheckRead(req, socket);
-            res.fResult = fServer->GetEngine()->ClientExternalClose(req.fRefNum);
+            res.fResult = fServer->GetEngine()->ClientExternalClose(req.d.fRefNum);
             CheckWriteRefNum("JackRequest::ClientClose", socket);
-            fHandler->ClientRemove(socket, req.fRefNum);
+            fHandler->ClientRemove(socket, req.d.fRefNum);
             // Will cause the wrapping thread to stop
             return -1;
         }
@@ -92,7 +92,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackResult res;
             jack_log("JackRequest::ActivateClient");
             CheckRead(req, socket);
-            res.fResult = fServer->GetEngine()->ClientActivate(req.fRefNum, req.fIsRealTime);
+            res.fResult = fServer->GetEngine()->ClientActivate(req.d.fRefNum, req.d.fIsRealTime);
             CheckWriteRefNum("JackRequest::ActivateClient", socket);
             break;
         }
@@ -102,7 +102,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackDeactivateRequest req;
             JackResult res;
             CheckRead(req, socket);
-            res.fResult = fServer->GetEngine()->ClientDeactivate(req.fRefNum);
+            res.fResult = fServer->GetEngine()->ClientDeactivate(req.d.fRefNum);
             CheckWriteRefNum("JackRequest::DeactivateClient", socket);
             break;
         }
@@ -112,7 +112,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackPortRegisterRequest req;
             JackPortRegisterResult res;
             CheckRead(req, socket);
-            res.fResult = fServer->GetEngine()->PortRegister(req.fRefNum, req.fName, req.fPortType, req.fFlags, req.fBufferSize, &res.fPortIndex);
+            res.fResult = fServer->GetEngine()->PortRegister(req.d.fRefNum, req.d.fName, req.d.fPortType, req.d.fFlags, req.d.fBufferSize, &res.fPortIndex);
             CheckWriteRefNum("JackRequest::RegisterPort", socket);
             break;
         }
@@ -122,7 +122,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackPortUnRegisterRequest req;
             JackResult res;
             CheckRead(req, socket);
-            res.fResult = fServer->GetEngine()->PortUnRegister(req.fRefNum, req.fPortIndex);
+            res.fResult = fServer->GetEngine()->PortUnRegister(req.d.fRefNum, req.d.fPortIndex);
             CheckWriteRefNum("JackRequest::UnRegisterPort", socket);
             break;
         }
@@ -132,7 +132,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackPortConnectNameRequest req;
             JackResult res;
             CheckRead(req, socket);
-            res.fResult = fServer->GetEngine()->PortConnect(req.fRefNum, req.fSrc, req.fDst);
+            res.fResult = fServer->GetEngine()->PortConnect(req.d.fRefNum, req.d.fSrc, req.d.fDst);
             CheckWriteRefNum("JackRequest::ConnectNamePorts", socket);
             break;
         }
@@ -142,7 +142,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackPortDisconnectNameRequest req;
             JackResult res;
             CheckRead(req, socket);
-            res.fResult = fServer->GetEngine()->PortDisconnect(req.fRefNum, req.fSrc, req.fDst);
+            res.fResult = fServer->GetEngine()->PortDisconnect(req.d.fRefNum, req.d.fSrc, req.d.fDst);
             CheckWriteRefNum("JackRequest::DisconnectNamePorts", socket);
             break;
         }
@@ -152,7 +152,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackPortConnectRequest req;
             JackResult res;
             CheckRead(req, socket);
-            res.fResult = fServer->GetEngine()->PortConnect(req.fRefNum, req.fSrc, req.fDst);
+            res.fResult = fServer->GetEngine()->PortConnect(req.d.fRefNum, req.d.fSrc, req.d.fDst);
             CheckWriteRefNum("JackRequest::ConnectPorts", socket);
             break;
         }
@@ -162,7 +162,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackPortDisconnectRequest req;
             JackResult res;
             CheckRead(req, socket);
-            res.fResult = fServer->GetEngine()->PortDisconnect(req.fRefNum, req.fSrc, req.fDst);
+            res.fResult = fServer->GetEngine()->PortDisconnect(req.d.fRefNum, req.d.fSrc, req.d.fDst);
             CheckWriteRefNum("JackRequest::DisconnectPorts", socket);
             break;
         }
@@ -172,7 +172,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackPortRenameRequest req;
             JackResult res;
             CheckRead(req, socket);
-            res.fResult = fServer->GetEngine()->PortRename(req.fRefNum, req.fPort, req.fName);
+            res.fResult = fServer->GetEngine()->PortRename(req.d.fRefNum, req.d.fPort, req.d.fName);
             CheckWriteRefNum("JackRequest::PortRename", socket);
             break;
         }
@@ -182,7 +182,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackSetBufferSizeRequest req;
             JackResult res;
             CheckRead(req, socket);
-            res.fResult = fServer->SetBufferSize(req.fBufferSize);
+            res.fResult = fServer->SetBufferSize(req.d.fBufferSize);
             CheckWrite("JackRequest::SetBufferSize", socket);
             break;
         }
@@ -192,7 +192,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackSetFreeWheelRequest req;
             JackResult res;
             CheckRead(req, socket);
-            res.fResult = fServer->SetFreewheel(req.fOnOff);
+            res.fResult = fServer->SetFreewheel(req.d.fOnOff);
             CheckWrite("JackRequest::SetFreeWheel", socket);
             break;
         }
@@ -212,7 +212,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackReleaseTimebaseRequest req;
             JackResult res;
             CheckRead(req, socket);
-            res.fResult = fServer->ReleaseTimebase(req.fRefNum);
+            res.fResult = fServer->ReleaseTimebase(req.d.fRefNum);
             CheckWriteRefNum("JackRequest::ReleaseTimebase", socket);
             break;
         }
@@ -222,7 +222,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackSetTimebaseCallbackRequest req;
             JackResult res;
             CheckRead(req, socket);
-            res.fResult = fServer->SetTimebaseCallback(req.fRefNum, req.fConditionnal);
+            res.fResult = fServer->SetTimebaseCallback(req.d.fRefNum, req.d.fConditionnal);
             CheckWriteRefNum("JackRequest::SetTimebaseCallback", socket);
             break;
         }
@@ -232,7 +232,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackGetInternalClientNameRequest req;
             JackGetInternalClientNameResult res;
             CheckRead(req, socket);
-            res.fResult = fServer->GetEngine()->GetInternalClientName(req.fIntRefNum, res.fName);
+            res.fResult = fServer->GetEngine()->GetInternalClientName(req.d.fIntRefNum, res.fName);
             CheckWriteRefNum("JackRequest::GetInternalClientName", socket);
             break;
         }
@@ -242,7 +242,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackInternalClientHandleRequest req;
             JackInternalClientHandleResult res;
             CheckRead(req, socket);
-            res.fResult = fServer->GetEngine()->InternalClientHandle(req.fName, &res.fStatus, &res.fIntRefNum);
+            res.fResult = fServer->GetEngine()->InternalClientHandle(req.d.fName, &res.fStatus, &res.fIntRefNum);
             CheckWriteRefNum("JackRequest::InternalClientHandle", socket);
             break;
         }
@@ -252,7 +252,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackInternalClientLoadRequest req;
             JackInternalClientLoadResult res;
             CheckRead(req, socket);
-            res.fResult = fServer->InternalClientLoad1(req.fName, req.fDllName, req.fLoadInitName, req.fOptions, &res.fIntRefNum, req.fUUID, &res.fStatus);
+            res.fResult = fServer->InternalClientLoad1(req.d.fName, req.d.fDllName, req.d.fLoadInitName, req.d.fOptions, &res.fIntRefNum, req.d.fUUID, &res.fStatus);
             CheckWriteName("JackRequest::InternalClientLoad", socket);
             break;
         }
@@ -262,7 +262,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackInternalClientUnloadRequest req;
             JackInternalClientUnloadResult res;
             CheckRead(req, socket);
-            res.fResult = fServer->GetEngine()->InternalClientUnload(req.fIntRefNum, &res.fStatus);
+            res.fResult = fServer->GetEngine()->InternalClientUnload(req.d.fIntRefNum, &res.fStatus);
             CheckWriteRefNum("JackRequest::InternalClientUnload", socket);
             break;
         }
@@ -271,11 +271,11 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             jack_log("JackRequest::Notification");
             JackClientNotificationRequest req;
             CheckRead(req, socket);
-            if (req.fNotify == kQUIT) {
+            if (req.d.fNotify == kQUIT) {
                 jack_log("JackRequest::Notification kQUIT");
                 throw JackQuitException();
             } else {
-                fServer->Notify(req.fRefNum, req.fNotify, req.fValue);
+                fServer->Notify(req.d.fRefNum, req.d.fNotify, req.d.fValue);
             }
             break;
         }
@@ -284,7 +284,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             jack_log("JackRequest::SessionNotify");
             JackSessionNotifyRequest req;
             CheckRead(req, socket);
-            fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath, socket, NULL);
+            fServer->GetEngine()->SessionNotify(req.d.fRefNum, req.d.fDst, req.d.fEventType, req.d.fPath, socket, NULL);
             break;
         }
 
@@ -293,7 +293,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackSessionReplyRequest req;
             JackResult res;
             CheckRead(req, socket);
-            res.fResult = fServer->GetEngine()->SessionReply(req.fRefNum);
+            res.fResult = fServer->GetEngine()->SessionReply(req.d.fRefNum);
             CheckWrite("JackRequest::SessionReply", socket);
             break;
         }
@@ -303,7 +303,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackGetClientNameRequest req;
             JackClientNameResult res;
             CheckRead(req, socket);
-            res.fResult = fServer->GetEngine()->GetClientNameForUUID(req.fUUID, res.fName);
+            res.fResult = fServer->GetEngine()->GetClientNameForUUID(req.d.fUUID, res.fName);
             CheckWrite("JackRequest::GetClientByUUID", socket);
             break;
         }
@@ -313,7 +313,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackGetUUIDRequest req;
             JackUUIDResult res;
             CheckRead(req, socket);
-            res.fResult = fServer->GetEngine()->GetUUIDForClientName(req.fName, res.fUUID);
+            res.fResult = fServer->GetEngine()->GetUUIDForClientName(req.d.fName, res.fUUID);
             CheckWrite("JackRequest::GetUUIDByClient", socket);
             break;
         }
@@ -323,7 +323,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackReserveNameRequest req;
             JackResult res;
             CheckRead(req, socket);
-            res.fResult = fServer->GetEngine()->ReserveClientName(req.fName, req.fUUID);
+            res.fResult = fServer->GetEngine()->ReserveClientName(req.d.fName, req.d.fUUID);
             CheckWrite("JackRequest::ReserveClientName", socket);
             break;
         }
@@ -333,7 +333,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackClientHasSessionCallbackRequest req;
             JackResult res;
             CheckRead(req, socket);
-            res.fResult = fServer->GetEngine()->ClientHasSessionCallback(req.fName);
+            res.fResult = fServer->GetEngine()->ClientHasSessionCallback(req.d.fName);
             CheckWrite("JackRequest::ClientHasSessionCallback", socket);
             break;
         }
@@ -342,7 +342,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             jack_log("JackRequest::PropertyChangeNotify");
             JackPropertyChangeNotifyRequest req;
             CheckRead(req, socket);
-            fServer->GetEngine()->PropertyChangeNotify(req.fSubject, req.fKey, req.fChange);
+            fServer->GetEngine()->PropertyChangeNotify(req.d.fSubject, req.d.fKey, req.d.fChange);
             break;
         }
 

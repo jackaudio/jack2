@@ -60,13 +60,13 @@ void JackGenericClientChannel::ServerSyncCall(JackRequest* req, JackResult* res,
     }
     
     if (req->Write(fRequest) < 0) {
-        jack_error("Could not write request type = %ld", req->fType);
+        jack_error("Could not write request type = %ld", req->getType());
         *result = -1;
         return;
     }
 
     if (res->Read(fRequest) < 0) {
-        jack_error("Could not read result type = %ld", req->fType);
+        jack_error("Could not read result type = %ld", req->getType());
         *result = -1;
         return;
     }
@@ -90,7 +90,7 @@ void JackGenericClientChannel::ServerAsyncCall(JackRequest* req, JackResult* res
     }
     
     if (req->Write(fRequest) < 0) {
-        jack_error("Could not write request type = %ld", req->fType);
+        jack_error("Could not write request type = %ld", req->getType());
         *result = -1;
     } else {
         *result = 0;
