@@ -911,21 +911,21 @@ int JackCoreAudioAdapter::OpenAUHAL(bool capturing,
     }
 
     // AUHAL
-#ifdef MAC_OS_X_VERSION_10_5
-    ComponentDescription cd = {kAudioUnitType_Output, kAudioUnitSubType_HALOutput, kAudioUnitManufacturer_Apple, 0, 0};
-    Component HALOutput = FindNextComponent(NULL, &cd);
-    err1 = OpenAComponent(HALOutput, &fAUHAL);
-    if (err1 != noErr) {
-        jack_error("Error calling OpenAComponent");
-        printError(err1);
-        goto error;
-    }
-#else 
+#if (defined(MAC_OS_X_VERSION_10_5) && (MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_5))
     AudioComponentDescription cd = {kAudioUnitType_Output, kAudioUnitSubType_HALOutput, kAudioUnitManufacturer_Apple, 0, 0};
     AudioComponent HALOutput = AudioComponentFindNext(NULL, &cd);
     err1 = AudioComponentInstanceNew(HALOutput, &fAUHAL);
     if (err1 != noErr) {
         jack_error("Error calling AudioComponentInstanceNew");
+        printError(err1);
+        goto error;
+    }
+#else 
+    ComponentDescription cd = {kAudioUnitType_Output, kAudioUnitSubType_HALOutput, kAudioUnitManufacturer_Apple, 0, 0};
+    Component HALOutput = FindNextComponent(NULL, &cd);
+    err1 = OpenAComponent(HALOutput, &fAUHAL);
+    if (err1 != noErr) {
+        jack_error("Error calling OpenAComponent");
         printError(err1);
         goto error;
     }
