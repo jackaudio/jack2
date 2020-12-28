@@ -105,7 +105,12 @@ extern "C"
         shm_ANDROID = 4			/* Android shared memory */
     } jack_shmtype_t;
 
+#ifdef __APPLE__
+    /* we need to align and pack data to 32bit so that x86_64 and arm64 work together */
+    typedef int32_t jack_shm_registry_index_t;
+#else
     typedef int16_t jack_shm_registry_index_t;
+#endif
 
     /**
      * A structure holding information about shared memory allocated by
