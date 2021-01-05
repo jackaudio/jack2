@@ -1,6 +1,17 @@
 ChangeLog
 #########
 
+* 1.9.17 (2021-01-15)
+
+WIP!
+
+  * Add jack-router to Windows installer, opt-in
+  * Fix jack_control stopping after first command iteration
+  * Fix registry keys for Windows, add 32bit compat ones on 64bit
+  * Fix library compat/current version under macOS
+  * Support for arm64 macOS builds
+  * Update QjackCtl used in macOS/Windows installers to v0.9.0, with 1 commit cherry-picked from develop branch
+
 * 1.9.16 (2020-10-16)
 
   * Fix/revert a change in how meta-data definitions were exposed (regression in 1.9.15)
