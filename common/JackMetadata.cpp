@@ -123,9 +123,32 @@ int JackMetadata::PropertyInit()
 #endif
 
     if ((ret = fDBenv->open (fDBenv, dbpath, DB_CREATE | DB_INIT_LOCK | DB_INIT_MPOOL | DB_THREAD, 0)) != 0) {
-        jack_error ("cannot open DB environment: %s", db_strerror (ret));
-        fDBenv = NULL;
-        return -1;
+#ifdef WIN32
+        // new versions of jack2 are built with HAVE_MIXED_SIZE_ADDRESSING, which induces this error, this is expected
+        if (ret == DB_VERSION_MISMATCH) {
+            // cleanup old stuff
+            snprintf (dbpath, sizeof(dbpath), "%s/jack_db/metadata.db", fDBFilesDir);
+            remove (dbpath);
+
+            snprintf (dbpath, sizeof(dbpath), "%s/jack_db/__db.001", fDBFilesDir);
+            remove (dbpath);
+
+            snprintf (dbpath, sizeof(dbpath), "%s/jack_db/__db.002", fDBFilesDir);
+            remove (dbpath);
+
+            snprintf (dbpath, sizeof(dbpath), "%s/jack_db/__db.003", fDBFilesDir);
+            remove (dbpath);
+
+            // try again fresh
+            ret = fDBenv->open (fDBenv, dbpath, DB_CREATE | DB_INIT_LOCK | DB_INIT_MPOOL | DB_THREAD, 0);
+        }
+        if (ret != 0)
+#endif
+        {
+            jack_error ("cannot open DB environment: %s", db_strerror (ret));
+            fDBenv = NULL;
+            return -1;
+        }
     }
 
     if ((ret = db_create (&fDB, fDBenv, 0)) != 0) {
