@@ -211,8 +211,8 @@ extern "C"
         desc = jack_driver_descriptor_construct("audioadapter", JackDriverNone, "netjack audio <==> net backend adapter", &filler);
 
         value.ui = 0;
-        jack_driver_descriptor_add_parameter(desc, &filler, "in-channels", 'i', JackDriverParamInt, &value, NULL, "Maximum number of input channels", NULL);
-        jack_driver_descriptor_add_parameter(desc, &filler, "out-channels", 'o', JackDriverParamInt, &value, NULL, "Maximum number of output channels", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "in-channels", 'i', JackDriverParamUInt, &value, NULL, "Maximum number of input channels", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "out-channels", 'o', JackDriverParamUInt, &value, NULL, "Maximum number of output channels", NULL);
 
         jack_driver_descriptor_add_parameter(desc, &filler, "capture", 'C', JackDriverParamString, &value, NULL, "Provide capture ports. Optionally set PortAudio device name", NULL);
 
@@ -230,10 +230,10 @@ extern "C"
         jack_driver_descriptor_add_parameter(desc, &filler, "list-devices", 'l', JackDriverParamBool, &value, NULL, "Display available PortAudio devices", NULL);
 
         value.ui = 0;
-        jack_driver_descriptor_add_parameter(desc, &filler, "quality", 'q', JackDriverParamInt, &value, NULL, "Resample algorithm quality (0 - 4)", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "quality", 'q', JackDriverParamUInt, &value, NULL, "Resample algorithm quality (0 - 4)", NULL);
 
         value.ui = 32768;
-        jack_driver_descriptor_add_parameter(desc, &filler, "ring-buffer", 'g', JackDriverParamInt, &value, NULL, "Fixed ringbuffer size", "Fixed ringbuffer size (if not set => automatic adaptative)");
+        jack_driver_descriptor_add_parameter(desc, &filler, "ring-buffer", 'g', JackDriverParamUInt, &value, NULL, "Fixed ringbuffer size", "Fixed ringbuffer size (if not set => automatic adaptative)");
 
         return desc;
     }
