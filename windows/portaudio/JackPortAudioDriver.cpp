@@ -334,10 +334,6 @@ int JackPortAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
         goto error;
     }
 
-    // It seems that some ASIO drivers (like ASIO4All) needs this to restart correctly;
-    delete fPaDevices;
-    fPaDevices = new PortAudioDevices();
-
     err = OpenStream(buffer_size);
     if (err != paNoError) {
         jack_error("Pa_OpenStream error = %s", Pa_GetErrorText(err));
