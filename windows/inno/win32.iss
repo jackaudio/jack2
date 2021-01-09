@@ -26,31 +26,31 @@ Name: dev; Description: "Developer resources"; Types: full router;
 
 [Files]
 ; icon
-Source: "jack.ico"; DestDir: "{app}"; Components: jackserver;
+Source: "jack.ico"; DestDir: "{app}"; Components: jackserver; Flags: ignoreversion;
 ; jackd and server libs
-Source: "win32\bin\jackd.exe"; DestDir: "{app}"; Components: jackserver;
-Source: "win32\lib\libjacknet.dll"; DestDir: "{app}"; Components: jackserver;
-Source: "win32\lib\libjackserver.dll"; DestDir: "{app}"; Components: jackserver;
+Source: "win32\bin\jackd.exe"; DestDir: "{app}"; Components: jackserver; Flags: ignoreversion;
+Source: "win32\lib\libjacknet.dll"; DestDir: "{app}"; Components: jackserver; Flags: ignoreversion;
+Source: "win32\lib\libjackserver.dll"; DestDir: "{app}"; Components: jackserver; Flags: ignoreversion;
 ; drivers
-Source: "win32\lib\jack\*.dll"; DestDir: "{app}\jack"; Components: jackserver;
+Source: "win32\lib\jack\*.dll"; DestDir: "{app}\jack"; Components: jackserver; Flags: ignoreversion;
 ; tools
-Source: "win32\bin\jack_*.exe"; DestDir: "{app}\tools"; Components: jackserver;
+Source: "win32\bin\jack_*.exe"; DestDir: "{app}\tools"; Components: jackserver; Flags: ignoreversion;
 ; jack client lib (NOTE goes into windir)
-Source: "win32\lib\libjack.dll"; DestDir: "{win}"; Components: jackserver;
+Source: "win32\lib\libjack.dll"; DestDir: "{win}"; Components: jackserver; Flags: ignoreversion;
 ; qjackctl
-Source: "win32\bin\qjackctl.exe"; DestDir: "{app}\qjackctl"; Components: qjackctl;
-Source: "Qt5*.dll"; DestDir: "{app}\qjackctl"; Components: qjackctl;
-Source: "qwindows.dll"; DestDir: "{app}\qjackctl\platforms"; Components: qjackctl;
+Source: "win32\bin\qjackctl.exe"; DestDir: "{app}\qjackctl"; Components: qjackctl; Flags: ignoreversion;
+Source: "Qt5*.dll"; DestDir: "{app}\qjackctl"; Components: qjackctl; Flags: ignoreversion;
+Source: "qwindows.dll"; DestDir: "{app}\qjackctl\platforms"; Components: qjackctl; Flags: ignoreversion;
 ; dev
-Source: "win32\include\jack\*.h"; DestDir: "{app}\include\jack"; Components: dev;
-Source: "win32\lib\*.a"; DestDir: "{app}\lib"; Components: dev;
-Source: "win32\lib\*.def"; DestDir: "{app}\lib"; Components: dev;
-Source: "win32\lib\*.lib"; DestDir: "{app}\lib"; Components: dev;
-Source: "win32\lib\jack\*.a"; DestDir: "{app}\lib\jack"; Components: dev;
+Source: "win32\include\jack\*.h"; DestDir: "{app}\include\jack"; Components: dev; Flags: ignoreversion;
+Source: "win32\lib\*.a"; DestDir: "{app}\lib"; Components: dev; Flags: ignoreversion;
+Source: "win32\lib\*.def"; DestDir: "{app}\lib"; Components: dev; Flags: ignoreversion;
+Source: "win32\lib\*.lib"; DestDir: "{app}\lib"; Components: dev; Flags: ignoreversion;
+Source: "win32\lib\jack\*.a"; DestDir: "{app}\lib\jack"; Components: dev; Flags: ignoreversion;
 ; router
-Source: "win32\jack-router\README.txt"; DestDir: "{app}\jack-router"; Components: router;
-Source: "win32\jack-router\win32\JackRouter.dll"; DestDir: "{app}\jack-router\win32"; Components: router; Flags: regserver;
-Source: "win32\jack-router\win32\JackRouter.ini"; DestDir: "{app}\jack-router\win32"; Components: router;
+Source: "win32\jack-router\README.txt"; DestDir: "{app}\jack-router"; Components: router; Flags: ignoreversion;
+Source: "win32\jack-router\win32\JackRouter.dll"; DestDir: "{app}\jack-router\win32"; Components: router; Flags: ignoreversion regserver;
+Source: "win32\jack-router\win32\JackRouter.ini"; DestDir: "{app}\jack-router\win32"; Components: router; Flags: ignoreversion;
 
 [Icons]
 Name: "{commonprograms}\QjackCtl"; Filename: "{app}\qjackctl\qjackctl.exe"; IconFilename: "{app}\jack.ico"; WorkingDir: "{app}"; Comment: "Graphical Interface for JACK"; Components: qjackctl;
