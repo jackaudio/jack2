@@ -4,7 +4,6 @@ ChangeLog
 * 1.9.17 (2021-01-15)
 
   * Fix jack_control stopping after first command iteration
-  * Fix registry keys for Windows, add 32bit compat ones on 64bit
   * Fix library compat/current version under macOS
   * Fix return codes of jackd on success
   * Ignore DB_VERSION_MISMATCH error on windows, it is expected
@@ -12,6 +11,7 @@ ChangeLog
 
 External changes, related to macOS/Windows installer:
   * Add jack-router to Windows installer, opt-in
+  * Fix registry keys for Windows, add 32bit compat ones on 64bit
   * Support for arm64 macOS builds
   * Show welcome and license pages on windows installer
   * Update QjackCtl used in macOS/Windows installers to v0.9.0, with some commits cherry-picked from develop branch
