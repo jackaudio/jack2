@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackConstants.h"
 #include "JackError.h"
 #include "promiscuous.h"
+#include <climits>
 #include <fcntl.h>
 #include <stdio.h>
 #include <sys/mman.h>
@@ -98,13 +99,19 @@ bool JackLinuxFutex::Wait()
         if (__sync_bool_compare_and_swap(&fFutex->futex, 1, 0))
             return true;
 
-        if (::syscall(SYS_futex, fFutex, fFutex->internal ? FUTEX_WAIT_PRIVATE : FUTEX_WAIT, 0, NULL, NULL, 0) != 0 && errno != EWOULDBLOCK)
+        if (::syscall(SYS_futex, fFutex, fFutex->internal ? FUTEX_WAIT_PRIVATE : FUTEX_WAIT, 0, NULL, NULL, 0) == 0)
+            continue;
+
+        if (errno != EAGAIN && errno != EINTR)
             return false;
     }
 }
 
 bool JackLinuxFutex::TimedWait(long usec)
 {
+    if (usec == LONG_MAX)
+        return Wait();
+
     if (!fFutex) {
         jack_error("JackLinuxFutex::TimedWait name = %s already deallocated!!", fName);
         return false;

@@ -31,6 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <math.h>
 #include <string>
 #include <algorithm>
+#include <climits>
 
 using namespace std;
 
@@ -636,7 +637,7 @@ inline int JackClient::CallProcessCallback()
 inline bool JackClient::WaitSync()
 {
     // Suspend itself: wait on the input synchro
-    if (GetGraphManager()->SuspendRefNum(GetClientControl(), fSynchroTable, 0x7FFFFFFF) < 0) {
+    if (GetGraphManager()->SuspendRefNum(GetClientControl(), fSynchroTable, LONG_MAX) < 0) {
         jack_error("SuspendRefNum error");
         return false;
     } else {
