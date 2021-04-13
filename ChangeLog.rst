@@ -1,6 +1,10 @@
 ChangeLog
 #########
 
+* 1.9.18 (2021-04-15)
+
+  * Fix usage of meta-data in official macOS builds (private DB errors)
+
 * 1.9.17 (2021-01-15)
 
   * Fix jack_control stopping after first command iteration
