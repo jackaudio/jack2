@@ -238,13 +238,15 @@ public:
         double         t_del;
 
         if (parse_options (load_init)) {
-                jack_error (APPNAME ": parse options failed");
-                return 1;
+            jack_error (APPNAME ": parse options failed");
+            delete this;
+            return 1;
         }
 
         if (device == 0)
         {
             help ();
+            delete this;
             return 1;
         }
         if (rqual < 16) rqual = 16;
@@ -252,6 +254,7 @@ public:
         if ((fsamp < 8000) || (bsize < 16) || (nfrag < 2) || (nchan < 1))
         {
             jack_error (APPNAME ": Illegal parameter value(s).");
+            delete this;
             return 1;
         }
 
@@ -262,6 +265,7 @@ public:
         if (A->state ())
         {
             jack_error (APPNAME ": Can't open ALSA capture device '%s'.", device);
+            delete this;
             return 1;
         }
         if (v_opt) A->printinfo ();
@@ -314,8 +318,7 @@ int
 jack_initialize (jack_client_t* client, const char* load_init)
 {
 	zita_a2j *c = new zita_a2j();
-	c->jack_initialize(client, load_init);
-	return 0;
+	return c->jack_initialize(client, load_init);
 }
 
 void jack_finish (void* arg)
