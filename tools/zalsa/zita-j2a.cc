@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 // ----------------------------------------------------------------------------
-#include <iostream>
+
 
 #include <stdlib.h>
 #include <string.h>
@@ -26,28 +26,28 @@
 #include "alsathread.h"
 #include "jackclient.h"
 #include "lfqueue.h"
+#include "jack/control.h"
 
 static const char *clopt = "hvLSj:d:r:p:n:c:Q:O:";
 
 static void help (void)
 {
-    fprintf (stderr, "\n%s-%s\n", APPNAME, VERSION);
-    fprintf (stderr, "(C) 2012-2018 Fons Adriaensen  <fons@linuxaudio.org>\n");
-    fprintf (stderr, "Use ALSA playback device as a Jack client.\n\n");
-    fprintf (stderr, "Usage: %s <options>\n", APPNAME);
-    fprintf (stderr, "Options:\n");
-    fprintf (stderr, "  -h                 Display this text\n");
-    fprintf (stderr, "  -j <jackname>      Name as Jack client [%s]\n", APPNAME);
-    fprintf (stderr, "  -d <device>        ALSA playback device [none]\n");  
-    fprintf (stderr, "  -r <rate>          Sample rate [48000]\n");
-    fprintf (stderr, "  -p <period>        Period size [256]\n");   
-    fprintf (stderr, "  -n <nfrags>        Number of fragments [2]\n");   
-    fprintf (stderr, "  -c <nchannels>     Number of channels [2]\n");
-    fprintf (stderr, "  -S                 Word clock sync, no resampling\n");
-    fprintf (stderr, "  -Q <quality>       Resampling quality, 16..96 [auto]\n");
-    fprintf (stderr, "  -O <samples>       Latency adjustment [0]\n");
-    fprintf (stderr, "  -L                 Force 16-bit and 2 channels [off]\n");
-    fprintf (stderr, "  -v                 Print tracing information [off]\n");
+    jack_info ("%s-%s", APPNAME, VERSION);
+    jack_info ("(C) 2012-2018 Fons Adriaensen  <fons@linuxaudio.org>");
+    jack_info ("Use ALSA playback device as a Jack client.");
+    jack_info ("Options:");
+    jack_info ("  -h                 Display this text");
+    jack_info ("  -j <jackname>      Name as Jack client [%s]", APPNAME);
+    jack_info ("  -d <device>        ALSA playback device [none]");
+    jack_info ("  -r <rate>          Sample rate [48000]");
+    jack_info ("  -p <period>        Period size [256]");
+    jack_info ("  -n <nfrags>        Number of fragments [2]");
+    jack_info ("  -c <nchannels>     Number of channels [2]");
+    jack_info ("  -S                 Word clock sync, no resampling");
+    jack_info ("  -Q <quality>       Resampling quality, 16..96 [auto]");
+    jack_info ("  -O <samples>       Latency adjustment [0]");
+    jack_info ("  -L                 Force 16-bit and 2 channels [off]");
+    jack_info ("  -v                 Print tracing information [off]");
 }
 
 class zita_j2a
@@ -106,8 +106,8 @@ private:
         {
             if (optarg && (*optarg == '-'))
             {
-                fprintf (stderr, "  Missing argument for '-%c' option.\n", k); 
-                fprintf (stderr, "  Use '-h' to see all options.\n");
+                jack_error (APPNAME ":   Missing argument for '-%c' option.", k);
+                jack_error (APPNAME ":   Use '-h' to see all options.");
                 return 1;
             }
             switch (k)
@@ -127,17 +127,17 @@ private:
             case '?':
                 if (optopt != ':' && strchr (clopt, optopt))
                 {
-                    fprintf (stderr, "  Missing argument for '-%c' option.\n", optopt); 
+                    jack_error (APPNAME ":   Missing argument for '-%c' option.", optopt); 
                 }
                 else if (isprint (optopt))
                 {
-                    fprintf (stderr, "  Unknown option '-%c'.\n", optopt);
+                    jack_error (APPNAME ":   Unknown option '-%c'.", optopt);
                 }
                 else
                 {
-                    fprintf (stderr, "  Unknown option character '0x%02x'.\n", optopt & 255);
+                    jack_error (APPNAME ":   Unknown option character '0x%02x'.", optopt & 255);
                 }
-                fprintf (stderr, "  Use '-h' to see all options.\n");
+                jack_error (APPNAME ":   Use '-h' to see all options.");
                 return 1;
             default:
                 return 1;
@@ -198,18 +198,18 @@ private:
             J = infoq->rd_datap ();
             if (J->_state == Jackclient::TERM)
             {
-                printf ("Fatal error condition, terminating.\n");
+                jack_info (APPNAME ": Fatal error condition, terminating.");
                 stop = true;
                 return;
             }
             else if (J->_state == Jackclient::WAIT)
             {
-                printf ("Detected excessive timing errors, waiting 10 seconds.\n");
+                jack_info (APPNAME ": Detected excessive timing errors, waiting 10 seconds.");
                 n = 0;
             }
             else if (J->_state == Jackclient::SYNC0)
             {
-                printf ("Starting synchronisation.\n");
+                jack_info (APPNAME ": Starting synchronisation.");
             }
             else if (v_opt)
             {
@@ -220,7 +220,7 @@ private:
             }
             infoq->rd_commit ();
         }
-        if (n) printf ("%8.3lf %10.6lf %5d\n", e / n, r / n, k);
+        if (n) jack_info ("%8.3lf %10.6lf %5d", e / n, r / n, k);
     }
 
     Alsa_pcmi      *A;
@@ -249,7 +249,7 @@ public:
         if (rqual > 96) rqual = 96;
         if ((fsamp < 8000) || (bsize < 16) || (nfrag < 2) || (nchan < 1))
         {
-            fprintf (stderr, "Illegal parameter value(s).\n");
+            jack_error (APPNAME ": Illegal parameter value(s).");
             return 1;
         }
 
@@ -259,14 +259,14 @@ public:
         A = new Alsa_pcmi (device, 0, 0, fsamp, bsize, nfrag, opts);
         if (A->state ())
         {
-            fprintf (stderr, "Can't open ALSA playback device '%s'.\n", device);
+            jack_error (APPNAME ": Can't open ALSA playback device '%s'.", device);
             return 1;
         }
         if (v_opt) A->printinfo ();
         if (nchan > A->nplay ())
         {
             nchan = A->nplay ();
-            fprintf (stderr, "Warning: only %d channels are available.\n", nchan);
+            jack_error (APPNAME ": Warning: only %d channels are available.", nchan);
         }
         P = new Alsathread (A, Alsathread::PLAY);
         J = new Jackclient (client, 0, Jackclient::PLAY, nchan, S_opt, this);
