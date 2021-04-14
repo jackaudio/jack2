@@ -174,6 +174,11 @@ def options(opt):
             help='Use Berkeley DB (metadata)')
     db.check(header_name='db.h')
     db.check(lib='db')
+    zalsa = opt.add_auto_option(
+            'zalsa',
+            help='Build internal zita-a2j/j2a client')
+    zalsa.check(lib='zita-alsa-pcmi')
+    zalsa.check(lib='zita-resampler')
 
     # dbus options
     opt.recurse('dbus')
