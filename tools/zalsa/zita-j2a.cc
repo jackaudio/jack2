@@ -318,6 +318,7 @@ jack_initialize (jack_client_t* client, const char* load_init)
 
 void jack_finish (void* arg)
 {
+	if (!arg) return;
 	Jackclient *J = (Jackclient *)arg;
 	zita_j2a *c = (zita_j2a *)J->getarg();
 	c->jack_finish(arg);
