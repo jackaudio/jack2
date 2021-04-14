@@ -96,7 +96,7 @@ def build(bld):
         prog.install_path = '${ADDON_DIR}/'
         prog.includes = os_incdir + ['../common/jack', '../common', 'zalsa']
         prog.source = ['zalsa/zita-a2j.cc', 'zalsa/alsathread.cc', 'zalsa/jackclient.cc', 'zalsa/pxthread.cc', 'zalsa/lfqueue.cc']
-        prog.target = 'zita-a2j'
+        prog.target = 'zalsa_in'
         prog.use = ['ZITA-ALSA-PCMI', 'ZITA-RESAMPLER', 'ALSA', 'M', 'RT', 'serverlib']
         prog.env['cxxshlib_PATTERN'] = '%s.so'
 
@@ -105,7 +105,7 @@ def build(bld):
         prog.install_path = '${ADDON_DIR}/'
         prog.includes = os_incdir + ['../common/jack', '../common', 'zalsa']
         prog.source = ['zalsa/zita-j2a.cc', 'zalsa/alsathread.cc', 'zalsa/jackclient.cc', 'zalsa/pxthread.cc', 'zalsa/lfqueue.cc']
-        prog.target = 'zita-j2a'
+        prog.target = 'zalsa_out'
         prog.use = ['ZITA-ALSA-PCMI', 'ZITA-RESAMPLER', 'ALSA', 'M', 'RT', 'serverlib']
         prog.env['cxxshlib_PATTERN'] = '%s.so'
 
