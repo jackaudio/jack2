@@ -112,6 +112,11 @@ process (jack_nframes_t frames, void* arg)
 static void wearedone(int sig) {
 	fprintf(stderr, "Shutting down\n");
 	keeprunning = 0;
+	/* main loop might be blocked by data_ready when jack server dies. */
+	if (pthread_mutex_trylock (&msg_thread_lock) == 0) {
+		pthread_cond_signal (&data_ready);
+		pthread_mutex_unlock (&msg_thread_lock);
+	}
 }
 
 static void usage (int status) {

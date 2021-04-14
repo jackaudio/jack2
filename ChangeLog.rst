@@ -1,6 +1,14 @@
 ChangeLog
 #########
 
+* 1.9.18 (2021-04-15)
+
+  * Add zalsa_in/out as internal client (based on zita-a2j/j2a and jack1 code)
+  * Fix jack_midi_dump deadlock on close after the jack server is restarted
+  * Fix interrupt signal for linux futex waits
+  * Fix usage of meta-data in official macOS builds (private DB errors)
+  * Log error message when cleaning previous DB (macOS and Windows)
+
 * 1.9.17 (2021-01-15)
 
   * Fix jack_control stopping after first command iteration

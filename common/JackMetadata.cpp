@@ -123,9 +123,11 @@ int JackMetadata::PropertyInit()
 #endif
 
     if ((ret = fDBenv->open (fDBenv, dbpath, DB_CREATE | DB_INIT_LOCK | DB_INIT_MPOOL | DB_THREAD, 0)) != 0) {
-#ifdef WIN32
+#if defined(WIN32) || defined(__APPLE__)
         // new versions of jack2 are built with HAVE_MIXED_SIZE_ADDRESSING, which induces this error, this is expected
         if (ret == DB_VERSION_MISMATCH) {
+            jack_error ("Failed to open previous DB environment, trying again clean...");
+
             // cleanup old stuff
             snprintf (dbpath, sizeof(dbpath), "%s/jack_db/metadata.db", fDBFilesDir);
             remove (dbpath);
@@ -145,7 +147,7 @@ int JackMetadata::PropertyInit()
         if (ret != 0)
 #endif
         {
-            jack_error ("cannot open DB environment: %s", db_strerror (ret));
+            jack_error ("Cannot open DB environment: %s", db_strerror (ret));
             fDBenv = NULL;
             return -1;
         }
