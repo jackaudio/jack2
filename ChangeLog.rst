@@ -7,6 +7,7 @@ ChangeLog
   * Fix jack_midi_dump deadlock on close after the jack server is restarted
   * Fix interrupt signal for linux futex waits
   * Fix usage of meta-data in official macOS builds (private DB errors)
+  * Log error message when cleaning previous DB (macOS and Windows)
 
 * 1.9.17 (2021-01-15)
 
