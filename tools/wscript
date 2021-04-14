@@ -19,8 +19,9 @@ example_tools = {
     }
 
 def configure(conf):
-    conf.env['BUILD_EXAMPLE_ALSA_IO'] = conf.env['SAMPLERATE'] and conf.env['BUILD_DRIVER_ALSA']
-    conf.env['BUILD_EXAMPLE_CLIENT_TRANSPORT'] = conf.env['READLINE']
+    conf.env['BUILD_TOOL_ALSA_IO'] = conf.env['SAMPLERATE'] and conf.env['BUILD_DRIVER_ALSA']
+    conf.env['BUILD_TOOL_CLIENT_TRANSPORT'] = conf.env['READLINE']
+    conf.env['BUILD_TOOL_ZALSA'] = conf.env['ZALSA']
 
 def build(bld):
     if bld.env['IS_LINUX']:
@@ -50,7 +51,7 @@ def build(bld):
 
         prog.target = example_tool
 
-    if bld.env['BUILD_EXAMPLE_CLIENT_TRANSPORT']:
+    if bld.env['BUILD_TOOL_CLIENT_TRANSPORT']:
         prog = bld(features = 'c cprogram')
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = 'transport.c'
@@ -74,7 +75,7 @@ def build(bld):
         prog.target = 'jack_netsource'
         prog.defines = ['HAVE_CONFIG_H']
 
-    if bld.env['IS_LINUX'] and bld.env['BUILD_EXAMPLE_ALSA_IO']:
+    if bld.env['IS_LINUX'] and bld.env['BUILD_TOOL_ALSA_IO']:
         prog = bld(features = 'c cprogram')
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = ['alsa_in.c', '../common/memops.c']
@@ -88,6 +89,25 @@ def build(bld):
         prog.env.append_value('CFLAGS', '-DNO_JACK_ERROR')
         prog.use = ['clientlib', 'ALSA', 'SAMPLERATE', 'M']
         prog.target = 'alsa_out'
+
+    if bld.env['IS_LINUX'] and bld.env['BUILD_TOOL_ZALSA']:
+        prog = bld(features = ['cxx', 'cxxshlib'])
+        prog.defines = ['HAVE_CONFIG_H','SERVER_SIDE','APPNAME="zalsa_in"','VERSION="0.4.0"']
+        prog.install_path = '${ADDON_DIR}/'
+        prog.includes = os_incdir + ['../common/jack', '../common', 'zalsa']
+        prog.source = ['zalsa/zita-a2j.cc', 'zalsa/alsathread.cc', 'zalsa/jackclient.cc', 'zalsa/pxthread.cc', 'zalsa/lfqueue.cc']
+        prog.target = 'zita-a2j'
+        prog.use = ['ZITA-ALSA-PCMI', 'ZITA-RESAMPLER', 'ALSA', 'M', 'RT', 'serverlib']
+        prog.env['cxxshlib_PATTERN'] = '%s.so'
+
+        prog = bld(features = ['cxx', 'cxxshlib'])
+        prog.defines = ['HAVE_CONFIG_H','SERVER_SIDE','APPNAME="zalsa_out"','VERSION="0.4.0"']
+        prog.install_path = '${ADDON_DIR}/'
+        prog.includes = os_incdir + ['../common/jack', '../common', 'zalsa']
+        prog.source = ['zalsa/zita-j2a.cc', 'zalsa/alsathread.cc', 'zalsa/jackclient.cc', 'zalsa/pxthread.cc', 'zalsa/lfqueue.cc']
+        prog.target = 'zita-j2a'
+        prog.use = ['ZITA-ALSA-PCMI', 'ZITA-RESAMPLER', 'ALSA', 'M', 'RT', 'serverlib']
+        prog.env['cxxshlib_PATTERN'] = '%s.so'
 
     if not bld.env['IS_WINDOWS']:
         bld.symlink_as('${PREFIX}/bin/jack_disconnect', 'jack_connect')
