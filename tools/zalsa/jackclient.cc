@@ -78,13 +78,13 @@ bool Jackclient::init (const char *jserv)
     {
 	if (_mode == PLAY)
 	{
-            sprintf (s, "USB_Audio_Playback_%d", i + 1);
+            sprintf (s, "playback_%d", i + 1);
             _ports [i] = jack_port_register (_client, s, JACK_DEFAULT_AUDIO_TYPE,
                                              flags | JackPortIsInput, 0);
 	}
 	else
 	{
-            sprintf (s, "USB_Audio_Capture_%d", i + 1);
+            sprintf (s, "capture_%d", i + 1);
             _ports [i] = jack_port_register (_client, s, JACK_DEFAULT_AUDIO_TYPE,
                                              flags | JackPortIsOutput, 0);
 	}
