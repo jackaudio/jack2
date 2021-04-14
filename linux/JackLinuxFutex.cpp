@@ -94,16 +94,16 @@ bool JackLinuxFutex::Wait()
         fFutex->internal = !fFutex->internal;
     }
 
+    const int wait_mode = fFutex->internal ? FUTEX_WAIT_PRIVATE : FUTEX_WAIT;
+
     for (;;)
     {
         if (__sync_bool_compare_and_swap(&fFutex->futex, 1, 0))
             return true;
 
-        if (::syscall(SYS_futex, fFutex, fFutex->internal ? FUTEX_WAIT_PRIVATE : FUTEX_WAIT, 0, NULL, NULL, 0) == 0)
-            continue;
-
-        if (errno != EAGAIN && errno != EINTR)
-            return false;
+        if (::syscall(SYS_futex, fFutex, wait_mode, 0, NULL, NULL, 0) != 0)
+            if (errno != EAGAIN && errno != EINTR)
+                return false;
     }
 }
 
@@ -127,14 +127,16 @@ bool JackLinuxFutex::TimedWait(long usec)
     const int  nsecs = (usec % 1000000) * 1000;
 
     const timespec timeout = { static_cast<time_t>(secs), nsecs };
+    const int wait_mode = fFutex->internal ? FUTEX_WAIT_PRIVATE : FUTEX_WAIT;
 
     for (;;)
     {
         if (__sync_bool_compare_and_swap(&fFutex->futex, 1, 0))
             return true;
 
-        if (::syscall(SYS_futex, fFutex, fFutex->internal ? FUTEX_WAIT_PRIVATE : FUTEX_WAIT, 0, &timeout, NULL, 0) != 0 && errno != EWOULDBLOCK)
-            return false;
+        if (::syscall(SYS_futex, fFutex, wait_mode, 0, &timeout, NULL, 0) != 0)
+            if (errno != EAGAIN && errno != EINTR)
+                return false;
     }
 }
 
