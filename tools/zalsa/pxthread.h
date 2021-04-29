@@ -42,6 +42,7 @@ public:
 
     virtual void thr_main (void) = 0;
     virtual int  thr_start (int policy, int priority, size_t stacksize = 0);
+    virtual void thr_wait (void);
 
 private:
   
