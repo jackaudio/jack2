@@ -76,3 +76,12 @@ void Pxthread::thr_main (void)
 {
 }
 
+
+void Pxthread::thr_wait (void)
+{
+    if (_thrid == 0)
+        return;
+    pthread_join (_thrid, NULL);
+    _thrid = 0;
+}
+

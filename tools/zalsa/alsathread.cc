@@ -45,7 +45,15 @@ Alsathread::Alsathread (Alsa_pcmi *alsadev, int mode) :
 
 Alsathread::~Alsathread (void)
 {
-    _alsadev->pcm_stop ();
+    if (_state != INIT)
+    {
+        _state = TERM;
+        thr_wait ();
+    }
+    else
+    {
+        _alsadev->pcm_stop ();
+    }
 }
 
 
