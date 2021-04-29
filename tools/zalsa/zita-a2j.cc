@@ -28,7 +28,7 @@
 #include "lfqueue.h"
 #include "jack/control.h"
 
-static const char *clopt = "hvLSj:d:r:p:n:c:Q:I:";
+static const char *clopt = "hvLSwj:d:r:p:n:c:Q:I:";
 
 static void help (void)
 {
@@ -47,6 +47,7 @@ static void help (void)
     jack_info ("  -Q <quality>       Resampling quality, 16..96 [auto]");
     jack_info ("  -I <samples>       Latency adjustment [0]");
     jack_info ("  -L                 Force 16-bit and 2 channels [off]");
+    jack_info ("  -w                 Wait until soundcard is available [off]");
     jack_info ("  -v                 Print tracing information [off]");
 }
 
@@ -60,6 +61,7 @@ class zita_a2j
 	bool v_opt;
 	bool L_opt;
 	bool S_opt;
+	bool w_opt;
 	char *jname;
 	char *device;
 	int fsamp;
@@ -81,6 +83,7 @@ public:
         v_opt = false;
         L_opt = false;
         S_opt = false;
+        w_opt = false;
         jname = strdup(APPNAME);
         device = 0;
         fsamp = 48000;
@@ -92,6 +95,7 @@ public:
         A = 0;
         C = 0;
         J = 0;
+        t = 0;
     }
 
 private:
@@ -116,6 +120,7 @@ private:
             case 'v' : v_opt = true; break;
             case 'L' : L_opt = true; break;
             case 'S' : S_opt = true; break;
+            case 'w' : w_opt = true; break;
             case 'j' : jname = optarg; break;
             case 'd' : device = optarg; break;
             case 'r' : fsamp = atoi (optarg); break;    
@@ -227,15 +232,48 @@ private:
     Alsathread     *C;
     Jackclient     *J;
 
+    pthread_t t;
+    int       topts;
+
+    static void* _retry_alsa_pcmi (void *arg)
+    {
+        ((zita_a2j*)arg)->retry_alsa_pcmi ();
+        return NULL;
+    }
+
+    void retry_alsa_pcmi ()
+    {
+        Alsa_pcmi *a;
+
+        while (! stop)
+        {
+            sleep(1);
+
+            a = new Alsa_pcmi (0, device, 0, fsamp, bsize, nfrag, topts);
+            if (a->state ())
+            {
+                delete a;
+                continue;
+            }
+
+            A = a;
+            if (v_opt) A->printinfo ();
+            C = new Alsathread (A, Alsathread::CAPT);
+            usleep (100*1000);
+            jack_initialize_part2 ();
+            jack_info (APPNAME ": Device is now available and has been activated");
+            break;
+        }
+
+        t = 0;
+    }
+
 public:
 
     int
     jack_initialize (jack_client_t* client, const char* load_init)
     {
-        int            k, k_del, opts;
-        double         t_jack;
-        double         t_alsa;
-        double         t_del;
+        int opts;
 
         if (parse_options (load_init)) {
             jack_error (APPNAME ": parse options failed");
@@ -261,22 +299,56 @@ public:
         opts = 0;
         if (v_opt) opts |= Alsa_pcmi::DEBUG_ALL;
         if (L_opt) opts |= Alsa_pcmi::FORCE_16B | Alsa_pcmi::FORCE_2CH;
-        A = new Alsa_pcmi (0, device, 0, fsamp, bsize, nfrag, opts);
-        if (A->state ())
+        if (w_opt)
         {
-            jack_error (APPNAME ": Can't open ALSA capture device '%s'.", device);
-            delete this;
-            return 1;
+            J = new Jackclient (client, 0, Jackclient::CAPT, nchan, S_opt, this);
+            A = new Alsa_pcmi (0, device, 0, fsamp, bsize, nfrag, opts);
+
+            // if device is not available, spawn thread to keep trying
+            if (A->state ())
+            {
+                delete A;
+                A = NULL;
+                topts = opts;
+                pthread_create (&t, NULL, _retry_alsa_pcmi, this);
+                jack_info (APPNAME ": Could not open device, will keep trying in new thread...");
+                return 0;
+            }
+
+            // otherwise continue as normal
+            if (v_opt) A->printinfo ();
+            C = new Alsathread (A, Alsathread::CAPT);
         }
-        if (v_opt) A->printinfo ();
-        if (nchan > A->ncapt ())
+        else
         {
-            nchan = A->ncapt ();
-            jack_error (APPNAME ": Warning: only %d channels are available.", nchan);
+            A = new Alsa_pcmi (0, device, 0, fsamp, bsize, nfrag, opts);
+            if (A->state ())
+            {
+                jack_error (APPNAME ": Can't open ALSA capture device '%s'.", device);
+                delete this;
+                return 1;
+            }
+            if (v_opt) A->printinfo ();
+            if (nchan > A->ncapt ())
+            {
+                nchan = A->ncapt ();
+                jack_error (APPNAME ": Warning: only %d channels are available.", nchan);
+            }
+            C = new Alsathread (A, Alsathread::CAPT);
+            J = new Jackclient (client, 0, Jackclient::CAPT, nchan, S_opt, this);
         }
-        C = new Alsathread (A, Alsathread::CAPT);
-        J = new Jackclient (client, 0, Jackclient::CAPT, nchan, S_opt, this);
-        usleep (100000);
+
+        usleep (100*1000);
+        jack_initialize_part2 ();
+        return 0;
+    }
+
+    void jack_initialize_part2 ()
+    {
+        int            k, k_del;
+        double         t_alsa;
+        double         t_jack;
+        double         t_del;
 
         t_alsa = (double) bsize / fsamp;
         if (t_alsa < 1e-3) t_alsa = 1e-3;
@@ -297,12 +369,16 @@ public:
 
         C->start (audioq, commq, alsaq, J->rprio () + 10);
         J->start (audioq, commq, alsaq, infoq, J->fsamp () / (double) fsamp, k_del, ltcor, rqual);
-
-        return 0;
     }
 
     void jack_finish (void* arg)
     {
+        if (t != 0)
+        {
+            stop = true;
+            pthread_join(t, NULL);
+        }
+
         commq->wr_int32 (Alsathread::TERM);
         usleep (100000);
         delete C;
