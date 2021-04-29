@@ -1,6 +1,11 @@
 ChangeLog
 #########
 
+* 1.9.19 (2021-07-15)
+
+  * WIP
+  * zalsa: add "-w" argument to wait for soundcard to be available
+
 * 1.9.18 (2021-04-15)
 
   * Add zalsa_in/out as internal client (based on zita-a2j/j2a and jack1 code)
