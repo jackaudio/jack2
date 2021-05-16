@@ -674,6 +674,11 @@ def build_drivers(bld):
         'linux/firewire/JackFFADOMidiSendQueue.cpp'
     ]
 
+    freebsd_oss_src = [
+        'common/memops.c',
+        'freebsd/oss/JackOSSDriver.cpp'
+    ]
+
     iio_driver_src = [
         'linux/iio/JackIIODriver.cpp'
     ]
@@ -780,7 +785,13 @@ def build_drivers(bld):
             use = ['serverlib'], # FIXME: Is this needed?
             framework = ['AudioUnit', 'CoreMIDI', 'CoreServices', 'Foundation'])
 
-    if bld.env['IS_SUN'] or bld.env['IS_FREEBSD']:
+    if bld.env['IS_FREEBSD']:
+        create_driver_obj(
+            bld,
+            target = 'oss',
+            source = freebsd_oss_src)
+
+    if bld.env['IS_SUN']:
         create_driver_obj(
             bld,
             target = 'boomer',
