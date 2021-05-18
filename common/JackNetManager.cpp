@@ -505,7 +505,7 @@ namespace Jack
             if (out) {
                 memset(out, 0, sizeof(float) * fParams.fPeriodSize);
             }
-            fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, out)));
+            fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, out);
         #endif
         }
 
@@ -660,6 +660,13 @@ namespace Jack
             strcpy(fMulticastIP, DEFAULT_MULTICAST_IP);
         }
 
+        const char* default_multicast_if = getenv("JACK_NETJACK_INTERFACE");
+        if (default_multicast_if) {
+            strcpy(fMulticastIF, default_multicast_if);
+        } else {
+            strcpy(fMulticastIF, DEFAULT_MULTICAST_IF);
+        }
+
         for (node = params; node; node = jack_slist_next(node)) {
 
             param = (const jack_driver_param_t*) node->data;
@@ -669,6 +676,14 @@ namespace Jack
                         strcpy(fMulticastIP, param->value.str);
                     } else {
                         jack_error("Can't use multicast address %s, using default %s", param->value.ui, DEFAULT_MULTICAST_IP);
+                    }
+                    break;
+
+                case 'f' :
+                    if (strlen(param->value.str) < 32) {
+                        strcpy(fMulticastIF, param->value.str);
+                    } else {
+                        jack_error("Can't use multicast interface %s, using default %s", param->value.ui, DEFAULT_MULTICAST_IF);
                     }
                     break;
 
@@ -761,7 +776,7 @@ namespace Jack
     {
         JackNetMasterManager* master_manager = static_cast<JackNetMasterManager*>(arg);
         jack_info("Starting Jack NetManager");
-        jack_info("Listening on '%s:%d'", master_manager->fMulticastIP, master_manager->fSocket.GetPort());
+        jack_info("Listening on '%s:%d%%%s'", master_manager->fMulticastIP, master_manager->fSocket.GetPort(),master_manager->fMulticastIF);
         master_manager->Run();
         return NULL;
     }
@@ -783,8 +798,8 @@ namespace Jack
             return;
         }
 
-        //socket
-        if (fSocket.NewSocket() == SOCKET_ERROR) {
+        //socket: we need to have socket probed first if we want to use multicast
+        if (fSocket.NewSocket(fMulticastIP) == SOCKET_ERROR) {
             jack_error("Can't create NetManager input socket : %s", StrError(NET_ERROR_CODE));
             return;
         }
@@ -797,7 +812,7 @@ namespace Jack
         }
 
         //join multicast group
-        if (fSocket.JoinMCastGroup(fMulticastIP) == SOCKET_ERROR) {
+        if (fSocket.JoinMCastGroup(fMulticastIP,fMulticastIF) == SOCKET_ERROR) {
             jack_error("Can't join multicast group : %s", StrError(NET_ERROR_CODE));
         }
 
@@ -843,6 +858,7 @@ namespace Jack
                         }
                         break;
                     default:
+                        jack_log("JackNetMasterManager::Run: read: %d; type: %d; peer: %s",rx_bytes,host_params.fPacketID,host_params.fName);
                         break;
                 }
             }
@@ -948,6 +964,9 @@ extern "C"
 
         strcpy(value.str, DEFAULT_MULTICAST_IP);
         jack_driver_descriptor_add_parameter(desc, &filler, "multicast-ip", 'a', JackDriverParamString, &value, NULL, "Multicast address", NULL);
+
+        strcpy(value.str, DEFAULT_MULTICAST_IF);
+        jack_driver_descriptor_add_parameter(desc, &filler, "multicast-if", 'f', JackDriverParamString, &value, NULL, "Multicast interface", "Multicast interface to bind to. ('all' - all ip ifs; 'any' (default) kernel chosen; ifname i.e. eth0)");
 
         value.i = DEFAULT_PORT;
         jack_driver_descriptor_add_parameter(desc, &filler, "udp-net-port", 'p', JackDriverParamInt, &value, NULL, "UDP port", NULL);

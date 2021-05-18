@@ -56,8 +56,6 @@ namespace Jack
     typedef struct _session_params session_params_t;
     typedef struct _packet_header packet_header_t;
     typedef struct _net_transport_data net_transport_data_t;
-    typedef struct sockaddr socket_address_t;
-    typedef struct in_addr address_t;
     typedef jack_default_audio_sample_t sample_t;
 
     enum JackNetEncoder {

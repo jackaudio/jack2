@@ -57,6 +57,7 @@ namespace Jack
         fSetTimeOut = false;
         fTxBuffer = NULL;
         fRxBuffer = NULL;
+        fMulticastIF[0]=0;
         fNetAudioCaptureBuffer = NULL;
         fNetAudioPlaybackBuffer = NULL;
         fNetMidiCaptureBuffer = NULL;
@@ -700,6 +701,12 @@ namespace Jack
 
         if (fSocket.IsLocal(fMulticastIP)) {
             jack_info("Local IP is used...");
+        } else if (fMulticastIF[0]) {
+            // bind the socket & interface
+            if (fSocket.Bind(fMulticastIF) == SOCKET_ERROR) {
+                jack_error("Can't bind the socket : %s", StrError(NET_ERROR_CODE));
+                return NET_SOCKET_ERROR;
+            }
         } else {
             // bind the socket
             if (fSocket.Bind() == SOCKET_ERROR) {
@@ -719,8 +726,7 @@ namespace Jack
         }
 
         // send 'AVAILABLE' until 'SLAVE_SETUP' received
-        jack_info("Waiting for a master...");
-        
+        jack_info("Waiting for a master on %s...",(fMulticastIF[0])?fMulticastIF:"default");
         do {
             // send 'available'
             session_params_t net_params;
