@@ -36,6 +36,8 @@ namespace Jack
 
 JackTransportEngine::JackTransportEngine(): JackAtomicArrayState<jack_position_t>()
 {
+    static_assert(offsetof(JackTransportEngine, fWriteCounter) % sizeof(fWriteCounter) == 0,
+                  "fWriteCounter must be first member of JackTransportEngine to ensure its alignment");
     fTransportState = JackTransportStopped;
     fTransportCmd = fPreviousCmd = TransportCommandStop;
     fSyncTimeout = 10000000;	/* 10 seconds default...

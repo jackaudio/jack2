@@ -93,7 +93,11 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
 #endif
 
     JackEngineControl(bool sync, bool temporary, long timeout, bool rt, long priority, bool verbose, jack_timer_type_t clock, const char* server_name)
-    {
+      {
+        static_assert(offsetof(JackEngineControl, fTransport) % sizeof(UInt32) == 0,
+                      "fTransport must be aligned within JackEngineControl");
+        static_assert(offsetof(JackEngineControl, fFrameTimer) % sizeof(UInt32) == 0,
+                      "fFrameTimer must be aligned within JackEngineControl");
         fBufferSize = 512;
         fSampleRate = 48000;
         fPeriodUsecs = jack_time_t(1000000.f / fSampleRate * fBufferSize);

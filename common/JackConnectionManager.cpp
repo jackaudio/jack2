@@ -32,6 +32,9 @@ namespace Jack
 JackConnectionManager::JackConnectionManager()
 {
     int i;
+    static_assert(offsetof(JackConnectionManager, fInputCounter) % sizeof(UInt32) == 0,
+                  "fInputCounter must be aligned within JackConnectionManager");
+
     jack_log("JackConnectionManager::InitConnections size = %ld ", sizeof(JackConnectionManager));
 
     for (i = 0; i < PORT_NUM_MAX; i++) {

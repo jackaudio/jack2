@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackAtomic.h"
 #include "JackCompilerDeps.h"
 #include <string.h> // for memcpy
+#include <cstddef>
 
 namespace Jack
 {
@@ -131,6 +132,8 @@ class JackAtomicState
 
         JackAtomicState()
         {
+            static_assert(offsetof(JackAtomicState, fCounter) % sizeof(fCounter) == 0,
+                          "fCounter must be aligned within JackAtomicState");
             Counter(fCounter) = 0;
             fCallWriteCounter = 0;
         }

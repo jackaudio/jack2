@@ -45,7 +45,10 @@ class JackActivationCount
     public:
 
         JackActivationCount(): fValue(0), fCount(0)
-        {}
+        {
+            static_assert(offsetof(JackActivationCount, fValue) % sizeof(fValue) == 0,
+                          "fValue must be aligned within JackActivationCount");
+        }
 
         bool Signal(JackSynchro* synchro, JackClientControl* control);
 
