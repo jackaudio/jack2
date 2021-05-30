@@ -93,8 +93,8 @@ class JackAtomicState
 
     protected:
 
-        T fState[2];
         volatile AtomicCounter fCounter;
+        T fState[2];
         SInt32 fCallWriteCounter;
 
         UInt32 WriteNextStateStartAux()
