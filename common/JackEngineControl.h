@@ -49,13 +49,13 @@ PRE_PACKED_STRUCTURE
 struct SERVER_EXPORT JackEngineControl : public JackShmMem
 {
     // Padding to align start of JackEngineControl after inherited JackShmMem data
-    char fPadding1[ sizeof(UInt32) - sizeof(JackShmMem) % sizeof(UInt32) ];
+    char fPadding1[ sizeof(UInt32) - (sizeof(JackShmMem) % sizeof(UInt32)) ];
 
     // Timer
     JackFrameTimer fFrameTimer;
 
     // Padding to align fTransport
-    char fPadding2[ sizeof(UInt32) - sizeof(fFrameTimer) % sizeof(UInt32) ];
+    char fPadding2[ sizeof(UInt32) - (sizeof(fFrameTimer) % sizeof(UInt32)) ];
     
     // Shared state
     JackTransportEngine fTransport;
