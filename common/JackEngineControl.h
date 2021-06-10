@@ -48,14 +48,7 @@ class JackGraphManager;
 PRE_PACKED_STRUCTURE
 struct SERVER_EXPORT JackEngineControl : public JackShmMem
 {
-    // Timer
-    JackFrameTimer fFrameTimer;
-
-    // Padding to align fTransport
-    char padding[ sizeof(UInt32) - sizeof(fFrameTimer) % sizeof(UInt32) ];
-    
     // Shared state
-    JackTransportEngine fTransport;
     jack_nframes_t fBufferSize;
     jack_nframes_t fSampleRate;
     bool fSyncMode;
@@ -71,6 +64,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
     int fClientPriority;
     int fMaxClientPriority;
     char fServerName[JACK_SERVER_NAME_SIZE+1];
+    JackTransportEngine fTransport;
     jack_timer_type_t fClockSource;
     int fDriverNum;
     bool fVerbose;
@@ -90,6 +84,9 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
     UInt64 fPeriod;
     UInt64 fComputation;
     UInt64 fConstraint;
+
+    // Timer
+    JackFrameTimer fFrameTimer;
 
 #ifdef JACK_MONITOR
     JackEngineProfiling fProfiler;
