@@ -64,7 +64,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
     int fClientPriority;
     int fMaxClientPriority;
     char fServerName[JACK_SERVER_NAME_SIZE+1];
-    JackTransportEngine fTransport;
+    alignas(UInt32) JackTransportEngine fTransport;
     jack_timer_type_t fClockSource;
     int fDriverNum;
     bool fVerbose;
@@ -86,7 +86,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
     UInt64 fConstraint;
 
     // Timer
-    JackFrameTimer fFrameTimer;
+    alignas(UInt32) JackFrameTimer fFrameTimer;
 
 #ifdef JACK_MONITOR
     JackEngineProfiling fProfiler;

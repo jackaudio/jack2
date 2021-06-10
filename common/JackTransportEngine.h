@@ -104,7 +104,7 @@ class SERVER_EXPORT JackTransportEngine : public JackAtomicArrayState<jack_posit
         bool fPendingPos;
         bool fNetworkSync;
         bool fConditionnal;
-        SInt32 fWriteCounter;
+        alignas(SInt32) SInt32 fWriteCounter;
 
         bool CheckAllRolling(JackClientInterface** table);
         void MakeAllStartingLocating(JackClientInterface** table);

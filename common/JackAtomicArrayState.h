@@ -122,7 +122,7 @@ class JackAtomicArrayState
         // fState[2] ==> request
 
         T fState[3];
-        volatile AtomicArrayCounter fCounter;
+        alignas(UInt32) volatile AtomicArrayCounter fCounter;
 
         UInt32 WriteNextStateStartAux(int state, bool* result)
         {
