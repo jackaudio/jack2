@@ -48,14 +48,11 @@ class JackGraphManager;
 PRE_PACKED_STRUCTURE
 struct SERVER_EXPORT JackEngineControl : public JackShmMem
 {
-    // Padding to align start of JackEngineControl after inherited JackShmMem data
-    char fPadding1[ sizeof(UInt32) - sizeof(JackShmMem) % sizeof(UInt32) ];
-
     // Timer
     JackFrameTimer fFrameTimer;
 
     // Padding to align fTransport
-    char fPadding2[ sizeof(UInt32) - sizeof(fFrameTimer) % sizeof(UInt32) ];
+    char padding[ sizeof(UInt32) - sizeof(fFrameTimer) % sizeof(UInt32) ];
     
     // Shared state
     JackTransportEngine fTransport;
@@ -104,7 +101,6 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
                       "fTransport must be aligned within JackEngineControl");
         static_assert(offsetof(JackEngineControl, fFrameTimer) % sizeof(UInt32) == 0,
                       "fFrameTimer must be aligned within JackEngineControl");
-
         fBufferSize = 512;
         fSampleRate = 48000;
         fPeriodUsecs = jack_time_t(1000000.f / fSampleRate * fBufferSize);
