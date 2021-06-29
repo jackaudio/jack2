@@ -193,7 +193,7 @@ void Jackclient::initsync (void)
 	_resamp->out_count = 99999;
 	_resamp->process ();
     }
-    // Initiliase state variables.
+    // Initialise state variables.
     _t_a0 = _t_a1 = 0;
     _k_a0 = _k_a1 = 0;
     // Initialise loop filter state.
