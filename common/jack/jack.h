@@ -606,10 +606,10 @@ int jack_set_xrun_callback (jack_client_t *client,
  * register a latency callback.
  *
  * Another case is when a client wants to use
- * @ref jack_port_get_latency_range(), which only returns meaninful
+ * @ref jack_port_get_latency_range(), which only returns meaningful
  * values when ports get connected and latency values change.
  *
- * See the documentation for  @ref jack_port_set_latency_range()
+ * See the documentation for @ref jack_port_set_latency_range()
  * on how the callback should operate. Remember that the @a mode
  * argument given to the latency callback will need to be
  * passed into @ref jack_port_set_latency_range()
