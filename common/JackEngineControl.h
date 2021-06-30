@@ -64,7 +64,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
     int fClientPriority;
     int fMaxClientPriority;
     char fServerName[JACK_SERVER_NAME_SIZE+1];
-    JackTransportEngine fTransport;
+    alignas(UInt32) JackTransportEngine fTransport;
     jack_timer_type_t fClockSource;
     int fDriverNum;
     bool fVerbose;
@@ -86,14 +86,18 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
     UInt64 fConstraint;
 
     // Timer
-    JackFrameTimer fFrameTimer;
+    alignas(UInt32) JackFrameTimer fFrameTimer;
 
 #ifdef JACK_MONITOR
     JackEngineProfiling fProfiler;
 #endif
 
     JackEngineControl(bool sync, bool temporary, long timeout, bool rt, long priority, bool verbose, jack_timer_type_t clock, const char* server_name)
-    {
+      {
+        static_assert(offsetof(JackEngineControl, fTransport) % sizeof(UInt32) == 0,
+                      "fTransport must be aligned within JackEngineControl");
+        static_assert(offsetof(JackEngineControl, fFrameTimer) % sizeof(UInt32) == 0,
+                      "fFrameTimer must be aligned within JackEngineControl");
         fBufferSize = 512;
         fSampleRate = 48000;
         fPeriodUsecs = jack_time_t(1000000.f / fSampleRate * fBufferSize);
