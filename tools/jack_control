@@ -151,253 +151,349 @@ def maybe_print_param_constraint(iface, param):
         for value in values:
             print(("%*s'%s' - %s" % (1 + max_len - len(str(value[0])), "", str(value[0]), str(value[1]))))
 
+
+class Context:
+    def __init__(self, control_iface: dbus.Interface,
+                 configure_iface: dbus.Interface) -> None:
+        self.index = 1
+        self.control_iface = control_iface
+        self.configure_iface =  configure_iface
+
+
+handlers = {}
+
+
+def register(command: str):
+    def register_handler(handler):
+        handlers[command] = handler
+        return handler
+    return register_handler
+
+
+@register('exit')
+def handle_exit(ctx: Context) -> None:
+    print("--- exit")
+    ctx.control_iface.Exit()
+
+
+@register('status')
+def handle_status(ctx: Context) -> None:
+    print("--- status")
+    if ctx.control_iface.IsStarted():
+        print("started")
+        sys.exit()
+    else:
+        print("stopped")
+        sys.exit(1)
+
+
+@register('start')
+def handle_start(ctx: Context) -> None:
+    print("--- start")
+    ctx.control_iface.StartServer()
+
+
+@register('stop')
+def handle_stop(ctx: Context) -> None:
+    print("--- stop")
+    ctx.control_iface.StopServer()
+
+
+@register('sm')
+def handle_sm(ctx: Context) -> None:
+    print("--- switch master driver")
+    ctx.control_iface.SwitchMaster()
+
+
+@register('ism')
+def handle_ism(ctx: Context) -> None:
+    if ctx.control_iface.IsManuallyActivated():
+        print("Manually activated")
+    else:
+        print("Automatically activated")
+
+
+@register('dl')
+def handle_dl(ctx: Context) -> None:
+    print("--- drivers list")
+    is_range, is_strict, is_fake_values, values = ctx.configure_iface.GetParameterConstraint(['engine', 'driver'])
+    for value in values:
+        print(value[1])
+
+
+@register('dg')
+def handle_dg(ctx: Context) -> None:
+    print("--- get selected driver")
+    isset, default, value = ctx.configure_iface.GetParameterValue(['engine', 'driver'])
+    print(value)
+
+
+@register('ds')
+def handle_ds(ctx: Context) -> None:
+    if ctx.index >= len(sys.argv):
+        print("driver select command requires driver name argument")
+        sys.exit(1)
+
+    arg = sys.argv[ctx.index]
+    ctx.index += 1
+
+    print("--- driver select \"%s\"" % arg)
+    ctx.configure_iface.SetParameterValue(['engine', 'driver'], dbus.String(arg))
+
+
+@register('dp')
+def handle_dp(ctx: Context) -> None:
+    print("--- get driver parameters (type:isset:default:value)")
+    get_parameters(ctx.configure_iface, ['driver'])
+
+
+@register('dpd')
+def handle_dpd(ctx: Context) -> None:
+    if ctx.index >= len(sys.argv):
+        print("get driver parameter long description command requires parameter name argument")
+        sys.exit(1)
+
+    param = sys.argv[ctx.index]
+    ctx.index += 1
+
+    print("--- get driver parameter description (%s)" % param)
+    type_char, name, short_descr, long_descr = ctx.configure_iface.GetParameterInfo(['driver', param])
+    print(long_descr)
+    maybe_print_param_constraint(ctx.configure_iface, ['driver', param])
+
+
+@register('dps')
+def handle_dps(ctx: Context) -> None:
+    if ctx.index + 1 >= len(sys.argv):
+        print("driver parameter set command requires parameter name and value arguments")
+        sys.exit(1)
+
+    param = sys.argv[ctx.index]
+    ctx.index += 1
+    value = sys.argv[ctx.index]
+    ctx.index += 1
+
+    print("--- driver param set \"%s\" -> \"%s\"" % (param, value))
+
+    type_char, name, short_descr, long_descr = ctx.configure_iface.GetParameterInfo(['driver', param])
+    ctx.configure_iface.SetParameterValue(['driver', param], python_type_to_jackdbus_type(value, type_char))
+
+
+@register('dpr')
+def handle_dpr(ctx: Context) -> None:
+    if ctx.index >= len(sys.argv):
+        print("driver parameter reset command requires parameter name argument")
+        sys.exit(1)
+
+    param = sys.argv[ctx.index]
+    ctx.index += 1
+
+    print("--- driver param reset \"%s\"" % param)
+    ctx.configure_iface.ResetParameterValue(['driver', param])
+
+
+@register('ep')
+def handle_ep(ctx: Context) -> None:
+    print("--- get engine parameters (type:isset:default:value)")
+    get_parameters(ctx.configure_iface, ['engine'])
+
+
+@register('epd')
+def handle_epd(ctx: Context) -> None:
+    if ctx.index >= len(sys.argv):
+        print("get engine parameter long description command requires parameter name argument")
+        sys.exit(1)
+
+    param_name = sys.argv[ctx.index]
+    ctx.index += 1
+
+    print("--- get engine parameter description (%s)" % param_name)
+
+    type_char, name, short_descr, long_descr = ctx.configure_iface.GetParameterInfo(['engine', param_name])
+    print(long_descr)
+    maybe_print_param_constraint(ctx.configure_iface, ['engine', param_name])
+
+
+@register('eps')
+def handle_eps(ctx: Context) -> None:
+    if ctx.index + 1 >= len(sys.argv):
+        print("engine parameter set command requires parameter name and value arguments")
+        sys.exit(1)
+
+    param = sys.argv[ctx.index]
+    ctx.index += 1
+    value = sys.argv[ctx.index]
+    ctx.index += 1
+
+    print("--- engine param set \"%s\" -> \"%s\"" % (param, value))
+
+    type_char, name, short_descr, long_descr = ctx.configure_iface.GetParameterInfo(['engine', param])
+    ctx.configure_iface.SetParameterValue(['engine', param], python_type_to_jackdbus_type(value, type_char))
+
+
+@register('epr')
+def handle_epr(ctx: Context) -> None:
+    if ctx.index >= len(sys.argv):
+        print("engine parameter reset command requires parameter name")
+        sys.exit(1)
+
+    param = sys.argv[ctx.index]
+    ctx.index += 1
+
+    print("--- engine param reset \"%s\"" % param)
+
+    type_char, name, short_descr, long_descr = ctx.configure_iface.GetParameterInfo(['engine', param])
+    ctx.configure_iface.ResetParameterValue(['engine', param])
+
+
+@register('il')
+def handle_il(ctx: Context) -> None:
+    print("--- internals list")
+    is_leaf, internals = ctx.configure_iface.ReadContainer(['internals'])
+    for internal in internals:
+        print(internal)
+
+
+@register('ip')
+def handle_ip(ctx: Context) -> None:
+    print("--- get internal parameters (type:isset:default:value)")
+
+    if ctx.index >= len(sys.argv):
+        print("internal parameters command requires internal name argument")
+        sys.exit()
+
+    internal_name = sys.argv[ctx.index]
+    ctx.index += 1
+
+    get_parameters(ctx.configure_iface, ['internals', internal_name])
+
+
+@register('ipd')
+def handle_ipd(ctx: Context) -> None:
+    if ctx.index + 1 >= len(sys.argv):
+        print("get internal parameter long description command requires internal and parameter name arguments")
+        sys.exit(1)
+
+    name = sys.argv[ctx.index]
+    ctx.index += 1
+    param = sys.argv[ctx.index]
+    ctx.index += 1
+
+    print("--- get internal parameter description (%s)" % param)
+    type_char, name, short_descr, long_descr = ctx.configure_iface.GetParameterInfo(['internals', name, param])
+    print(long_descr)
+
+
+@register('ips')
+def handle_ips(ctx: Context) -> None:
+    if ctx.index + 2 >= len(sys.argv):
+        print("internal parameter set command requires internal, parameter name and value arguments")
+        sys.exit(1)
+
+    internal_name = sys.argv[ctx.index]
+    ctx.index += 1
+    param = sys.argv[ctx.index]
+    ctx.index += 1
+    value = sys.argv[ctx.index]
+    ctx.index += 1
+
+    print("--- internal param set \"%s\" -> \"%s\"" % (param, value))
+
+    type_char, name, short_descr, long_descr = ctx.configure_iface.GetParameterInfo(['internals', internal_name, param])
+    ctx.configure_iface.SetParameterValue(['internals', internal_name, param], python_type_to_jackdbus_type(value, type_char))
+
+
+@register('ipr')
+def handle_ipr(ctx: Context) -> None:
+    if ctx.index + 1 >= len(sys.argv):
+        print("reset internal parameter command requires internal and parameter name arguments")
+        sys.exit(1)
+
+    internal_name = sys.argv[ctx.index]
+    ctx.index += 1
+    param = sys.argv[ctx.index]
+    ctx.index += 1
+
+    print("--- internal param reset \"%s\"" % param)
+
+    ctx.configure_iface.ResetParameterValue(['internals', internal_name, param])
+
+
+@register('iload')
+def handle_iload(ctx: Context) -> None:
+    print("--- load internal")
+
+    if ctx.index >= len(sys.argv):
+        print("load internal command requires internal name argument")
+        sys.exit(1)
+
+    name = sys.argv[ctx.index]
+    ctx.index += 1
+    result = ctx.control_iface.LoadInternal(name)
+
+
+@register('iunload')
+def handle_iunload(ctx: Context) -> None:
+    print("--- unload internal")
+
+    if ctx.index >= len(sys.argv):
+        print("unload internal command requires internal name argument")
+        sys.exit(1)
+
+    name = sys.argv[ctx.index]
+    ctx.index += 1
+    result = ctx.control_iface.UnloadInternal(name)
+
+
+@register('asd')
+def handle_asd(ctx: Context) -> None:
+    print("--- add slave driver")
+
+    if ctx.index >= len(sys.argv):
+        print("add slave driver command requires driver name argument")
+        sys.exit(1)
+
+    name = sys.argv[ctx.index]
+    ctx.index += 1
+    result = ctx.control_iface.AddSlaveDriver(name)
+
+
+@register('rsd')
+def handle_rsd(ctx: Context) -> None:
+    print("--- remove slave driver")
+
+    if ctx.index >= len(sys.argv):
+        print("remove slave driver command requires driver name argument")
+        sys.exit(1)
+
+    name = sys.argv[ctx.index]
+    ctx.index += 1
+    result = ctx.control_iface.RemoveSlaveDriver(name)
+
+
 def main():
     if len(sys.argv) == 1 or sys.argv[1] in ["-h", "--help", "help"]:
         print_help()
         return 0
 
     bus = dbus.SessionBus()
-
     controller = bus.get_object(service_name, "/org/jackaudio/Controller")
-    control_iface = dbus.Interface(controller, control_interface_name)
-    configure_iface = dbus.Interface(controller, configure_interface_name)
+    ctx = Context(dbus.Interface(controller, control_interface_name),
+                  dbus.Interface(controller, configure_interface_name))
 
-    # check arguments
-    index = 1
-    while index < len(sys.argv):
-        arg = sys.argv[index]
-        index += 1
-        try:
-            if arg == "exit":
-                print("--- exit")
-                control_iface.Exit()
-            elif arg == "status":
-                print("--- status")
-                if control_iface.IsStarted():
-                    print("started")
-                    return 0
-                else:
-                    print("stopped")
-                    return 1
-            elif arg == 'start':
-                print("--- start")
-                control_iface.StartServer()
-            elif arg == 'stop':
-                print("--- stop")
-                control_iface.StopServer()
-            elif arg == 'sm':
-                print("--- switch master driver")
-                control_iface.SwitchMaster()
-            elif arg == 'ism':
-                if control_iface.IsManuallyActivated():
-                    print("Manually activated")
-                else:
-                    print("Automatically activated")
-            elif arg == 'dl':
-                print("--- drivers list")
-                is_range, is_strict, is_fake_values, values = configure_iface.GetParameterConstraint(['engine', 'driver'])
-                for value in values:
-                    print(value[1])
-            elif arg == 'dg':
-                print("--- get selected driver")
-                isset, default, value = configure_iface.GetParameterValue(['engine', 'driver'])
-                print(value)
-            elif arg == 'ds':
-                if index >= len(sys.argv):
-                    print("driver select command requires driver name argument")
-                    return 1
+    while ctx.index < len(sys.argv):
+        arg = sys.argv[ctx.index]
+        ctx.index += 1
+        handler = handlers.get(arg)
+        if handler is None:
+            print("Unknown command '%s'" % arg)
+        else:
+            try:
+                handler(ctx)
+            except dbus.DBusException as e:
+                print("DBus exception: %s" % str(e))
+                return 1
 
-                arg = sys.argv[index]
-                index += 1
-
-                print("--- driver select \"%s\"" % arg)
-                configure_iface.SetParameterValue(['engine', 'driver'], dbus.String(arg))
-            elif arg == 'dp':
-                print("--- get driver parameters (type:isset:default:value)")
-                get_parameters(configure_iface, ['driver'])
-            elif arg == 'dpd':
-                if index >= len(sys.argv):
-                    print("get driver parameter long description command requires parameter name argument")
-                    return 1
-
-                param = sys.argv[index]
-                index += 1
-
-                print("--- get driver parameter description (%s)" % param)
-                type_char, name, short_descr, long_descr = configure_iface.GetParameterInfo(['driver', param])
-                print(long_descr)
-                maybe_print_param_constraint(configure_iface, ['driver', param])
-            elif arg == 'dps':
-                if index + 1 >= len(sys.argv):
-                    print("driver parameter set command requires parameter name and value arguments")
-                    return 1
-
-                param = sys.argv[index]
-                index += 1
-                value = sys.argv[index]
-                index += 1
-
-                print("--- driver param set \"%s\" -> \"%s\"" % (param, value))
-
-                type_char, name, short_descr, long_descr = configure_iface.GetParameterInfo(['driver', param])
-                configure_iface.SetParameterValue(['driver', param], python_type_to_jackdbus_type(value, type_char))
-            elif arg == 'dpr':
-                if index >= len(sys.argv):
-                    print("driver parameter reset command requires parameter name argument")
-                    return 1
-
-                param = sys.argv[index]
-                index += 1
-
-                print("--- driver param reset \"%s\"" % param)
-                configure_iface.ResetParameterValue(['driver', param])
-            elif arg == 'ep':
-                print("--- get engine parameters (type:isset:default:value)")
-                get_parameters(configure_iface, ['engine'])
-            elif arg == 'epd':
-                if index >= len(sys.argv):
-                    print("get engine parameter long description command requires parameter name argument")
-                    return 1
-
-                param_name = sys.argv[index]
-                index += 1
-
-                print("--- get engine parameter description (%s)" % param_name)
-
-                type_char, name, short_descr, long_descr = configure_iface.GetParameterInfo(['engine', param_name])
-                print(long_descr)
-                maybe_print_param_constraint(configure_iface, ['engine', param_name])
-            elif arg == 'eps':
-                if index + 1 >= len(sys.argv):
-                    print("engine parameter set command requires parameter name and value arguments")
-                    return 1
-
-                param = sys.argv[index]
-                index += 1
-                value = sys.argv[index]
-                index += 1
-
-                print("--- engine param set \"%s\" -> \"%s\"" % (param, value))
-
-                type_char, name, short_descr, long_descr = configure_iface.GetParameterInfo(['engine', param])
-                configure_iface.SetParameterValue(['engine', param], python_type_to_jackdbus_type(value, type_char))
-            elif arg == 'epr':
-                if index >= len(sys.argv):
-                    print("engine parameter reset command requires parameter name")
-                    return 1
-
-                param = sys.argv[index]
-                index += 1
-
-                print("--- engine param reset \"%s\"" % param)
-
-                type_char, name, short_descr, long_descr = configure_iface.GetParameterInfo(['engine', param])
-                configure_iface.ResetParameterValue(['engine', param])
-            elif arg == 'il':
-                print("--- internals list")
-                is_leaf, internals = configure_iface.ReadContainer(['internals'])
-                for internal in internals:
-                    print(internal)
-            elif arg == 'ip':
-                print("--- get internal parameters (type:isset:default:value)")
-
-                if index >= len(sys.argv):
-                    print("internal parameters command requires internal name argument")
-                    return 1
-
-                internal_name = sys.argv[index]
-                index += 1
-
-                get_parameters(configure_iface, ['internals', internal_name])
-            elif arg == 'ipd':
-                if index + 1 >= len(sys.argv):
-                    print("get internal parameter long description command requires internal and parameter name arguments")
-                    return 1
-
-                name = sys.argv[index]
-                index += 1
-                param = sys.argv[index]
-                index += 1
-
-                print("--- get internal parameter description (%s)" % param)
-                type_char, name, short_descr, long_descr = configure_iface.GetParameterInfo(['internals', name, param])
-                print(long_descr)
-            elif arg == 'ips':
-                if index + 2 >= len(sys.argv):
-                    print("internal parameter set command requires internal, parameter name and value arguments")
-                    return 1
-
-                internal_name = sys.argv[index]
-                index += 1
-                param = sys.argv[index]
-                index += 1
-                value = sys.argv[index]
-                index += 1
-
-                print("--- internal param set \"%s\" -> \"%s\"" % (param, value))
-
-                type_char, name, short_descr, long_descr = configure_iface.GetParameterInfo(['internals', internal_name, param])
-                configure_iface.SetParameterValue(['internals', internal_name, param], python_type_to_jackdbus_type(value, type_char))
-            elif arg == 'ipr':
-                if index + 1 >= len(sys.argv):
-                    print("reset internal parameter command requires internal and parameter name arguments")
-                    return 1
-
-                internal_name = sys.argv[index]
-                index += 1
-                param = sys.argv[index]
-                index += 1
-
-                print("--- internal param reset \"%s\"" % param)
-
-                configure_iface.ResetParameterValue(['internals', internal_name, param])
-            elif arg == 'iload':
-                print("--- load internal")
-
-                if index >= len(sys.argv):
-                    print("load internal command requires internal name argument")
-                    return 1
-
-                name = sys.argv[index]
-                index += 1
-                result = control_iface.LoadInternal(name)
-            elif arg == 'iunload':
-                print("--- unload internal")
-
-                if index >= len(sys.argv):
-                    print("unload internal command requires internal name argument")
-                    return 1
-
-                name = sys.argv[index]
-                index += 1
-                result = control_iface.UnloadInternal(name)
-            elif arg == 'asd':
-                print("--- add slave driver")
-
-                if index >= len(sys.argv):
-                    print("add slave driver command requires driver name argument")
-                    return 1
-
-                name = sys.argv[index]
-                index += 1
-                result = control_iface.AddSlaveDriver(name)
-            elif arg == 'rsd':
-                print("--- remove slave driver")
-
-                if index >= len(sys.argv):
-                    print("remove slave driver command requires driver name argument")
-                    return 1
-
-                name = sys.argv[index]
-                index += 1
-                result = control_iface.RemoveSlaveDriver(name)
-            else:
-                print("Unknown command '%s'" % arg)
-        except dbus.DBusException as e:
-            print("DBus exception: %s" % str(e))
-            return 1
-
-    return 0
 
 if __name__ == '__main__':
     sys.exit(main())
