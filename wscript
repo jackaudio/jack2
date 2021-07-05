@@ -228,7 +228,7 @@ def configure(conf):
                 mandatory=False)
 
     conf.env.append_unique('CFLAGS', '-Wall')
-    conf.env.append_unique('CXXFLAGS', '-Wall')
+    conf.env.append_unique('CXXFLAGS', ['-Wall', '-Wno-invalid-offsetof'])
     conf.env.append_unique('CXXFLAGS', '-std=gnu++11')
 
     if not conf.env['IS_MACOSX']:
