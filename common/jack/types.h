@@ -538,17 +538,21 @@ typedef uint64_t jack_unique_t;         /**< Unique ID (opaque) */
  */
 typedef enum {
 
-    JackPositionBBT = 0x10,     /**< Bar, Beat, Tick */
-    JackPositionTimecode = 0x20,        /**< External timecode */
-    JackBBTFrameOffset =      0x40,     /**< Frame offset of BBT information */
-    JackAudioVideoRatio =     0x80, /**< audio frames per video frame */
-    JackVideoFrameOffset =   0x100  /**< frame offset of first video frame */
+    JackPositionBBT      = 0x10,  /**< Bar, Beat, Tick */
+    JackPositionTimecode = 0x20,  /**< External timecode */
+    JackBBTFrameOffset   = 0x40,  /**< Frame offset of BBT information */
+    JackAudioVideoRatio  = 0x80,  /**< audio frames per video frame */
+    JackVideoFrameOffset = 0x100, /**< frame offset of first video frame */
+    JackTickDouble       = 0x200, /**< double-resolution tick */
 
 } jack_position_bits_t;
 
 /** all valid position bits */
 #define JACK_POSITION_MASK (JackPositionBBT|JackPositionTimecode)
 #define EXTENDED_TIME_INFO
+
+/** transport tick_double member is available for use */
+#define JACK_TICK_DOUBLE
 
 PRE_PACKED_STRUCTURE
 struct _jack_position {
@@ -609,10 +613,18 @@ struct _jack_position {
                          set, but the value is zero, there is
                          no video frame within this cycle. */
 
+    /* JACK extra transport fields */
+
+    double              tick_double; /**< current tick-within-beat in double resolution.
+                         Should be assumed zero if JackTickDouble is not set.
+                         Since older versions of JACK do not expose this variable,
+                         the macro JACK_TICK_DOUBLE is provided,
+                         which can be used as build-time detection. */
+
     /* For binary compatibility, new fields should be allocated from
      * this padding area with new valid bits controlling access, so
      * the existing structure size and offsets are preserved. */
-    int32_t             padding[7];
+    int32_t             padding[5];
 
     /* When (unique_1 == unique_2) the contents are consistent. */
     jack_unique_t       unique_2;       /**< unique ID */
