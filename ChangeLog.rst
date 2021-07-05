@@ -3,8 +3,12 @@ ChangeLog
 
 * 1.9.19 (2021-07-15)
 
-  * WIP
-  * zalsa: add "-w" argument to wait for soundcard to be available
+  * WIP (note to write asking CI help)
+  * Add jack_position_t::tick_double, and flags around it
+  * Add zalsa "-w" argument to wait for soundcard to be available
+  * Fix alignment of fields for atomic accesses
+  * Fix build for platforms needing __STDC_FORMAT_MACROS
+  * Fix compilation of documentation
 
 * 1.9.18 (2021-04-15)
 
