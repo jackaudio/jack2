@@ -543,7 +543,7 @@ typedef enum {
     JackBBTFrameOffset   = 0x40,  /**< Frame offset of BBT information */
     JackAudioVideoRatio  = 0x80,  /**< audio frames per video frame */
     JackVideoFrameOffset = 0x100, /**< frame offset of first video frame */
-    JackTickDouble       = 0x200, /**< double-precision tick */
+    JackTickDouble       = 0x200, /**< double-resolution tick */
 
 } jack_position_bits_t;
 
@@ -615,7 +615,7 @@ struct _jack_position {
 
     /* JACK extra transport fields */
 
-    double              tick_double; /**< current tick-within-beat in double precision.
+    double              tick_double; /**< current tick-within-beat in double resolution.
                          Should be assumed zero if JackTickDouble is not set.
                          Since older versions of JACK do not expose this variable,
                          the macro JACK_TICK_DOUBLE is provided,
