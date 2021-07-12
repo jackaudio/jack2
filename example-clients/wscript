@@ -49,10 +49,15 @@ def build(bld):
         else:
             use = ['clientlib']
 
-        if bld.env['IS_MACOSX']:
-            prog = bld(features='c cprogram', framework = ['Foundation'])
+        if example_program == 'jack_simdtests':
+            ftrs = 'cxx cxxprogram'
         else:
-            prog = bld(features='c cprogram')
+            ftrs = 'c cprogram'
+
+        if bld.env['IS_MACOSX']:
+            prog = bld(features = ftrs, framework = ['Foundation'])
+        else:
+            prog = bld(features = ftrs)
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = example_program_source
         prog.use = use
