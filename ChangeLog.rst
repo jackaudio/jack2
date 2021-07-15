@@ -3,7 +3,6 @@ ChangeLog
 
 * 1.9.19 (2021-07-15)
 
-  * WIP (note to write asking CI help)
   * Add jack_position_t::tick_double, and flags around it
   * Add zalsa "-w" argument to wait for soundcard to be available
   * Bump internal protocol version to 9 (due to struct alignment)
