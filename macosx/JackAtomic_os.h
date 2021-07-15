@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define __JackAtomic_APPLE__
 
 #include "JackTypes.h"
+#include <cassert>
 
 #if defined(__ppc__) || defined(__ppc64__)
 
@@ -67,8 +68,11 @@ static inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void* ad
 
 #else
 
+#include <stdio.h>
 static inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void* addr)
 {
+    // Assert pointer is 32-bit aligned
+    assert(((long)addr & (sizeof(int)-1)) == 0);
     return __sync_bool_compare_and_swap ((UInt32*)addr, value, newvalue);
 }
 

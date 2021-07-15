@@ -64,7 +64,7 @@ class JackMessageBuffer : public JackRunnableInterface
         JackProcessSync fGuard;
         volatile unsigned int fInBuffer;
         volatile unsigned int fOutBuffer;
-        SInt32 fOverruns;
+        alignas(SInt32) SInt32 fOverruns;
         bool fRunning;
 
         void Flush();

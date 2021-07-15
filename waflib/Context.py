@@ -520,7 +520,7 @@ class Context(ctx):
 		"""
 		Prints a configuration message of the form ``msg: result``.
 		The second part of the message will be in colors. The output
-		can be disabled easly by setting ``in_msg`` to a positive value::
+		can be disabled easily by setting ``in_msg`` to a positive value::
 
 			def configure(conf):
 				self.in_msg = 1

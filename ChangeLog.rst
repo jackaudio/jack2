@@ -1,6 +1,16 @@
 ChangeLog
 #########
 
+* 1.9.19 (2021-07-15)
+
+  * WIP (note to write asking CI help)
+  * Add jack_position_t::tick_double, and flags around it
+  * Add zalsa "-w" argument to wait for soundcard to be available
+  * Bump internal protocol version to 9 (due to struct alignment)
+  * Fix alignment of fields for atomic accesses
+  * Fix build for platforms needing __STDC_FORMAT_MACROS
+  * Fix compilation of documentation
+
 * 1.9.18 (2021-04-15)
 
   * Add zalsa_in/out as internal client (based on zita-a2j/j2a and jack1 code)

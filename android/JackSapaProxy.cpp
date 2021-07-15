@@ -113,7 +113,7 @@ namespace Jack
         jack_set_process_callback(client, Process, this);
         jack_activate(client);
 
-        //conenct between sapaproxy and system ports
+        //connect between sapaproxy and system ports
         for (unsigned int i = 0; i < ports_system_capture_cnt; i++) {
             sprintf(port_name, "system:capture_%d", i + 1);
             jack_connect(client, port_name, jack_port_name(fInputPorts[i]));

@@ -23,6 +23,7 @@
 #include "JackAtomic.h"
 #include "JackCompilerDeps.h"
 #include <string.h> // for memcpy
+#include <cstddef>
 
 namespace Jack
 {
@@ -121,7 +122,7 @@ class JackAtomicArrayState
         // fState[2] ==> request
 
         T fState[3];
-        volatile AtomicArrayCounter fCounter;
+        alignas(UInt32) volatile AtomicArrayCounter fCounter;
 
         UInt32 WriteNextStateStartAux(int state, bool* result)
         {
@@ -159,6 +160,8 @@ class JackAtomicArrayState
 
         JackAtomicArrayState()
         {
+            static_assert(offsetof(JackAtomicArrayState, fCounter) % sizeof(fCounter) == 0,
+                          "fCounter must be aligned within JackAtomicArrayState");
             Counter1(fCounter) = 0;
         }
 

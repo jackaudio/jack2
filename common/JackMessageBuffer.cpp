@@ -38,7 +38,10 @@ JackMessageBuffer::JackMessageBuffer()
     fOutBuffer(0),
     fOverruns(0),
     fRunning(false)
-{}
+{
+    static_assert(offsetof(JackMessageBuffer, fOverruns) % sizeof(fOverruns) == 0,
+                  "fOverruns must be aligned within JackMessageBuffer");
+}
 
 JackMessageBuffer::~JackMessageBuffer()
 {}

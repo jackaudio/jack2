@@ -24,7 +24,7 @@
 #include "config.h"
 #endif
 
-#define VERSION "1.9.18"
+#define VERSION "1.9.19"
 
 #define BUFFER_SIZE_MAX 8192
 
@@ -72,7 +72,7 @@
 
 #define ALL_CLIENTS -1 // for notification
 
-#define JACK_PROTOCOL_VERSION 8
+#define JACK_PROTOCOL_VERSION 9
 
 #define SOCKET_TIME_OUT 2               // in sec
 #define DRIVER_OPEN_TIMEOUT 5           // in sec
