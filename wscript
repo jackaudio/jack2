@@ -218,7 +218,7 @@ def configure(conf):
     if conf.env['IS_WINDOWS']:
         conf.env.append_unique('CCDEFINES', '_POSIX')
         conf.env.append_unique('CXXDEFINES', '_POSIX')
-        if Options.options.platform == 'msys':
+        if Options.options.platform in ('msys', 'win32'):
             conf.env.append_value('INCLUDES', ['/mingw64/include'])
             conf.check(
                 header_name='asio.h',
@@ -388,7 +388,7 @@ def configure(conf):
         # existing install paths that use ADDON_DIR rather than have to
         # have special cases for windows each time.
         conf.env['ADDON_DIR'] = conf.env['LIBDIR'] + '/jack'
-        if Options.options.platform == 'msys':
+        if Options.options.platform in ('msys', 'win32'):
             conf.define('ADDON_DIR', 'jack')
             conf.define('__STDC_FORMAT_MACROS', 1) # for PRIu64
         else:
