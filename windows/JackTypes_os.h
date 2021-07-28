@@ -31,9 +31,5 @@ typedef UInt64 uint64_t;
 typedef unsigned short uint16_t;
 typedef DWORD jack_tls_key;
 
-#if defined(__MINGW32__)
-#define PRIu64 "llu"
-#endif
-
 #endif
 
