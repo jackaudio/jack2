@@ -221,9 +221,8 @@ def configure(conf):
         if Options.options.platform in ('msys', 'win32'):
             conf.env.append_value('INCLUDES', ['/mingw64/include'])
             conf.check(
-                header_name='asio.h',
-                includes='/opt/asiosdk/common',
-                msg='Checking for ASIO SDK',
+                header_name='pa_asio.h',
+                msg='Checking for PortAudio ASIO support',
                 define_name='HAVE_ASIO',
                 mandatory=False)
 
