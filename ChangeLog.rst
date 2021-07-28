@@ -1,6 +1,11 @@
 ChangeLog
 #########
 
+* 1.9.20 (2021-10-15)
+
+  * WIP
+  * Fix incomplete ASIO support on Windows
+
 * 1.9.19 (2021-07-15)
 
   * Add jack_position_t::tick_double, and flags around it
