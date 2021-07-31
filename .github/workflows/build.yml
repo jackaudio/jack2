@@ -43,9 +43,9 @@ jobs:
       shell: bash
       run: |
         pushd PawPaw && source local.env macos && popd
-        ~/PawPawBuilds/targets/macos/bin/python3 ./waf configure --platform=darwin --prefix=/usr/local
-        ~/PawPawBuilds/targets/macos/bin/python3 ./waf build -j $(sysctl -n hw.logicalcpu)
-        ~/PawPawBuilds/targets/macos/bin/python3 ./waf install --destdir="$(pwd)/destdir"
+        python ./waf configure --platform=darwin --prefix=/usr/local
+        python ./waf build -j $(sysctl -n hw.logicalcpu)
+        python ./waf install --destdir="$(pwd)/destdir"
 
   # macOS native universal build
   macos_universal:
@@ -90,16 +90,10 @@ jobs:
       with:
         path: |
           ~/PawPawBuilds/builds
-          ~/PawPawBuilds/debs
           ~/PawPawBuilds/downloads
           ~/PawPawBuilds/targets
           /var/cache/apt/archives
         key: cache-win32
-    #- name: Restore debian packages cache
-      #run: |
-        #if [ -d ~/PawPawBuilds/debs ] && [ "$(ls ~/PawPawBuilds/debs | wc -l)" -ne 0 ]; then \
-          #sudo cp ~/PawPawBuilds/debs/*.deb /var/cache/apt/archives/; \
-        #fi
     - name: Set up dependencies
       run: |
         wget -qO- https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add - && \
@@ -107,10 +101,6 @@ jobs:
         sudo apt-add-repository -y 'deb https://dl.winehq.org/wine-builds/ubuntu/ focal main' && \
         sudo apt-get install -y autopoint build-essential curl cmake jq llvm mingw-w64 qttools5-dev-tools winehq-stable xvfb \
           binutils-mingw-w64-i686 g++-mingw-w64-i686
-    #- name: Cache debian packages
-      #run: |
-        #mkdir -p ~/PawPawBuilds/debs && \
-        #sudo mv /var/cache/apt/archives/*.deb ~/PawPawBuilds/debs/
     - name: Bootstrap win32 cross-compiled
       shell: bash
       run: |
@@ -139,16 +129,10 @@ jobs:
       with:
         path: |
           ~/PawPawBuilds/builds
-          ~/PawPawBuilds/debs
           ~/PawPawBuilds/downloads
           ~/PawPawBuilds/targets
           /var/cache/apt/archives
         key: cache-win64
-    #- name: Restore debian packages cache
-      #run: |
-        #if [ -d ~/PawPawBuilds/debs ] && [ "$(ls ~/PawPawBuilds/debs | wc -l)" -ne 0 ]; then \
-          #sudo cp ~/PawPawBuilds/debs/*.deb /var/cache/apt/archives/; \
-        #fi
     - name: Set up dependencies
       run: |
         wget -qO- https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add - && \
@@ -156,10 +140,6 @@ jobs:
         sudo apt-add-repository -y 'deb https://dl.winehq.org/wine-builds/ubuntu/ focal main' && \
         sudo apt-get install -y autopoint build-essential curl cmake jq llvm mingw-w64 qttools5-dev-tools winehq-stable xvfb \
           binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64
-    #- name: Cache debian packages
-      #run: |
-        #mkdir -p ~/PawPawBuilds/debs && \
-        #sudo mv /var/cache/apt/archives/*.deb ~/PawPawBuilds/debs/
     - name: Bootstrap win64 cross-compiled
       shell: bash
       run: |
