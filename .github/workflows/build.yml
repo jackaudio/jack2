@@ -46,13 +46,13 @@ jobs:
         python ./waf configure --platform=darwin --prefix=/usr/local
         python ./waf build -j $(sysctl -n hw.logicalcpu)
         python ./waf install --destdir=$(pwd)/destdir
-    - name: Generate macOS package
-      shell: bash
-      run: |
-        ./macosx/generate-pkg.sh $(pwd)/destdir
     - name: Set sha8
       id: slug
       run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+    - name: Generate macOS package
+      shell: bash
+      run: |
+        ./macosx/generate-pkg.sh $(pwd)/destdir ${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
     - uses: actions/upload-artifact@v2
       with:
         name: jack2-macOS-intel-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
@@ -103,13 +103,13 @@ jobs:
           #install_name_tool -change "${PAWPAW_PREFIX}/jack2/lib/libjack.0.dylib" "/usr/local/lib/libjack.0.dylib" "${f}"
           #install_name_tool -change "${PAWPAW_PREFIX}/jack2/lib/libjacknet.0.dylib" "/usr/local/lib/libjacknet.0.dylib" "${f}"
           #install_name_tool -change "${PAWPAW_PREFIX}/jack2/lib/libjackserver.0.dylib" "/usr/local/lib/libjackserver.0.dylib" "${f}"
-    - name: Generate macOS package
-      shell: bash
-      run: |
-        ./macosx/generate-pkg.sh $(pwd)/destdir
     - name: Set sha8
       id: slug
       run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+    - name: Generate macOS package
+      shell: bash
+      run: |
+        ./macosx/generate-pkg.sh $(pwd)/destdir ${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
     - uses: actions/upload-artifact@v2
       with:
         name: jack2-macOS-universal-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
