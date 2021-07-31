@@ -188,6 +188,10 @@ jobs:
         echo "#define VERSION \"${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}\"" > version.iss
         wine ${WINEPREFIX}/drive_c/InnoSeup/ISCC.exe win32-mini.iss
         popd
+    - uses: actions/upload-artifact@v2
+      with:
+        name: jack2-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+        path: windows/inno/jack2-*.exe
 
   # linux with win64 cross-compilation
   win64:
@@ -269,3 +273,7 @@ jobs:
         echo "#define VERSION \"${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}\"" > version.iss
         wine64 ${WINEPREFIX}/drive_c/InnoSeup/ISCC.exe win64-mini.iss
         popd
+    - uses: actions/upload-artifact@v2
+      with:
+        name: jack2-win64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+        path: windows/inno/jack2-*.exe
