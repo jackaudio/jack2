@@ -45,7 +45,7 @@ jobs:
         pushd PawPaw && source local.env macos && popd
         python ./waf configure --platform=darwin --prefix=/usr/local
         python ./waf build -j $(sysctl -n hw.logicalcpu)
-        python ./waf install --destdir="$(pwd)/destdir"
+        python ./waf install --destdir=$(pwd)/destdir
     - name: Generate macOS package
       shell: bash
       run: |
@@ -79,7 +79,7 @@ jobs:
     - name: Fix up Xcode
       run: |
         sudo rm -Rf /Library/Developer/CommandLineTools/SDKs/*
-        sudo xcode-select -s "/Applications/Xcode_12.3.app"
+        sudo xcode-select -s /Applications/Xcode_12.3.app
     - name: Bootstrap macOS universal
       shell: bash
       run: |
@@ -159,7 +159,7 @@ jobs:
       shell: bash
       run: |
         pushd PawPaw && source local.env win32 && popd
-        ./waf configure --platform=win32 --prefix="$(pwd)/destdir" --static
+        ./waf configure --platform=win32 --prefix=$(pwd)/destdir --static
         ./waf build -j $(nproc)
         ./waf install
     - name: Generate MSVC lib files
@@ -215,19 +215,18 @@ jobs:
       shell: bash
       run: |
         pushd PawPaw && source local.env win64 && popd
-        #export PATH+=":/usr/i686-w64-mingw32/bin"
-        #export LDFLAGS+="-L~/PawPawBuilds/targets/win64/lib32"
-        #--mixed
-        ./waf configure --platform=win32 --prefix="$(pwd)/destdir" --static
+        export PATH+=":/usr/i686-w64-mingw32/bin"
+        export LDFLAGS+="-L~/PawPawBuilds/targets/win64/lib32"
+        ./waf configure --platform=win32 --prefix=$(pwd)/destdir --static --mixed
         ./waf build -j $(nproc)
         ./waf install
     - name: Generate MSVC lib files
       shell: bash
       run: |
         # 32bit
-        #pushd $(pwd)/destdir/lib32
-        #llvm-dlltool -m i386 -D libjack.dll -d libjack.def -l libjack.lib
-        #popd
+        pushd $(pwd)/destdir/lib32
+        llvm-dlltool -m i386 -D libjack.dll -d libjack.def -l libjack.lib
+        popd
         # 64bit
         pushd $(pwd)/destdir/lib
         llvm-dlltool -m i386:x86-64 -D libjack64.dll -d libjack64.def -l libjack64.lib
