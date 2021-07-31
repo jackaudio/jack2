@@ -35,8 +35,8 @@ jobs:
       shell: bash
       run: |
         if [ ! -d PawPaw ]; then
-            git clone https://github.com/DISTRHO/PawPaw.git
-            git -C PawPaw checkout ${PAWPAW_VERSION}
+          git clone https://github.com/DISTRHO/PawPaw.git
+          git -C PawPaw checkout ${PAWPAW_VERSION}
         fi
         ./PawPaw/bootstrap-jack2.sh macos && ./PawPaw/.cleanup.sh macos
     - name: Build jack2
@@ -73,10 +73,17 @@ jobs:
       shell: bash
       run: |
         if [ ! -d PawPaw ]; then
-            git clone https://github.com/DISTRHO/PawPaw.git
-            git -C PawPaw checkout ${PAWPAW_VERSION}
+          git clone https://github.com/DISTRHO/PawPaw.git
+          git -C PawPaw checkout ${PAWPAW_VERSION}
         fi
         ./PawPaw/bootstrap-jack2.sh macos-universal && ./PawPaw/.cleanup.sh macos-universal
+    - name: Build jack2
+      shell: bash
+      run: |
+        pushd PawPaw && source local.env macos-universal && popd
+        python ./waf configure --platform=darwin --prefix=/usr/local
+        python ./waf build -j $(sysctl -n hw.logicalcpu)
+        python ./waf install --destdir="$(pwd)/destdir"
 
   # linux with win32 cross-compilation
   win32:
@@ -96,26 +103,26 @@ jobs:
         key: cache-win32
     - name: Set up dependencies
       run: |
-        wget -qO- https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add - && \
-        sudo dpkg --add-architecture i386 && \
-        sudo apt-add-repository -y 'deb https://dl.winehq.org/wine-builds/ubuntu/ focal main' && \
+        wget -qO- https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add -
+        sudo dpkg --add-architecture i386
+        sudo apt-add-repository -y 'deb https://dl.winehq.org/wine-builds/ubuntu/ focal main'
         sudo apt-get install -y autopoint build-essential curl cmake jq llvm mingw-w64 qttools5-dev-tools winehq-stable xvfb \
           binutils-mingw-w64-i686 g++-mingw-w64-i686
     - name: Bootstrap win32 cross-compiled
       shell: bash
       run: |
         if [ ! -d PawPaw ]; then
-            git clone https://github.com/DISTRHO/PawPaw.git
-            git -C PawPaw checkout ${PAWPAW_VERSION}
+          git clone https://github.com/DISTRHO/PawPaw.git
+          git -C PawPaw checkout ${PAWPAW_VERSION}
         fi
         ./PawPaw/bootstrap-jack2.sh win32 && ./PawPaw/.cleanup.sh win32
     - name: Build jack2
       shell: bash
       run: |
         pushd PawPaw && source local.env win32 && popd
-        wine ~/PawPawBuilds/targets/win32/bin/python3.exe ./waf configure --platform=win32 --prefix="$(pwd)/destdir" --static
-        wine ~/PawPawBuilds/targets/macos/bin/python3.exe ./waf build -j $(nproc)
-        wine ~/PawPawBuilds/targets/macos/bin/python3.exe ./waf install
+        ./waf configure --platform=win32 --prefix="$(pwd)/destdir" --static
+        ./waf build -j $(nproc)
+        ./waf install
 
   # linux with win64 cross-compilation
   win64:
@@ -135,16 +142,23 @@ jobs:
         key: cache-win64
     - name: Set up dependencies
       run: |
-        wget -qO- https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add - && \
-        sudo dpkg --add-architecture i386 && \
-        sudo apt-add-repository -y 'deb https://dl.winehq.org/wine-builds/ubuntu/ focal main' && \
+        wget -qO- https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add -
+        sudo dpkg --add-architecture i386
+        sudo apt-add-repository -y 'deb https://dl.winehq.org/wine-builds/ubuntu/ focal main'
         sudo apt-get install -y autopoint build-essential curl cmake jq llvm mingw-w64 qttools5-dev-tools winehq-stable xvfb \
           binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64
     - name: Bootstrap win64 cross-compiled
       shell: bash
       run: |
         if [ ! -d PawPaw ]; then
-            git clone https://github.com/DISTRHO/PawPaw.git
-            git -C PawPaw checkout ${PAWPAW_VERSION}
+          git clone https://github.com/DISTRHO/PawPaw.git
+          git -C PawPaw checkout ${PAWPAW_VERSION}
         fi
         ./PawPaw/bootstrap-jack2.sh win64 && ./PawPaw/.cleanup.sh win64
+    - name: Build jack2
+      shell: bash
+      run: |
+        pushd PawPaw && source local.env win32 && popd
+        ./waf configure --platform=win32 --prefix="$(pwd)/destdir" --static
+        ./waf build -j $(nproc)
+        ./waf install
