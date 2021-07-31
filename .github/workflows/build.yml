@@ -165,9 +165,11 @@ jobs:
     - name: Generate MSVC lib files
       shell: bash
       run: |
-        llvm-dlltool -m i386 -D libjack.dll -d $(pwd)/destdir/lib/libjack.def -l $(pwd)/destdir/lib/libjack.lib
-        llvm-dlltool -m i386 -D libjacknet.dll -d $(pwd)/destdir/lib/libjacknet.def -l $(pwd)/destdir/lib/libjacknet.lib
-        llvm-dlltool -m i386 -D libjackserver.dll -d $(pwd)/destdir/lib/libjackserver.def -l $(pwd)/destdir/lib/libjackserver.lib
+        pushd $(pwd)/destdir/lib
+        llvm-dlltool -m i386 -D libjack.dll -d libjack.def -l libjack.lib
+        llvm-dlltool -m i386 -D libjacknet.dll -d libjacknet.def -l libjacknet.lib
+        llvm-dlltool -m i386 -D libjackserver.dll -d libjackserver.def -l libjackserver.lib
+        popd
 
   # linux with win64 cross-compilation
   win64:
@@ -212,14 +214,23 @@ jobs:
     - name: Build jack2
       shell: bash
       run: |
-        pushd PawPaw && source local.env win32 && popd
+        pushd PawPaw && source local.env win64 && popd
+        #export PATH+=":/usr/i686-w64-mingw32/bin"
+        #export LDFLAGS+="-L~/PawPawBuilds/targets/win64/lib32"
+        #--mixed
         ./waf configure --platform=win32 --prefix="$(pwd)/destdir" --static
         ./waf build -j $(nproc)
         ./waf install
     - name: Generate MSVC lib files
       shell: bash
       run: |
-        llvm-dlltool -m i386 -D libjack.dll -d $(pwd)/destdir/lib32/libjack.def -l $(pwd)/destdir/lib32/libjack.lib
-        llvm-dlltool -m i386:x86-64 -D libjack64.dll -d $(pwd)/destdir/lib/libjack64.def -l $(pwd)/destdir/lib/libjack64.lib
-        llvm-dlltool -m i386:x86-64 -D libjacknet64.dll -d $(pwd)/destdir/lib/libjacknet64.def -l $(pwd)/destdir/lib/libjacknet64.lib
-        llvm-dlltool -m i386:x86-64 -D libjackserver64.dll -d $(pwd)/destdir/lib/libjackserver64.def -l $(pwd)/destdir/lib/libjackserver64.lib
+        # 32bit
+        #pushd $(pwd)/destdir/lib32
+        #llvm-dlltool -m i386 -D libjack.dll -d libjack.def -l libjack.lib
+        #popd
+        # 64bit
+        pushd $(pwd)/destdir/lib
+        llvm-dlltool -m i386:x86-64 -D libjack64.dll -d libjack64.def -l libjack64.lib
+        llvm-dlltool -m i386:x86-64 -D libjacknet64.dll -d libjacknet64.def -l libjacknet64.lib
+        llvm-dlltool -m i386:x86-64 -D libjackserver64.dll -d libjackserver64.def -l libjackserver64.lib
+        popd
