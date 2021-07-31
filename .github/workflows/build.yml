@@ -181,12 +181,12 @@ jobs:
         wineboot -u
         # Download and install innosetup
         curl -L https://jrsoftware.org/download.php/is.exe?site=2 -o is.exe
-        wine is.exe /allusers /dir=C:\\InnoSeup /nocancel /norestart /verysilent
+        xvfb-run wine is.exe /allusers /dir=C:\\InnoSeup /nocancel /norestart /verysilent
         # create installer
         ln -sf $(pwd)/destdir windows/inno/win32
         pushd windows/inno
         echo "#define VERSION \"${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}\"" > version.iss
-        wine ${WINEPREFIX}/drive_c/InnoSeup/ISCC.exe win32-mini.iss
+        xvfb-run wine ${WINEPREFIX}/drive_c/InnoSeup/ISCC.exe win32-mini.iss
         popd
     - uses: actions/upload-artifact@v2
       with:
@@ -266,12 +266,12 @@ jobs:
         wineboot -u
         # Download and install innosetup
         curl -L https://jrsoftware.org/download.php/is.exe?site=2 -o is.exe
-        wine64 is.exe /allusers /dir=C:\\InnoSeup /nocancel /norestart /verysilent
+        xvfb-run wine64 is.exe /allusers /dir=C:\\InnoSeup /nocancel /norestart /verysilent
         # create installer
         ln -sf $(pwd)/destdir windows/inno/win64
         pushd windows/inno
         echo "#define VERSION \"${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}\"" > version.iss
-        wine64 ${WINEPREFIX}/drive_c/InnoSeup/ISCC.exe win64-mini.iss
+        xvfb-run wine64 ${WINEPREFIX}/drive_c/InnoSeup/ISCC.exe win64-mini.iss
         popd
     - uses: actions/upload-artifact@v2
       with:
