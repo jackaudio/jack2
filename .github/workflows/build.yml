@@ -27,7 +27,7 @@ jobs:
           ~/PawPawBuilds/builds
           ~/PawPawBuilds/downloads
           ~/PawPawBuilds/targets
-        key: macos-${PAWPAW_VERSION}
+        key: macos
     - name: Set up dependencies
       run: |
         brew install cmake jq meson
@@ -46,6 +46,17 @@ jobs:
         python ./waf configure --platform=darwin --prefix=/usr/local
         python ./waf build -j $(sysctl -n hw.logicalcpu)
         python ./waf install --destdir="$(pwd)/destdir"
+    - name: Generate macOS package
+      shell: bash
+      run: |
+        ./macosx/generate-pkg.sh $(pwd)/destdir
+    - name: Set sha8
+      id: slug
+      run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+    - uses: actions/upload-artifact@v2
+      with:
+        name: jack2-macOS-intel-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+        path: macosx/jack2-osx-*.pkg
 
   # macOS native universal build
   macos_universal:
@@ -61,7 +72,7 @@ jobs:
           ~/PawPawBuilds/builds
           ~/PawPawBuilds/downloads
           ~/PawPawBuilds/targets
-        key: macos-universal-${PAWPAW_VERSION}
+        key: macos-universal
     - name: Set up dependencies
       run: |
         brew install cmake jq meson
@@ -83,7 +94,26 @@ jobs:
         pushd PawPaw && source local.env macos-universal && popd
         python ./waf configure --platform=darwin --prefix=/usr/local
         python ./waf build -j $(sysctl -n hw.logicalcpu)
-        python ./waf install --destdir="$(pwd)/destdir"
+        python ./waf install --destdir=$(pwd)/destdir
+    #- name: Patch binaries
+      #shell: bash
+      #run: |
+        #pushd $(pwd)/destdir
+        #for f in $(ls bin/* lib/*.dylib lib/jack/*); do
+          #install_name_tool -change "${PAWPAW_PREFIX}/jack2/lib/libjack.0.dylib" "/usr/local/lib/libjack.0.dylib" "${f}"
+          #install_name_tool -change "${PAWPAW_PREFIX}/jack2/lib/libjacknet.0.dylib" "/usr/local/lib/libjacknet.0.dylib" "${f}"
+          #install_name_tool -change "${PAWPAW_PREFIX}/jack2/lib/libjackserver.0.dylib" "/usr/local/lib/libjackserver.0.dylib" "${f}"
+    - name: Generate macOS package
+      shell: bash
+      run: |
+        ./macosx/generate-pkg.sh $(pwd)/destdir
+    - name: Set sha8
+      id: slug
+      run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+    - uses: actions/upload-artifact@v2
+      with:
+        name: jack2-macOS-universal-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+        path: macosx/jack2-osx-*.pkg
 
   # linux with win32 cross-compilation
   win32:
@@ -100,7 +130,7 @@ jobs:
           ~/PawPawBuilds/debs
           ~/PawPawBuilds/downloads
           ~/PawPawBuilds/targets
-        key: win32-${PAWPAW_VERSION}
+        key: win32
     - name: Restore debian packages cache
       run: |
         if [ -d ~/PawPawBuilds/debs ] && [ "$(ls ~/PawPawBuilds/debs | wc -l)" -ne 0 ]; then \
@@ -154,7 +184,7 @@ jobs:
           ~/PawPawBuilds/debs
           ~/PawPawBuilds/downloads
           ~/PawPawBuilds/targets
-        key: win64-${PAWPAW_VERSION}
+        key: win64
     - name: Restore debian packages cache
       run: |
         if [ -d ~/PawPawBuilds/debs ] && [ "$(ls ~/PawPawBuilds/debs | wc -l)" -ne 0 ]; then \
