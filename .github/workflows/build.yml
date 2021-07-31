@@ -27,7 +27,7 @@ jobs:
           ~/PawPawBuilds/builds
           ~/PawPawBuilds/downloads
           ~/PawPawBuilds/targets
-        key: cache-macos
+        key: macos-${PAWPAW_VERSION}
     - name: Set up dependencies
       run: |
         brew install cmake jq meson
@@ -61,7 +61,7 @@ jobs:
           ~/PawPawBuilds/builds
           ~/PawPawBuilds/downloads
           ~/PawPawBuilds/targets
-        key: cache-macos-universal
+        key: macos-universal-${PAWPAW_VERSION}
     - name: Set up dependencies
       run: |
         brew install cmake jq meson
@@ -97,10 +97,15 @@ jobs:
       with:
         path: |
           ~/PawPawBuilds/builds
+          ~/PawPawBuilds/debs
           ~/PawPawBuilds/downloads
           ~/PawPawBuilds/targets
-          /var/cache/apt/archives
-        key: cache-win32
+        key: win32-${PAWPAW_VERSION}
+    - name: Restore debian packages cache
+      run: |
+        if [ -d ~/PawPawBuilds/debs ] && [ "$(ls ~/PawPawBuilds/debs | wc -l)" -ne 0 ]; then \
+          sudo cp ~/PawPawBuilds/debs/*.deb /var/cache/apt/archives/; \
+        fi
     - name: Set up dependencies
       run: |
         wget -qO- https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add -
@@ -108,6 +113,10 @@ jobs:
         sudo apt-add-repository -y 'deb https://dl.winehq.org/wine-builds/ubuntu/ focal main'
         sudo apt-get install -y autopoint build-essential curl cmake jq llvm mingw-w64 qttools5-dev-tools winehq-stable xvfb \
           binutils-mingw-w64-i686 g++-mingw-w64-i686
+    - name: Cache debian packages
+      run: |
+        mkdir -p ~/PawPawBuilds/debs && \
+        sudo mv /var/cache/apt/archives/*.deb ~/PawPawBuilds/debs/
     - name: Bootstrap win32 cross-compiled
       shell: bash
       run: |
@@ -123,6 +132,12 @@ jobs:
         ./waf configure --platform=win32 --prefix="$(pwd)/destdir" --static
         ./waf build -j $(nproc)
         ./waf install
+    - name: Generate MSVC lib files
+      shell: bash
+      run: |
+        llvm-dlltool -m i386 -D libjack.dll -d $(pwd)/destdir/lib/libjack.def -l $(pwd)/destdir/lib/libjack.lib
+        llvm-dlltool -m i386 -D libjacknet.dll -d $(pwd)/destdir/lib/libjacknet.def -l $(pwd)/destdir/lib/libjacknet.lib
+        llvm-dlltool -m i386 -D libjackserver.dll -d $(pwd)/destdir/lib/libjackserver.def -l $(pwd)/destdir/lib/libjackserver.lib
 
   # linux with win64 cross-compilation
   win64:
@@ -136,10 +151,15 @@ jobs:
       with:
         path: |
           ~/PawPawBuilds/builds
+          ~/PawPawBuilds/debs
           ~/PawPawBuilds/downloads
           ~/PawPawBuilds/targets
-          /var/cache/apt/archives
-        key: cache-win64
+        key: win64-${PAWPAW_VERSION}
+    - name: Restore debian packages cache
+      run: |
+        if [ -d ~/PawPawBuilds/debs ] && [ "$(ls ~/PawPawBuilds/debs | wc -l)" -ne 0 ]; then \
+          sudo cp ~/PawPawBuilds/debs/*.deb /var/cache/apt/archives/; \
+        fi
     - name: Set up dependencies
       run: |
         wget -qO- https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add -
@@ -147,6 +167,10 @@ jobs:
         sudo apt-add-repository -y 'deb https://dl.winehq.org/wine-builds/ubuntu/ focal main'
         sudo apt-get install -y autopoint build-essential curl cmake jq llvm mingw-w64 qttools5-dev-tools winehq-stable xvfb \
           binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64
+    - name: Cache debian packages
+      run: |
+        mkdir -p ~/PawPawBuilds/debs && \
+        sudo mv /var/cache/apt/archives/*.deb ~/PawPawBuilds/debs/
     - name: Bootstrap win64 cross-compiled
       shell: bash
       run: |
@@ -162,3 +186,10 @@ jobs:
         ./waf configure --platform=win32 --prefix="$(pwd)/destdir" --static
         ./waf build -j $(nproc)
         ./waf install
+    - name: Generate MSVC lib files
+      shell: bash
+      run: |
+        llvm-dlltool -m i386 -D libjack.dll -d $(pwd)/destdir/lib32/libjack.def -l $(pwd)/destdir/lib32/libjack.lib
+        llvm-dlltool -m i386:x86-64 -D libjack64.dll -d $(pwd)/destdir/lib/libjack64.def -l $(pwd)/destdir/lib/libjack64.lib
+        llvm-dlltool -m i386:x86-64 -D libjacknet64.dll -d $(pwd)/destdir/lib/libjacknet64.def -l $(pwd)/destdir/lib/libjacknet64.lib
+        llvm-dlltool -m i386:x86-64 -D libjackserver64.dll -d $(pwd)/destdir/lib/libjackserver64.def -l $(pwd)/destdir/lib/libjackserver64.lib
