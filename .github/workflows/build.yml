@@ -170,6 +170,24 @@ jobs:
         llvm-dlltool -m i386 -D libjacknet.dll -d libjacknet.def -l libjacknet.lib
         llvm-dlltool -m i386 -D libjackserver.dll -d libjackserver.def -l libjackserver.lib
         popd
+    - name: Set sha8
+      id: slug
+      run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+    - name: Generate Windows installer
+      shell: bash
+      run: |
+        # Setup wine
+        export WINEPREFIX=$(pwd)/innosetup
+        wineboot -u
+        # Download and install innosetup
+        curl -L https://jrsoftware.org/download.php/is.exe?site=2 -o is.exe
+        wine is.exe /allusers /dir=C:\\InnoSeup /nocancel /norestart /verysilent
+        # create installer
+        ln -sf $(pwd)/destdir windows/inno/win32
+        pushd windows/inno
+        echo "#define VERSION \"${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}\"" > version.iss
+        wine ${WINEPREFIX}/drive_c/InnoSeup/ISCC.exe win32-mini.iss
+        popd
 
   # linux with win64 cross-compilation
   win64:
@@ -232,4 +250,22 @@ jobs:
         llvm-dlltool -m i386:x86-64 -D libjack64.dll -d libjack64.def -l libjack64.lib
         llvm-dlltool -m i386:x86-64 -D libjacknet64.dll -d libjacknet64.def -l libjacknet64.lib
         llvm-dlltool -m i386:x86-64 -D libjackserver64.dll -d libjackserver64.def -l libjackserver64.lib
+        popd
+    - name: Set sha8
+      id: slug
+      run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+    - name: Generate Windows installer
+      shell: bash
+      run: |
+        # Setup wine
+        export WINEPREFIX=$(pwd)/innosetup
+        wineboot -u
+        # Download and install innosetup
+        curl -L https://jrsoftware.org/download.php/is.exe?site=2 -o is.exe
+        wine64 is.exe /allusers /dir=C:\\InnoSeup /nocancel /norestart /verysilent
+        # create installer
+        ln -sf $(pwd)/destdir windows/inno/win64
+        pushd windows/inno
+        echo "#define VERSION \"${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}\"" > version.iss
+        wine64 ${WINEPREFIX}/drive_c/InnoSeup/ISCC.exe win64-mini.iss
         popd
