@@ -15,7 +15,11 @@ fi
 
 # ---------------------------------------------------------------------------------------------------------------------
 
-VERSION=$(cat ../wscript | awk 'sub("VERSION=","")' | tr -d "'")
+if [ -n "${2}" ]; then
+    VERSION="${2}"
+else
+    VERSION=$(cat ../wscript | awk 'sub("VERSION=","")' | tr -d "'")
+fi
 
 rm -f jack2-osx-root.pkg
 rm -f jack2-osx-${VERSION}.pkg
