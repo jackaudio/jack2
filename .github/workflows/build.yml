@@ -313,4 +313,4 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: jack2-ubuntu-20.04-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-        path: ./*.deb
+        path: ../*.deb
