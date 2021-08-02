@@ -305,7 +305,11 @@ jobs:
     - name: Build jack2 packages
       shell: bash
       run: |
-        apt-get source jackd2
+        apt-get source -d jackd2
+        tar xf *.debian.tar.xz
+        rm -rf debian/source
+        dch -M -b -v "$(cat wscript | awk 'sub("VERSION=","")' | tr -d "'")~$(date +"%Y%m%d")git${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}" -D focal "automated build"
+        debuild -rfakeroot --no-lintian || true
     - uses: actions/upload-artifact@v2
       with:
         name: jack2-ubuntu-20.04-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
