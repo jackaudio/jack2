@@ -27,19 +27,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 namespace Jack
 {
-		struct JackRequest;
-	struct JackResult;
-		
-		class JackPosixMutex;
-	class JackPosixThread;
-	class JackPosixSemaphore;
+    struct JackRequest;
+    struct JackResult;
 
-	class JackSocketServerChannel;
-	class JackSocketClientChannel;
-	class JackSocketServerNotifyChannel;
-	class JackSocketNotifyChannel;
-	class JackClientSocket;
-	class JackNetUnixSocket;
+    class JackPosixMutex;
+    class JackPosixThread;
+    class JackPosixSemaphore;
+
+    class JackSocketServerChannel;
+    class JackSocketClientChannel;
+    class JackSocketServerNotifyChannel;
+    class JackSocketNotifyChannel;
+    class JackClientSocket;
+    class JackNetUnixSocket;
 }
 
 /* __JackPlatformMutex__ */
