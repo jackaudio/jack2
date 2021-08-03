@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 static inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void* addr)
 {
-		 return atomic_cmpset_32((uint32_t*)addr, value, newvalue);
+    return atomic_cmpset_32((uint32_t*)addr, value, newvalue);
 }
 
 #endif
