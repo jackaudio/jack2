@@ -39,12 +39,16 @@ class SERVER_EXPORT JackMachSemaphore : public detail::JackSynchro
     private:
 
         semaphore_t fSemaphore;
-        mach_port_t fBootPort;
 
         int fSharedMem;
-        char* fSharedName;
 
-        bool recursiveBootstrapRegister(int counter);
+        /*! \brief Pointer to shared memory containing semaphore send right port.
+         *
+         * If the semaphore has been Allocate()d (in the case of the server) or Connect()ed (in the
+         * case of the client), and not yet Disconnect()ed or Destroy()ed, a pointer to a shared
+         * memory segment at which a send right for a semaphore can be found. Otherwise, NULL.
+         */
+        mach_port_t* fSharedSemaphoreSend;
 
     protected:
 
@@ -52,7 +56,7 @@ class SERVER_EXPORT JackMachSemaphore : public detail::JackSynchro
 
     public:
 
-        JackMachSemaphore():JackSynchro(), fSemaphore(0), fBootPort(0), fSharedMem(0), fSharedName(NULL)
+        JackMachSemaphore():JackSynchro(), fSemaphore(0), fSharedMem(0), fSharedSemaphoreSend(NULL)
         {}
 
         bool Signal();
