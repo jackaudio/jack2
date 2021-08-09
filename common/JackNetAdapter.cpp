@@ -35,7 +35,7 @@ namespace Jack
         because we don't have full parametering right now, parameters will be parsed from the param list,
         and then JackNetSlaveInterface will be filled with proper values.
         */
-        char multicast_ip[32];
+        char multicast_ip[32],multicast_if[32];
         uint udp_port;
         GetHostName(fParams.fName, JACK_CLIENT_NAME_SIZE);
         fSocket.GetName(fParams.fSlaveNetName);
@@ -58,11 +58,10 @@ namespace Jack
         udp_port = (default_udp_port) ? atoi(default_udp_port) : DEFAULT_PORT;
 
         const char* default_multicast_ip = getenv("JACK_NETJACK_MULTICAST");
-        if (default_multicast_ip) {
-            strcpy(multicast_ip, default_multicast_ip);
-        } else {
-            strcpy(multicast_ip, DEFAULT_MULTICAST_IP);
-        }
+        strcpy(multicast_ip, (default_multicast_ip) ? default_multicast_ip : DEFAULT_MULTICAST_IP); 
+
+        const char* default_multicast_if = getenv("JACK_NETJACK_INTERFACE");
+        strcpy(multicast_if, (default_multicast_if) ? default_multicast_if : DEFAULT_MULTICAST_IF); 
 
         //options parsing
         const JSList* node;
@@ -75,6 +74,10 @@ namespace Jack
                 case 'a' :
                     assert(strlen(param->value.str) < 32);
                     strcpy(multicast_ip, param->value.str);
+                    break;
+                case 'f' :
+                    assert(strlen(param->value.str) < 32);
+                    strcpy(multicast_if, param->value.str);
                     break;
                 case 'p' :
                     udp_port = param->value.ui;
@@ -128,9 +131,10 @@ namespace Jack
         }
 
         strcpy(fMulticastIP, multicast_ip);
+        if(strcmp(multicast_if,DEFAULT_MULTICAST_IF))
+            strcpy(fMulticastIF, multicast_if);
 
         // Set the socket parameters
-        fSocket.SetPort(udp_port);
         fSocket.SetAddress(fMulticastIP, udp_port);
 
         // If not set, takes default
@@ -423,6 +427,9 @@ extern "C"
 
         strcpy(value.str, DEFAULT_MULTICAST_IP);
         jack_driver_descriptor_add_parameter(desc, &filler, "multicast-ip", 'a', JackDriverParamString, &value, NULL, "Multicast address, or explicit IP of the master", NULL);
+
+        strcpy(value.str, DEFAULT_MULTICAST_IF);
+        jack_driver_descriptor_add_parameter(desc, &filler, "multicast-if", 'f', JackDriverParamString, &value, NULL, "Multicast interface name or any", "Multicast interface to send probes from (any - kernel chosen (default), if_name - from specified interface)");
 
         value.i = DEFAULT_PORT;
         jack_driver_descriptor_add_parameter(desc, &filler, "udp-net-port", 'p', JackDriverParamInt, &value, NULL, "UDP port", NULL);

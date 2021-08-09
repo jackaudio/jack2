@@ -33,20 +33,27 @@ namespace Jack
 #define SOCKET_ERROR -1
 #define StrError strerror
 
-    typedef struct sockaddr socket_address_t;
-    typedef struct in_addr address_t;
-
     //JackNetUnixSocket********************************************
     class SERVER_EXPORT JackNetUnixSocket
     {
-        private:
+        protected:
 
+            int fFamily;
             int fSockfd;
+            int fState;
             int fPort;
             int fTimeOut;
+            struct sockaddr_storage fSendAddr;
+            struct sockaddr_storage fRecvAddr;
+            void Clone(const JackNetUnixSocket& socket);
+            int ProbeAF(const char* ip, struct sockaddr_storage *addr, int (*call)(int, const struct sockaddr*, socklen_t));
+            int BindMCastIface(const char *if_name, const int option, struct in_addr *addr);
+            int BindMCast6Iface(const char *if_name, struct in6_addr *addr);
 
-            struct sockaddr_in fSendAddr;
-            struct sockaddr_in fRecvAddr;
+        private:
+
+            char f_addr_buff[INET6_ADDRSTRLEN];
+
         #if defined(__sun__) || defined(sun)
             int WaitRead();
             int WaitWrite();
@@ -62,8 +69,10 @@ namespace Jack
             JackNetUnixSocket& operator=(const JackNetUnixSocket& socket);
 
             //socket management
+            int NewSocket(const char *ip);
             int NewSocket();
             int Bind();
+            int Bind(const char *if_name);
             int BindWith(const char* ip);
             int BindWith(int port);
             int Connect();
@@ -79,11 +88,14 @@ namespace Jack
             //address management
             int SetAddress(const char* ip, int port);
             char* GetSendIP();
+            int SetSendIP(const char *ip);
             char* GetRecvIP();
+            int SetRecvIP(const char *ip);
 
             //utility
             int GetName(char* name);
             int JoinMCastGroup(const char* mcast_ip);
+            int JoinMCastGroup(const char* mcast_ip, const char* if_name);
 
             //options management
             int SetOption(int level, int optname, const void* optval, socklen_t optlen);

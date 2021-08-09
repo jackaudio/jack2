@@ -79,7 +79,7 @@ namespace Jack
         public:
 
             JackNetDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
-                        const char* ip, int port, int mtu, int midi_input_ports, int midi_output_ports,
+                        const char* ip, int port, const char* mcif, int mtu, int midi_input_ports, int midi_output_ports,
                         char* net_name, uint transport_sync, int network_latency, int celt_encoding,
                         int opus_encoding, bool auto_save);
             virtual ~JackNetDriver();
