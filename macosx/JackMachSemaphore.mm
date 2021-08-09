@@ -128,6 +128,11 @@ bool JackMachSemaphore::TimedWait(long usec)
  */
 bool JackMachSemaphore::Allocate(const char* client_name, const char* server_name, int value)
 {
+    if (fSemaphore != MACH_PORT_NULL) {
+        jack_error("JackMachSemaphore::Allocate: Semaphore already allocated; called twice? [%s]", fName);
+        return false;
+    }
+
     BuildName(client_name, server_name, fName, sizeof(fName));
 
     mach_port_t task = mach_task_self();
@@ -147,16 +152,28 @@ bool JackMachSemaphore::Allocate(const char* client_name, const char* server_nam
 
     if ((res = mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &fServicePort)) != KERN_SUCCESS) {
         jack_mach_error(res, "failed to allocate IPC port");
+
+        // Cleanup created semaphore
+        this->Destroy();
+
         return false;
     }
 
     if ((res = mach_port_insert_right(mach_task_self(), fServicePort, fServicePort, MACH_MSG_TYPE_MAKE_SEND)) != KERN_SUCCESS) {
         jack_mach_error(res, "failed to obtain send right for IPC port");
+
+        // Cleanup created semaphore & mach port
+        this->Destroy();
+
         return false;
     }
 
     if ((res = bootstrap_register(fBootPort, fName, fServicePort)) != KERN_SUCCESS) {
         jack_mach_bootstrap_err(res, "can't register IPC port with bootstrap server", fName);
+
+        // Cleanup created semaphore & mach port
+        this->Destroy();
+
         return false;
     }
 
@@ -165,6 +182,10 @@ bool JackMachSemaphore::Allocate(const char* client_name, const char* server_nam
 
     if (fThreadSemServer->Start() < 0) {
         jack_error("JackMachSemaphore::Allocate: failed to start semaphore IPC server thread [%s]", fName);
+
+        // Cleanup created semaphore, mach port (incl. service registration), and server
+        this->Destroy();
+
         return false;
     }
 
@@ -201,7 +222,7 @@ bool JackMachSemaphore::ConnectInput(const char* client_name, const char* server
     }
 
     if ((res = bootstrap_look_up(fBootPort, fName, &fServicePort)) != KERN_SUCCESS) {
-        jack_mach_bootstrap_err(res, "can't find mach semaphore", fName);
+        jack_mach_bootstrap_err(res, "can't find IPC service port to request semaphore", fName);
         return false;
     }
 
@@ -209,6 +230,13 @@ bool JackMachSemaphore::ConnectInput(const char* client_name, const char* server
 
     if ((res = mach_port_allocate(task, MACH_PORT_RIGHT_RECEIVE, &semaphore_req_port)) != KERN_SUCCESS) {
         jack_mach_error(res, "failed to allocate request port");
+
+        if ((res = mach_port_deallocate(task, fServicePort)) != KERN_SUCCESS) {
+            jack_mach_error(res, "failed to deallocate IPC service port during cleanup");
+        } else {
+            fServicePort = MACH_PORT_NULL;
+        }
+
         return false;
     }
 
@@ -226,7 +254,6 @@ bool JackMachSemaphore::ConnectInput(const char* client_name, const char* server
     msg.hdr.msgh_bits = MACH_MSGH_BITS(MACH_MSG_TYPE_MOVE_SEND, MACH_MSG_TYPE_MAKE_SEND_ONCE);
     msg.hdr.msgh_local_port = semaphore_req_port;
     msg.hdr.msgh_remote_port = fServicePort;
-    fServicePort = MACH_PORT_NULL; // We moved it into the message and away to the destination
 
     mach_msg_return_t send_err = mach_msg(
         &msg.hdr,
@@ -239,7 +266,20 @@ bool JackMachSemaphore::ConnectInput(const char* client_name, const char* server
 
     if (send_err != MACH_MSG_SUCCESS) {
         jack_mach_error(send_err, "failed to send semaphore port request IPC");
+
+        if ((res = mach_port_deallocate(task, fServicePort)) != KERN_SUCCESS) {
+            jack_mach_error(res, "failed to deallocate IPC service port during cleanup");
+        } else {
+            fServicePort = MACH_PORT_NULL;
+        }
+
+        if ((res = mach_port_destroy(task, semaphore_req_port)) != KERN_SUCCESS) {
+            jack_mach_error(res, "failed to destroy IPC request port during cleanup");
+        }
+
         return false;
+    } else {
+        fServicePort = MACH_PORT_NULL; // We moved it into the message and away to the destination
     }
 
     mach_msg_return_t recv_err = mach_msg(
@@ -252,21 +292,22 @@ bool JackMachSemaphore::ConnectInput(const char* client_name, const char* server
         MACH_PORT_NULL
     );
 
-    if (recv_err != MACH_MSG_SUCCESS) {
-        jack_mach_error(recv_err, "failed to receive semaphore port");
-        return false;
-    }
-
-    fSemaphore = msg.hdr.msgh_remote_port;
-
-    // Don't leak ports: destroy the port we created to send/receive the request
+    /* Don't leak ports: irrespective of if we succeeded to read or not, destroy the port we created
+     * to send/receive the request as we have no further use for it either way. */
     if ((res = mach_port_destroy(task, semaphore_req_port)) != KERN_SUCCESS) {
         jack_mach_error(res, "failed to destroy semaphore_req_port");
         // This isn't good, but doesn't actually stop the semaphore from working... don't bail
     }
 
-    jack_log("JackMachSemaphore::Connect: OK, name = %s ", fName);
-    return true;
+    if (recv_err != MACH_MSG_SUCCESS) {
+        jack_mach_error(recv_err, "failed to receive semaphore port");
+        return false;
+    } else {
+        fSemaphore = msg.hdr.msgh_remote_port;
+
+        jack_log("JackMachSemaphore::Connect: OK, name = %s ", fName);
+        return true;
+    }
 }
 
 bool JackMachSemaphore::Connect(const char* name, const char* server_name)
@@ -295,6 +336,8 @@ bool JackMachSemaphore::Disconnect()
         if ((res = mach_port_deallocate(task, fServicePort)) != KERN_SUCCESS) {
             jack_mach_error(res, "failed to deallocate stray service port");
             // Continue cleanup even if this fails; don't bail
+        } else {
+            fServicePort = MACH_PORT_NULL;
         }
     }
 
