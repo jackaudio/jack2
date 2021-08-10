@@ -21,6 +21,7 @@ example_tools = {
 def configure(conf):
     conf.env['BUILD_TOOL_ALSA_IO'] = conf.env['SAMPLERATE'] and conf.env['BUILD_DRIVER_ALSA']
     conf.env['BUILD_TOOL_CLIENT_TRANSPORT'] = conf.env['READLINE']
+    conf.env['BUILD_TOOL_CLIENT_NETSOURCE'] = conf.env['CELT'] or conf.env['OPUS']
     conf.env['BUILD_TOOL_ZALSA'] = conf.env['ZALSA']
 
 def build(bld):
@@ -66,7 +67,7 @@ def build(bld):
                 prog.env['LIB_PTHREAD'] = [':libwinpthread.a']
         prog.target = 'jack_transport'
 
-    if bld.env['IS_LINUX'] or bld.env['IS_MACOSX']:
+    if bld.env['BUILD_TOOL_CLIENT_NETSOURCE']:
         prog = bld(features = 'c cprogram')
         prog.includes = os_incdir + ['.', '..', '../common/jack', '../common']
         prog.source = ['netsource.c', '../common/netjack_packet.c']
