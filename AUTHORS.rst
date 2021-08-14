@@ -72,6 +72,7 @@ Nedko Arnaudov
 Olaf Hering
 Olivier Humbert
 Paul Davis
+Peter Bridgman
 Peter L Jones
 Pieter Palmers
 Ricardo Crudo
