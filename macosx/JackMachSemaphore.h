@@ -22,6 +22,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "JackCompilerDeps.h"
 #include "JackSynchro.h"
+
+#include "JackMachThread.h"
+#include "JackMachSemaphoreServer.h"
+
 #include <mach/mach.h>
 #include <servers/bootstrap.h>
 #include <mach/semaphore.h>
@@ -38,13 +42,24 @@ class SERVER_EXPORT JackMachSemaphore : public detail::JackSynchro
 
     private:
 
+        /*! \brief A mach send right to the mach semaphore, or MACH_PORT_NULL if not yet Allocate()d
+         * (server) or Connect()ed (client). */
         semaphore_t fSemaphore;
+
+        /*! \brief The bootstrap port for this task, or MACH_PORT_NULL if not yet obtained. */
         mach_port_t fBootPort;
 
-        int fSharedMem;
-        char* fSharedName;
+        /*! \brief The IPC port used to pass the semaphore port from the server to the client, and
+         * for the client to request that this occurs. MACH_PORT_NULL if not yet created (server) or
+         * looked up (client). */
+        mach_port_t fServicePort;
 
-        bool recursiveBootstrapRegister(int counter);
+        /*! \brief On the server, if allocated, a runnable semaphore server which listens for IPC
+         * messages and replies with a send right for a semaphore port. */
+        JackMachSemaphoreServer* fSemServer;
+
+        /*! \brief On the server, if allocated, a thread that runs \ref fSemServer. */
+        JackMachThread* fThreadSemServer;
 
     protected:
 
@@ -52,7 +67,13 @@ class SERVER_EXPORT JackMachSemaphore : public detail::JackSynchro
 
     public:
 
-        JackMachSemaphore():JackSynchro(), fSemaphore(0), fBootPort(0), fSharedMem(0), fSharedName(NULL)
+        JackMachSemaphore():
+            JackSynchro(),
+            fSemaphore(MACH_PORT_NULL),
+            fBootPort(MACH_PORT_NULL),
+            fServicePort(MACH_PORT_NULL),
+            fSemServer(NULL),
+            fThreadSemServer(NULL)
         {}
 
         bool Signal();
