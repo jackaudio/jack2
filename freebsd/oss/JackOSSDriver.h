@@ -28,13 +28,13 @@ namespace Jack
 
 typedef jack_default_audio_sample_t jack_sample_t;
 
-#define OSS_DRIVER_DEF_DEV	"/dev/dsp"
-#define OSS_DRIVER_DEF_FS	48000
-#define OSS_DRIVER_DEF_BLKSIZE	1024
-#define OSS_DRIVER_DEF_NPERIODS	1
-#define OSS_DRIVER_DEF_BITS	16
-#define OSS_DRIVER_DEF_INS	2
-#define OSS_DRIVER_DEF_OUTS	2
+#define OSS_DRIVER_DEF_DEV "/dev/dsp"
+#define OSS_DRIVER_DEF_FS 48000
+#define OSS_DRIVER_DEF_BLKSIZE 1024
+#define OSS_DRIVER_DEF_NPERIODS 1
+#define OSS_DRIVER_DEF_BITS 16
+#define OSS_DRIVER_DEF_INS 2
+#define OSS_DRIVER_DEF_OUTS 2
 
 /*!
 \brief The OSS driver.
@@ -42,21 +42,22 @@ typedef jack_default_audio_sample_t jack_sample_t;
 
 class JackOSSDriver : public JackAudioDriver
 {
-
-    enum { kRead = 1, kWrite = 2, kReadWrite = 3 };
-
     private:
 
         int fInFD;
         int fOutFD;
 
         int fBits;
-        int fSampleFormat;
         int fNperiods;
-        unsigned int fSampleSize;
-        int fRWMode;
+        bool fCapture;
+        bool fPlayback;
         bool fExcl;
         bool fIgnoreHW;
+        jack_nframes_t fExtraCaptureLatency;
+        jack_nframes_t fExtraPlaybackLatency;
+
+        unsigned int fInSampleSize;
+        unsigned int fOutSampleSize;
 
         unsigned int fInputBufferSize;
         unsigned int fOutputBufferSize;
@@ -64,26 +65,49 @@ class JackOSSDriver : public JackAudioDriver
         void* fInputBuffer;
         void* fOutputBuffer;
 
-        bool fFirstCycle;
+        jack_nframes_t fInBlockSize;
+        jack_nframes_t fOutBlockSize;
+        jack_nframes_t fInMeanStep;
+        jack_nframes_t fOutMeanStep;
+        jack_nframes_t fOSSInBuffer;
+        jack_nframes_t fOSSOutBuffer;
+
+        jack_time_t fOSSReadSync;
+        long long fOSSReadOffset;
+        jack_time_t fOSSWriteSync;
+        long long fOSSWriteOffset;
+
+        // Buffer balance and sync correction
+        long long fBufferBalance;
+        bool fForceBalancing;
+        bool fForceSync;
 
         int OpenInput();
         int OpenOutput();
         int OpenAux();
         void CloseAux();
-        void SetSampleFormat();
         void DisplayDeviceInfo();
-
-        // Redefining since timing for CPU load is specific
-        int ProcessSync();
+        int ProbeInBlockSize();
+        int ProbeOutBlockSize();
+        int Discard(jack_nframes_t frames);
+        int WriteSilence(jack_nframes_t frames);
+        int WaitAndSync();
 
     public:
 
         JackOSSDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
                 : JackAudioDriver(name, alias, engine, table),
                 fInFD(-1), fOutFD(-1), fBits(0),
-                fSampleFormat(0), fNperiods(0), fRWMode(0), fExcl(false), fIgnoreHW(true),
+                fNperiods(0), fCapture(false), fPlayback(false), fExcl(false), fIgnoreHW(true),
+                fExtraCaptureLatency(0), fExtraPlaybackLatency(0),
+                fInSampleSize(0), fOutSampleSize(0),
                 fInputBufferSize(0), fOutputBufferSize(0),
-                fInputBuffer(NULL), fOutputBuffer(NULL), fFirstCycle(true)
+                fInputBuffer(NULL), fOutputBuffer(NULL),
+                fInBlockSize(1), fOutBlockSize(1),
+                fInMeanStep(0), fOutMeanStep(0),
+                fOSSInBuffer(0), fOSSOutBuffer(0),
+                fOSSReadSync(0), fOSSReadOffset(0), fOSSWriteSync(0), fOSSWriteOffset(0),
+                fBufferBalance(0), fForceBalancing(false), fForceSync(false)
         {}
 
         virtual ~JackOSSDriver()
