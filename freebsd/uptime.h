@@ -1,1 +1,1 @@
-../linux/uptime.h
+#include "../linux/uptime.h"
