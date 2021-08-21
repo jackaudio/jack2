@@ -28,6 +28,7 @@
 #define __jack_metadata_h__
 
 #include <jack/types.h>
+#include <jack/systemdeps.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -88,6 +89,7 @@ typedef struct {
  *             types in the definition of jack_property_t above.
  * @return 0 on success.
  */
+JACK_CLIENT_API_EXPORT
 int
 jack_set_property(jack_client_t*,
                   jack_uuid_t subject,
@@ -108,6 +110,7 @@ jack_set_property(jack_client_t*,
  *
  * @return 0 on success, -1 if the @p subject has no @p key property.
  */
+JACK_CLIENT_API_EXPORT
 int
 jack_get_property(jack_uuid_t subject,
                   const char* key,
@@ -130,6 +133,7 @@ typedef struct {
  * @param desc a jack_description_t whose associated memory will all be released
  * @param free_description_itself if non-zero, then @param desc will also be passed to free()
  */
+JACK_CLIENT_API_EXPORT
 void
 jack_free_description (jack_description_t* desc, int free_description_itself);
 
@@ -140,6 +144,7 @@ jack_free_description (jack_description_t* desc, int free_description_itself);
  *             The caller must free this value with jack_free_description().
  * @return the number of properties, -1 if no @p subject with any properties exists.
  */
+JACK_CLIENT_API_EXPORT
 int
 jack_get_properties (jack_uuid_t         subject,
                      jack_description_t* desc);
@@ -151,6 +156,7 @@ jack_get_properties (jack_uuid_t         subject,
  *              and the array itself with jack_free().
  * @return the number of descriptions, or -1 on error.
  */
+JACK_CLIENT_API_EXPORT
 int
 jack_get_all_properties (jack_description_t** descs);
 
@@ -163,6 +169,7 @@ jack_get_all_properties (jack_description_t** descs);
  *
  * @return 0 on success, -1 otherwise
  */
+JACK_CLIENT_API_EXPORT
 int jack_remove_property (jack_client_t* client, jack_uuid_t subject, const char* key);
 
 /**
@@ -173,6 +180,7 @@ int jack_remove_property (jack_client_t* client, jack_uuid_t subject, const char
  *
  * @return a count of the number of properties removed, or -1 on error.
  */
+JACK_CLIENT_API_EXPORT
 int jack_remove_properties (jack_client_t* client, jack_uuid_t subject);
 
 /**
@@ -186,6 +194,7 @@ int jack_remove_properties (jack_client_t* client, jack_uuid_t subject);
  *
  * @return 0 on success, -1 otherwise
  */
+JACK_CLIENT_API_EXPORT
 int jack_remove_all_properties (jack_client_t* client);
 
 typedef enum {
@@ -221,6 +230,7 @@ typedef void (*JackPropertyChangeCallback)(jack_uuid_t            subject,
  *
  * @return 0 success, -1 otherwise.
  */
+JACK_CLIENT_API_EXPORT
 int jack_set_property_change_callback (jack_client_t*             client,
                                        JackPropertyChangeCallback callback,
                                        void*                      arg);
@@ -229,6 +239,7 @@ int jack_set_property_change_callback (jack_client_t*             client,
  * A value that identifies what the hardware port is connected to (an external
  * device of some kind). Possible values might be "E-Piano" or "Master 2 Track".
  */
+JACK_CLIENT_API_EXPORT
 extern const char* JACK_METADATA_CONNECTED;
 
 /**
@@ -242,6 +253,7 @@ extern const char* JACK_METADATA_CONNECTED;
  * status byte will gracefully ignore OSC messages if the user makes an
  * inappropriate connection.
  */
+JACK_CLIENT_API_EXPORT
 extern const char* JACK_METADATA_EVENT_TYPES;
 
 /**
@@ -249,6 +261,7 @@ extern const char* JACK_METADATA_EVENT_TYPES;
  * specific hardware outputs of a client. Typical values might be
  * "ADAT1", "S/PDIF L" or "MADI 43".
  */
+JACK_CLIENT_API_EXPORT
 extern const char* JACK_METADATA_HARDWARE;
 
 /**
@@ -256,6 +269,7 @@ extern const char* JACK_METADATA_HARDWARE;
  * NxN (with 32 < N <= 128) image to be used when displaying a visual
  * representation of that client or port.
  */
+JACK_CLIENT_API_EXPORT
 extern const char* JACK_METADATA_ICON_LARGE;
 
 /**
@@ -267,6 +281,7 @@ extern const char* JACK_METADATA_ICON_LARGE;
  * Theme Specification:
  * https://specifications.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
  */
+JACK_CLIENT_API_EXPORT
 extern const char* JACK_METADATA_ICON_NAME;
 
 /**
@@ -274,6 +289,7 @@ extern const char* JACK_METADATA_ICON_NAME;
  * NxN (with N <=32) image to be used when displaying a visual representation
  * of that client or port.
  */
+JACK_CLIENT_API_EXPORT
 extern const char* JACK_METADATA_ICON_SMALL;
 
 /**
@@ -287,6 +303,7 @@ extern const char* JACK_METADATA_ICON_SMALL;
  *
  * It is encouraged to use http://www.w3.org/2001/XMLSchema#int as the type.
  */
+JACK_CLIENT_API_EXPORT
 extern const char* JACK_METADATA_ORDER;
 
 /**
@@ -294,10 +311,12 @@ extern const char* JACK_METADATA_ORDER;
  * unless the user has explicitly overridden that a request to show the port
  * name, or some other key value.
  */
+JACK_CLIENT_API_EXPORT
 extern const char* JACK_METADATA_PRETTY_NAME;
 
 /**
  */
+JACK_CLIENT_API_EXPORT
 extern const char* JACK_METADATA_PORT_GROUP;
 
 /**
@@ -309,6 +328,7 @@ extern const char* JACK_METADATA_PORT_GROUP;
  * their output directly to speakers.  In particular, CV ports are not
  * necessarily periodic at all and may have very high DC.
  */
+JACK_CLIENT_API_EXPORT
 extern const char* JACK_METADATA_SIGNAL_TYPE;
 
 /**

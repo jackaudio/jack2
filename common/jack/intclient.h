@@ -26,6 +26,7 @@ extern "C"
 #endif
 
 #include <jack/types.h>
+#include <jack/systemdeps.h>
 
 /**
  * Get an internal client's name.  This is useful when @ref
@@ -42,6 +43,7 @@ extern "C"
  * client name obtained from the heap via malloc().  The caller should
  * jack_free() this storage when no longer needed.
  */
+JACK_CLIENT_API_EXPORT
 char *jack_get_internal_client_name (jack_client_t *client,
                                      jack_intclient_t intclient);
 
@@ -63,6 +65,7 @@ char *jack_get_internal_client_name (jack_client_t *client,
  * internal client was not found, and @a *status includes the @ref
  * JackNoSuchClient and @ref JackFailure bits.
  */
+JACK_CLIENT_API_EXPORT
 jack_intclient_t jack_internal_client_handle (jack_client_t *client,
         const char *client_name,
         jack_status_t *status);
@@ -104,6 +107,7 @@ jack_intclient_t jack_internal_client_handle (jack_client_t *client,
  * the load operation failed, the internal client was not loaded, and
  * @a *status includes the @ref JackFailure bit.
  */
+JACK_CLIENT_API_EXPORT
 jack_intclient_t jack_internal_client_load (jack_client_t *client,
         const char *client_name,
         jack_options_t options,
@@ -120,6 +124,7 @@ jack_intclient_t jack_internal_client_load (jack_client_t *client,
  *
  * @return 0 if successful, otherwise @ref JackStatus bits.
  */
+JACK_CLIENT_API_EXPORT
 jack_status_t jack_internal_client_unload (jack_client_t *client,
         jack_intclient_t intclient);
 

@@ -50,6 +50,7 @@ extern "C"
  * Otherwise returns -1.
  */
 
+JACK_CLIENT_API_EXPORT
 int jack_client_real_time_priority (jack_client_t*) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
@@ -58,6 +59,7 @@ int jack_client_real_time_priority (jack_client_t*) JACK_OPTIONAL_WEAK_EXPORT;
  * is subject to realtime scheduling. Otherwise returns -1.
  */
 
+JACK_CLIENT_API_EXPORT
 int jack_client_max_real_time_priority (jack_client_t*) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
@@ -70,6 +72,7 @@ int jack_client_max_real_time_priority (jack_client_t*) JACK_OPTIONAL_WEAK_EXPOR
  * @returns 0, if successful; EPERM, if the calling process lacks
  * required realtime privileges; otherwise some other error number.
  */
+JACK_CLIENT_API_EXPORT
 int jack_acquire_real_time_scheduling (jack_native_thread_t thread, int priority) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
@@ -88,12 +91,13 @@ int jack_acquire_real_time_scheduling (jack_native_thread_t thread, int priority
  *
  * @returns 0, if successful; otherwise some error number.
  */
+JACK_CLIENT_API_EXPORT
 int jack_client_create_thread (jack_client_t* client,
-                               jack_native_thread_t *thread,
-                               int priority,
-                               int realtime, 	/* boolean */
-                               void *(*start_routine)(void*),
-                               void *arg) JACK_OPTIONAL_WEAK_EXPORT;
+                                                      jack_native_thread_t *thread,
+                                                      int priority,
+                                                      int realtime, 	/* boolean */
+                                                      void *(*start_routine)(void*),
+                                                      void *arg) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Drop realtime scheduling for a thread.
@@ -102,6 +106,7 @@ int jack_client_create_thread (jack_client_t* client,
  *
  * @returns 0, if successful; otherwise an error number.
  */
+JACK_CLIENT_API_EXPORT
 int jack_drop_real_time_scheduling (jack_native_thread_t thread) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
@@ -111,6 +116,7 @@ int jack_drop_real_time_scheduling (jack_native_thread_t thread) JACK_OPTIONAL_W
  *
  * @returns 0, if successful; otherwise an error number.
  */
+JACK_CLIENT_API_EXPORT
 int jack_client_stop_thread(jack_client_t* client, jack_native_thread_t thread) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
@@ -120,7 +126,8 @@ int jack_client_stop_thread(jack_client_t* client, jack_native_thread_t thread) 
  *
  * @returns 0, if successful; otherwise an error number.
  */
- int jack_client_kill_thread(jack_client_t* client, jack_native_thread_t thread) JACK_OPTIONAL_WEAK_EXPORT;
+JACK_CLIENT_API_EXPORT
+int jack_client_kill_thread(jack_client_t* client, jack_native_thread_t thread) JACK_OPTIONAL_WEAK_EXPORT;
 
 #ifndef _WIN32
 
@@ -147,6 +154,7 @@ int jack_client_stop_thread(jack_client_t* client, jack_native_thread_t thread) 
  * @param creator a function that creates a new thread
  *
  */
+JACK_CLIENT_API_EXPORT
 void jack_set_thread_creator (jack_thread_creator_t creator) JACK_OPTIONAL_WEAK_EXPORT;
 
 #endif

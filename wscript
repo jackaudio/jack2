@@ -229,7 +229,10 @@ def configure(conf):
     conf.env.append_unique('CFLAGS', '-Wall')
     conf.env.append_unique('CXXFLAGS', ['-Wall', '-Wno-invalid-offsetof'])
     conf.env.append_unique('CXXFLAGS', '-std=gnu++11')
-
+    
+    conf.env.append_unique('CFLAGS', '-DBUILDING_JACK')
+    conf.env.append_unique('CXXFLAGS', '-DBUILDING_JACK')
+    
     if not conf.env['IS_MACOSX']:
         conf.env.append_unique('LDFLAGS', '-Wl,--no-undefined')
     else:

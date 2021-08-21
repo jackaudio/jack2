@@ -27,6 +27,7 @@ extern "C" {
 
 #include <jack/types.h>
 #include <jack/weakmacros.h>
+#include <jack/systemdeps.h>
 
 /**
  * @defgroup TransportControl Transport and Timebase control
@@ -49,6 +50,7 @@ extern "C" {
  *
  * @return 0 on success, otherwise a non-zero error code.
  */
+JACK_CLIENT_API_EXPORT
 int  jack_release_timebase (jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
@@ -71,7 +73,8 @@ int  jack_release_timebase (jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
  *
  * @return 0 on success, otherwise a non-zero error code.
  */
-int  jack_set_sync_callback (jack_client_t *client,
+JACK_CLIENT_API_EXPORT
+int jack_set_sync_callback (jack_client_t *client,
 			     JackSyncCallback sync_callback,
 			     void *arg) JACK_OPTIONAL_WEAK_EXPORT;
 
@@ -92,6 +95,7 @@ int  jack_set_sync_callback (jack_client_t *client,
  *
  * @return 0 on success, otherwise a non-zero error code.
  */
+JACK_CLIENT_API_EXPORT
 int  jack_set_sync_timeout (jack_client_t *client,
 			    jack_time_t timeout) JACK_OPTIONAL_WEAK_EXPORT;
 
@@ -120,6 +124,7 @@ int  jack_set_sync_timeout (jack_client_t *client,
  *   timebase master;
  *   - other non-zero error code.
  */
+JACK_CLIENT_API_EXPORT
 int  jack_set_timebase_callback (jack_client_t *client,
 				 int conditional,
 				 JackTimebaseCallback timebase_callback,
@@ -141,6 +146,7 @@ int  jack_set_timebase_callback (jack_client_t *client,
  *
  * @return 0 if valid request, non-zero otherwise.
  */
+JACK_CLIENT_API_EXPORT
 int  jack_transport_locate (jack_client_t *client,
 			    jack_nframes_t frame) JACK_OPTIONAL_WEAK_EXPORT;
 
@@ -159,6 +165,7 @@ int  jack_transport_locate (jack_client_t *client,
  *
  * @return Current transport state.
  */
+JACK_CLIENT_API_EXPORT
 jack_transport_state_t jack_transport_query (const jack_client_t *client,
 					     jack_position_t *pos) JACK_OPTIONAL_WEAK_EXPORT;
 
@@ -169,6 +176,7 @@ jack_transport_state_t jack_transport_query (const jack_client_t *client,
  *
  * @param client the JACK client structure
  */
+JACK_CLIENT_API_EXPORT
 jack_nframes_t jack_get_current_transport_frame (const jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
@@ -187,6 +195,7 @@ jack_nframes_t jack_get_current_transport_frame (const jack_client_t *client) JA
  *
  * @return 0 if valid request, EINVAL if position structure rejected.
  */
+JACK_CLIENT_API_EXPORT
 int  jack_transport_reposition (jack_client_t *client,
 				const jack_position_t *pos) JACK_OPTIONAL_WEAK_EXPORT;
 
@@ -201,6 +210,7 @@ int  jack_transport_reposition (jack_client_t *client,
  *
  * @param client the JACK client structure.
  */
+JACK_CLIENT_API_EXPORT
 void jack_transport_start (jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
@@ -211,6 +221,7 @@ void jack_transport_start (jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
  *
  * @param client the JACK client structure.
  */
+JACK_CLIENT_API_EXPORT
 void jack_transport_stop (jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
@@ -225,6 +236,7 @@ void jack_transport_stop (jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
  *
  * @pre Must be called from the process thread.
  */
+JACK_CLIENT_API_EXPORT
 void jack_get_transport_info (jack_client_t *client,
 			      jack_transport_info_t *tinfo) JACK_OPTIONAL_WEAK_EXPORT;
 
@@ -235,6 +247,7 @@ void jack_get_transport_info (jack_client_t *client,
  * earlier transport interface, but it does nothing.  Instead, define
  * a ::JackTimebaseCallback.
  */
+JACK_CLIENT_API_EXPORT
 void jack_set_transport_info (jack_client_t *client,
 			      jack_transport_info_t *tinfo) JACK_OPTIONAL_WEAK_EXPORT;
 

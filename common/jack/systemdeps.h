@@ -138,4 +138,17 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
     #define JACK_LIB_EXPORT
 #endif
 
+
+#ifdef _WIN32
+	#if defined(BUILDING_JACK)
+		#define JACK_CLIENT_API_EXPORT __declspec(dllexport)
+	#else
+		#define JACK_CLIENT_API_EXPORT __declspec(dllimport)
+	#endif
+#elif __GNUC__ >= 4
+	#define JACK_CLIENT_API_EXPORT __attribute__((visibility("default")))
+#else
+	#define JACK_CLIENT_API_EXPORT /* nothing */
+#endif
+
 #endif /* __jack_systemdeps_h__ */

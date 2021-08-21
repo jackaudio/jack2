@@ -27,12 +27,14 @@ extern "C"
 #endif
 
 #include <jack/types.h>
+#include <jack/systemdeps.h>
 
 /**
  * @return the maximum delay reported by the backend since
  * startup or reset.  When compared to the period size in usecs, this
  * can be used to estimate the ideal period size for a given setup.
  */
+JACK_CLIENT_API_EXPORT
 float jack_get_max_delayed_usecs (jack_client_t *client);
 
 /**
@@ -40,6 +42,7 @@ float jack_get_max_delayed_usecs (jack_client_t *client);
  * occurrence.  This probably only makes sense when called from a @ref
  * JackXRunCallback defined using jack_set_xrun_callback().
  */
+JACK_CLIENT_API_EXPORT
 float jack_get_xrun_delayed_usecs (jack_client_t *client);
 
 /**
@@ -48,6 +51,7 @@ float jack_get_xrun_delayed_usecs (jack_client_t *client);
  * system (e.g. toggling kernel preemption) has on the delay
  * experienced by JACK, without having to restart the JACK engine.
  */
+JACK_CLIENT_API_EXPORT
 void jack_reset_max_delayed_usecs (jack_client_t *client);
 
 #ifdef __cplusplus

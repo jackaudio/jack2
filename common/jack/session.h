@@ -27,6 +27,7 @@ extern "C" {
 
 #include <jack/types.h>
 #include <jack/weakmacros.h>
+#include <jack/systemdeps.h>
 
 /**
  * @defgroup SessionClientFunctions Session API for clients.
@@ -184,9 +185,10 @@ typedef void (*JackSessionCallback)(jack_session_event_t *event,
  *
  * @return 0 on success, otherwise a non-zero error code
  */
+JACK_CLIENT_API_EXPORT
 int jack_set_session_callback (jack_client_t       *client,
-                               JackSessionCallback  session_callback,
-                               void                *arg) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
+                                                      JackSessionCallback  session_callback,
+                                                      void                *arg) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
 
 /**
  * Reply to a session event.
@@ -201,8 +203,9 @@ int jack_set_session_callback (jack_client_t       *client,
  *
  * @return 0 on success, otherwise a non-zero error code
  */
+JACK_CLIENT_API_EXPORT
 int jack_session_reply (jack_client_t        *client,
-                        jack_session_event_t *event) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
+                                               jack_session_event_t *event) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
 
 
 /**
@@ -214,6 +217,7 @@ int jack_session_reply (jack_client_t        *client,
  * JACK developers recommend the use of NSM instead.
  * See https://github.com/linuxaudio/new-session-manager
  */
+JACK_CLIENT_API_EXPORT
 void jack_session_event_free (jack_session_event_t *event) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
 
 
@@ -224,6 +228,7 @@ void jack_session_event_free (jack_session_event_t *event) JACK_OPTIONAL_WEAK_DE
  * The caller is responsible for calling jack_free(3) on any non-NULL
  * returned value.
  */
+JACK_CLIENT_API_EXPORT
 char *jack_client_get_uuid (jack_client_t *client) JACK_WEAK_EXPORT;
 
 /**
@@ -250,6 +255,7 @@ typedef struct  {
  * of jack_session_command_t. its terminated by ret[i].uuid == NULL target ==
  * NULL means send to all interested clients. otherwise a clientname
  */
+JACK_CLIENT_API_EXPORT
 jack_session_command_t *jack_session_notify (
 	jack_client_t*             client,
 	const char                *target,
@@ -263,6 +269,7 @@ jack_session_command_t *jack_session_notify (
  * JACK developers recommend the use of NSM instead.
  * See https://github.com/linuxaudio/new-session-manager
  */
+JACK_CLIENT_API_EXPORT
 void jack_session_commands_free (jack_session_command_t *cmds) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
 
 /**
@@ -274,6 +281,7 @@ void jack_session_commands_free (jack_session_command_t *cmds) JACK_OPTIONAL_WEA
  *
  * @return 0 on success, otherwise a non-zero error code
  */
+JACK_CLIENT_API_EXPORT
 int
 jack_reserve_client_name (jack_client_t *client,
                           const char    *name,
@@ -289,6 +297,7 @@ jack_reserve_client_name (jack_client_t *client,
  * @return 0 when the client has no session callback, 1 when it has one.
  *        -1 on error.
  */
+JACK_CLIENT_API_EXPORT
 int
 jack_client_has_session_callback (jack_client_t *client, const char *client_name) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
 

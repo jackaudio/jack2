@@ -27,6 +27,7 @@ extern "C"
 #endif
 
 #include <sys/types.h>
+#include <jack/systemdeps.h>
 
 /** @file ringbuffer.h
  *
@@ -68,6 +69,7 @@ jack_ringbuffer_t ;
  * @return a pointer to a new jack_ringbuffer_t, if successful; NULL
  * otherwise.
  */
+JACK_CLIENT_API_EXPORT
 jack_ringbuffer_t *jack_ringbuffer_create(size_t sz);
 
 /**
@@ -76,6 +78,7 @@ jack_ringbuffer_t *jack_ringbuffer_create(size_t sz);
  *
  * @param rb a pointer to the ringbuffer structure.
  */
+JACK_CLIENT_API_EXPORT
 void jack_ringbuffer_free(jack_ringbuffer_t *rb);
 
 /**
@@ -98,6 +101,7 @@ void jack_ringbuffer_free(jack_ringbuffer_t *rb);
  * @param vec a pointer to a 2 element array of jack_ringbuffer_data_t.
  *
  */
+JACK_CLIENT_API_EXPORT
 void jack_ringbuffer_get_read_vector(const jack_ringbuffer_t *rb,
                                      jack_ringbuffer_data_t *vec);
 
@@ -120,6 +124,7 @@ void jack_ringbuffer_get_read_vector(const jack_ringbuffer_t *rb,
  * @param rb a pointer to the ringbuffer structure.
  * @param vec a pointer to a 2 element array of jack_ringbuffer_data_t.
  */
+JACK_CLIENT_API_EXPORT
 void jack_ringbuffer_get_write_vector(const jack_ringbuffer_t *rb,
                                       jack_ringbuffer_data_t *vec);
 
@@ -133,6 +138,7 @@ void jack_ringbuffer_get_write_vector(const jack_ringbuffer_t *rb,
  *
  * @return the number of bytes read, which may range from 0 to cnt.
  */
+JACK_CLIENT_API_EXPORT
 size_t jack_ringbuffer_read(jack_ringbuffer_t *rb, char *dest, size_t cnt);
 
 /**
@@ -150,6 +156,7 @@ size_t jack_ringbuffer_read(jack_ringbuffer_t *rb, char *dest, size_t cnt);
  *
  * @return the number of bytes read, which may range from 0 to cnt.
  */
+JACK_CLIENT_API_EXPORT
 size_t jack_ringbuffer_peek(jack_ringbuffer_t *rb, char *dest, size_t cnt);
 
 /**
@@ -163,6 +170,7 @@ size_t jack_ringbuffer_peek(jack_ringbuffer_t *rb, char *dest, size_t cnt);
  * @param rb a pointer to the ringbuffer structure.
  * @param cnt the number of bytes read.
  */
+JACK_CLIENT_API_EXPORT
 void jack_ringbuffer_read_advance(jack_ringbuffer_t *rb, size_t cnt);
 
 /**
@@ -172,6 +180,7 @@ void jack_ringbuffer_read_advance(jack_ringbuffer_t *rb, size_t cnt);
  *
  * @return the number of bytes available to read.
  */
+JACK_CLIENT_API_EXPORT
 size_t jack_ringbuffer_read_space(const jack_ringbuffer_t *rb);
 
 /**
@@ -181,6 +190,7 @@ size_t jack_ringbuffer_read_space(const jack_ringbuffer_t *rb);
  *
  * @param rb a pointer to the ringbuffer structure.
  */
+JACK_CLIENT_API_EXPORT
 int jack_ringbuffer_mlock(jack_ringbuffer_t *rb);
 
 /**
@@ -190,6 +200,7 @@ int jack_ringbuffer_mlock(jack_ringbuffer_t *rb);
  *
  * @param rb a pointer to the ringbuffer structure.
  */
+JACK_CLIENT_API_EXPORT
 void jack_ringbuffer_reset(jack_ringbuffer_t *rb);
 
 /**
@@ -200,6 +211,7 @@ void jack_ringbuffer_reset(jack_ringbuffer_t *rb);
  * @param rb a pointer to the ringbuffer structure.
  * @param sz the new size, that must be less than allocated size.
  */
+JACK_CLIENT_API_EXPORT
 void jack_ringbuffer_reset_size (jack_ringbuffer_t * rb, size_t sz);
 
 /**
@@ -211,8 +223,9 @@ void jack_ringbuffer_reset_size (jack_ringbuffer_t * rb, size_t sz);
  *
  * @return the number of bytes write, which may range from 0 to cnt
  */
+JACK_CLIENT_API_EXPORT
 size_t jack_ringbuffer_write(jack_ringbuffer_t *rb, const char *src,
-                             size_t cnt);
+                                                    size_t cnt);
 
 /**
  * Advance the write pointer.
@@ -225,6 +238,7 @@ size_t jack_ringbuffer_write(jack_ringbuffer_t *rb, const char *src,
  * @param rb a pointer to the ringbuffer structure.
  * @param cnt the number of bytes written.
  */
+JACK_CLIENT_API_EXPORT
 void jack_ringbuffer_write_advance(jack_ringbuffer_t *rb, size_t cnt);
 
 /**
@@ -234,6 +248,7 @@ void jack_ringbuffer_write_advance(jack_ringbuffer_t *rb, size_t cnt);
  *
  * @return the amount of free space (in bytes) available for writing.
  */
+JACK_CLIENT_API_EXPORT
 size_t jack_ringbuffer_write_space(const jack_ringbuffer_t *rb);
 
 #ifdef __cplusplus
