@@ -143,7 +143,7 @@ namespace Jack
         }
 
         char host_name[32];
-        gethostname(host_name, sizeof(host_name));
+        GetHostName(host_name, sizeof(host_name));
 
         struct hostent* host = gethostbyname(host_name);
         if (host) {
