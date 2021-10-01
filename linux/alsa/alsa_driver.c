@@ -315,8 +315,8 @@ alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 
 			case 4: /* NO DITHER */
 				driver->write_via_copy = driver->quirk_bswap?
-					sample_move_d32u24_sSs:
-					sample_move_d32u24_sS;
+					sample_move_d32l24_sSs:
+					sample_move_d32l24_sS;
 				break;
 
 			default:
@@ -344,8 +344,8 @@ alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 				break;
 			case 4:
 				driver->read_via_copy = driver->quirk_bswap?
-					sample_move_dS_s32u24s:
-					sample_move_dS_s32u24;
+					sample_move_dS_s32l24s:
+					sample_move_dS_s32l24;
 				break;
 			}
 		}
