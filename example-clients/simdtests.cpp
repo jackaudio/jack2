@@ -119,6 +119,26 @@ test_case_data_t test_cases[] = {
 		NULL,
 		"32u24" },
 	{
+		4,
+		3,
+		true,
+		accelerated::sample_move_d32l24_sSs,
+		origerated::sample_move_d32l24_sSs,
+		accelerated::sample_move_dS_s32l24s,
+		origerated::sample_move_dS_s32l24s,
+		NULL,
+		"32l24s" },
+	{
+		4,
+		3,
+		false,
+		accelerated::sample_move_d32l24_sS,
+		origerated::sample_move_d32l24_sS,
+		accelerated::sample_move_dS_s32l24,
+		origerated::sample_move_dS_s32l24,
+		NULL,
+		"32l24" },
+	{
 		3,
 		3,
 		true,
@@ -283,7 +303,8 @@ int main(int argc, char *argv[])
 #else
 					test_cases[testcase].reverse);
 #endif
-				if(intval_accel != intval_orig) {
+				// allow a deviation of 1
+				if(intval_accel>intval_orig+1 || intval_orig>intval_accel+1) {
 					if(int_error_count<maxerr_displayed) {
 						printf("Value error sample %u:", sample);
 						printf(" Orig 0x");
