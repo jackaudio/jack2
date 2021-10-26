@@ -230,7 +230,7 @@ int jack_get_client_pid (const char *name) JACK_OPTIONAL_WEAK_EXPORT;
  */
 jack_native_thread_t jack_client_thread_id (jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
 
-/*@}*/
+/**@}*/
 
 /**
  * @param client pointer to JACK client structure.
@@ -289,7 +289,7 @@ void jack_cycle_signal (jack_client_t* client, int status) JACK_OPTIONAL_WEAK_EX
 */
 int jack_set_process_thread(jack_client_t* client, JackThreadCallback thread_callback, void *arg) JACK_OPTIONAL_WEAK_EXPORT;
 
-/*@}*/
+/**@}*/
 
 /**
  * @defgroup ClientCallbacks Setting Client Callbacks
@@ -557,8 +557,6 @@ int jack_set_graph_order_callback (jack_client_t *client,
 int jack_set_xrun_callback (jack_client_t *client,
                             JackXRunCallback xrun_callback, void *arg) JACK_OPTIONAL_WEAK_EXPORT;
 
-/*@}*/
-
 /**
  * Tell the Jack server to call @a latency_callback whenever it
  * is necessary to recompute the latencies for some or all
@@ -619,7 +617,7 @@ int jack_set_xrun_callback (jack_client_t *client,
 int jack_set_latency_callback (jack_client_t *client,
 			       JackLatencyCallback latency_callback,
 			       void *) JACK_WEAK_EXPORT;
-/*@}*/
+/**@}*/
 
 /**
  * @defgroup ServerClientControl Controlling & querying JACK server operation
@@ -706,7 +704,7 @@ int jack_engine_takeover_timebase (jack_client_t *) JACK_OPTIONAL_WEAK_DEPRECATE
  */
 float jack_cpu_load (jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
 
-/*@}*/
+/**@}*/
 
 /**
  * @defgroup PortFunctions Creating & manipulating ports
@@ -1049,10 +1047,11 @@ int jack_port_type_size(void) JACK_OPTIONAL_WEAK_EXPORT;
  */
 size_t jack_port_type_get_buffer_size (jack_client_t *client, const char *port_type) JACK_WEAK_EXPORT;
 
-/*@}*/
+/**@}*/
 
 /**
  * @defgroup LatencyFunctions Managing and determining latency
+ * @{
  *
  * The purpose of JACK's latency API is to allow clients to
  * easily answer two questions:
@@ -1097,7 +1096,6 @@ size_t jack_port_type_get_buffer_size (jack_client_t *client, const char *port_t
  * clients that add latency to the signal path should interact
  * with JACK to ensure that the correct latency figures are
  * used.
- * @{
  */
 
 /**
@@ -1263,7 +1261,7 @@ jack_nframes_t jack_port_get_total_latency (jack_client_t *client,
  */
 int jack_recompute_total_latency (jack_client_t*, jack_port_t* port) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
 
-/*@}*/
+/**@}*/
 
 /**
  * @defgroup PortSearching Looking up ports
@@ -1304,7 +1302,7 @@ jack_port_t * jack_port_by_name (jack_client_t *client, const char *port_name) J
 jack_port_t * jack_port_by_id (jack_client_t *client,
                                jack_port_id_t port_id) JACK_OPTIONAL_WEAK_EXPORT;
 
-/*@}*/
+/**@}*/
 
 /**
  * @defgroup TimeFunctions Handling time
@@ -1412,12 +1410,12 @@ jack_nframes_t jack_time_to_frames(const jack_client_t *client, jack_time_t) JAC
  */
 jack_time_t jack_get_time(void) JACK_OPTIONAL_WEAK_EXPORT;
 
-/*@}*/
+/**@}*/
 
 /**
  * @defgroup ErrorOutput Controlling error/information output
+ * @{
  */
-/*@{*/
 
 /**
  * Display JACK error message.
@@ -1457,7 +1455,7 @@ extern void (*jack_info_callback)(const char *msg) JACK_OPTIONAL_WEAK_EXPORT;
  */
 void jack_set_info_function (void (*func)(const char *)) JACK_OPTIONAL_WEAK_EXPORT;
 
-/*@}*/
+/**@}*/
 
 /**
  * The free function to be used on memory returned by jack_port_get_connections,

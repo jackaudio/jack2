@@ -120,6 +120,6 @@
 #endif
 #endif
 
-/*@}*/
+/**@}*/
 
 #endif /* weakjack */
