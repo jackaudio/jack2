@@ -185,7 +185,7 @@ jack_midi_event_write(void *port_buffer,
 uint32_t
 jack_midi_get_lost_event_count(void *port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
 
-/*@}*/
+/**@}*/
 
 #ifdef __cplusplus
 }

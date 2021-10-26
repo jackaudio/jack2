@@ -151,7 +151,7 @@ void jack_set_thread_creator (jack_thread_creator_t creator) JACK_OPTIONAL_WEAK_
 
 #endif
 
-/* @} */
+/**@}*/
 
 #ifdef __cplusplus
 }

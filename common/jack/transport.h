@@ -238,7 +238,7 @@ void jack_get_transport_info (jack_client_t *client,
 void jack_set_transport_info (jack_client_t *client,
 			      jack_transport_info_t *tinfo) JACK_OPTIONAL_WEAK_EXPORT;
 
-/*@}*/
+/**@}*/
 
 #ifdef __cplusplus
 }
