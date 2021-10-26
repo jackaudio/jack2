@@ -646,7 +646,7 @@ jack_log(
 	const char *format,
 	...);
 
-/* @} */
+/**@}*/
 
 #if 0
 { /* Adjust editor indent */
