@@ -73,6 +73,7 @@
    So, for now (October 2008) we use 2^(N-1)-1 as the scaling factor.
 */
 
+#define SAMPLE_32BIT_SCALING  2147483647.0
 #define SAMPLE_24BIT_SCALING  8388607.0f
 #define SAMPLE_16BIT_SCALING  32767.0f
 
@@ -80,6 +81,11 @@
    
    advice from Fons Adriaensen: make the limits symmetrical
  */
+
+#define SAMPLE_32BIT_MAX   2147483647
+#define SAMPLE_32BIT_MIN   -2147483647
+#define SAMPLE_32BIT_MAX_F  2147483647.0
+#define SAMPLE_32BIT_MIN_F  -2147483647.0
 
 #define SAMPLE_24BIT_MAX  8388607  
 #define SAMPLE_24BIT_MIN  -8388607 
@@ -106,6 +112,7 @@
 */
 
 #define f_round(f) lrintf(f)
+#define d_round(f) lrint(f)
 
 #define float_16(s, d)\
 	if ((s) <= NORMALIZED_FLOAT_MIN) {\
@@ -144,6 +151,16 @@
 		(d) = SAMPLE_24BIT_MAX;                                        \
 	} else {\
 		(d) = f_round ((s) * SAMPLE_24BIT_SCALING);                    \
+	}
+
+#define float_32(s, d)                                                 \
+	if ((s) <= NORMALIZED_FLOAT_MIN) {\
+		(d) = SAMPLE_32BIT_MIN;                                        \
+	} else if ((s) >= NORMALIZED_FLOAT_MAX) {\
+		(d) = SAMPLE_32BIT_MAX;                                        \
+	} else {\
+        double extended_value = ((double)s) * SAMPLE_32BIT_SCALING;      \
+		(d) = d_round (extended_value);                                \
 	}
 
 /* call this when "s" has already been scaled (e.g. when dithering)
@@ -195,6 +212,11 @@ static inline __m128 clip(__m128 s, __m128 min, __m128 max)
     return _mm_min_ps(max, _mm_max_ps(s, min));
 }
 
+static inline __m128d clip_double(__m128d s, __m128d min, __m128d max)
+{
+    return _mm_min_pd(max, _mm_max_pd(s, min));
+}
+
 static inline __m128i float_24_sse(__m128 s)
 {
     const __m128 upper_bound = gen_one(); /* NORMALIZED_FLOAT_MAX */
@@ -212,6 +234,26 @@ static inline __m128i float_24_sse(__m128 s)
 static inline float32x4_t clip(float32x4_t s, float32x4_t min, float32x4_t max)
 {
 	return vminq_f32(max, vmaxq_f32(s, min));
+}
+
+static inline float32x4_t float_32_multiply_extended(float32x4_t samples, double factor)
+{
+	float64x2_t factor64 = vdupq_n_f64(factor);
+	float64x2_t lower_elements = vcvt_f64_f32(vget_low_f32(samples));
+	float64x2_t upper_elements = vcvt_high_f64_f32(samples);
+	lower_elements = vmulq_f64(lower_elements, factor64);
+	upper_elements = vmulq_f64(upper_elements, factor64);
+	float32x2_t lower_down_scaled = vcvt_f32_f64(lower_elements);
+	return vcvt_high_f32_f64(lower_down_scaled, upper_elements);
+}
+
+static inline int32x4_t float_32_neon(float32x4_t s)
+{
+	const float32x4_t upper_bound = vdupq_n_f32(NORMALIZED_FLOAT_MAX);
+	const float32x4_t lower_bound = vdupq_n_f32(NORMALIZED_FLOAT_MIN);
+
+	float32x4_t clipped = clip(s, lower_bound, upper_bound);
+	return vcvtq_s32_f32(float_32_multiply_extended(clipped, SAMPLE_32BIT_SCALING));
 }
 
 static inline int32x4_t float_24_neon(float32x4_t s)
@@ -274,6 +316,7 @@ void sample_move_dS_floatLE (char *dst, jack_default_audio_sample_t *src, unsign
    
    S      - sample is a jack_default_audio_sample_t, currently (October 2008) a 32 bit floating point value
    Ss     - like S but reverse endian from the host CPU
+   32     - sample is an signed 32 bit integer value
    32u24  - sample is an signed 32 bit integer value, but data is in upper 24 bits only
    32u24s - like 32u24 but reverse endian from the host CPU
    32l24  - sample is an signed 32 bit integer value, but data is in lower 24 bits only
@@ -289,6 +332,93 @@ void sample_move_dS_floatLE (char *dst, jack_default_audio_sample_t *src, unsign
 */   
 
 /* functions for native integer sample data */
+
+void sample_move_d32_sSs (char *dst, jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state)
+{
+#if defined (__ARM_NEON__) || defined (__ARM_NEON)
+	unsigned long unrolled = nsamples / 4;
+	nsamples = nsamples & 3;
+
+	while (unrolled--) {
+		float32x4_t samples = vld1q_f32(src);
+		int32x4_t converted = float_32_neon(samples);
+		converted = vreinterpretq_s32_u8(vrev32q_u8(vreinterpretq_u8_s32(converted)));
+
+		switch(dst_skip) {
+			case 4:
+				vst1q_s32((int32_t*)dst, converted);
+				break;
+			default:
+				vst1q_lane_s32((int32_t*)(dst),            converted, 0);
+				vst1q_lane_s32((int32_t*)(dst+dst_skip),   converted, 1);
+				vst1q_lane_s32((int32_t*)(dst+2*dst_skip), converted, 2);
+				vst1q_lane_s32((int32_t*)(dst+3*dst_skip), converted, 3);
+				break;
+		}
+		dst += 4*dst_skip;
+		src+= 4;
+	}
+#endif
+
+	int32_t z;
+
+	while (nsamples--) {
+
+		float_32 (*src, z);
+
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+		dst[0]=(char)(z>>24);
+		dst[1]=(char)(z>>16);
+		dst[2]=(char)(z>>8);
+		dst[3]=(char)(z);
+#elif __BYTE_ORDER == __BIG_ENDIAN
+		dst[0]=(char)(z);
+		dst[1]=(char)(z>>8);
+		dst[2]=(char)(z>>16);
+		dst[3]=(char)(z>>24);
+#endif
+		dst += dst_skip;
+		src++;
+	}
+}
+
+void sample_move_d32_sS (char *dst, jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state)
+{
+#if defined (__ARM_NEON__) || defined (__ARM_NEON)
+	unsigned long unrolled = nsamples / 4;
+	nsamples = nsamples & 3;
+
+	while (unrolled--) {
+		float32x4_t samples = vld1q_f32(src);
+		int32x4_t converted = float_32_neon(samples);
+
+		switch(dst_skip) {
+			case 4:
+				vst1q_s32((int32_t*)dst, converted);
+				break;
+			default:
+				vst1q_lane_s32((int32_t*)(dst),            converted, 0);
+				vst1q_lane_s32((int32_t*)(dst+dst_skip),   converted, 1);
+				vst1q_lane_s32((int32_t*)(dst+2*dst_skip), converted, 2);
+				vst1q_lane_s32((int32_t*)(dst+3*dst_skip), converted, 3);
+				break;
+		}
+		dst += 4*dst_skip;
+
+		src+= 4;
+	}
+#endif
+    while (nsamples--) {
+        double sample = *((float *)src);
+        double clipped = fmin(1.0, fmax(sample, -1.0));
+        double scaled = clipped * SAMPLE_32BIT_MAX_F;
+        int y = (int)scaled;
+        *((int *) dst) = y;
+
+        dst += dst_skip;
+        src++;
+    }
+}
 
 void sample_move_d32u24_sSs (char *dst, jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state)
 {
@@ -689,6 +819,68 @@ void sample_move_d32l24_sS (char *dst, jack_default_audio_sample_t *src, unsigne
 #endif
 }	
 
+void sample_move_dS_s32s (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip)
+{
+	const jack_default_audio_sample_t scaling = 1.0/SAMPLE_32BIT_SCALING;
+#if defined (__ARM_NEON__) || defined (__ARM_NEON)
+	unsigned long unrolled = nsamples / 4;
+	while (unrolled--) {
+		uint32x4_t src128;
+		switch(src_skip)
+		{
+			case 4:
+				src128 = vld1q_u32((uint32_t*)src);
+				break;
+			case 8:
+				src128 = vld2q_u32((uint32_t*)src).val[0];
+				break;
+			default:
+				src128 = vld1q_lane_u32((uint32_t*)src,              src128, 0);
+				src128 = vld1q_lane_u32((uint32_t*)(src+src_skip),   src128, 1);
+				src128 = vld1q_lane_u32((uint32_t*)(src+2*src_skip), src128, 2);
+				src128 = vld1q_lane_u32((uint32_t*)(src+3*src_skip), src128, 3);
+				break;
+		}
+		src128 = vreinterpretq_u32_u8(vrev32q_u8(vreinterpretq_u8_u32(src128)));
+		float32x4_t samples = vcvtq_f32_s32(vreinterpretq_s32_u32(src128));
+		samples = float_32_multiply_extended(samples, scaling);
+		vst1q_f32(dst, samples);
+
+		src += 4*src_skip;
+		dst += 4;
+	}
+	nsamples = nsamples & 3;
+#endif
+
+	/* ALERT: signed sign-extension portability !!! */
+
+
+	while (nsamples--) {
+		int32_t x;
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+		x = (unsigned char)(src[0]);
+		x <<= 8;
+		x |= (unsigned char)(src[1]);
+		x <<= 8;
+		x |= (unsigned char)(src[2]);
+		x <<= 8;
+		x |= (unsigned char)(src[3]);
+#elif __BYTE_ORDER == __BIG_ENDIAN
+		x = (unsigned char)(src[3]);
+		x <<= 8;
+		x |= (unsigned char)(src[2]);
+		x <<= 8;
+		x |= (unsigned char)(src[1]);
+		x <<= 8;
+		x |= (unsigned char)(src[0]);
+#endif
+		double extended = x * scaling;
+		*dst = (float)extended;
+		dst++;
+		src += src_skip;
+	}
+}
+
 void sample_move_dS_s32l24s (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip)
 {
 #if defined (__ARM_NEON__) || defined (__ARM_NEON)
@@ -752,6 +944,47 @@ void sample_move_dS_s32l24s (jack_default_audio_sample_t *dst, char *src, unsign
 		src += src_skip;
 	}
 }	
+
+void sample_move_dS_s32 (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip)
+{
+	const double scaling = 1.0 / SAMPLE_32BIT_SCALING;
+#if defined (__ARM_NEON__) || defined (__ARM_NEON)
+	unsigned long unrolled = nsamples / 4;
+    nsamples = nsamples & 3;
+	while (unrolled--) {
+		uint32x4_t src128;
+		switch(src_skip) {
+			case 4:
+				src128 = vld1q_u32((uint32_t*)src);
+				break;
+			case 8:
+				src128 = vld2q_u32((uint32_t*)src).val[0];
+				break;
+			default:
+				src128 = vld1q_lane_u32((uint32_t*)src,              src128, 0);
+				src128 = vld1q_lane_u32((uint32_t*)(src+src_skip),   src128, 1);
+				src128 = vld1q_lane_u32((uint32_t*)(src+2*src_skip), src128, 2);
+				src128 = vld1q_lane_u32((uint32_t*)(src+3*src_skip), src128, 3);
+				break;
+		}
+
+		float32x4_t samples = vcvtq_f32_s32(vreinterpretq_s32_u32(src128));
+		samples = float_32_multiply_extended(samples, scaling);
+		vst1q_f32(dst, samples);
+
+		src += 4*src_skip;
+		dst += 4;
+	}
+#endif
+
+	while (nsamples--) {
+		int32_t val=(*((int32_t*)src));
+		double extended = val * scaling;
+		*dst = (float)extended;
+		dst++;
+		src += src_skip;
+	}
+}
 
 void sample_move_dS_s32l24 (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip)
 {
