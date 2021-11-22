@@ -84,8 +84,8 @@
 
 #define SAMPLE_32BIT_MAX   2147483647
 #define SAMPLE_32BIT_MIN   -2147483647
-#define SAMPLE_32BIT_MAX_F  2147483647.0
-#define SAMPLE_32BIT_MIN_F  -2147483647.0
+#define SAMPLE_32BIT_MAX_D  2147483647.0
+#define SAMPLE_32BIT_MIN_D  -2147483647.0
 
 #define SAMPLE_24BIT_MAX  8388607  
 #define SAMPLE_24BIT_MIN  -8388607 
@@ -153,15 +153,14 @@
 		(d) = f_round ((s) * SAMPLE_24BIT_SCALING);                    \
 	}
 
-#define float_32(s, d)                                                 \
-	if ((s) <= NORMALIZED_FLOAT_MIN) {\
-		(d) = SAMPLE_32BIT_MIN;                                        \
-	} else if ((s) >= NORMALIZED_FLOAT_MAX) {\
-		(d) = SAMPLE_32BIT_MAX;                                        \
-	} else {\
-        double extended_value = ((double)s) * SAMPLE_32BIT_SCALING;      \
-		(d) = d_round (extended_value);                                \
-	}
+#define float_32(s, d)												\
+	do {															\
+		double clipped = fmin(NORMALIZED_FLOAT_MAX,					\
+				fmax((double)(s), NORMALIZED_FLOAT_MIN));			\
+		double scaled = clipped * SAMPLE_32BIT_MAX_D;				\
+		(d) = d_round(scaled);										\
+	}																\
+	while (0)
 
 /* call this when "s" has already been scaled (e.g. when dithering)
  */
@@ -296,14 +295,14 @@ void sample_move_dS_floatLE (char *dst, jack_default_audio_sample_t *src, unsign
    
    S      - sample is a jack_default_audio_sample_t, currently (October 2008) a 32 bit floating point value
    Ss     - like S but reverse endian from the host CPU
-   32     - sample is an signed 32 bit integer value
-   32u24  - sample is an signed 32 bit integer value, but data is in upper 24 bits only
+   32     - sample is a signed 32 bit integer value
+   32u24  - sample is a signed 32 bit integer value, but data is in upper 24 bits only
    32u24s - like 32u24 but reverse endian from the host CPU
-   32l24  - sample is an signed 32 bit integer value, but data is in lower 24 bits only
+   32l24  - sample is a signed 32 bit integer value, but data is in lower 24 bits only
    32l24s - like 32l24 but reverse endian from the host CPU
-   24     - sample is an signed 24 bit integer value
+   24     - sample is a signed 24 bit integer value
    24s    - like 24 but reverse endian from the host CPU
-   16     - sample is an signed 16 bit integer value
+   16     - sample is a signed 16 bit integer value
    16s    - like 16 but reverse endian from the host CPU
 
    For obvious reasons, the reverse endian versions only show as source types.
@@ -317,7 +316,7 @@ void sample_move_d32_sSs (char *dst, jack_default_audio_sample_t *src, unsigned 
 {
 	while (nsamples--) {
 		int32_t z;
-		float_32 (*src, z);
+		float_32(*src, z);
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 		dst[0]=(char)(z>>24);
 		dst[1]=(char)(z>>16);
@@ -337,12 +336,7 @@ void sample_move_d32_sSs (char *dst, jack_default_audio_sample_t *src, unsigned 
 void sample_move_d32_sS (char *dst, jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state)
 {
 	while (nsamples--) {
-		double sample = *((float *)src);
-		double clipped = fmin(1.0, fmax(sample, -1.0));
-		double scaled = clipped * SAMPLE_32BIT_MAX_F;
-		int y = (int)scaled;
-		*((int *) dst) = y;
-
+		float_32(*src, *(int32_t *)dst);
 		dst += dst_skip;
 		src++;
 	}
