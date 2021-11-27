@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "opensl_io.h"
+#include <string.h>
+#include <unistd.h>
 //#define CONV16BIT 32768
 //#define CONVMYFLT (1./32768.)
 #define CONV16BIT 32640
@@ -116,12 +118,12 @@ static SLresult openSLPlayOpen(OPENSL_STREAM *p)
     const SLInterfaceID ids[] = {SL_IID_VOLUME};
     const SLboolean req[] = {SL_BOOLEAN_FALSE};
     result = (*p->engineEngine)->CreateOutputMix(p->engineEngine, &(p->outputMixObject), 1, ids, req);
-    if(result != SL_RESULT_SUCCESS) goto end_openaudio;
+    if(result != SL_RESULT_SUCCESS) return result;
 
     // realize the output mix
     result = (*p->outputMixObject)->Realize(p->outputMixObject, SL_BOOLEAN_FALSE);
    
-    int speakers;
+    SLuint32 speakers;
     if(channels > 1) 
       speakers = SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT;
     else speakers = SL_SPEAKER_FRONT_CENTER;
@@ -225,7 +227,7 @@ static SLresult openSLRecOpen(OPENSL_STREAM *p){
     SLDataSource audioSrc = {&loc_dev, NULL};
 
     // configure audio sink
-    int speakers;
+    SLuint32 speakers;
     if(channels > 1) 
       speakers = SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT;
     else speakers = SL_SPEAKER_FRONT_CENTER;
@@ -316,7 +318,11 @@ OPENSL_STREAM *android_OpenAudioDevice(int sr, int inchannels, int outchannels, 
   p->outchannels = outchannels;
   p->sr = sr;
   p->inlock = createThreadLock();
+  if (p->inlock == NULL)
+     return NULL;
   p->outlock = createThreadLock();
+  if (p->outlock == NULL)
+     return NULL;
  
   if((p->outBufSamples  =  bufferframes*outchannels) != 0) {
     if((p->outputBuffer[0] = (short *) calloc(p->outBufSamples, sizeof(short))) == NULL ||
@@ -336,6 +342,10 @@ OPENSL_STREAM *android_OpenAudioDevice(int sr, int inchannels, int outchannels, 
 
   p->currentInputIndex = 0;
   p->currentOutputBuffer  = 0;
+  p->outputBufferSize[0] = 0;
+  p->outputBufferSize[1] = 0;
+  p->inputBufferSize[0] = 0;
+  p->inputBufferSize[1] = 0;
   p->currentInputIndex = p->inBufSamples;
   p->currentInputBuffer = 0; 
 
@@ -358,6 +368,17 @@ OPENSL_STREAM *android_OpenAudioDevice(int sr, int inchannels, int outchannels, 
   notifyThreadLock(p->inlock);
 
   p->time = 0.;
+
+  if (p->bqPlayerBufferQueue)
+    (*p->bqPlayerBufferQueue)->Enqueue(p->bqPlayerBufferQueue, 
+				 p->outputBuffer[0], p->outBufSamples*sizeof(short));
+
+  if (p->recorderBufferQueue)
+    (*p->recorderBufferQueue)->Enqueue(p->recorderBufferQueue, 
+				 p->inputBuffer[0], p->inBufSamples*sizeof(short));
+
+
+
   return p;
 }
 
@@ -414,39 +435,66 @@ double android_GetTimestamp(OPENSL_STREAM *p){
 void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 {
   OPENSL_STREAM *p = (OPENSL_STREAM *) context;
+
+  while ((p->inputBufferSize[0] > 0) && (p->inputBufferSize[1] > 0))
+    usleep(1000);
+
+  p->currentInputBuffer = (p->currentInputBuffer ?  0 : 1);
+  int queueInputBuffer = (p->currentInputBuffer ?  0 : 1);
+  int size = p->inBufSamples;
+  short *inBuffer = p->inputBuffer[queueInputBuffer];
+
+  (*p->recorderBufferQueue)->Enqueue(p->recorderBufferQueue, 
+				 inBuffer, size * sizeof(short));
+
+  p->inputBufferSize[queueInputBuffer] = size;
   notifyThreadLock(p->inlock);
 }
  
 // gets a buffer of size samples from the device
 int android_AudioIn(OPENSL_STREAM *p,float *buffer,int size){
+
   short *inBuffer;
   int i, bufsamps, index;
   if(p == NULL) return 0;
   bufsamps = p->inBufSamples;
-  if(bufsamps ==  0) return 0;
-  index = p->currentInputIndex;
 
+  if(bufsamps ==  0) return 0;
+  if (size > bufsamps) return 0;
+
+  if (p->inputBufferSize[p->currentInputBuffer] == 0)
+     waitThreadLock(p->inlock);
+
+  index = 0;
   inBuffer = p->inputBuffer[p->currentInputBuffer];
+
   for(i=0; i < size; i++){
-    if (index >= bufsamps) {
-      waitThreadLock(p->inlock);
-      (*p->recorderBufferQueue)->Enqueue(p->recorderBufferQueue, 
-					 inBuffer,bufsamps*sizeof(short));
-      p->currentInputBuffer = (p->currentInputBuffer ? 0 : 1);
-      index = 0;
-      inBuffer = p->inputBuffer[p->currentInputBuffer];
-    }
     buffer[i] = (float) inBuffer[index++]*CONVMYFLT;
   }
-  p->currentInputIndex = index;
+
+  p->inputBufferSize[p->currentInputBuffer] = 0;
   if(p->outchannels == 0) p->time += (double) size/(p->sr*p->inchannels);
-  return i;
+
+  return size;
 }
 
 // this callback handler is called every time a buffer finishes playing
 void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 {
   OPENSL_STREAM *p = (OPENSL_STREAM *) context;
+
+  while ((p->outputBufferSize[0] == 0) && (p->outputBufferSize[1] == 0))
+    usleep(1000);
+
+  p->currentOutputBuffer = (p->currentOutputBuffer ?  0 : 1);
+  int queueOutputBuffer = (p->currentOutputBuffer ?  0 : 1);
+  int size = p->outputBufferSize[queueOutputBuffer];
+  short *outBuffer = p->outputBuffer[queueOutputBuffer];
+
+  (*p->bqPlayerBufferQueue)->Enqueue(p->bqPlayerBufferQueue, 
+				 outBuffer, size * sizeof(short));
+
+  p->outputBufferSize[queueOutputBuffer] = 0;
   notifyThreadLock(p->outlock);
 }
 
@@ -457,24 +505,26 @@ int android_AudioOut(OPENSL_STREAM *p, float *buffer,int size){
   int i, bufsamps, index;
   if(p == NULL) return 0;
   bufsamps = p->outBufSamples;
+
   if(bufsamps ==  0) return 0;
-  index = p->currentOutputIndex;
+  if (size > bufsamps) return 0;
+
+
+  if (p->outputBufferSize[p->currentOutputBuffer] != 0)
+     waitThreadLock(p->outlock);
+
+  index = 0;
   outBuffer = p->outputBuffer[p->currentOutputBuffer];
+
 
   for(i=0; i < size; i++){
     outBuffer[index++] = (short) (buffer[i]*CONV16BIT);
-    if (index >= p->outBufSamples) {
-      waitThreadLock(p->outlock);
-      (*p->bqPlayerBufferQueue)->Enqueue(p->bqPlayerBufferQueue, 
-					 outBuffer,bufsamps*sizeof(short));
-      p->currentOutputBuffer = (p->currentOutputBuffer ?  0 : 1);
-      index = 0;
-      outBuffer = p->outputBuffer[p->currentOutputBuffer];
-    }
   }
-  p->currentOutputIndex = index;
+
+  p->outputBufferSize[p->currentOutputBuffer] = size;
+
   p->time += (double) size/(p->sr*p->outchannels);
-  return i;
+  return size;
 }
 
 //----------------------------------------------------------------------
@@ -507,12 +557,12 @@ int waitThreadLock(void *lock)
   int   retval = 0;
   p = (threadLock*) lock;
   pthread_mutex_lock(&(p->m));
+  p->s = (unsigned char) 0;
   while (!p->s) {
     pthread_cond_wait(&(p->c), &(p->m));
   }
-  p->s = (unsigned char) 0;
   pthread_mutex_unlock(&(p->m));
-  return NULL;
+  return retval;
 }
 
 void notifyThreadLock(void *lock)

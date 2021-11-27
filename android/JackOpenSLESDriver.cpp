@@ -30,7 +30,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <fcntl.h>
 #include <math.h>
 
-#include <android/log.h>
 #include "opensl_io.h"
 
 #define JACK_OPENSLES_DEFAULT_SAMPLERATE   48000

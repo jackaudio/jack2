@@ -72,10 +72,12 @@ typedef struct opensl_stream {
   // current buffer half (0, 1)
   int currentOutputBuffer;
   int currentInputBuffer;
-  
+
   // buffers
   short *outputBuffer[2];
   short *inputBuffer[2];
+  int outputBufferSize[2];
+  int inputBufferSize[2];
 
   // size of buffers
   int outBufSamples;
