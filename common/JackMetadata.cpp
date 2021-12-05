@@ -21,6 +21,7 @@
 #include "JackMetadata.h"
 
 #include "JackClient.h"
+#include "JackTools.h"
 
 #include <string.h>
 #include <sys/stat.h>
@@ -68,20 +69,20 @@ JackMetadata::~JackMetadata()
     if (fIsEngine)
     {
         // cleanup after libdb, nasty!
-        snprintf (dbpath, sizeof(dbpath), "%s/jack_db/metadata.db", fDBFilesDir);
+        snprintf (dbpath, sizeof(dbpath), "%s/jack_db-%d/metadata.db", fDBFilesDir, JackTools::GetUID());
         remove (dbpath);
 
-        snprintf (dbpath, sizeof(dbpath), "%s/jack_db/__db.001", fDBFilesDir);
+        snprintf (dbpath, sizeof(dbpath), "%s/jack_db-%d/__db.001", fDBFilesDir, JackTools::GetUID());
         remove (dbpath);
 
-        snprintf (dbpath, sizeof(dbpath), "%s/jack_db/__db.002", fDBFilesDir);
+        snprintf (dbpath, sizeof(dbpath), "%s/jack_db-%d/__db.002", fDBFilesDir, JackTools::GetUID());
         remove (dbpath);
 
-        snprintf (dbpath, sizeof(dbpath), "%s/jack_db/__db.003", fDBFilesDir);
+        snprintf (dbpath, sizeof(dbpath), "%s/jack_db-%d/__db.003", fDBFilesDir, JackTools::GetUID());
         remove (dbpath);
 
         // remove our custom dir
-        snprintf (dbpath, sizeof(dbpath), "%s/jack_db", fDBFilesDir);
+        snprintf (dbpath, sizeof(dbpath), "%s/jack_db-%d", fDBFilesDir, JackTools::GetUID());
         rmdir (dbpath);
     }
 #endif
@@ -115,7 +116,7 @@ int JackMetadata::PropertyInit()
         return -1;
     }
 
-    snprintf (dbpath, sizeof(dbpath), "%s/jack_db", fDBFilesDir);
+    snprintf (dbpath, sizeof(dbpath), "%s/jack_db-%d", fDBFilesDir, JackTools::GetUID());
 #ifdef WIN32
     mkdir (dbpath);
 #else
@@ -129,16 +130,16 @@ int JackMetadata::PropertyInit()
             jack_error ("Failed to open previous DB environment, trying again clean...");
 
             // cleanup old stuff
-            snprintf (dbpath, sizeof(dbpath), "%s/jack_db/metadata.db", fDBFilesDir);
+            snprintf (dbpath, sizeof(dbpath), "%s/jack_db-%d/metadata.db", fDBFilesDir, JackTools::GetUID());
             remove (dbpath);
 
-            snprintf (dbpath, sizeof(dbpath), "%s/jack_db/__db.001", fDBFilesDir);
+            snprintf (dbpath, sizeof(dbpath), "%s/jack_db-%d/__db.001", fDBFilesDir, JackTools::GetUID());
             remove (dbpath);
 
-            snprintf (dbpath, sizeof(dbpath), "%s/jack_db/__db.002", fDBFilesDir);
+            snprintf (dbpath, sizeof(dbpath), "%s/jack_db-%d/__db.002", fDBFilesDir, JackTools::GetUID());
             remove (dbpath);
 
-            snprintf (dbpath, sizeof(dbpath), "%s/jack_db/__db.003", fDBFilesDir);
+            snprintf (dbpath, sizeof(dbpath), "%s/jack_db-%d/__db.003", fDBFilesDir, JackTools::GetUID());
             remove (dbpath);
 
             // try again fresh
@@ -160,7 +161,7 @@ int JackMetadata::PropertyInit()
         return -1;
     }
 
-    snprintf (dbpath, sizeof(dbpath), "%s/jack_db/metadata.db", fDBFilesDir);
+    snprintf (dbpath, sizeof(dbpath), "%s/jack_db-%d/metadata.db", fDBFilesDir, JackTools::GetUID());
     if ((ret = fDB->open (fDB, NULL, dbpath, NULL, DB_HASH, DB_CREATE | DB_THREAD, 0666)) != 0) {
         jack_error ("Cannot open metadata DB at %s: %s", dbpath, db_strerror (ret));
         fDB->close (fDB, 0);
