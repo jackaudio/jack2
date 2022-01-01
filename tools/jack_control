@@ -30,7 +30,6 @@ def dbus_type_to_python_type(dbus_value):
 
 def python_type_to_jackdbus_type(value, type_char):
     type_char = str(type_char)
-
     if type_char == "b":
         return bool_convert(value);
     elif type_char == "y":
@@ -41,20 +40,6 @@ def python_type_to_jackdbus_type(value, type_char):
         return dbus.UInt32(value)
 
     return value
-
-def dbus_type_to_type_string(dbus_value):
-    if type(dbus_value) == dbus.Boolean:
-        return "bool"
-    if type(dbus_value) == dbus.Int32:
-        return "sint"
-    if type(dbus_value) == dbus.UInt32:
-        return "uint"
-    if type(dbus_value) == dbus.Byte:
-        return "char"
-    if type(dbus_value) == dbus.String:
-        return "str"
-
-    return None                         # throw exception here?
 
 def dbus_typesig_to_type_string(type_char):
     type_char = str(type_char)
