@@ -54,7 +54,7 @@ def dbus_typesig_to_type_string(type_char):
     if type_char == 'b':
         return "bool"
 
-    print('shit')
+    print('err: unknown dbus typesig "%s"' % type_char)
     return None                         # throw exception here?
 
 def get_parameters(iface, path):
