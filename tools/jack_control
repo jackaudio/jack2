@@ -30,6 +30,7 @@ def dbus_type_to_python_type(dbus_value):
 
 def python_type_to_jackdbus_type(value, type_char):
     type_char = str(type_char)
+
     if type_char == "b":
         return bool_convert(value);
     elif type_char == "y":
@@ -40,6 +41,20 @@ def python_type_to_jackdbus_type(value, type_char):
         return dbus.UInt32(value)
 
     return value
+
+def dbus_type_to_type_string(dbus_value):
+    if type(dbus_value) == dbus.Boolean:
+        return "bool"
+    if type(dbus_value) == dbus.Int32:
+        return "sint"
+    if type(dbus_value) == dbus.UInt32:
+        return "uint"
+    if type(dbus_value) == dbus.Byte:
+        return "char"
+    if type(dbus_value) == dbus.String:
+        return "str"
+
+    return None                         # throw exception here?
 
 def dbus_typesig_to_type_string(type_char):
     type_char = str(type_char)
@@ -54,7 +69,7 @@ def dbus_typesig_to_type_string(type_char):
     if type_char == 'b':
         return "bool"
 
-    print('err: unknown dbus typesig "%s"' % type_char)
+    print('shit')
     return None                         # throw exception here?
 
 def get_parameters(iface, path):
@@ -77,25 +92,6 @@ def get_parameters(iface, path):
         default = dbus_type_to_python_type(default)
 
         print("%20s: %s (%s:%s:%s:%s)" %(name, descr, typestr, isset, default, value))
-
-def maybe_print_param_constraint(iface, param):
-    is_range, is_strict, is_fake, values = iface.GetParameterConstraint(param)
-    if is_range:
-        print()
-        print(("allowed range: %s to %s (inclusive)" % (values[0][0], values[1][0])))
-    elif len(values):
-        print()
-        if is_strict:
-            print("allowed values:")
-        else:
-            print("suggested values:")
-
-        max_len = 0
-        for value in values:
-            if len(str(value[0])) > max_len:
-                   max_len = len(str(value[0]))
-        for value in values:
-            print(("%*s'%s' - %s" % (1 + max_len - len(str(value[0])), "", str(value[0]), str(value[1]))))
 
 def print_help():
     print("Usage: %s [command] [command] ..." % os.path.basename(sys.argv[0]))
@@ -127,6 +123,25 @@ def print_help():
     print("    epd <param>                - get long description for engine parameter")
     print("    eps <param> <value>        - set engine parameter")
     print("    epr <param>                - reset engine parameter to its default value")
+
+def maybe_print_param_constraint(iface, param):
+    is_range, is_strict, is_fake, values = iface.GetParameterConstraint(param)
+    if is_range:
+        print()
+        print(("allowed range: %s to %s (inclusive)" % (values[0][0], values[1][0])))
+    elif len(values):
+        print()
+        if is_strict:
+            print("allowed values:")
+        else:
+            print("suggested values:")
+
+        max_len = 0
+        for value in values:
+            if len(str(value[0])) > max_len:
+                   max_len = len(str(value[0]))
+        for value in values:
+            print(("%*s'%s' - %s" % (1 + max_len - len(str(value[0])), "", str(value[0]), str(value[1]))))
 
 def parse_argv(argv):
     global control_iface, configure_iface
