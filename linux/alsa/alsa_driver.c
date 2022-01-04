@@ -334,6 +334,7 @@ alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 						}
 						else if (bits == 24)
 						{
+							jack_log("sample format is SND_PCM_FORMAT_S32 but only 24 bits available");
 							driver->write_via_copy = driver->quirk_bswap?
 								sample_move_d32u24_sSs:
 								sample_move_d32u24_sS;
@@ -397,6 +398,7 @@ alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 						}
 						else if(bits == 24)
 						{
+							jack_log("sample format is SND_PCM_FORMAT_S32 but only 24 bits available");
 							driver->read_via_copy = driver->quirk_bswap?
 								sample_move_dS_s32u24s:
 								sample_move_dS_s32u24;
@@ -404,7 +406,7 @@ alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 						else
 						{
 							jack_error("unsupported sample format for capture: "
-									   "SND_PCM_FORMAT_S32LE with %d bits",
+									   "SND_PCM_FORMAT_S32 with %d bits",
 									   bits);
 							exit (1);
 						}
