@@ -354,12 +354,16 @@ def parse_argv(argv):
 
 def shell():
     from click.parser import split_arg_string
+    from sys import stdin
     while True:
-        cmd = sys.stdin.readline()
-        if (cmd == ''):
+        try:
+            cmd = stdin.readline()
+            if (cmd == ''):
+                break
+            s,t = parse_argv(split_arg_string(cmd))
+            print("%i: %s" % (s, t), flush=True)
+        except:
             break
-        s,t = parse_argv(split_arg_string(cmd))
-        print("%i: %s" % (s, t))
 
 def main():
     global control_iface, configure_iface
