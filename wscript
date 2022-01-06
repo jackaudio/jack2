@@ -134,6 +134,12 @@ def options(opt):
             'celt',
             help='Build with CELT')
     celt.add_function(check_for_celt)
+    opt.add_auto_option(
+            'example-tools',
+            help='Build with jack-example-tools',
+            conf_dest='BUILD_JACK_EXAMPLE_TOOLS',
+            default=True,
+    )
 
     # Suffix _PKG to not collide with HAVE_OPUS defined by the option.
     opus = opt.add_auto_option(
@@ -296,9 +302,9 @@ def configure(conf):
         else:
             conf.env['SYSTEMD_USER_UNIT_DIR'] = None
 
-
-    conf.recurse('example-clients')
-    conf.recurse('tools')
+    if conf.env['HAVE_JACK_EXAMPLE_TOOLS']:
+        conf.recurse('example-clients')
+        conf.recurse('tools')
 
     # test for the availability of ucontext, and how it should be used
     for t in ['gp_regs', 'uc_regs', 'mc_gregs', 'gregs']:
@@ -839,13 +845,14 @@ def build(bld):
 
     build_drivers(bld)
 
-    bld.recurse('example-clients')
-    bld.recurse('tools')
+    if bld.env['HAVE_JACK_EXAMPLE_TOOLS']:
+        bld.recurse('example-clients')
+        bld.recurse('tools')
 
     if bld.env['IS_LINUX'] or bld.env['IS_FREEBSD']:
         bld.recurse('man')
         bld.recurse('systemd')
-    if not bld.env['IS_WINDOWS']:
+    if not bld.env['IS_WINDOWS'] and bld.env['HAVE_JACK_EXAMPLE_TOOLS']:
         bld.recurse('tests')
     if bld.env['BUILD_JACKDBUS']:
         bld.recurse('dbus')
