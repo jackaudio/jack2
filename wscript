@@ -3,9 +3,7 @@
 from __future__ import print_function
 
 import os
-import subprocess
 import shutil
-import re
 import sys
 
 from waflib import Logs, Options, Task, Utils
@@ -419,17 +417,6 @@ def configure(conf):
         conf.define('JACK_MONITOR', 1)
     conf.write_config_header('config.h', remove=False)
 
-    svnrev = None
-    try:
-        f = open('svnversion.h')
-        data = f.read()
-        m = re.match(r'^#define SVN_VERSION "([^"]*)"$', data)
-        if m != None:
-            svnrev = m.group(1)
-        f.close()
-    except IOError:
-        pass
-
     if Options.options.mixed:
         conf.setenv(lib32, env=conf.env.derive())
         conf.env.append_unique('CFLAGS', '-m32')
@@ -458,13 +445,7 @@ def configure(conf):
         conf.write_config_header('config.h')
 
     print()
-    print('==================')
-    version_msg = 'JACK ' + VERSION
-    if svnrev:
-        version_msg += ' exported from r' + svnrev
-    else:
-        version_msg += ' svn revision will checked and eventually updated during build'
-    print(version_msg)
+    print('JACK ' + VERSION)
 
     conf.msg('Maximum JACK clients', Options.options.clients, color='NORMAL')
     conf.msg('Maximum ports per application', Options.options.application_ports, color='NORMAL')
@@ -820,26 +801,6 @@ def build(bld):
 
     bld.recurse('compat')
 
-    if not os.access('svnversion.h', os.R_OK):
-        def post_run(self):
-            sg = Utils.h_file(self.outputs[0].abspath(self.env))
-            #print sg.encode('hex')
-            Build.bld.node_sigs[self.env.variant()][self.outputs[0].id] = sg
-
-        script = bld.path.find_resource('svnversion_regenerate.sh')
-        script = script.abspath()
-
-        bld(
-                rule = '%s ${TGT}' % script,
-                name = 'svnversion',
-                runnable_status = Task.RUN_ME,
-                before = 'c cxx',
-                color = 'BLUE',
-                post_run = post_run,
-                source = ['svnversion_regenerate.sh'],
-                target = [bld.path.find_or_declare('svnversion.h')]
-        )
-
     if bld.env['BUILD_JACKD']:
         build_jackd(bld)
 
@@ -917,10 +878,6 @@ def build(bld):
                 shutil.rmtree(html_build_dir)
                 Logs.pprint('CYAN', 'Removing doxygen generated documentation done.')
 
-def dist(ctx):
-    # This code blindly assumes it is working in the toplevel source directory.
-    if not os.path.exists('svnversion.h'):
-        os.system('./svnversion_regenerate.sh svnversion.h')
 
 from waflib import TaskGen
 @TaskGen.extension('.mm')
