@@ -5,6 +5,11 @@ ChangeLog
 
   * WIP
   * Fix incomplete ASIO support on Windows
+  * Add waf autooption ``--example-tools`` to allow optional build of
+    executables, libraries and man pages provided by `jack-example-tools
+    <https://github.com/jackaudio/jack-example-tools>`_ (the files are built by
+    default). Building and installing the additional files can be disabled by
+    using ``--example-tools=no`` or ``--no-example-tools``.
 
 * 1.9.19 (2021-07-15)
 
