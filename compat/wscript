@@ -19,6 +19,7 @@
 
 import os
 
+
 def get_subdirs(ctx):
     """
     Get the compatibility module subirectories.
@@ -37,6 +38,7 @@ def get_subdirs(ctx):
             subdirs.append(entry)
     return subdirs
 
+
 def recurse_into_subdirs(ctx):
     """
     Recurse into compatibility module subdirectories.
@@ -47,11 +49,14 @@ def recurse_into_subdirs(ctx):
     for x in get_subdirs(ctx):
         ctx.recurse(x)
 
+
 def options(opt):
     recurse_into_subdirs(opt)
 
+
 def configure(conf):
     recurse_into_subdirs(conf)
+
 
 def build(bld):
     recurse_into_subdirs(bld)
