@@ -300,7 +300,7 @@ def configure(conf):
         else:
             conf.env['SYSTEMD_USER_UNIT_DIR'] = None
 
-    if conf.env['HAVE_JACK_EXAMPLE_TOOLS']:
+    if conf.env['BUILD_JACK_EXAMPLE_TOOLS']:
         conf.recurse('example-clients')
         conf.recurse('tools')
 
@@ -806,14 +806,14 @@ def build(bld):
 
     build_drivers(bld)
 
-    if bld.env['HAVE_JACK_EXAMPLE_TOOLS']:
+    if bld.env['BUILD_JACK_EXAMPLE_TOOLS']:
         bld.recurse('example-clients')
         bld.recurse('tools')
 
     if bld.env['IS_LINUX'] or bld.env['IS_FREEBSD']:
         bld.recurse('man')
         bld.recurse('systemd')
-    if not bld.env['IS_WINDOWS'] and bld.env['HAVE_JACK_EXAMPLE_TOOLS']:
+    if not bld.env['IS_WINDOWS'] and bld.env['BUILD_JACK_EXAMPLE_TOOLS']:
         bld.recurse('tests')
     if bld.env['BUILD_JACKDBUS']:
         bld.recurse('dbus')
