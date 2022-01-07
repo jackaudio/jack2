@@ -2,24 +2,34 @@
 # encoding: utf-8
 
 import os.path
-import re # subst_func
 
 from waflib import Logs, Options
 
+
 def options(opt):
-    opt.add_option('--enable-pkg-config-dbus-service-dir', action='store_true', default=False, help='force D-Bus service install dir to be one returned by pkg-config')
+    opt.add_option(
+        '--enable-pkg-config-dbus-service-dir',
+        action='store_true',
+        default=False,
+        help='force D-Bus service install dir to be one returned by pkg-config',
+    )
+
 
 def configure(conf):
     conf.env['BUILD_JACKDBUS'] = False
     conf.define('JACK_VERSION', conf.env['JACK_VERSION'])
 
     if not conf.check_cfg(package='dbus-1 >= 1.0.0', args='--cflags --libs', mandatory=False):
-        print(Logs.colors.RED + 'ERROR !! jackdbus will not be built because libdbus-dev is missing' + Logs.colors.NORMAL)
+        print(
+            Logs.colors.RED + 'ERROR !! jackdbus will not be built because libdbus-dev is missing' + Logs.colors.NORMAL
+        )
         return
 
     dbus_dir = conf.check_cfg(package='dbus-1', args='--variable=session_bus_services_dir')
     if not dbus_dir:
-        print(Logs.colors.RED + 'ERROR !! jackdbus will not be built because service dir is unknown' + Logs.colors.NORMAL)
+        print(
+            Logs.colors.RED + 'ERROR !! jackdbus will not be built because service dir is unknown' + Logs.colors.NORMAL
+        )
         return
 
     dbus_dir = dbus_dir.strip()
@@ -36,8 +46,9 @@ def configure(conf):
 
     conf.env['BUILD_JACKDBUS'] = True
 
+
 def build(bld):
-    obj = bld(features = ['c', 'cprogram'], idx=17)
+    obj = bld(features=['c', 'cprogram'], idx=17)
     if bld.env['IS_LINUX']:
         sysdeps_dbus_include = ['../linux', '../posix']
     if bld.env['IS_FREEBSD']:
@@ -46,7 +57,7 @@ def build(bld):
         sysdeps_dbus_include = ['../macosx', '../posix']
 
     obj.includes = sysdeps_dbus_include + ['.', '../', '../common', '../common/jack']
-    obj.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
+    obj.defines = ['HAVE_CONFIG_H', 'SERVER_SIDE']
     obj.source = [
         'jackdbus.c',
         'controller.c',
@@ -59,7 +70,6 @@ def build(bld):
         'controller_iface_transport.c',
         'xml.c',
         'xml_expat.c',
-        #'xml_nop.c',
         'xml_write_raw.c',
         'sigsegv.c',
         'reserve.c',
@@ -84,11 +94,11 @@ def build(bld):
 
     # process org.jackaudio.service.in -> org.jackaudio.service
     obj = bld(
-            features = 'subst',
-            source = 'org.jackaudio.service.in',
-            target = 'org.jackaudio.service',
-            install_path = '${DBUS_SERVICES_DIR}/',
-            BINDIR = bld.env['PREFIX'] + '/bin')
+            features='subst',
+            source='org.jackaudio.service.in',
+            target='org.jackaudio.service',
+            install_path='${DBUS_SERVICES_DIR}/',
+            BINDIR=bld.env['PREFIX'] + '/bin')
 
     if not bld.env['IS_WINDOWS']:
         bld.install_files('${PREFIX}/bin', 'jack_control', chmod=0o755)
