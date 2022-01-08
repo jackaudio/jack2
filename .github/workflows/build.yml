@@ -24,9 +24,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          ~/PawPawBuilds/builds
-          ~/PawPawBuilds/downloads
-          ~/PawPawBuilds/targets
+          ~/PawPawBuilds
         key: macos
     - name: Set up dependencies
       run: |
@@ -69,9 +67,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          ~/PawPawBuilds/builds
-          ~/PawPawBuilds/downloads
-          ~/PawPawBuilds/targets
+          ~/PawPawBuilds
         key: macos-universal
     - name: Set up dependencies
       run: |
@@ -118,23 +114,24 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          ~/PawPawBuilds/builds
-          ~/PawPawBuilds/debs
-          ~/PawPawBuilds/downloads
-          ~/PawPawBuilds/targets
+          ~/PawPawBuilds
         key: win32
     - name: Restore debian packages cache
       run: |
         if [ -d ~/PawPawBuilds/debs ] && [ "$(ls ~/PawPawBuilds/debs | wc -l)" -ne 0 ]; then \
           sudo cp ~/PawPawBuilds/debs/*.deb /var/cache/apt/archives/; \
         fi
+    - name: Fix GitHub mess
+      run: |
+        sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+        sudo apt-get update -qq
+        sudo apt-get install -yqq --allow-downgrades libpcre2-8-0/focal
     - name: Set up dependencies
       run: |
-        wget -qO- https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add -
         sudo dpkg --add-architecture i386
-        sudo apt-add-repository -y 'deb https://dl.winehq.org/wine-builds/ubuntu/ focal main'
-        sudo apt-get install -y autopoint build-essential curl cmake jq llvm mingw-w64 qttools5-dev-tools winehq-stable xvfb \
-          binutils-mingw-w64-i686 g++-mingw-w64-i686
+        sudo apt-get update -qq
+        sudo apt-get install -y autopoint build-essential curl cmake jq llvm mingw-w64 qttools5-dev-tools xvfb \
+          binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 wine-stable:i386
     - name: Cache debian packages
       run: |
         mkdir -p ~/PawPawBuilds/debs && \
@@ -196,23 +193,24 @@ jobs:
       uses: actions/cache@v2
       with:
         path: |
-          ~/PawPawBuilds/builds
-          ~/PawPawBuilds/debs
-          ~/PawPawBuilds/downloads
-          ~/PawPawBuilds/targets
+          ~/PawPawBuilds
         key: win64
     - name: Restore debian packages cache
       run: |
         if [ -d ~/PawPawBuilds/debs ] && [ "$(ls ~/PawPawBuilds/debs | wc -l)" -ne 0 ]; then \
           sudo cp ~/PawPawBuilds/debs/*.deb /var/cache/apt/archives/; \
         fi
+    - name: Fix GitHub mess
+      run: |
+        sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+        sudo apt-get update -qq
+        sudo apt-get install -yqq --allow-downgrades libpcre2-8-0/focal
     - name: Set up dependencies
       run: |
-        wget -qO- https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add -
         sudo dpkg --add-architecture i386
-        sudo apt-add-repository -y 'deb https://dl.winehq.org/wine-builds/ubuntu/ focal main'
-        sudo apt-get install -y autopoint build-essential curl cmake jq llvm mingw-w64 qttools5-dev-tools winehq-stable xvfb \
-          binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64
+        sudo apt-get update -qq
+        sudo apt-get install -y autopoint build-essential curl cmake jq llvm mingw-w64 qttools5-dev-tools xvfb \
+          binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64 wine-stable
     - name: Cache debian packages
       run: |
         mkdir -p ~/PawPawBuilds/debs && \
