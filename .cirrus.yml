@@ -1,0 +1,29 @@
+task:
+  freebsd_instance:
+    matrix:
+      - image_family: freebsd-12-3
+      - image_family: freebsd-13-0
+
+  environment:
+    CFLAGS: -O2 -pipe -fPIC -fstack-protector-strong -fno-strict-aliasing -I/usr/local/include
+    CPPFLAGS: -O2 -pipe -fPIC -fstack-protector-strong -fno-strict-aliasing -I/usr/local/include
+    LDFLAGS: -lreadline -L/usr/local/lib -fstack-protector-strong
+  prepare_script:
+    - mkdir ${HOME}/install
+
+  matrix:
+    - name: FreeBSD Minimal Build
+      dependencies_script:
+        - pkg install -y pkgconf python3 libsndfile libsamplerate libsysinfo readline expat
+      config_script:
+        - python3 ./waf configure --celt=no --sndfile=yes --samplerate=yes --alsa=no --classic --readline=yes --opus=no --example-tools=no --prefix ${HOME}/install
+    - name: FreeBSD All Options
+      dependencies_script:
+        - pkg install -y pkgconf python3 libsndfile libsamplerate libsysinfo readline alsa-lib dbus expat opus
+      config_script:
+        - python3 ./waf configure --celt=no --sndfile=yes --samplerate=yes --alsa=yes --dbus --classic --autostart=dbus --readline=yes --opus=yes --prefix ${HOME}/install
+
+  build_script:
+    - python3 ./waf
+  install_script:
+    - python3 ./waf install
