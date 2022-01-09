@@ -8,10 +8,11 @@ on:
     branches:
       - '*'
 env:
-  CACHE_VERSION: 1
+  CACHE_VERSION: 2
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
-  PAWPAW_VERSION: f82379fcbf4623112ef497b118a96c1d94b7112e
+  PAWPAW_SKIP_LTO: 1
+  PAWPAW_VERSION: 023bccdeffafc4212292072a1eba78d9e709510e
 
 jobs:
   # macOS native intel build
@@ -122,7 +123,7 @@ jobs:
         if [ -d ~/PawPawBuilds/debs ] && [ "$(ls ~/PawPawBuilds/debs | wc -l)" -ne 0 ]; then \
           sudo cp ~/PawPawBuilds/debs/*.deb /var/cache/apt/archives/; \
         fi
-    - name: Fix GitHub mess
+    - name: Fix GitHub's mess
       run: |
         sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
         sudo apt-get update -qq
