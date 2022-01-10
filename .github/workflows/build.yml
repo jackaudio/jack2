@@ -8,9 +8,11 @@ on:
     branches:
       - '*'
 env:
+  CACHE_VERSION: 3
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
-  PAWPAW_VERSION: 8c69660ab10b75cd7a488f41386dbcb4c8802c5a
+  PAWPAW_SKIP_LTO: 1
+  PAWPAW_VERSION: 023bccdeffafc4212292072a1eba78d9e709510e
 
 jobs:
   # macOS native intel build
@@ -25,7 +27,7 @@ jobs:
       with:
         path: |
           ~/PawPawBuilds
-        key: macos
+        key: macos-v${{ env.CACHE_VERSION }}
     - name: Set up dependencies
       run: |
         brew install cmake jq meson
@@ -68,7 +70,7 @@ jobs:
       with:
         path: |
           ~/PawPawBuilds
-        key: macos-universal
+        key: macos-universal-v${{ env.CACHE_VERSION }}
     - name: Set up dependencies
       run: |
         brew install cmake jq meson
@@ -115,13 +117,13 @@ jobs:
       with:
         path: |
           ~/PawPawBuilds
-        key: win32
+        key: win32-v${{ env.CACHE_VERSION }}
     - name: Restore debian packages cache
       run: |
         if [ -d ~/PawPawBuilds/debs ] && [ "$(ls ~/PawPawBuilds/debs | wc -l)" -ne 0 ]; then \
           sudo cp ~/PawPawBuilds/debs/*.deb /var/cache/apt/archives/; \
         fi
-    - name: Fix GitHub mess
+    - name: Fix GitHub's mess
       run: |
         sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
         sudo apt-get update -qq
@@ -194,13 +196,13 @@ jobs:
       with:
         path: |
           ~/PawPawBuilds
-        key: win64
+        key: win64-v${{ env.CACHE_VERSION }}
     - name: Restore debian packages cache
       run: |
         if [ -d ~/PawPawBuilds/debs ] && [ "$(ls ~/PawPawBuilds/debs | wc -l)" -ne 0 ]; then \
           sudo cp ~/PawPawBuilds/debs/*.deb /var/cache/apt/archives/; \
         fi
-    - name: Fix GitHub mess
+    - name: Fix GitHub's mess
       run: |
         sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
         sudo apt-get update -qq
@@ -280,7 +282,7 @@ jobs:
       with:
         path: |
           ~/debs
-        key: ubuntu-20.04
+        key: ubuntu-20.04-v${{ env.CACHE_VERSION }}
     - name: Restore debian packages cache
       run: |
         if [ -d ~/debs ] && [ "$(ls ~/debs | wc -l)" -ne 0 ]; then \
