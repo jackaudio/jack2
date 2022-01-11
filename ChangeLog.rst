@@ -1,15 +1,22 @@
 ChangeLog
 #########
 
-* 1.9.20 (2021-10-15)
+* 1.9.20 (2022-01-15)
 
   * WIP
-  * Fix incomplete ASIO support on Windows
   * Add waf autooption ``--example-tools`` to allow optional build of
     executables, libraries and man pages provided by `jack-example-tools
     <https://github.com/jackaudio/jack-example-tools>`_ (the files are built by
     default). Building and installing the additional files can be disabled by
     using ``--example-tools=no`` or ``--no-example-tools``.
+  * Fix incomplete ASIO support on Windows
+  * Fix netsource tool missing on Windows
+  * Fix semaphore usage on macOS
+  * Official FreeBSD support
+
+External changes, related to macOS/Windows installer:
+  * Update Qt5 used in macOS/Windows installers to 5.12.12
+  * Update QjackCtl used in macOS/Windows installers to 0.9.6
 
 * 1.9.19 (2021-07-15)
 
