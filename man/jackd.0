@@ -583,6 +583,13 @@ Whether or not to ignore hardware period size.
 (default: false)
 
 .TP
+\fB\-e, \-\-excl \fIboolean\fR
+Request exclusive and direct access to the sound device.
+This avoids mixing and automatic audio conversion in the
+OSS driver, and the extra latency that comes with that.
+(default: false)
+
+.TP
 \fB\-I, \-\-input\-latency\fR
 Extra input latency (frames). 
 (default: 0)
