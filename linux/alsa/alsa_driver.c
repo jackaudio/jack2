@@ -314,9 +314,44 @@ alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 				break;
 
 			case 4: /* NO DITHER */
+				switch (driver->playback_sample_format)
+				{
+					case SND_PCM_FORMAT_S24_LE:
+					case SND_PCM_FORMAT_S24_BE:
 				driver->write_via_copy = driver->quirk_bswap?
 					sample_move_d32l24_sSs:
 					sample_move_d32l24_sS;
+				break;
+					case SND_PCM_FORMAT_S32_LE:
+					case SND_PCM_FORMAT_S32_BE:
+					{
+						int bits = snd_pcm_hw_params_get_sbits(driver->playback_hw_params);
+						if (bits == 32)
+						{
+							driver->write_via_copy = driver->quirk_bswap?
+								sample_move_d32_sSs:
+								sample_move_d32_sS;
+						}
+						else if (bits == 24)
+						{
+							jack_log("sample format is SND_PCM_FORMAT_S32 but only 24 bits available");
+							driver->write_via_copy = driver->quirk_bswap?
+								sample_move_d32u24_sSs:
+								sample_move_d32u24_sS;
+						}
+						else
+						{
+							jack_error("unsupported sample format for playback: "
+									   "SND_PCM_FORMAT_S32 with %d bits",
+									   bits);
+							exit (1);
+						}
+						break;
+					}
+					default:
+					jack_error("unsupported 4 byte sample_format");
+					exit (1);
+				}
 				break;
 
 			default:
@@ -343,9 +378,44 @@ alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 					sample_move_dS_s24;
 				break;
 			case 4:
+				switch (driver->capture_sample_format)
+				{
+					case SND_PCM_FORMAT_S24_LE:
+					case SND_PCM_FORMAT_S24_BE:
 				driver->read_via_copy = driver->quirk_bswap?
 					sample_move_dS_s32l24s:
 					sample_move_dS_s32l24;
+				break;
+					case SND_PCM_FORMAT_S32_LE:
+					case SND_PCM_FORMAT_S32_BE:
+					{
+						int bits = snd_pcm_hw_params_get_sbits(driver->capture_hw_params);
+						if (bits == 32)
+						{
+							driver->read_via_copy = driver->quirk_bswap?
+								sample_move_dS_s32s:
+								sample_move_dS_s32;
+						}
+						else if(bits == 24)
+						{
+							jack_log("sample format is SND_PCM_FORMAT_S32 but only 24 bits available");
+							driver->read_via_copy = driver->quirk_bswap?
+								sample_move_dS_s32u24s:
+								sample_move_dS_s32u24;
+						}
+						else
+						{
+							jack_error("unsupported sample format for capture: "
+									   "SND_PCM_FORMAT_S32 with %d bits",
+									   bits);
+							exit (1);
+						}
+						break;
+					}
+					default:
+                        jack_error("unsupported 4 byte sample_format");
+                        exit (1);
+                }
 				break;
 			}
 		}

@@ -73,6 +73,7 @@
    So, for now (October 2008) we use 2^(N-1)-1 as the scaling factor.
 */
 
+#define SAMPLE_32BIT_SCALING  2147483647.0
 #define SAMPLE_24BIT_SCALING  8388607.0f
 #define SAMPLE_16BIT_SCALING  32767.0f
 
@@ -80,6 +81,11 @@
    
    advice from Fons Adriaensen: make the limits symmetrical
  */
+
+#define SAMPLE_32BIT_MAX   2147483647
+#define SAMPLE_32BIT_MIN   -2147483647
+#define SAMPLE_32BIT_MAX_D  2147483647.0
+#define SAMPLE_32BIT_MIN_D  -2147483647.0
 
 #define SAMPLE_24BIT_MAX  8388607  
 #define SAMPLE_24BIT_MIN  -8388607 
@@ -106,6 +112,7 @@
 */
 
 #define f_round(f) lrintf(f)
+#define d_round(f) lrint(f)
 
 #define float_16(s, d)\
 	if ((s) <= NORMALIZED_FLOAT_MIN) {\
@@ -145,6 +152,15 @@
 	} else {\
 		(d) = f_round ((s) * SAMPLE_24BIT_SCALING);                    \
 	}
+
+#define float_32(s, d)												\
+	do {															\
+		double clipped = fmin(NORMALIZED_FLOAT_MAX,					\
+				fmax((double)(s), NORMALIZED_FLOAT_MIN));			\
+		double scaled = clipped * SAMPLE_32BIT_MAX_D;				\
+		(d) = d_round(scaled);										\
+	}																\
+	while (0)
 
 /* call this when "s" has already been scaled (e.g. when dithering)
  */
@@ -193,6 +209,11 @@ static inline __m128 gen_one(void)
 static inline __m128 clip(__m128 s, __m128 min, __m128 max)
 {
     return _mm_min_ps(max, _mm_max_ps(s, min));
+}
+
+static inline __m128d clip_double(__m128d s, __m128d min, __m128d max)
+{
+    return _mm_min_pd(max, _mm_max_pd(s, min));
 }
 
 static inline __m128i float_24_sse(__m128 s)
@@ -274,13 +295,14 @@ void sample_move_dS_floatLE (char *dst, jack_default_audio_sample_t *src, unsign
    
    S      - sample is a jack_default_audio_sample_t, currently (October 2008) a 32 bit floating point value
    Ss     - like S but reverse endian from the host CPU
-   32u24  - sample is an signed 32 bit integer value, but data is in upper 24 bits only
+   32     - sample is a signed 32 bit integer value
+   32u24  - sample is a signed 32 bit integer value, but data is in upper 24 bits only
    32u24s - like 32u24 but reverse endian from the host CPU
-   32l24  - sample is an signed 32 bit integer value, but data is in lower 24 bits only
+   32l24  - sample is a signed 32 bit integer value, but data is in lower 24 bits only
    32l24s - like 32l24 but reverse endian from the host CPU
-   24     - sample is an signed 24 bit integer value
+   24     - sample is a signed 24 bit integer value
    24s    - like 24 but reverse endian from the host CPU
-   16     - sample is an signed 16 bit integer value
+   16     - sample is a signed 16 bit integer value
    16s    - like 16 but reverse endian from the host CPU
 
    For obvious reasons, the reverse endian versions only show as source types.
@@ -289,6 +311,36 @@ void sample_move_dS_floatLE (char *dst, jack_default_audio_sample_t *src, unsign
 */   
 
 /* functions for native integer sample data */
+
+void sample_move_d32_sSs (char *dst, jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state)
+{
+	while (nsamples--) {
+		int32_t z;
+		float_32(*src, z);
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+		dst[0]=(char)(z>>24);
+		dst[1]=(char)(z>>16);
+		dst[2]=(char)(z>>8);
+		dst[3]=(char)(z);
+#elif __BYTE_ORDER == __BIG_ENDIAN
+		dst[0]=(char)(z);
+		dst[1]=(char)(z>>8);
+		dst[2]=(char)(z>>16);
+		dst[3]=(char)(z>>24);
+#endif
+		dst += dst_skip;
+		src++;
+	}
+}
+
+void sample_move_d32_sS (char *dst, jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state)
+{
+	while (nsamples--) {
+		float_32(*src, *(int32_t *)dst);
+		dst += dst_skip;
+		src++;
+	}
+}
 
 void sample_move_d32u24_sSs (char *dst, jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state)
 {
@@ -689,6 +741,35 @@ void sample_move_d32l24_sS (char *dst, jack_default_audio_sample_t *src, unsigne
 #endif
 }	
 
+void sample_move_dS_s32s (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip)
+{
+	const jack_default_audio_sample_t scaling = 1.0/SAMPLE_32BIT_SCALING;
+	while (nsamples--) {
+		int32_t x;
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+		x = (unsigned char)(src[0]);
+		x <<= 8;
+		x |= (unsigned char)(src[1]);
+		x <<= 8;
+		x |= (unsigned char)(src[2]);
+		x <<= 8;
+		x |= (unsigned char)(src[3]);
+#elif __BYTE_ORDER == __BIG_ENDIAN
+		x = (unsigned char)(src[3]);
+		x <<= 8;
+		x |= (unsigned char)(src[2]);
+		x <<= 8;
+		x |= (unsigned char)(src[1]);
+		x <<= 8;
+		x |= (unsigned char)(src[0]);
+#endif
+		double extended = x * scaling;
+		*dst = (float)extended;
+		dst++;
+		src += src_skip;
+	}
+}
+
 void sample_move_dS_s32l24s (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip)
 {
 #if defined (__ARM_NEON__) || defined (__ARM_NEON)
@@ -752,6 +833,18 @@ void sample_move_dS_s32l24s (jack_default_audio_sample_t *dst, char *src, unsign
 		src += src_skip;
 	}
 }	
+
+void sample_move_dS_s32 (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip)
+{
+	const double scaling = 1.0 / SAMPLE_32BIT_SCALING;
+	while (nsamples--) {
+		int32_t val=(*((int32_t*)src));
+		double extended = val * scaling;
+		*dst = (float)extended;
+		dst++;
+		src += src_skip;
+	}
+}
 
 void sample_move_dS_s32l24 (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip)
 {
