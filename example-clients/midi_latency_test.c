@@ -163,7 +163,7 @@ create_semaphore(int id)
         semaphore = NULL;
     }
 #else
-    semaphore = malloc(sizeof(semaphore_t));
+    semaphore = malloc(sizeof(sem_t));
     if (semaphore != NULL) {
         if (sem_init(semaphore, 0, 0)) {
             free(semaphore);
