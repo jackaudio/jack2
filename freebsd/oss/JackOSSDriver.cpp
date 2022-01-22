@@ -197,7 +197,6 @@ static inline void CopyAndConvertOut(void *dst, jack_sample_t *src, size_t nfram
 void JackOSSDriver::DisplayDeviceInfo()
 {
     audio_buf_info info;
-    oss_audioinfo ai_in, ai_out;
     memset(&info, 0, sizeof(audio_buf_info));
     int cap = 0;
 
@@ -279,10 +278,6 @@ void JackOSSDriver::DisplayDeviceInfo()
             if (cap & DSP_CAP_MULTI)    jack_info(" DSP_CAP_MULTI");
             if (cap & DSP_CAP_BIND)     jack_info(" DSP_CAP_BIND");
         }
-    }
-
-    if (ai_in.rate_source != ai_out.rate_source) {
-        jack_info("Warning : input and output are not necessarily driven by the same clock!");
     }
 }
 
