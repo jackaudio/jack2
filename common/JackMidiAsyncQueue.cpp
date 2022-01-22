@@ -38,7 +38,7 @@ JackMidiAsyncQueue::JackMidiAsyncQueue(size_t max_bytes, size_t max_messages)
         }
         jack_ringbuffer_free(byte_ring);
     }
-    delete data_buffer;
+    delete[] data_buffer;
     throw std::bad_alloc();
 }
 
