@@ -510,7 +510,7 @@ LIB_EXPORT int jack_port_tie(jack_port_t* src, jack_port_t* dst)
         jack_error("jack_port_tie called with ports not belonging to the same client");
         return -1;
     } else {
-        return manager->GetPort(mydst)->Tie(mysrc);
+        return (manager ? manager->GetPort(mydst)->Tie(mysrc) : -1);
     }
 }
 
