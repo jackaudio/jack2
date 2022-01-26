@@ -43,6 +43,7 @@ Source: "win32\lib\libjack.dll"; DestDir: "{win}"; Components: jackserver; Flags
 Source: "win32\bin\qjackctl.exe"; DestDir: "{app}\qjackctl"; Components: qjackctl; Flags: ignoreversion;
 Source: "Qt5*.dll"; DestDir: "{app}\qjackctl"; Components: qjackctl; Flags: ignoreversion;
 Source: "qwindows.dll"; DestDir: "{app}\qjackctl\platforms"; Components: qjackctl; Flags: ignoreversion;
+Source: "qwindowsvistastyle.dll"; DestDir: "{app}\qjackctl\styles"; Components: qjackctl; Flags: ignoreversion;
 ; dev
 Source: "win32\include\jack\*.h"; DestDir: "{app}\include\jack"; Components: dev; Flags: ignoreversion;
 Source: "win32\lib\*.a"; DestDir: "{app}\lib"; Components: dev; Flags: ignoreversion;
