@@ -94,7 +94,7 @@ class JackAtomicState
     protected:
 
         T fState[2];
-        alignas(UInt32) volatile AtomicCounter fCounter;
+        alignas(UInt32) alignas(AtomicCounter) volatile AtomicCounter fCounter;
         SInt32 fCallWriteCounter;
 
         UInt32 WriteNextStateStartAux()
