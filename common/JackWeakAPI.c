@@ -62,9 +62,9 @@ void tryload_libjack()
         }
     #elif defined(WIN32)
         #ifdef _WIN64
-            libjack_handle = LoadLibrary("libjack64.dll");
+            libjack_handle = LoadLibraryA("libjack64.dll");
         #else
-            libjack_handle = LoadLibrary("libjack.dll");
+            libjack_handle = LoadLibraryA("libjack.dll");
         #endif
     #else
         libjack_handle = dlopen("libjack.so.0", RTLD_LAZY);
