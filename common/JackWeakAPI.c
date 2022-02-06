@@ -77,8 +77,11 @@ void *load_jack_function(const char *fn_name)
 {
     void *fn = 0;
     if (!libjack_handle) {
-        fprintf (stderr, "libjack not found, so do not try to load  %s ffs  !\n", fn_name);
-        return 0;
+        tryload_libjack();
+        if (!libjack_handle) {
+            fprintf (stderr, "libjack not found, so do not try to load  %s ffs  !\n", fn_name);
+            return 0;
+       }
     }
 #ifdef WIN32
     fn = (void*)GetProcAddress(libjack_handle, fn_name);
