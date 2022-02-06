@@ -66,6 +66,11 @@ void tryload_libjack()
         #else
             libjack_handle = LoadLibraryA("libjack.dll");
         #endif
+        if (!libjack_handle) {
+            char* lpMsgBuf;
+            FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,NULL,GetLastError(),MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),(LPTSTR) &lpMsgBuf,0,NULL );
+            fprintf(stderr, "Failed to load libjack DLL: %d", lpMsgBuf);
+        }
     #else
         libjack_handle = dlopen("libjack.so.0", RTLD_LAZY);
     #endif
