@@ -38,7 +38,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //----------------------------------------------------------------
 inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void * addr)
 {
-    register char c;
+    char c;
     __asm {
         push	ebx
         push	esi
@@ -59,7 +59,7 @@ inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void * addr)
 
 static inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void* addr)
 {
-    register char ret;
+    char ret;
     __asm__ __volatile__ (
         "# CAS \n\t"
         LOCK "cmpxchg %2, (%1) \n\t"
