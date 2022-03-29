@@ -149,11 +149,15 @@ bool JackFifo::Allocate(const char* name, const char* server_name, int value)
     if ((fFifo = open(fName, O_RDWR | O_CREAT, 0666)) < 0) {
         jack_error("Cannot open FIFO name = %s err = %s", name, strerror(errno));
         return false;
-    } else {
-        fPoll.fd = fFifo;
-        fPoll.events = POLLERR | POLLIN | POLLHUP | POLLNVAL;
-        return true;
     }
+
+    fPoll.fd = fFifo;
+    fPoll.events = POLLERR | POLLIN | POLLHUP | POLLNVAL;
+    while (value--) {
+        Signal();
+    }
+
+    return true;
 }
 
 // Client side
