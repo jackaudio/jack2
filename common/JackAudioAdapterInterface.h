@@ -82,9 +82,9 @@ namespace Jack
         jack_nframes_t fAdaptedBufferSize;
         jack_nframes_t fAdaptedSampleRate;
 
-        //PI controller
-        JackPIControler fPIControler;
-
+        //PI controler
+        JackPIController** fPIControllerCapture;
+        JackPIController** fPIControllerPlayback;
         JackResampler** fCaptureRingBuffer;
         JackResampler** fPlaybackRingBuffer;
 
@@ -94,6 +94,7 @@ namespace Jack
 
         bool fRunning;
         bool fAdaptative;
+        bool fResampleRatioPerChannel;
 
         void ResetRingBuffers();
         void AdaptRingBufferSize();
@@ -108,13 +109,14 @@ namespace Jack
                                 fHostSampleRate(sample_rate),
                                 fAdaptedBufferSize(buffer_size),
                                 fAdaptedSampleRate(sample_rate),
-                                fPIControler(sample_rate / sample_rate, 256),
+                                fPIControllerCapture(NULL), fPIControllerPlayback(NULL),
                                 fCaptureRingBuffer(NULL), fPlaybackRingBuffer(NULL),
                                 fQuality(0),
                                 fRingbufferCurSize(ring_buffer_size),
                                 fPullAndPushTime(0),
                                 fRunning(false),
-                                fAdaptative(true)
+                                fAdaptative(true),
+                                fResampleRatioPerChannel(false)
         {}
 
         JackAudioAdapterInterface(jack_nframes_t host_buffer_size,
@@ -128,12 +130,14 @@ namespace Jack
                                 fHostSampleRate(host_sample_rate),
                                 fAdaptedBufferSize(adapted_buffer_size),
                                 fAdaptedSampleRate(adapted_sample_rate),
-                                fPIControler(host_sample_rate / host_sample_rate, 256),
+                                fPIControllerCapture(NULL), fPIControllerPlayback(NULL),
+                                fCaptureRingBuffer(NULL), fPlaybackRingBuffer(NULL),
                                 fQuality(0),
                                 fRingbufferCurSize(ring_buffer_size),
                                 fPullAndPushTime(0),
                                 fRunning(false),
-                                fAdaptative(true)
+                                fAdaptative(true),
+                                fResampleRatioPerChannel(false)
         {}
 
         virtual ~JackAudioAdapterInterface()
@@ -168,6 +172,7 @@ namespace Jack
         virtual int GetInputLatency(int port_index) { return 0; }
         virtual int GetOutputLatency(int port_index) { return 0; }
 
+        double GetSharedRatio(int delta_frames);
         int PushAndPull(jack_default_audio_sample_t** inputBuffer, jack_default_audio_sample_t** outputBuffer, unsigned int frames);
         int PullAndPush(jack_default_audio_sample_t** inputBuffer, jack_default_audio_sample_t** outputBuffer, unsigned int frames);
 
