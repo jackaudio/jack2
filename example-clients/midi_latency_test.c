@@ -652,8 +652,7 @@ main(int argc, char **argv)
             break;
         default:
             {
-                char *s = "'- '";
-                s[2] = c;
+                signed char s[] = {'\'', '-', c, '\'', '\0'};
                 die(s, "invalid switch");
             }
         case -1:
