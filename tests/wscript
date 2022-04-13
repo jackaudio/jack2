@@ -3,30 +3,30 @@
 
 test_programs = {
     # For testing purposes
-    #'synchroClient': ['testSynchroClient.cpp'],
-    #'synchroServer': ['testSynchroServer.cpp'],
-    #'synchroServerClient': ['testSynchroServerClient.cpp'],
-    #'testSem': ['testSem.cpp'],
+    # 'synchroClient': ['testSynchroClient.cpp'],
+    # 'synchroServer': ['testSynchroServer.cpp'],
+    # 'synchroServerClient': ['testSynchroServerClient.cpp'],
+    # 'testSem': ['testSem.cpp'],
     'jack_test': ['test.cpp'],
     'jack_cpu': ['cpu.c'],
     'jack_iodelay': ['iodelay.cpp'],
-    'jack_multiple_metro' : ['external_metro.cpp'],
+    'jack_multiple_metro': ['external_metro.cpp'],
     }
+
 
 def build(bld):
     for test_program, test_program_sources in list(test_programs.items()):
-        prog = bld(features = 'cxx cxxprogram')
+        prog = bld(features='cxx cxxprogram')
         if bld.env['IS_MACOSX']:
-            prog.includes = ['..','../macosx', '../posix', '../common/jack', '../common']
+            prog.includes = ['..', '../macosx', '../posix', '../common/jack', '../common']
         if bld.env['IS_LINUX']:
-            prog.includes = ['..','../linux', '../posix', '../common/jack', '../common']
+            prog.includes = ['..', '../linux', '../posix', '../common/jack', '../common']
         if bld.env['IS_FREEBSD']:
-            prog.includes = ['..','../freebsd', '../posix', '../common/jack', '../common']
+            prog.includes = ['..', '../freebsd', '../posix', '../common/jack', '../common']
         if bld.env['IS_SUN']:
-            prog.includes = ['..','../solaris', '../posix', '../common/jack', '../common']
+            prog.includes = ['..', '../solaris', '../posix', '../common/jack', '../common']
         prog.source = test_program_sources
         if bld.env['IS_LINUX']:
             prog.uselib = 'RT'
         prog.use = 'clientlib'
         prog.target = test_program
-        #prog.cxxflags = ['-Wno-deprecated-declarations']

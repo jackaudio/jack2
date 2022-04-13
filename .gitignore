@@ -5,6 +5,7 @@ __pycache__
 *.dll
 *.pyc
 *.pkg
+flake8.txt
 codeBlocks
 /android/.server/
 /android/.client/

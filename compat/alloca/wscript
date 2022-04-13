@@ -19,14 +19,17 @@
 
 from waflib import Errors
 
+
 def options(opt):
     pass
+
 
 def configure(conf):
     try:
         conf.check(header_name='alloca.h')
     except Errors.ConfigurationError:
         conf.env.append_unique('INCLUDES', conf.path.abspath())
+
 
 def build(bld):
     pass

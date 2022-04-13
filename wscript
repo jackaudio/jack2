@@ -6,11 +6,11 @@ import os
 import shutil
 import sys
 
-from waflib import Logs, Options, Task, Utils
+from waflib import Logs, Options, TaskGen
 from waflib.Build import BuildContext, CleanContext, InstallContext, UninstallContext
 
-VERSION='1.9.20'
-APPNAME='jack'
+VERSION = '1.9.20'
+APPNAME = 'jack'
 JACK_API_VERSION = '0.1.0'
 
 # these variables are mandatory ('/' are converted automatically)
@@ -20,11 +20,13 @@ out = 'build'
 # lib32 variant name used when building in mixed mode
 lib32 = 'lib32'
 
+
 def display_feature(conf, msg, build):
     if build:
         conf.msg(msg, 'yes', color='GREEN')
     else:
         conf.msg(msg, 'no', color='YELLOW')
+
 
 def check_for_celt(conf):
     found = False
@@ -45,36 +47,69 @@ def check_for_celt(conf):
     if not found:
         raise conf.errors.ConfigurationError
 
+
 def options(opt):
     # options provided by the modules
     opt.load('compiler_cxx')
     opt.load('compiler_c')
-    opt.load('autooptions');
+    opt.load('autooptions')
 
     opt.load('xcode6')
 
     opt.recurse('compat')
 
     # install directories
-    opt.add_option('--htmldir', type='string', default=None, help='HTML documentation directory [Default: <prefix>/share/jack-audio-connection-kit/reference/html/')
+    opt.add_option(
+        '--htmldir',
+        type='string',
+        default=None,
+        help='HTML documentation directory [Default: <prefix>/share/jack-audio-connection-kit/reference/html/',
+    )
     opt.add_option('--libdir', type='string', help='Library directory [Default: <prefix>/lib]')
     opt.add_option('--libdir32', type='string', help='32bit Library directory [Default: <prefix>/lib32]')
     opt.add_option('--pkgconfigdir', type='string', help='pkg-config file directory [Default: <libdir>/pkgconfig]')
     opt.add_option('--mandir', type='string', help='Manpage directory [Default: <prefix>/share/man/man1]')
 
     # options affecting binaries
-    opt.add_option('--platform', type='string', default=sys.platform, help='Target platform for cross-compiling, e.g. cygwin or win32')
+    opt.add_option(
+        '--platform',
+        type='string',
+        default=sys.platform,
+        help='Target platform for cross-compiling, e.g. cygwin or win32',
+    )
     opt.add_option('--mixed', action='store_true', default=False, help='Build with 32/64 bits mixed mode')
     opt.add_option('--debug', action='store_true', default=False, dest='debug', help='Build debuggable binaries')
-    opt.add_option('--static', action='store_true', default=False, dest='static', help='Build static binaries (Windows only)')
+    opt.add_option(
+        '--static',
+        action='store_true',
+        default=False,
+        dest='static',
+        help='Build static binaries (Windows only)',
+    )
 
     # options affecting general jack functionality
-    opt.add_option('--classic', action='store_true', default=False, help='Force enable standard JACK (jackd) even if D-Bus JACK (jackdbus) is enabled too')
+    opt.add_option(
+        '--classic',
+        action='store_true',
+        default=False,
+        help='Force enable standard JACK (jackd) even if D-Bus JACK (jackdbus) is enabled too',
+    )
     opt.add_option('--dbus', action='store_true', default=False, help='Enable D-Bus JACK (jackdbus)')
-    opt.add_option('--autostart', type='string', default='default', help='Autostart method. Possible values: "default", "classic", "dbus", "none"')
+    opt.add_option(
+        '--autostart',
+        type='string',
+        default='default',
+        help='Autostart method. Possible values: "default", "classic", "dbus", "none"',
+    )
     opt.add_option('--profile', action='store_true', default=False, help='Build with engine profiling')
     opt.add_option('--clients', default=256, type='int', dest='clients', help='Maximum number of JACK clients')
-    opt.add_option('--ports-per-application', default=2048, type='int', dest='application_ports', help='Maximum number of ports per application')
+    opt.add_option(
+        '--ports-per-application',
+        default=2048,
+        type='int',
+        dest='application_ports',
+        help='Maximum number of ports per application',
+    )
     opt.add_option('--systemd-unit', action='store_true', default=False, help='Install systemd units.')
 
     opt.set_auto_options_define('HAVE_%s')
@@ -115,7 +150,7 @@ def options(opt):
             'portaudio',
             help='Enable Portaudio driver',
             conf_dest='BUILD_DRIVER_PORTAUDIO')
-    portaudio.check(header_name='windows.h') # only build portaudio on windows
+    portaudio.check(header_name='windows.h')  # only build portaudio on windows
     portaudio.check_cfg(
             package='portaudio-2.0 >= 19',
             uselib_store='PORTAUDIO',
@@ -190,6 +225,7 @@ def options(opt):
     # this must be called before the configure phase
     opt.apply_auto_options_hack()
 
+
 def detect_platform(conf):
     # GNU/kFreeBSD and GNU/Hurd are treated as Linux
     platforms = [
@@ -201,12 +237,12 @@ def detect_platform(conf):
         ('IS_WINDOWS', 'Windows', ['cygwin', 'msys', 'win32'])
     ]
 
-    for key,name,strings in platforms:
+    for key, name, strings in platforms:
         conf.env[key] = False
 
     conf.start_msg('Checking platform')
     platform = Options.options.platform
-    for key,name,strings in platforms:
+    for key, name, strings in platforms:
         for s in strings:
             if platform.startswith(s):
                 conf.env[key] = True
@@ -245,16 +281,16 @@ def configure(conf):
         conf.check(lib='aften', uselib='AFTEN', define_name='AFTEN')
         conf.check_cxx(
             fragment=''
-                + '#include <aften/aften.h>\n'
-                + 'int\n'
-                + 'main(void)\n'
-                + '{\n'
-                + 'AftenContext fAftenContext;\n'
-                + 'aften_set_defaults(&fAftenContext);\n'
-                + 'unsigned char *fb;\n'
-                + 'float *buf=new float[10];\n'
-                + 'int res = aften_encode_frame(&fAftenContext, fb, buf, 1);\n'
-                + '}\n',
+            + '#include <aften/aften.h>\n'
+            + 'int\n'
+            + 'main(void)\n'
+            + '{\n'
+            + 'AftenContext fAftenContext;\n'
+            + 'aften_set_defaults(&fAftenContext);\n'
+            + 'unsigned char *fb;\n'
+            + 'float *buf=new float[10];\n'
+            + 'int res = aften_encode_frame(&fAftenContext, fb, buf, 1);\n'
+            + '}\n',
             lib='aften',
             msg='Checking for aften_encode_frame()',
             define_name='HAVE_AFTEN_NEW_API',
@@ -270,15 +306,15 @@ def configure(conf):
     # Check for functions.
     conf.check(
             fragment=''
-                + '#define _GNU_SOURCE\n'
-                + '#include <poll.h>\n'
-                + '#include <signal.h>\n'
-                + '#include <stddef.h>\n'
-                + 'int\n'
-                + 'main(void)\n'
-                + '{\n'
-                + '   ppoll(NULL, 0, NULL, NULL);\n'
-                + '}\n',
+            + '#define _GNU_SOURCE\n'
+            + '#include <poll.h>\n'
+            + '#include <signal.h>\n'
+            + '#include <stddef.h>\n'
+            + 'int\n'
+            + 'main(void)\n'
+            + '{\n'
+            + '   ppoll(NULL, 0, NULL, NULL);\n'
+            + '}\n',
             msg='Checking for ppoll',
             define_name='HAVE_PPOLL',
             mandatory=False)
@@ -292,7 +328,7 @@ def configure(conf):
     conf.recurse('common')
     if Options.options.dbus:
         conf.recurse('dbus')
-        if conf.env['BUILD_JACKDBUS'] != True:
+        if not conf.env['BUILD_JACKDBUS']:
             conf.fatal('jackdbus was explicitly requested but cannot be built')
     if conf.env['IS_LINUX']:
         if Options.options.systemd_unit:
@@ -367,7 +403,7 @@ def configure(conf):
         conf.env.append_unique('CFLAGS', '-g')
         conf.env.append_unique('LINKFLAGS', '-g')
 
-    if not Options.options.autostart in ['default', 'classic', 'dbus', 'none']:
+    if Options.options.autostart not in ['default', 'classic', 'dbus', 'none']:
         conf.fatal('Invalid autostart value "' + Options.options.autostart + '"')
 
     if Options.options.autostart == 'default':
@@ -398,10 +434,10 @@ def configure(conf):
         conf.env['ADDON_DIR'] = conf.env['LIBDIR'] + '/jack'
         if Options.options.platform in ('msys', 'win32'):
             conf.define('ADDON_DIR', 'jack')
-            conf.define('__STDC_FORMAT_MACROS', 1) # for PRIu64
+            conf.define('__STDC_FORMAT_MACROS', 1)  # for PRIu64
         else:
-            # don't define ADDON_DIR in config.h, use the default 'jack' defined in
-            # windows/JackPlatformPlug_os.h
+            # don't define ADDON_DIR in config.h, use the default 'jack'
+            # defined in windows/JackPlatformPlug_os.h
             pass
     else:
         conf.env['ADDON_DIR'] = os.path.normpath(os.path.join(conf.env['LIBDIR'], 'jack'))
@@ -430,7 +466,8 @@ def configure(conf):
 
         if conf.env['IS_WINDOWS'] and conf.env['BUILD_STATIC']:
             def replaceFor32bit(env):
-                for e in env: yield e.replace('x86_64', 'i686', 1)
+                for e in env:
+                    yield e.replace('x86_64', 'i686', 1)
             for env in ('AR', 'CC', 'CXX', 'LINK_CC', 'LINK_CXX'):
                 conf.all_envs[lib32][env] = list(replaceFor32bit(conf.all_envs[lib32][env]))
             conf.all_envs[lib32]['LIB_REGEX'] = ['tre32']
@@ -462,7 +499,7 @@ def configure(conf):
         ('C++ compiler flags', ['CXXFLAGS', 'CPPFLAGS']),
         ('Linker flags',       ['LINKFLAGS', 'LDFLAGS'])
     ]
-    for name,vars in tool_flags:
+    for name, vars in tool_flags:
         flags = []
         for var in vars:
             flags += conf.all_envs[''][var]
@@ -496,18 +533,23 @@ def configure(conf):
             print(Logs.colors.RED + 'WARNING: but service file will be installed in')
             print(Logs.colors.RED + 'WARNING:', end=' ')
             print(Logs.colors.CYAN + conf.env['DBUS_SERVICES_DIR'])
-            print(Logs.colors.RED + 'WARNING: You may need to adjust your D-Bus configuration after installing jackdbus')
+            print(
+                Logs.colors.RED + 'WARNING: You may need to adjust your D-Bus configuration after installing jackdbus'
+            )
             print('WARNING: You can override dbus service install directory')
             print('WARNING: with --enable-pkg-config-dbus-service-dir option to this script')
             print(Logs.colors.NORMAL, end=' ')
     print()
 
+
 def init(ctx):
     for y in (BuildContext, CleanContext, InstallContext, UninstallContext):
-        name = y.__name__.replace('Context','').lower()
+        name = y.__name__.replace('Context', '').lower()
+
         class tmp(y):
             cmd = name + '_' + lib32
             variant = lib32
+
 
 def obj_add_includes(bld, obj):
     if bld.env['BUILD_JACKDBUS']:
@@ -528,15 +570,16 @@ def obj_add_includes(bld, obj):
     if bld.env['IS_WINDOWS']:
         obj.includes += ['windows']
 
+
 # FIXME: Is SERVER_SIDE needed?
 def build_jackd(bld):
     jackd = bld(
-        features = ['cxx', 'cxxprogram'],
-        defines = ['HAVE_CONFIG_H','SERVER_SIDE'],
-        includes = ['.', 'common', 'common/jack'],
-        target = 'jackd',
-        source = ['common/Jackdmp.cpp'],
-        use = ['serverlib', 'SYSTEMD']
+        features=['cxx', 'cxxprogram'],
+        defines=['HAVE_CONFIG_H', 'SERVER_SIDE'],
+        includes=['.', 'common', 'common/jack'],
+        target='jackd',
+        source=['common/Jackdmp.cpp'],
+        use=['serverlib', 'SYSTEMD']
     )
 
     if bld.env['BUILD_JACKDBUS']:
@@ -560,6 +603,7 @@ def build_jackd(bld):
 
     return jackd
 
+
 # FIXME: Is SERVER_SIDE needed?
 def create_driver_obj(bld, **kw):
     if 'use' in kw:
@@ -568,10 +612,10 @@ def create_driver_obj(bld, **kw):
         kw['use'] = ['serverlib']
 
     driver = bld(
-        features = ['c', 'cxx', 'cshlib', 'cxxshlib'],
-        defines = ['HAVE_CONFIG_H', 'SERVER_SIDE'],
-        includes = ['.', 'common', 'common/jack'],
-        install_path = '${ADDON_DIR}/',
+        features=['c', 'cxx', 'cshlib', 'cxxshlib'],
+        defines=['HAVE_CONFIG_H', 'SERVER_SIDE'],
+        includes=['.', 'common', 'common/jack'],
+        install_path='${ADDON_DIR}/',
         **kw)
 
     if bld.env['IS_WINDOWS']:
@@ -582,6 +626,7 @@ def create_driver_obj(bld, **kw):
     obj_add_includes(bld, driver)
 
     return driver
+
 
 def build_drivers(bld):
     # Non-hardware driver sources. Lexically sorted.
@@ -690,103 +735,104 @@ def build_drivers(bld):
     # Create non-hardware driver objects. Lexically sorted.
     create_driver_obj(
         bld,
-        target = 'dummy',
-        source = dummy_src)
+        target='dummy',
+        source=dummy_src)
 
     create_driver_obj(
         bld,
-        target = 'loopback',
-        source = loopback_src)
+        target='loopback',
+        source=loopback_src)
 
     create_driver_obj(
         bld,
-        target = 'net',
-        source = net_src,
-        use = ['CELT'])
+        target='net',
+        source=net_src,
+        use=['CELT'])
 
     create_driver_obj(
         bld,
-        target = 'netone',
-        source = netone_src,
-        use = ['SAMPLERATE', 'CELT'])
+        target='netone',
+        source=netone_src,
+        use=['SAMPLERATE', 'CELT'])
 
     create_driver_obj(
         bld,
-        target = 'proxy',
-        source = proxy_src)
+        target='proxy',
+        source=proxy_src)
 
     # Create hardware driver objects. Lexically sorted after the conditional,
     # e.g. BUILD_DRIVER_ALSA.
     if bld.env['BUILD_DRIVER_ALSA']:
         create_driver_obj(
             bld,
-            target = 'alsa',
-            source = alsa_src,
-            use = ['ALSA'])
+            target='alsa',
+            source=alsa_src,
+            use=['ALSA'])
         create_driver_obj(
             bld,
-            target = 'alsarawmidi',
-            source = alsarawmidi_src,
-            use = ['ALSA'])
+            target='alsarawmidi',
+            source=alsarawmidi_src,
+            use=['ALSA'])
 
     if bld.env['BUILD_DRIVER_FFADO']:
         create_driver_obj(
             bld,
-            target = 'firewire',
-            source = ffado_src,
-            use = ['LIBFFADO'])
+            target='firewire',
+            source=ffado_src,
+            use=['LIBFFADO'])
 
     if bld.env['BUILD_DRIVER_IIO']:
         create_driver_obj(
             bld,
-            target = 'iio',
-            source = iio_src,
-            use = ['GTKIOSTREAM', 'EIGEN3'])
+            target='iio',
+            source=iio_driver_src,
+            use=['GTKIOSTREAM', 'EIGEN3'])
 
     if bld.env['BUILD_DRIVER_PORTAUDIO']:
         create_driver_obj(
             bld,
-            target = 'portaudio',
-            source = portaudio_src,
-            use = ['PORTAUDIO'])
+            target='portaudio',
+            source=portaudio_src,
+            use=['PORTAUDIO'])
 
     if bld.env['BUILD_DRIVER_WINMME']:
         create_driver_obj(
             bld,
-            target = 'winmme',
-            source = winmme_src,
-            use = ['WINMME'])
+            target='winmme',
+            source=winmme_src,
+            use=['WINMME'])
 
     if bld.env['IS_MACOSX']:
         create_driver_obj(
             bld,
-            target = 'coreaudio',
-            source = coreaudio_src,
-            use = ['AFTEN'],
-            framework = ['AudioUnit', 'CoreAudio', 'CoreServices'])
+            target='coreaudio',
+            source=coreaudio_src,
+            use=['AFTEN'],
+            framework=['AudioUnit', 'CoreAudio', 'CoreServices'])
 
         create_driver_obj(
             bld,
-            target = 'coremidi',
-            source = coremidi_src,
-            use = ['serverlib'], # FIXME: Is this needed?
-            framework = ['AudioUnit', 'CoreMIDI', 'CoreServices', 'Foundation'])
+            target='coremidi',
+            source=coremidi_src,
+            use=['serverlib'],  # FIXME: Is this needed?
+            framework=['AudioUnit', 'CoreMIDI', 'CoreServices', 'Foundation'])
 
     if bld.env['IS_FREEBSD']:
         create_driver_obj(
             bld,
-            target = 'oss',
-            source = freebsd_oss_src)
+            target='oss',
+            source=freebsd_oss_src)
 
     if bld.env['IS_SUN']:
         create_driver_obj(
             bld,
-            target = 'boomer',
-            source = boomer_src)
+            target='boomer',
+            source=boomer_src)
         create_driver_obj(
             bld,
-            target = 'oss',
-            source = oss_src)
+            target='oss',
+            source=oss_src)
+
 
 def build(bld):
     if not bld.variant and bld.env['BUILD_WITH_32_64']:
@@ -822,12 +868,12 @@ def build(bld):
         html_build_dir = bld.path.find_or_declare('html').abspath()
 
         bld(
-            features = 'subst',
-            source = 'doxyfile.in',
-            target = 'doxyfile',
-            HTML_BUILD_DIR = html_build_dir,
-            SRCDIR = bld.srcnode.abspath(),
-            VERSION = VERSION
+            features='subst',
+            source='doxyfile.in',
+            target='doxyfile',
+            HTML_BUILD_DIR=html_build_dir,
+            SRCDIR=bld.srcnode.abspath(),
+            VERSION=VERSION
         )
 
         # There are two reasons for logging to doxygen.log and using it as
@@ -843,9 +889,9 @@ def build(bld):
             return task.exec_command(cmd)
 
         bld(
-            rule = doxygen,
-            source = 'doxyfile',
-            target = 'doxygen.log'
+            rule=doxygen,
+            source='doxyfile',
+            target='doxygen.log'
         )
 
         # Determine where to install HTML documentation. Since share_dir is the
@@ -867,19 +913,18 @@ def build(bld):
             Logs.pprint('CYAN', 'Installing doxygen documentation...')
             shutil.copytree(html_build_dir, html_install_dir)
             Logs.pprint('CYAN', 'Installing doxygen documentation done.')
-        elif bld.cmd =='uninstall':
+        elif bld.cmd == 'uninstall':
             Logs.pprint('CYAN', 'Uninstalling doxygen documentation...')
             if os.path.isdir(share_dir):
                 shutil.rmtree(share_dir)
             Logs.pprint('CYAN', 'Uninstalling doxygen documentation done.')
-        elif bld.cmd =='clean':
+        elif bld.cmd == 'clean':
             if os.access(html_build_dir, os.R_OK):
                 Logs.pprint('CYAN', 'Removing doxygen generated documentation...')
                 shutil.rmtree(html_build_dir)
                 Logs.pprint('CYAN', 'Removing doxygen generated documentation done.')
 
 
-from waflib import TaskGen
 @TaskGen.extension('.mm')
 def mm_hook(self, node):
     """Alias .mm files to be compiled the same as .cpp files, gcc will do the right thing."""
