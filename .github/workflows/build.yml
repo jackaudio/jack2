@@ -8,10 +8,11 @@ on:
     branches:
       - '*'
 env:
-  CACHE_VERSION: 4
+  CACHE_VERSION: 5
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
   PAWPAW_VERSION: 023bccdeffafc4212292072a1eba78d9e709510e
+  PAWPAW_SKIP_LTO: 1
 
 jobs:
   # macOS native intel build
@@ -40,8 +41,6 @@ jobs:
         ./PawPaw/bootstrap-jack2.sh macos && ./PawPaw/.cleanup.sh macos
     - name: Build jack2
       shell: bash
-      env:
-        PAWPAW_SKIP_LTO: 1
       run: |
         pushd PawPaw && source local.env macos && popd
         python ./waf configure --platform=darwin --prefix=/usr/local --example-tools
@@ -89,8 +88,6 @@ jobs:
         ./PawPaw/bootstrap-jack2.sh macos-universal && ./PawPaw/.cleanup.sh macos-universal
     - name: Build jack2
       shell: bash
-      env:
-        PAWPAW_SKIP_LTO: 1
       run: |
         pushd PawPaw && source local.env macos-universal && popd
         python ./waf configure --platform=darwin --prefix=/usr/local --example-tools
@@ -151,8 +148,6 @@ jobs:
         ./PawPaw/bootstrap-jack2.sh win32 && ./PawPaw/.cleanup.sh win32
     - name: Build jack2
       shell: bash
-      env:
-        PAWPAW_SKIP_LTO: 1
       run: |
         pushd PawPaw && source local.env win32 && popd
         ./waf configure --platform=win32 --prefix=$(pwd)/destdir --static --example-tools
@@ -233,8 +228,6 @@ jobs:
         ./PawPaw/bootstrap-jack2.sh win64 && ./PawPaw/.cleanup.sh win64
     - name: Build jack2
       shell: bash
-      env:
-        PAWPAW_SKIP_LTO: 1
       run: |
         pushd PawPaw && source local.env win64 && popd
         export PATH+=":/usr/i686-w64-mingw32/bin"

@@ -9,7 +9,8 @@ import sys
 from waflib import Logs, Options, TaskGen
 from waflib.Build import BuildContext, CleanContext, InstallContext, UninstallContext
 
-VERSION = '1.9.20'
+# see also common/JackConstants.h
+VERSION = '1.9.21'
 APPNAME = 'jack'
 JACK_API_VERSION = '0.1.0'
 
