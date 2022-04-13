@@ -136,7 +136,7 @@ def options(opt):
             'example-tools',
             help='Build with jack-example-tools',
             conf_dest='BUILD_JACK_EXAMPLE_TOOLS',
-            default=True,
+            default=False,
     )
 
     # Suffix _PKG to not collide with HAVE_OPUS defined by the option.

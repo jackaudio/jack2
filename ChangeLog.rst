@@ -1,6 +1,16 @@
 ChangeLog
 #########
 
+* 1.9.21 (2022-04-15)
+
+  * The waf autooption ``--example-tools`` introduced in 1.9.20 is now off by default,
+    To get the previous behavior back pass ``--example-tools`` during build.
+    This flag (and the related tools and their code) are going to be removed in the next release.
+  * 
+
+External changes, related to macOS/Windows installer:
+  * 
+
 * 1.9.20 (2022-01-15)
 
   * Add waf autooption ``--example-tools`` to allow optional build of
