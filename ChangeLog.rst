@@ -3,6 +3,7 @@ ChangeLog
 
 * 1.9.21 (2022-04-15)
 
+  * Add shell mode to ``jack_control`` (executes commands from stdin until EOF)
   * The waf autooption ``--example-tools`` introduced in 1.9.20 is now off by default,
     To get the previous behavior back pass ``--example-tools`` during build.
     This flag (and the related tools and their code) are going to be removed in the next release.
@@ -10,10 +11,12 @@ ChangeLog
   * Fix build of jack-example-tools man pages (1.9.20 regression)
   * Fix missing symbols from jack client library (error and info callback pointers)
   * Fix potential memory corruption in midi_latency_test tool
+  * Fix JackWeakAPI on Windows
   * Use predefined variables in pkg-config file (required for mingw)
 
 External changes, related to macOS/Windows installer:
   * Fix application style in QJackCtl (qwindowsvistastyle.dll was missing)
+  * Update QjackCtl used in macOS/Windows installers to 0.9.7
 
 * 1.9.20 (2022-01-15)
 

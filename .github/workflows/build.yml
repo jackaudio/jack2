@@ -8,10 +8,9 @@ on:
     branches:
       - '*'
 env:
-  CACHE_VERSION: 3
+  CACHE_VERSION: 4
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
-  PAWPAW_SKIP_LTO: 1
   PAWPAW_VERSION: 023bccdeffafc4212292072a1eba78d9e709510e
 
 jobs:
