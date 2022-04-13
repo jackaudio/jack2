@@ -43,7 +43,7 @@ jobs:
       shell: bash
       run: |
         pushd PawPaw && source local.env macos && popd
-        python ./waf configure --platform=darwin --prefix=/usr/local
+        python ./waf configure --platform=darwin --prefix=/usr/local --example-tools
         python ./waf build -j $(sysctl -n hw.logicalcpu)
         python ./waf install --destdir=$(pwd)/destdir
     - name: Set sha8
@@ -90,7 +90,7 @@ jobs:
       shell: bash
       run: |
         pushd PawPaw && source local.env macos-universal && popd
-        python ./waf configure --platform=darwin --prefix=/usr/local
+        python ./waf configure --platform=darwin --prefix=/usr/local --example-tools
         python ./waf build -j $(sysctl -n hw.logicalcpu)
         python ./waf install --destdir=$(pwd)/destdir
     - name: Set sha8
@@ -150,7 +150,7 @@ jobs:
       shell: bash
       run: |
         pushd PawPaw && source local.env win32 && popd
-        ./waf configure --platform=win32 --prefix=$(pwd)/destdir --static
+        ./waf configure --platform=win32 --prefix=$(pwd)/destdir --static --example-tools
         ./waf build -j $(nproc)
         ./waf install
     - name: Generate MSVC lib files
@@ -168,8 +168,9 @@ jobs:
       shell: bash
       run: |
         # Setup wine
+        export WINEDLLOVERRIDES="mscoree,mshtml="
         export WINEPREFIX=$(pwd)/innosetup
-        wineboot -u
+        xvfb-run wineboot -u
         # Download and install innosetup
         curl -L https://jrsoftware.org/download.php/is.exe?site=2 -o is.exe
         xvfb-run wine is.exe /allusers /dir=C:\\InnoSeup /nocancel /norestart /verysilent
@@ -231,7 +232,7 @@ jobs:
         pushd PawPaw && source local.env win64 && popd
         export PATH+=":/usr/i686-w64-mingw32/bin"
         export LDFLAGS+="-L~/PawPawBuilds/targets/win64/lib32"
-        ./waf configure --platform=win32 --prefix=$(pwd)/destdir --static --mixed
+        ./waf configure --platform=win32 --prefix=$(pwd)/destdir --static --mixed --example-tools
         ./waf build -j $(nproc)
         ./waf install
     - name: Generate MSVC lib files
@@ -254,8 +255,9 @@ jobs:
       shell: bash
       run: |
         # Setup wine
+        export WINEDLLOVERRIDES="mscoree,mshtml="
         export WINEPREFIX=$(pwd)/innosetup
-        wineboot -u
+        xvfb-run wineboot -u
         # Download and install innosetup
         curl -L https://jrsoftware.org/download.php/is.exe?site=2 -o is.exe
         xvfb-run wine64 is.exe /allusers /dir=C:\\InnoSeup /nocancel /norestart /verysilent

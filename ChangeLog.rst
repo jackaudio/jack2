@@ -6,10 +6,14 @@ ChangeLog
   * The waf autooption ``--example-tools`` introduced in 1.9.20 is now off by default,
     To get the previous behavior back pass ``--example-tools`` during build.
     This flag (and the related tools and their code) are going to be removed in the next release.
-  * 
+  * Fix alignas() on non-packed architectures
+  * Fix build of jack-example-tools man pages (1.9.20 regression)
+  * Fix missing symbols from jack client library (error and info callback pointers)
+  * Fix potential memory corruption in midi_latency_test tool
+  * Use predefined variables in pkg-config file (required for mingw)
 
 External changes, related to macOS/Windows installer:
-  * 
+  * Fix application style in QJackCtl (qwindowsvistastyle.dll was missing)
 
 * 1.9.20 (2022-01-15)
 
