@@ -1,6 +1,10 @@
 #!/usr/bin/python3
 
+
 from __future__ import print_function
+import dbus
+import sys
+
 name_base = 'org.jackaudio'
 control_interface_name = name_base + '.JackControl'
 configure_interface_name = name_base + '.Configure'
@@ -8,17 +12,13 @@ service_name = name_base + '.service'
 control_iface = None
 configure_iface = None
 
-import sys
-import os
-from traceback import print_exc
-
-import dbus
 
 def bool_convert(str_value):
-    if str_value == "0" or str_value.lower() in ["false","off","no","(null)"]:
+    if str_value == "0" or str_value.lower() in ["false", "off", "no", "(null)"]:
         return False
 
     return bool(str_value)
+
 
 def dbus_type_to_python_type(dbus_value):
     t = type(dbus_value)
@@ -28,18 +28,20 @@ def dbus_type_to_python_type(dbus_value):
         return int(dbus_value)
     return dbus_value
 
+
 def python_type_to_jackdbus_type(value, type_char):
     type_char = str(type_char)
     if type_char == "b":
-        return bool_convert(value);
+        return bool_convert(value)
     elif type_char == "y":
-        return dbus.Byte(ord(value));
+        return dbus.Byte(ord(value))
     elif type_char == "i":
         return dbus.Int32(value)
     elif type_char == "u":
         return dbus.UInt32(value)
 
     return value
+
 
 def dbus_typesig_to_type_string(type_char):
     type_char = str(type_char)
@@ -57,18 +59,19 @@ def dbus_typesig_to_type_string(type_char):
     print('err: unknown dbus typesig "%s"' % type_char)
     return None                         # throw exception here?
 
+
 def get_parameters(iface, path):
     params = iface.GetParametersInfo(path)
 
-    #print params
+    # print params
     for param in params:
         typestr = dbus_typesig_to_type_string(param[0])
         name = param[1]
-        #print name
+        # print name
         descr = param[2]
-        #print descr
+        # print descr
         isset, default, value = iface.GetParameterValue(path + [name])
-        #print typestr
+        # print typestr
         if bool(isset):
             isset = "set"
         else:
@@ -76,38 +79,44 @@ def get_parameters(iface, path):
         value = dbus_type_to_python_type(value)
         default = dbus_type_to_python_type(default)
 
-        print("%20s: %s (%s:%s:%s:%s)" %(name, descr, typestr, isset, default, value))
+        print("%20s: %s (%s:%s:%s:%s)" % (name, descr, typestr, isset, default, value))
+
 
 def print_help():
-    print("Usage: %s [command] [command] ..." % os.path.basename(sys.argv[0]))
-    print("Commands:")
-    print("    shell                      - execute commands from stdin until End Of File (Ctrl+D in terminal)")
-    print("    exit                       - exit jack dbus service (stops jack server if currently running)")
-    print("    help                       - print this help text")
-    print("    status                     - check whether jack server is started, return value is 0 if running and 1 otherwise")
-    print("    start                      - start jack server if not currently started")
-    print("    stop                       - stop jack server if currently started")
-    print("    sm                         - switch master to currently selected driver")
-    print("    dl                         - get list of available drivers")
-    print("    dg                         - get currently selected driver")
-    print("    ds <driver>                - select driver")
-    print("    dp                         - get parameters of currently selected driver")
-    print("    dpd <param>                - get long description for driver parameter")
-    print("    dps <param> <value>        - set driver parameter")
-    print("    dpr <param>                - reset driver parameter to its default value")
-    print("    asd <driver>               - add slave driver")
-    print("    rsd <driver>               - remove slave driver")
-    print("    il                         - get list of available internals")
-    print("    ip <name>                  - get parameters of given internal")
-    print("    ipd <name> <param>         - get long description for internal parameter")
-    print("    ips <name> <param> <value> - set internal parameter")
-    print("    ipr <name> <param>         - reset internal parameter to its default value")
-    print("    iload <name>               - load internal")
-    print("    iunload <name>             - unload internal")
-    print("    ep                         - get engine parameters")
-    print("    epd <param>                - get long description for engine parameter")
-    print("    eps <param> <value>        - set engine parameter")
-    print("    epr <param>                - reset engine parameter to its default value")
+    help_output = (
+        "Usage: jack_control [command] [command] ...\n"
+        "Commands:\n"
+        "    shell                      - execute commands from stdin until End Of File (Ctrl+D in terminal)\n"
+        "    exit                       - exit jack dbus service (stops jack server if currently running)\n"
+        "    help                       - print this help text\n"
+        "    status                     - check whether jack server is started, "
+        "return value is 0 if running and 1 otherwise\n"
+        "    start                      - start jack server if not currently started\n"
+        "    stop                       - stop jack server if currently started\n"
+        "    sm                         - switch master to currently selected driver\n"
+        "    dl                         - get list of available drivers\n"
+        "    dg                         - get currently selected driver\n"
+        "    ds <driver>                - select driver\n"
+        "    dp                         - get parameters of currently selected driver\n"
+        "    dpd <param>                - get long description for driver parameter\n"
+        "    dps <param> <value>        - set driver parameter\n"
+        "    dpr <param>                - reset driver parameter to its default value\n"
+        "    asd <driver>               - add slave driver\n"
+        "    rsd <driver>               - remove slave driver\n"
+        "    il                         - get list of available internals\n"
+        "    ip <name>                  - get parameters of given internal\n"
+        "    ipd <name> <param>         - get long description for internal parameter\n"
+        "    ips <name> <param> <value> - set internal parameter\n"
+        "    ipr <name> <param>         - reset internal parameter to its default value\n"
+        "    iload <name>               - load internal\n"
+        "    iunload <name>             - unload internal\n"
+        "    ep                         - get engine parameters\n"
+        "    epd <param>                - get long description for engine parameter\n"
+        "    eps <param> <value>        - set engine parameter\n"
+        "    epr <param>                - reset engine parameter to its default value\n"
+    )
+    print(help_output)
+
 
 def maybe_print_param_constraint(iface, param):
     is_range, is_strict, is_fake, values = iface.GetParameterConstraint(param)
@@ -124,13 +133,14 @@ def maybe_print_param_constraint(iface, param):
         max_len = 0
         for value in values:
             if len(str(value[0])) > max_len:
-                   max_len = len(str(value[0]))
+                max_len = len(str(value[0]))
         for value in values:
             print(("%*s'%s' - %s" % (1 + max_len - len(str(value[0])), "", str(value[0]), str(value[1]))))
 
+
 def parse_argv(argv):
     global control_iface, configure_iface
-    
+
     # check arguments
     index = 0
     while index < len(argv):
@@ -162,7 +172,9 @@ def parse_argv(argv):
                     print("Automatically activated")
             elif arg == 'dl':
                 print("--- drivers list")
-                is_range, is_strict, is_fake_values, values = configure_iface.GetParameterConstraint(['engine', 'driver'])
+                is_range, is_strict, is_fake_values, values = configure_iface.GetParameterConstraint(
+                    ['engine', 'driver']
+                )
                 for value in values:
                     print(value[1])
             elif arg == 'dg':
@@ -270,7 +282,10 @@ def parse_argv(argv):
                 get_parameters(configure_iface, ['internals', internal_name])
             elif arg == 'ipd':
                 if index + 1 >= len(argv):
-                    return (1, "get internal parameter long description command requires internal and parameter name arguments")
+                    return (
+                        1,
+                        "get internal parameter long description command requires internal and parameter name arguments"
+                    )
 
                 name = argv[index]
                 index += 1
@@ -293,8 +308,13 @@ def parse_argv(argv):
 
                 print("--- internal param set \"%s\" -> \"%s\"" % (param, value))
 
-                type_char, name, short_descr, long_descr = configure_iface.GetParameterInfo(['internals', internal_name, param])
-                configure_iface.SetParameterValue(['internals', internal_name, param], python_type_to_jackdbus_type(value, type_char))
+                type_char, name, short_descr, long_descr = configure_iface.GetParameterInfo(
+                    ['internals', internal_name, param]
+                )
+                configure_iface.SetParameterValue(
+                    ['internals', internal_name, param],
+                    python_type_to_jackdbus_type(value, type_char),
+                )
             elif arg == 'ipr':
                 if index + 1 >= len(argv):
                     return (1, "reset internal parameter command requires internal and parameter name arguments")
@@ -315,7 +335,7 @@ def parse_argv(argv):
 
                 name = argv[index]
                 index += 1
-                result = control_iface.LoadInternal(name)
+                control_iface.LoadInternal(name)
             elif arg == 'iunload':
                 print("--- unload internal")
 
@@ -324,7 +344,7 @@ def parse_argv(argv):
 
                 name = argv[index]
                 index += 1
-                result = control_iface.UnloadInternal(name)
+                control_iface.UnloadInternal(name)
             elif arg == 'asd':
                 print("--- add slave driver")
 
@@ -333,7 +353,7 @@ def parse_argv(argv):
 
                 name = argv[index]
                 index += 1
-                result = control_iface.AddSlaveDriver(name)
+                control_iface.AddSlaveDriver(name)
             elif arg == 'rsd':
                 print("--- remove slave driver")
 
@@ -342,15 +362,16 @@ def parse_argv(argv):
 
                 name = argv[index]
                 index += 1
-                result = control_iface.RemoveSlaveDriver(name)
+                control_iface.RemoveSlaveDriver(name)
             elif arg == 'help':
                 print_help()
             else:
                 return (0, "Unknown command '%s'" % arg)
         except dbus.DBusException as e:
             return (1, "DBus exception: %s" % str(e))
-    
+
     return (0, "")
+
 
 def shell():
     from click.parser import split_arg_string
@@ -360,10 +381,11 @@ def shell():
             cmd = stdin.readline()
             if (cmd == ''):
                 break
-            s,t = parse_argv(split_arg_string(cmd))
+            s, t = parse_argv(split_arg_string(cmd))
             print("%i: %s" % (s, t), flush=True)
-        except:
+        except Exception:
             break
+
 
 def main():
     global control_iface, configure_iface
@@ -386,6 +408,7 @@ def main():
         if (t):
             print(t)
         return s
+
 
 if __name__ == '__main__':
     sys.exit(main())
