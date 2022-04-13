@@ -1,6 +1,6 @@
 ---
 
-name: Test files
+name: Test wscript files
 
 on:
   push:
@@ -17,6 +17,6 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install flake8
+          sudo apt-get install flake8 findutils
       - name: Lint with flake8
-        run: flake8
+        run: find . -type f \( -iname wscript -or -iname jack_control \) -exec flake8 {} \;
