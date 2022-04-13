@@ -62,10 +62,15 @@ void tryload_libjack()
         }
     #elif defined(WIN32)
         #ifdef _WIN64
-            libjack_handle = LoadLibrary("libjack64.dll");
+            libjack_handle = LoadLibraryA("libjack64.dll");
         #else
-            libjack_handle = LoadLibrary("libjack.dll");
+            libjack_handle = LoadLibraryA("libjack.dll");
         #endif
+        if (!libjack_handle) {
+            char* lpMsgBuf;
+            FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,NULL,GetLastError(),MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),(LPTSTR) &lpMsgBuf,0,NULL );
+            fprintf(stderr, "Failed to load libjack DLL: %d", lpMsgBuf);
+        }
     #else
         libjack_handle = dlopen("libjack.so.0", RTLD_LAZY);
     #endif
@@ -77,8 +82,11 @@ void *load_jack_function(const char *fn_name)
 {
     void *fn = 0;
     if (!libjack_handle) {
-        fprintf (stderr, "libjack not found, so do not try to load  %s ffs  !\n", fn_name);
-        return 0;
+        tryload_libjack();
+        if (!libjack_handle) {
+            fprintf (stderr, "libjack not found, so do not try to load  %s ffs  !\n", fn_name);
+            return 0;
+       }
     }
 #ifdef WIN32
     fn = (void*)GetProcAddress(libjack_handle, fn_name);
