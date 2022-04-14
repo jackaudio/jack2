@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackTools.h"
 #include "JackConstants.h"
 #include "JackError.h"
+#include "JackPosixCommon.h"
 #include <fcntl.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -122,29 +123,80 @@ bool JackPosixSemaphore::Wait()
 
 bool JackPosixSemaphore::TimedWait(long usec)
 {
-	int res;
-	struct timeval now;
-	timespec time;
+    int res;
+    struct timespec rel_timeout, now_mono, end_mono, now_real, end_real;
+    struct timespec diff_mono;
 
 	if (!fSemaphore) {
 		jack_error("JackPosixSemaphore::TimedWait name = %s already deallocated!!", fName);
 		return false;
 	}
-	gettimeofday(&now, 0);
-	time.tv_sec = now.tv_sec + usec / 1000000;
-    long tv_usec = (now.tv_usec + (usec % 1000000));
-    time.tv_sec += tv_usec / 1000000;
-    time.tv_nsec = (tv_usec % 1000000) * 1000;
 
-    while ((res = sem_timedwait(fSemaphore, &time)) < 0) {
-        jack_error("JackPosixSemaphore::TimedWait err = %s", strerror(errno));
-        jack_log("JackPosixSemaphore::TimedWait now : %ld %ld ", now.tv_sec, now.tv_usec);
-        jack_log("JackPosixSemaphore::TimedWait next : %ld %ld ", time.tv_sec, time.tv_nsec/1000);
-        if (errno != EINTR) {
-            break;
+    /* Convert usec argument to timespec */
+    rel_timeout.tv_sec = usec / 1000000;
+    rel_timeout.tv_nsec = (usec % 1000000) * 1000;
+
+    /* Calculate absolute monotonic timeout */
+    res = clock_gettime(CLOCK_MONOTONIC, &now_mono);
+    if (res != 0) {
+        /* CLOCK_MONOTONIC is not supported, do not check for time skips. */
+        res = clock_gettime(CLOCK_REALTIME, &now_real);
+        assert(res == 0);
+        JackPosixTools::TimespecAdd(&now_real, &rel_timeout, &end_real);
+        while ((res = sem_timedwait(fSemaphore, &end_real)) < 0) {
+            if (errno != EINTR) {
+                break;
+            }
+        }
+        if (res == 0) {
+            return true;
+        } else {
+            goto err;
         }
     }
-    return (res == 0);
+    JackPosixTools::TimespecAdd(&now_mono, &rel_timeout, &end_mono);
+
+    /* sem_timedwait() is affected by abrupt time jumps, i.e. when the system
+     * time is changed. To protect against this, measure the time difference
+     * between and after the sem_timedwait() call and if it suggests that there
+     * has been a time jump, restart the call. */
+    for (;;) {
+        /* Calculate absolute realtime timeout, assuming no steps */
+        res = clock_gettime(CLOCK_REALTIME, &now_real);
+        assert(res == 0);
+        JackPosixTools::TimespecSub(&end_mono, &now_mono, &diff_mono);
+        JackPosixTools::TimespecAdd(&now_real, &diff_mono, &end_real);
+
+        while ((res = sem_timedwait(fSemaphore, &end_real)) < 0) {
+            if (errno != EINTR) {
+                break;
+            }
+        }
+        if (res == 0) {
+            return true;
+        }
+        if (errno != ETIMEDOUT) {
+            goto err;
+        }
+
+        /* Compare with monotonic timeout, in case a step happened */
+        int old_errno = errno;
+        res = clock_gettime(CLOCK_MONOTONIC, &now_mono);
+        assert(res == 0);
+        errno = old_errno;
+        if (JackPosixTools::TimespecCmp(&now_mono, &end_mono) >= 0) {
+            goto err;
+        }
+    }
+    return true;
+
+err:
+    jack_error("JackPosixSemaphore::TimedWait err = %s", strerror(errno));
+    jack_log("JackPosixSemaphore::TimedWait now : %ld %ld ", now_real.tv_sec,
+        now_real.tv_nsec / 1000);
+    jack_log("JackPosixSemaphore::TimedWait next : %ld %ld ", end_real.tv_sec,
+        end_real.tv_nsec / 1000);
+    return false;
 }
 
 // Server side : publish the semaphore in the global namespace
