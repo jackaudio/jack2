@@ -34,21 +34,25 @@ class SERVER_EXPORT JackMachSemaphoreServer : public JackRunnableInterface
 {
     private:
         /*! \brief The semaphore send right that will be dispatched to clients. */
-        semaphore_t fSemaphore;
+        const semaphore_t fSemaphore;
 
         /*! \brief The port on which we will listen for IPC messages. */
-        mach_port_t fServerReceive;
+        const mach_port_t fServerReceive;
 
         /*! \brief A pointer to a null-terminated string buffer that will be read to obtain the
          * server name for reporting purposes. Not managed at all by this type. */
-        char* fName;
+        const char* const fName;
+
+        /*! \brief Whether thread should keep running. */
+        bool fRunning;
 
     public:
-        JackMachSemaphoreServer(semaphore_t semaphore, mach_port_t server_recv, char* name):
-            fSemaphore(semaphore), fServerReceive(server_recv), fName(name)
+        JackMachSemaphoreServer(semaphore_t semaphore, mach_port_t server_recv, const char* name):
+            fSemaphore(semaphore), fServerReceive(server_recv), fName(name), fRunning(true)
         {}
 
         bool Execute() override;
+        bool Invalidate();
 };
 
 } // end of namespace

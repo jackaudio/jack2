@@ -52,9 +52,14 @@ bool JackMachSemaphoreServer::Execute() {
         MACH_PORT_NULL
     );
 
+    // this error is expected when deleting ports, we get notified that they somehow changed
+    if (recv_err == MACH_RCV_PORT_CHANGED) {
+        return fRunning;
+    }
+
     if (recv_err != MACH_MSG_SUCCESS) {
         jack_mach_error(recv_err, "receive error");
-        return true; // Continue processing more connections
+        return fRunning; // Continue processing more connections
     }
 
     /* We're going to reuse the message struct that we received the message into to send a reply.
@@ -79,6 +84,23 @@ bool JackMachSemaphoreServer::Execute() {
 
     if (send_err != MACH_MSG_SUCCESS) {
         jack_mach_error(send_err, "send error");
+    }
+
+    return fRunning;
+}
+
+bool JackMachSemaphoreServer::Invalidate() {
+    fRunning = false;
+
+    const mach_port_t task = mach_task_self();
+    kern_return_t res;
+
+    if ((res = mach_port_destroy(task, fServerReceive)) != KERN_SUCCESS) {
+        jack_mach_error(res, "failed to destroy IPC port");
+    }
+
+    if ((res = semaphore_destroy(task, fSemaphore)) != KERN_SUCCESS) {
+        jack_mach_error(res, "failed to destroy semaphore");
     }
 
     return true;

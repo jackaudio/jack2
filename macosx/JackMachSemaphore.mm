@@ -305,7 +305,7 @@ bool JackMachSemaphore::ConnectInput(const char* client_name, const char* server
     } else {
         fSemaphore = msg.hdr.msgh_remote_port;
 
-        jack_log("JackMachSemaphore::Connect: OK, name = %s ", fName);
+        jack_log("JackMachSemaphore::Connect: OK, name = %s", fName);
         return true;
     }
 }
@@ -353,17 +353,22 @@ bool JackMachSemaphore::Disconnect()
 // Server side : destroy the JackGlobals
 void JackMachSemaphore::Destroy()
 {
+    const mach_port_t task = mach_task_self();
     kern_return_t res;
-    mach_port_t task = mach_task_self();
 
     if (fSemaphore == MACH_PORT_NULL) {
         jack_error("JackMachSemaphore::Destroy semaphore is MACH_PORT_NULL; already destroyed?");
         return;
     }
 
+    if (fSemServer && fSemServer->Invalidate()) {
+        fServicePort = MACH_PORT_NULL;
+        fSemaphore = MACH_PORT_NULL;
+    }
+
     if (fThreadSemServer) {
-        if (fThreadSemServer->Kill() < 0) {
-            jack_error("JackMachSemaphore::Destroy failed to kill semaphore server thread...");
+        if (fThreadSemServer->Stop() < 0) {
+            jack_error("JackMachSemaphore::Destroy failed to stop semaphore server thread...");
             // Oh dear. How sad. Never mind.
         }
 
@@ -378,16 +383,20 @@ void JackMachSemaphore::Destroy()
         delete server;
     }
 
-    if ((res = mach_port_destroy(task, fServicePort)) != KERN_SUCCESS) {
-        jack_mach_error(res, "failed to destroy IPC port");
-    } else {
-        fServicePort = MACH_PORT_NULL;
+    if (fServicePort != MACH_PORT_NULL) {
+        if ((res = mach_port_destroy(task, fServicePort)) != KERN_SUCCESS) {
+            jack_mach_error(res, "failed to destroy IPC port");
+        } else {
+            fServicePort = MACH_PORT_NULL;
+        }
     }
 
-    if ((res = semaphore_destroy(mach_task_self(), fSemaphore)) != KERN_SUCCESS) {
-        jack_mach_error(res, "failed to destroy semaphore");
-    } else {
-        fSemaphore = MACH_PORT_NULL;
+    if (fSemaphore != MACH_PORT_NULL) {
+        if ((res = semaphore_destroy(mach_task_self(), fSemaphore)) != KERN_SUCCESS) {
+            jack_mach_error(res, "failed to destroy semaphore");
+        } else {
+            fSemaphore = MACH_PORT_NULL;
+        }
     }
 
     jack_log("JackMachSemaphore::Destroy: OK, name = %s", fName);
