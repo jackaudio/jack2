@@ -9,6 +9,7 @@ ChangeLog
     This flag (and the related tools and their code) are going to be removed in the next release.
   * Fix alignas() on non-packed architectures
   * Fix build of jack-example-tools man pages (1.9.20 regression)
+  * Fix compatibility with macOS 12
   * Fix missing symbols from jack client library (error and info callback pointers)
   * Fix potential memory corruption in midi_latency_test tool
   * Fix JackWeakAPI on Windows
