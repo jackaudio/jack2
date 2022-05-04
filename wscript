@@ -169,9 +169,9 @@ def options(opt):
             help='Build with CELT')
     celt.add_function(check_for_celt)
     opt.add_auto_option(
-            'example-tools',
-            help='Build with jack-example-tools',
-            conf_dest='BUILD_JACK_EXAMPLE_TOOLS',
+            'tests',
+            help='Build tests',
+            conf_dest='BUILD_TESTS',
             default=False,
     )
 
@@ -336,10 +336,6 @@ def configure(conf):
             conf.recurse('systemd')
         else:
             conf.env['SYSTEMD_USER_UNIT_DIR'] = None
-
-    if conf.env['BUILD_JACK_EXAMPLE_TOOLS']:
-        conf.recurse('example-clients')
-        conf.recurse('tools')
 
     # test for the availability of ucontext, and how it should be used
     for t in ['gp_regs', 'uc_regs', 'mc_gregs', 'gregs']:
@@ -853,14 +849,10 @@ def build(bld):
 
     build_drivers(bld)
 
-    if bld.env['BUILD_JACK_EXAMPLE_TOOLS']:
-        bld.recurse('example-clients')
-        bld.recurse('tools')
-
     if bld.env['IS_LINUX'] or bld.env['IS_FREEBSD']:
         bld.recurse('man')
         bld.recurse('systemd')
-    if not bld.env['IS_WINDOWS'] and bld.env['BUILD_JACK_EXAMPLE_TOOLS']:
+    if not bld.env['IS_WINDOWS'] and bld.env['BUILD_TESTS']:
         bld.recurse('tests')
     if bld.env['BUILD_JACKDBUS']:
         bld.recurse('dbus')
