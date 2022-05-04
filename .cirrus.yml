@@ -7,21 +7,21 @@ task:
   environment:
     CFLAGS: -O2 -pipe -fPIC -fstack-protector-strong -fno-strict-aliasing -I/usr/local/include
     CPPFLAGS: -O2 -pipe -fPIC -fstack-protector-strong -fno-strict-aliasing -I/usr/local/include
-    LDFLAGS: -lreadline -L/usr/local/lib -fstack-protector-strong
+    LDFLAGS: -L/usr/local/lib -fstack-protector-strong
   prepare_script:
     - mkdir /Install
 
   matrix:
     - name: FreeBSD Minimal Build
       dependencies_script:
-        - pkg install -y pkgconf python3 libsamplerate libsysinfo readline expat
+        - pkg install -y pkgconf python3 libsamplerate libsysinfo expat
       config_script:
-        - python3 ./waf configure --celt=no --samplerate=yes --alsa=no --classic --readline=yes --opus=no --example-tools=no --prefix /Install --pkgconfigdir libdata/pkgconfig
+        - python3 ./waf configure --celt=no --samplerate=yes --alsa=no --classic --opus=no --example-tools=no --prefix /Install --pkgconfigdir libdata/pkgconfig
     - name: FreeBSD All Options
       dependencies_script:
-        - pkg install -y pkgconf python3 libsamplerate libsysinfo readline alsa-lib dbus expat opus
+        - pkg install -y pkgconf python3 libsamplerate libsysinfo alsa-lib dbus expat opus
       config_script:
-        - python3 ./waf configure --celt=no --samplerate=yes --alsa=yes --dbus --classic --autostart=dbus --readline=yes --opus=yes --prefix /Install --pkgconfigdir libdata/pkgconfig
+        - python3 ./waf configure --celt=no --samplerate=yes --alsa=yes --dbus --classic --autostart=dbus --opus=yes --prefix /Install --pkgconfigdir libdata/pkgconfig
 
   build_script:
     - python3 ./waf

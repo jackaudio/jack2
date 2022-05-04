@@ -191,13 +191,6 @@ def options(opt):
     samplerate.check_cfg(
             package='samplerate',
             args='--cflags --libs')
-    readline = opt.add_auto_option(
-            'readline',
-            help='Build with readline')
-    readline.check(lib='readline')
-    readline.check(
-            header_name=['stdio.h', 'readline/readline.h'],
-            msg='Checking for header readline/readline.h')
     sd = opt.add_auto_option(
             'systemd',
             help='Use systemd notify')
