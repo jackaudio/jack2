@@ -8,10 +8,10 @@ on:
     branches:
       - '*'
 env:
-  CACHE_VERSION: 5
+  CACHE_VERSION: 6
   DEBIAN_FRONTEND: noninteractive
   HOMEBREW_NO_AUTO_UPDATE: 1
-  PAWPAW_VERSION: 023bccdeffafc4212292072a1eba78d9e709510e
+  PAWPAW_VERSION: 86d947d472e1478af882175ee329a6f769b4d15c
   PAWPAW_SKIP_LTO: 1
 
 jobs:
@@ -43,7 +43,7 @@ jobs:
       shell: bash
       run: |
         pushd PawPaw && source local.env macos && popd
-        python ./waf configure --platform=darwin --prefix=/usr/local --example-tools
+        python ./waf configure --platform=darwin --prefix=/usr/local
         python ./waf build -j $(sysctl -n hw.logicalcpu)
         python ./waf install --destdir=$(pwd)/destdir
     - name: Set sha8
@@ -90,7 +90,7 @@ jobs:
       shell: bash
       run: |
         pushd PawPaw && source local.env macos-universal && popd
-        python ./waf configure --platform=darwin --prefix=/usr/local --example-tools
+        python ./waf configure --platform=darwin --prefix=/usr/local
         python ./waf build -j $(sysctl -n hw.logicalcpu)
         python ./waf install --destdir=$(pwd)/destdir
     - name: Set sha8
@@ -150,7 +150,7 @@ jobs:
       shell: bash
       run: |
         pushd PawPaw && source local.env win32 && popd
-        ./waf configure --platform=win32 --prefix=$(pwd)/destdir --static --example-tools
+        ./waf configure --platform=win32 --prefix=$(pwd)/destdir --static
         ./waf build -j $(nproc)
         ./waf install
     - name: Generate MSVC lib files
@@ -232,7 +232,7 @@ jobs:
         pushd PawPaw && source local.env win64 && popd
         export PATH+=":/usr/i686-w64-mingw32/bin"
         export LDFLAGS+="-L~/PawPawBuilds/targets/win64/lib32"
-        ./waf configure --platform=win32 --prefix=$(pwd)/destdir --static --mixed --example-tools
+        ./waf configure --platform=win32 --prefix=$(pwd)/destdir --static --mixed
         ./waf build -j $(nproc)
         ./waf install
     - name: Generate MSVC lib files
@@ -310,7 +310,7 @@ jobs:
         #apt-get source -d jackd2
         #tar xf *.debian.tar.xz
         #rm -rf debian/source
-        #sed -i "s|--prefix=/usr --classic|--prefix=/usr --example-tools --classic|" debian/rules
+        #sed -i "s|--prefix=/usr --classic|--prefix=/usr --classic|" debian/rules
         #dch -M -b -v "$(cat wscript | awk 'sub("^VERSION = ","")' | tr -d "'")~$(date +"%Y%m%d")git${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}" -D focal "automated build"
         #debuild -rfakeroot --no-lintian || true
     #- uses: actions/upload-artifact@v2
