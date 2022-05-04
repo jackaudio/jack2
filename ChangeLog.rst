@@ -1,6 +1,12 @@
 ChangeLog
 #########
 
+* 1.9.22 (2022-xx-yy)
+
+  * The waf autooption ``--example-tools`` has been removed.
+    The example clients and tools are no longer part of the jack2 project.
+  * Drop dependencies that were only used for example clients and tools (readline, sndfile and zita libs)
+
 * 1.9.21 (2022-04-15)
 
   * Add shell mode to ``jack_control`` (executes commands from stdin until EOF)
