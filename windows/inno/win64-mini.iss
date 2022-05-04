@@ -21,7 +21,7 @@ Name: "full"; Description: "Full installation";
 Name: "custom"; Description: "Custom installation"; Flags: iscustom;
 
 [Components]
-Name: jackserver; Description: "JACK Server and tools"; Types: full custom; Flags: fixed;
+Name: jackserver; Description: "JACK Server"; Types: full custom; Flags: fixed;
 Name: dev; Description: "Developer resources"; Types: full;
 
 [Files]
@@ -33,8 +33,6 @@ Source: "win64\lib\libjacknet64.dll"; DestDir: "{app}"; Components: jackserver; 
 Source: "win64\lib\libjackserver64.dll"; DestDir: "{app}"; Components: jackserver; Flags: ignoreversion;
 ; drivers
 Source: "win64\lib\jack\*.dll"; DestDir: "{app}\jack"; Components: jackserver; Flags: ignoreversion;
-; tools
-Source: "win64\bin\jack_*.exe"; DestDir: "{app}\tools"; Components: jackserver; Flags: ignoreversion;
 ; jack client lib (NOTE goes into windir)
 Source: "win64\lib\libjack64.dll"; DestDir: "{win}"; Components: jackserver; Flags: ignoreversion;
 Source: "win64\lib32\libjack.dll"; DestDir: "{win}"; Components: jackserver; Flags: ignoreversion;
