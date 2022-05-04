@@ -191,12 +191,6 @@ def options(opt):
     samplerate.check_cfg(
             package='samplerate',
             args='--cflags --libs')
-    sndfile = opt.add_auto_option(
-            'sndfile',
-            help='Build with libsndfile')
-    sndfile.check_cfg(
-            package='sndfile',
-            args='--cflags --libs')
     readline = opt.add_auto_option(
             'readline',
             help='Build with readline')

@@ -14,14 +14,14 @@ task:
   matrix:
     - name: FreeBSD Minimal Build
       dependencies_script:
-        - pkg install -y pkgconf python3 libsndfile libsamplerate libsysinfo readline expat
+        - pkg install -y pkgconf python3 libsamplerate libsysinfo readline expat
       config_script:
-        - python3 ./waf configure --celt=no --sndfile=yes --samplerate=yes --alsa=no --classic --readline=yes --opus=no --example-tools=no --prefix /Install --pkgconfigdir libdata/pkgconfig
+        - python3 ./waf configure --celt=no --samplerate=yes --alsa=no --classic --readline=yes --opus=no --example-tools=no --prefix /Install --pkgconfigdir libdata/pkgconfig
     - name: FreeBSD All Options
       dependencies_script:
-        - pkg install -y pkgconf python3 libsndfile libsamplerate libsysinfo readline alsa-lib dbus expat opus
+        - pkg install -y pkgconf python3 libsamplerate libsysinfo readline alsa-lib dbus expat opus
       config_script:
-        - python3 ./waf configure --celt=no --sndfile=yes --samplerate=yes --alsa=yes --dbus --classic --autostart=dbus --readline=yes --opus=yes --prefix /Install --pkgconfigdir libdata/pkgconfig
+        - python3 ./waf configure --celt=no --samplerate=yes --alsa=yes --dbus --classic --autostart=dbus --readline=yes --opus=yes --prefix /Install --pkgconfigdir libdata/pkgconfig
 
   build_script:
     - python3 ./waf
