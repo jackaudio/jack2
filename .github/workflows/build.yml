@@ -273,47 +273,47 @@ jobs:
         path: windows/inno/jack2-*.exe
 
   # ubuntu-20.04
-  ubuntu_20_04:
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: recursive
-    - name: Set up cache
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/debs
-        key: ubuntu-20.04-v${{ env.CACHE_VERSION }}
-    - name: Restore debian packages cache
-      run: |
-        if [ -d ~/debs ] && [ "$(ls ~/debs | wc -l)" -ne 0 ]; then \
-          sudo cp ~/debs/*.deb /var/cache/apt/archives/; \
-        fi
-    - name: Set up dependencies
-      run: |
-        sudo add-apt-repository -y ppa:ubuntustudio-ppa/backports
-        sudo sed -i "s/# deb-src/deb-src/" /etc/apt/sources.list /etc/apt/sources.list.d/*.list
-        sudo apt-get update -qq
-        sudo apt-get build-dep jackd2
-        sudo apt-get install devscripts
-    - name: Cache debian packages
-      run: |
-        mkdir -p ~/debs && \
-        sudo mv /var/cache/apt/archives/*.deb ~/debs/
-    - name: Set sha8
-      id: slug
-      run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
-    - name: Build jack2 packages
-      shell: bash
-      run: |
-        apt-get source -d jackd2
-        tar xf *.debian.tar.xz
-        rm -rf debian/source
-        sed -i "s|--prefix=/usr --classic|--prefix=/usr --example-tools --classic|" debian/rules
-        dch -M -b -v "$(cat wscript | awk 'sub("^VERSION = ","")' | tr -d "'")~$(date +"%Y%m%d")git${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}" -D focal "automated build"
-        debuild -rfakeroot --no-lintian || true
-    - uses: actions/upload-artifact@v2
-      with:
-        name: jack2-ubuntu-20.04-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-        path: ~/work/jack2/*.deb
+  #ubuntu_20_04:
+    #runs-on: ubuntu-20.04
+    #steps:
+    #- uses: actions/checkout@v2
+      #with:
+        #submodules: recursive
+    #- name: Set up cache
+      #uses: actions/cache@v2
+      #with:
+        #path: |
+          #~/debs
+        #key: ubuntu-20.04-v${{ env.CACHE_VERSION }}
+    #- name: Restore debian packages cache
+      #run: |
+        #if [ -d ~/debs ] && [ "$(ls ~/debs | wc -l)" -ne 0 ]; then \
+          #sudo cp ~/debs/*.deb /var/cache/apt/archives/; \
+        #fi
+    #- name: Set up dependencies
+      #run: |
+        #sudo add-apt-repository -y ppa:ubuntustudio-ppa/backports
+        #sudo sed -i "s/# deb-src/deb-src/" /etc/apt/sources.list /etc/apt/sources.list.d/*.list
+        #sudo apt-get update -qq
+        #sudo apt-get build-dep jackd2
+        #sudo apt-get install devscripts
+    #- name: Cache debian packages
+      #run: |
+        #mkdir -p ~/debs && \
+        #sudo mv /var/cache/apt/archives/*.deb ~/debs/
+    #- name: Set sha8
+      #id: slug
+      #run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+    #- name: Build jack2 packages
+      #shell: bash
+      #run: |
+        #apt-get source -d jackd2
+        #tar xf *.debian.tar.xz
+        #rm -rf debian/source
+        #sed -i "s|--prefix=/usr --classic|--prefix=/usr --example-tools --classic|" debian/rules
+        #dch -M -b -v "$(cat wscript | awk 'sub("^VERSION = ","")' | tr -d "'")~$(date +"%Y%m%d")git${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}" -D focal "automated build"
+        #debuild -rfakeroot --no-lintian || true
+    #- uses: actions/upload-artifact@v2
+      #with:
+        #name: jack2-ubuntu-20.04-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+        #path: ~/work/jack2/*.deb
