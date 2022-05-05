@@ -16,7 +16,7 @@ task:
       dependencies_script:
         - pkg install -y pkgconf python3 libsamplerate libsysinfo expat
       config_script:
-        - python3 ./waf configure --celt=no --samplerate=yes --alsa=no --classic --opus=no --example-tools=no --prefix /Install --pkgconfigdir libdata/pkgconfig
+        - python3 ./waf configure --celt=no --samplerate=yes --alsa=no --classic --opus=no --prefix /Install --pkgconfigdir libdata/pkgconfig
     - name: FreeBSD All Options
       dependencies_script:
         - pkg install -y pkgconf python3 libsamplerate libsysinfo alsa-lib dbus expat opus
