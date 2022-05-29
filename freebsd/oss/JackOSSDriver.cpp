@@ -868,12 +868,7 @@ int JackOSSDriver::Open(jack_nframes_t nframes,
     fIgnoreHW = ignorehwbuf;
     fNperiods = user_nperiods;
     fExcl = excl;
-    fExtraCaptureLatency = capture_latency;
-    fExtraPlaybackLatency = playback_latency;
 
-    // Additional playback latency introduced by the OSS buffer. The extra hardware
-    // latency given by the user should then be symmetric as reported by jack_iodelay.
-    playback_latency += user_nperiods * nframes;
     // Generic JackAudioDriver Open
     if (JackAudioDriver::Open(nframes, samplerate, capturing, playing, inchannels, outchannels, monitor,
         capture_driver_uid, playback_driver_uid, capture_latency, playback_latency) != 0) {
@@ -1237,14 +1232,35 @@ int JackOSSDriver::Write()
     return 0;
 }
 
+void JackOSSDriver::UpdateLatencies()
+{
+    // Reimplement from JackAudioDriver. Base latency is smaller, and there's
+    // additional latency due to OSS playback buffer management.
+    jack_latency_range_t input_range;
+    jack_latency_range_t output_range;
+
+    for (int i = 0; i < fCaptureChannels; i++) {
+        input_range.max = input_range.min = (fEngineControl->fBufferSize / 2) + fCaptureLatency;
+        fGraphManager->GetPort(fCapturePortList[i])->SetLatencyRange(JackCaptureLatency, &input_range);
+    }
+
+    for (int i = 0; i < fPlaybackChannels; i++) {
+        output_range.max = (fEngineControl->fBufferSize / 2) + fPlaybackLatency;
+        // Additional latency introduced by the OSS buffer.
+        output_range.max += fNperiods * fEngineControl->fBufferSize;
+        // Plus one period if in async mode.
+        if (!fEngineControl->fSyncMode) {
+            output_range.max += fEngineControl->fBufferSize;
+        }
+        output_range.min = output_range.max;
+        fGraphManager->GetPort(fPlaybackPortList[i])->SetLatencyRange(JackPlaybackLatency, &output_range);
+    }
+}
+
 int JackOSSDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
+    // Close and reopen device, we have to adjust the OSS buffer management.
     CloseAux();
-
-    // Additional latency introduced by the OSS buffer, depends on buffer size.
-    fCaptureLatency = fExtraCaptureLatency;
-    fPlaybackLatency = fExtraPlaybackLatency + fNperiods * buffer_size;
-
     JackAudioDriver::SetBufferSize(buffer_size); // Generic change, never fails
     return OpenAux();
 }
