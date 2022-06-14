@@ -67,7 +67,7 @@ Set number of periods. See note for period_size.
 .TP
 \fB\-q \fI quality\fR  
 .br
-Set the quality of the resampler from 0 to 4. can significanly reduce cpu usage.
+Set the quality of the resampler from 0 to 4. can significantly reduce cpu usage.
 .TP
 \fB\-m \fI max_diff\fR  
 .br

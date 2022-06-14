@@ -615,7 +615,7 @@ def h_fun(fun):
 			#
 			# The sorting result outcome will be consistent because:
 			# 1. tuples are compared in order of their elements
-			# 2. optional argument namess are unique
+			# 2. optional argument names are unique
 			code.extend(sorted(fun.keywords.items()))
 			code.append(h_fun(fun.func))
 			fun.code = h_list(code)
