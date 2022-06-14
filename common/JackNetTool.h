@@ -500,7 +500,7 @@ namespace Jack
     SERVER_EXPORT void SessionParamsDisplay(session_params_t* params);
     //display packet header
     SERVER_EXPORT void PacketHeaderDisplay(packet_header_t* header);
-    //get the packet type from a sesion parameters
+    //get the packet type from a session parameters
     SERVER_EXPORT sync_packet_type_t GetPacketType(session_params_t* params);
     //set the packet type in a session parameters
     SERVER_EXPORT int SetPacketType(session_params_t* params, sync_packet_type_t packet_type);

@@ -28,7 +28,7 @@ But now you can compile JACK using GCC, with MingW. The project is actually orga
 
 But for some reasons, you need to compile JACK using a SJLJ version of G++ (available on MingW website).
 Current GCC/G++ version (3.4.5) doesn't includes SJLJ so you'll have to use another one.
-JACK needs the use of SJLJ exceptions instead of DW2 because exceptions are exchanged between DLL's, and DW2 does not allow to throw an exception out of a DLL, so it wouldn't be cought.
+JACK needs the use of SJLJ exceptions instead of DW2 because exceptions are exchanged between DLL's, and DW2 does not allow to throw an exception out of a DLL, so it wouldn't be caught.
 
 The resources files has been created with ResEdit (ANSI build). VisualStudio uses 'ressource.rc' and 'ressource_vc.h'. The other files are used by MingW.
 
