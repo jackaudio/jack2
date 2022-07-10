@@ -312,7 +312,7 @@ class ConfigSet(object):
 		:type filename: string
 		"""
 		tbl = self.table
-		code = Utils.readf(filename, m='rU')
+		code = Utils.readf(filename, m='r')
 		for m in re_imp.finditer(code):
 			g = m.group
 			tbl[g(2)] = eval(g(3))
