@@ -27,6 +27,29 @@
 #endif /* USE_MLOCK */
 #include "JackCompilerDeps.h"
 
+/* Portable definitions for acquire and release fences */
+#if defined(_MSC_VER) && !defined(_M_AMD64) && !defined(_M_IX86) && !defined(_M_X64)
+	/* Acquire and release fences are only necessary for
+	 * non-x86 systems. In fact, gcc will generate no
+	 * instructions for acq/rel fences on x86. Hence, we only
+	 * use MemoryBarrier() for non-x86 systems with msvc */
+	#include <windows.h>
+	#define JACK_ACQ_FENCE() MemoryBarrier()
+	#define JACK_REL_FENCE() MemoryBarrier()
+#elif defined(__GNUC__)
+	#ifdef __ATOMIC_ACQUIRE
+		#define JACK_ACQ_FENCE() __atomic_thread_fence(__ATOMIC_ACQUIRE)
+		#define JACK_REL_FENCE() __atomic_thread_fence(__ATOMIC_RELEASE)
+	#else
+		/* Fallback to the legacy __sync builtin (full memory fence) */
+		#define JACK_ACQ_FENCE() __sync_synchronize()
+		#define JACK_REL_FENCE() __sync_synchronize()
+	#endif
+#else
+	#define JACK_ACQ_FENCE()
+	#define JACK_REL_FENCE()
+#endif
+
 typedef struct {
     char *buf;
     size_t len;
@@ -126,7 +149,7 @@ jack_ringbuffer_reset (jack_ringbuffer_t * rb)
 {
 	rb->read_ptr = 0;
 	rb->write_ptr = 0;
-    memset(rb->buf, 0, rb->size);
+	memset(rb->buf, 0, rb->size);
 }
 
 /* Reset the read and write pointers to zero. This is not thread
@@ -151,7 +174,7 @@ jack_ringbuffer_read_space (const jack_ringbuffer_t * rb)
 {
 	size_t w, r;
 
-	w = rb->write_ptr;
+	w = rb->write_ptr; JACK_ACQ_FENCE();
 	r = rb->read_ptr;
 
 	if (w > r) {
@@ -171,7 +194,7 @@ jack_ringbuffer_write_space (const jack_ringbuffer_t * rb)
 	size_t w, r;
 
 	w = rb->write_ptr;
-	r = rb->read_ptr;
+	r = rb->read_ptr; JACK_ACQ_FENCE();
 
 	if (w > r) {
 		return ((r - w + rb->size) & rb->size_mask) - 1;
@@ -199,6 +222,8 @@ jack_ringbuffer_read (jack_ringbuffer_t * rb, char *dest, size_t cnt)
 
 	to_read = cnt > free_cnt ? free_cnt : cnt;
 
+	/* note: relaxed load here, rb->read_ptr cannot be
+	 * modified from writing thread  */
 	cnt2 = rb->read_ptr + to_read;
 
 	if (cnt2 > rb->size) {
@@ -210,10 +235,12 @@ jack_ringbuffer_read (jack_ringbuffer_t * rb, char *dest, size_t cnt)
 	}
 
 	memcpy (dest, &(rb->buf[rb->read_ptr]), n1);
+	JACK_REL_FENCE(); /* ensure pointer increment happens after copy */
 	rb->read_ptr = (rb->read_ptr + n1) & rb->size_mask;
 
 	if (n2) {
 		memcpy (dest + n1, &(rb->buf[rb->read_ptr]), n2);
+		JACK_REL_FENCE(); /* ensure pointer increment happens after copy */
 		rb->read_ptr = (rb->read_ptr + n2) & rb->size_mask;
 	}
 
@@ -278,6 +305,8 @@ jack_ringbuffer_write (jack_ringbuffer_t * rb, const char *src, size_t cnt)
 
 	to_write = cnt > free_cnt ? free_cnt : cnt;
 
+	/* note: relaxed load here, rb->write_ptr cannot be
+	 * modified from reading thread  */
 	cnt2 = rb->write_ptr + to_write;
 
 	if (cnt2 > rb->size) {
@@ -289,10 +318,12 @@ jack_ringbuffer_write (jack_ringbuffer_t * rb, const char *src, size_t cnt)
 	}
 
 	memcpy (&(rb->buf[rb->write_ptr]), src, n1);
+	JACK_REL_FENCE(); /* ensure pointer increment happens after copy */
 	rb->write_ptr = (rb->write_ptr + n1) & rb->size_mask;
 
 	if (n2) {
 		memcpy (&(rb->buf[rb->write_ptr]), src + n1, n2);
+		JACK_REL_FENCE(); /* ensure pointer increment happens after copy */
 		rb->write_ptr = (rb->write_ptr + n2) & rb->size_mask;
 	}
 
@@ -305,6 +336,7 @@ LIB_EXPORT void
 jack_ringbuffer_read_advance (jack_ringbuffer_t * rb, size_t cnt)
 {
 	size_t tmp = (rb->read_ptr + cnt) & rb->size_mask;
+	JACK_REL_FENCE(); /* ensure pointer increment happens after copy (by user) */
 	rb->read_ptr = tmp;
 }
 
@@ -314,6 +346,7 @@ LIB_EXPORT void
 jack_ringbuffer_write_advance (jack_ringbuffer_t * rb, size_t cnt)
 {
 	size_t tmp = (rb->write_ptr + cnt) & rb->size_mask;
+	JACK_REL_FENCE(); /* ensure pointer increment happens after copy (by user) */
 	rb->write_ptr = tmp;
 }
 
@@ -330,7 +363,7 @@ jack_ringbuffer_get_read_vector (const jack_ringbuffer_t * rb,
 	size_t cnt2;
 	size_t w, r;
 
-	w = rb->write_ptr;
+	w = rb->write_ptr; JACK_ACQ_FENCE();
 	r = rb->read_ptr;
 
 	if (w > r) {
@@ -375,7 +408,7 @@ jack_ringbuffer_get_write_vector (const jack_ringbuffer_t * rb,
 	size_t w, r;
 
 	w = rb->write_ptr;
-	r = rb->read_ptr;
+	r = rb->read_ptr; JACK_ACQ_FENCE();
 
 	if (w > r) {
 		free_cnt = ((r - w + rb->size) & rb->size_mask) - 1;
