@@ -155,7 +155,7 @@ def parse_argv(argv):
                 if control_iface.IsStarted():
                     return (0, "started")
                 else:
-                    return (1, "stoped")
+                    return (1, "stopped")
             elif arg == 'start':
                 print("--- start")
                 control_iface.StartServer()
