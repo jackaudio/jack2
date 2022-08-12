@@ -28,14 +28,20 @@
 #include "JackCompilerDeps.h"
 
 /* Portable definitions for acquire and release fences */
-#if defined(_MSC_VER) && !defined(_M_AMD64) && !defined(_M_IX86) && !defined(_M_X64)
-	/* Acquire and release fences are only necessary for
-	 * non-x86 systems. In fact, gcc will generate no
-	 * instructions for acq/rel fences on x86. Hence, we only
-	 * use MemoryBarrier() for non-x86 systems with msvc */
-	#include <windows.h>
-	#define JACK_ACQ_FENCE() MemoryBarrier()
-	#define JACK_REL_FENCE() MemoryBarrier()
+#if defined(_MSC_VER)
+	#if defined(_M_AMD64) || defined(_M_IX86) || defined(_M_X64)
+		/* Only compiler fences are needed on x86. In fact, GCC
+		 * will generate no instructions for acq/rel fences on
+		 * x86 */
+		#include <intrin.h>
+		#define JACK_ACQ_FENCE() _ReadBarrier()
+		#define JACK_REL_FENCE() _WriteBarrier()
+	#else
+		/* Use full memory fence for non-x86 systems with msvc */
+		#include <windows.h>
+		#define JACK_ACQ_FENCE() MemoryBarrier()
+		#define JACK_REL_FENCE() MemoryBarrier()
+	#endif
 #elif defined(__GNUC__)
 	#ifdef __ATOMIC_ACQUIRE
 		#define JACK_ACQ_FENCE() __atomic_thread_fence(__ATOMIC_ACQUIRE)
@@ -58,8 +64,8 @@ jack_ringbuffer_data_t ;
 
 typedef struct {
     char	*buf;
-    volatile size_t write_ptr;
-    volatile size_t read_ptr;
+    size_t	write_ptr;
+    size_t	read_ptr;
     size_t	size;
     size_t	size_mask;
     int	mlocked;
