@@ -183,11 +183,7 @@ jack_ringbuffer_read_space (const jack_ringbuffer_t * rb)
 	w = rb->write_ptr; JACK_ACQ_FENCE();
 	r = rb->read_ptr;
 
-	if (w > r) {
-		return w - r;
-	} else {
-		return (w - r + rb->size) & rb->size_mask;
-	}
+	return (w - r) & rb->size_mask;
 }
 
 /* Return the number of bytes available for writing.  This is the
@@ -202,13 +198,7 @@ jack_ringbuffer_write_space (const jack_ringbuffer_t * rb)
 	w = rb->write_ptr;
 	r = rb->read_ptr; JACK_ACQ_FENCE();
 
-	if (w > r) {
-		return ((r - w + rb->size) & rb->size_mask) - 1;
-	} else if (w < r) {
-		return (r - w) - 1;
-	} else {
-		return rb->size - 1;
-	}
+	return (r - w - 1) & rb->size_mask;
 }
 
 /* The copying data reader.  Copy at most `cnt' bytes from `rb' to
@@ -367,17 +357,10 @@ jack_ringbuffer_get_read_vector (const jack_ringbuffer_t * rb,
 {
 	size_t free_cnt;
 	size_t cnt2;
-	size_t w, r;
+	size_t r;
 
-	w = rb->write_ptr; JACK_ACQ_FENCE();
 	r = rb->read_ptr;
-
-	if (w > r) {
-		free_cnt = w - r;
-	} else {
-		free_cnt = (w - r + rb->size) & rb->size_mask;
-	}
-
+	free_cnt = jack_ringbuffer_read_space(rb);
 	cnt2 = r + free_cnt;
 
 	if (cnt2 > rb->size) {
@@ -411,19 +394,10 @@ jack_ringbuffer_get_write_vector (const jack_ringbuffer_t * rb,
 {
 	size_t free_cnt;
 	size_t cnt2;
-	size_t w, r;
+	size_t w;
 
 	w = rb->write_ptr;
-	r = rb->read_ptr; JACK_ACQ_FENCE();
-
-	if (w > r) {
-		free_cnt = ((r - w + rb->size) & rb->size_mask) - 1;
-	} else if (w < r) {
-		free_cnt = (r - w) - 1;
-	} else {
-		free_cnt = rb->size - 1;
-	}
-
+	free_cnt = jack_ringbuffer_write_space(rb);
 	cnt2 = w + free_cnt;
 
 	if (cnt2 > rb->size) {
