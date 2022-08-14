@@ -33,7 +33,7 @@ extern "C" {
  *
  * @deprecated Use of JACK-Session is currently deprecated and unsupported.
  * JACK developers recommend the use of NSM instead.
- * See https://github.com/linuxaudio/new-session-manager
+ * See https://new-session-manager.jackaudio.org/
  * @{
  */
 
