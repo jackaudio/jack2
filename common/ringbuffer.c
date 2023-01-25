@@ -180,7 +180,8 @@ jack_ringbuffer_read_space (const jack_ringbuffer_t * rb)
 {
 	size_t w, r;
 
-	w = rb->write_ptr; JACK_ACQ_FENCE();
+	w = rb->write_ptr;
+	JACK_ACQ_FENCE();
 	r = rb->read_ptr;
 
 	return (w - r) & rb->size_mask;
@@ -196,7 +197,8 @@ jack_ringbuffer_write_space (const jack_ringbuffer_t * rb)
 	size_t w, r;
 
 	w = rb->write_ptr;
-	r = rb->read_ptr; JACK_ACQ_FENCE();
+	r = rb->read_ptr;
+	JACK_ACQ_FENCE();
 
 	return (r - w - 1) & rb->size_mask;
 }
