@@ -50,8 +50,8 @@ jack_ringbuffer_data_t ;
 
 typedef struct {
     char	*buf;
-    volatile size_t write_ptr;
-    volatile size_t read_ptr;
+    size_t	write_ptr;
+    size_t	read_ptr;
     size_t	size;
     size_t	size_mask;
     int	mlocked;
