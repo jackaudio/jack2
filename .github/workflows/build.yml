@@ -19,11 +19,11 @@ jobs:
   macos:
     runs-on: macos-10.15
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: recursive
     - name: Set up cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ~/PawPawBuilds
@@ -53,7 +53,7 @@ jobs:
       shell: bash
       run: |
         ./macosx/generate-pkg.sh $(pwd)/destdir/usr/local ${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: jack2-macOS-intel-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
         path: macosx/jack2-osx-*.pkg
@@ -62,11 +62,11 @@ jobs:
   macos_universal:
     runs-on: macos-10.15
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: recursive
     - name: Set up cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ~/PawPawBuilds
@@ -100,7 +100,7 @@ jobs:
       shell: bash
       run: |
         ./macosx/generate-pkg.sh $(pwd)/destdir/usr/local ${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: jack2-macOS-universal-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
         path: macosx/jack2-osx-*.pkg
@@ -109,11 +109,11 @@ jobs:
   win32:
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: recursive
     - name: Set up cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ~/PawPawBuilds
@@ -181,7 +181,7 @@ jobs:
         echo "#define VERSION \"${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}\"" > version.iss
         xvfb-run wine ${WINEPREFIX}/drive_c/InnoSeup/ISCC.exe win32-mini.iss
         popd
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: jack2-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
         path: windows/inno/jack2-*.exe
@@ -190,11 +190,11 @@ jobs:
   win64:
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: recursive
     - name: Set up cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ~/PawPawBuilds
@@ -269,7 +269,7 @@ jobs:
         echo "#define VERSION \"${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}\"" > version.iss
         xvfb-run wine64 ${WINEPREFIX}/drive_c/InnoSeup/ISCC.exe win64-mini.iss
         popd
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: jack2-win64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
         path: windows/inno/jack2-*.exe
@@ -278,11 +278,11 @@ jobs:
   #ubuntu_20_04:
     #runs-on: ubuntu-20.04
     #steps:
-    #- uses: actions/checkout@v2
+    #- uses: actions/checkout@v3
       #with:
         #submodules: recursive
     #- name: Set up cache
-      #uses: actions/cache@v2
+      #uses: actions/cache@v3
       #with:
         #path: |
           #~/debs
@@ -315,7 +315,7 @@ jobs:
         #sed -i "s|--prefix=/usr --classic|--prefix=/usr --classic|" debian/rules
         #dch -M -b -v "$(cat wscript | awk 'sub("^VERSION = ","")' | tr -d "'")~$(date +"%Y%m%d")git${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}" -D focal "automated build"
         #debuild -rfakeroot --no-lintian || true
-    #- uses: actions/upload-artifact@v2
+    #- uses: actions/upload-artifact@v3
       #with:
         #name: jack2-ubuntu-20.04-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
         #path: ~/work/jack2/*.deb
