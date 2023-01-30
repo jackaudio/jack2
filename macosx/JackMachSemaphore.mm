@@ -1,5 +1,6 @@
 /*
 Copyright (C) 2004-2008 Grame
+Copyright (C) 2016-2023 Filipe Coelho <falktx@falktx.com>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -92,9 +93,13 @@ bool JackMachSemaphore::Wait()
 
     kern_return_t res = semaphore_wait(fSemaphore);
 
-    // killing a thread will abort the semaphore wait
-    if (res == KERN_SUCCESS || res == KERN_ABORTED) {
+    if (res == KERN_SUCCESS) {
         return true;
+    }
+
+    // killing a thread will abort the semaphore wait, skip the error log
+    if (res == KERN_ABORTED) {
+        return false;
     }
 
     jack_error("JackMachSemaphore::Wait name = %s err = %s", fName, mach_error_string(res));
@@ -114,9 +119,13 @@ bool JackMachSemaphore::TimedWait(long usec)
 
     kern_return_t res = semaphore_timedwait(fSemaphore, time);
 
-    // killing a thread will abort the semaphore wait
-    if (res == KERN_SUCCESS || res == KERN_ABORTED) {
+    if (res == KERN_SUCCESS) {
         return true;
+    }
+
+    // killing a thread will abort the semaphore wait, skip the error log
+    if (res == KERN_ABORTED) {
+        return false;
     }
 
     jack_error("JackMachSemaphore::TimedWait name = %s usec = %ld err = %s", fName, usec, mach_error_string(res));

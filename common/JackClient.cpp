@@ -1,6 +1,7 @@
 /*
 Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2008 Grame
+Copyright (C) 2016-2023 Filipe Coelho <falktx@falktx.com>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -638,6 +639,13 @@ inline bool JackClient::WaitSync()
 {
     // Suspend itself: wait on the input synchro
     if (GetGraphManager()->SuspendRefNum(GetClientControl(), fSynchroTable, LONG_MAX) < 0) {
+#ifdef __APPLE__
+        // FIXME macOS reports wait failures when closing down, due to aborted semaphore, ignore it
+        if (!GetClientControl()->fActive) {
+            fThread.Terminate();
+            return true;
+        }
+#endif
         jack_error("SuspendRefNum error");
         return false;
     } else {
