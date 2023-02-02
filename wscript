@@ -695,6 +695,7 @@ def build_drivers(bld):
 
     freebsd_oss_src = [
         'common/memops.c',
+        'freebsd/oss/JackOSSChannel.cpp',
         'freebsd/oss/JackOSSDriver.cpp'
     ]
 

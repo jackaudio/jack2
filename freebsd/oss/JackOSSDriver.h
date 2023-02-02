@@ -22,6 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackOSSDriver__
 
 #include "JackAudioDriver.h"
+#include "JackOSSChannel.h"
 
 namespace Jack
 {
@@ -44,9 +45,6 @@ class JackOSSDriver : public JackAudioDriver
 {
     private:
 
-        int fInFD;
-        int fOutFD;
-
         int fBits;
         int fNperiods;
         bool fCapture;
@@ -54,42 +52,15 @@ class JackOSSDriver : public JackAudioDriver
         bool fExcl;
         bool fIgnoreHW;
 
-        unsigned int fInSampleSize;
-        unsigned int fOutSampleSize;
+        std::int64_t fCycleEnd;
+        std::int64_t fLastRun;
+        std::int64_t fMaxRunGap;
+        jack_sample_t** fSampleBuffers;
 
-        unsigned int fInputBufferSize;
-        unsigned int fOutputBufferSize;
+        JackOSSChannel fChannel;
 
-        void* fInputBuffer;
-        void* fOutputBuffer;
-
-        jack_nframes_t fInBlockSize;
-        jack_nframes_t fOutBlockSize;
-        jack_nframes_t fInMeanStep;
-        jack_nframes_t fOutMeanStep;
-        jack_nframes_t fOSSInBuffer;
-        jack_nframes_t fOSSOutBuffer;
-
-        jack_time_t fOSSReadSync;
-        long long fOSSReadOffset;
-        jack_time_t fOSSWriteSync;
-        long long fOSSWriteOffset;
-
-        // Buffer balance and sync correction
-        long long fBufferBalance;
-        bool fForceBalancing;
-        bool fForceSync;
-
-        int OpenInput();
-        int OpenOutput();
         int OpenAux();
         void CloseAux();
-        void DisplayDeviceInfo();
-        int ProbeInBlockSize();
-        int ProbeOutBlockSize();
-        int Discard(jack_nframes_t frames);
-        int WriteSilence(jack_nframes_t frames);
-        int WaitAndSync();
 
     protected:
         virtual void UpdateLatencies();
@@ -98,16 +69,9 @@ class JackOSSDriver : public JackAudioDriver
 
         JackOSSDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
                 : JackAudioDriver(name, alias, engine, table),
-                fInFD(-1), fOutFD(-1), fBits(0),
+                fBits(0),
                 fNperiods(0), fCapture(false), fPlayback(false), fExcl(false), fIgnoreHW(true),
-                fInSampleSize(0), fOutSampleSize(0),
-                fInputBufferSize(0), fOutputBufferSize(0),
-                fInputBuffer(NULL), fOutputBuffer(NULL),
-                fInBlockSize(1), fOutBlockSize(1),
-                fInMeanStep(0), fOutMeanStep(0),
-                fOSSInBuffer(0), fOSSOutBuffer(0),
-                fOSSReadSync(0), fOSSReadOffset(0), fOSSWriteSync(0), fOSSWriteOffset(0),
-                fBufferBalance(0), fForceBalancing(false), fForceSync(false)
+                fCycleEnd(0), fLastRun(0), fMaxRunGap(0), fSampleBuffers(nullptr)
         {}
 
         virtual ~JackOSSDriver()
