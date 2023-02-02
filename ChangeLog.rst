@@ -1,11 +1,14 @@
 ChangeLog
 #########
 
-* 1.9.22 (2022-xx-yy)
+* 1.9.22 (2023-02-02)
 
   * The waf autooption ``--example-tools`` has been removed.
     The example clients and tools are no longer part of the jack2 project.
   * Drop dependencies that were only used for example clients and tools (readline, sndfile and zita libs)
+  * Fix build with python3.11+
+  * Fix compatibility with macOS 12+
+  * Fix ringbuffer thread safety on ARM
 
 * 1.9.21 (2022-04-15)
 
