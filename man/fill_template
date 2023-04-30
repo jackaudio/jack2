@@ -4,8 +4,8 @@ d=""
 
 if [ "$2" == "True" ]; then
   for i in *.0 ; do
-    sed -e "s/!VERSION!/${1}/g" -e "s/!DATE!/`date $d '+%B %Y'`/g" < ${i} > ${i%%0}1
+    sed -e "s/!VERSION!/${1}/g" -e "s/!DATE!/`date $d '+%Y-%m-%d'`/g" < ${i} > ${i%%0}1
   done
 else
-  sed -e "s/!VERSION!/${1}/g" -e "s/!DATE!/`date $d '+%B %Y'`/g" < jackd.0 > jackd.1
+  sed -e "s/!VERSION!/${1}/g" -e "s/!DATE!/`date $d '+%Y-%m-%d'`/g" < jackd.0 > jackd.1
 fi
