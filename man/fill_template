@@ -2,7 +2,7 @@
 d=""
 [ -z "$SOURCE_DATE_EPOCH" ] || d="--utc --date=@$SOURCE_DATE_EPOCH"
 
-if [ "$2" == "True" ]; then
+if [ "$2" = "True" ]; then
   for i in *.0 ; do
     sed -e "s/!VERSION!/${1}/g" -e "s/!DATE!/`date $d '+%Y-%m-%d'`/g" < ${i} > ${i%%0}1
   done
