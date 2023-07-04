@@ -117,7 +117,7 @@ jobs:
         pushd PawPaw && source local.env ${{ matrix.target }} && popd
         export PATH+=":/usr/i686-w64-mingw32/bin"
         export LDFLAGS+="-L~/PawPawBuilds/targets/win64/lib32"
-        ./waf configure --platform=win32 --prefix=$(pwd)/destdir --static --mixed
+        ./waf configure --platform=win32 --prefix=$(pwd)/destdir --static ${{ matrix.target == 'win64' && '--mixed' || '' }}
         ./waf build -j $(nproc)
         ./waf install
     - name: Generate MSVC lib files
