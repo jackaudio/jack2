@@ -1,6 +1,6 @@
 #!/bin/sh
 d=""
-[ -z "$SOURCE_DATE_EPOCH" ] || d="--utc --date=@$SOURCE_DATE_EPOCH"
+[ -z "$SOURCE_DATE_EPOCH" ] || d="-u --date=@$SOURCE_DATE_EPOCH"
 
 if [ "$2" = "True" ]; then
   for i in *.0 ; do
