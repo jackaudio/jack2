@@ -8,16 +8,18 @@ on:
     branches:
       - '*'
 env:
-  CACHE_VERSION: 6
-  DEBIAN_FRONTEND: noninteractive
-  HOMEBREW_NO_AUTO_UPDATE: 1
-  PAWPAW_VERSION: 86d947d472e1478af882175ee329a6f769b4d15c
+  CACHE_VERSION: 20230704
+  PAWPAW_VERSION: 6a3c6a65a89abe221858c3f7635140074506bfc3
   PAWPAW_SKIP_LTO: 1
+  PAWPAW_SKIP_GLIB: 1
+  PAWPAW_SKIP_LV2: 1
 
 jobs:
-  # macOS native intel build
   macos:
-    runs-on: macos-10.15
+    strategy:
+      matrix:
+        target: [intel, universal]
+    runs-on: macos-11
     steps:
     - uses: actions/checkout@v3
       with:
@@ -27,40 +29,45 @@ jobs:
       with:
         path: |
           ~/PawPawBuilds
-        key: macos-v${{ env.CACHE_VERSION }}
+        key: macos-${{ matrix.target }}-v${{ env.CACHE_VERSION }}
     - name: Set up dependencies
       run: |
         brew install cmake jq meson
-    - name: Bootstrap macOS intel
+    - name: Bootstrap dependencies
       shell: bash
       run: |
         if [ ! -d PawPaw ]; then
           git clone https://github.com/DISTRHO/PawPaw.git
           git -C PawPaw checkout ${PAWPAW_VERSION}
         fi
-        ./PawPaw/bootstrap-jack2.sh macos && ./PawPaw/.cleanup.sh macos
+        ./PawPaw/bootstrap-jack2.sh macos-${{ matrix.target }} && ./PawPaw/.cleanup.sh macos-${{ matrix.target }}
     - name: Build jack2
       shell: bash
       run: |
-        pushd PawPaw && source local.env macos && popd
+        pushd PawPaw && source local.env macos-${{ matrix.target }} && popd
         python ./waf configure --platform=darwin --prefix=/usr/local
         python ./waf build -j $(sysctl -n hw.logicalcpu)
         python ./waf install --destdir=$(pwd)/destdir
-    - name: Set sha8
-      id: slug
-      run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+    - name: Set sha8 (non-release)
+      if: startsWith(github.ref, 'refs/tags/') != true
+      run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
+    - name: Set sha8 (release)
+      if: startsWith(github.ref, 'refs/tags/')
+      run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
     - name: Generate macOS package
       shell: bash
       run: |
-        ./macosx/generate-pkg.sh $(pwd)/destdir/usr/local ${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+        ./macosx/generate-pkg.sh $(pwd)/destdir/usr/local ${{ github.event.pull_request.number || env.SHA8 }}
     - uses: actions/upload-artifact@v3
       with:
-        name: jack2-macOS-intel-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+        name: jack2-macOS-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}
         path: macosx/jack2-osx-*.pkg
 
-  # macOS native universal build
-  macos_universal:
-    runs-on: macos-10.15
+  windows:
+    strategy:
+      matrix:
+        target: [win32, win64]
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -70,54 +77,7 @@ jobs:
       with:
         path: |
           ~/PawPawBuilds
-        key: macos-universal-v${{ env.CACHE_VERSION }}
-    - name: Set up dependencies
-      run: |
-        brew install cmake jq meson
-    - name: Fix up Xcode
-      run: |
-        sudo rm -Rf /Library/Developer/CommandLineTools/SDKs/*
-        sudo xcode-select -s /Applications/Xcode_12.3.app
-    - name: Bootstrap macOS universal
-      shell: bash
-      run: |
-        if [ ! -d PawPaw ]; then
-          git clone https://github.com/DISTRHO/PawPaw.git
-          git -C PawPaw checkout ${PAWPAW_VERSION}
-        fi
-        ./PawPaw/bootstrap-jack2.sh macos-universal && ./PawPaw/.cleanup.sh macos-universal
-    - name: Build jack2
-      shell: bash
-      run: |
-        pushd PawPaw && source local.env macos-universal && popd
-        python ./waf configure --platform=darwin --prefix=/usr/local
-        python ./waf build -j $(sysctl -n hw.logicalcpu)
-        python ./waf install --destdir=$(pwd)/destdir
-    - name: Set sha8
-      id: slug
-      run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
-    - name: Generate macOS package
-      shell: bash
-      run: |
-        ./macosx/generate-pkg.sh $(pwd)/destdir/usr/local ${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-    - uses: actions/upload-artifact@v3
-      with:
-        name: jack2-macOS-universal-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-        path: macosx/jack2-osx-*.pkg
-
-  # linux with win32 cross-compilation
-  win32:
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        submodules: recursive
-    - name: Set up cache
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/PawPawBuilds
-        key: win32-v${{ env.CACHE_VERSION }}
+        key: ${{ matrix.target }}-v${{ env.CACHE_VERSION }}
     - name: Restore debian packages cache
       run: |
         if [ -d ~/PawPawBuilds/debs ] && [ "$(ls ~/PawPawBuilds/debs | wc -l)" -ne 0 ]; then \
@@ -126,119 +86,50 @@ jobs:
     - name: Fix GitHub's mess
       run: |
         sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-        sudo apt-get update -qq
-        sudo apt-get install -yqq --allow-downgrades libgd3/focal libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
-        sudo apt-get purge -yqq libmono* moby* mono* php* libgdiplus libpcre2-posix3 libzip4
-    - name: Set up dependencies
-      run: |
         sudo dpkg --add-architecture i386
         sudo apt-get update -qq
+        sudo apt-get install -yqq --allow-downgrades libc6:i386 libgcc-s1:i386 libstdc++6:i386
+    - name: Set up dependencies
+      if: ${{ matrix.target == 'win32' }}
+      run: |
         sudo apt-get install -y autopoint build-essential curl cmake jq llvm mingw-w64 xvfb \
           binutils-mingw-w64-i686 g++-mingw-w64-i686 mingw-w64 wine-stable:i386
-    - name: Cache debian packages
-      run: |
-        mkdir -p ~/PawPawBuilds/debs && \
-        sudo mv /var/cache/apt/archives/*.deb ~/PawPawBuilds/debs/
-    - name: Bootstrap win32 cross-compiled
-      shell: bash
-      run: |
-        if [ ! -d PawPaw ]; then
-          git clone https://github.com/DISTRHO/PawPaw.git
-          git -C PawPaw checkout ${PAWPAW_VERSION}
-        fi
-        ./PawPaw/bootstrap-jack2.sh win32 && ./PawPaw/.cleanup.sh win32
-    - name: Build jack2
-      shell: bash
-      run: |
-        pushd PawPaw && source local.env win32 && popd
-        ./waf configure --platform=win32 --prefix=$(pwd)/destdir --static
-        ./waf build -j $(nproc)
-        ./waf install
-    - name: Generate MSVC lib files
-      shell: bash
-      run: |
-        pushd $(pwd)/destdir/lib
-        llvm-dlltool -m i386 -D libjack.dll -d libjack.def -l libjack.lib
-        llvm-dlltool -m i386 -D libjacknet.dll -d libjacknet.def -l libjacknet.lib
-        llvm-dlltool -m i386 -D libjackserver.dll -d libjackserver.def -l libjackserver.lib
-        popd
-    - name: Set sha8
-      id: slug
-      run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
-    - name: Generate Windows installer
-      shell: bash
-      run: |
-        # Setup wine
-        export WINEDLLOVERRIDES="mscoree,mshtml="
-        export WINEPREFIX=$(pwd)/innosetup
-        xvfb-run wineboot -u
-        # Download and install innosetup
-        curl -L https://jrsoftware.org/download.php/is.exe?site=2 -o is.exe
-        xvfb-run wine is.exe /allusers /dir=C:\\InnoSeup /nocancel /norestart /verysilent
-        # create installer
-        ln -sf $(pwd)/destdir windows/inno/win32
-        pushd windows/inno
-        echo "#define VERSION \"${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}\"" > version.iss
-        xvfb-run wine ${WINEPREFIX}/drive_c/InnoSeup/ISCC.exe win32-mini.iss
-        popd
-    - uses: actions/upload-artifact@v3
-      with:
-        name: jack2-win32-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-        path: windows/inno/jack2-*.exe
-
-  # linux with win64 cross-compilation
-  win64:
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        submodules: recursive
-    - name: Set up cache
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/PawPawBuilds
-        key: win64-v${{ env.CACHE_VERSION }}
-    - name: Restore debian packages cache
-      run: |
-        if [ -d ~/PawPawBuilds/debs ] && [ "$(ls ~/PawPawBuilds/debs | wc -l)" -ne 0 ]; then \
-          sudo cp ~/PawPawBuilds/debs/*.deb /var/cache/apt/archives/; \
-        fi
-    - name: Fix GitHub's mess
-      run: |
-        sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-        sudo apt-get update -qq
-        sudo apt-get install -yqq --allow-downgrades libgd3/focal libpcre2-8-0/focal libpcre2-16-0/focal libpcre2-32-0/focal libpcre2-posix2/focal
-        sudo apt-get purge -yqq libmono* moby* mono* php* libgdiplus libpcre2-posix3 libzip4
     - name: Set up dependencies
+      if: ${{ matrix.target == 'win64' }}
       run: |
-        sudo dpkg --add-architecture i386
-        sudo apt-get update -qq
         sudo apt-get install -y autopoint build-essential curl cmake jq llvm mingw-w64 xvfb \
           binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64 mingw-w64 wine-stable
     - name: Cache debian packages
       run: |
         mkdir -p ~/PawPawBuilds/debs && \
         sudo mv /var/cache/apt/archives/*.deb ~/PawPawBuilds/debs/
-    - name: Bootstrap win64 cross-compiled
+    - name: Bootstrap dependencies
       shell: bash
       run: |
         if [ ! -d PawPaw ]; then
           git clone https://github.com/DISTRHO/PawPaw.git
           git -C PawPaw checkout ${PAWPAW_VERSION}
         fi
-        ./PawPaw/bootstrap-jack2.sh win64 && ./PawPaw/.cleanup.sh win64
+        ./PawPaw/bootstrap-jack2.sh ${{ matrix.target }} && ./PawPaw/.cleanup.sh ${{ matrix.target }}
     - name: Build jack2
       shell: bash
       run: |
-        pushd PawPaw && source local.env win64 && popd
+        pushd PawPaw && source local.env ${{ matrix.target }} && popd
         export PATH+=":/usr/i686-w64-mingw32/bin"
         export LDFLAGS+="-L~/PawPawBuilds/targets/win64/lib32"
-        ./waf configure --platform=win32 --prefix=$(pwd)/destdir --static --mixed
+        ./waf configure --platform=win32 --prefix=$(pwd)/destdir --static ${{ matrix.target == 'win64' && '--mixed' || '' }}
         ./waf build -j $(nproc)
         ./waf install
     - name: Generate MSVC lib files
-      shell: bash
+      if: ${{ matrix.target == 'win32' }}
+      run: |
+        pushd $(pwd)/destdir/lib
+        llvm-dlltool -m i386 -D libjack.dll -d libjack.def -l libjack.lib
+        llvm-dlltool -m i386 -D libjacknet.dll -d libjacknet.def -l libjacknet.lib
+        llvm-dlltool -m i386 -D libjackserver.dll -d libjackserver.def -l libjackserver.lib
+        popd
+    - name: Generate MSVC lib files
+      if: ${{ matrix.target == 'win64' }}
       run: |
         # 32bit
         pushd $(pwd)/destdir/lib32
@@ -250,9 +141,12 @@ jobs:
         llvm-dlltool -m i386:x86-64 -D libjacknet64.dll -d libjacknet64.def -l libjacknet64.lib
         llvm-dlltool -m i386:x86-64 -D libjackserver64.dll -d libjackserver64.def -l libjackserver64.lib
         popd
-    - name: Set sha8
-      id: slug
-      run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
+    - name: Set sha8 (non-release)
+      if: startsWith(github.ref, 'refs/tags/') != true
+      run: echo "SHA8=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
+    - name: Set sha8 (release)
+      if: startsWith(github.ref, 'refs/tags/')
+      run: echo "SHA8=$(echo ${{ github.ref_name }})" >> $GITHUB_ENV
     - name: Generate Windows installer
       shell: bash
       run: |
@@ -262,60 +156,14 @@ jobs:
         xvfb-run wineboot -u
         # Download and install innosetup
         curl -L https://jrsoftware.org/download.php/is.exe?site=2 -o is.exe
-        xvfb-run wine64 is.exe /allusers /dir=C:\\InnoSeup /nocancel /norestart /verysilent
+        xvfb-run wine is.exe /allusers /dir=C:\\InnoSeup /nocancel /norestart /verysilent
         # create installer
-        ln -sf $(pwd)/destdir windows/inno/win64
+        ln -sf $(pwd)/destdir windows/inno/${{ matrix.target }}
         pushd windows/inno
-        echo "#define VERSION \"${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}\"" > version.iss
-        xvfb-run wine64 ${WINEPREFIX}/drive_c/InnoSeup/ISCC.exe win64-mini.iss
+        echo "#define VERSION \"${{ github.event.pull_request.number || env.SHA8 }}\"" > version.iss
+        xvfb-run wine ${WINEPREFIX}/drive_c/InnoSeup/ISCC.exe ${{ matrix.target }}-mini.iss
         popd
     - uses: actions/upload-artifact@v3
       with:
-        name: jack2-win64-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
+        name: jack2-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}
         path: windows/inno/jack2-*.exe
-
-  # ubuntu-20.04
-  #ubuntu_20_04:
-    #runs-on: ubuntu-20.04
-    #steps:
-    #- uses: actions/checkout@v3
-      #with:
-        #submodules: recursive
-    #- name: Set up cache
-      #uses: actions/cache@v3
-      #with:
-        #path: |
-          #~/debs
-        #key: ubuntu-20.04-v${{ env.CACHE_VERSION }}
-    #- name: Restore debian packages cache
-      #run: |
-        #if [ -d ~/debs ] && [ "$(ls ~/debs | wc -l)" -ne 0 ]; then \
-          #sudo cp ~/debs/*.deb /var/cache/apt/archives/; \
-        #fi
-    #- name: Set up dependencies
-      #run: |
-        #sudo add-apt-repository -y ppa:ubuntustudio-ppa/backports
-        #sudo sed -i "s/# deb-src/deb-src/" /etc/apt/sources.list /etc/apt/sources.list.d/*.list
-        #sudo apt-get update -qq
-        #sudo apt-get build-dep jackd2
-        #sudo apt-get install devscripts
-    #- name: Cache debian packages
-      #run: |
-        #mkdir -p ~/debs && \
-        #sudo mv /var/cache/apt/archives/*.deb ~/debs/
-    #- name: Set sha8
-      #id: slug
-      #run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
-    #- name: Build jack2 packages
-      #shell: bash
-      #run: |
-        #apt-get source -d jackd2
-        #tar xf *.debian.tar.xz
-        #rm -rf debian/source
-        #sed -i "s|--prefix=/usr --classic|--prefix=/usr --classic|" debian/rules
-        #dch -M -b -v "$(cat wscript | awk 'sub("^VERSION = ","")' | tr -d "'")~$(date +"%Y%m%d")git${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}" -D focal "automated build"
-        #debuild -rfakeroot --no-lintian || true
-    #- uses: actions/upload-artifact@v3
-      #with:
-        #name: jack2-ubuntu-20.04-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-        #path: ~/work/jack2/*.deb
