@@ -11,6 +11,8 @@ env:
   CACHE_VERSION: 20230704
   PAWPAW_VERSION: 6a3c6a65a89abe221858c3f7635140074506bfc3
   PAWPAW_SKIP_LTO: 1
+  PAWPAW_SKIP_GLIB: 1
+  PAWPAW_SKIP_LV2: 1
 
 jobs:
   macos:
@@ -61,8 +63,7 @@ jobs:
         name: jack2-macOS-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}
         path: macosx/jack2-osx-*.pkg
 
-  # linux with mingw cross-compilation
-  win32:
+  windows:
     strategy:
       matrix:
         target: [win32, win64]
@@ -88,7 +89,6 @@ jobs:
         sudo dpkg --add-architecture i386
         sudo apt-get update -qq
         sudo apt-get install -yqq --allow-downgrades libc6:i386 libgcc-s1:i386 libstdc++6:i386
-        sudo apt-get clean
     - name: Set up dependencies
       if: ${{ matrix.target == 'win32' }}
       run: |
@@ -167,49 +167,3 @@ jobs:
       with:
         name: jack2-${{ matrix.target }}-${{ github.event.pull_request.number || env.SHA8 }}
         path: windows/inno/jack2-*.exe
-
-  # ubuntu-20.04
-  #ubuntu_20_04:
-    #runs-on: ubuntu-20.04
-    #steps:
-    #- uses: actions/checkout@v3
-      #with:
-        #submodules: recursive
-    #- name: Set up cache
-      #uses: actions/cache@v3
-      #with:
-        #path: |
-          #~/debs
-        #key: ubuntu-20.04-v${{ env.CACHE_VERSION }}
-    #- name: Restore debian packages cache
-      #run: |
-        #if [ -d ~/debs ] && [ "$(ls ~/debs | wc -l)" -ne 0 ]; then \
-          #sudo cp ~/debs/*.deb /var/cache/apt/archives/; \
-        #fi
-    #- name: Set up dependencies
-      #run: |
-        #sudo add-apt-repository -y ppa:ubuntustudio-ppa/backports
-        #sudo sed -i "s/# deb-src/deb-src/" /etc/apt/sources.list /etc/apt/sources.list.d/*.list
-        #sudo apt-get update -qq
-        #sudo apt-get build-dep jackd2
-        #sudo apt-get install devscripts
-    #- name: Cache debian packages
-      #run: |
-        #mkdir -p ~/debs && \
-        #sudo mv /var/cache/apt/archives/*.deb ~/debs/
-    #- name: Set sha8
-      #id: slug
-      #run: echo "::set-output name=sha8::$(echo ${{ github.sha }} | cut -c1-8)"
-    #- name: Build jack2 packages
-      #shell: bash
-      #run: |
-        #apt-get source -d jackd2
-        #tar xf *.debian.tar.xz
-        #rm -rf debian/source
-        #sed -i "s|--prefix=/usr --classic|--prefix=/usr --classic|" debian/rules
-        #dch -M -b -v "$(cat wscript | awk 'sub("^VERSION = ","")' | tr -d "'")~$(date +"%Y%m%d")git${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}" -D focal "automated build"
-        #debuild -rfakeroot --no-lintian || true
-    #- uses: actions/upload-artifact@v3
-      #with:
-        #name: jack2-ubuntu-20.04-${{ github.event.pull_request.number || steps.slug.outputs.sha8 }}
-        #path: ~/work/jack2/*.deb
