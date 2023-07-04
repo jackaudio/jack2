@@ -13,7 +13,7 @@
     </choices-outline>
     <domains enable_anywhere="false" enable_currentUserHome="false" enable_localSystem="true" />
     <license file="@CURDIR@/../COPYING" mime-type="text/plain" />
-    <options customize="never" hostArchitectures="x86_64" require-scripts="false" rootVolumeOnly="true" />
+    <options customize="never" hostArchitectures="arm64,x86_64" require-scripts="false" rootVolumeOnly="true" />
     <pkg-ref id="org.jackaudio.jack2" />
     <welcome file="@CURDIR@/package-welcome.txt" mime-type="text/plain" />
 </installer-gui-script>
