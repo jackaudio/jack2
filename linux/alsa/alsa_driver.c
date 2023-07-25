@@ -1283,28 +1283,35 @@ alsa_driver_restart (alsa_driver_t *driver)
 }
 
 static int
-alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs)
+alsa_driver_get_status (alsa_driver_t *driver)
 {
-	snd_pcm_status_t *status;
 	int res;
+	snd_pcm_t *pcm_handle;
 
+	snd_pcm_status_t *status;
 	snd_pcm_status_alloca(&status);
 
 	if (driver->capture_handle) {
-		if ((res = snd_pcm_status(driver->capture_handle, status))
-		    < 0) {
-			jack_error("status error: %s", snd_strerror(res));
-		}
+		pcm_handle = driver->capture_handle;
 	} else {
-		if ((res = snd_pcm_status(driver->playback_handle, status))
-		    < 0) {
-			jack_error("status error: %s", snd_strerror(res));
-		}
+		pcm_handle = driver->playback_handle;
 	}
+	res = snd_pcm_status(pcm_handle, status);
+	if (res < 0) {
+		jack_error("status error: %s", snd_strerror(res));
+		return -1;
+	}
+	return snd_pcm_status_get_state(status);
+}
 
-	if (snd_pcm_status_get_state(status) == SND_PCM_STATE_SUSPENDED)
-	{
-		jack_log("**** alsa_pcm: pcm in suspended state, resuming it" );
+static int
+alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs)
+{
+	int status;
+	int res;
+
+	status = alsa_driver_get_status(driver);
+	if (status == SND_PCM_STATE_SUSPENDED) {
 		if (driver->capture_handle) {
 			if ((res = alsa_driver_prepare(driver->capture_handle, SND_PCM_STREAM_CAPTURE))
 			    < 0) {
@@ -1319,7 +1326,7 @@ alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs)
 		}
 	}
 
-	if (snd_pcm_status_get_state(status) == SND_PCM_STATE_XRUN
+	if (status == SND_PCM_STATE_XRUN
 	    && driver->process_count > XRUN_REPORT_DELAY) {
 		struct timeval now, diff, tstamp;
 		driver->xrun_count++;
