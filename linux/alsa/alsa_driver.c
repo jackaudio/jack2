@@ -2062,6 +2062,97 @@ discover_alsa_using_apps ()
         }
 }
 
+static int
+alsa_driver_open (alsa_driver_t *driver, bool is_capture)
+{
+	int err = 0;
+	char* current_apps;
+
+	if(is_capture) {
+		err = snd_pcm_open (&driver->capture_handle,
+				    driver->alsa_name_capture,
+				    SND_PCM_STREAM_CAPTURE,
+				    SND_PCM_NONBLOCK);
+	} else {
+		err = snd_pcm_open (&driver->playback_handle,
+				    driver->alsa_name_playback,
+				    SND_PCM_STREAM_PLAYBACK,
+				    SND_PCM_NONBLOCK);
+	}
+	if (err < 0) {
+		switch (errno) {
+		case EBUSY:
+#ifdef __ANDROID__
+			jack_error ("\n\nATTENTION: The device \"%s\" is "
+				    "already in use. Please stop the"
+				    " application using it and "
+				    "run JACK again",
+				    is_capture ? driver->alsa_name_capture : driver->alsa_name_playback);
+#else
+			current_apps = discover_alsa_using_apps ();
+			if (current_apps) {
+				jack_error ("\n\nATTENTION: The device \"%s\" is "
+					    "already in use. The following applications "
+					    " are using your soundcard(s) so you should "
+					    " check them and stop them as necessary before "
+					    " trying to start JACK again:\n\n%s",
+					    is_capture ? driver->alsa_name_capture : driver->alsa_name_playback,
+					    current_apps);
+				free (current_apps);
+			} else {
+				jack_error ("\n\nATTENTION: The device \"%s\" is "
+					    "already in use. Please stop the"
+					    " application using it and "
+					    "run JACK again",
+					    is_capture ? driver->alsa_name_capture : driver->alsa_name_playback);
+			}
+#endif
+			break;
+
+		case EPERM:
+			jack_error ("you do not have permission to open "
+				    "the audio device \"%s\" for playback",
+				    is_capture ? driver->alsa_name_capture : driver->alsa_name_playback);
+			break;
+
+		case EINVAL:
+			jack_error ("the state of handle or the mode is invalid "
+				"or invalid state change occured \"%s\" for playback",
+				is_capture ? driver->alsa_name_capture : driver->alsa_name_playback);
+			break;
+
+		case ENOENT:
+			jack_error ("device \"%s\"  does not exist for playback",
+				is_capture ? driver->alsa_name_capture : driver->alsa_name_playback);
+			break;
+
+		case ENOMEM:
+			jack_error ("Not enough memory available for allocation for \"%s\" for playback",
+				is_capture ? driver->alsa_name_capture : driver->alsa_name_playback);
+			break;
+
+		case SND_ERROR_INCOMPATIBLE_VERSION:
+			jack_error ("Version mismatch \"%s\" for playback",
+				is_capture ? driver->alsa_name_capture : driver->alsa_name_playback);
+			break;
+		}
+		alsa_driver_delete (driver);
+		if(is_capture) {
+			driver->capture_handle = NULL;
+		} else {
+			driver->playback_handle = NULL;
+		}
+	}
+
+	if (is_capture && driver->capture_handle) {
+		snd_pcm_nonblock (driver->capture_handle, 0);
+	} else if(!is_capture && driver->playback_handle) {
+		snd_pcm_nonblock (driver->playback_handle, 0);
+	}
+
+	return err;
+}
+
 jack_driver_t *
 alsa_driver_new (char *name, char *playback_alsa_device,
 		 char *capture_alsa_device,
@@ -2085,7 +2176,6 @@ alsa_driver_new (char *name, char *playback_alsa_device,
 		 )
 {
 	int err;
-    char* current_apps;
 	alsa_driver_t *driver;
 
 	jack_info ("creating alsa driver ... %s|%s|%" PRIu32 "|%" PRIu32
@@ -2176,105 +2266,19 @@ alsa_driver_new (char *name, char *playback_alsa_device,
 	alsa_driver_hw_specific (driver, hw_monitoring, hw_metering);
 
 	if (playing) {
-		if (snd_pcm_open (&driver->playback_handle,
-				  playback_alsa_device,
-				  SND_PCM_STREAM_PLAYBACK,
-				  SND_PCM_NONBLOCK) < 0) {
-			switch (errno) {
-			case EBUSY:
-#ifdef __ANDROID__
-                jack_error ("\n\nATTENTION: The playback device \"%s\" is "
-                            "already in use. Please stop the"
-                            " application using it and "
-                            "run JACK again",
-                            playback_alsa_device);
-#else
-                current_apps = discover_alsa_using_apps ();
-                if (current_apps) {
-                        jack_error ("\n\nATTENTION: The playback device \"%s\" is "
-                                    "already in use. The following applications "
-                                    " are using your soundcard(s) so you should "
-                                    " check them and stop them as necessary before "
-                                    " trying to start JACK again:\n\n%s",
-                                    playback_alsa_device,
-                                    current_apps);
-                        free (current_apps);
-                } else {
-                        jack_error ("\n\nATTENTION: The playback device \"%s\" is "
-                                    "already in use. Please stop the"
-                                    " application using it and "
-                                    "run JACK again",
-                                    playback_alsa_device);
-                }
-#endif
-                alsa_driver_delete (driver);
-				return NULL;
-
-			case EPERM:
-				jack_error ("you do not have permission to open "
-					    "the audio device \"%s\" for playback",
-					    playback_alsa_device);
-				alsa_driver_delete (driver);
-				return NULL;
-				break;
-			}
-
-			driver->playback_handle = NULL;
-		}
-
-		if (driver->playback_handle) {
-			snd_pcm_nonblock (driver->playback_handle, 0);
+		err = alsa_driver_open(driver, SND_PCM_STREAM_PLAYBACK);
+		if(err < 0) {
+			jack_error ("\n\nATTENTION: Opening of the playback device \"%s\" failed.",
+				    playback_alsa_device);
+			return NULL;
 		}
 	}
-
-	if (capturing) {
-		if (snd_pcm_open (&driver->capture_handle,
-				  capture_alsa_device,
-				  SND_PCM_STREAM_CAPTURE,
-				  SND_PCM_NONBLOCK) < 0) {
-			switch (errno) {
-			case EBUSY:
-#ifdef __ANDROID__
-                jack_error ("\n\nATTENTION: The capture (recording) device \"%s\" is "
-                            "already in use",
-                            capture_alsa_device);
-#else
-                current_apps = discover_alsa_using_apps ();
-                if (current_apps) {
-                        jack_error ("\n\nATTENTION: The capture device \"%s\" is "
-                                    "already in use. The following applications "
-                                    " are using your soundcard(s) so you should "
-                                    " check them and stop them as necessary before "
-                                    " trying to start JACK again:\n\n%s",
-                                    capture_alsa_device,
-                                    current_apps);
-                        free (current_apps);
-                } else {
-                        jack_error ("\n\nATTENTION: The capture (recording) device \"%s\" is "
-                                    "already in use. Please stop the"
-                                    " application using it and "
-                                    "run JACK again",
-                                    capture_alsa_device);
-                }
-				alsa_driver_delete (driver);
-				return NULL;
-#endif
-				break;
-
-			case EPERM:
-				jack_error ("you do not have permission to open "
-					    "the audio device \"%s\" for capture",
-					    capture_alsa_device);
-				alsa_driver_delete (driver);
-				return NULL;
-				break;
-			}
-
-			driver->capture_handle = NULL;
-		}
-
-		if (driver->capture_handle) {
-			snd_pcm_nonblock (driver->capture_handle, 0);
+	if(capturing) {
+		err = alsa_driver_open(driver, SND_PCM_STREAM_CAPTURE);
+		if(err < 0) {
+			jack_error ("\n\nATTENTION: Opening of the capture device \"%s\" failed.",
+				    capture_alsa_device);
+			return NULL;
 		}
 	}
 
