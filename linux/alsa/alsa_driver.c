@@ -1331,7 +1331,7 @@ alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs)
 	return 0;
 }
 
-void
+static void
 alsa_driver_silence_untouched_channels (alsa_driver_t *driver,
 					jack_nframes_t nframes)
 {

@@ -210,8 +210,6 @@ alsa_driver_write_to_channel (alsa_driver_t *driver,
 	alsa_driver_mark_channel_done (driver, channel);
 }
 
-void  alsa_driver_silence_untouched_channels (alsa_driver_t *driver,
-					      jack_nframes_t nframes);
 int
 alsa_driver_reset_parameters (alsa_driver_t *driver,
 			      jack_nframes_t frames_per_cycle,
