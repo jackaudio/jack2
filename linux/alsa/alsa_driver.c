@@ -1147,14 +1147,15 @@ alsa_driver_start (alsa_driver_t *driver)
 		(driver->midi->start)(driver->midi);
 
 	if (driver->playback_handle) {
+		const jack_nframes_t silence_frames = driver->frames_per_cycle *
+		        driver->playback_nperiods;
 		/* fill playback buffer with zeroes, and mark
 		   all fragments as having data.
 		*/
 
 		pavail = snd_pcm_avail_update (driver->playback_handle);
 
-		if (pavail !=
-		    driver->frames_per_cycle * driver->playback_nperiods) {
+		if (pavail != silence_frames) {
 			jack_error ("ALSA: full buffer not available at start");
 			return -1;
 		}
@@ -1175,14 +1176,10 @@ alsa_driver_start (alsa_driver_t *driver)
 
 		for (chn = 0; chn < driver->playback_nchannels; chn++) {
 			alsa_driver_silence_on_channel (
-				driver, chn,
-				driver->user_nperiods
-				* driver->frames_per_cycle);
+				driver, chn, silence_frames);
 		}
 
-		snd_pcm_mmap_commit (driver->playback_handle, poffset,
-				     driver->user_nperiods
-				     * driver->frames_per_cycle);
+		snd_pcm_mmap_commit (driver->playback_handle, poffset, silence_frames);
 
 		if ((err = alsa_driver_stream_start (driver->playback_handle, SND_PCM_STREAM_PLAYBACK)) < 0) {
 			jack_error ("ALSA: could not start playback (%s)",
