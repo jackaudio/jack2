@@ -688,6 +688,17 @@ alsa_driver_configure_stream (alsa_driver_t *driver, char *device_name,
 	return 0;
 }
 
+static void
+alsa_driver_set_sample_bytes (alsa_driver_t *driver)
+{
+	driver->playback_sample_bytes =
+		snd_pcm_format_physical_width (driver->playback_sample_format)
+		/ 8;
+	driver->capture_sample_bytes =
+		snd_pcm_format_physical_width (driver->capture_sample_format)
+		/ 8;
+}
+
 static int
 alsa_driver_set_parameters (alsa_driver_t *driver,
 			    jack_nframes_t frames_per_cycle,
@@ -835,12 +846,7 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 		}
 	}
 
-	driver->playback_sample_bytes =
-		snd_pcm_format_physical_width (driver->playback_sample_format)
-		/ 8;
-	driver->capture_sample_bytes =
-		snd_pcm_format_physical_width (driver->capture_sample_format)
-		/ 8;
+	alsa_driver_set_sample_bytes(driver);
 
 	if (driver->playback_handle) {
 		switch (driver->playback_sample_format) {
