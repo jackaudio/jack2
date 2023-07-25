@@ -688,6 +688,28 @@ alsa_driver_configure_stream (alsa_driver_t *driver, char *device_name,
 	return 0;
 }
 
+static int
+alsa_driver_check_format (snd_pcm_format_t format)
+{
+	switch (format) {
+	case SND_PCM_FORMAT_FLOAT_LE:
+	case SND_PCM_FORMAT_S24_3LE:
+	case SND_PCM_FORMAT_S24_3BE:
+	case SND_PCM_FORMAT_S24_LE:
+	case SND_PCM_FORMAT_S24_BE:
+	case SND_PCM_FORMAT_S32_BE:
+	case SND_PCM_FORMAT_S16_BE:
+	case SND_PCM_FORMAT_S16_LE:
+	case SND_PCM_FORMAT_S32_LE:
+		break;
+	default:
+		jack_error ("format not supported %d", format);
+		return -1;
+	}
+
+	return 0;
+}
+
 static void
 alsa_driver_set_sample_bytes (alsa_driver_t *driver)
 {
@@ -849,42 +871,20 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 	alsa_driver_set_sample_bytes(driver);
 
 	if (driver->playback_handle) {
-		switch (driver->playback_sample_format) {
-        case SND_PCM_FORMAT_FLOAT_LE:
-		case SND_PCM_FORMAT_S32_LE:
-		case SND_PCM_FORMAT_S24_3LE:
-		case SND_PCM_FORMAT_S24_3BE:
-		case SND_PCM_FORMAT_S24_LE:
-		case SND_PCM_FORMAT_S24_BE:
-		case SND_PCM_FORMAT_S16_LE:
-		case SND_PCM_FORMAT_S32_BE:
-		case SND_PCM_FORMAT_S16_BE:
-			break;
-
-		default:
+		err = alsa_driver_check_format(driver->playback_sample_format);
+		if(err < 0) {
 			jack_error ("programming error: unhandled format "
 				    "type for playback");
-			exit (1);
+			return -1;
 		}
 	}
 
 	if (driver->capture_handle) {
-		switch (driver->capture_sample_format) {
-        case SND_PCM_FORMAT_FLOAT_LE:
-		case SND_PCM_FORMAT_S32_LE:
-		case SND_PCM_FORMAT_S24_3LE:
-		case SND_PCM_FORMAT_S24_3BE:
-		case SND_PCM_FORMAT_S24_LE:
-		case SND_PCM_FORMAT_S24_BE:
-		case SND_PCM_FORMAT_S16_LE:
-		case SND_PCM_FORMAT_S32_BE:
-		case SND_PCM_FORMAT_S16_BE:
-			break;
-
-		default:
+		err = alsa_driver_check_format(driver->capture_sample_format);
+		if(err < 0) {
 			jack_error ("programming error: unhandled format "
 				    "type for capture");
-			exit (1);
+			return -1;
 		}
 	}
 
