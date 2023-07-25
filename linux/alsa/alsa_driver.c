@@ -755,32 +755,34 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 		 rate, frames_per_cycle, (((float)frames_per_cycle / (float) rate) * 1000.0f), user_nperiods);
 
 	if (driver->capture_handle) {
-		if (alsa_driver_configure_stream (
-			    driver,
-			    driver->alsa_name_capture,
-			    "capture",
-			    driver->capture_handle,
-			    driver->capture_hw_params,
-			    driver->capture_sw_params,
-			    &driver->capture_nperiods,
-			    &driver->capture_nchannels,
-			    driver->capture_sample_bytes)) {
+		err = alsa_driver_configure_stream (
+		    driver,
+		    driver->alsa_name_capture,
+		    "capture",
+		    driver->capture_handle,
+		    driver->capture_hw_params,
+		    driver->capture_sw_params,
+		    &driver->capture_nperiods,
+		    &driver->capture_nchannels,
+		    driver->capture_sample_bytes);
+		if (err) {
 			jack_error ("ALSA: cannot configure capture channel");
 			return -1;
 		}
 	}
 
 	if (driver->playback_handle) {
-		if (alsa_driver_configure_stream (
-			    driver,
-			    driver->alsa_name_playback,
-			    "playback",
-			    driver->playback_handle,
-			    driver->playback_hw_params,
-			    driver->playback_sw_params,
-			    &driver->playback_nperiods,
-			    &driver->playback_nchannels,
-			    driver->playback_sample_bytes)) {
+		err = alsa_driver_configure_stream (
+		    driver,
+		    driver->alsa_name_playback,
+		    "playback",
+		    driver->playback_handle,
+		    driver->playback_hw_params,
+		    driver->playback_sw_params,
+		    &driver->playback_nperiods,
+		    &driver->playback_nchannels,
+		    driver->playback_sample_bytes);
+		if (err) {
 			jack_error ("ALSA: cannot configure playback channel");
 			return -1;
 		}
@@ -1230,7 +1232,8 @@ alsa_driver_stop (alsa_driver_t *driver)
     ClearOutput();
 
 	if (driver->playback_handle) {
-		if ((err = snd_pcm_drop (driver->playback_handle)) < 0) {
+		err = snd_pcm_drop (driver->playback_handle);
+		if (err < 0) {
 			jack_error ("ALSA: channel flush for playback "
 				    "failed (%s)", snd_strerror (err));
 			return -1;
@@ -1240,7 +1243,8 @@ alsa_driver_stop (alsa_driver_t *driver)
 	if (!driver->playback_handle
 	    || driver->capture_and_playback_not_synced) {
 		if (driver->capture_handle) {
-			if ((err = snd_pcm_drop (driver->capture_handle)) < 0) {
+			err = snd_pcm_drop (driver->capture_handle);
+			if (err < 0) {
 				jack_error ("ALSA: channel flush for "
 					    "capture failed (%s)",
 					    snd_strerror (err));
