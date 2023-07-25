@@ -91,6 +91,7 @@ struct midi_port_t {
 	char dev[16];
 	char name[64];
 	char device_name[64];
+	char subdev_name[64];
 
 	jack_port_t *jack;
 	snd_rawmidi_t *rawmidi;
@@ -415,6 +416,7 @@ void midi_port_init(const alsa_rawmidi_t *midi, midi_port_t *port, snd_rawmidi_i
 	name = snd_rawmidi_info_get_subdevice_name(info);
 	if (!strlen(name))
 		name = port->device_name;
+	strncpy(port->subdev_name, name, sizeof(port->subdev_name));
 	snprintf(port->name, sizeof(port->name), "%s %s %s", port->id.id[2] ? "out":"in", port->dev, name);
 
 	// replace all offending characters with '-'
@@ -438,8 +440,38 @@ inline int midi_port_open_jack(alsa_rawmidi_t *midi, midi_port_t *port, int type
 	port->jack = jack_port_register(midi->client, name, JACK_DEFAULT_MIDI_TYPE,
 		type | JackPortIsPhysical | JackPortIsTerminal, 0);
 
+	// Like in alsa_seqmidi.c, use the Jack1 port name as alias. -ag
+	const char* device_name = port->device_name;
+	const char* port_name = port->subdev_name;
+	const char *type_name = (type & JackPortIsOutput) ? "out" : "in";
+	if (strstr (port_name, device_name) == port_name) {
+	  /* entire client name is part of the port name so don't replicate it */
+	  snprintf (name,
+		    sizeof(name),
+		    "alsa_midi:%s (%s)",
+		    port_name,
+		    type_name);
+	} else {
+	  snprintf (name,
+		    sizeof(name),
+		    "alsa_midi:%s %s (%s)",
+		    device_name,
+		    port_name,
+		    type_name);
+	}
+
+	// replace all offending characters with ' '
+	char *c;
+	for (c = name; *c; ++c) {
+	  if (!isalnum(*c) && *c != ' ' && *c != '/' && *c != '_' && *c != ':' && *c != ',' && *c != '(' && *c != ')') {
+			*c = ' ';
+		}
+	}
+
 	if (port->jack) {
-		jack_port_set_alias(port->jack, alias);
+		// we just ignore the given alias argument, and use the Jack1
+		// port name from above instead -ag
+		jack_port_set_alias(port->jack, name);
 		jack_port_set_default_metadata(port->jack, port->device_name);
 	}
 
