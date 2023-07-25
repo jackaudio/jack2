@@ -95,6 +95,17 @@ jack_driver_nt_init (jack_driver_nt_t * driver)
     driver->nt_run_cycle = 0;
 }
 
+static int
+alsa_driver_prepare (snd_pcm_t *handle, int is_capture)
+{
+	int res = snd_pcm_prepare (handle);
+	if (res < 0) {
+		jack_error("error preparing: %s", snd_strerror(res));
+	}
+
+	return res;
+}
+
 static void
 alsa_driver_release_channel_dependent_memory (alsa_driver_t *driver)
 {
@@ -1078,7 +1089,7 @@ alsa_driver_start (alsa_driver_t *driver)
 	driver->poll_next = 0;
 
 	if (driver->playback_handle) {
-		if ((err = snd_pcm_prepare (driver->playback_handle)) < 0) {
+		if ((err = alsa_driver_prepare (driver->playback_handle, SND_PCM_STREAM_PLAYBACK)) < 0) {
 			jack_error ("ALSA: prepare error for playback on "
 				    "\"%s\" (%s)", driver->alsa_name_playback,
 				    snd_strerror(err));
@@ -1088,7 +1099,7 @@ alsa_driver_start (alsa_driver_t *driver)
 
 	if ((driver->capture_handle && driver->capture_and_playback_not_synced)
 	    || !driver->playback_handle) {
-		if ((err = snd_pcm_prepare (driver->capture_handle)) < 0) {
+		if ((err = alsa_driver_prepare (driver->capture_handle, SND_PCM_STREAM_CAPTURE)) < 0) {
 			jack_error ("ALSA: prepare error for capture on \"%s\""
 				    " (%s)", driver->alsa_name_capture,
 				    snd_strerror(err));
@@ -1295,13 +1306,13 @@ alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs)
 	{
 		jack_log("**** alsa_pcm: pcm in suspended state, resuming it" );
 		if (driver->capture_handle) {
-			if ((res = snd_pcm_prepare(driver->capture_handle))
+			if ((res = alsa_driver_prepare(driver->capture_handle, SND_PCM_STREAM_CAPTURE))
 			    < 0) {
 				jack_error("error preparing after suspend: %s", snd_strerror(res));
 			}
 		} 
 		if (driver->playback_handle) {
-			if ((res = snd_pcm_prepare(driver->playback_handle))
+			if ((res = alsa_driver_prepare(driver->playback_handle, SND_PCM_STREAM_PLAYBACK))
 			    < 0) {
 				jack_error("error preparing after suspend: %s", snd_strerror(res));
 			}
@@ -1319,13 +1330,15 @@ alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs)
 		jack_log("**** alsa_pcm: xrun of at least %.3f msecs",*delayed_usecs / 1000.0);
 		if (driver->capture_handle) {
 			jack_log("Repreparing capture");
-			if ((res = snd_pcm_prepare(driver->capture_handle)) < 0) {
+			if ((res = alsa_driver_prepare(driver->capture_handle,
+			                               SND_PCM_STREAM_CAPTURE)) < 0) {
 				jack_error("error preparing after xrun: %s", snd_strerror(res));
 			}
 		}
 		if (driver->playback_handle) {
 			jack_log("Repreparing playback");
-			if ((res = snd_pcm_prepare(driver->playback_handle)) < 0) {
+			if ((res = alsa_driver_prepare(driver->playback_handle,
+			                               SND_PCM_STREAM_PLAYBACK)) < 0) {
 				jack_error("error preparing after xrun: %s", snd_strerror(res));
 			}
 		}
