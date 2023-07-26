@@ -95,6 +95,17 @@ jack_driver_nt_init (jack_driver_nt_t * driver)
     driver->nt_run_cycle = 0;
 }
 
+static int
+alsa_driver_prepare (snd_pcm_t *handle, int is_capture)
+{
+	int res = snd_pcm_prepare (handle);
+	if (res < 0) {
+		jack_error("error preparing: %s", snd_strerror(res));
+	}
+
+	return res;
+}
+
 static void
 alsa_driver_release_channel_dependent_memory (alsa_driver_t *driver)
 {
@@ -318,10 +329,12 @@ alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 				{
 					case SND_PCM_FORMAT_S24_LE:
 					case SND_PCM_FORMAT_S24_BE:
-				driver->write_via_copy = driver->quirk_bswap?
-					sample_move_d32l24_sSs:
-					sample_move_d32l24_sS;
-				break;
+					{
+						driver->write_via_copy = driver->quirk_bswap?
+							sample_move_d32u24_sSs:
+							sample_move_d32u24_sS;
+						break;
+					}
 					case SND_PCM_FORMAT_S32_LE:
 					case SND_PCM_FORMAT_S32_BE:
 					{
@@ -382,10 +395,12 @@ alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 				{
 					case SND_PCM_FORMAT_S24_LE:
 					case SND_PCM_FORMAT_S24_BE:
-				driver->read_via_copy = driver->quirk_bswap?
-					sample_move_dS_s32l24s:
-					sample_move_dS_s32l24;
-				break;
+					{
+						driver->read_via_copy = driver->quirk_bswap?
+							sample_move_dS_s32u24s:
+							sample_move_dS_s32u24;
+						break;
+					}
 					case SND_PCM_FORMAT_S32_LE:
 					case SND_PCM_FORMAT_S32_BE:
 					{
@@ -685,6 +700,39 @@ alsa_driver_configure_stream (alsa_driver_t *driver, char *device_name,
 }
 
 static int
+alsa_driver_check_format (snd_pcm_format_t format)
+{
+	switch (format) {
+	case SND_PCM_FORMAT_FLOAT_LE:
+	case SND_PCM_FORMAT_S24_3LE:
+	case SND_PCM_FORMAT_S24_3BE:
+	case SND_PCM_FORMAT_S24_LE:
+	case SND_PCM_FORMAT_S24_BE:
+	case SND_PCM_FORMAT_S32_BE:
+	case SND_PCM_FORMAT_S16_BE:
+	case SND_PCM_FORMAT_S16_LE:
+	case SND_PCM_FORMAT_S32_LE:
+		break;
+	default:
+		jack_error ("format not supported %d", format);
+		return -1;
+	}
+
+	return 0;
+}
+
+static void
+alsa_driver_set_sample_bytes (alsa_driver_t *driver)
+{
+	driver->playback_sample_bytes =
+		snd_pcm_format_physical_width (driver->playback_sample_format)
+		/ 8;
+	driver->capture_sample_bytes =
+		snd_pcm_format_physical_width (driver->capture_sample_format)
+		/ 8;
+}
+
+static int
 alsa_driver_set_parameters (alsa_driver_t *driver,
 			    jack_nframes_t frames_per_cycle,
 			    jack_nframes_t user_nperiods,
@@ -707,32 +755,34 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 		 rate, frames_per_cycle, (((float)frames_per_cycle / (float) rate) * 1000.0f), user_nperiods);
 
 	if (driver->capture_handle) {
-		if (alsa_driver_configure_stream (
-			    driver,
-			    driver->alsa_name_capture,
-			    "capture",
-			    driver->capture_handle,
-			    driver->capture_hw_params,
-			    driver->capture_sw_params,
-			    &driver->capture_nperiods,
-			    &driver->capture_nchannels,
-			    driver->capture_sample_bytes)) {
+		err = alsa_driver_configure_stream (
+		    driver,
+		    driver->alsa_name_capture,
+		    "capture",
+		    driver->capture_handle,
+		    driver->capture_hw_params,
+		    driver->capture_sw_params,
+		    &driver->capture_nperiods,
+		    &driver->capture_nchannels,
+		    driver->capture_sample_bytes);
+		if (err) {
 			jack_error ("ALSA: cannot configure capture channel");
 			return -1;
 		}
 	}
 
 	if (driver->playback_handle) {
-		if (alsa_driver_configure_stream (
-			    driver,
-			    driver->alsa_name_playback,
-			    "playback",
-			    driver->playback_handle,
-			    driver->playback_hw_params,
-			    driver->playback_sw_params,
-			    &driver->playback_nperiods,
-			    &driver->playback_nchannels,
-			    driver->playback_sample_bytes)) {
+		err = alsa_driver_configure_stream (
+		    driver,
+		    driver->alsa_name_playback,
+		    "playback",
+		    driver->playback_handle,
+		    driver->playback_hw_params,
+		    driver->playback_sw_params,
+		    &driver->playback_nperiods,
+		    &driver->playback_nchannels,
+		    driver->playback_sample_bytes);
+		if (err) {
 			jack_error ("ALSA: cannot configure playback channel");
 			return -1;
 		}
@@ -831,50 +881,23 @@ alsa_driver_set_parameters (alsa_driver_t *driver,
 		}
 	}
 
-	driver->playback_sample_bytes =
-		snd_pcm_format_physical_width (driver->playback_sample_format)
-		/ 8;
-	driver->capture_sample_bytes =
-		snd_pcm_format_physical_width (driver->capture_sample_format)
-		/ 8;
+	alsa_driver_set_sample_bytes(driver);
 
 	if (driver->playback_handle) {
-		switch (driver->playback_sample_format) {
-        case SND_PCM_FORMAT_FLOAT_LE:
-		case SND_PCM_FORMAT_S32_LE:
-		case SND_PCM_FORMAT_S24_3LE:
-		case SND_PCM_FORMAT_S24_3BE:
-		case SND_PCM_FORMAT_S24_LE:
-		case SND_PCM_FORMAT_S24_BE:
-		case SND_PCM_FORMAT_S16_LE:
-		case SND_PCM_FORMAT_S32_BE:
-		case SND_PCM_FORMAT_S16_BE:
-			break;
-
-		default:
+		err = alsa_driver_check_format(driver->playback_sample_format);
+		if(err < 0) {
 			jack_error ("programming error: unhandled format "
 				    "type for playback");
-			exit (1);
+			return -1;
 		}
 	}
 
 	if (driver->capture_handle) {
-		switch (driver->capture_sample_format) {
-        case SND_PCM_FORMAT_FLOAT_LE:
-		case SND_PCM_FORMAT_S32_LE:
-		case SND_PCM_FORMAT_S24_3LE:
-		case SND_PCM_FORMAT_S24_3BE:
-		case SND_PCM_FORMAT_S24_LE:
-		case SND_PCM_FORMAT_S24_BE:
-		case SND_PCM_FORMAT_S16_LE:
-		case SND_PCM_FORMAT_S32_BE:
-		case SND_PCM_FORMAT_S16_BE:
-			break;
-
-		default:
+		err = alsa_driver_check_format(driver->capture_sample_format);
+		if(err < 0) {
 			jack_error ("programming error: unhandled format "
 				    "type for capture");
-			exit (1);
+			return -1;
 		}
 	}
 
@@ -1051,6 +1074,12 @@ alsa_driver_get_channel_addresses (alsa_driver_t *driver,
 	return 0;
 }
 
+static int
+alsa_driver_stream_start(snd_pcm_t *pcm, bool is_capture)
+{
+	return snd_pcm_start(pcm);
+}
+
 int
 alsa_driver_start (alsa_driver_t *driver)
 {
@@ -1062,7 +1091,7 @@ alsa_driver_start (alsa_driver_t *driver)
 	driver->poll_next = 0;
 
 	if (driver->playback_handle) {
-		if ((err = snd_pcm_prepare (driver->playback_handle)) < 0) {
+		if ((err = alsa_driver_prepare (driver->playback_handle, SND_PCM_STREAM_PLAYBACK)) < 0) {
 			jack_error ("ALSA: prepare error for playback on "
 				    "\"%s\" (%s)", driver->alsa_name_playback,
 				    snd_strerror(err));
@@ -1072,7 +1101,7 @@ alsa_driver_start (alsa_driver_t *driver)
 
 	if ((driver->capture_handle && driver->capture_and_playback_not_synced)
 	    || !driver->playback_handle) {
-		if ((err = snd_pcm_prepare (driver->capture_handle)) < 0) {
+		if ((err = alsa_driver_prepare (driver->capture_handle, SND_PCM_STREAM_CAPTURE)) < 0) {
 			jack_error ("ALSA: prepare error for capture on \"%s\""
 				    " (%s)", driver->alsa_name_capture,
 				    snd_strerror(err));
@@ -1120,14 +1149,15 @@ alsa_driver_start (alsa_driver_t *driver)
 		(driver->midi->start)(driver->midi);
 
 	if (driver->playback_handle) {
+		const jack_nframes_t silence_frames = driver->frames_per_cycle *
+		        driver->playback_nperiods;
 		/* fill playback buffer with zeroes, and mark
 		   all fragments as having data.
 		*/
 
 		pavail = snd_pcm_avail_update (driver->playback_handle);
 
-		if (pavail !=
-		    driver->frames_per_cycle * driver->playback_nperiods) {
+		if (pavail != silence_frames) {
 			jack_error ("ALSA: full buffer not available at start");
 			return -1;
 		}
@@ -1148,16 +1178,12 @@ alsa_driver_start (alsa_driver_t *driver)
 
 		for (chn = 0; chn < driver->playback_nchannels; chn++) {
 			alsa_driver_silence_on_channel (
-				driver, chn,
-				driver->user_nperiods
-				* driver->frames_per_cycle);
+				driver, chn, silence_frames);
 		}
 
-		snd_pcm_mmap_commit (driver->playback_handle, poffset,
-				     driver->user_nperiods
-				     * driver->frames_per_cycle);
+		snd_pcm_mmap_commit (driver->playback_handle, poffset, silence_frames);
 
-		if ((err = snd_pcm_start (driver->playback_handle)) < 0) {
+		if ((err = alsa_driver_stream_start (driver->playback_handle, SND_PCM_STREAM_PLAYBACK)) < 0) {
 			jack_error ("ALSA: could not start playback (%s)",
 				    snd_strerror (err));
 			return -1;
@@ -1166,7 +1192,7 @@ alsa_driver_start (alsa_driver_t *driver)
 
 	if ((driver->capture_handle && driver->capture_and_playback_not_synced)
 	    || !driver->playback_handle) {
-		if ((err = snd_pcm_start (driver->capture_handle)) < 0) {
+		if ((err = alsa_driver_stream_start (driver->capture_handle, SND_PCM_STREAM_CAPTURE)) < 0) {
 			jack_error ("ALSA: could not start capture (%s)",
 				    snd_strerror (err));
 			return -1;
@@ -1206,7 +1232,8 @@ alsa_driver_stop (alsa_driver_t *driver)
     ClearOutput();
 
 	if (driver->playback_handle) {
-		if ((err = snd_pcm_drop (driver->playback_handle)) < 0) {
+		err = snd_pcm_drop (driver->playback_handle);
+		if (err < 0) {
 			jack_error ("ALSA: channel flush for playback "
 				    "failed (%s)", snd_strerror (err));
 			return -1;
@@ -1216,7 +1243,8 @@ alsa_driver_stop (alsa_driver_t *driver)
 	if (!driver->playback_handle
 	    || driver->capture_and_playback_not_synced) {
 		if (driver->capture_handle) {
-			if ((err = snd_pcm_drop (driver->capture_handle)) < 0) {
+			err = snd_pcm_drop (driver->capture_handle);
+			if (err < 0) {
 				jack_error ("ALSA: channel flush for "
 					    "capture failed (%s)",
 					    snd_strerror (err));
@@ -1256,43 +1284,50 @@ alsa_driver_restart (alsa_driver_t *driver)
 }
 
 static int
-alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs)
+alsa_driver_get_status (alsa_driver_t *driver)
 {
-	snd_pcm_status_t *status;
 	int res;
+	snd_pcm_t *pcm_handle;
 
+	snd_pcm_status_t *status;
 	snd_pcm_status_alloca(&status);
 
 	if (driver->capture_handle) {
-		if ((res = snd_pcm_status(driver->capture_handle, status))
-		    < 0) {
-			jack_error("status error: %s", snd_strerror(res));
-		}
+		pcm_handle = driver->capture_handle;
 	} else {
-		if ((res = snd_pcm_status(driver->playback_handle, status))
-		    < 0) {
-			jack_error("status error: %s", snd_strerror(res));
-		}
+		pcm_handle = driver->playback_handle;
 	}
+	res = snd_pcm_status(pcm_handle, status);
+	if (res < 0) {
+		jack_error("status error: %s", snd_strerror(res));
+		return -1;
+	}
+	return snd_pcm_status_get_state(status);
+}
 
-	if (snd_pcm_status_get_state(status) == SND_PCM_STATE_SUSPENDED)
-	{
-		jack_log("**** alsa_pcm: pcm in suspended state, resuming it" );
+static int
+alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs)
+{
+	int status;
+	int res;
+
+	status = alsa_driver_get_status(driver);
+	if (status == SND_PCM_STATE_SUSPENDED) {
 		if (driver->capture_handle) {
-			if ((res = snd_pcm_prepare(driver->capture_handle))
+			if ((res = alsa_driver_prepare(driver->capture_handle, SND_PCM_STREAM_CAPTURE))
 			    < 0) {
 				jack_error("error preparing after suspend: %s", snd_strerror(res));
 			}
 		} 
 		if (driver->playback_handle) {
-			if ((res = snd_pcm_prepare(driver->playback_handle))
+			if ((res = alsa_driver_prepare(driver->playback_handle, SND_PCM_STREAM_PLAYBACK))
 			    < 0) {
 				jack_error("error preparing after suspend: %s", snd_strerror(res));
 			}
 		}
 	}
 
-	if (snd_pcm_status_get_state(status) == SND_PCM_STATE_XRUN
+	if (status == SND_PCM_STATE_XRUN
 	    && driver->process_count > XRUN_REPORT_DELAY) {
 		struct timeval now, diff, tstamp;
 		driver->xrun_count++;
@@ -1303,13 +1338,15 @@ alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs)
 		jack_log("**** alsa_pcm: xrun of at least %.3f msecs",*delayed_usecs / 1000.0);
 		if (driver->capture_handle) {
 			jack_log("Repreparing capture");
-			if ((res = snd_pcm_prepare(driver->capture_handle)) < 0) {
+			if ((res = alsa_driver_prepare(driver->capture_handle,
+			                               SND_PCM_STREAM_CAPTURE)) < 0) {
 				jack_error("error preparing after xrun: %s", snd_strerror(res));
 			}
 		}
 		if (driver->playback_handle) {
 			jack_log("Repreparing playback");
-			if ((res = snd_pcm_prepare(driver->playback_handle)) < 0) {
+			if ((res = alsa_driver_prepare(driver->playback_handle,
+			                               SND_PCM_STREAM_PLAYBACK)) < 0) {
 				jack_error("error preparing after xrun: %s", snd_strerror(res));
 			}
 		}
@@ -1321,7 +1358,7 @@ alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs)
 	return 0;
 }
 
-void
+static void
 alsa_driver_silence_untouched_channels (alsa_driver_t *driver,
 					jack_nframes_t nframes)
 {
@@ -1340,12 +1377,16 @@ alsa_driver_silence_untouched_channels (alsa_driver_t *driver,
 	}
 }
 
-void
-alsa_driver_set_clock_sync_status (alsa_driver_t *driver, channel_t chn,
-				   ClockSyncStatus status)
+static int
+alsa_driver_poll_descriptors(snd_pcm_t *pcm, struct pollfd *pfds, unsigned int space, bool is_capture)
 {
-	driver->clock_sync_data[chn] = status;
-	alsa_driver_clock_sync_notify (driver, chn, status);
+	return snd_pcm_poll_descriptors(pcm, pfds, space);
+}
+
+static snd_pcm_sframes_t
+alsa_driver_avail(alsa_driver_t *driver, snd_pcm_t *pcm, bool is_capture)
+{
+	return snd_pcm_avail_update(pcm);
 }
 
 static int under_gdb = FALSE;
@@ -1388,16 +1429,16 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 		nfds = 0;
 
 		if (need_playback) {
-			snd_pcm_poll_descriptors (driver->playback_handle,
+			alsa_driver_poll_descriptors (driver->playback_handle,
 						  &driver->pfd[0],
-						  driver->playback_nfds);
+						  driver->playback_nfds, SND_PCM_STREAM_PLAYBACK);
 			nfds += driver->playback_nfds;
 		}
 
 		if (need_capture) {
-			snd_pcm_poll_descriptors (driver->capture_handle,
+			alsa_driver_poll_descriptors (driver->capture_handle,
 						  &driver->pfd[nfds],
-						  driver->capture_nfds);
+						  driver->capture_nfds, SND_PCM_STREAM_CAPTURE);
 			ci = nfds;
 			nfds += driver->capture_nfds;
 		}
@@ -1574,8 +1615,8 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 	}
 
 	if (driver->capture_handle) {
-		if ((capture_avail = snd_pcm_avail_update (
-			     driver->capture_handle)) < 0) {
+		if ((capture_avail = alsa_driver_avail (driver,
+			     driver->capture_handle, SND_PCM_STREAM_CAPTURE)) < 0) {
 			if (capture_avail == -EPIPE) {
 				xrun_detected = TRUE;
 			} else {
@@ -1589,8 +1630,8 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 	}
 
 	if (driver->playback_handle) {
-		if ((playback_avail = snd_pcm_avail_update (
-			     driver->playback_handle)) < 0) {
+		if ((playback_avail = alsa_driver_avail (driver,
+			     driver->playback_handle, SND_PCM_STREAM_PLAYBACK)) < 0) {
 			if (playback_avail == -EPIPE) {
 				xrun_detected = TRUE;
 			} else {
@@ -2048,6 +2089,97 @@ discover_alsa_using_apps ()
         }
 }
 
+static int
+alsa_driver_open (alsa_driver_t *driver, bool is_capture)
+{
+	int err = 0;
+	char* current_apps;
+
+	if(is_capture) {
+		err = snd_pcm_open (&driver->capture_handle,
+				    driver->alsa_name_capture,
+				    SND_PCM_STREAM_CAPTURE,
+				    SND_PCM_NONBLOCK);
+	} else {
+		err = snd_pcm_open (&driver->playback_handle,
+				    driver->alsa_name_playback,
+				    SND_PCM_STREAM_PLAYBACK,
+				    SND_PCM_NONBLOCK);
+	}
+	if (err < 0) {
+		switch (errno) {
+		case EBUSY:
+#ifdef __ANDROID__
+			jack_error ("\n\nATTENTION: The device \"%s\" is "
+				    "already in use. Please stop the"
+				    " application using it and "
+				    "run JACK again",
+				    is_capture ? driver->alsa_name_capture : driver->alsa_name_playback);
+#else
+			current_apps = discover_alsa_using_apps ();
+			if (current_apps) {
+				jack_error ("\n\nATTENTION: The device \"%s\" is "
+					    "already in use. The following applications "
+					    " are using your soundcard(s) so you should "
+					    " check them and stop them as necessary before "
+					    " trying to start JACK again:\n\n%s",
+					    is_capture ? driver->alsa_name_capture : driver->alsa_name_playback,
+					    current_apps);
+				free (current_apps);
+			} else {
+				jack_error ("\n\nATTENTION: The device \"%s\" is "
+					    "already in use. Please stop the"
+					    " application using it and "
+					    "run JACK again",
+					    is_capture ? driver->alsa_name_capture : driver->alsa_name_playback);
+			}
+#endif
+			break;
+
+		case EPERM:
+			jack_error ("you do not have permission to open "
+				    "the audio device \"%s\" for playback",
+				    is_capture ? driver->alsa_name_capture : driver->alsa_name_playback);
+			break;
+
+		case EINVAL:
+			jack_error ("the state of handle or the mode is invalid "
+				"or invalid state change occured \"%s\" for playback",
+				is_capture ? driver->alsa_name_capture : driver->alsa_name_playback);
+			break;
+
+		case ENOENT:
+			jack_error ("device \"%s\"  does not exist for playback",
+				is_capture ? driver->alsa_name_capture : driver->alsa_name_playback);
+			break;
+
+		case ENOMEM:
+			jack_error ("Not enough memory available for allocation for \"%s\" for playback",
+				is_capture ? driver->alsa_name_capture : driver->alsa_name_playback);
+			break;
+
+		case SND_ERROR_INCOMPATIBLE_VERSION:
+			jack_error ("Version mismatch \"%s\" for playback",
+				is_capture ? driver->alsa_name_capture : driver->alsa_name_playback);
+			break;
+		}
+		alsa_driver_delete (driver);
+		if(is_capture) {
+			driver->capture_handle = NULL;
+		} else {
+			driver->playback_handle = NULL;
+		}
+	}
+
+	if (is_capture && driver->capture_handle) {
+		snd_pcm_nonblock (driver->capture_handle, 0);
+	} else if(!is_capture && driver->playback_handle) {
+		snd_pcm_nonblock (driver->playback_handle, 0);
+	}
+
+	return err;
+}
+
 jack_driver_t *
 alsa_driver_new (char *name, char *playback_alsa_device,
 		 char *capture_alsa_device,
@@ -2071,7 +2203,6 @@ alsa_driver_new (char *name, char *playback_alsa_device,
 		 )
 {
 	int err;
-    char* current_apps;
 	alsa_driver_t *driver;
 
 	jack_info ("creating alsa driver ... %s|%s|%" PRIu32 "|%" PRIu32
@@ -2162,105 +2293,19 @@ alsa_driver_new (char *name, char *playback_alsa_device,
 	alsa_driver_hw_specific (driver, hw_monitoring, hw_metering);
 
 	if (playing) {
-		if (snd_pcm_open (&driver->playback_handle,
-				  playback_alsa_device,
-				  SND_PCM_STREAM_PLAYBACK,
-				  SND_PCM_NONBLOCK) < 0) {
-			switch (errno) {
-			case EBUSY:
-#ifdef __ANDROID__
-                jack_error ("\n\nATTENTION: The playback device \"%s\" is "
-                            "already in use. Please stop the"
-                            " application using it and "
-                            "run JACK again",
-                            playback_alsa_device);
-#else
-                current_apps = discover_alsa_using_apps ();
-                if (current_apps) {
-                        jack_error ("\n\nATTENTION: The playback device \"%s\" is "
-                                    "already in use. The following applications "
-                                    " are using your soundcard(s) so you should "
-                                    " check them and stop them as necessary before "
-                                    " trying to start JACK again:\n\n%s",
-                                    playback_alsa_device,
-                                    current_apps);
-                        free (current_apps);
-                } else {
-                        jack_error ("\n\nATTENTION: The playback device \"%s\" is "
-                                    "already in use. Please stop the"
-                                    " application using it and "
-                                    "run JACK again",
-                                    playback_alsa_device);
-                }
-#endif
-                alsa_driver_delete (driver);
-				return NULL;
-
-			case EPERM:
-				jack_error ("you do not have permission to open "
-					    "the audio device \"%s\" for playback",
-					    playback_alsa_device);
-				alsa_driver_delete (driver);
-				return NULL;
-				break;
-			}
-
-			driver->playback_handle = NULL;
-		}
-
-		if (driver->playback_handle) {
-			snd_pcm_nonblock (driver->playback_handle, 0);
+		err = alsa_driver_open(driver, SND_PCM_STREAM_PLAYBACK);
+		if(err < 0) {
+			jack_error ("\n\nATTENTION: Opening of the playback device \"%s\" failed.",
+				    playback_alsa_device);
+			return NULL;
 		}
 	}
-
-	if (capturing) {
-		if (snd_pcm_open (&driver->capture_handle,
-				  capture_alsa_device,
-				  SND_PCM_STREAM_CAPTURE,
-				  SND_PCM_NONBLOCK) < 0) {
-			switch (errno) {
-			case EBUSY:
-#ifdef __ANDROID__
-                jack_error ("\n\nATTENTION: The capture (recording) device \"%s\" is "
-                            "already in use",
-                            capture_alsa_device);
-#else
-                current_apps = discover_alsa_using_apps ();
-                if (current_apps) {
-                        jack_error ("\n\nATTENTION: The capture device \"%s\" is "
-                                    "already in use. The following applications "
-                                    " are using your soundcard(s) so you should "
-                                    " check them and stop them as necessary before "
-                                    " trying to start JACK again:\n\n%s",
-                                    capture_alsa_device,
-                                    current_apps);
-                        free (current_apps);
-                } else {
-                        jack_error ("\n\nATTENTION: The capture (recording) device \"%s\" is "
-                                    "already in use. Please stop the"
-                                    " application using it and "
-                                    "run JACK again",
-                                    capture_alsa_device);
-                }
-				alsa_driver_delete (driver);
-				return NULL;
-#endif
-				break;
-
-			case EPERM:
-				jack_error ("you do not have permission to open "
-					    "the audio device \"%s\" for capture",
-					    capture_alsa_device);
-				alsa_driver_delete (driver);
-				return NULL;
-				break;
-			}
-
-			driver->capture_handle = NULL;
-		}
-
-		if (driver->capture_handle) {
-			snd_pcm_nonblock (driver->capture_handle, 0);
+	if(capturing) {
+		err = alsa_driver_open(driver, SND_PCM_STREAM_CAPTURE);
+		if(err < 0) {
+			jack_error ("\n\nATTENTION: Opening of the capture device \"%s\" failed.",
+				    capture_alsa_device);
+			return NULL;
 		}
 	}
 
@@ -2364,25 +2409,6 @@ alsa_driver_new (char *name, char *playback_alsa_device,
 }
 
 int
-alsa_driver_listen_for_clock_sync_status (alsa_driver_t *driver,
-					  ClockSyncListenerFunction func,
-					  void *arg)
-{
-	ClockSyncListener *csl;
-
-	csl = (ClockSyncListener *) malloc (sizeof (ClockSyncListener));
-	csl->function = func;
-	csl->arg = arg;
-	csl->id = driver->next_clock_sync_listener_id++;
-
-	pthread_mutex_lock (&driver->clock_sync_lock);
-	driver->clock_sync_listeners =
-		jack_slist_prepend (driver->clock_sync_listeners, csl);
-	pthread_mutex_unlock (&driver->clock_sync_lock);
-	return csl->id;
-}
-
-int
 alsa_driver_stop_listening_to_clock_sync_status (alsa_driver_t *driver,
 						 unsigned int which)
 
@@ -2404,22 +2430,6 @@ alsa_driver_stop_listening_to_clock_sync_status (alsa_driver_t *driver,
 	}
 	pthread_mutex_unlock (&driver->clock_sync_lock);
 	return ret;
-}
-
-void
-alsa_driver_clock_sync_notify (alsa_driver_t *driver, channel_t chn,
-			       ClockSyncStatus status)
-{
-	JSList *node;
-
-	pthread_mutex_lock (&driver->clock_sync_lock);
-	for (node = driver->clock_sync_listeners; node;
-	     node = jack_slist_next (node)) {
-		ClockSyncListener *csl = (ClockSyncListener *) node->data;
-		csl->function (chn, status, csl->arg);
-	}
-	pthread_mutex_unlock (&driver->clock_sync_lock);
-
 }
 
 /* DRIVER "PLUGIN" INTERFACE */
