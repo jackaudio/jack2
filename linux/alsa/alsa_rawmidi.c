@@ -441,6 +441,7 @@ inline int midi_port_open_jack(alsa_rawmidi_t *midi, midi_port_t *port, int type
 		type | JackPortIsPhysical | JackPortIsTerminal, 0);
 
 	// Like in alsa_seqmidi.c, use the Jack1 port name as alias. -ag
+	const char *prefix = "alsa_midi:";
 	const char* device_name = port->device_name;
 	const char* port_name = port->subdev_name;
 	const char *type_name = (type & JackPortIsOutput) ? "out" : "in";
@@ -448,13 +449,15 @@ inline int midi_port_open_jack(alsa_rawmidi_t *midi, midi_port_t *port, int type
 	  /* entire client name is part of the port name so don't replicate it */
 	  snprintf (name,
 		    sizeof(name),
-		    "alsa_midi:%s (%s)",
+		    "%s%s (%s)",
+		    prefix,
 		    port_name,
 		    type_name);
 	} else {
 	  snprintf (name,
 		    sizeof(name),
-		    "alsa_midi:%s %s (%s)",
+		    "%s%s %s (%s)",
+		    prefix,
 		    device_name,
 		    port_name,
 		    type_name);
@@ -472,7 +475,8 @@ inline int midi_port_open_jack(alsa_rawmidi_t *midi, midi_port_t *port, int type
 		// we just ignore the given alias argument, and use the Jack1
 		// port name from above instead -ag
 		jack_port_set_alias(port->jack, name);
-		jack_port_set_default_metadata(port->jack, port->device_name);
+		// Pretty-name metadata is the same as alias without the prefix.
+		jack_port_set_default_metadata (port->jack, name+strlen(prefix));
 	}
 
 	return port->jack == NULL;

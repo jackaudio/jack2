@@ -512,6 +512,7 @@ port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const s
 		goto failed;
 
 	// First alias: Jack1-compatible port name. -ag
+	const char *prefix = "alsa_midi:";
 	const char *device_name = snd_seq_client_info_get_name(client_info);
 	const char* port_name = snd_seq_port_info_get_name (info);
 	const char* type_name = jack_caps & JackPortIsOutput ? "out" : "in";
@@ -520,13 +521,15 @@ port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const s
 	  /* entire client name is part of the port name so don't replicate it */
 	  snprintf (port->name,
 		    sizeof(port->name),
-		    "alsa_midi:%s (%s)",
+		    "%s%s (%s)",
+		    prefix,
 		    port_name,
 		    type_name);
 	} else {
 	  snprintf (port->name,
 		    sizeof(port->name),
-		    "alsa_midi:%s %s (%s)",
+		    "%s%s %s (%s)",
+		    prefix,
 		    device_name,
 		    port_name,
 		    type_name);
@@ -540,7 +543,8 @@ port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const s
 	}
 
 	jack_port_set_alias (port->jack_port, port->name);
-	jack_port_set_default_metadata (port->jack_port, device_name);
+	// Pretty-name metadata is the same as first alias without the prefix.
+	jack_port_set_default_metadata (port->jack_port, port->name+strlen(prefix));
 
 	// Second alias: Strip the alsa_midi prefix, so that devices appear
 	// under their ALSA names. Use the ALSA port names (without device
@@ -562,7 +566,6 @@ port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const s
 	}
 
 	jack_port_set_alias (port->jack_port, port->name);
-	jack_port_set_default_metadata (port->jack_port, device_name);
 
 	if (type == PORT_INPUT)
 		err = alsa_connect_from(self, port->remote.client, port->remote.port);
