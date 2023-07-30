@@ -122,7 +122,7 @@ bool JackPosixProcessSync::TimedWait(long usec)
     time.tv_nsec = (next_date_usec % 1000000) * 1000;
 
     res = pthread_cond_timedwait(&fCond, &fMutex, &time);
-    if (res != 0) {
+    if (res != 0 && res != ETIMEDOUT) {
         jack_error("JackPosixProcessSync::TimedWait error usec = %ld err = %s", usec, strerror(res));
     } else {
         fOwner = pthread_self();
