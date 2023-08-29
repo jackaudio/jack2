@@ -74,7 +74,7 @@ class task_gen(object):
 		else:
 			self.bld = kw['bld']
 			self.env = self.bld.env.derive()
-			self.path = self.bld.path # emulate chdir when reading scripts
+			self.path = kw.get('path', self.bld.path) # by default, emulate chdir when reading scripts
 
 			# Provide a unique index per folder
 			# This is part of a measure to prevent output file name collisions
@@ -400,7 +400,7 @@ def feature(*k):
 	Decorator that registers a task generator method that will be executed when the
 	object attribute ``feature`` contains the corresponding key(s)::
 
-		from waflib.Task import feature
+		from waflib.TaskGen import feature
 		@feature('myfeature')
 		def myfunction(self):
 			print('that is my feature!')
@@ -631,12 +631,8 @@ def process_rule(self):
 			cls.scan = self.scan
 		elif has_deps:
 			def scan(self):
-				nodes = []
-				for x in self.generator.to_list(getattr(self.generator, 'deps', None)):
-					node = self.generator.path.find_resource(x)
-					if not node:
-						self.generator.bld.fatal('Could not find %r (was it declared?)' % x)
-					nodes.append(node)
+				deps = getattr(self.generator, 'deps', None)
+				nodes = self.generator.to_nodes(deps)
 				return [nodes, []]
 			cls.scan = scan
 
@@ -727,7 +723,7 @@ def sequence_order(self):
 	self.bld.prev = self
 
 
-re_m4 = re.compile('@(\w+)@', re.M)
+re_m4 = re.compile(r'@(\w+)@', re.M)
 
 class subst_pc(Task.Task):
 	"""
@@ -905,7 +901,7 @@ def process_subst(self):
 		# paranoid safety measure for the general case foo.in->foo.h with ambiguous dependencies
 		for xt in HEADER_EXTS:
 			if b.name.endswith(xt):
-				tsk.ext_in = tsk.ext_in + ['.h']
+				tsk.ext_out = tsk.ext_out + ['.h']
 				break
 
 		inst_to = getattr(self, 'install_path', None)

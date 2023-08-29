@@ -216,7 +216,10 @@ def parse_options():
 	ctx = Context.create_context('options')
 	ctx.execute()
 	if not Options.commands:
-		Options.commands.append(default_cmd)
+		if isinstance(default_cmd, list):
+			Options.commands.extend(default_cmd)
+		else:
+			Options.commands.append(default_cmd)
 	if Options.options.whelp:
 		ctx.parser.print_help()
 		sys.exit(0)
@@ -280,7 +283,7 @@ def distclean_dir(dirname):
 			pass
 
 	try:
-		shutil.rmtree('c4che')
+		shutil.rmtree(Build.CACHE_DIR)
 	except OSError:
 		pass
 
@@ -303,7 +306,7 @@ def distclean(ctx):
 
 	# remove a build folder, if any
 	cur = '.'
-	if ctx.options.no_lock_in_top:
+	if os.environ.get('NO_LOCK_IN_TOP') or ctx.options.no_lock_in_top:
 		cur = ctx.options.out
 
 	try:
@@ -329,7 +332,12 @@ def distclean(ctx):
 		else:
 			remove_and_log(env.out_dir, shutil.rmtree)
 
-		for k in (env.out_dir, env.top_dir, env.run_dir):
+		env_dirs = [env.out_dir]
+		if not (os.environ.get('NO_LOCK_IN_TOP') or ctx.options.no_lock_in_top):
+			env_dirs.append(env.top_dir)
+		if not (os.environ.get('NO_LOCK_IN_RUN') or ctx.options.no_lock_in_run):
+			env_dirs.append(env.run_dir)
+		for k in env_dirs:
 			p = os.path.join(k, Options.lockfile)
 			remove_and_log(p, os.remove)
 
@@ -380,7 +388,11 @@ class Dist(Context.Context):
 
 			for x in files:
 				archive_name = self.get_base_name() + '/' + x.path_from(self.base_path)
-				zip.write(x.abspath(), archive_name, zipfile.ZIP_DEFLATED)
+				if os.environ.get('SOURCE_DATE_EPOCH'):
+					# TODO: parse that timestamp
+					zip.writestr(zipfile.ZipInfo(archive_name), x.read(), zipfile.ZIP_DEFLATED)
+				else:
+					zip.write(x.abspath(), archive_name, zipfile.ZIP_DEFLATED)
 			zip.close()
 		else:
 			self.fatal('Valid algo types are tar.bz2, tar.gz, tar.xz or zip')
@@ -417,6 +429,8 @@ class Dist(Context.Context):
 		tinfo.gid   = 0
 		tinfo.uname = 'root'
 		tinfo.gname = 'root'
+		if os.environ.get('SOURCE_DATE_EPOCH'):
+			tinfo.mtime = int(os.environ.get('SOURCE_DATE_EPOCH'))
 
 		if os.path.isfile(p):
 			with open(p, 'rb') as f:
@@ -598,12 +612,15 @@ def autoconfigure(execute_method):
 			cmd = env.config_cmd or 'configure'
 			if Configure.autoconfig == 'clobber':
 				tmp = Options.options.__dict__
+				launch_dir_tmp = Context.launch_dir
 				if env.options:
 					Options.options.__dict__ = env.options
+				Context.launch_dir = env.launch_dir
 				try:
 					run_command(cmd)
 				finally:
 					Options.options.__dict__ = tmp
+					Context.launch_dir = launch_dir_tmp
 			else:
 				run_command(cmd)
 			run_command(self.cmd)
