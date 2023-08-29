@@ -75,13 +75,13 @@ re_lines = re.compile(
 	re.IGNORECASE | re.MULTILINE)
 """Match #include lines"""
 
-re_mac = re.compile("^[a-zA-Z_]\w*")
+re_mac = re.compile(r"^[a-zA-Z_]\w*")
 """Match macro definitions"""
 
 re_fun = re.compile('^[a-zA-Z_][a-zA-Z0-9_]*[(]')
 """Match macro functions"""
 
-re_pragma_once = re.compile('^\s*once\s*', re.IGNORECASE)
+re_pragma_once = re.compile(r'^\s*once\s*', re.IGNORECASE)
 """Match #pragma once statements"""
 
 re_nl = re.compile('\\\\\r*\n', re.MULTILINE)
@@ -660,7 +660,7 @@ def extract_macro(txt):
 			# empty define, assign an empty token
 			return (v, [[], [('T','')]])
 
-re_include = re.compile('^\s*(<(?:.*)>|"(?:.*)")')
+re_include = re.compile(r'^\s*(<(?:.*)>|"(?:.*)")')
 def extract_include(txt, defs):
 	"""
 	Process a line in the form::

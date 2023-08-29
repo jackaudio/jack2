@@ -27,6 +27,10 @@ def run():
 	[cmd, kwargs, cargs] = cPickle.loads(base64.b64decode(txt))
 	cargs = cargs or {}
 
+	if not 'close_fds' in kwargs:
+		# workers have no fds
+		kwargs['close_fds'] = False
+
 	ret = 1
 	out, err, ex, trace = (None, None, None, None)
 	try:

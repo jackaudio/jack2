@@ -36,18 +36,19 @@ from waflib import Utils
 from waflib.Logs import debug
 
 c_compiler = {
-'win32':  ['msvc', 'gcc', 'clang'],
-'cygwin': ['gcc'],
-'darwin': ['clang', 'gcc'],
-'aix':    ['xlc', 'gcc', 'clang'],
-'linux':  ['gcc', 'clang', 'icc'],
-'sunos':  ['suncc', 'gcc'],
-'irix':   ['gcc', 'irixcc'],
-'hpux':   ['gcc'],
-'osf1V':  ['gcc'],
-'gnu':    ['gcc', 'clang'],
-'java':   ['gcc', 'msvc', 'clang', 'icc'],
-'default':['clang', 'gcc'],
+'win32':       ['msvc', 'gcc', 'clang'],
+'cygwin':      ['gcc', 'clang'],
+'darwin':      ['clang', 'gcc'],
+'aix':         ['xlc', 'gcc', 'clang'],
+'linux':       ['gcc', 'clang', 'icc'],
+'sunos':       ['suncc', 'gcc'],
+'irix':        ['gcc', 'irixcc'],
+'hpux':        ['gcc'],
+'osf1V':       ['gcc'],
+'gnu':         ['gcc', 'clang'],
+'java':        ['gcc', 'msvc', 'clang', 'icc'],
+'gnukfreebsd': ['gcc', 'clang'],
+'default':     ['clang', 'gcc'],
 }
 """
 Dict mapping platform names to Waf tools finding specific C compilers::
