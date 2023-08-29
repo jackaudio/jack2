@@ -147,13 +147,13 @@ static port_type_t port_type[2] = {
 	{
 		SND_SEQ_PORT_CAP_SUBS_READ,
 		JackPortIsOutput,
-		"playback",
+		"capture",
 		do_jack_input
 	},
 	{
 		SND_SEQ_PORT_CAP_SUBS_WRITE,
 		JackPortIsInput,
-		"capture",
+		"playback",
 		do_jack_output
 	}
 };
@@ -493,15 +493,6 @@ port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const s
 	snd_seq_client_info_alloca (&client_info);
 	snd_seq_get_any_client_info (self->seq, addr.client, client_info);
 
-	const char *device_name = snd_seq_client_info_get_name(client_info);
-	snprintf(port->name, sizeof(port->name), "alsa_pcm:%s/midi_%s_%d",
-		 device_name, port_type[type].name, addr.port+1);
-
-	// replace all offending characters by -
-	for (c = port->name; *c; ++c)
-		if (!isalnum(*c) && *c != '/' && *c != '_' && *c != ':' && *c != '(' && *c != ')')
-			*c = '-';
-
 	jack_caps = port_type[type].jack_caps;
 
 	/* mark anything that looks like a hardware port as physical&terminal */
@@ -520,21 +511,61 @@ port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const s
 	if (!port->jack_port)
 		goto failed;
 
+	// First alias: Jack1-compatible port name. -ag
+	const char *prefix = "alsa_midi:";
+	const char *device_name = snd_seq_client_info_get_name(client_info);
+	const char* port_name = snd_seq_port_info_get_name (info);
+	const char* type_name = jack_caps & JackPortIsOutput ? "out" : "in";
+	// This code is pilfered from Jack1. -ag
+	if (strstr (port_name, device_name) == port_name) {
+	  /* entire client name is part of the port name so don't replicate it */
+	  snprintf (port->name,
+		    sizeof(port->name),
+		    "%s%s (%s)",
+		    prefix,
+		    port_name,
+		    type_name);
+	} else {
+	  snprintf (port->name,
+		    sizeof(port->name),
+		    "%s%s %s (%s)",
+		    prefix,
+		    device_name,
+		    port_name,
+		    type_name);
+	}
+
+	// replace all offending characters with ' '
+	for (c = port->name; *c; ++c) {
+		if (!isalnum(*c) && *c != ' ' && *c != '/' && *c != '_' && *c != ':' && *c != '(' && *c != ')') {
+			*c = ' ';
+		}
+	}
+
 	jack_port_set_alias (port->jack_port, port->name);
-	jack_port_set_default_metadata (port->jack_port, device_name);
+	// Pretty-name metadata is the same as first alias without the prefix.
+	jack_port_set_default_metadata (port->jack_port, port->name+strlen(prefix));
 
-	/* generate an alias */
+	// Second alias: Strip the alsa_midi prefix, so that devices appear
+	// under their ALSA names. Use the ALSA port names (without device
+	// prefix) for the individual ports. -ag
+	if (strstr (port_name, device_name) == port_name) {
+	  // remove the device name prefix from the port name if present
+	  port_name += strlen(device_name);
+	  while (*port_name == ' ' || *port_name == '\t')
+	    port_name++;
+	}
+	snprintf(port->name, sizeof(port->name), "%s:%s (%s)",
+		 device_name, port_name, port_type[type].name);
 
-	snprintf(port->name, sizeof(port->name), "%s:midi/%s_%d",
-		 snd_seq_client_info_get_name (client_info), port_type[type].name, addr.port+1);
-
-	// replace all offending characters by -
-	for (c = port->name; *c; ++c)
-		if (!isalnum(*c) && *c != '/' && *c != '_' && *c != ':' && *c != '(' && *c != ')')
-			*c = '-';
+	// replace all offending characters with ' '
+	for (c = port->name; *c; ++c) {
+		if (!isalnum(*c) && *c != ' ' && *c != '/' && *c != '_' && *c != ':' && *c != '(' && *c != ')') {
+			*c = ' ';
+		}
+	}
 
 	jack_port_set_alias (port->jack_port, port->name);
-	jack_port_set_default_metadata (port->jack_port, device_name);
 
 	if (type == PORT_INPUT)
 		err = alsa_connect_from(self, port->remote.client, port->remote.port);
