@@ -51,7 +51,6 @@ JackSynchro* GetSynchroTable()
     return (JackLibGlobals::fGlobals ? JackLibGlobals::fGlobals->fSynchroTable : 0);
 }
 
-// Used for client-side Metadata API (JackLibAPI.cpp)
 JackMetadata* GetMetadata()
 {
     if (JackLibGlobals::fGlobals) {
