@@ -33,8 +33,10 @@ namespace Jack {
     private:
 
         static void CALLBACK
-        HandleMidiInputEvent(HMIDIIN handle, UINT message, DWORD port,
-                             DWORD param1, DWORD param2);
+        HandleMidiInputEvent(HMIDIIN handle, UINT message,
+                             DWORD_PTR port,
+                             DWORD_PTR param1,
+                             DWORD_PTR param2);
 
         void
         EnqueueMessage(DWORD timestamp, size_t length, jack_midi_data_t *data);
@@ -43,7 +45,7 @@ namespace Jack {
         GetInErrorString(MMRESULT error, LPTSTR text);
 
         void
-        ProcessWinMME(UINT message, DWORD param1, DWORD param2);
+        ProcessWinMME(UINT message, DWORD_PTR param1, DWORD_PTR param2);
 
         void
         WriteInError(const char *jack_func, const char *mm_func,

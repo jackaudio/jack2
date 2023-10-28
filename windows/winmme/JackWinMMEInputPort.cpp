@@ -35,8 +35,9 @@ using Jack::JackWinMMEInputPort;
 
 void CALLBACK
 JackWinMMEInputPort::HandleMidiInputEvent(HMIDIIN handle, UINT message,
-                                          DWORD port, DWORD param1,
-                                          DWORD param2)
+                                          DWORD_PTR port,
+                                          DWORD_PTR param1,
+                                          DWORD_PTR param2)
 {
     ((JackWinMMEInputPort *) port)->ProcessWinMME(message, param1, param2);
 }
@@ -201,7 +202,7 @@ JackWinMMEInputPort::ProcessJack(JackMidiBuffer *port_buffer,
 }
 
 void
-JackWinMMEInputPort::ProcessWinMME(UINT message, DWORD param1, DWORD param2)
+JackWinMMEInputPort::ProcessWinMME(UINT message, DWORD_PTR param1, DWORD_PTR param2)
 {
     set_threaded_log_function();
     switch (message) {
