@@ -32,7 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 import os, sys, inspect
 
-VERSION="2.0.12"
+VERSION="2.0.26"
 REVISION="x"
 GIT="x"
 INSTALL="x"
@@ -142,6 +142,9 @@ def find_lib():
 	if name.endswith('waf-light'):
 		w = test(base)
 		if w: return w
+		for dir in sys.path:
+			if test(dir):
+				return dir
 		err('waf-light requires waflib -> export WAFDIR=/folder')
 
 	dirname = '%s-%s-%s' % (WAF, VERSION, REVISION)

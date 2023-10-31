@@ -11,7 +11,7 @@ The values put in :py:class:`ConfigSet` must be serializable (dicts, lists, stri
 
 import copy, re, os
 from waflib import Logs, Utils
-re_imp = re.compile('^(#)*?([^#=]*?)\ =\ (.*?)$', re.M)
+re_imp = re.compile(r'^(#)*?([^#=]*?)\ =\ (.*?)$', re.M)
 
 class ConfigSet(object):
 	"""

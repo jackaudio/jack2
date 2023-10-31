@@ -37,6 +37,8 @@ class PriorityTasks(object):
 		return len(self.lst)
 	def __iter__(self):
 		return iter(self.lst)
+	def __str__(self):
+		return 'PriorityTasks: [%s]' % '\n  '.join(str(x) for x in self.lst)
 	def clear(self):
 		self.lst = []
 	def append(self, task):
@@ -69,7 +71,7 @@ class Consumer(Utils.threading.Thread):
 		"""Task to execute"""
 		self.spawner = spawner
 		"""Coordinator object"""
-		self.setDaemon(1)
+		self.daemon = True
 		self.start()
 	def run(self):
 		"""
@@ -96,7 +98,7 @@ class Spawner(Utils.threading.Thread):
 		""":py:class:`waflib.Runner.Parallel` producer instance"""
 		self.sem = Utils.threading.Semaphore(master.numjobs)
 		"""Bounded semaphore that prevents spawning more than *n* concurrent consumers"""
-		self.setDaemon(1)
+		self.daemon = True
 		self.start()
 	def run(self):
 		"""
@@ -181,10 +183,12 @@ class Parallel(object):
 		The reverse dependency graph of dependencies obtained from Task.run_after
 		"""
 
-		self.spawner = Spawner(self)
+		self.spawner = None
 		"""
 		Coordinating daemon thread that spawns thread consumers
 		"""
+		if self.numjobs > 1:
+			self.spawner = Spawner(self)
 
 	def get_next_task(self):
 		"""
@@ -254,6 +258,8 @@ class Parallel(object):
 							self.outstanding.append(x)
 							break
 					else:
+						if self.stop or self.error:
+							break
 						raise Errors.WafError('Broken revdeps detected on %r' % self.incomplete)
 				else:
 					tasks = next(self.biter)
@@ -331,11 +337,16 @@ class Parallel(object):
 
 		if hasattr(tsk, 'semaphore'):
 			sem = tsk.semaphore
-			sem.release(tsk)
-			while sem.waiting and not sem.is_locked():
-				# take a frozen task, make it ready to run
-				x = sem.waiting.pop()
-				self._add_task(x)
+			try:
+				sem.release(tsk)
+			except KeyError:
+				# TODO
+				pass
+			else:
+				while sem.waiting and not sem.is_locked():
+					# take a frozen task, make it ready to run
+					x = sem.waiting.pop()
+					self._add_task(x)
 
 	def get_out(self):
 		"""

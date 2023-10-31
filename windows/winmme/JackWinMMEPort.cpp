@@ -31,7 +31,11 @@ using Jack::JackWinMMEPort;
 ///////////////////////////////////////////////////////////////////////////////
 
 JackWinMMEPort::JackWinMMEPort()
-{}
+{
+     memset(alias, 0, sizeof(alias));
+     memset(name, 0, sizeof(name));
+     memset(device_name, 0, sizeof(device_name));
+}
 
 JackWinMMEPort::~JackWinMMEPort()
 {}

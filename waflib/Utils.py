@@ -11,7 +11,7 @@ through Python versions 2.5 to 3.X and across different platforms (win32, linux,
 
 from __future__ import with_statement
 
-import atexit, os, sys, errno, inspect, re, datetime, platform, base64, signal, functools, time
+import atexit, os, sys, errno, inspect, re, datetime, platform, base64, signal, functools, time, shlex
 
 try:
 	import cPickle
@@ -49,10 +49,16 @@ try:
 	from hashlib import md5
 except ImportError:
 	try:
-		from md5 import md5
+		from hashlib import sha1 as md5
 	except ImportError:
-		# never fail to enable fixes from another module
+		# never fail to enable potential fixes from another module
 		pass
+else:
+	try:
+		md5().digest()
+	except ValueError:
+		# Fips? #2213
+		from hashlib import sha1 as md5
 
 try:
 	import threading
@@ -202,7 +208,7 @@ class lazy_generator(object):
 
 	next = __next__
 
-is_win32 = os.sep == '\\' or sys.platform == 'win32' # msys2
+is_win32 = os.sep == '\\' or sys.platform == 'win32' or os.name == 'nt' # msys2
 """
 Whether this system is a Windows series
 """
@@ -446,6 +452,8 @@ def console_encoding():
 			pass
 		else:
 			if codepage:
+				if 65001 == codepage and sys.version_info < (3, 3):
+					return 'utf-8'
 				return 'cp%d' % codepage
 	return sys.stdout.encoding or ('cp1252' if is_win32 else 'latin-1')
 
@@ -484,7 +492,9 @@ def split_path_msys(path):
 if sys.platform == 'cygwin':
 	split_path = split_path_cygwin
 elif is_win32:
-	if os.environ.get('MSYSTEM'):
+	# Consider this an MSYSTEM environment if $MSYSTEM is set and python
+	# reports is executable from a unix like path on a windows host.
+	if os.environ.get('MSYSTEM') and sys.executable.startswith('/'):
 		split_path = split_path_msys
 	else:
 		split_path = split_path_win32
@@ -569,10 +579,13 @@ def quote_define_name(s):
 	fu = fu.upper()
 	return fu
 
-re_sh = re.compile('\\s|\'|"')
-"""
-Regexp used for shell_escape below
-"""
+# shlex.quote didn't exist until python 3.3. Prior to that it was a non-documented
+# function in pipes.
+try:
+	shell_quote = shlex.quote
+except AttributeError:
+	import pipes
+	shell_quote = pipes.quote
 
 def shell_escape(cmd):
 	"""
@@ -581,7 +594,7 @@ def shell_escape(cmd):
 	"""
 	if isinstance(cmd, str):
 		return cmd
-	return ' '.join(repr(x) if re_sh.search(x) else x for x in cmd)
+	return ' '.join(shell_quote(x) for x in cmd)
 
 def h_list(lst):
 	"""
@@ -595,6 +608,12 @@ def h_list(lst):
 	:return: hash of the list
 	"""
 	return md5(repr(lst).encode()).digest()
+
+if sys.hexversion < 0x3000000:
+	def h_list_python2(lst):
+		return md5(repr(lst)).digest()
+	h_list_python2.__doc__ = h_list.__doc__
+	h_list = h_list_python2
 
 def h_fun(fun):
 	"""
@@ -615,7 +634,7 @@ def h_fun(fun):
 			#
 			# The sorting result outcome will be consistent because:
 			# 1. tuples are compared in order of their elements
-			# 2. optional argument names are unique
+			# 2. optional argument namess are unique
 			code.extend(sorted(fun.keywords.items()))
 			code.append(h_fun(fun.func))
 			fun.code = h_list(code)
@@ -730,7 +749,7 @@ def unversioned_sys_platform():
 	if s == 'cli' and os.name == 'nt':
 		# ironpython is only on windows as far as we know
 		return 'win32'
-	return re.split('\d+$', s)[0]
+	return re.split(r'\d+$', s)[0]
 
 def nada(*k, **kw):
 	"""
@@ -851,6 +870,19 @@ def lib64():
 				return '64'
 	return ''
 
+def loose_version(ver_str):
+	# private for the time being!
+	# see #2402
+	lst = re.split(r'([.]|\\d+|[a-zA-Z])', ver_str)
+	ver = []
+	for i, val in enumerate(lst):
+		try:
+			ver.append(int(val))
+		except ValueError:
+			if val != '.':
+				ver.append(val)
+	return ver
+
 def sane_path(p):
 	# private function for the time being!
 	return os.path.abspath(os.path.expanduser(p))
@@ -871,13 +903,13 @@ def get_process():
 	except IndexError:
 		filepath = os.path.dirname(os.path.abspath(__file__)) + os.sep + 'processor.py'
 		cmd = [sys.executable, '-c', readf(filepath)]
-		return subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, bufsize=0)
+		return subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, bufsize=0, close_fds=not is_win32)
 
 def run_prefork_process(cmd, kwargs, cargs):
 	"""
 	Delegates process execution to a pre-forked process instance.
 	"""
-	if not 'env' in kwargs:
+	if not kwargs.get('env'):
 		kwargs['env'] = dict(os.environ)
 	try:
 		obj = base64.b64encode(cPickle.dumps([cmd, kwargs, cargs]))

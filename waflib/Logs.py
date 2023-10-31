@@ -237,7 +237,10 @@ class formatter(logging.Formatter):
 		if rec.levelno >= logging.INFO:
 			# the goal of this is to format without the leading "Logs, hour" prefix
 			if rec.args:
-				return msg % rec.args
+				try:
+					return msg % rec.args
+				except UnicodeDecodeError:
+					return msg.encode('utf-8') % rec.args
 			return msg
 
 		rec.msg = msg
@@ -276,9 +279,9 @@ def error(*k, **kw):
 
 def warn(*k, **kw):
 	"""
-	Wraps logging.warn
+	Wraps logging.warning
 	"""
-	log.warn(*k, **kw)
+	log.warning(*k, **kw)
 
 def info(*k, **kw):
 	"""

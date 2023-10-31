@@ -13,22 +13,11 @@ from waflib.Configure import conf
 @conf
 def find_irixcc(conf):
 	v = conf.env
-	cc = None
-	if v.CC:
-		cc = v.CC
-	elif 'CC' in conf.environ:
-		cc = conf.environ['CC']
-	if not cc:
-		cc = conf.find_program('cc', var='CC')
-	if not cc:
-		conf.fatal('irixcc was not found')
-
+	cc = conf.find_program('cc', var='CC')
 	try:
 		conf.cmd_and_log(cc + ['-version'])
 	except Errors.WafError:
 		conf.fatal('%r -version could not be executed' % cc)
-
-	v.CC = cc
 	v.CC_NAME = 'irix'
 
 @conf
@@ -57,7 +46,6 @@ def irixcc_common_flags(conf):
 
 def configure(conf):
 	conf.find_irixcc()
-	conf.find_cpp()
 	conf.find_ar()
 	conf.irixcc_common_flags()
 	conf.cc_load_tools()

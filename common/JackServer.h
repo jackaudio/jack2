@@ -38,6 +38,7 @@ class JackDriverClientInterface;
 struct JackEngineControl;
 class JackLockedEngine;
 class JackLoadableInternalClient;
+class JackMetadata;
 
 /*!
 \brief The Jack server.
@@ -55,6 +56,7 @@ class SERVER_EXPORT JackServer
         JackLockedEngine* fEngine;
         JackEngineControl* fEngineControl;
         JackGraphManager* fGraphManager;
+        JackMetadata* fMetadata;
         JackServerChannel fRequestChannel;
         JackConnectionManager fConnectionState;
         JackSynchro fSynchroTable[CLIENT_NUM];
@@ -104,6 +106,7 @@ class SERVER_EXPORT JackServer
         JackEngineControl* GetEngineControl();
         JackSynchro* GetSynchroTable();
         JackGraphManager* GetGraphManager();
+        JackMetadata* GetMetadata();
 
 };
 

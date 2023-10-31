@@ -53,6 +53,11 @@ SERVER_EXPORT JackSynchro* GetSynchroTable()
     return JackServerGlobals::fInstance->GetSynchroTable();
 }
 
+SERVER_EXPORT JackMetadata* GetMetadata()
+{
+    return JackServerGlobals::fInstance->GetMetadata();
+}
+
 JackInternalClient::JackInternalClient(JackServer* server, JackSynchro* table): JackClient(table)
 {
     fChannel = new JackInternalClientChannel(server);
@@ -157,7 +162,7 @@ int JackLoadableInternalClient::Init(const char* so_name)
 
     fDescriptor = (JackDriverDescFunction)GetJackProc(fHandle, "jack_get_descriptor");
     if (fDescriptor == NULL) {
-        jack_info("No jack_get_descriptor entry-point for %s", so_name);
+        jack_log("No jack_get_descriptor entry-point for %s", so_name);
     }
     return 0;
 }

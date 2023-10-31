@@ -68,6 +68,8 @@ MACRO_TO_DEST_CPU = {
 '__s390__'    : 's390',
 '__sh__'      : 'sh',
 '__xtensa__'  : 'xtensa',
+'__e2k__'     : 'e2k',
+'__riscv'     : 'riscv',
 }
 
 @conf
@@ -86,6 +88,10 @@ def parse_flags(self, line, uselib_store, env=None, force_static=False, posix=No
 	:type uselib_store: string
 	:param env: config set or conf.env by default
 	:type env: :py:class:`waflib.ConfigSet.ConfigSet`
+	:param force_static: force usage of static libraries
+	:type force_static: bool default False
+	:param posix: usage of POSIX mode for shlex lexical analiysis library
+	:type posix: bool default True
 	"""
 
 	assert(isinstance(line, str))
@@ -102,6 +108,8 @@ def parse_flags(self, line, uselib_store, env=None, force_static=False, posix=No
 	lex.whitespace_split = True
 	lex.commenters = ''
 	lst = list(lex)
+
+	so_re = re.compile(r"\.so(?:\.[0-9]+)*$")
 
 	# append_unique is not always possible
 	# for example, apple flags may require both -arch i386 and -arch ppc
@@ -144,7 +152,7 @@ def parse_flags(self, line, uselib_store, env=None, force_static=False, posix=No
 		elif x.startswith('-std='):
 			prefix = 'CXXFLAGS' if '++' in x else 'CFLAGS'
 			app(prefix, x)
-		elif x.startswith('+') or x in ('-pthread', '-fPIC', '-fpic', '-fPIE', '-fpie'):
+		elif x.startswith('+') or x in ('-pthread', '-fPIC', '-fpic', '-fPIE', '-fpie', '-flto', '-fno-lto'):
 			app('CFLAGS', x)
 			app('CXXFLAGS', x)
 			app('LINKFLAGS', x)
@@ -180,7 +188,7 @@ def parse_flags(self, line, uselib_store, env=None, force_static=False, posix=No
 			app('CFLAGS', tmp)
 			app('CXXFLAGS', tmp)
 			app('LINKFLAGS', tmp)
-		elif x.endswith(('.a', '.so', '.dylib', '.lib')):
+		elif x.endswith(('.a', '.dylib', '.lib')) or so_re.search(x):
 			appu('LINKFLAGS', x) # not cool, #762
 		else:
 			self.to_log('Unhandled flag %r' % x)
@@ -246,13 +254,15 @@ def exec_cfg(self, kw):
 	* if modversion is given, then return the module version
 	* else, execute the *-config* program with the *args* and *variables* given, and set the flags on the *conf.env.FLAGS_name* variable
 
+	:param path: the **-config program to use**
+	:type path: list of string
 	:param atleast_pkgconfig_version: minimum pkg-config version to use (disable other tests)
 	:type atleast_pkgconfig_version: string
 	:param package: package name, for example *gtk+-2.0*
 	:type package: string
-	:param uselib_store: if the test is successful, define HAVE\_*name*. It is also used to define *conf.env.FLAGS_name* variables.
+	:param uselib_store: if the test is successful, define HAVE\\_*name*. It is also used to define *conf.env.FLAGS_name* variables.
 	:type uselib_store: string
-	:param modversion: if provided, return the version of the given module and define *name*\_VERSION
+	:param modversion: if provided, return the version of the given module and define *name*\\_VERSION
 	:type modversion: string
 	:param args: arguments to give to *package* when retrieving flags
 	:type args: list of string
@@ -260,6 +270,12 @@ def exec_cfg(self, kw):
 	:type variables: list of string
 	:param define_variable: additional variables to define (also in conf.env.PKG_CONFIG_DEFINES)
 	:type define_variable: dict(string: string)
+	:param pkg_config_path: paths where pkg-config should search for .pc config files (overrides env.PKG_CONFIG_PATH if exists)
+	:type pkg_config_path: string, list of directories separated by colon
+	:param force_static: force usage of static libraries
+	:type force_static: bool default False
+	:param posix: usage of POSIX mode for shlex lexical analiysis library
+	:type posix: bool default True
 	"""
 
 	path = Utils.to_list(kw['path'])
@@ -334,6 +350,7 @@ def check_cfg(self, *k, **kw):
 	"""
 	Checks for configuration flags using a **-config**-like program (pkg-config, sdl-config, etc).
 	This wraps internal calls to :py:func:`waflib.Tools.c_config.validate_cfg` and :py:func:`waflib.Tools.c_config.exec_cfg`
+	so check exec_cfg parameters descriptions for more details on kw passed
 
 	A few examples::
 
@@ -659,20 +676,21 @@ class test_exec(Task.Task):
 	"""
 	color = 'PINK'
 	def run(self):
+		cmd = [self.inputs[0].abspath()] + getattr(self.generator, 'test_args', [])
 		if getattr(self.generator, 'rpath', None):
 			if getattr(self.generator, 'define_ret', False):
-				self.generator.bld.retval = self.generator.bld.cmd_and_log([self.inputs[0].abspath()])
+				self.generator.bld.retval = self.generator.bld.cmd_and_log(cmd)
 			else:
-				self.generator.bld.retval = self.generator.bld.exec_command([self.inputs[0].abspath()])
+				self.generator.bld.retval = self.generator.bld.exec_command(cmd)
 		else:
 			env = self.env.env or {}
 			env.update(dict(os.environ))
 			for var in ('LD_LIBRARY_PATH', 'DYLD_LIBRARY_PATH', 'PATH'):
 				env[var] = self.inputs[0].parent.abspath() + os.path.pathsep + env.get(var, '')
 			if getattr(self.generator, 'define_ret', False):
-				self.generator.bld.retval = self.generator.bld.cmd_and_log([self.inputs[0].abspath()], env=env)
+				self.generator.bld.retval = self.generator.bld.cmd_and_log(cmd, env=env)
 			else:
-				self.generator.bld.retval = self.generator.bld.exec_command([self.inputs[0].abspath()], env=env)
+				self.generator.bld.retval = self.generator.bld.exec_command(cmd, env=env)
 
 @feature('test_exec')
 @after_method('apply_link')
@@ -1266,10 +1284,11 @@ def multicheck(self, *k, **kw):
 	tasks = []
 
 	id_to_task = {}
-	for dct in k:
+	for counter, dct in enumerate(k):
 		x = Task.classes['cfgtask'](bld=bld, env=None)
 		tasks.append(x)
 		x.args = dct
+		x.args['multicheck_counter'] = counter
 		x.bld = bld
 		x.conf = self
 		x.args = dct

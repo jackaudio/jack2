@@ -44,7 +44,7 @@ class opt_parser(optparse.OptionParser):
 	"""
 	def __init__(self, ctx, allow_unknown=False):
 		optparse.OptionParser.__init__(self, conflict_handler='resolve', add_help_option=False,
-			version='waf %s (%s)' % (Context.WAFVERSION, Context.WAFREVISION))
+			version='%s %s (%s)' % (Context.WAFNAME, Context.WAFVERSION, Context.WAFREVISION))
 		self.formatter.width = Logs.get_term_cols()
 		self.ctx = ctx
 		self.allow_unknown = allow_unknown
@@ -61,6 +61,21 @@ class opt_parser(optparse.OptionParser):
 					largs.append(e.opt_str)
 				else:
 					self.error(str(e))
+
+	def _process_long_opt(self, rargs, values):
+		# --custom-option=-ftxyz is interpreted as -f -t... see #2280
+		if self.allow_unknown:
+			back = [] + rargs
+			try:
+				optparse.OptionParser._process_long_opt(self, rargs, values)
+			except optparse.BadOptionError:
+				while rargs:
+					rargs.pop()
+				rargs.extend(back)
+				rargs.pop(0)
+				raise
+		else:
+			optparse.OptionParser._process_long_opt(self, rargs, values)
 
 	def print_usage(self, file=None):
 		return self.print_help(file)
@@ -96,11 +111,11 @@ class opt_parser(optparse.OptionParser):
 		lst.sort()
 		ret = '\n'.join(lst)
 
-		return '''waf [commands] [options]
+		return '''%s [commands] [options]
 
-Main commands (example: ./waf build -j4)
+Main commands (example: ./%s build -j4)
 %s
-''' % ret
+''' % (Context.WAFNAME, Context.WAFNAME, ret)
 
 
 class OptionsContext(Context.Context):
@@ -141,9 +156,9 @@ class OptionsContext(Context.Context):
 		gr.add_option('-o', '--out', action='store', default='', help='build dir for the project', dest='out')
 		gr.add_option('-t', '--top', action='store', default='', help='src dir for the project', dest='top')
 
-		gr.add_option('--no-lock-in-run', action='store_true', default='', help=optparse.SUPPRESS_HELP, dest='no_lock_in_run')
-		gr.add_option('--no-lock-in-out', action='store_true', default='', help=optparse.SUPPRESS_HELP, dest='no_lock_in_out')
-		gr.add_option('--no-lock-in-top', action='store_true', default='', help=optparse.SUPPRESS_HELP, dest='no_lock_in_top')
+		gr.add_option('--no-lock-in-run', action='store_true', default=os.environ.get('NO_LOCK_IN_RUN', ''), help=optparse.SUPPRESS_HELP, dest='no_lock_in_run')
+		gr.add_option('--no-lock-in-out', action='store_true', default=os.environ.get('NO_LOCK_IN_OUT', ''), help=optparse.SUPPRESS_HELP, dest='no_lock_in_out')
+		gr.add_option('--no-lock-in-top', action='store_true', default=os.environ.get('NO_LOCK_IN_TOP', ''), help=optparse.SUPPRESS_HELP, dest='no_lock_in_top')
 
 		default_prefix = getattr(Context.g_module, 'default_prefix', os.environ.get('PREFIX'))
 		if not default_prefix:
@@ -282,6 +297,8 @@ class OptionsContext(Context.Context):
 			elif arg != 'options':
 				commands.append(arg)
 
+		if options.jobs < 1:
+			options.jobs = 1
 		for name in 'top out destdir prefix bindir libdir'.split():
 			# those paths are usually expanded from Context.launch_dir
 			if getattr(options, name, None):
