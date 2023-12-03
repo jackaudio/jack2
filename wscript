@@ -151,7 +151,6 @@ def options(opt):
             'portaudio',
             help='Enable Portaudio driver',
             conf_dest='BUILD_DRIVER_PORTAUDIO')
-    portaudio.check(header_name='windows.h')  # only build portaudio on windows
     portaudio.check_cfg(
             package='portaudio-2.0 >= 19',
             uselib_store='PORTAUDIO',

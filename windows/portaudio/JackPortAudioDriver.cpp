@@ -29,10 +29,42 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <iostream>
 #include <assert.h>
 
+#ifdef __linux__
+#include "JackServerGlobals.h"
+#endif
+
 using namespace std;
 
 namespace Jack
 {
+
+#ifdef __linux__
+static volatile bool device_reservation_loop_running = false;
+
+static void* on_device_reservation_loop(void*)
+{
+    while (device_reservation_loop_running && JackServerGlobals::on_device_reservation_loop != NULL) {
+        JackServerGlobals::on_device_reservation_loop();
+        usleep(50*1000);
+    }
+
+    return NULL;
+}
+
+static bool name_to_num(const char* paDeviceName, char* entry)
+{
+    if (const char* sep = strstr(paDeviceName, " (hw:"))
+    {
+        sep += 5;
+        while (*sep != '\0' && *sep != ',' && *sep != ')')
+            *entry++ = *sep++;
+        *entry = '\0';
+        return true;
+    }
+
+    return false;
+}
+#endif
 
 int JackPortAudioDriver::Render(const void* inputBuffer, void* outputBuffer,
                                 unsigned long framesPerBuffer,
@@ -231,6 +263,27 @@ int JackPortAudioDriver::Open(jack_nframes_t buffer_size,
     fCaptureChannels = inchannels;
     fPlaybackChannels = outchannels;
 
+#ifdef __linux__
+    if (JackServerGlobals::on_device_acquire != NULL) {
+        char audio_name[32];
+        snprintf(audio_name, sizeof(audio_name), "Audio");
+
+        if (name_to_num(capture_driver_name, audio_name+5)) {
+            if (!JackServerGlobals::on_device_acquire(audio_name)) {
+                jack_error("Audio device %s cannot be acquired...", capture_driver_name);
+                return -1;
+            }
+        }
+
+        if (strcmp(capture_driver_name, playback_driver_name) && name_to_num(playback_driver_name, audio_name+5)) {
+            if (!JackServerGlobals::on_device_acquire(audio_name)) {
+                jack_error("Audio device %s cannot be acquired...", playback_driver_name);
+                return -1;
+            }
+        }
+    }
+#endif
+
     err = OpenStream(buffer_size);
     if (err != paNoError) {
         jack_error("Pa_OpenStream error = %s", Pa_GetErrorText(err));
@@ -241,6 +294,15 @@ int JackPortAudioDriver::Open(jack_nframes_t buffer_size,
     fEngineControl->fPeriod = fEngineControl->fPeriodUsecs * 1000;
     fEngineControl->fComputation = JackTools::ComputationMicroSec(fEngineControl->fBufferSize) * 1000;
     fEngineControl->fConstraint = fEngineControl->fPeriodUsecs * 1000;
+#endif
+
+#ifdef __linux__
+    if (JackServerGlobals::on_device_reservation_loop != NULL) {
+        device_reservation_loop_running = true;
+        if (JackPosixThread::StartImp(&fReservationLoopThread, 0, 0, on_device_reservation_loop, NULL) != 0) {
+            device_reservation_loop_running = false;
+        }
+    }
 #endif
 
     return 0;
@@ -260,6 +322,28 @@ int JackPortAudioDriver::Close()
     if (err != paNoError) {
         jack_error("Pa_CloseStream error = %s", Pa_GetErrorText(err));
     }
+
+#ifdef __linux__
+    if (device_reservation_loop_running) {
+        device_reservation_loop_running = false;
+        JackPosixThread::StopImp(fReservationLoopThread);
+    }
+
+    if (JackServerGlobals::on_device_release != NULL)
+    {
+        char audio_name[32];
+        snprintf(audio_name, sizeof(audio_name), "Audio");
+
+        if (name_to_num(fCaptureDriverName, audio_name+5)) {
+            JackServerGlobals::on_device_release(audio_name);
+        }
+
+        if (strcmp(fCaptureDriverName, fPlaybackDriverName) && name_to_num(fPlaybackDriverName, audio_name+5)) {
+            JackServerGlobals::on_device_release(audio_name);
+        }
+    }
+#endif
+
     delete fPaDevices;
     fPaDevices = NULL;
     return (err != paNoError) ? -1 : 0;
@@ -269,9 +353,9 @@ int JackPortAudioDriver::Attach()
 {
     if (JackAudioDriver::Attach() == 0) {
 
+#if defined(HAVE_ASIO)
         const char* alias;
 
-#if defined(HAVE_ASIO)
         if (fInputDevice != paNoDevice && fPaDevices->GetHostFromDevice(fInputDevice) == "ASIO") {
             for (int i = 0; i < fCaptureChannels; i++) {
                 if (PaAsio_GetInputChannelName(fInputDevice, i, &alias) == paNoError) {

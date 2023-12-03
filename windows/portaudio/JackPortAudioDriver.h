@@ -22,7 +22,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackAudioDriver.h"
 #include "JackPortAudioDevices.h"
+
+#ifdef _WIN32
 #include "JackMMCSS.h"
+#endif
 
 namespace Jack
 {
@@ -31,7 +34,11 @@ namespace Jack
 \brief The PortAudio driver.
 */
 
-class JackPortAudioDriver : public JackMMCSS, public JackAudioDriver
+class JackPortAudioDriver :
+#ifdef _WIN32
+    public JackMMCSS,
+#endif
+    public JackAudioDriver
 {
 
     private:
@@ -42,6 +49,7 @@ class JackPortAudioDriver : public JackMMCSS, public JackAudioDriver
         PaDeviceIndex fInputDevice;
         PaDeviceIndex fOutputDevice;
         PortAudioDevices* fPaDevices;
+        jack_native_thread_t fReservationLoopThread;
 
         static int Render(const void* inputBuffer, void* outputBuffer,
                           unsigned long framesPerBuffer,
@@ -55,8 +63,11 @@ class JackPortAudioDriver : public JackMMCSS, public JackAudioDriver
 
     public:
 
-        JackPortAudioDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table, PortAudioDevices* pa_devices)
-                : JackMMCSS(), JackAudioDriver(name, alias, engine, table), fStream(NULL), fInputBuffer(NULL), fOutputBuffer(NULL),
+        JackPortAudioDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table, PortAudioDevices* pa_devices) :
+#ifdef _WIN32
+                JackMMCSS(),
+#endif
+                JackAudioDriver(name, alias, engine, table), fStream(NULL), fInputBuffer(NULL), fOutputBuffer(NULL),
                 fInputDevice(paNoDevice), fOutputDevice(paNoDevice), fPaDevices(pa_devices)
         {}
 
