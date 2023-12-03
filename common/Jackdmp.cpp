@@ -38,7 +38,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackControlAPIAndroid.h"
 #endif
 
-#if defined(JACK_DBUS) && defined(__linux__)
+#if defined(HAVE_DBUS_1) && defined(__linux__)
 #include <cstdlib>
 #include <dbus/dbus.h>
 #include "audio_reserve.h"
@@ -325,7 +325,7 @@ int main(int argc, char** argv)
     bool notify_sent = false;
 
     copyright(stdout);
-#if defined(JACK_DBUS) && defined(__linux__)
+#if defined(HAVE_DBUS_1) && defined(__linux__)
     if (getenv("JACK_NO_AUDIO_RESERVATION"))
         server_ctl = jackctl_server_create2(NULL, NULL, NULL);
     else
