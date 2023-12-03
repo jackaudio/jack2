@@ -191,16 +191,25 @@ def options(opt):
     samplerate.check_cfg(
             package='samplerate',
             args='--cflags --libs')
+
     sd = opt.add_auto_option(
             'systemd',
             help='Use systemd notify')
     sd.check(header_name='systemd/sd-daemon.h')
     sd.check(lib='systemd')
+
     db = opt.add_auto_option(
             'db',
             help='Use Berkeley DB (metadata)')
     db.check(header_name='db.h')
     db.check(lib='db')
+
+    libdbus = opt.add_auto_option(
+            'libdbus',
+            help='Build with DBus device reservation')
+    libdbus.check_cfg(
+            package='dbus-1 >= 1.0.0',
+            args='--cflags --libs')
 
     # dbus options
     opt.recurse('dbus')
@@ -531,7 +540,7 @@ def init(ctx):
 
 
 def obj_add_includes(bld, obj):
-    if bld.env['BUILD_JACKDBUS']:
+    if bld.env['BUILD_JACKDBUS'] or bld.env['HAVE_DBUS_1']:
         obj.includes += ['dbus']
 
     if bld.env['IS_LINUX']:
@@ -561,7 +570,7 @@ def build_jackd(bld):
         use=['serverlib', 'SYSTEMD']
     )
 
-    if bld.env['BUILD_JACKDBUS']:
+    if bld.env['BUILD_JACKDBUS'] or bld.env['HAVE_DBUS_1']:
         jackd.source += ['dbus/audio_reserve.c', 'dbus/reserve.c']
         jackd.use += ['DBUS-1']
 
