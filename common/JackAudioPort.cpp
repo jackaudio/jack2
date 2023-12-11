@@ -64,14 +64,14 @@ static inline void MixAudioBuffer(jack_default_audio_sample_t* mixbuffer, jack_d
         buffer += 4;
         frames_group--;
     #else
-        register jack_default_audio_sample_t mixFloat1 = *mixbuffer;
-        register jack_default_audio_sample_t sourceFloat1 = *buffer;
-        register jack_default_audio_sample_t mixFloat2 = *(mixbuffer + 1);
-        register jack_default_audio_sample_t sourceFloat2 = *(buffer + 1);
-        register jack_default_audio_sample_t mixFloat3 = *(mixbuffer + 2);
-        register jack_default_audio_sample_t sourceFloat3 = *(buffer + 2);
-        register jack_default_audio_sample_t mixFloat4 = *(mixbuffer + 3);
-        register jack_default_audio_sample_t sourceFloat4 = *(buffer + 3);
+        jack_default_audio_sample_t mixFloat1 = *mixbuffer;
+        jack_default_audio_sample_t sourceFloat1 = *buffer;
+        jack_default_audio_sample_t mixFloat2 = *(mixbuffer + 1);
+        jack_default_audio_sample_t sourceFloat2 = *(buffer + 1);
+        jack_default_audio_sample_t mixFloat3 = *(mixbuffer + 2);
+        jack_default_audio_sample_t sourceFloat3 = *(buffer + 2);
+        jack_default_audio_sample_t mixFloat4 = *(mixbuffer + 3);
+        jack_default_audio_sample_t sourceFloat4 = *(buffer + 3);
 
         buffer += 4;
         frames_group--;
@@ -91,8 +91,8 @@ static inline void MixAudioBuffer(jack_default_audio_sample_t* mixbuffer, jack_d
     }
 
     while (frames > 0) {
-        register jack_default_audio_sample_t mixFloat1 = *mixbuffer;
-        register jack_default_audio_sample_t sourceFloat1 = *buffer;
+        jack_default_audio_sample_t mixFloat1 = *mixbuffer;
+        jack_default_audio_sample_t sourceFloat1 = *buffer;
         buffer++;
         frames--;
         mixFloat1 += sourceFloat1;
