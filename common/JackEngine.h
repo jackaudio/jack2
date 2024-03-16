@@ -113,8 +113,8 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         int ClientExternalClose(int refnum);
         int ClientInternalClose(int refnum, bool wait);
 
-        int ClientActivate(int refnum, bool is_real_time);
-        int ClientDeactivate(int refnum);
+        int ClientActivate(int refnum, bool is_real_time, bool wait);
+        int ClientDeactivate(int refnum, bool wait);
 
         void ClientKill(int refnum);
 

@@ -135,8 +135,12 @@ bool JackSocketClientChannel::Execute()
     JackClientNotification event;
     JackResult res;
 
-    if (event.Read(fNotificationSocket) < 0) {
-        jack_error("JackSocketClientChannel read fail");
+    int err = event.Read(fNotificationSocket);
+    if (err < 0) {
+        // aborted reading due to shutdown
+        if (err != JACK_REQUEST_ERR_ABORTED) {
+            jack_error("JackSocketClientChannel read fail");
+        }
         goto error;
     }
 

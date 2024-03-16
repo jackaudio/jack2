@@ -35,8 +35,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
-#define CheckRes(exp) { if ((exp) < 0) { jack_error("CheckRes error"); return -1; } }
-#define CheckSize() { CheckRes(trans->Read(&fSize, sizeof(int))); if (fSize != Size()) { jack_error("CheckSize error size = %d Size() = %d", fSize, Size()); return -1; } }
+#define CheckRes(exp) { \
+    int reserr = (exp); \
+    if (reserr < 0) { \
+        if (reserr != JACK_REQUEST_ERR_ABORTED) \
+            jack_error("CheckRes error"); \
+        return reserr; \
+    } \
+}
+
+#define CheckSize() { \
+    CheckRes(trans->Read(&fSize, sizeof(int))); \
+    if (fSize != Size()) { \
+        jack_error("CheckSize error size = %d Size() = %d", fSize, Size()); \
+        return -1; \
+    } \
+}
 
 /*!
 \brief Session API constants.

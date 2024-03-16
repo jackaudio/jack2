@@ -600,30 +600,30 @@ int main(int argc, char** argv)
         }
     }
 
-    // Start the server
-    if (!jackctl_server_start(server_ctl)) {
-        fprintf(stderr, "Failed to start server\n");
-        goto close_server;
-    }
-
     // Internal clients
     for (it = internals_list.begin(); it != internals_list.end(); it++) {
         jackctl_internal_t * internal_driver_ctl = jackctl_server_get_internal(server_ctl, *it);
         if (internal_driver_ctl == NULL) {
             fprintf(stderr, "Unknown internal \"%s\"\n", *it);
-            goto stop_server;
+            goto close_server;
         }
         if (!jackctl_server_load_internal(server_ctl, internal_driver_ctl)) {
             fprintf(stderr, "Internal client \"%s\" cannot be loaded\n", *it);
-            goto stop_server;
+            goto close_server;
         }
     }
 
     if (internal_session_file != NULL) {
         if (!jackctl_server_load_session_file(server_ctl, internal_session_file)) {
             fprintf(stderr, "Internal session file %s cannot be loaded!\n", internal_session_file);
-            goto stop_server;
+            goto close_server;
         }
+    }
+
+    // Start the server
+    if (!jackctl_server_start(server_ctl)) {
+        fprintf(stderr, "Failed to start server\n");
+        goto close_server;
     }
 
     notify_server_start(server_name);

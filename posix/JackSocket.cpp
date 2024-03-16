@@ -195,12 +195,16 @@ int JackClientSocket::Read(void* data, int len)
 
     if ((res = read(fSocket, data, len)) != len) {
         if (errno == EWOULDBLOCK || errno == EAGAIN) {
-            jack_error("JackClientSocket::Read time out");
-            return 0;  // For a non blocking socket, a read failure is not considered as an error
+            jack_log("JackClientSocket::Read time out");
+            // For a non blocking socket, a read failure is not considered as an error
+            return 0;
         } else if (res != 0) {
-            jack_error("Cannot read socket fd = %d err = %s", fSocket, strerror(errno));
+            jack_error("Cannot read socket fd = %d res = %d err = %s", fSocket, res, strerror(errno));
             //return 0;
             return -1;
+        } else if (errno == 0) {
+            // aborted reading due to shutdown
+            return JACK_REQUEST_ERR_ABORTED;
         } else {
             jack_error("Cannot read socket fd = %d err = %s", fSocket, strerror(errno));
             return -1;

@@ -50,20 +50,20 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
         }
         void ClientOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, int* result)
         {
-            *result = fEngine->ClientInternalOpen(name, ref, shared_engine, shared_manager, client, true);
+            *result = fEngine->ClientInternalOpen(name, ref, shared_engine, shared_manager, client, fServer->IsRunning());
         }
         void ClientClose(int refnum, int* result)
         {
-            *result = fEngine->ClientInternalClose(refnum, true);
+            *result = fEngine->ClientInternalClose(refnum, fServer->IsRunning());
         }
 
         void ClientActivate(int refnum, int is_real_time, int* result)
         {
-            *result = fEngine->ClientActivate(refnum, is_real_time);
+            *result = fEngine->ClientActivate(refnum, is_real_time, fServer->IsRunning());
         }
         void ClientDeactivate(int refnum, int* result)
         {
-            *result = fEngine->ClientDeactivate(refnum);
+            *result = fEngine->ClientDeactivate(refnum, fServer->IsRunning());
         }
 
         void PortRegister(int refnum, const char* name, const char* type, unsigned int flags, unsigned int buffer_size, unsigned int* port_index, int* result)

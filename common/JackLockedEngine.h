@@ -146,18 +146,18 @@ class SERVER_EXPORT JackLockedEngine
             CATCH_CLOSE_EXCEPTION_RETURN
         }
 
-        int ClientActivate(int refnum, bool is_real_time)
+        int ClientActivate(int refnum, bool is_real_time, bool wait)
         {
             TRY_CALL
             JackLock lock(&fEngine);
-            return (fEngine.CheckClient(refnum)) ? fEngine.ClientActivate(refnum, is_real_time) : -1;
+            return (fEngine.CheckClient(refnum)) ? fEngine.ClientActivate(refnum, is_real_time, wait) : -1;
             CATCH_EXCEPTION_RETURN
         }
-        int ClientDeactivate(int refnum)
+        int ClientDeactivate(int refnum, bool wait)
         {
             TRY_CALL
             JackLock lock(&fEngine);
-            return (fEngine.CheckClient(refnum)) ? fEngine.ClientDeactivate(refnum) : -1;
+            return (fEngine.CheckClient(refnum)) ? fEngine.ClientDeactivate(refnum, wait) : -1;
             CATCH_EXCEPTION_RETURN
         }
         void ClientKill(int refnum)

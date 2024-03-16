@@ -789,7 +789,7 @@ int JackEngine::ClientCloseAux(int refnum, bool wait)
     return 0;
 }
 
-int JackEngine::ClientActivate(int refnum, bool is_real_time)
+int JackEngine::ClientActivate(int refnum, bool is_real_time, bool wait)
 {
     JackClientInterface* client = fClientTable[refnum];
     jack_log("JackEngine::ClientActivate ref = %ld name = %s", refnum, client->GetClientControl()->fName);
@@ -799,7 +799,7 @@ int JackEngine::ClientActivate(int refnum, bool is_real_time)
     }
 
     // Wait for graph state change to be effective
-    if (!fSignal.LockedTimedWait(fEngineControl->fTimeOutUsecs * 10)) {
+    if (wait && !fSignal.LockedTimedWait(fEngineControl->fTimeOutUsecs * 10)) {
         jack_error("JackEngine::ClientActivate wait error ref = %ld name = %s", refnum, client->GetClientControl()->fName);
         return -1;
     } else {
@@ -824,7 +824,7 @@ int JackEngine::ClientActivate(int refnum, bool is_real_time)
 }
 
 // May be called without client
-int JackEngine::ClientDeactivate(int refnum)
+int JackEngine::ClientDeactivate(int refnum, bool wait)
 {
     JackClientInterface* client = fClientTable[refnum];
     jack_log("JackEngine::ClientDeactivate ref = %ld name = %s", refnum, client->GetClientControl()->fName);
@@ -854,7 +854,7 @@ int JackEngine::ClientDeactivate(int refnum)
     fLastSwitchUsecs = 0; // Force switch to occur next cycle, even when called with "dead" clients
 
     // Wait for graph state change to be effective
-    if (!fSignal.LockedTimedWait(fEngineControl->fTimeOutUsecs * 10)) {
+    if (wait && !fSignal.LockedTimedWait(fEngineControl->fTimeOutUsecs * 10)) {
         jack_error("JackEngine::ClientDeactivate wait error ref = %ld name = %s", refnum, client->GetClientControl()->fName);
         return -1;
     } else {
@@ -865,7 +865,7 @@ int JackEngine::ClientDeactivate(int refnum)
 void JackEngine::ClientKill(int refnum)
 {
     jack_log("JackEngine::ClientKill ref = %ld", refnum);
-    if (ClientDeactivate(refnum) < 0) {
+    if (ClientDeactivate(refnum, true) < 0) {
         jack_error("JackEngine::ClientKill ref = %ld cannot be removed from the graph !!", refnum);
     }
     if (ClientExternalClose(refnum) < 0) {

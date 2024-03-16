@@ -81,6 +81,8 @@
 
 #define JACK_SERVER_FAILURE "JACK server has been closed"
 
+#define JACK_REQUEST_ERR_ABORTED -13
+
 #define NO_PORT   0xFFFE
 
 #define EMPTY   0xFFFD

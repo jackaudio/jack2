@@ -92,7 +92,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackResult res;
             jack_log("JackRequest::ActivateClient");
             CheckRead(req, socket);
-            res.fResult = fServer->GetEngine()->ClientActivate(req.fRefNum, req.fIsRealTime);
+            res.fResult = fServer->GetEngine()->ClientActivate(req.fRefNum, req.fIsRealTime, fServer->IsRunning());
             CheckWriteRefNum("JackRequest::ActivateClient", socket);
             break;
         }
@@ -102,7 +102,7 @@ int JackRequestDecoder::HandleRequest(detail::JackChannelTransactionInterface* s
             JackDeactivateRequest req;
             JackResult res;
             CheckRead(req, socket);
-            res.fResult = fServer->GetEngine()->ClientDeactivate(req.fRefNum);
+            res.fResult = fServer->GetEngine()->ClientDeactivate(req.fRefNum, fServer->IsRunning());
             CheckWriteRefNum("JackRequest::DeactivateClient", socket);
             break;
         }
