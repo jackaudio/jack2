@@ -32,6 +32,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //#define IIO_SAFETY_FACTOR 2./3. ///< The default safety factor, allow consumption of this fraction of the available DMA buffer before we don't allow the driver to continue.
 #define IIO_SAFETY_FACTOR 1. ///< The default safety factor, allow consumption of this fraction of the available DMA buffer before we don't allow the driver to continue.
 
+using namespace std;
+
 namespace Jack {
 
 int JackIIODriver::Open(jack_nframes_t buffer_size, jack_nframes_t samplerate, bool capturing, bool playing, int inchannels, int outchannels, bool monitor, const char* capture_driver_name, const char* playback_driver_name, jack_nframes_t capture_latency, jack_nframes_t playback_latency) {
