@@ -430,6 +430,7 @@ int JackAlsaDriver::Read()
     int wait_status;
     jack_nframes_t nframes;
     fDelayedUsecs = 0.f;
+    int retry_cnt = 0;
 
 retry:
 
@@ -444,6 +445,11 @@ retry:
          */
         jack_log("ALSA XRun wait_status = %d", wait_status);
         NotifyXRun(fBeginDateUst, fDelayedUsecs);
+        if(retry_cnt >= MAX_RECOVERY_RETRY) {
+            jack_error("ALSA Device not recovering, tried Xrun recovery for %d times", retry_cnt);
+            return -1;
+        }
+        retry_cnt++;
         goto retry; /* recoverable error*/
     }
 
@@ -949,10 +955,14 @@ void SetTime(jack_time_t time)
     g_alsa_driver->SetTimetAux(time);
 }
 
-int Restart()
+int Restart(int delay)
 {
     int res;
+
     if ((res = g_alsa_driver->Stop()) == 0) {
+        if(delay > 0) {
+            usleep(delay * MS_TO_US);
+        }
         res = g_alsa_driver->Start();
     }
     return res;
