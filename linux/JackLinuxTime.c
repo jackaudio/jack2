@@ -122,7 +122,12 @@ static jack_time_t jack_get_microseconds_from_hpet (void)
 
 #endif /* HPET_SUPPORT */
 
-#define HAVE_CLOCK_GETTIME 1
+/* One should avoid gettimeofday for purposes of timestamping,
+ * cause it is possible to mis calculate time between timestamps
+ * if something/user changes system date. 
+ * -- lja
+ */
+/* #define HAVE_CLOCK_GETTIME 1 */
 
 #ifndef HAVE_CLOCK_GETTIME
 
