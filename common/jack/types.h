@@ -468,13 +468,14 @@ enum JackPortFlags {
 
     /**
      * if JackPortIsInput is set, then the port can receive
-     * data.
+     * data from output ports. The creator of this port can
+     * read from it.
      */
     JackPortIsInput = 0x1,
 
     /**
-     * if JackPortIsOutput is set, then data can be read from
-     * the port.
+     * if JackPortIsOutput is set, then data can be forwarded to
+     * input ports. The creator of this port can write to it.
      */
     JackPortIsOutput = 0x2,
 
