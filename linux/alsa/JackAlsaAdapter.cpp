@@ -86,6 +86,9 @@ namespace Jack
                     fRingbufferCurSize = param->value.ui;
                     fAdaptative = false;
                     break;
+                case 'R':
+                    fResampleRatioPerChannel = true;
+                    break;
             }
         }
 
@@ -228,6 +231,9 @@ extern "C"
         value.ui = 32768;
         jack_driver_descriptor_add_parameter(desc, &filler, "ring-buffer", 'g', JackDriverParamUInt, &value, NULL, "Fixed ringbuffer size", "Fixed ringbuffer size (if not set => automatic adaptative)");
 
+        value.i  = false;
+        jack_driver_descriptor_add_parameter(desc, &filler, "multi-ratios", 'R', JackDriverParamBool, &value, NULL, "Calculate resample ratio per channel"
+                   , "Calculate resample ratio per channel in case of repeated ringbuffer errors because of clock drift between the channels from the same device.");
         return desc;
     }
 

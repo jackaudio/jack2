@@ -995,9 +995,11 @@ struct JackNetAdapter : public JackAudioAdapterInterface {
 
         if (fCaptureChannels > 0) {
             fCaptureRingBuffer = new JackResampler*[fCaptureChannels];
+            fPIControllerCapture = new JackPIController*[fCaptureChannels];
         }
         if (fPlaybackChannels > 0) {
             fPlaybackRingBuffer = new JackResampler*[fPlaybackChannels];
+            fPIControllerPlayback = new JackPIController*[fPlaybackChannels];
         }
 
         if (fAdaptative) {
@@ -1013,10 +1015,12 @@ struct JackNetAdapter : public JackAudioAdapterInterface {
         for (int i = 0; i < fCaptureChannels; i++ ) {
             fCaptureRingBuffer[i] = new JackResampler();
             fCaptureRingBuffer[i]->Reset(fRingbufferCurSize);
+            fPIControllerCapture[i] = new JackPIController(double(fHostSampleRate) / double(fAdaptedSampleRate));
         }
         for (int i = 0; i < fPlaybackChannels; i++ ) {
             fPlaybackRingBuffer[i] = new JackResampler();
             fPlaybackRingBuffer[i]->Reset(fRingbufferCurSize);
+            fPIControllerPlayback[i] = new JackPIController(double(fHostSampleRate) / double(fAdaptedSampleRate));
         }
 
         if (fCaptureChannels > 0) {
@@ -1036,9 +1040,11 @@ struct JackNetAdapter : public JackAudioAdapterInterface {
     {
         for (int i = 0; i < fCaptureChannels; i++ ) {
             fCaptureRingBuffer[i]->Reset(fRingbufferCurSize);
+            fPIControllerCapture[i]->Reset();
         }
         for (int i = 0; i < fPlaybackChannels; i++ ) {
             fPlaybackRingBuffer[i]->Reset(fRingbufferCurSize);
+            fPIControllerPlayback[i]->Reset();
         }
     }
 

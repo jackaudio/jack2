@@ -65,9 +65,13 @@ class JackRingBuffer
         virtual unsigned int ReadSpace();
         virtual unsigned int WriteSpace();
 
-        unsigned int GetError()
+        unsigned int GetReadBalance()
         {
             return (jack_ringbuffer_read_space(fRingBuffer) / sizeof(float)) - (fRingBufferSize / 2);
+        }
+        unsigned int GetWriteBalance()
+        {
+            return (jack_ringbuffer_write_space(fRingBuffer) / sizeof(float)) - (fRingBufferSize / 2);
         }
 
 };

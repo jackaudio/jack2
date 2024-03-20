@@ -220,102 +220,44 @@ namespace Jack
 #endif
 
     /*
-    Torben Hohn PI controller from JACK1
+    Torben Hohn PI controler from JACK1
     */
 
-    struct JackPIControler {
+    struct JackPIController {
 
-        double resample_mean;
         double static_resample_factor;
-
-        double* offset_array;
-        double* window_array;
-        int offset_differential_index;
-
         double offset_integral;
-
         double catch_factor;
         double catch_factor2;
-        double pclamp;
-        double controlquant;
-        int smooth_size;
 
         double hann(double x)
         {
             return 0.5 * (1.0 - cos(2 * M_PI * x));
         }
 
-        JackPIControler(double resample_factor, int fir_size)
+        JackPIController(double resample_factor)
         {
-            resample_mean = resample_factor;
             static_resample_factor = resample_factor;
-            offset_array = new double[fir_size];
-            window_array = new double[fir_size];
-            offset_differential_index = 0;
             offset_integral = 0.0;
-            smooth_size = fir_size;
-
-            for (int i = 0; i < fir_size; i++) {
-                offset_array[i] = 0.0;
-                window_array[i] = hann(double(i) / (double(fir_size) - 1.0));
-            }
 
             // These values could be configurable
             catch_factor = 100000;
             catch_factor2 = 10000;
-            pclamp = 15.0;
-            controlquant = 10000.0;
         }
 
-        ~JackPIControler()
+        ~JackPIController()
         {
-            delete[] offset_array;
-            delete[] window_array;
         }
 
         void Init(double resample_factor)
         {
-            resample_mean = resample_factor;
             static_resample_factor = resample_factor;
         }
 
-        /*
-        double GetRatio(int fill_level)
+        void Reset()
         {
-            double offset = fill_level;
-
-            // Save offset.
-            offset_array[(offset_differential_index++) % smooth_size] = offset;
-
-            // Build the mean of the windowed offset array basically fir lowpassing.
-            double smooth_offset = 0.0;
-            for (int i = 0; i < smooth_size; i++) {
-                smooth_offset += offset_array[(i + offset_differential_index - 1) % smooth_size] * window_array[i];
-            }
-            smooth_offset /= double(smooth_size);
-
-            // This is the integral of the smoothed_offset
-            offset_integral += smooth_offset;
-
-            // Clamp offset : the smooth offset still contains unwanted noise which would go straight onto the resample coeff.
-            // It only used in the P component and the I component is used for the fine tuning anyways.
-            if (fabs(smooth_offset) < pclamp)
-                smooth_offset = 0.0;
-
-            // Ok, now this is the PI controller.
-            // u(t) = K * (e(t) + 1/T \int e(t') dt')
-            // Kp = 1/catch_factor and T = catch_factor2  Ki = Kp/T
-            double current_resample_factor
-                = static_resample_factor - smooth_offset / catch_factor - offset_integral / catch_factor / catch_factor2;
-
-            // Now quantize this value around resample_mean, so that the noise which is in the integral component doesn't hurt.
-            current_resample_factor = floor((current_resample_factor - resample_mean) * controlquant + 0.5) / controlquant + resample_mean;
-
-            // Calculate resample_mean so we can init ourselves to saner values.
-            resample_mean = 0.9999 * resample_mean + 0.0001 * current_resample_factor;
-            return current_resample_factor;
+            offset_integral = 0.0;
         }
-        */
 
         double GetRatio(int error)
         {
@@ -329,20 +271,6 @@ namespace Jack
             // Kp = 1/catch_factor and T = catch_factor2 Ki = Kp/T
             return static_resample_factor - smooth_offset/catch_factor - offset_integral/catch_factor/catch_factor2;
         }
-
-        void OurOfBounds()
-        {
-            int i;
-            // Set the resample_rate... we need to adjust the offset integral, to do this.
-            // first look at the PI controller, this code is just a special case, which should never execute once
-            // everything is swung in.
-            offset_integral = - (resample_mean - static_resample_factor) * catch_factor * catch_factor2;
-            // Also clear the array. we are beginning a new control cycle.
-            for (i = 0; i < smooth_size; i++) {
-                offset_array[i] = 0.0;
-            }
-        }
-
     };
 
 }
