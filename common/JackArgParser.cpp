@@ -121,26 +121,6 @@ namespace Jack {
         return 0;
     }
 
-    int JackArgParser::GetArgv ( char** argv )
-    {
-        //argv must be NULL
-        if ( argv )
-            return -1;
-        //else allocate and fill it
-        argv = (char**)calloc (fArgv.size(), sizeof(char*));
-        if (argv == NULL) 
-        {
-            return -1;
-        }
-        for ( unsigned int i = 0; i < fArgv.size(); i++ )
-        {
-            argv[i] = (char*)calloc(fArgv[i].length(), sizeof(char));
-            fill_n ( argv[i], fArgv[i].length() + 1, 0 );
-            fArgv[i].copy ( argv[i], fArgv[i].length() );
-        }
-        return 0;
-    }
-
     void JackArgParser::DeleteArgv ( const char** argv )
     {
         unsigned int i;
