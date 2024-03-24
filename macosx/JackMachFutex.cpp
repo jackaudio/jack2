@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2004-2008 Grame
-Copyright (C) 2016 Filipe Coelho
+Copyright (C) 2016-2024 Filipe Coelho
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -18,47 +18,58 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#include "JackLinuxFutex.h"
+#include "JackMachFutex.h"
 #include "JackTools.h"
 #include "JackConstants.h"
 #include "JackError.h"
 #include "promiscuous.h"
-#include <climits>
+#include <cerrno>
 #include <fcntl.h>
 #include <stdio.h>
 #include <sys/mman.h>
-#include <syscall.h>
-#include <linux/futex.h>
 
-#if !defined(SYS_futex) && defined(SYS_futex_time64)
-#define SYS_futex SYS_futex_time64
-#endif
+#define UL_COMPARE_AND_WAIT        1
+#define UL_COMPARE_AND_WAIT_SHARED 3
+#define ULF_WAKE_ALL               0x00000100
+#define ULF_NO_ERRNO               0x01000000
+
+extern "C" {
+int __ulock_wait(uint32_t operation, void* addr, uint64_t value, uint32_t timeout_us);
+int __ulock_wake(uint32_t operation, void* addr, uint64_t value);
+}
 
 namespace Jack
 {
 
-JackLinuxFutex::JackLinuxFutex() : JackSynchro(), fSharedMem(-1), fFutex(NULL), fPrivate(false)
+JackMachFutex::JackMachFutex() : JackSynchro(), fSharedMem(-1), fFutex(NULL), fPrivate(false)
 {
     const char* promiscuous = getenv("JACK_PROMISCUOUS_SERVER");
     fPromiscuous = (promiscuous != NULL);
     fPromiscuousGid = jack_group2gid(promiscuous);
 }
 
-void JackLinuxFutex::BuildName(const char* client_name, const char* server_name, char* res, int size)
+void JackMachFutex::BuildName(const char* client_name, const char* server_name, char* res, int size)
 {
     char ext_client_name[SYNC_MAX_NAME_SIZE + 1];
     JackTools::RewriteName(client_name, ext_client_name);
+
+    // make the name as small as possible, as macos has issues with long semaphore names
+    if (strcmp(server_name, "default") == 0)
+        server_name = "";
+    else if (strcmp(server_name, "mod-desktop") == 0)
+        server_name = "mdsk.";
+
     if (fPromiscuous) {
-        snprintf(res, size, "jack_sem.%s_%s", server_name, ext_client_name);
+        snprintf(res, std::min(size, 32), "js.%s%s", server_name, ext_client_name);
     } else {
-        snprintf(res, size, "jack_sem.%d_%s_%s", JackTools::GetUID(), server_name, ext_client_name);
+        snprintf(res, std::min(size, 32), "js%d.%s%s", JackTools::GetUID(), server_name, ext_client_name);
     }
 }
 
-bool JackLinuxFutex::Signal()
+bool JackMachFutex::Signal()
 {
     if (!fFutex) {
-        jack_error("JackLinuxFutex::Signal name = %s already deallocated!!", fName);
+        jack_error("JackMachFutex::Signal name = %s already deallocated!!", fName);
         return false;
     }
 
@@ -72,19 +83,31 @@ bool JackLinuxFutex::Signal()
         if (! fFutex->internal) return true;
     }
 
-    ::syscall(SYS_futex, fFutex, fFutex->internal ? FUTEX_WAKE_PRIVATE : FUTEX_WAKE, 1, NULL, NULL, 0);
+    const uint32_t operation = ULF_NO_ERRNO | (fFutex->internal ? UL_COMPARE_AND_WAIT : UL_COMPARE_AND_WAIT_SHARED);
+    __ulock_wake(operation, fFutex, 0);
     return true;
 }
 
-bool JackLinuxFutex::SignalAll()
-{
-    return Signal();
-}
-
-bool JackLinuxFutex::Wait()
+bool JackMachFutex::SignalAll()
 {
     if (!fFutex) {
-        jack_error("JackLinuxFutex::Wait name = %s already deallocated!!", fName);
+        jack_error("JackMachFutex::SignalAll name = %s already deallocated!!", fName);
+        return false;
+    }
+
+    if (fFlush) {
+        return true;
+    }
+
+    const uint32_t operation = ULF_NO_ERRNO | ULF_WAKE_ALL | (fFutex->internal ? UL_COMPARE_AND_WAIT : UL_COMPARE_AND_WAIT_SHARED);
+    __ulock_wake(operation, fFutex, 0);
+    return true;
+}
+
+bool JackMachFutex::Wait()
+{
+    if (!fFutex) {
+        jack_error("JackMachFutex::Wait name = %s already deallocated!!", fName);
         return false;
     }
 
@@ -94,26 +117,26 @@ bool JackLinuxFutex::Wait()
         fFutex->internal = !fFutex->internal;
     }
 
-    const int wait_mode = fFutex->internal ? FUTEX_WAIT_PRIVATE : FUTEX_WAIT;
+    const uint32_t operation = fFutex->internal ? UL_COMPARE_AND_WAIT : UL_COMPARE_AND_WAIT_SHARED;
 
     for (;;)
     {
         if (__sync_bool_compare_and_swap(&fFutex->futex, 1, 0))
             return true;
 
-        if (::syscall(SYS_futex, fFutex, wait_mode, 0, NULL, NULL, 0) != 0)
+        if (__ulock_wait(operation, fFutex, 0, UINT32_MAX) != 0)
             if (errno != EAGAIN && errno != EINTR)
                 return false;
     }
 }
 
-bool JackLinuxFutex::TimedWait(long usec)
+bool JackMachFutex::TimedWait(long usec)
 {
     if (usec == LONG_MAX)
         return Wait();
 
     if (!fFutex) {
-        jack_error("JackLinuxFutex::TimedWait name = %s already deallocated!!", fName);
+        jack_error("JackMachFutex::TimedWait name = %s already deallocated!!", fName);
         return false;
      }
 
@@ -123,28 +146,27 @@ bool JackLinuxFutex::TimedWait(long usec)
         fFutex->internal = !fFutex->internal;
     }
 
-    const uint secs  =  usec / 1000000;
-    const int  nsecs = (usec % 1000000) * 1000;
-
-    const timespec timeout = { static_cast<time_t>(secs), nsecs };
-    const int wait_mode = fFutex->internal ? FUTEX_WAIT_PRIVATE : FUTEX_WAIT;
+    const uint32_t operation = fFutex->internal ? UL_COMPARE_AND_WAIT : UL_COMPARE_AND_WAIT_SHARED;
 
     for (;;)
     {
         if (__sync_bool_compare_and_swap(&fFutex->futex, 1, 0))
             return true;
 
-        if (::syscall(SYS_futex, fFutex, wait_mode, 0, &timeout, NULL, 0) != 0)
+        if (__ulock_wait(operation, fFutex, 0, usec) != 0)
             if (errno != EAGAIN && errno != EINTR)
                 return false;
     }
 }
 
 // Server side : publish the futex in the global namespace
-bool JackLinuxFutex::Allocate(const char* name, const char* server_name, int value, bool internal)
+bool JackMachFutex::Allocate(const char* name, const char* server_name, int value, bool internal)
 {
     BuildName(name, server_name, fName, sizeof(fName));
-    jack_log("JackLinuxFutex::Allocate name = %s val = %ld", fName, value);
+    jack_log("JackMachFutex::Allocate name = %s val = %ld", fName, value);
+
+    // FIXME
+    shm_unlink(fName);
 
     if ((fSharedMem = shm_open(fName, O_CREAT | O_RDWR, 0777)) < 0) {
         jack_error("Allocate: can't check in named futex name = %s err = %s", fName, strerror(errno));
@@ -163,12 +185,7 @@ bool JackLinuxFutex::Allocate(const char* name, const char* server_name, int val
         return false;
     }
 
-    FutexData* futex = (FutexData*)mmap(NULL, sizeof(FutexData), PROT_READ|PROT_WRITE, MAP_SHARED|MAP_LOCKED, fSharedMem, 0);
-
-    // try without MAP_LOCKED
-    if (futex == NULL || futex == MAP_FAILED) {
-        futex = (FutexData*)mmap(NULL, sizeof(FutexData), PROT_READ|PROT_WRITE, MAP_SHARED, fSharedMem, 0);
-    }
+    FutexData* futex = (FutexData*)mmap(NULL, sizeof(FutexData), PROT_READ|PROT_WRITE, MAP_SHARED, fSharedMem, 0);
 
     if (futex == NULL || futex == MAP_FAILED) {
         jack_error("Allocate: can't check in named futex name = %s err = %s", fName, strerror(errno));
@@ -177,6 +194,8 @@ bool JackLinuxFutex::Allocate(const char* name, const char* server_name, int val
         shm_unlink(fName);
         return false;
     }
+
+    mlock(futex, sizeof(FutexData));
 
     fPrivate = internal;
 
@@ -190,10 +209,10 @@ bool JackLinuxFutex::Allocate(const char* name, const char* server_name, int val
 }
 
 // Client side : get the published futex from server
-bool JackLinuxFutex::Connect(const char* name, const char* server_name)
+bool JackMachFutex::Connect(const char* name, const char* server_name)
 {
     BuildName(name, server_name, fName, sizeof(fName));
-    jack_log("JackLinuxFutex::Connect name = %s", fName);
+    jack_log("JackMachFutex::Connect name = %s", fName);
 
     // Temporary...
     if (fFutex) {
@@ -206,12 +225,7 @@ bool JackLinuxFutex::Connect(const char* name, const char* server_name)
         return false;
     }
 
-    FutexData* futex = (FutexData*)mmap(NULL, sizeof(FutexData), PROT_READ|PROT_WRITE, MAP_SHARED|MAP_LOCKED, fSharedMem, 0);
-
-    // try without MAP_LOCKED
-    if (futex == NULL || futex == MAP_FAILED) {
-        futex = (FutexData*)mmap(NULL, sizeof(FutexData), PROT_READ|PROT_WRITE, MAP_SHARED, fSharedMem, 0);
-    }
+    FutexData* futex = (FutexData*)mmap(NULL, sizeof(FutexData), PROT_READ|PROT_WRITE, MAP_SHARED, fSharedMem, 0);
 
     if (futex == NULL || futex == MAP_FAILED) {
         jack_error("Connect: can't connect named futex name = %s err = %s", fName, strerror(errno));
@@ -219,6 +233,8 @@ bool JackLinuxFutex::Connect(const char* name, const char* server_name)
         fSharedMem = -1;
         return false;
     }
+
+    mlock(futex, sizeof(FutexData));
 
     if (! fPrivate && futex->wasInternal)
     {
@@ -235,17 +251,17 @@ bool JackLinuxFutex::Connect(const char* name, const char* server_name)
     return true;
 }
 
-bool JackLinuxFutex::ConnectInput(const char* name, const char* server_name)
+bool JackMachFutex::ConnectInput(const char* name, const char* server_name)
 {
     return Connect(name, server_name);
 }
 
-bool JackLinuxFutex::ConnectOutput(const char* name, const char* server_name)
+bool JackMachFutex::ConnectOutput(const char* name, const char* server_name)
 {
     return Connect(name, server_name);
 }
 
-bool JackLinuxFutex::Disconnect()
+bool JackMachFutex::Disconnect()
 {
     if (!fFutex) {
         return true;
@@ -271,7 +287,7 @@ bool JackLinuxFutex::Disconnect()
 }
 
 // Server side : destroy the futex
-void JackLinuxFutex::Destroy()
+void JackMachFutex::Destroy()
 {
     if (!fFutex) {
         return;

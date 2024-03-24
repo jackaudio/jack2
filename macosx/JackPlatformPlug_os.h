@@ -31,9 +31,9 @@ namespace Jack
     struct JackRequest;
     struct JackResult;
 
-	class JackPosixMutex;
-	class JackMachThread;
-	class JackMachSemaphore;
+    class JackPosixMutex;
+    class JackMachThread;
+    class JackMachFutex;
 
     class JackSocketServerChannel;
     class JackSocketClientChannel;
@@ -52,8 +52,8 @@ namespace Jack { typedef JackPosixMutex JackMutex; }
 namespace Jack { typedef JackMachThread JackThread; }
 
 /* __JackPlatformSynchro__  client activation */
-#include "JackMachSemaphore.h"
-namespace Jack { typedef JackMachSemaphore JackSynchro; }
+#include "JackMachFutex.h"
+namespace Jack { typedef JackMachFutex JackSynchro; }
 
 /* __JackPlatformProcessSync__ */
 #include "JackPosixProcessSync.h"
