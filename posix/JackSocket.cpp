@@ -202,7 +202,7 @@ int JackClientSocket::Read(void* data, int len)
             jack_error("Cannot read socket fd = %d res = %d err = %s", fSocket, res, strerror(errno));
             //return 0;
             return -1;
-        } else if (errno == 0) {
+        } else if (errno == 0 || errno == ENOTCONN) {
             // aborted reading due to shutdown
             return JACK_REQUEST_ERR_ABORTED;
         } else {

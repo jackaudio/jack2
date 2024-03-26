@@ -639,13 +639,6 @@ inline bool JackClient::WaitSync()
 {
     // Suspend itself: wait on the input synchro
     if (GetGraphManager()->SuspendRefNum(GetClientControl(), fSynchroTable, LONG_MAX) < 0) {
-#ifdef __APPLE__
-        // FIXME macOS reports wait failures when closing down, due to aborted semaphore, ignore it
-        if (!GetClientControl()->fActive) {
-            fThread.Terminate();
-            return true;
-        }
-#endif
         jack_error("SuspendRefNum error");
         return false;
     } else {

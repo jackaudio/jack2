@@ -46,7 +46,7 @@ int JackMachThread::SetThreadToPriority(jack_native_thread_t thread, UInt32 inPr
 #endif
         theTCPolicy.preemptible = true;
         kern_return_t res = thread_policy_set(pthread_mach_thread_np(thread), THREAD_TIME_CONSTRAINT_POLICY, (thread_policy_t) &theTCPolicy, THREAD_TIME_CONSTRAINT_POLICY_COUNT);
-        jack_log("JackMachThread::thread_policy_set res = %ld", res);
+        jack_log("JackMachThread::thread_policy_set RT res = %ld", res);
         return (res == KERN_SUCCESS) ? 0 : -1;
     } else {
         // OTHER THREADS
@@ -69,7 +69,7 @@ int JackMachThread::SetThreadToPriority(jack_native_thread_t thread, UInt32 inPr
 
         thePrecedencePolicy.importance = relativePriority;
         kern_return_t res = thread_policy_set(pthread_mach_thread_np(thread), THREAD_PRECEDENCE_POLICY, (thread_policy_t) &thePrecedencePolicy, THREAD_PRECEDENCE_POLICY_COUNT);
-        jack_log("JackMachThread::thread_policy_set res = %ld", res);
+        jack_log("JackMachThread::thread_policy_set non-RT res = %ld", res);
         return (res == KERN_SUCCESS) ? 0 : -1;
     }
 }
@@ -160,21 +160,16 @@ int JackMachThread::GetParams(jack_native_thread_t thread, UInt64* period, UInt6
 
 int JackMachThread::Kill()
 {
-#if 0
-    // NOTE: starting macOS 12, this code no longer works
     if (fThread != (jack_native_thread_t)NULL)  { // If thread has been started
         jack_log("JackMachThread::Kill");
         mach_port_t machThread = pthread_mach_thread_np(fThread);
-        int res = (thread_terminate(machThread) == KERN_SUCCESS) ? 0 : -1;
+        int res = (thread_abort(machThread) == KERN_SUCCESS) ? 0 : -1;
         fStatus = kIdle;
         fThread = (jack_native_thread_t)NULL;
         return res;
     } else {
         return -1;
     }
-#else
-    return JackPosixThread::Kill();
-#endif
 }
 
 int JackMachThread::AcquireRealTime()
