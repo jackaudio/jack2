@@ -515,6 +515,29 @@ enum JackPortFlags {
      */
     JackPortIsTerminal = 0x10,
 
+    /**
+     * if JackPortIsCV is set, then the port buffer represents audio-rate
+     * control data rather than audio.
+     *
+     * Clients SHOULD prevent connections between Audio and CV ports.
+     *
+     * To make the ports more meaningful, clients can add meta-data to them.
+     * It is recommended to set these 2 in particular:
+     *  - http://lv2plug.in/ns/lv2core#minimum
+     *  - http://lv2plug.in/ns/lv2core#maximum
+     */
+    JackPortIsCV = 0x20,
+
+    /**
+     * if JackPortIsMIDI2 is set, then the port expects to receive MIDI2 data.
+     *
+     * JACK will automatically convert MIDI1 data into MIDI2 for this port.
+     *
+     * for ports without this flag JACK will convert MIDI2 into MIDI1
+     * as much possible, some events might be skipped.
+     */
+    JackPortIsMIDI2 = 0x20,
+
 };
 
 /**
