@@ -76,8 +76,8 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
     jack_time_t fMaxUsecs;
     jack_time_t fRollingClientUsecs[JACK_ENGINE_ROLLING_COUNT];
     unsigned int fRollingClientUsecsCnt;
-    int fRollingClientUsecsIndex;
-    int fRollingInterval;
+    unsigned int fRollingClientUsecsIndex;
+    unsigned int fRollingInterval;
     float fCPULoad;
     float fMaxCPULoad;
 

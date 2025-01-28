@@ -63,7 +63,7 @@ void JackEngineControl::CalcCPULoad(JackClientInterface** table,
 
     // Each time we have a full set of iterations, recompute the current
     // usage from the latest JACK_ENGINE_ROLLING_COUNT client entries.
-    if (fRollingClientUsecsCnt && (fRollingClientUsecsIndex == 0)) {
+    if (fRollingClientUsecsCnt && (fRollingClientUsecsIndex == 0 || fRollingClientUsecsCnt == fRollingInterval)) {
         jack_time_t avg_usecs = 0;
         jack_time_t max_usecs = 0;
 
@@ -74,6 +74,12 @@ void JackEngineControl::CalcCPULoad(JackClientInterface** table,
 
         fMaxUsecs = JACK_MAX(fMaxUsecs, max_usecs);
 
+        if (fRollingClientUsecsCnt == fRollingInterval)
+        {
+            fMaxUsecs = max_usecs;
+            fRollingClientUsecsCnt = 0;
+        }
+
         if (max_usecs < ((fPeriodUsecs * 95) / 100)) {
             // Average the values from our JACK_ENGINE_ROLLING_COUNT array
             fSpareUsecs = (jack_time_t)(fPeriodUsecs - (avg_usecs / JACK_ENGINE_ROLLING_COUNT));
@@ -83,7 +89,7 @@ void JackEngineControl::CalcCPULoad(JackClientInterface** table,
         }
 
         fCPULoad = ((1.f - (float(fSpareUsecs) / float(fPeriodUsecs))) * 50.f + (fCPULoad * 0.5f));
-        fMaxCPULoad = 1.f - (float(fMaxUsecs) / float(fPeriodUsecs));
+        fMaxCPULoad = (1.f - float(fMaxUsecs < fPeriodUsecs ? fPeriodUsecs - fMaxUsecs : 0) / float(fPeriodUsecs)) * 100.f;
     }
 
     fRollingClientUsecsCnt++;
