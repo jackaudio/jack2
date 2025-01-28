@@ -704,6 +704,14 @@ int jack_engine_takeover_timebase (jack_client_t *) JACK_OPTIONAL_WEAK_DEPRECATE
  */
 float jack_cpu_load (jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
 
+/**
+ * @return the current maximum CPU load used by JACK.  This is a running
+ * average of the time it takes to execute a full process cycle for
+ * all clients as a percentage of the real time available per cycle
+ * determined by the buffer size and sample rate.
+ */
+float jack_max_cpu_load (jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
+
 /**@}*/
 
 /**

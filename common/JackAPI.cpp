@@ -195,6 +195,7 @@ extern "C"
                                         jack_time_t    *next_usecs,
                                         float          *period_usecs);
     LIB_EXPORT float jack_cpu_load(jack_client_t *client);
+    LIB_EXPORT float jack_max_cpu_load(jack_client_t *client);
     LIB_EXPORT jack_native_thread_t jack_client_thread_id(jack_client_t *);
     LIB_EXPORT void jack_set_error_function(print_function);
     LIB_EXPORT void jack_set_info_function(print_function);
@@ -1454,6 +1455,20 @@ LIB_EXPORT float jack_cpu_load(jack_client_t* ext_client)
     } else {
         JackEngineControl* control = GetEngineControl();
         return (control ? control->fCPULoad : 0.0f);
+    }
+}
+
+LIB_EXPORT float jack_max_cpu_load(jack_client_t* ext_client)
+{
+    JackGlobals::CheckContext("jack_max_cpu_load");
+
+    JackClient* client = (JackClient*)ext_client;
+    if (client == NULL) {
+        jack_error("jack_max_cpu_load called with a NULL client");
+        return 0.0f;
+    } else {
+        JackEngineControl* control = GetEngineControl();
+        return (control ? control->fMaxCPULoad : 0.0f);
     }
 }
 

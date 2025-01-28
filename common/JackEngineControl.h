@@ -76,9 +76,10 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
     jack_time_t fMaxUsecs;
     jack_time_t fRollingClientUsecs[JACK_ENGINE_ROLLING_COUNT];
     unsigned int fRollingClientUsecsCnt;
-    int	fRollingClientUsecsIndex;
-    int	fRollingInterval;
+    int fRollingClientUsecsIndex;
+    int fRollingInterval;
     float fCPULoad;
+    float fMaxCPULoad;
 
     // For OSX thread
     UInt64 fPeriod;
@@ -124,6 +125,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
         strncpy(fServerName, server_name, sizeof(fServerName));
         fServerName[sizeof(fServerName) - 1] = 0;
         fCPULoad = 0.f;
+        fMaxCPULoad = 0.f;
         fPeriod = 0;
         fComputation = 0;
         fConstraint = 0;

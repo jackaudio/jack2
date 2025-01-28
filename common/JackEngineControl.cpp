@@ -83,6 +83,7 @@ void JackEngineControl::CalcCPULoad(JackClientInterface** table,
         }
 
         fCPULoad = ((1.f - (float(fSpareUsecs) / float(fPeriodUsecs))) * 50.f + (fCPULoad * 0.5f));
+        fMaxCPULoad = 1.f - (float(fMaxUsecs) / float(fPeriodUsecs));
     }
 
     fRollingClientUsecsCnt++;
