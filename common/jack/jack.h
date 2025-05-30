@@ -21,14 +21,15 @@
 #ifndef __jack_h__
 #define __jack_h__
 
+#include <jack/systemdeps.h>
+#include <jack/types.h>
+#include <jack/transport.h>
+#include <jack/weakmacros.h>
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
-#include <jack/systemdeps.h>
-#include <jack/types.h>
-#include <jack/transport.h>
 
 /**
  * Note: More documentation can be found in jack/types.h.
@@ -45,8 +46,6 @@ extern "C"
      * use all JACK symbols with weak linkage, include
      * <jack/weakjack.h> before jack.h.
      *************************************************************/
-
-#include <jack/weakmacros.h>
 
 /**
  * Call this function to get version of the JACK, in form of several numbers

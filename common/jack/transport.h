@@ -21,12 +21,12 @@
 #ifndef __jack_transport_h__
 #define __jack_transport_h__
 
+#include <jack/types.h>
+#include <jack/weakmacros.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <jack/types.h>
-#include <jack/weakmacros.h>
 
 /**
  * @defgroup TransportControl Transport and Timebase control

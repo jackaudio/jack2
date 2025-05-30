@@ -27,15 +27,14 @@
 #ifndef __JACK_NET_PACKET_H__
 #define __JACK_NET_PACKET_H__
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #include <jack/jack.h>
 #include <jack/types.h>
 #include <jack/jslist.h>
 #include <jack/midiport.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // The Packet Header.
 

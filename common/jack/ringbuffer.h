@@ -21,12 +21,11 @@
 #ifndef _RINGBUFFER_H
 #define _RINGBUFFER_H
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #include <sys/types.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file ringbuffer.h
  *

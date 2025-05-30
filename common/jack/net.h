@@ -20,14 +20,13 @@
 #ifndef __net_h__
 #define __net_h__
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #include <jack/systemdeps.h>
 #include <jack/types.h>
 #include <jack/weakmacros.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define DEFAULT_MULTICAST_IP    "225.3.19.154"
 #define DEFAULT_PORT            19000

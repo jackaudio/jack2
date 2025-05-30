@@ -21,14 +21,13 @@
 #ifndef __JACK_MIDIPORT_H
 #define __JACK_MIDIPORT_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <jack/weakmacros.h>
 #include <jack/types.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** Type for raw event data contained in @ref jack_midi_event_t. */
 typedef unsigned char jack_midi_data_t;

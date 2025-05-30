@@ -21,11 +21,6 @@
 #ifndef __external_metro__
 #define __external_metro__
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
@@ -35,6 +30,10 @@ extern "C"
 #include <string.h>
 #include <jack/jack.h>
 #include <jack/transport.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
     typedef jack_default_audio_sample_t sample_t;
 

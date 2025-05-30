@@ -21,16 +21,15 @@
 #ifndef __jack_driver_interface_h__
 #define __jack_driver_interface_h__
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #include <limits.h>
 #include "jslist.h"
 
 #include "JackCompilerDeps.h"
 #include "JackSystemDeps.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define JACK_DRIVER_NAME_MAX          15
 #define JACK_DRIVER_PARAM_NAME_MAX    15

@@ -20,13 +20,13 @@
 #ifndef __jack_thread_h__
 #define __jack_thread_h__
 
+#include <jack/systemdeps.h>
+#include <jack/weakmacros.h>
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
-#include <jack/systemdeps.h>
-#include <jack/weakmacros.h>
 
 /* use 512KB stack per thread - the default is way too high to be feasible
  * with mlockall() on many systems */
