@@ -1,6 +1,10 @@
 ChangeLog
 #########
 
+* 1.9.23 (WIP)
+
+  * Add jack_max_cpu_load API call
+
 * 1.9.22 (2023-02-02)
 
   * The waf autooption ``--example-tools`` has been removed.
