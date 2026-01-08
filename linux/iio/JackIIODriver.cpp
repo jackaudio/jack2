@@ -139,7 +139,7 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
     int ret, colCnt;
     Jack::JackDriverClientInterface* threaded_driver=NULL;
 
-    string chipName(IIO_DEFAULT_CHIP); // the default chip name to search for in the IIO devices.
+    std::string chipName(IIO_DEFAULT_CHIP); // the default chip name to search for in the IIO devices.
     float fs = IIO_DEFAULT_READ_FS; // IIO sample rate is fixed.
     jack_nframes_t periodSize = IIO_DEFAULT_PERIOD_SIZE; // default block size
     jack_nframes_t periodCount = IIO_DEFAULT_PERIOD_COUNT; // default block count
