@@ -55,7 +55,7 @@ JackMetadata::JackMetadata(bool isEngine)
 JackMetadata::~JackMetadata()
 {
 #if HAVE_DB
-    char dbpath[PATH_MAX + 1];
+    char dbpath[JACK_PATH_MAX + 1];
 
     if (fDB) {
         fDB->close (fDB, 0);
@@ -93,16 +93,16 @@ int JackMetadata::PropertyInit()
 #if HAVE_DB
 
     int ret;
-    char dbpath[PATH_MAX + 1];
+    char dbpath[JACK_PATH_MAX + 1];
 
 #ifdef WIN32
-    ret = GetTempPathA (PATH_MAX, fDBFilesDir);
-    if ((ret > PATH_MAX) || (ret == 0)) {
+    ret = GetTempPathA (JACK_PATH_MAX, fDBFilesDir);
+    if ((ret > JACK_PATH_MAX) || (ret == 0)) {
         jack_error ("cannot get path for temp files");
         return -1;
     }
 #else
-    strncpy (fDBFilesDir, jack_server_dir, PATH_MAX);
+    strncpy (fDBFilesDir, jack_server_dir, JACK_PATH_MAX);
 #endif
 
     /* idempotent */

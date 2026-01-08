@@ -149,6 +149,7 @@ void JackOSSDriver::DisplayDeviceInfo()
 
     if (fRWMode & kWrite) {
 
+#ifdef OSS_SYSINFO
         oss_sysinfo si;
         if (ioctl(fOutFD, OSS_SYSINFO, &si) == -1) {
             jack_error("JackOSSDriver::DisplayDeviceInfo OSS_SYSINFO failed : %s@%i, errno = %d", __FILE__, __LINE__, errno);
@@ -160,6 +161,7 @@ void JackOSSDriver::DisplayDeviceInfo()
             jack_info("OSS numaudioengines %d", si.numaudioengines);
             jack_info("OSS numcards %d", si.numcards);
         }
+#endif
 
         jack_info("Output capabilities - %d channels : ", fPlaybackChannels);
         jack_info("Output block size = %d", fOutputBufferSize);
@@ -187,6 +189,7 @@ void JackOSSDriver::DisplayDeviceInfo()
 
     if (fRWMode & kRead) {
 
+#ifdef OSS_SYSINFO
       	oss_sysinfo si;
         if (ioctl(fInFD, OSS_SYSINFO, &si) == -1) {
             jack_error("JackOSSDriver::DisplayDeviceInfo OSS_SYSINFO failed : %s@%i, errno = %d", __FILE__, __LINE__, errno);
@@ -198,6 +201,7 @@ void JackOSSDriver::DisplayDeviceInfo()
             jack_info("OSS numaudioengines %d", si.numaudioengines);
             jack_info("OSS numcards %d", si.numcards);
         }
+#endif
 
         jack_info("Input capabilities - %d channels : ", fCaptureChannels);
         jack_info("Input block size = %d", fInputBufferSize);

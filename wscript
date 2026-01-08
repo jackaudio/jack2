@@ -221,8 +221,9 @@ def detect_platform(conf):
     # GNU/kFreeBSD and GNU/Hurd are treated as Linux
     platforms = [
         # ('KEY, 'Human readable name', ['strings', 'to', 'check', 'for'])
-        ('IS_LINUX',   'Linux',   ['gnu0', 'gnukfreebsd', 'linux', 'posix']),
+        ('IS_LINUX',   'Linux',   ['gnukfreebsd', 'linux', 'posix']),
         ('IS_FREEBSD', 'FreeBSD', ['freebsd']),
+        ('IS_HURD',    'GNU/Hurd',['gnu0']),
         ('IS_MACOSX',  'MacOS X', ['darwin']),
         ('IS_SUN',     'SunOS',   ['sunos']),
         ('IS_WINDOWS', 'Windows', ['cygwin', 'msys', 'win32'])
@@ -549,6 +550,9 @@ def obj_add_includes(bld, obj):
     if bld.env['IS_FREEBSD']:
         obj.includes += ['freebsd', 'posix']
 
+    if bld.env['IS_HURD']:
+        obj.includes += ['gnu', 'posix']
+
     if bld.env['IS_MACOSX']:
         obj.includes += ['macosx', 'posix']
 
@@ -579,6 +583,9 @@ def build_jackd(bld):
 
     if bld.env['IS_FREEBSD']:
         jackd.use += ['M', 'PTHREAD']
+
+    if bld.env['IS_HURD']:
+        jackd.use += ['DL', 'M', 'PTHREAD', 'RT', 'STDC++']
 
     if bld.env['IS_MACOSX']:
         jackd.use += ['DL', 'PTHREAD']
@@ -812,6 +819,12 @@ def build_drivers(bld):
             target='oss',
             source=freebsd_oss_src)
 
+    if bld.env['IS_HURD']:
+        create_driver_obj(
+            bld,
+            target='oss',
+            source=oss_src)
+
     if bld.env['IS_SUN']:
         create_driver_obj(
             bld,
@@ -841,7 +854,7 @@ def build(bld):
 
     build_drivers(bld)
 
-    if bld.env['IS_LINUX'] or bld.env['IS_FREEBSD']:
+    if bld.env['IS_LINUX'] or bld.env['IS_FREEBSD'] or bld.env['IS_HURD']:
         bld.recurse('man')
         bld.recurse('systemd')
     if not bld.env['IS_WINDOWS'] and bld.env['BUILD_TESTS']:

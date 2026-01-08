@@ -197,7 +197,9 @@ JackOSSAdapter::JackOSSAdapter(jack_nframes_t buffer_size, jack_nframes_t sample
 void JackOSSAdapter::DisplayDeviceInfo()
 {
     audio_buf_info info;
+#ifdef SNDCTL_AUDIOINFO
     oss_audioinfo ai_in, ai_out;
+#endif
     memset(&info, 0, sizeof(audio_buf_info));
     int cap = 0;
 
@@ -208,6 +210,7 @@ void JackOSSAdapter::DisplayDeviceInfo()
 
     if (fRWMode & kWrite) {
 
+#ifdef OSS_SYSINFO
        oss_sysinfo si;
         if (ioctl(fOutFD, OSS_SYSINFO, &si) == -1) {
             jack_error("JackOSSAdapter::DisplayDeviceInfo OSS_SYSINFO failed : %s@%i, errno = %d", __FILE__, __LINE__, errno);
@@ -219,6 +222,7 @@ void JackOSSAdapter::DisplayDeviceInfo()
             jack_info("OSS numaudioengines %d", si.numaudioengines);
             jack_info("OSS numcards %d", si.numcards);
         }
+#endif
 
         jack_info("Output capabilities - %d channels : ", fPlaybackChannels);
         jack_info("Output block size = %d", fOutputBufferSize);
@@ -246,6 +250,7 @@ void JackOSSAdapter::DisplayDeviceInfo()
 
     if (fRWMode & kRead) {
 
+#ifdef OSS_SYSINFO
         oss_sysinfo si;
         if (ioctl(fInFD, OSS_SYSINFO, &si) == -1) {
             jack_error("JackOSSAdapter::DisplayDeviceInfo OSS_SYSINFO failed : %s@%i, errno = %d", __FILE__, __LINE__, errno);
@@ -257,6 +262,7 @@ void JackOSSAdapter::DisplayDeviceInfo()
             jack_info("OSS numaudioengines %d", si.numaudioengines);
             jack_info("OSS numcards %d", si.numcards);
         }
+#endif
 
         jack_info("Input capabilities - %d channels : ", fCaptureChannels);
         jack_info("Input block size = %d", fInputBufferSize);
@@ -282,6 +288,7 @@ void JackOSSAdapter::DisplayDeviceInfo()
         }
     }
 
+#ifdef SNDCTL_AUDIOINFO
     if (ioctl(fInFD, SNDCTL_AUDIOINFO, &ai_in) != -1) {
         jack_info("Using audio engine %d = %s for input", ai_in.dev, ai_in.name);
     }
@@ -293,6 +300,7 @@ void JackOSSAdapter::DisplayDeviceInfo()
     if (ai_in.rate_source != ai_out.rate_source) {
         jack_info("Warning : input and output are not necessarily driven by the same clock!");
     }
+#endif
 }
 
 int JackOSSAdapter::OpenInput()

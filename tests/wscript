@@ -23,6 +23,8 @@ def build(bld):
             prog.includes = ['..', '../linux', '../posix', '../common/jack', '../common']
         if bld.env['IS_FREEBSD']:
             prog.includes = ['..', '../freebsd', '../posix', '../common/jack', '../common']
+        if bld.env['IS_HURD']:
+            prog.includes = ['..', '../gnu', '../posix', '../common/jack', '../common']
         if bld.env['IS_SUN']:
             prog.includes = ['..', '../solaris', '../posix', '../common/jack', '../common']
         prog.source = test_program_sources

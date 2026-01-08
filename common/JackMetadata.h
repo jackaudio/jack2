@@ -39,6 +39,8 @@
 
 #include <jack/uuid.h>
 
+#include "driver_interface.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -89,7 +91,7 @@ class JackMetadata
         DB* fDB;
         DB_ENV* fDBenv;
         const bool fIsEngine;
-        char fDBFilesDir[PATH_MAX + 1];
+        char fDBFilesDir[JACK_PATH_MAX + 1];
     #endif
 
         int PropertyInit();
