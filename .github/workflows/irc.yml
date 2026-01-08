@@ -2,6 +2,9 @@ name: irc
 
 on: [push]
 
+env:
+  COMMIT_MESSAGE: ${{ github.event.commits[0].message }}
+
 jobs:
   notification:
     runs-on: ubuntu-latest
@@ -10,7 +13,7 @@ jobs:
       - name: Format message
         id: message
         run: |
-          message="${{ github.actor }} pushed $(echo '${{ github.event.commits[0].message }}' | head -n 1) ${{ github.event.commits[0].url }}"
+          message="${{ github.actor }} pushed $(echo '$COMMIT_MESSAGE' | head -n 1) ${{ github.event.commits[0].url }}"
           echo ::set-output name=message::"${message}"
       - name: IRC notification
         uses: Gottox/irc-message-action@v2
