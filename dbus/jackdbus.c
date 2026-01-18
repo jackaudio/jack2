@@ -854,6 +854,7 @@ main (int argc, char **argv)
     void *controller_ptr;
     struct stat st;
     char timestamp_str[26];
+    bool save_pending;
 
     st.st_mtime = 0;
     stat(argv[0], &st);
@@ -947,9 +948,10 @@ main (int argc, char **argv)
     jack_info("Listening for D-Bus messages");
 
     g_exit_command = FALSE;
-    while (!g_exit_command && dbus_connection_read_write_dispatch (g_connection, 200))
+    save_pending = false;
+    while (!g_exit_command && dbus_connection_read_write_dispatch (g_connection, (save_pending ? 200 : -1)))
     {
-        jack_controller_run(controller_ptr);
+        save_pending = jack_controller_run(controller_ptr);
     }
 
     jack_controller_destroy(controller_ptr);
