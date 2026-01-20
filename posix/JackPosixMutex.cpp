@@ -28,7 +28,10 @@ namespace Jack
     JackBasePosixMutex::JackBasePosixMutex(const char* name)
         :fOwner(0)
     {
-        int res = pthread_mutex_init(&fMutex, NULL);
+        pthread_mutexattr_t attr;
+        pthread_mutexattr_init(&attr);
+        pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK);
+        int res = pthread_mutex_init(&fMutex, &attr);
         ThrowIf(res != 0, JackException("JackBasePosixMutex: could not init the mutex"));
     }
 
