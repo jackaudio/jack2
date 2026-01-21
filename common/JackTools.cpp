@@ -69,8 +69,19 @@ namespace Jack {
     int JackTools::GetUID()
     {
 #ifdef WIN32
-        return  _getpid();
-        //#error "No getuid function available"
+        HANDLE tokenHandle = nullptr;
+        if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &tokenHandle)) {
+            return 0;
+        }
+
+        TOKEN_STATISTICS tokenStats;
+        DWORD returnLength;
+        if (!GetTokenInformation(tokenHandle, TokenStatistics, &tokenStats, sizeof(tokenStats), &returnLength)) {
+            CloseHandle(tokenHandle);
+            return 0;
+        }
+
+        return(tokenStats.AuthenticationId.LowPart);
 #else
         return geteuid();
 #endif
