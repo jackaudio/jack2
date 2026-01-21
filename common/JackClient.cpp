@@ -109,14 +109,17 @@ int JackClient::Close()
     int result = 0;
 
     Deactivate();
+
+    assert(JackGlobals::fSynchroMutex);
     
     // Channels is stopped first to avoid receiving notifications while closing
-    fChannel->Stop();  
+    JackGlobals::fSynchroMutex->Lock();
+    fChannel->Stop();
+    JackGlobals::fSynchroMutex->Unlock();
     // Then close client
     fChannel->ClientClose(GetClientControl()->fRefNum, &result);
   
     fChannel->Close();
-    assert(JackGlobals::fSynchroMutex);
     JackGlobals::fSynchroMutex->Lock();
     fSynchroTable[GetClientControl()->fRefNum].Disconnect();
     JackGlobals::fSynchroMutex->Unlock();
