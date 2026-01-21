@@ -18,6 +18,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include <cassert>
+#include <algorithm>
 
 #include "JackCoreMidiPort.h"
 #include "JackCoreMidiUtil.h"
