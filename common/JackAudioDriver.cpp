@@ -28,6 +28,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackLockedEngine.h"
 #include "JackException.h"
 #include <assert.h>
+#include "JackServerGlobals.h"
 
 using namespace std;
 
@@ -199,7 +200,11 @@ int JackAudioDriver::Write()
 
 int JackAudioDriver::Process()
 {
-    return (fEngineControl->fSyncMode) ? ProcessSync() : ProcessAsync();
+    int err = (fEngineControl->fSyncMode) ? ProcessSync() : ProcessAsync();
+    if(err && JackServerGlobals::on_failure != NULL) {
+        JackServerGlobals::on_failure();
+    }
+    return err;
 }
 
 /*
