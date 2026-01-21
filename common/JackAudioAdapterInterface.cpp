@@ -67,8 +67,8 @@ namespace Jack
         fprintf(file, "set xlabel \"audio cycles\"\n");
         fprintf(file, "set ylabel \"frames\"\n");
         fprintf(file, "plot ");
-        fprintf(file, "\"JackAudioAdapter.log\" using 2 title \"Ringbuffer error\" with lines,");
-        fprintf(file, "\"JackAudioAdapter.log\" using 3 title \"Ringbuffer error with timing correction\" with lines");
+        fprintf(file, "\"JackAudioAdapter.log\" using 2 title \"Ringbuffer error\" with dots,");
+        fprintf(file, "\"JackAudioAdapter.log\" using 3 title \"Ringbuffer error with timing correction\" with dots");
 
         fprintf(file, "\n unset multiplot\n");
         fprintf(file, "set output 'AdapterTiming1.svg\n");
@@ -81,8 +81,8 @@ namespace Jack
         fprintf(file, "set xlabel \"audio cycles\"\n");
         fprintf(file, "set ylabel \"frames\"\n");
         fprintf(file, "plot ");
-        fprintf(file, "\"JackAudioAdapter.log\" using 2 title \"Consumer interrupt period\" with lines,");
-        fprintf(file, "\"JackAudioAdapter.log\" using 3 title \"Producer interrupt period\" with lines\n");
+        fprintf(file, "\"JackAudioAdapter.log\" using 2 title \"Consumer interrupt period\" with dots,");
+        fprintf(file, "\"JackAudioAdapter.log\" using 3 title \"Producer interrupt period\" with dots\n");
         fprintf(file, "unset multiplot\n");
         fprintf(file, "unset output\n");
 
@@ -97,8 +97,8 @@ namespace Jack
         fprintf(file, "set xlabel \"audio cycles\"\n");
         fprintf(file, "set ylabel \"resampling ratio\"\n");
         fprintf(file, "plot ");
-        fprintf(file, "\"JackAudioAdapter.log\" using 4 title \"Ratio 1\" with lines,");
-        fprintf(file, "\"JackAudioAdapter.log\" using 5 title \"Ratio 2\" with lines");
+        fprintf(file, "\"JackAudioAdapter.log\" using 4 title \"Ratio 1\" with dots,");
+        fprintf(file, "\"JackAudioAdapter.log\" using 5 title \"Ratio 2\" with dots");
 
         fprintf(file, "\n unset multiplot\n");
         fprintf(file, "set output 'AdapterTiming2.svg\n");
@@ -111,8 +111,8 @@ namespace Jack
         fprintf(file, "set xlabel \"audio cycles\"\n");
         fprintf(file, "set ylabel \"resampling ratio\"\n");
         fprintf(file, "plot ");
-        fprintf(file, "\"JackAudioAdapter.log\" using 4 title \"Ratio 1\" with lines,");
-        fprintf(file, "\"JackAudioAdapter.log\" using 5 title \"Ratio 2\" with lines\n");
+        fprintf(file, "\"JackAudioAdapter.log\" using 4 title \"Ratio 1\" with dots,");
+        fprintf(file, "\"JackAudioAdapter.log\" using 5 title \"Ratio 2\" with dots\n");
         fprintf(file, "unset multiplot\n");
         fprintf(file, "unset output\n");
 
@@ -127,8 +127,8 @@ namespace Jack
          fprintf(file, "set xlabel \"audio cycles\"\n");
         fprintf(file, "set ylabel \"frames\"\n");
         fprintf(file, "plot ");
-        fprintf(file, "\"JackAudioAdapter.log\" using 6 title \"Frames position in consumer ringbuffer\" with lines,");
-        fprintf(file, "\"JackAudioAdapter.log\" using 7 title \"Frames position in producer ringbuffer\" with lines");
+        fprintf(file, "\"JackAudioAdapter.log\" using 6 title \"Frames position in consumer ringbuffer\" with dots,");
+        fprintf(file, "\"JackAudioAdapter.log\" using 7 title \"Frames position in producer ringbuffer\" with dots");
 
         fprintf(file, "\n unset multiplot\n");
         fprintf(file, "set output 'AdapterTiming3.svg\n");
@@ -141,8 +141,8 @@ namespace Jack
         fprintf(file, "set xlabel \"audio cycles\"\n");
         fprintf(file, "set ylabel \"frames\"\n");
         fprintf(file, "plot ");
-        fprintf(file, "\"JackAudioAdapter.log\" using 6 title \"Frames position in consumer ringbuffer\" with lines,");
-        fprintf(file, "\"JackAudioAdapter.log\" using 7 title \"Frames position in producer ringbuffer\" with lines\n");
+        fprintf(file, "\"JackAudioAdapter.log\" using 6 title \"Frames position in consumer ringbuffer\" with dots,");
+        fprintf(file, "\"JackAudioAdapter.log\" using 7 title \"Frames position in producer ringbuffer\" with dots\n");
         fprintf(file, "unset multiplot\n");
         fprintf(file, "unset output\n");
 
@@ -173,9 +173,11 @@ namespace Jack
 
         for (int i = 0; i < fCaptureChannels; i++) {
             fCaptureRingBuffer[i]->Reset(fRingbufferCurSize);
+            fPIControllerCapture[i]->Reset();
         }
         for (int i = 0; i < fPlaybackChannels; i++) {
             fPlaybackRingBuffer[i]->Reset(fRingbufferCurSize);
+            fPIControllerPlayback[i]->Reset();
         }
     }
 
@@ -191,9 +193,11 @@ namespace Jack
 #else
     void JackAudioAdapterInterface::Create()
     {
-        //ringbuffers
         fCaptureRingBuffer = new JackResampler*[fCaptureChannels];
+        fPIControllerCapture = new JackPIController*[fCaptureChannels];
+
         fPlaybackRingBuffer = new JackResampler*[fPlaybackChannels];
+        fPIControllerPlayback = new JackPIController*[fPlaybackChannels];
 
         if (fAdaptative) {
             AdaptRingBufferSize();
@@ -205,13 +209,22 @@ namespace Jack
             jack_info("Fixed ringbuffer size = %d frames", fRingbufferCurSize);
         }
 
+        if (fResampleRatioPerChannel){
+            jack_info("Resample ratio tracked independently for each capture and playback channel");
+        } else {
+            jack_info("Shared resample ratio tracking for all capture and playback channels");
+        }
+
+
         for (int i = 0; i < fCaptureChannels; i++ ) {
             fCaptureRingBuffer[i] = new JackLibSampleRateResampler(fQuality);
             fCaptureRingBuffer[i]->Reset(fRingbufferCurSize);
+            fPIControllerCapture[i] = new JackPIController(double(fHostSampleRate) / double(fAdaptedSampleRate));
         }
         for (int i = 0; i < fPlaybackChannels; i++ ) {
             fPlaybackRingBuffer[i] = new JackLibSampleRateResampler(fQuality);
             fPlaybackRingBuffer[i]->Reset(fRingbufferCurSize);
+            fPIControllerPlayback[i] = new JackPIController(double(fHostSampleRate) / double(fAdaptedSampleRate));
         }
 
         if (fCaptureChannels > 0) {
@@ -227,40 +240,79 @@ namespace Jack
     {
         for (int i = 0; i < fCaptureChannels; i++) {
             delete(fCaptureRingBuffer[i]);
+            delete(fPIControllerCapture[i]);
         }
         for (int i = 0; i < fPlaybackChannels; i++) {
             delete (fPlaybackRingBuffer[i]);
+            delete(fPIControllerPlayback[i]);
         }
 
         delete[] fCaptureRingBuffer;
+        delete [] fPIControllerCapture;
         delete[] fPlaybackRingBuffer;
+        delete [] fPIControllerPlayback;
+    }
+
+    double JackAudioAdapterInterface::GetSharedRatio(int delta_frames)
+    {
+        if (0 < fCaptureChannels) {
+            return fPIControllerCapture[0]->GetRatio(fCaptureRingBuffer[0]->GetReadBalance() - delta_frames);
+        }
+        else if (0 < fPlaybackChannels) {
+            return fPIControllerPlayback[0]->GetRatio(fPlaybackRingBuffer[0]->GetReadBalance() - delta_frames);
+        }
+        return 1;
     }
 
     int JackAudioAdapterInterface::PushAndPull(float** inputBuffer, float** outputBuffer, unsigned int frames)
     {
+        // Most of the time we can use a shared ratio calculated on a single input or output channel ringbuffer and apply this ratio also to all other channels.
+        // In some situations we see that there is a drift between the channels coming from or going to the same device.
+        // On those devices we need to activate the fResampleRatioPerChannel option so that every channel will calculate and keep track of its own resample ratio
+        // in order to keep his ringbuffer in a good balance which is half used for reading and half used for writing.
+        // Not using this option when it is needed will result in buffer errors followed by resets for all the buffers.
+        // cfr. https://github.com/jackaudio/jack2/issues/534
+
         bool failure = false;
         fRunning = true;
 
         // Finer estimation of the position in the ringbuffer
         int delta_frames = (fPullAndPushTime > 0) ? (int)((float(long(GetMicroSeconds() - fPullAndPushTime)) * float(fAdaptedSampleRate)) / 1000000.f) : 0;
 
-        double ratio = 1;
-
-        // TODO : done like this just to avoid crash when input only or output only...
-        if (fCaptureChannels > 0) {
-            ratio = fPIControler.GetRatio(fCaptureRingBuffer[0]->GetError() - delta_frames);
-        } else if (fPlaybackChannels > 0) {
-            ratio = fPIControler.GetRatio(fPlaybackRingBuffer[0]->GetError() - delta_frames);
+        double ratioC[fCaptureChannels];
+        double ratioP[fPlaybackChannels];
+        if(!fResampleRatioPerChannel) {
+            double shared_ratio = GetSharedRatio(delta_frames);
+            for (int i = 0; i < fCaptureChannels; i++) {
+                ratioC[i] = shared_ratio;
+            }
+            for (int i = 0; i < fPlaybackChannels; i++) {
+                ratioP[i] = shared_ratio;
+            }
+#ifdef JACK_MONITOR
+            if (fCaptureRingBuffer && fCaptureRingBuffer[0] != NULL) {
+                fTable.Write(fCaptureRingBuffer[0]->GetReadBalance(), fCaptureRingBuffer[0]->GetReadBalance() - delta_frames, shared_ratio, 1/shared_ratio, fCaptureRingBuffer[0]->ReadSpace(), fCaptureRingBuffer[0]->ReadSpace());
+            }
+#endif // JACK_MONITOR
+        }
+        else {
+            for (int i = 0; i < fCaptureChannels; i++) {
+                ratioC[i] = fPIControllerCapture[i]->GetRatio(fCaptureRingBuffer[i]->GetReadBalance() - delta_frames);
+            }
+            for (int i = 0; i < fPlaybackChannels; i++) {
+                ratioP[i] = fPIControllerPlayback[i]->GetRatio(fPlaybackRingBuffer[i]->GetWriteBalance() + delta_frames);
+            }
+#ifdef JACK_MONITOR
+            if (fCaptureRingBuffer && fCaptureRingBuffer[0] != NULL) {
+                fTable.Write(fCaptureRingBuffer[0]->GetReadBalance(), fCaptureRingBuffer[0]->GetReadBalance() - delta_frames, ratioC[0], 1/ratioC[0], fCaptureRingBuffer[0]->ReadSpace(), fCaptureRingBuffer[0]->ReadSpace());
+            }
+#endif // JACK_MONITOR
         }
 
-    #ifdef JACK_MONITOR
-        if (fCaptureRingBuffer && fCaptureRingBuffer[0] != NULL)
-            fTable.Write(fCaptureRingBuffer[0]->GetError(), fCaptureRingBuffer[0]->GetError() - delta_frames, ratio, 1/ratio, fCaptureRingBuffer[0]->ReadSpace(), fCaptureRingBuffer[0]->ReadSpace());
-    #endif
 
         // Push/pull from ringbuffer
         for (int i = 0; i < fCaptureChannels; i++) {
-            fCaptureRingBuffer[i]->SetRatio(ratio);
+            fCaptureRingBuffer[i]->SetRatio(ratioC[i]);
             if (inputBuffer[i]) {
                 if (fCaptureRingBuffer[i]->WriteResample(inputBuffer[i], frames) < frames) {
                     failure = true;
@@ -269,7 +321,7 @@ namespace Jack
         }
 
         for (int i = 0; i < fPlaybackChannels; i++) {
-            fPlaybackRingBuffer[i]->SetRatio(1/ratio);
+            fPlaybackRingBuffer[i]->SetRatio(1 / ratioP[i]);
             if (outputBuffer[i]) {
                 if (fPlaybackRingBuffer[i]->ReadResample(outputBuffer[i], frames) < frames) {
                      failure = true;
@@ -347,14 +399,32 @@ namespace Jack
     int JackAudioAdapterInterface::SetHostSampleRate(jack_nframes_t sample_rate)
     {
         fHostSampleRate = sample_rate;
-        fPIControler.Init(double(fHostSampleRate) / double(fAdaptedSampleRate));
+        if (NULL != fPIControllerCapture) {
+            for (int i = 0; i < fCaptureChannels; i++) {
+                fPIControllerCapture[i]->Init(double(fHostSampleRate) / double(fAdaptedSampleRate));
+            }
+        }
+        if (NULL != fPIControllerPlayback) {
+            for (int i = 0; i < fPlaybackChannels; i++) {
+                fPIControllerPlayback[i]->Init(double(fHostSampleRate) / double(fAdaptedSampleRate));
+            }
+        }
         return 0;
     }
 
     int JackAudioAdapterInterface::SetAdaptedSampleRate(jack_nframes_t sample_rate)
     {
         fAdaptedSampleRate = sample_rate;
-        fPIControler.Init(double(fHostSampleRate) / double(fAdaptedSampleRate));
+        if (NULL != fPIControllerCapture) {
+            for (int i = 0; i < fCaptureChannels; i++) {
+                fPIControllerCapture[i]->Init(double(fHostSampleRate) / double(fAdaptedSampleRate));
+            }
+        }
+        if (NULL != fPIControllerPlayback) {
+            for (int i = 0; i < fPlaybackChannels; i++ ) {
+                fPIControllerPlayback[i]->Init(double(fHostSampleRate) / double(fAdaptedSampleRate));
+            }
+        }
         return 0;
     }
 
