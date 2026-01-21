@@ -29,7 +29,7 @@
 //#define DISABLE_SIGNAL_MAGIC
 
 #define DEFAULT_XDG_CONFIG "/.config"
-#define DEFAULT_XDG_LOG "/.log"
+#define DEFAULT_XDG_STATE "/.local/state"
 #define JACKDBUS_DIR "/jack"
 #define JACKDBUS_LOG "/jackdbus.log"
 #define JACKDBUS_CONF "/conf.xml"

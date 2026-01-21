@@ -694,7 +694,7 @@ pathname_cat(const char *pathname_a, const char *pathname_b)
 bool
 paths_init()
 {
-	const char *home_dir, *xdg_config_home, *xdg_log_home;
+    const char *home_dir;
     
     home_dir = getenv("HOME");
     if (home_dir == NULL)
@@ -703,26 +703,30 @@ paths_init()
         goto fail;
     }
 
-	xdg_config_home = getenv("XDG_CONFIG_HOME");
-	if (xdg_config_home == NULL)
-	{
-	    if (!(xdg_config_home = pathname_cat(home_dir, DEFAULT_XDG_CONFIG))) goto fail;
-	}
+    g_jackdbus_config_dir = getenv("XDG_CONFIG_HOME");
+    if (g_jackdbus_config_dir == NULL)
+    {
+        if (!(g_jackdbus_config_dir = pathname_cat(home_dir, DEFAULT_XDG_CONFIG))) goto fail;
+    }
 
-    if (!(xdg_log_home = pathname_cat(home_dir, DEFAULT_XDG_LOG))) goto fail;
+    g_jackdbus_log_dir = getenv("XDG_STATE_HOME");
+    if (g_jackdbus_log_dir == NULL)
+    {
+        if (!(g_jackdbus_log_dir = pathname_cat(home_dir, DEFAULT_XDG_STATE))) goto fail;
+    }
 
-	if (!(g_jackdbus_config_dir = pathname_cat(xdg_config_home, JACKDBUS_DIR))) goto fail;
-	if (!(g_jackdbus_log_dir = pathname_cat(xdg_log_home, JACKDBUS_DIR))) goto fail;
 
-    if (!ensure_dir_exist(xdg_config_home, 0700))
+    if (!ensure_dir_exist(g_jackdbus_config_dir, 0700))
     {
         goto fail;
     }
+    if (!(g_jackdbus_config_dir = pathname_cat(g_jackdbus_config_dir, JACKDBUS_DIR))) goto fail;
     
-    if (!ensure_dir_exist(xdg_log_home, 0700))
+    if (!ensure_dir_exist(g_jackdbus_log_dir, 0700))
     {
         goto fail;
     }
+    if (!(g_jackdbus_log_dir = pathname_cat(g_jackdbus_log_dir, JACKDBUS_DIR))) goto fail;
 
     if (!ensure_dir_exist(g_jackdbus_config_dir, 0700))
     {
