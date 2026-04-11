@@ -225,7 +225,7 @@ static OSStatus DisplayDeviceNames()
         UIname = NULL;
         err = AudioDeviceGetProperty(devices[i], 0, false, kAudioDevicePropertyDeviceUID, &size, &UIname);
         if (err == noErr) {
-            CFStringGetCString(UIname, internal_name, 256, CFStringGetSystemEncoding());
+            CFStringGetCString(UIname, internal_name, 256, kCFStringEncodingUTF8);
         } else {
             goto error;
         }
