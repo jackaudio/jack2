@@ -24,6 +24,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackSystemDeps.h"
 #include "JackConstants.h"
 
+#include <memory>
+
 #ifdef __CLIENTDEBUG__
 #include <iostream>
 #include <fstream>
@@ -40,8 +42,8 @@ struct JackGlobals {
     static jack_tls_key fRealTimeThread;
     static jack_tls_key fNotificationThread;
     static jack_tls_key fKeyLogFunction;
-    static JackMutex* fOpenMutex;
-    static JackMutex* fSynchroMutex;
+    static std::unique_ptr<JackMutex> fOpenMutex;
+    static std::unique_ptr<JackMutex> fSynchroMutex;
     static volatile bool fServerRunning;
     static JackClient* fClientTable[CLIENT_NUM];
     static bool fVerbose;
