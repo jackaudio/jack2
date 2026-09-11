@@ -33,8 +33,8 @@ static bool gKeyNotificationThreadInitialized = jack_tls_allocate_key(&JackGloba
 jack_tls_key JackGlobals::fKeyLogFunction;
 static bool fKeyLogFunctionInitialized = jack_tls_allocate_key(&JackGlobals::fKeyLogFunction);
 
-JackMutex* JackGlobals::fOpenMutex = new JackMutex();
-JackMutex* JackGlobals::fSynchroMutex = new JackMutex();
+std::unique_ptr<JackMutex> JackGlobals::fOpenMutex(new JackMutex());
+std::unique_ptr<JackMutex> JackGlobals::fSynchroMutex(new JackMutex());
 volatile bool JackGlobals::fServerRunning = false;
 JackClient* JackGlobals::fClientTable[CLIENT_NUM] = {};
 
