@@ -52,6 +52,28 @@ char *g_jackdbus_log_dir;
 size_t g_jackdbus_log_dir_len; /* without terminating '\0' char */
 int g_exit_command;
 DBusConnection *g_connection;
+static volatile sig_atomic_t g_exit_signal;
+
+static void
+jack_dbus_exit_signal_handler(int signal)
+{
+    g_exit_signal = signal;
+}
+
+static bool
+jack_dbus_setup_signals(void)
+{
+    struct sigaction action;
+
+    memset(&action, 0, sizeof(action));
+    sigemptyset(&action.sa_mask);
+    action.sa_handler = jack_dbus_exit_signal_handler;
+
+    return sigaction(SIGHUP, &action, NULL) == 0 &&
+        sigaction(SIGINT, &action, NULL) == 0 &&
+        sigaction(SIGQUIT, &action, NULL) == 0 &&
+        sigaction(SIGTERM, &action, NULL) == 0;
+}
 
 void
 jack_dbus_send_signal(
@@ -889,7 +911,12 @@ main (int argc, char **argv)
     }
 
 #if !defined(DISABLE_SIGNAL_MAGIC)
-    jackctl_setup_signals(0);
+    g_exit_signal = 0;
+    if (!jack_dbus_setup_signals())
+    {
+        ret = 1;
+        goto fail_uninit_log;
+    }
 #endif
 
     jack_set_error_function(jack_dbus_error_callback);
@@ -947,9 +974,14 @@ main (int argc, char **argv)
     jack_info("Listening for D-Bus messages");
 
     g_exit_command = FALSE;
-    while (!g_exit_command && dbus_connection_read_write_dispatch (g_connection, 200))
+    while (!g_exit_command && !g_exit_signal && dbus_connection_read_write_dispatch (g_connection, 200))
     {
         jack_controller_run(controller_ptr);
+    }
+
+    if (g_exit_signal)
+    {
+        jack_info("Controller received signal %d.", g_exit_signal);
     }
 
     jack_controller_destroy(controller_ptr);
