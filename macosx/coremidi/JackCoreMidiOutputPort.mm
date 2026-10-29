@@ -33,7 +33,7 @@ using Jack::JackCoreMidiOutputPort;
 JackCoreMidiOutputPort::JackCoreMidiOutputPort(double time_ratio,
                                                size_t max_bytes,
                                                size_t max_messages):
-    JackCoreMidiPort(time_ratio)
+    JackCoreMidiPort(time_ratio), stopping(false)
 {
     read_queue = new JackMidiBufferReadQueue();
     std::unique_ptr<JackMidiBufferReadQueue> read_queue_ptr(read_queue);
@@ -54,6 +54,8 @@ JackCoreMidiOutputPort::JackCoreMidiOutputPort(double time_ratio,
 
 JackCoreMidiOutputPort::~JackCoreMidiOutputPort()
 {
+    // the thread must be gone before the semaphore is closed
+    Stop();
     delete thread;
     sem_close(thread_queue_semaphore);
     sem_unlink(semaphore_name);
@@ -67,10 +69,18 @@ JackCoreMidiOutputPort::Execute()
     jack_midi_event_t *event = 0;
     MIDIPacketList *packet_list = (MIDIPacketList *) packet_buffer;
     for (;;) {
+        // Stop() sets this before waking the semaphore
+        if (stopping) {
+            break;
+        }
         MIDIPacket *packet = MIDIPacketListInit(packet_list);
         assert(packet);
         if (! event) {
             event = GetCoreMidiEvent(true);
+            if (! event) {
+                // woken by Stop(), or by a wake-up left over from a previous Stop()
+                continue;
+            }
         }
         jack_midi_data_t *data = event->buffer;
         jack_nframes_t send_frame = event->time;
@@ -227,6 +237,7 @@ JackCoreMidiOutputPort::Start()
 {
     bool result = thread->GetStatus() != JackThread::kIdle;
     if (! result) {
+        stopping = false;
         result = ! thread->StartSync();
         if (! result) {
             jack_error("JackCoreMidiOutputPort::Start - failed to start MIDI "
@@ -241,7 +252,10 @@ JackCoreMidiOutputPort::Stop()
 {
     bool result = thread->GetStatus() == JackThread::kIdle;
     if (! result) {
-        result = ! thread->Kill();
+        // Kill() does not make sem_wait() return, wake up the thread and wait for it
+        stopping = true;
+        sem_post(thread_queue_semaphore);
+        result = ! thread->Stop();
         if (! result) {
             jack_error("JackCoreMidiOutputPort::Stop - failed to stop MIDI "
                        "processing thread.");

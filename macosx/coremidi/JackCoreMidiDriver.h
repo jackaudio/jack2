@@ -27,6 +27,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackCoreMidiVirtualOutputPort.h"
 #include "JackMidiDriver.h"
 #include "JackThread.h"
+#include <atomic>
 
 namespace Jack {
 
@@ -63,6 +64,9 @@ namespace Jack {
         void Restart();
     
         JackThread fThread;    /*! Thread to execute the Process function */
+        CFRunLoopRef fRunLoop; // run loop of fThread
+        std::atomic<bool> fClosing; // set by Close(), makes fThread exit
+        std::atomic<bool> fStarted; // true once Start() is done
 
     public:
 
