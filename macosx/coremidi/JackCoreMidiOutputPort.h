@@ -20,6 +20,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackCoreMidiOutputPort__
 #define __JackCoreMidiOutputPort__
 
+#include <atomic>
 #include <semaphore.h>
 
 #include "JackCoreMidiPort.h"
@@ -49,6 +50,7 @@ namespace Jack {
         JackThread *thread;
         JackMidiAsyncQueue *thread_queue;
         sem_t *thread_queue_semaphore;
+        std::atomic<bool> stopping; // set by Stop(), makes the thread exit
 
     protected:
 

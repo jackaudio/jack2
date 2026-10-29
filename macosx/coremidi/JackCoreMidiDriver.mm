@@ -63,7 +63,7 @@ JackCoreMidiDriver::HandleNotificationEvent(const MIDINotification *message,
 JackCoreMidiDriver::JackCoreMidiDriver(const char *name, const char *alias,
                                        JackLockedEngine *engine,
                                        JackSynchro *table):
-    JackMidiDriver(name, alias, engine, table),fThread(this)
+    JackMidiDriver(name, alias, engine, table),fThread(this),fRunLoop(NULL),fClosing(false),fStarted(false)
 {
     mach_timebase_info_data_t info;
     kern_return_t result = mach_timebase_info(&info);
@@ -91,6 +91,8 @@ JackCoreMidiDriver::~JackCoreMidiDriver()
 
 bool JackCoreMidiDriver::Init()
 {
+    // needed to stop the run loop in Close()
+    fRunLoop = CFRunLoopGetCurrent();
     return OpenAux();
 }
 
@@ -340,7 +342,14 @@ bool JackCoreMidiDriver::OpenAux()
 
 bool JackCoreMidiDriver::Execute()
 {
-    CFRunLoopRun();
+    // CFRunLoopRun() cannot be cancelled, run in short slices and check fClosing
+    while (!fClosing) {
+        SInt32 result = CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.1, false);
+        if (result == kCFRunLoopRunFinished) {
+            // nothing attached to the run loop, do not spin
+            JackSleep(100000);
+        }
+    }
     return false;
 }
 
@@ -451,7 +460,13 @@ JackCoreMidiDriver::Attach()
 int
 JackCoreMidiDriver::Close()
 {
-    fThread.Kill();
+    // Kill() cannot interrupt the run loop, stop it and wait for the thread
+    fClosing = true;
+    if (fRunLoop) {
+        CFRunLoopStop(fRunLoop);
+    }
+    fThread.Stop();
+    fRunLoop = NULL;
     return CloseAux();
 }
 
@@ -552,6 +567,11 @@ JackCoreMidiDriver::Restart()
 void
 JackCoreMidiDriver::HandleNotification(const MIDINotification *message)
 {
+    // ignore changes while closing, and while starting as a restart would race with Attach()
+    if (fClosing || !fStarted) {
+        return;
+    }
+
     switch (message->messageID) {
 
         case kMIDIMsgObjectAdded: {
@@ -598,6 +618,7 @@ JackCoreMidiDriver::Open(bool capturing_aux, bool playing_aux, int in_channels_a
     capture_latency = capture_latency_aux;
     playback_latency = playback_latency_aux;
 
+    fClosing = false;
     fThread.StartSync();
 
     int count = 0;
@@ -672,6 +693,7 @@ JackCoreMidiDriver::Start()
 
     jack_info("JackCoreMidiDriver::Start - Driver started.");
 
+    fStarted = true;
     return 0;
 
  stop_virtual_output_ports:
@@ -711,6 +733,7 @@ JackCoreMidiDriver::Stop()
 {
     int result = 0;
 
+    fStarted = false;
     JackMidiDriver::Stop();
 
     jack_info("JackCoreMidiDriver::Stop - disabling physical input ports.");
