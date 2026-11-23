@@ -746,6 +746,10 @@ int JackEngine::ClientCloseAux(int refnum, bool wait)
     jack_uuid_t uuid = JACK_UUID_EMPTY_INITIALIZER;
     jack_uuid_copy (&uuid, client->GetClientControl()->fSessionID);
 
+    // Release what a client process that died left in the metadata store,
+    // a lock it still held would block RemoveProperties() below forever
+    fMetadata.ReclaimDeadClients();
+
     // Unregister all ports ==> notifications are sent
     jack_int_t ports[PORT_NUM_FOR_CLIENT];
     int i;

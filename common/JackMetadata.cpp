@@ -26,6 +26,14 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <limits.h>
+#ifndef WIN32
+#include <errno.h>
+#include <signal.h>
+#include <stdio.h>
+#endif
+
+/* upper bound on threads tracked in the DB environment, needed by failchk */
+#define JACK_METADATA_THREAD_COUNT 64
 
 
 #define JACK_METADATA_PREFIX "http://jackaudio.org/metadata/"
@@ -43,6 +51,30 @@ LIB_EXPORT const char* JACK_METADATA_SIGNAL_TYPE = JACK_METADATA_PREFIX "signal-
 
 namespace Jack
 {
+
+#if HAVE_DB && !defined(WIN32)
+/* tells libdb whether a process that has the environment open is still running */
+static int jack_metadata_is_alive(DB_ENV* dbenv, pid_t pid, db_threadid_t tid, u_int32_t flags)
+{
+#ifdef __linux__
+    /* a client that died is a zombie until its parent reaps it, and a
+       zombie still answers kill() */
+    char path[64];
+    char line[512];
+    FILE* file;
+
+    snprintf (path, sizeof(path), "/proc/%d/stat", (int)pid);
+    if ((file = fopen (path, "r")) != NULL) {
+        char* state = fgets (line, sizeof(line), file) ? strrchr (line, ')') : NULL;
+        fclose (file);
+        if (state && state[1] == ' ') {
+            return (state[2] != 'Z' && state[2] != 'X');
+        }
+    }
+#endif
+    return (kill (pid, 0) == 0 || errno == EPERM);
+}
+#endif
 
 JackMetadata::JackMetadata(bool isEngine)
 #if HAVE_DB
@@ -108,13 +140,21 @@ int JackMetadata::PropertyInit()
     mkdir (dbpath, S_IRWXU | S_IRWXG);
 #endif
 
-    if ((ret = OpenEnvironment (dbpath)) != 0) {
+    ret = OpenEnvironment (dbpath, true);
+#ifndef WIN32
+    if (ret == EINVAL && !fIsEngine) {
+        /* the environment was created by a server that does not track
+           the processes using it, join it as it is */
+        ret = OpenEnvironment (dbpath, false);
+    }
+#endif
+    if (ret != 0) {
 #if defined(WIN32) || defined(__APPLE__)
         // new versions of jack2 are built with HAVE_MIXED_SIZE_ADDRESSING, which induces this error, this is expected
         if (ret == DB_VERSION_MISMATCH) {
             jack_error ("Failed to open previous DB environment, trying again clean...");
             RemoveDBFiles();
-            ret = OpenEnvironment (dbpath);
+            ret = OpenEnvironment (dbpath, true);
         }
 #endif
         if (ret != 0) {
@@ -148,7 +188,7 @@ int JackMetadata::PropertyInit()
 }
 
 #if HAVE_DB
-int JackMetadata::OpenEnvironment(const char* home)
+int JackMetadata::OpenEnvironment(const char* home, bool track)
 {
     int ret;
 
@@ -157,6 +197,17 @@ int JackMetadata::OpenEnvironment(const char* home)
         fDBenv = NULL;
         return ret;
     }
+
+#ifndef WIN32
+    /* track the processes using the environment, so that the server can
+       release what a client that died without closing it still holds */
+    if (track) {
+        fDBenv->set_thread_count (fDBenv, JACK_METADATA_THREAD_COUNT);
+        if (fIsEngine) {
+            fDBenv->set_isalive (fDBenv, jack_metadata_is_alive);
+        }
+    }
+#endif
 
     if ((ret = fDBenv->open (fDBenv, home, DB_CREATE | DB_INIT_LOCK | DB_INIT_MPOOL | DB_THREAD, 0)) != 0) {
         /* a handle whose open failed cannot be used again */
@@ -179,6 +230,32 @@ void JackMetadata::RemoveDBFiles()
     }
 }
 #endif
+
+void JackMetadata::ReclaimDeadClients()
+{
+#if HAVE_DB && !defined(WIN32)
+    int ret;
+
+    /* each client process allocates mutexes in the shared environment;
+       one that exits without closing it leaves them allocated, and once
+       the mutex region is full no client can open the metadata store */
+    if (fDBenv && fIsEngine && (ret = fDBenv->failchk (fDBenv, 0)) != 0) {
+        jack_error ("Cannot release metadata resources of dead clients: %s", db_strerror (ret));
+
+        if (ret == DB_RUNRECOVERY) {
+            /* a client died inside libdb, holding locks or mutexes that
+               cannot be released: any further access to this environment,
+               closing our handles included, would wait for them forever.
+               Abandon the handles and start a new, empty store */
+            jack_error ("Starting a new metadata store");
+            fDB = NULL;
+            fDBenv = NULL;
+            RemoveDBFiles();
+            PropertyInit();
+        }
+    }
+#endif
+}
 
 int JackMetadata::PropertyChangeNotify(JackClient* client, jack_uuid_t subject, const char* key, jack_property_change_t change)
 {
