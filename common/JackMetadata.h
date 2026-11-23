@@ -97,6 +97,9 @@ class JackMetadata
 
     #if HAVE_DB
         void MakeKeyDbt(DBT* dbt, jack_uuid_t subject, const char* key);
+        int OpenEnvironment(const char* home, bool track);
+        int OpenStore(const char* home, bool track);
+        void RemoveDBFiles();
     #endif
 
     public:
@@ -117,6 +120,8 @@ class JackMetadata
         int RemoveProperty(JackClient* client, jack_uuid_t subject, const char* key);
         int RemoveProperties(JackClient* client, jack_uuid_t subject);
         int RemoveAllProperties(JackClient* client);
+
+        void ReclaimDeadClients();
 
 };
 
