@@ -69,17 +69,7 @@ JackMetadata::~JackMetadata()
     if (fIsEngine)
     {
         // cleanup after libdb, nasty!
-        snprintf (dbpath, sizeof(dbpath), "%s/jack_db-%d/metadata.db", fDBFilesDir, JackTools::GetUID());
-        remove (dbpath);
-
-        snprintf (dbpath, sizeof(dbpath), "%s/jack_db-%d/__db.001", fDBFilesDir, JackTools::GetUID());
-        remove (dbpath);
-
-        snprintf (dbpath, sizeof(dbpath), "%s/jack_db-%d/__db.002", fDBFilesDir, JackTools::GetUID());
-        remove (dbpath);
-
-        snprintf (dbpath, sizeof(dbpath), "%s/jack_db-%d/__db.003", fDBFilesDir, JackTools::GetUID());
-        remove (dbpath);
+        RemoveDBFiles();
 
         // remove our custom dir
         snprintf (dbpath, sizeof(dbpath), "%s/jack_db-%d", fDBFilesDir, JackTools::GetUID());
@@ -111,11 +101,6 @@ int JackMetadata::PropertyInit()
         return 0;
     }
 
-    if ((ret = db_env_create (&fDBenv, 0)) != 0) {
-        jack_error ("cannot initialize DB environment: %s\n", db_strerror (ret));
-        return -1;
-    }
-
     snprintf (dbpath, sizeof(dbpath), "%s/jack_db-%d", fDBFilesDir, JackTools::GetUID());
 #ifdef WIN32
     mkdir (dbpath);
@@ -123,33 +108,17 @@ int JackMetadata::PropertyInit()
     mkdir (dbpath, S_IRWXU | S_IRWXG);
 #endif
 
-    if ((ret = fDBenv->open (fDBenv, dbpath, DB_CREATE | DB_INIT_LOCK | DB_INIT_MPOOL | DB_THREAD, 0)) != 0) {
+    if ((ret = OpenEnvironment (dbpath)) != 0) {
 #if defined(WIN32) || defined(__APPLE__)
         // new versions of jack2 are built with HAVE_MIXED_SIZE_ADDRESSING, which induces this error, this is expected
         if (ret == DB_VERSION_MISMATCH) {
             jack_error ("Failed to open previous DB environment, trying again clean...");
-
-            // cleanup old stuff
-            snprintf (dbpath, sizeof(dbpath), "%s/jack_db-%d/metadata.db", fDBFilesDir, JackTools::GetUID());
-            remove (dbpath);
-
-            snprintf (dbpath, sizeof(dbpath), "%s/jack_db-%d/__db.001", fDBFilesDir, JackTools::GetUID());
-            remove (dbpath);
-
-            snprintf (dbpath, sizeof(dbpath), "%s/jack_db-%d/__db.002", fDBFilesDir, JackTools::GetUID());
-            remove (dbpath);
-
-            snprintf (dbpath, sizeof(dbpath), "%s/jack_db-%d/__db.003", fDBFilesDir, JackTools::GetUID());
-            remove (dbpath);
-
-            // try again fresh
-            ret = fDBenv->open (fDBenv, dbpath, DB_CREATE | DB_INIT_LOCK | DB_INIT_MPOOL | DB_THREAD, 0);
+            RemoveDBFiles();
+            ret = OpenEnvironment (dbpath);
         }
-        if (ret != 0)
 #endif
-        {
+        if (ret != 0) {
             jack_error ("Cannot open DB environment: %s", db_strerror (ret));
-            fDBenv = NULL;
             return -1;
         }
     }
@@ -177,6 +146,39 @@ int JackMetadata::PropertyInit()
     return -1;
 #endif
 }
+
+#if HAVE_DB
+int JackMetadata::OpenEnvironment(const char* home)
+{
+    int ret;
+
+    if ((ret = db_env_create (&fDBenv, 0)) != 0) {
+        jack_error ("cannot initialize DB environment: %s\n", db_strerror (ret));
+        fDBenv = NULL;
+        return ret;
+    }
+
+    if ((ret = fDBenv->open (fDBenv, home, DB_CREATE | DB_INIT_LOCK | DB_INIT_MPOOL | DB_THREAD, 0)) != 0) {
+        /* a handle whose open failed cannot be used again */
+        fDBenv->close (fDBenv, 0);
+        fDBenv = NULL;
+        return ret;
+    }
+
+    return 0;
+}
+
+void JackMetadata::RemoveDBFiles()
+{
+    static const char* const files[] = { "metadata.db", "__db.001", "__db.002", "__db.003" };
+    char dbpath[PATH_MAX + 1];
+
+    for (size_t i = 0; i < sizeof(files) / sizeof(files[0]); i++) {
+        snprintf (dbpath, sizeof(dbpath), "%s/jack_db-%d/%s", fDBFilesDir, JackTools::GetUID(), files[i]);
+        remove (dbpath);
+    }
+}
+#endif
 
 int JackMetadata::PropertyChangeNotify(JackClient* client, jack_uuid_t subject, const char* key, jack_property_change_t change)
 {
