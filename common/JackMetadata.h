@@ -98,6 +98,7 @@ class JackMetadata
     #if HAVE_DB
         void MakeKeyDbt(DBT* dbt, jack_uuid_t subject, const char* key);
         int OpenEnvironment(const char* home, bool track);
+        int OpenStore(const char* home, bool track);
         void RemoveDBFiles();
     #endif
 

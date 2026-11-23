@@ -26,10 +26,10 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <limits.h>
-#ifndef WIN32
 #include <errno.h>
-#include <signal.h>
 #include <stdio.h>
+#ifndef WIN32
+#include <signal.h>
 #endif
 
 /* upper bound on threads tracked in the DB environment, needed by failchk */
@@ -140,44 +140,36 @@ int JackMetadata::PropertyInit()
     mkdir (dbpath, S_IRWXU | S_IRWXG);
 #endif
 
-    ret = OpenEnvironment (dbpath, true);
+    ret = OpenStore (dbpath, true);
 #ifndef WIN32
-    if (ret == EINVAL && !fIsEngine) {
+    if (ret == EINVAL) {
         /* the environment was created by a server that does not track
            the processes using it, join it as it is */
-        ret = OpenEnvironment (dbpath, false);
+        ret = OpenStore (dbpath, false);
     }
 #endif
     if (ret != 0) {
+        bool clean = false;
 #if defined(WIN32) || defined(__APPLE__)
         // new versions of jack2 are built with HAVE_MIXED_SIZE_ADDRESSING, which induces this error, this is expected
-        if (ret == DB_VERSION_MISMATCH) {
-            jack_error ("Failed to open previous DB environment, trying again clean...");
-            RemoveDBFiles();
-            ret = OpenEnvironment (dbpath, true);
-        }
+        clean = (ret == DB_VERSION_MISMATCH);
 #endif
-        if (ret != 0) {
-            jack_error ("Cannot open DB environment: %s", db_strerror (ret));
+#ifndef WIN32
+        /* the server starts over only with an environment that no process
+           can use any more: one left half created by a process killed
+           while creating it (EAGAIN, once libdb gave up waiting for its
+           creator), one whose mutex region is full (ENOMEM), and one a
+           process died inside of (DB_RUNRECOVERY) */
+        clean = clean || (fIsEngine && (ret == EAGAIN || ret == ENOMEM || ret == DB_RUNRECOVERY));
+#endif
+        if (!clean) {
             return -1;
         }
-    }
-
-    if ((ret = db_create (&fDB, fDBenv, 0)) != 0) {
-        jack_error ("Cannot initialize metadata DB (%s)", db_strerror (ret));
-        fDBenv->close (fDBenv, 0);
-        fDBenv = NULL;
-        return -1;
-    }
-
-    snprintf (dbpath, sizeof(dbpath), "%s/jack_db-%d/metadata.db", fDBFilesDir, JackTools::GetUID());
-    if ((ret = fDB->open (fDB, NULL, dbpath, NULL, DB_HASH, DB_CREATE | DB_THREAD, 0666)) != 0) {
-        jack_error ("Cannot open metadata DB at %s: %s", dbpath, db_strerror (ret));
-        fDB->close (fDB, 0);
-        fDB = NULL;
-        fDBenv->close (fDBenv, 0);
-        fDBenv = NULL;
-        return -1;
+        jack_error ("Failed to open previous DB environment, trying again clean...");
+        RemoveDBFiles();
+        if (OpenStore (dbpath, true) != 0) {
+            return -1;
+        }
     }
 
     return 0;
@@ -216,6 +208,49 @@ int JackMetadata::OpenEnvironment(const char* home, bool track)
         return ret;
     }
 
+#ifndef WIN32
+    /* a server that was killed leaves what its clients held, and what it
+       held itself, in the environment the next server finds */
+    if (track && fIsEngine && (ret = fDBenv->failchk (fDBenv, 0)) == DB_RUNRECOVERY) {
+        /* a process died inside libdb, closing would wait for it forever */
+        fDBenv = NULL;
+        return ret;
+    }
+#endif
+
+    return 0;
+}
+
+int JackMetadata::OpenStore(const char* home, bool track)
+{
+    int ret;
+    char dbpath[PATH_MAX + 1];
+
+    if ((ret = OpenEnvironment (home, track)) != 0) {
+        if (!(track && ret == EINVAL)) {
+            // EINVAL: created without thread tracking, the caller joins it untracked
+            jack_error ("Cannot open DB environment: %s", db_strerror (ret));
+        }
+        return ret;
+    }
+
+    if ((ret = db_create (&fDB, fDBenv, 0)) != 0) {
+        jack_error ("Cannot initialize metadata DB (%s)", db_strerror (ret));
+        fDBenv->close (fDBenv, 0);
+        fDBenv = NULL;
+        return ret;
+    }
+
+    snprintf (dbpath, sizeof(dbpath), "%s/metadata.db", home);
+    if ((ret = fDB->open (fDB, NULL, dbpath, NULL, DB_HASH, DB_CREATE | DB_THREAD, 0666)) != 0) {
+        jack_error ("Cannot open metadata DB at %s: %s", dbpath, db_strerror (ret));
+        fDB->close (fDB, 0);
+        fDB = NULL;
+        fDBenv->close (fDBenv, 0);
+        fDBenv = NULL;
+        return ret;
+    }
+
     return 0;
 }
 
@@ -239,7 +274,12 @@ void JackMetadata::ReclaimDeadClients()
     /* each client process allocates mutexes in the shared environment;
        one that exits without closing it leaves them allocated, and once
        the mutex region is full no client can open the metadata store */
-    if (fDBenv && fIsEngine && (ret = fDBenv->failchk (fDBenv, 0)) != 0) {
+    u_int32_t threads = 0;
+
+    if (fDBenv) {
+        fDBenv->get_thread_count (fDBenv, &threads);
+    }
+    if (threads && fIsEngine && (ret = fDBenv->failchk (fDBenv, 0)) != 0) {
         jack_error ("Cannot release metadata resources of dead clients: %s", db_strerror (ret));
 
         if (ret == DB_RUNRECOVERY) {
